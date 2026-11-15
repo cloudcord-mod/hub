@@ -19,3 +19,8 @@ html.cc-game-mode-cosmetics [class*="nameplate"] video,
 html.cc-game-mode-cosmetics [class*="nameplated"] video {
     display: none !important;
 }
+
+/* No GPU compositing layers kept alive for elements that might animate. */
+html.cc-game-mode * {
+    will-change: auto !important;
+}
