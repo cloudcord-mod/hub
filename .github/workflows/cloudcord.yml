@@ -1534,8 +1534,14 @@ jobs:
               const local = (settings as any).cloudcordLocalProfiles?.[id];
               const shared = sharedProfiles.get(id);
               if (!local) return shared;
-              return { ...(shared || {}), ...local, __localBadges: Object.prototype.hasOwnProperty.call(local, "badgeFlags") || Object.prototype.hasOwnProperty.call(local, "customBadgeIds") };
+              // Same merged object while neither side changed, so profile caches below stay valid.
+              const hit = mergedOverrides.get(id);
+              if (hit && hit.local === local && hit.shared === shared) return hit.value;
+              const value = { ...(shared || {}), ...local, __localBadges: Object.prototype.hasOwnProperty.call(local, "badgeFlags") || Object.prototype.hasOwnProperty.call(local, "customBadgeIds") };
+              mergedOverrides.set(id, { local, shared, value });
+              return value;
           }
+          const mergedOverrides = new Map<string, { local: any; shared: any; value: any }>();
 
           function refreshSharedProfiles() {
               if (AppState.currentState !== "active") return;
@@ -1599,8 +1605,19 @@ jobs:
               return cloned;
           }
 
+          // Same clone back while Discord's profile object and the shared data are unchanged.
+          // A new object on every render made profile screens re-render and re-run their
+          // effects over and over, which could run Android out of memory.
+          const sharedDecorations = new WeakMap<object, { data: any; userId: string; depth: number; value: any }>();
           function decorateSharedProfile(original: any, userId: string, data: any, depth = 0) {
               if (!original || typeof original !== "object" || !data) return original;
+              const hit = sharedDecorations.get(original);
+              if (hit && hit.data === data && hit.userId === userId && hit.depth === depth) return hit.value;
+              const value = decorateSharedProfileFresh(original, userId, data, depth);
+              try { sharedDecorations.set(original, { data, userId, depth, value }); } catch {}
+              return value;
+          }
+          function decorateSharedProfileFresh(original: any, userId: string, data: any, depth: number) {
               const cloned = Object.assign(Object.create(Object.getPrototypeOf(original) || Object.prototype), original);
               for (const [key, value] of Object.entries(nativeSocialProfile(original, data))) setOwnValue(cloned, key, value);
               for (const [key, value] of Object.entries(nativeProfileAppearance(data))) setOwnValue(cloned, key, value);
