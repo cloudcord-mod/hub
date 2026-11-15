@@ -953,6 +953,14 @@ function onPendingProfileChange(action: any) {
     try { showToast(isImageUri(banner) && isImageUri(avatar) ? "Saved as your CloudCord picture and banner." : isImageUri(banner) ? "Saved as your CloudCord banner." : "Saved as your CloudCord profile picture.", Toasts.Type.SUCCESS); } catch (e) { logger.warn("Showing save toast failed", e); }
 }
 
+/** Sets the CloudCord profile banner (seen by CloudCord users) and turns the custom profile on. False when Fake Profile isn't running. */
+export function setCloudCordBanner(uri: string) {
+    if (!profileRuntimeActive || !isImageUri(uri)) return false;
+    saveOwnData({ ...storedData, banner: uri, nitro: true }, true);
+    queueSharedPublish();
+    return true;
+}
+
 function queueSharedPublish() {
     if (publishTimer) clearTimeout(publishTimer);
     if (!profileRuntimeActive || storedData.localOnly) return;
