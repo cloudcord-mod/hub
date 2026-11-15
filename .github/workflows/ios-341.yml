@@ -105,6 +105,14 @@ jobs:
             --output cloudcord-diagnostics.ipa
           cmp dist/cc.js <(unzip -p cloudcord-diagnostics.ipa Payload/Discord.app/BunnyResources.bundle/runtime.js)
 
+      - name: Package standalone IPA (own bundle ID)
+        run: |
+          python3 ios/scripts/package-cloudcord-ipa.py             --discord-ipa Discord-344.1-base.ipa             --discord-version 344.1             --rain-loader ios/rain-original/RainTweak.dylib.b64             --rain-bootstrap CloudCordBootstrap.dylib             --runtime-js dist/cc.js             --bundle-id app.cloudcord.ios             --display-name CloudCord             --output cloudcord-standalone.ipa
+          unzip -p cloudcord-standalone.ipa Payload/Discord.app/Info.plist | grep -q '<string>app.cloudcord.ios</string>'
+          unzip -p cloudcord-standalone.ipa Payload/Discord.app/PlugIns/BroadcastUpload.appex/Info.plist | grep -q '<string>app.cloudcord.ios.'
+          if unzip -p cloudcord-standalone.ipa Payload/Discord.app/Info.plist | grep -q '<string>com.hammerandchisel.discord</string>'; then echo 'Standalone IPA still has Discord bundle ID'; exit 1; fi
+          cmp dist/cc.js <(unzip -p cloudcord-standalone.ipa Payload/Discord.app/BunnyResources.bundle/runtime.js)
+
       - name: Publish CloudCord iOS 344.1 test download
         uses: softprops/action-gh-release@v2
         with:
@@ -114,4 +122,5 @@ jobs:
           make_latest: false
           files: |
             cloudcord0.ipa
+            cloudcord-standalone.ipa
             cloudcord-diagnostics.ipa

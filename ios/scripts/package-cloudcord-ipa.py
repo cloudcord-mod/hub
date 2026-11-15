@@ -97,6 +97,25 @@ def add_discord_app_group(entitlements: bytes | None) -> bytes:
     return plistlib.dumps(values)
 
 
+def rebrand_bundle_ids(app: Path, bundle_id: str, display_name: str | None) -> None:
+    """Give the app and its extensions CloudCord's own IDs.
+
+    Extensions must keep the app's ID as their prefix, so each one swaps only
+    Discord's prefix. Entitlements are left alone: the sideload signer rewrites
+    them for the user's own team anyway.
+    """
+    original = plistlib.loads((app / "Info.plist").read_bytes())["CFBundleIdentifier"]
+    for plist_path in [app / "Info.plist", *(app / "PlugIns").glob("*.appex/Info.plist")]:
+        info = plistlib.loads(plist_path.read_bytes())
+        current = info.get("CFBundleIdentifier", "")
+        if current == original or current.startswith(original + "."):
+            info["CFBundleIdentifier"] = bundle_id + current[len(original):]
+        if plist_path.parent == app and display_name:
+            info["CFBundleDisplayName"] = display_name
+            info["CFBundleName"] = display_name
+        plist_path.write_bytes(plistlib.dumps(info))
+
+
 def extract_deb(deb: Path, destination: Path) -> tuple[list[Path], list[Path]]:
     raw = deb.read_bytes()
     if raw[:8] != b"!<arch>\n":
@@ -222,6 +241,8 @@ def main() -> None:
     parser.add_argument("--rain-bootstrap", type=Path)
     parser.add_argument("--runtime-js", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--bundle-id", help="Standalone build: replace Discord's bundle ID so CloudCord installs next to Discord")
+    parser.add_argument("--display-name", help="Home screen name for a standalone build")
     parser.add_argument("--startup-diagnostics", action="store_true", help="Expose local startup.txt through Files for testing")
     args = parser.parse_args()
 
@@ -240,6 +261,9 @@ def main() -> None:
             raise RuntimeError(
                 f"Expected Discord {args.discord_version}, got {info.get('CFBundleShortVersionString')}"
             )
+
+        if args.bundle_id:
+            rebrand_bundle_ids(discord_app, args.bundle_id, args.display_name)
 
         main_bundle = discord_app / "main.jsbundle"
         if not main_bundle.exists():
