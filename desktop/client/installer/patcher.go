@@ -82,10 +82,7 @@ type DiscordInstall struct {
 
 func KillDiscordProcess() {
 	if runtime.GOOS == "windows" {
-		_ = exec.Command("taskkill", "/F", "/IM", "Discord.exe", "/T").Run()
-		_ = exec.Command("taskkill", "/F", "/IM", "DiscordCanary.exe", "/T").Run()
-		_ = exec.Command("taskkill", "/F", "/IM", "DiscordPTB.exe", "/T").Run()
-		_ = exec.Command("taskkill", "/F", "/IM", "DiscordDevelopment.exe", "/T").Run()
+		killProcessesByName("Discord.exe", "DiscordCanary.exe", "DiscordPTB.exe", "DiscordDevelopment.exe")
 	}
 }
 

@@ -3,27 +3,39 @@ module sinlotl
 go 1.26.2
 
 require (
-	github.com/AllenDang/cimgui-go v1.3.2-0.20250409185506-6b2ff1aa26b5
-	github.com/AllenDang/giu v0.14.1
 	github.com/ProtonMail/go-appdir v1.1.0
 	github.com/fatih/color v1.19.0
 	github.com/manifoldco/promptui v0.9.0
+	github.com/wailsapp/wails/v2 v2.10.2
 	golang.org/x/sys v0.43.0
 )
 
 require (
-	github.com/AllenDang/go-findfont v0.0.0-20200702051237-9f180485aeb8 // indirect
+	github.com/bep/debounce v1.2.1 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
-	github.com/faiface/mainthread v0.0.0-20171120011319-8b78f0a41ae3 // indirect
-	github.com/gucio321/glm-go v0.0.0-20241029220517-e1b5a3e011c8 // indirect
+	github.com/go-ole/go-ole v1.3.0 // indirect
+	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
+	github.com/labstack/echo/v4 v4.13.3 // indirect
+	github.com/labstack/gommon v0.4.2 // indirect
+	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
+	github.com/leaanthony/gosod v1.0.4 // indirect
+	github.com/leaanthony/slicer v1.6.0 // indirect
+	github.com/leaanthony/u v1.1.1 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
-	github.com/mazznoer/csscolorparser v0.1.8 // indirect
-	github.com/napsy/go-css v1.0.0 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
-	github.com/sahilm/fuzzy v0.1.1 // indirect
-	golang.design/x/hotkey v0.4.1 // indirect
-	golang.design/x/mainthread v0.3.0 // indirect
-	golang.org/x/image v0.39.0 // indirect
-	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/samber/lo v1.49.1 // indirect
+	github.com/tkrajina/go-reflector v0.5.8 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasttemplate v1.2.2 // indirect
+	github.com/wailsapp/go-webview2 v1.0.19 // indirect
+	github.com/wailsapp/mimetype v1.4.1 // indirect
+	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 )

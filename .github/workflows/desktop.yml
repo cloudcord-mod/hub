@@ -45,16 +45,9 @@ jobs:
       - name: Check interrupted installer downloads
         run: go test desktop/client/installer/runtime_download.go desktop/client/installer/runtime_download_test.go desktop/client/installer/operation.go desktop/client/installer/operation_test.go
 
-      - name: Setup MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          path-type: inherit
-
-      - name: Install original Windows GUI dependencies
-        shell: msys2 {0}
-        run: |
-          pacman -S --noconfirm git mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2
-          go install github.com/tc-hib/go-winres@latest
+      - name: Install Windows resource tool
+        shell: bash
+        run: go install github.com/tc-hib/go-winres@v0.3.3
 
       - name: Verify required source files
         shell: bash
@@ -219,27 +212,17 @@ jobs:
 
       - name: Build Windows installer
         working-directory: desktop/client/installer
-        shell: msys2 {0}
+        shell: bash
         run: |
-          set +e
-          {
-            "$(go env GOPATH)/bin/go-winres" simply --icon winres/icon.png --manifest gui \
-              --product-version "git-tag" --file-version "git-tag" \
-              --product-name "CloudCord" --file-description "CloudCord Setup" \
-              --original-filename "CloudCordSetup.exe" &&
-            CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v -tags "static gui" \
-              -ldflags "-H=windowsgui -extldflags=-static -X 'sinlotl/buildinfo.InstallerGitHash=${{ github.sha }}' -X 'sinlotl/buildinfo.InstallerTag=cloudcord'" \
-              -o CloudCordSetup.exe . &&
-            CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v -tags "static gui" \
-              -ldflags "-H=windowsgui -extldflags=-static -X 'main.IsTestBuildStr=1' -X 'sinlotl/buildinfo.InstallerGitHash=${{ github.sha }}' -X 'sinlotl/buildinfo.InstallerTag=cloudcord-test'" \
-              -o CloudCordSetup-Test.exe .
-          } 2>&1 | tee installer-build.log
-          status=${PIPESTATUS[0]}
-          if [ "$status" -ne 0 ]; then
-            detail=$(tail -n 20 installer-build.log | tr '\n' ' ' | sed 's/%/%25/g;s/\r/%0D/g')
-            echo "::error title=Original installer build failed::$detail"
-            exit "$status"
-          fi
+          set -e
+          # Wails on Windows is pure Go (WebView2 is part of Windows), so no C toolchain
+          # or static MinGW linking is needed. Version info is stamped from the run number.
+          ver="1.0.${{ github.run_number }}.0"
+          sed -i "s/1\.0\.0\.0/$ver/g" winres/winres.json
+          "$(go env GOPATH)/bin/go-winres" make --in winres/winres.json
+          common="-H=windowsgui -X 'sinlotl/buildinfo.InstallerGitHash=${{ github.sha }}'"
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -tags "desktop,production"             -ldflags "$common -X 'sinlotl/buildinfo.InstallerTag=cloudcord'" -o CloudCordSetup.exe .
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath -tags "desktop,production"             -ldflags "$common -X 'main.IsTestBuildStr=1' -X 'sinlotl/buildinfo.InstallerTag=cloudcord-test'" -o CloudCordSetup-Test.exe .
 
       - name: Build Linux installer
         working-directory: desktop/client/installer
