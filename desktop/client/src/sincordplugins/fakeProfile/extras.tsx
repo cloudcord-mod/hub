@@ -83,7 +83,7 @@ function fakeMember(guildId: string, member: any) {
 
 interface CustomRole { id: string; name: string; color: string; hoist: boolean; emoji?: string; admin?: boolean; top?: boolean; }
 interface RoleTweak { name?: string; color?: string; emoji?: string; }
-interface BoostFake { name?: string; iconUrl?: string; level?: boolean; booster?: boolean; partner?: boolean; verified?: boolean; members?: number; online?: number; roles?: string[]; owner?: boolean; customRoles?: CustomRole[]; roleTweaks?: Record<string, RoleTweak>; }
+interface BoostFake { name?: string; iconUrl?: string; level?: boolean; boostCount?: number; booster?: boolean; partner?: boolean; verified?: boolean; members?: number; online?: number; roles?: string[]; owner?: boolean; customRoles?: CustomRole[]; roleTweaks?: Record<string, RoleTweak>; }
 interface Extras { fakeNitro?: boolean; giftCode?: string; giftPlan?: string; giftStyle?: number; boosts?: Record<string, BoostFake>; fakeRequests?: { id: string; user: any; since: string; }[]; fakeOrbs?: number; }
 
 function readExtras(): Extras {
@@ -261,6 +261,8 @@ function fakeFeatures(real: any, partner: boolean, verified: boolean) {
     return value;
 }
 function boostFor(guildId?: string | null) { return guildId ? extras.boosts?.[guildId] : undefined; }
+// Boost count → tier: 2 boosts completes level 1, 7 level 2, 14 level 3.
+function tierForBoosts(count: number) { return count >= 14 ? 3 : count >= 7 ? 2 : count >= 2 ? 1 : 0; }
 // Read-only overlays: Discord's stores keep their real data, we only change what's returned.
 // ---- Visual roles: your own roles and new names/colours/icons for real ones, only on this device ----
 const hexNumber = (hex?: string) => { const value = parseInt(String(hex || "").replace(/^#/, ""), 16); return Number.isFinite(value) ? value : 0; };
@@ -351,7 +353,7 @@ function installBoostHooks() {
     (GuildStore as any).getGuild = function (guildId: string, ...rest: unknown[]) {
         const guild = getGuild.call(this, guildId, ...rest);
         const fake = boostFor(guildId);
-        if (!guild || typeof guild !== "object" || overlaySet.has(guild) || !(fake?.name || fake?.iconUrl || fake?.level || fake?.partner || fake?.verified || fake?.owner || fake?.members != null || fake?.online != null)) return guild;
+        if (!guild || typeof guild !== "object" || overlaySet.has(guild) || !(fake?.name || fake?.iconUrl || fake?.level || fake?.boostCount != null || fake?.partner || fake?.verified || fake?.owner || fake?.members != null || fake?.online != null)) return guild;
         let overlay = guildOverlays.get(guild);
         if (!overlay) guildOverlays.set(guild, overlay = new Proxy(guild, {
             get: (target, key) => {
@@ -359,6 +361,8 @@ function installBoostHooks() {
                 if (now?.name && key === "name") return now.name;
                 // A placeholder icon hash makes Discord ask for the icon URL, which returns the chosen picture.
                 if (now?.iconUrl && key === "icon") return "cloudcord_custom";
+                if (now?.boostCount != null && key === "premiumTier") return tierForBoosts(now.boostCount);
+                if (now?.boostCount != null && key === "premiumSubscriberCount") return now.boostCount;
                 if (now?.level && key === "premiumTier") return 3;
                 if (now?.level && key === "premiumSubscriberCount") return Math.max(14, target.premiumSubscriberCount ?? 0);
                 if (now?.owner && key === "ownerId") return UserStore.getCurrentUser()?.id ?? target.ownerId;
@@ -566,7 +570,9 @@ function BoostSection() {
             </Grid2>
             <div className="cpx-inline"><button type="button" className="cpx-btn" onClick={() => sendFakeBoostMessage(times, reached)}>Send fake boost message</button></div>
             <span className="cpx-hint">Shows in the channel you have open and disappears when you switch channels or restart.</span>
-            <Switch label="Show this server as Level 3" description="Boost bar and perks look unlocked here. Real limits like upload size don't change." checked={fake.level === true} onChange={value => set({ level: value })} />
+            <label className="cpx-field"><span className="cpx-label">Server boosts</span><input className="cpx-input" type="number" min={0} placeholder="Real count" value={fake.boostCount ?? ""} onChange={event => { const text = event.currentTarget.value; set({ boostCount: text === "" ? undefined : Math.min(999999, Math.max(0, Math.floor(Number(text) || 0))) }); }} /></label>
+            <span className="cpx-hint">{fake.boostCount != null ? `Shows ${fake.boostCount} boosts and Level ${tierForBoosts(fake.boostCount)} completed. ` : ""}2 boosts completes level 1, 7 level 2, 14 level 3. Only on your screen.</span>
+            {fake.boostCount == null && <Switch label="Show this server as Level 3" description="Boost bar and perks look unlocked here. Real limits like upload size don't change." checked={fake.level === true} onChange={value => set({ level: value })} />}
             <Switch label="Show as a Partner server" description="Partner badge next to the server name and in invites." checked={fake.partner === true} onChange={value => set({ partner: value })} />
             <Switch label="Show as a Verified server" description="Verified check next to the server name." checked={fake.verified === true} onChange={value => set({ verified: value })} />
             <Grid2>

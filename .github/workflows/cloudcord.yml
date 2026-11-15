@@ -3260,8 +3260,10 @@ jobs:
           // ---- Fake boost (device only) ----
           type CustomRole = { id: string; name: string; color: string; hoist: boolean; emoji?: string; admin?: boolean; top?: boolean };
           type RoleTweak = { name?: string; color?: string; emoji?: string };
-          type BoostFake = { level?: boolean; booster?: boolean; partner?: boolean; verified?: boolean; members?: number; online?: number; roles?: string[]; owner?: boolean; customRoles?: CustomRole[]; roleTweaks?: Record<string, RoleTweak> };
+          type BoostFake = { level?: boolean; boostCount?: number; booster?: boolean; partner?: boolean; verified?: boolean; members?: number; online?: number; roles?: string[]; owner?: boolean; customRoles?: CustomRole[]; roleTweaks?: Record<string, RoleTweak> };
           function boostFor(guildId?: string | null): BoostFake | undefined { return guildId ? (extrasState() as any).boosts?.[guildId] : undefined; }
+          // Boost count → tier: 2 boosts completes level 1, 7 level 2, 14 level 3.
+          function tierForBoosts(count: number) { return count >= 14 ? 3 : count >= 7 ? 2 : count >= 2 ? 1 : 0; }
           const guildOverlays = new WeakMap<object, any>();
           const memberOverlays = new WeakMap<object, any>();
           // Our own overlays, so a guild that comes back through getGuild is never wrapped twice.
@@ -3535,10 +3537,12 @@ jobs:
                   try {
                   const guildId = args[0];
                   const fake = boostFor(guildId);
-                  if (!guild || typeof guild !== "object" || overlaySet.has(guild) || !(fake?.level || fake?.partner || fake?.verified || fake?.owner || fake?.members != null || fake?.online != null)) return guild;
+                  if (!guild || typeof guild !== "object" || overlaySet.has(guild) || !(fake?.level || fake?.boostCount != null || fake?.partner || fake?.verified || fake?.owner || fake?.members != null || fake?.online != null)) return guild;
                   let overlay = guildOverlays.get(guild);
                   if (!overlay) guildOverlays.set(guild, overlay = new Proxy(guild, { get: (target: any, key) => {
                       const now = boostFor(guildId);
+                      if (now?.boostCount != null && key === "premiumTier") return tierForBoosts(now.boostCount);
+                      if (now?.boostCount != null && key === "premiumSubscriberCount") return now.boostCount;
                       if (now?.level && key === "premiumTier") return 3;
                       if (now?.level && key === "premiumSubscriberCount") return Math.max(14, target.premiumSubscriberCount ?? 0);
                       if (now?.owner && key === "ownerId" && currentUserId) return currentUserId;
@@ -3610,7 +3614,8 @@ jobs:
                       <K.Field label="Boosts"><K.Chips options={[1, 2, 3, 5, 10].map(value => ({ value, label: value + "x" }))} value={times} onChange={(value: number) => setTimes(value)} /></K.Field>
                       <K.Field label="Message"><K.Chips options={[{ value: 0, label: "Just boosted" }, { value: 1, label: "Level 1" }, { value: 2, label: "Level 2" }, { value: 3, label: "Level 3" }]} value={reached} onChange={(value: number) => setReached(value)} /></K.Field>
                       <Button text="Send fake boost message" variant="primary" size="sm" onPress={() => sendFakeBoostMessage(times, reached)} />
-                      <ToggleRow label="Show this server as Level 3" subLabel="Perks look unlocked here. Real limits don't change" value={fake.level === true} onPress={() => set({ level: !fake.level })} />
+                      <K.Field label="Server boosts" hint={(fake.boostCount != null ? "Level " + tierForBoosts(fake.boostCount) + " completed. " : "") + "2 boosts = level 1, 7 = level 2, 14 = level 3. Only on your screen. Empty for the real count"}><TextInput defaultValue={fake.boostCount == null ? "" : String(fake.boostCount)} placeholder="14" keyboardType="number-pad" onChangeText={(text: string) => { const clean = text.replace(/\D/g, "").slice(0, 6); set({ boostCount: clean ? Number(clean) : undefined }); }} placeholderTextColor="#777" /></K.Field>
+                      {fake.boostCount == null && <ToggleRow label="Show this server as Level 3" subLabel="Perks look unlocked here. Real limits don't change" value={fake.level === true} onPress={() => set({ level: !fake.level })} />}
                       <ToggleRow label="Show as a Partner server" subLabel="Partner badge next to the server name" value={fake.partner === true} onPress={() => set({ partner: !fake.partner })} />
                       <ToggleRow label="Show as a Verified server" subLabel="Verified check next to the server name" value={fake.verified === true} onPress={() => set({ verified: !fake.verified })} />
                       <K.Field label="Members" hint="Leave empty for the real count"><TextInput defaultValue={fake.members == null ? "" : String(fake.members)} placeholder="25000" keyboardType="number-pad" onChangeText={(text: string) => { const clean = text.replace(/\D/g, ""); set({ members: clean ? Number(clean) : undefined }); }} placeholderTextColor="#777" /></K.Field>
