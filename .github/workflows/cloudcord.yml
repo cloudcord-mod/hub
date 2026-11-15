@@ -3211,12 +3211,14 @@ jobs:
               const http = extrasHttp(); if (!http) return;
               const match = (req: any) => typeof req?.url === "string" ? req.url.match(/\/entitlements\/gift-codes\/([A-Za-z0-9-]+)(\/redeem)?/) : null;
               instead("get", http, (args: any[], original: any) => {
-                  const m = match(args[0]); const code = extrasState().giftCode;
+                  // Any error in this check sends the request to Discord unchanged.
+                  let m: any = null, code: any = null; try { m = match(args[0]); code = extrasState().giftCode; } catch {}
                   if (m && !m[2] && code && m[1] === code) return Promise.resolve({ ok: true, status: 200, body: fakeGiftBody(code), headers: {} });
                   return original(...args);
               });
               instead("post", http, (args: any[], original: any) => {
-                  const m = match(args[0]); const code = extrasState().giftCode;
+                  // Any error in this check sends the request to Discord unchanged.
+                  let m: any = null, code: any = null; try { m = match(args[0]); code = extrasState().giftCode; } catch {}
                   if (m?.[2] && code && m[1] === code) { showToast("This is your fake gift. It only looks real on your device."); return Promise.reject({ ok: false, status: 400, body: { code: 50050, message: "This gift is only a preview on this device." } }); }
                   return original(...args);
               });

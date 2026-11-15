@@ -127,8 +127,8 @@ function patchMiscellaneous(): PatchCleanupFn {
     // Global analytics utilities
     AnalyticsUtils?.AnalyticsActionHandlers &&
       noop("handleTrack", AnalyticsUtils.AnalyticsActionHandlers),
-    AnalyticsUtils?.AnalyticsActionHandlers &&
-      noop("handleFingerprint", AnalyticsUtils.AnalyticsActionHandlers),
+    // handleFingerprint stays: Discord sends that fingerprint with login and
+    // register requests, and without it they can fail with a generic error.
 
     // Super properties tracking
     SuperPropUtils && noop("track", SuperPropUtils),
