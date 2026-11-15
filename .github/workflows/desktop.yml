@@ -255,6 +255,8 @@ jobs:
 
           if [ -f "desktop/client/dist/CloudCordSetup.exe" ]; then
             cp "desktop/client/dist/CloudCordSetup.exe" "desktop/client/dist/cloudcord.exe"
+            # Old links to CloudCordInstaller.exe get the same new installer.
+            cp "desktop/client/dist/CloudCordSetup.exe" "desktop/client/dist/CloudCordInstaller.exe"
           fi
           if [ -f "desktop/client/dist/CloudCordSetup-Test.exe" ]; then
             cp "desktop/client/dist/CloudCordSetup-Test.exe" "desktop/client/dist/cloudcord-test.exe"
@@ -279,16 +281,6 @@ jobs:
             desktop/client/CREDITS.md
             desktop/client/CLOUDCORD_NOTES.md
             desktop/client/README.md
-
-      - name: Build animated Windows installer
-        shell: bash
-        run: |
-          set -e
-          bash desktop/client/installer/windows/build.sh
-          cp desktop/client/installer/windows/out/CloudCordInstaller.exe desktop/client/dist/CloudCordInstaller.exe
-          # The new installer is the main Windows download.
-          cp desktop/client/dist/CloudCordInstaller.exe desktop/client/dist/CloudCordSetup.exe
-          cp desktop/client/dist/CloudCordInstaller.exe desktop/client/dist/cloudcord.exe
 
       - name: Package desktop.asar for updater
         shell: bash
