@@ -9,11 +9,46 @@ import "./style.css";
 import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { Channel } from "@vencord/discord-types";
 import { Devs } from "@utils/constants";
-import { purgeOwnMessages, PurgeSignal } from "@utils/purgeDm";
-import definePlugin from "@utils/types";
+import { MIN_DELAY_MS, PURGE_DEFAULTS, purgeOwnMessages, PurgeProgress, PurgeSignal } from "@utils/purgeDm";
+import definePlugin, { OptionType } from "@utils/types";
+import { definePluginSettings } from "@api/Settings";
 import { Alerts, ChannelStore, Menu, RestAPI, showToast, Toasts, UserStore } from "@webpack/common";
 
 const DM = 1;
+
+const settings = definePluginSettings({
+    delaySeconds: {
+        type: OptionType.NUMBER,
+        description: `Seconds between deletes (at least ${MIN_DELAY_MS / 1000}). Doubles for the rest of a run after Discord rate limits you.`,
+        default: PURGE_DEFAULTS.delayMs / 1000,
+        isValid: (value: number) => value >= MIN_DELAY_MS / 1000 || `At least ${MIN_DELAY_MS / 1000} seconds.`,
+    },
+    jitterSeconds: {
+        type: OptionType.NUMBER,
+        description: "Random extra seconds added to each delay (0 to this)",
+        default: PURGE_DEFAULTS.jitterMs / 1000,
+        isValid: (value: number) => value >= 0 || "Can't be negative.",
+    },
+    burstEvery: {
+        type: OptionType.NUMBER,
+        description: "Take a longer pause after this many deletes (0 = never)",
+        default: PURGE_DEFAULTS.burstEvery,
+        isValid: (value: number) => (value >= 0 && Number.isInteger(value)) || "A whole number, 0 or more.",
+    },
+    burstPauseSeconds: {
+        type: OptionType.NUMBER,
+        description: "Length of that pause in seconds",
+        default: PURGE_DEFAULTS.burstPauseMs / 1000,
+        isValid: (value: number) => value >= 0 || "Can't be negative.",
+    },
+    maxPerRun: {
+        type: OptionType.NUMBER,
+        description: "Most messages to delete in one run (0 = no limit). Run it again to continue.",
+        default: PURGE_DEFAULTS.maxPerRun,
+        isValid: (value: number) => (value >= 0 && Number.isInteger(value)) || "A whole number, 0 or more.",
+    },
+});
+const seconds = (ms: number) => `${(ms / 1000).toFixed(ms % 1000 ? 1 : 0)}s`;
 let running: { channelId: string; signal: PurgeSignal; bar: HTMLElement; } | null = null;
 
 function nameOf(channel: Channel) {
@@ -28,7 +63,14 @@ function progressBar(name: string, cancel: () => void) {
     bar.querySelector("button")!.addEventListener("click", cancel);
     document.body.appendChild(bar);
     const text = bar.querySelector<HTMLElement>(".cc-purge-text")!;
-    return { bar, update: (deleted: number, found: number) => { text.textContent = `Purging your messages with ${name}: ${deleted} deleted, ${found} found`; } };
+    return {
+        bar, update: ({ deleted, found, delay, nextPauseIn, waiting }: PurgeProgress) => {
+            const pace = waiting?.reason === "burst" ? `pausing ${seconds(waiting.ms)}`
+                : waiting?.reason === "rateLimit" ? `rate limited, waiting ${seconds(waiting.ms)}`
+                    : `delay ${seconds(delay)}${nextPauseIn ? `, pause in ${nextPauseIn}` : ""}`;
+            text.textContent = `Purging your messages with ${name}: ${deleted} deleted, ${found} found · ${pace}`;
+        }
+    };
 }
 
 function stopRunning() {
@@ -47,11 +89,22 @@ async function purge(channel: Channel) {
     const signal: PurgeSignal = { cancelled: false };
     const { bar, update } = progressBar(name, () => { signal.cancelled = true; });
     running = { channelId: channel.id, signal, bar };
-    update(0, 0);
+    update({ deleted: 0, found: 0, delay: Math.max(MIN_DELAY_MS, settings.store.delaySeconds * 1000), nextPauseIn: settings.store.burstEvery });
     try {
-        const result = await purgeOwnMessages({ rest: RestAPI as any, channelId: channel.id, authorId: me, signal, pace: 1000, onProgress: update });
+        const { delaySeconds, jitterSeconds, burstEvery, burstPauseSeconds, maxPerRun } = settings.store;
+        const result = await purgeOwnMessages({
+            rest: RestAPI as any, channelId: channel.id, authorId: me, signal, onProgress: update,
+            delayMs: Math.max(MIN_DELAY_MS, delaySeconds * 1000), jitterMs: jitterSeconds * 1000,
+            burstEvery, burstPauseMs: burstPauseSeconds * 1000, maxPerRun,
+        });
         const skipped = result.skipped ? `, ${result.skipped} couldn't be deleted` : "";
-        showToast(`${result.cancelled ? "Purge cancelled" : "Purge finished"}: ${result.deleted} deleted${skipped}.`, result.cancelled ? Toasts.Type.MESSAGE : Toasts.Type.SUCCESS);
+        const message = {
+            done: `Purge finished: ${result.deleted} deleted${skipped}.`,
+            cancelled: `Purge cancelled: ${result.deleted} deleted${skipped}.`,
+            limit: `Deleted ${result.deleted}, the most for one run${skipped}. Run again to continue.`,
+            rateLimited: `Stopped after ${result.deleted} deleted: Discord rate limited this 3 times in a row. Wait a while, then run again.`,
+        }[result.stop];
+        showToast(message, result.stop === "done" ? Toasts.Type.SUCCESS : result.stop === "rateLimited" ? Toasts.Type.FAILURE : Toasts.Type.MESSAGE);
     } catch {
         showToast("Purge stopped: Discord didn't return the message history.", Toasts.Type.FAILURE);
     } finally {
@@ -62,7 +115,7 @@ async function purge(channel: Channel) {
 function confirmPurge(channel: Channel) {
     Alerts.show({
         title: "Purge my messages",
-        body: `Delete every message you sent in your DM with ${nameOf(channel)}? Their messages stay. This can't be undone, and it runs slowly (about one message a second) to avoid rate limits.`,
+        body: `Delete every message you sent in your DM with ${nameOf(channel)}? Their messages stay. This can't be undone, and it runs slowly (about with pauses) to avoid rate limits.`,
         confirmText: "Delete my messages",
         cancelText: "Cancel",
         confirmColor: "red",
@@ -92,6 +145,7 @@ export default definePlugin({
     description: "Adds \"Purge my messages\" to a DM's and a user's right-click menu: deletes every message you sent in that DM, one by one. Warning: bulk deleting is automation that Discord can flag on your account. Use at your own risk.",
     authors: [Devs.Xohus],
     tags: ["Utility", "Chat"],
+    settings,
     searchTerms: ["delete", "purge", "clear", "dm", "messages"],
     contextMenus: {
         "channel-context": ChannelContext,

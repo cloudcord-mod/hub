@@ -12,17 +12,41 @@ export interface PurgeRest {
     del(request: { url: string; }): Promise<unknown>;
 }
 export interface PurgeSignal { cancelled: boolean; }
+export interface PurgeProgress {
+    deleted: number;
+    found: number;
+    /** Current base delay between deletes in ms (doubles after a rate limit). */
+    delay: number;
+    /** Deletes left before the next burst pause, or 0 when burst pauses are off. */
+    nextPauseIn: number;
+    /** Set while sitting in a burst pause or a rate-limit wait. */
+    waiting?: { reason: "burst" | "rateLimit"; ms: number; };
+}
 export interface PurgeOptions {
     rest: PurgeRest;
     channelId: string;
     authorId: string;
     signal?: PurgeSignal;
-    /** Base gap between deletes in ms; a random 0–50% is added. */
-    pace?: number;
+    /** Base gap between deletes in ms; never below MIN_DELAY_MS unless 0 (tests only). */
+    delayMs?: number;
+    /** Random extra 0..jitterMs added to each gap. */
+    jitterMs?: number;
+    /** Pause for burstPauseMs after this many deletes; 0 turns it off. */
+    burstEvery?: number;
+    burstPauseMs?: number;
+    /** Stop after this many deletes in one run; 0 means no limit. */
+    maxPerRun?: number;
     sleep?: (ms: number) => Promise<void>;
-    onProgress?: (deleted: number, found: number) => void;
+    random?: () => number;
+    onProgress?: (progress: PurgeProgress) => void;
 }
-export interface PurgeResult { deleted: number; found: number; skipped: number; cancelled: boolean; }
+export type PurgeStop = "done" | "cancelled" | "limit" | "rateLimited";
+export interface PurgeResult { deleted: number; found: number; skipped: number; cancelled: boolean; stop: PurgeStop; delay: number; }
+
+export const MIN_DELAY_MS = 800;
+export const PURGE_DEFAULTS = { delayMs: 1200, jitterMs: 500, burstEvery: 25, burstPauseMs: 30_000, maxPerRun: 500 };
+/** Consecutive 429s that end a run. */
+export const MAX_RATE_LIMITS_IN_A_ROW = 3;
 
 // Normal messages, replies and app command messages; everything else is a system message.
 const DELETABLE_TYPES = new Set([0, 19, 20, 23]);
@@ -37,8 +61,10 @@ function retryAfterMs(error: any) {
     return Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds * 1000) : 5000;
 }
 
+class RateLimited extends Error { }
+
 /** Walks history with `before` paging and yields the user's own deletable messages, newest first. */
-export async function* ownMessages(rest: PurgeRest, channelId: string, authorId: string, signal?: PurgeSignal, sleep = wait) {
+export async function* ownMessages(rest: PurgeRest, channelId: string, authorId: string, signal?: PurgeSignal, onRateLimit: (error: any) => Promise<void> = async error => wait(retryAfterMs(error))) {
     let before: string | undefined;
     while (!signal?.cancelled) {
         let page: any[];
@@ -46,7 +72,7 @@ export async function* ownMessages(rest: PurgeRest, channelId: string, authorId:
             const response = await rest.get({ url: `/channels/${channelId}/messages`, query: { limit: 100, ...(before ? { before } : {}) } });
             page = Array.isArray(response?.body) ? response.body : [];
         } catch (error: any) {
-            if (error?.status === 429) { await sleep(retryAfterMs(error)); continue; }
+            if (error?.status === 429) { await onRateLimit(error); continue; }
             throw error;
         }
         if (!page.length) return;
@@ -56,27 +82,63 @@ export async function* ownMessages(rest: PurgeRest, channelId: string, authorId:
     }
 }
 
-export async function purgeOwnMessages({ rest, channelId, authorId, signal, pace = 1000, sleep = wait, onProgress }: PurgeOptions): Promise<PurgeResult> {
-    const result: PurgeResult = { deleted: 0, found: 0, skipped: 0, cancelled: false };
-    for await (const message of ownMessages(rest, channelId, authorId, signal, sleep)) {
-        if (signal?.cancelled) break;
-        result.found++;
-        onProgress?.(result.deleted, result.found);
-        for (let attempt = 0; ; attempt++) {
+export async function purgeOwnMessages(options: PurgeOptions): Promise<PurgeResult> {
+    const { rest, channelId, authorId, signal, sleep = wait, random = Math.random, onProgress } = options;
+    const jitterMs = Math.max(0, options.jitterMs ?? PURGE_DEFAULTS.jitterMs);
+    const burstEvery = Math.max(0, Math.floor(options.burstEvery ?? PURGE_DEFAULTS.burstEvery));
+    const burstPauseMs = Math.max(0, options.burstPauseMs ?? PURGE_DEFAULTS.burstPauseMs);
+    const maxPerRun = Math.max(0, Math.floor(options.maxPerRun ?? PURGE_DEFAULTS.maxPerRun));
+    const requested = options.delayMs ?? PURGE_DEFAULTS.delayMs;
+    let delay = requested === 0 ? 0 : Math.max(MIN_DELAY_MS, requested);
+    let limitedInARow = 0;
+    const result: PurgeResult = { deleted: 0, found: 0, skipped: 0, cancelled: false, stop: "done", delay };
+    const progress = (waiting?: PurgeProgress["waiting"]) => onProgress?.({
+        deleted: result.deleted, found: result.found, delay,
+        nextPauseIn: burstEvery ? burstEvery - (result.deleted % burstEvery) : 0, waiting,
+    });
+    // Waits out a 429, then doubles the delay for the rest of the run; too many in a row ends it.
+    const onRateLimit = async (error: any) => {
+        limitedInARow++;
+        if (limitedInARow >= MAX_RATE_LIMITS_IN_A_ROW) throw new RateLimited();
+        const ms = retryAfterMs(error);
+        progress({ reason: "rateLimit", ms });
+        await sleep(ms);
+        delay = Math.max(delay * 2, MIN_DELAY_MS);
+    };
+
+    try {
+        for await (const message of ownMessages(rest, channelId, authorId, signal, onRateLimit)) {
             if (signal?.cancelled) break;
-            try {
-                await rest.del({ url: `/channels/${channelId}/messages/${message.id}` });
-                result.deleted++;
-                break;
-            } catch (error: any) {
-                if (error?.status === 429 && attempt < 5) { await sleep(retryAfterMs(error) * (attempt + 1)); continue; }
-                result.skipped++; // already gone, too old for the API, or not allowed
-                break;
+            result.found++;
+            progress();
+            while (!signal?.cancelled) {
+                try {
+                    await rest.del({ url: `/channels/${channelId}/messages/${message.id}` });
+                    result.deleted++;
+                    limitedInARow = 0;
+                    break;
+                } catch (error: any) {
+                    if (error?.status === 429) { await onRateLimit(error); continue; }
+                    limitedInARow = 0;
+                    result.skipped++; // already gone, too old for the API, or not allowed
+                    break;
+                }
+            }
+            progress();
+            if (signal?.cancelled) break;
+            if (maxPerRun && result.deleted >= maxPerRun) { result.stop = "limit"; break; }
+            if (burstEvery && burstPauseMs && result.deleted > 0 && result.deleted % burstEvery === 0) {
+                progress({ reason: "burst", ms: burstPauseMs });
+                await sleep(burstPauseMs);
+            } else if (delay > 0) {
+                await sleep(delay + random() * jitterMs);
             }
         }
-        onProgress?.(result.deleted, result.found);
-        if (pace > 0) await sleep(pace + Math.random() * pace * 0.5);
+    } catch (error) {
+        if (!(error instanceof RateLimited)) throw error;
+        result.stop = "rateLimited";
     }
-    result.cancelled = !!signal?.cancelled;
+    if (signal?.cancelled) { result.cancelled = true; result.stop = "cancelled"; }
+    result.delay = delay;
     return result;
 }
