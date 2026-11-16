@@ -31,6 +31,7 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
 
 @interface ChatAutoOverlay : NSObject
 @property (nonatomic, strong) UIWindow *window;
+@property (nonatomic, strong) UIView *secureCanvas;
 @property (nonatomic, strong) UIButton *button;
 @property (nonatomic, assign) BOOL enabled;
 + (instancetype)shared;
@@ -120,19 +121,29 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
         self.window.windowLevel = UIWindowLevelAlert + 100;
         self.window.backgroundColor = UIColor.clearColor;
         self.window.opaque = NO;
-        // Capture shielding: a secure UITextField makes the whole window
-        // render as secure content, which iOS excludes from screenshots,
-        // screen recording, AirPlay and ReplayKit/screen-share capture.
+        // Capture shielding: a secure text field owns a private "secure
+        // canvas" subview whose layer is flagged secure — anything placed
+        // inside it is excluded from screenshots, screen recording, AirPlay
+        // and ReplayKit/screen-share capture on every iOS version.
         UITextField *shield = [[UITextField alloc] initWithFrame:self.window.bounds];
         shield.secureTextEntry = YES;
         shield.userInteractionEnabled = NO;
         shield.backgroundColor = UIColor.clearColor;
         [self.window addSubview:shield];
+        UIView *canvas = shield.subviews.firstObject;
+        if (canvas) {
+            canvas.frame = self.window.bounds;
+            canvas.userInteractionEnabled = YES;
+            canvas.backgroundColor = UIColor.clearColor;
+            [self.window addSubview:canvas];
+            self.secureCanvas = canvas;
+        }
     }
     if (!self.button) {
         self.button = [self makeButton];
         [self restorePosition];
-        [self.window addSubview:self.button];
+        UIView *host = self.secureCanvas ?: self.window;
+        [host addSubview:self.button];
     }
     self.window.hidden = NO;
 }
