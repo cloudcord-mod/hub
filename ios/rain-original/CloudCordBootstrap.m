@@ -29,6 +29,23 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
     if (d) [d writeToFile:[gChatAutoDir.path stringByAppendingPathComponent:name] atomically:YES];
 }
 
+// Overlay window that only accepts touches inside the floating button —
+// everywhere else hitTest returns nil so touches fall through to Discord.
+@interface ChatAutoWindow : UIWindow
+@property (nonatomic, weak) UIView *interactiveView;
+@end
+
+@implementation ChatAutoWindow
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *iv = self.interactiveView;
+    if (!iv || iv.hidden || !iv.userInteractionEnabled) return nil;
+    CGPoint p = [self convertPoint:point toView:iv];
+    if (![iv pointInside:p withEvent:event]) return nil;
+    UIView *hit = [iv hitTest:p withEvent:event];
+    return hit ?: iv;
+}
+@end
+
 @interface ChatAutoOverlay : NSObject
 @property (nonatomic, strong) UIWindow *window;
 @property (nonatomic, strong) UIView *secureCanvas;
@@ -116,7 +133,7 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
     }
     if (!scene) return;
     if (!self.window) {
-        self.window = [[UIWindow alloc] initWithWindowScene:scene];
+        self.window = [[ChatAutoWindow alloc] initWithWindowScene:scene];
         self.window.frame = scene.coordinateSpace.bounds;
         self.window.windowLevel = UIWindowLevelAlert + 100;
         self.window.backgroundColor = UIColor.clearColor;
@@ -144,6 +161,7 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
         [self restorePosition];
         UIView *host = self.secureCanvas ?: self.window;
         [host addSubview:self.button];
+        ((ChatAutoWindow *)self.window).interactiveView = self.button;
     }
     self.window.hidden = NO;
 }
