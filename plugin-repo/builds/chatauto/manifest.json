@@ -1,0 +1,12 @@
+{
+  "id": "chatauto",
+  "version": "1.0.0",
+  "type": "plugin",
+  "spec": 3,
+  "main": "",
+  "display": {
+    "name": "Chat Auto",
+    "description": "Auto-answers the Arabic word games (tafkeek / fastest) in a chosen channel via OCR.space",
+    "authors": [{ "name": "owner" }]
+  }
+}
