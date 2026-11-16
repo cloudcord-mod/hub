@@ -1,0 +1,9 @@
+{
+  "$meta": {
+    "name": "Chat Auto Plugins",
+    "description": "Personal plugin repository"
+  },
+  "chatauto": {
+    "version": "1.0.0"
+  }
+}
