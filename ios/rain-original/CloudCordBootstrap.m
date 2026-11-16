@@ -120,21 +120,18 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
         self.window.windowLevel = UIWindowLevelAlert + 100;
         self.window.backgroundColor = UIColor.clearColor;
         self.window.opaque = NO;
-        // Hidden from screenshots, screen recording, AirPlay and Discord
-        // screen share on iOS 17+ (covers iOS 26.x). isExcludedFromCapture is
-        // a UIView property — it is applied to the button and shield below.
-        // The secure text field extends protection to older capture paths.
+        // Capture shielding: a secure UITextField makes the whole window
+        // render as secure content, which iOS excludes from screenshots,
+        // screen recording, AirPlay and ReplayKit/screen-share capture.
         UITextField *shield = [[UITextField alloc] initWithFrame:self.window.bounds];
         shield.secureTextEntry = YES;
         shield.userInteractionEnabled = NO;
         shield.backgroundColor = UIColor.clearColor;
-        if (@available(iOS 17.0, *)) shield.isExcludedFromCapture = YES;
         [self.window addSubview:shield];
     }
     if (!self.button) {
         self.button = [self makeButton];
         [self restorePosition];
-        if (@available(iOS 17.0, *)) self.button.isExcludedFromCapture = YES;
         [self.window addSubview:self.button];
     }
     self.window.hidden = NO;
