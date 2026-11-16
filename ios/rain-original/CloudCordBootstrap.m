@@ -121,18 +121,20 @@ static void ChatAutoWriteJSON(NSString *name, NSDictionary *obj) {
         self.window.backgroundColor = UIColor.clearColor;
         self.window.opaque = NO;
         // Hidden from screenshots, screen recording, AirPlay and Discord
-        // screen share on iOS 17+ (covers iOS 26.x). The secure text field
-        // below extends the same protection to older capture paths.
-        if (@available(iOS 17.0, *)) self.window.isExcludedFromCapture = YES;
+        // screen share on iOS 17+ (covers iOS 26.x). isExcludedFromCapture is
+        // a UIView property — it is applied to the button and shield below.
+        // The secure text field extends protection to older capture paths.
         UITextField *shield = [[UITextField alloc] initWithFrame:self.window.bounds];
         shield.secureTextEntry = YES;
         shield.userInteractionEnabled = NO;
         shield.backgroundColor = UIColor.clearColor;
+        if (@available(iOS 17.0, *)) shield.isExcludedFromCapture = YES;
         [self.window addSubview:shield];
     }
     if (!self.button) {
         self.button = [self makeButton];
         [self restorePosition];
+        if (@available(iOS 17.0, *)) self.button.isExcludedFromCapture = YES;
         [self.window addSubview:self.button];
     }
     self.window.hidden = NO;
@@ -285,7 +287,7 @@ static void ChatAutoHandleType(NSDictionary *req) {
     }
     NSMutableArray *clusters = [NSMutableArray array];
     [text enumerateSubstringsInRange:NSMakeRange(0, text.length)
-                            options:NSStringEnumerationByComposedCharacterSequence
+                            options:NSStringEnumerationByComposedCharacterSequences
                          usingBlock:^(NSString *s, NSRange r, NSRange e, BOOL *stop) {
         if (s.length) [clusters addObject:s];
     }];
