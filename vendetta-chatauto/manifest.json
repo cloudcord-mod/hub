@@ -1,0 +1,9 @@
+{
+  "name": "Chat Auto",
+  "description": "Auto-answers the Arabic word games in a chosen channel",
+  "authors": [
+    { "name": "owner", "id": 0 }
+  ],
+  "main": "index.js",
+  "hash": "62407a5cca3f189bcfe88a23303394a44426ea9347b56edbc2daf0dc89a023f2"
+}
