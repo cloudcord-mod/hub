@@ -560,6 +560,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         Object.assign(headerMessages.t, { "CvQ18w": "Épingler le message", "Bse+F/": "Désépingler le message",
             p89ACt: "Confirmer", xFjByk: "Retirer des épingles", "ETE/oC": "Retirer" });
         const ownerRow = () => null;
+        const ProfileAvatar = () => null;
+        const avatarSizes = { normal: 32, large: 80 };
         const nativeActivityText = () => ({ text: "Artist", tooltip: "Original tooltip" });
         const activityText = { default: nativeActivityText };
         const pinPrompts = [];
@@ -766,6 +768,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 : path.endsWith("/useMediaViewerSources.tsx") ? viewerSources
                 : path.endsWith("/GIFPickerItemView.tsx") ? gifPicker
                 : path.endsWith("/MarkupParsers.tsx") ? markupParser
+                : path === "design/void/Avatar/native/Avatar.tsx" ? { default: ProfileAvatar, AvatarSizes: { NORMAL: "normal" } }
                 : path === "modules/messages/native/Messages.tsx" ? { default: NativeMessages }
                 : path.endsWith("/MessagesRenderer.tsx") ? { default: MessagesRenderer }
                 : path.endsWith("/FavoritesGuildSuggestedChannels.tsx") ? { default: FavoritesGuildSuggestedChannels }
@@ -800,6 +803,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                     : name === "transitionToChannel" ? { transitionToMessage: (channel, message) => jumpRoutes.push([channel, message]) }
                     : name === "pinMessage" ? pinActions
                     : name === "Fonts" ? { Permissions: embedPermissions }
+                    : name === "AVATAR_SIZE_MAP" ? { AVATAR_SIZE_MAP: avatarSizes }
                     : name === "getChatLayout" ? layout : name === "getBaseAppContainerDimensions" ? appContainer
                     : name === "getUserAvatarURL" ? icons : name === "startTyping" ? typing : ["editMessage", "jumpToMessage"].includes(name) ? messageEditor
                     : name === "createFriendInvite" ? inviteApi : name === "relativeTimeRounding" ? relativeTime
@@ -831,6 +835,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                     } else mediaAlerts.push([title, body]);
                 } },
                 PixelRatio: { getFontScale: () => deviceFontScale },
+                StyleSheet: { flatten: style => Array.isArray(style) ? Object.assign({}, ...style.flat(Infinity)) : style },
                 ScrollView: nativeScrollView, FlatList: nativeFlatList, SectionList: nativeSectionList,
                 Linking: { openURL: openExternal },
                 Image: { getSize: (_, success) => success(1200, 480) },
@@ -1339,6 +1344,29 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                     assert.equal(wrapped.type(wrapped.props), original);
                     assert.equal(styled.type(styled.props).props.style, baseStyle);
                 }
+                assert.equal(appearanceHooks.size, 0);
+                continue;
+            } else if (rule.style?.avatarCornerRatio) {
+                const hook = appearanceHooks.get(ProfileAvatar);
+                const props = Object.freeze({ user: { id: me }, status: "online", avatarStyle: [{ opacity: 0.8 }, { height: 20, width: 24 }] });
+                const renderAvatar = options => {
+                    const original = jsx(ProfileAvatar, options);
+                    const wrapped = hook(null, original);
+                    return { original, wrapped, styled: wrapped.type(wrapped.props) };
+                };
+                const custom = renderAvatar(props);
+                assert.equal(custom.styled.props.status, props.status);
+                assert.equal(custom.styled.props.user, props.user);
+                assert.equal(custom.styled.props.avatarStyle[0], props.avatarStyle);
+                assert.equal(custom.styled.props.avatarStyle[1].borderRadius, 20 * rule.style.avatarCornerRatio);
+                const normal = renderAvatar({ user: props.user });
+                assert.equal(normal.styled.props.avatarStyle[1].borderRadius, 32 * rule.style.avatarCornerRatio);
+                const large = renderAvatar({ user: props.user, size: "large" });
+                assert.equal(large.styled.props.avatarStyle[1].borderRadius, 80 * rule.style.avatarCornerRatio);
+                const unknown = renderAvatar({ user: props.user, size: "unknown" });
+                assert.equal(unknown.styled, unknown.original);
+                click(render(), "Disable " + rule.plugin);
+                assert.equal(custom.wrapped.type(custom.wrapped.props), custom.original);
                 assert.equal(appearanceHooks.size, 0);
                 continue;
             } else if (rule.style?.serverIconScale) {

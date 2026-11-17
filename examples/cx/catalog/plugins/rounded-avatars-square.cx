@@ -1,0 +1,3 @@
+plugin "RoundedAvatarsSquare":
+  needs appearance.style
+  style rounded-square-avatars

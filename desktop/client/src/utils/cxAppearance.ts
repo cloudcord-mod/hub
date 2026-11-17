@@ -361,6 +361,16 @@ export const cxAppearanceTargets = {
         css: 'nav[aria-label="Servers sidebar"] [class*="listItem"] svg[class*="svg"] { transform: scale(1.1); }',
         style: { serverIconScale: 1.1 },
     },
+    "square-avatars": {
+        plugin: "SquareAvatars", label: "give avatars round-square corners",
+        css: 'img[class*="avatar"], [class*="avatar"] foreignObject { border-radius: 22% !important; mask: none !important; }',
+        style: { avatarComponent: "design/void/Avatar/native/Avatar.tsx", avatarCornerRatio: 0.22 },
+    },
+    "rounded-square-avatars": {
+        plugin: "RoundedAvatarsSquare", label: "give avatars softer square corners",
+        css: '[class*="avatar"] img, img[class*="avatar"] { border-radius: 28% !important; } [class*="avatar"] svg mask rect, mask[id*="avatar"] circle { rx: 28%; }',
+        style: { avatarComponent: "design/void/Avatar/native/Avatar.tsx", avatarCornerRatio: 0.28 },
+    },
     "empty-server-folders": {
         plugin: "HideEmptyFolders", label: "empty expanded server folders",
         css: '[class*="folder"][class*="expanded"]:empty { display: none !important; }',

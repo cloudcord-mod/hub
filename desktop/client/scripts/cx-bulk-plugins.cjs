@@ -1836,7 +1836,7 @@ function checkAppearancePaths(appearance, indexes) {
     const missing = [];
     for (const { plugin, mobile, style } of Object.values(appearance)) {
         const paths = mobile?.hideComponentPaths ?? [mobile?.renderTree ?? mobile?.settingsEntry,
-            style?.centeredMessageList, style?.messageWidthRenderer].filter(Boolean);
+            style?.centeredMessageList, style?.messageWidthRenderer, style?.avatarComponent].filter(Boolean);
         if (!paths.length) continue;
         checked++;
         for (const path of paths) {

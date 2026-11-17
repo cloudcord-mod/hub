@@ -33,7 +33,7 @@ import { createCxUserNotes, CX_USER_NOTE_LIMIT } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
 import type { ComponentType, Context, ReactElement, ReactNode } from "react";
-import { Alert, Animated, FlatList, Image, Linking, PixelRatio, Pressable, processColor, ScrollView, SectionList, Text, TextInput, View } from "react-native";
+import { Alert, Animated, FlatList, Image, Linking, PixelRatio, Pressable, processColor, ScrollView, SectionList, StyleSheet, Text, TextInput, View } from "react-native";
 
 const session = createCxSession();
 const callClock = createCxCallClock();
@@ -2140,6 +2140,25 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                 },
                 styleAppearanceTarget(target) {
                     const style = cxAppearanceTargets[target].style;
+                    if ("avatarComponent" in style) {
+                        const avatar = findByFilePath(style.avatarComponent);
+                        const sizes = findByProps("AVATAR_SIZE_MAP")?.AVATAR_SIZE_MAP;
+                        const normal = avatar?.AvatarSizes?.NORMAL;
+                        if (!avatar?.default || typeof normal !== "string" || typeof sizes?.[normal] !== "number") {
+                            throw new Error("Discord's avatar styles are unavailable");
+                        }
+                        return registerJsxAppearance([avatar.default], element => {
+                            const { avatarStyle, size = normal } = element.props;
+                            const dimension = typeof size === "string" && Object.hasOwn(sizes, size) ? sizes[size] : undefined;
+                            if (!Number.isFinite(dimension) || dimension <= 0) return element;
+                            const current = StyleSheet.flatten(avatarStyle);
+                            const width = typeof current?.width === "number" ? current.width : dimension;
+                            const height = typeof current?.height === "number" ? current.height : dimension;
+                            const radius = Math.min(width, height) * style.avatarCornerRatio;
+                            if (!Number.isFinite(radius) || radius <= 0) return element;
+                            return React.cloneElement(element, { avatarStyle: [avatarStyle, { borderRadius: radius }] });
+                        });
+                    }
                     if ("blurredMedia" in style) return registerBlurredMedia(style.blurredMedia);
                     if ("reducedMotion" in style) return registerReducedMotion();
                     if ("mentionHighlight" in style) {

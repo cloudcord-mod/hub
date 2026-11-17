@@ -174,6 +174,7 @@ import plugin_catalog_reverse_image_search from "../../../../examples/cx/catalog
 import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins/reverse-text.cx";
 import plugin_catalog_rot13_text from "../../../../examples/cx/catalog/plugins/rot13-text.cx";
 import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/plugins/round-server-icons.cx";
+import plugin_catalog_rounded_avatars_square from "../../../../examples/cx/catalog/plugins/rounded-avatars-square.cx";
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
 import plugin_catalog_scroll_to_latest from "../../../../examples/cx/catalog/plugins/scroll-to-latest.cx";
@@ -191,6 +192,7 @@ import plugin_catalog_sort_reactions from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_space_out from "../../../../examples/cx/catalog/plugins/space-out.cx";
 import plugin_catalog_split_large_messages from "../../../../examples/cx/catalog/plugins/split-large-messages.cx";
 import plugin_catalog_spotify_share_commands from "../../../../examples/cx/catalog/plugins/spotify-share-commands.cx";
+import plugin_catalog_square_avatars from "../../../../examples/cx/catalog/plugins/square-avatars.cx";
 import plugin_catalog_starify from "../../../../examples/cx/catalog/plugins/starify.cx";
 import plugin_catalog_sticker_blocker from "../../../../examples/cx/catalog/plugins/sticker-blocker.cx";
 import plugin_catalog_stop_auto_unread from "../../../../examples/cx/catalog/plugins/stop-auto-unread.cx";
@@ -493,6 +495,7 @@ export const cxCatalog = {
         { name: "ReverseText", source: plugin_catalog_reverse_text },
         { name: "ROT13 Text", source: plugin_catalog_rot13_text },
         { name: "RoundServerIcons", source: plugin_catalog_round_server_icons },
+        { name: "RoundedAvatarsSquare", source: plugin_catalog_rounded_avatars_square },
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages },
         { name: "ScrollToLatest", source: plugin_catalog_scroll_to_latest },
@@ -510,6 +513,7 @@ export const cxCatalog = {
         { name: "SpaceOut", source: plugin_catalog_space_out },
         { name: "SplitLargeMessages", source: plugin_catalog_split_large_messages },
         { name: "SpotifyShareCommands", source: plugin_catalog_spotify_share_commands },
+        { name: "SquareAvatars", source: plugin_catalog_square_avatars },
         { name: "Starify", source: plugin_catalog_starify },
         { name: "StickerBlocker", source: plugin_catalog_sticker_blocker },
         { name: "StopAutoUnread", source: plugin_catalog_stop_auto_unread },
