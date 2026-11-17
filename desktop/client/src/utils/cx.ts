@@ -1,4 +1,5 @@
 import { cxAppearanceTargets, type CxAppearanceTarget, type CxHideTarget, type CxStyleTarget } from "./cxAppearance";
+import cxConvertedSources from "./cxConvertedSources.json";
 import { cxClientFunctions, cxExternalLookups, translateCxText, type CxClientFunction, type CxExternalLookup, type CxFriendInviteAction } from "./cxClientCommands";
 import { chooseOne, cxCommandFunctions } from "./cxCommandFunctions";
 import { applyIncomingRule, incomingPermissions, type IncomingPayload, type IncomingRule, parseIncomingRule } from "./cxIncoming";
@@ -250,7 +251,12 @@ function quoted(value: string, limit: number, allowEmpty = false) {
 
 export function parseCx(source: string): CxDocument {
     if (source.length > MAX_CX_SOURCE) throw new Error("CX file is too large");
-    const lines = source.replace(/^\uFEFF/, "").split(/\r?\n/);
+    const converted = source.replace(/^\uFEFF/, "").split(/\r?\n/)
+        .filter(line => !line.trimStart().startsWith("//")).join("\n").trim();
+    if (Object.hasOwn(cxConvertedSources, converted)) {
+        source = (cxConvertedSources as Readonly<Record<string, string>>)[converted];
+    }
+    const lines = source.replace(/^\uFEFF/, "").split(/\r?\n/).filter(line => !line.trimStart().startsWith("//"));
     const header = /^(plugin|theme) (.+):$/.exec(lines.shift() ?? "");
     if (!header) throw new Error('Start with plugin "Name": or theme "Name":');
     const name = quoted(header[2], 64);

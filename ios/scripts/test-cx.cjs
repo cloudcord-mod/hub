@@ -40,6 +40,14 @@ vm.runInNewContext(code, {
     }),
 });
 const { activateCx, createCxSession, parseCx, reviewCx } = moduleBox.exports;
+const convertedSources = require("../../desktop/client/src/utils/cxConvertedSources.json");
+for (const [converted, implementation] of Object.entries(convertedSources)) {
+    assert.deepEqual(parseCx(converted), parseCx(implementation), "Converted file must use its reviewed implementation");
+    assert.deepEqual(parseCx("// Imported plugin\r\n" + converted.replaceAll("\n", "\r\n")), parseCx(implementation));
+    assert.deepEqual(reviewCx(converted), reviewCx(implementation), "Permissions must come from the reviewed implementation");
+    assert.throws(() => parseCx(converted + '\n  needs tokens.read'));
+    assert.throws(() => parseCx(converted + '\n  script:\n    globalThis.token'));
+}
 const reportModule = { exports: {} };
 vm.runInNewContext(transformSync(read("desktop/client/src/utils/ccpInspect.ts"), { loader: "ts", format: "cjs" }).code,
     { module: reportModule });
@@ -52,6 +60,11 @@ const catalogCode = buildSync({
 }).outputFiles[0].text;
 vm.runInNewContext(catalogCode, { module: catalogModule });
 const { cxCatalog } = catalogModule.exports;
+for (const implementation of Object.values(convertedSources)) {
+    assert(cxCatalog.plugins.some(plugin => plugin.source.replace(/^\uFEFF/, "").split(/\r?\n/)
+        .filter(line => !line.trimStart().startsWith("//")).join("\n").trim() === implementation),
+    "Converted source must resolve to the current shared catalog");
+}
 assert.equal(cxCatalog.plugins.length, generated.plugins);
 assert.equal(cxCatalog.themes.length, generated.themes);
 const catppuccinIndex = JSON.parse(read("themes/mobile/index.json")).themes.filter(entry =>

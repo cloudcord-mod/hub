@@ -223,7 +223,7 @@ function csvField(value) {
 function writeReport(output, report) {
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + "\n");
-    const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail",
+    const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Runtime parser", "Runtime parser detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail",
         "Desktop settings switches", "Mobile settings switches", "Command inputs", "Checked at", "Adapter source commit", "Adapter source modified", "Candidate pack SHA-256"];
     if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings", "Desktop pack declared settings");
     if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail", "Missed fixture lookups (Windows/Android export names)");
@@ -231,6 +231,7 @@ function writeReport(output, report) {
     if (report.discoverLifecycle) header.push("Discover lifecycle (fixture)", "Discover lifecycle detail");
     const rows = [...report.candidates, ...report.additionalSharedPlugins].map(entry => [
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
+        entry.parser?.status, entry.parser?.reason,
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
         entry.desktop.settingsSwitches?.join("; "), entry.mobile.settingsSwitches?.join("; "),
         (entry.desktop.commandInputs ?? entry.mobile.commandInputs)?.join("; "),
@@ -251,7 +252,7 @@ function writeReport(output, report) {
 function groupBatchErrors(candidates) {
     const groups = new Map();
     for (const entry of candidates) {
-        for (const check of ["syntax", "desktop", "mobile", "moduleLoad", "desktopLifecycle", "discoverFactory", "discoverLifecycle"]) {
+        for (const check of ["syntax", "parser", "desktop", "mobile", "moduleLoad", "desktopLifecycle", "discoverFactory", "discoverLifecycle"]) {
             const outcome = entry[check];
             if (outcome?.status !== "Fail") continue;
             const issues = outcome.issues ?? [outcome.error ?? outcome.reason ?? "Unknown error"];
@@ -300,6 +301,7 @@ async function main(args) {
     const adapters = new Map(rows.map(row => [row.platform + ":" + row.sourceHash, row]));
     const styles = new Map(rows.filter(row => row.appearanceCss).map(row => [row.platform + ":" + row.appearanceCss.trim(), row]));
     const originalDesktopPort = originalDesktopPortResolver(sourceRoot, packs["Desktop CX pack"], rows);
+    const parseRuntime = require("../../desktop/client/scripts/sync-cx-catalog.cjs").loadCxRuntime().parseCx;
     const matched = new Set();
     const candidates = queues.flat().map(([id, name, group, portableFile]) => {
         const pack = packs[group];
@@ -356,6 +358,20 @@ async function main(args) {
             : "The desktop pack needs a native mobile port";
         return { id, name, group, syntax: checkCandidate(id, entry, pack, parse), desktop: blocked(desktop), mobile: blocked(mobile) };
     });
+
+    for (const candidate of candidates) {
+        const source = packs[candidate.group].entries?.get(candidate.id)?.source;
+        if (!source) {
+            candidate.parser = blocked("Converted source is missing");
+            continue;
+        }
+        try {
+            parseRuntime(source);
+            candidate.parser = result("Pass");
+        } catch (error) {
+            candidate.parser = result("Fail", formatError(error));
+        }
+    }
 
     let desktopModuleLoad, desktopLifecycle;
     if (desktopEvidence) {
@@ -435,7 +451,7 @@ async function main(args) {
         entry[row.platform] = adapterResult(row);
         additional.set(row.sourceHash, entry);
     }
-    const totals = Object.fromEntries(["syntax", ...platforms].map(check => {
+    const totals = Object.fromEntries(["syntax", "parser", ...platforms].map(check => {
         const counts = { Pass: 0, Fail: 0, Blocked: 0 };
         for (const entry of candidates) counts[entry[check].status]++;
         return [check, counts];
