@@ -4541,6 +4541,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(transformHooks.size, 1);
             const hook = [...transformHooks][0];
             const message = { content: input, attachments: ["image"] };
+            let checkDisplayAfterDisable;
             if (desktop) hook("channel", message);
             else hook(message);
             assert.equal(message.content, expected);
@@ -4565,10 +4566,42 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 if (desktop) edit("channel", "message", message);
                 else edit(message);
                 assert.equal(message.content, "ab");
+            } else if (name === "Unindent") {
+                assert.equal(editHooks.size, 1);
+                const edit = [...editHooks][0];
+                const originalCode = "\treturn 1;\n\t  // nested";
+                const formattedCode = "return 1;\n  // nested";
+                const fence = String.fromCharCode(96).repeat(3);
+                message.content = fence + "ts\n" + originalCode + "\n" + fence + " " + fence + " inline " + fence;
+                if (desktop) edit("channel", "message", message);
+                else edit(message);
+                assert.equal(message.content, fence + "ts\n" + formattedCode + "\n" + fence + " " + fence + " inline " + fence);
+                if (desktop) {
+                    const patch = desktopPlugin.patches.find(patch => patch.replacement.replace === ",content:$self.unindentCodeBlock($1),inQuote");
+                    const fixture = "input => ({type:'codeBlock',content:input,inQuote:false})";
+                    const code = fixture.replace(patch.replacement.match, patch.replacement.replace.replace("$self", "plugin"));
+                    assert.notEqual(code, fixture);
+                    const renderCode = new Function("plugin", "return " + code)(desktopPlugin);
+                    assert.equal(renderCode(originalCode).content, formattedCode);
+                    checkDisplayAfterDisable = () => assert.equal(renderCode(originalCode).content, originalCode);
+                } else {
+                    const code = Object.freeze({ type: "codeBlock", content: originalCode, lang: "ts" });
+                    const quote = Object.freeze({ type: "blockQuote", content: Object.freeze([code]) });
+                    const text = Object.freeze({ type: "text", content: originalCode });
+                    const message = Object.freeze({ ast: Object.freeze([quote, text]) });
+                    const markup = markupParser.parseMessageMarkup(message, undefined, false);
+                    assert.equal(markup.content[0].content[0].content, formattedCode);
+                    assert.equal(markup.content[0].content[0].lang, "ts");
+                    assert.equal(markup.content[1], text);
+                    assert.equal(markupParser.parseMessageMarkup(message, undefined, false), markup);
+                    assert.equal(code.content, originalCode);
+                    checkDisplayAfterDisable = () => assert.equal(markupParser.parseMessageMarkup(message, undefined, false).content, message.ast);
+                }
             } else {
                 assert.equal(editHooks.size, 0);
             }
             click(render(), "Disable " + name);
+            checkDisplayAfterDisable?.();
             assert.equal(transformHooks.size, 0);
             assert.equal(editHooks.size, 0);
             message.content = input;

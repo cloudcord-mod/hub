@@ -20,6 +20,7 @@ import { validateCxWallpaper } from "./cxWallpaper";
 import { cxProfileMenuActions, isCxProfileUserId, type CxProfileMenuAction } from "./cxProfileMenu";
 
 export { cxProfileMenuActions, getCxProfileMedia, getCxProfileMenuCopy, isCxProfileUserId, type CxProfileMenuAction } from "./cxProfileMenu";
+export { unindentCxCode } from "./cxMessageTransforms";
 export { formatCxChannelName, getCxChannelNameCopy, type CxChannelLabel } from "./cxChannelNames";
 export { isCxNotificationMuted, type CxMessageAlert } from "./cxIncoming";
 export { bindCxChannelOpenRead, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, markCxServersRead, markCxServersReadAndWait, runCxFriendInvites } from "./cxClientCommands";

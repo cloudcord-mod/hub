@@ -1094,6 +1094,11 @@ const desktopEffectRecipes = {
         effect: "code-block-gap",
         sha256: "8ba09f634b2778cb288bd1dfc93f02294b8d07bc387c30202bff6c3dffe35733",
     },
+    Unindent: {
+        effect: "unindent-code-blocks",
+        sha256: "9afa89f37129ba9e252791bf0528f2ee2b91f63f50acdb131d8aea5ffe77a673",
+        transforms: [["send", "unindentCode"], ["edit", "unindentCode"]],
+    },
     NoMosaic: {
         effect: "flat-attachments",
         sha256: "a28bf52feb55f75f2404b22e42805d1197496153a3cc31796f16c7a6fc0b2a21",
@@ -1158,7 +1163,13 @@ function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {
     }
     const effect = nativeEffects[recipe.effect];
     if (!effect) return;
-    const compiled = { capability: "native-effect", lines: ["  needs " + effect.permission, "  use " + recipe.effect] };
+    const transforms = recipe.transforms ?? [];
+    const compiled = { capability: "native-effect", lines: [
+        ...transforms.map(([stage]) => "  needs " + (stage === "send" ? "messages.transform" : "messages.edit.transform")),
+        "  needs " + effect.permission,
+        ...transforms.map(([stage, transform]) => "  before " + stage + " " + transform),
+        "  use " + recipe.effect,
+    ] };
     if (recipe.sha256) {
         const sha256 = createHash("sha256").update(source.text.replaceAll("\r\n", "\n"), "utf8").digest("hex");
         return sha256 === recipe.sha256 ? compiled : undefined;

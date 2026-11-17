@@ -122,19 +122,27 @@ export function formatLocalTime(hour: number, minute: number, meridiem: string |
     return "<t:" + Math.floor(target.getTime() / 1000) + ":t>";
 }
 
+// Unindent by Ven, Vencord contributors (GPL-3.0-or-later).
+export function unindentCxCode(code: string) {
+    const expanded = code.replace(/\t/g, "    ");
+    let minimum = Infinity;
+    for (const line of expanded.split("\n")) {
+        if (line.trim()) minimum = Math.min(minimum, /^ */.exec(line)![0].length);
+        if (minimum === 0) return expanded;
+    }
+    return Number.isFinite(minimum) ? expanded.replace(new RegExp(`^ {${minimum}}`, "gm"), "") : expanded;
+}
+
 export const messageTransforms = {
     reverse: reverseText,
     // NormalizeMessageLinks by bb010g.
     normalizeDiscordLinks: (text: string) => text.replace(/https:\/\/(?:canary\.|ptb\.)discord(?:app)?\.com\/channels\//g, "https://discord.com/channels/"),
-    // Unindent by Vee.
-    unindentCode: (text: string) => text.replace(/(```[^\n`]*\n)([\s\S]*?)(```)/g, (_, opening, code: string, closing) => {
-        const lines = code.split("\n");
-        let minimum = Infinity;
-        for (const line of lines) {
-            if (line.trim()) minimum = Math.min(minimum, /^[\t ]*/.exec(line)![0].length);
-        }
-        if (!Number.isFinite(minimum) || minimum === 0) return opening + code + closing;
-        return opening + lines.map(line => line.replace(/^[\t ]+/, indent => indent.slice(minimum))).join("\n") + closing;
+    unindentCode: (text: string) => text.replace(/```[\s\S]*?```/g, block => {
+        const newline = block.indexOf("\n");
+        if (newline === -1) return block;
+        const hasClosingLine = block.endsWith("\n```");
+        const body = block.slice(newline + 1, hasClosingLine ? -4 : undefined);
+        return block.slice(0, newline + 1) + unindentCxCode(body) + "\n" + (hasClosingLine ? "```" : "");
     }),
     // WriteUpperCase by Samwich and KrystalSkull.
     capitalizeSentences: (text: string, exclusions = "http, https, ok") => {

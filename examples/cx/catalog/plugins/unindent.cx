@@ -1,3 +1,7 @@
 plugin "Unindent":
   needs messages.transform
+  needs messages.edit.transform
+  needs appearance.style
   before send unindentCode
+  before edit unindentCode
+  use unindent-code-blocks

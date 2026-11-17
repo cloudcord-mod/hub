@@ -24,6 +24,7 @@ import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type C
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
 import { selectCxAppearanceOption } from "@utils/cx";
+import { unindentCxCode } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -394,6 +395,7 @@ const profileBioTransforms = new Set<(bio: string) => string>();
 const typingDotListeners = new Set<() => void>();
 let staticTypingDotUsers = 0;
 let codeBlockGapUsers = 0;
+let unindentCodeBlockUsers = 0;
 const stockCodeBlock = /^```(?:([a-z0-9_+\-.#]+?)\n)?\n*([^\n][^]*?)\n*```/i;
 const codeBlockWithoutGap = new RegExp(stockCodeBlock.source + "\\n?", stockCodeBlock.flags);
 let fixFileExtensionUsers = 0;
@@ -869,6 +871,9 @@ export function CxSettings({ initialSource = "" }: { initialSource?: string; } =
                         case "code-block-gap":
                             codeBlockGapUsers++;
                             return () => { codeBlockGapUsers--; };
+                        case "unindent-code-blocks":
+                            unindentCodeBlockUsers++;
+                            return () => { unindentCodeBlockUsers--; };
                         case "hide-disabled-emojis":
                             return hideDisabledEmojiInPicker();
                         case "copy-emoji-markdown":
@@ -1333,6 +1338,13 @@ export default definePlugin({
             },
         ],
     }, {
+        // Unindent by Ven (GPL-3.0-or-later).
+        find: "inQuote:",
+        replacement: {
+            match: /,content:([^,]+),inQuote/,
+            replace: ",content:$self.unindentCodeBlock($1),inQuote",
+        },
+    }, {
         // FixCodeblockGap by Grzesiek11 (GPL-3.0-or-later).
         find: stockCodeBlock.source,
         replacement: {
@@ -1543,6 +1555,9 @@ export default definePlugin({
         },
     }],
     codeBlockMatcher(original: RegExp) { return codeBlockGapUsers > 0 ? codeBlockWithoutGap : original; },
+    unindentCodeBlock(content: unknown) {
+        return unindentCodeBlockUsers > 0 && typeof content === "string" ? unindentCxCode(content) : content;
+    },
     hideRoleHeaders() { return roleHeaderUsers > 0; },
     renderTextAttachmentCopy({ fileContents, bytesLeft }: { fileContents?: string; bytesLeft?: number; } = {}) {
         if (!fileCopyUsers || typeof fileContents !== "string" || typeof bytesLeft !== "number" || !Number.isFinite(bytesLeft)) return null;

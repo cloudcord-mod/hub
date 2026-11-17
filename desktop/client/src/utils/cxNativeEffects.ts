@@ -6,6 +6,7 @@ export const cxNativeEffects = {
     "silent-typing": { permission: "typing.suppress", label: "Stop sending your typing indicator" },
     "static-typing-dots": { permission: "appearance.style", label: "Keep Discord's typing dots still" },
     "code-block-gap": { permission: "appearance.style", label: "Remove the extra blank line after fenced code blocks" },
+    "unindent-code-blocks": { permission: "appearance.style", label: "Remove common leading indentation from displayed code blocks" },
     "force-owner-crown": { permission: "appearance.style", label: "Show the server owner’s native crown in the member list" },
     "spotify-song-name": { permission: "appearance.style", label: "Show the song title in Spotify activity status" },
     "sort-reactions-by-count": { permission: "appearance.style", label: "Show the most-used reactions first under each message" },

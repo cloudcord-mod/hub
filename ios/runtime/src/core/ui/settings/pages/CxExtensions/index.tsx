@@ -9,6 +9,7 @@ import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAc
 import { createCxTimestampRegistry, type CxTimestampFormats, type CxTimestampSurface } from "@lib/api/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel, type CxVoiceMemberOptions } from "@lib/api/cx";
 import { selectCxAppearanceOption } from "@lib/api/cx";
+import { unindentCxCode } from "@lib/api/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, validateCxMediaLink, validateCxStickerLink, type CxChannelLabel } from "@lib/api/cx";
 import { registerCommand } from "@lib/api/commands";
 import { describeCcpReport } from "@lib/api/ccpInspect";
@@ -2362,19 +2363,28 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                                 },
                             }, enabled);
                         }
+                        case "unindent-code-blocks":
                         case "code-block-gap": {
                             const parser = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
                             const cache = new WeakMap<object, unknown>();
                             type MarkupNode = { type?: string; content?: unknown; } | null;
-                            function compactCodeBlocks(nodes: MarkupNode[], depth = 0): MarkupNode[] {
+                            const unindent = effect === "unindent-code-blocks";
+                            function formatCodeBlocks(nodes: MarkupNode[], depth = 0): MarkupNode[] {
                                 let changed = false;
                                 const content = nodes.flatMap((node, index) => {
                                     if (depth < 8 && (node?.type === "blockQuote" || node?.type === "paragraph") && Array.isArray(node.content)) {
-                                        const nested = compactCodeBlocks(node.content, depth + 1);
+                                        const nested = formatCodeBlocks(node.content, depth + 1);
                                         if (nested !== node.content) {
                                             changed = true;
                                             return [{ ...node, content: nested }];
                                         }
+                                    }
+                                    if (unindent) {
+                                        if (node?.type !== "codeBlock" || typeof node.content !== "string") return [node];
+                                        const content = unindentCxCode(node.content);
+                                        if (content === node.content) return [node];
+                                        changed = true;
+                                        return [{ ...node, content }];
                                     }
                                     if (nodes[index - 1]?.type !== "codeBlock") return [node];
                                     if (node?.type === "newline" && (node.content == null || node.content === "\n")) {
@@ -2393,7 +2403,7 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                                     const row = invoke(args) as { content?: MarkupNode[]; isInlineReplyPreview?: boolean; hasBailedAst?: boolean; } | undefined;
                                     if (!Array.isArray(row?.content) || row.isInlineReplyPreview || row.hasBailedAst) return row;
                                     if (cache.has(row)) return cache.get(row);
-                                    const content = compactCodeBlocks(row.content);
+                                    const content = formatCodeBlocks(row.content);
                                     const result = content === row.content ? row : { ...row, content };
                                     cache.set(row, result);
                                     return result;
