@@ -25,7 +25,11 @@ const bootstrap = `
 globalThis.window = globalThis;
 globalThis.document = {
     documentElement: {}, head: {}, addEventListener() {}, removeEventListener() {},
-    createElement: () => ({ style: { transform: "", transition: "" } }),
+    createElement(tag) {
+        const element = { style: { transform: "", transition: "" } };
+        if (tag === "canvas") element.getContext = kind => kind === "2d" ? { canvas: element } : null;
+        return element;
+    },
 };
 globalThis.location = { href: "https://discord.invalid/channels/@me", origin: "https://discord.invalid" };
 const react = {
@@ -113,7 +117,9 @@ async function main() {
             hook.dispose();
             const checked = context.evalCode(`${bootstrap}
 const rec = scripts.loadScript(${JSON.stringify(entry.id)}, ${JSON.stringify(code)}, { patches: false });
-JSON.stringify({ loaded: !rec.error, error: rec.error?.message ?? "", stack: rec.error?.stack?.split("\\n").slice(0, 4).join("\\n"), warnings: [...rec.warnings], patches: rec.plugin?.patches?.length ?? 0 });`);
+const patches = rec.plugin?.patches ?? [];
+const textTargets = patches.map(patch => patch.find).filter(target => typeof target === "string" && target.length <= 4096);
+JSON.stringify({ loaded: !rec.error, error: rec.error?.message ?? "", stack: rec.error?.stack?.split("\\n").slice(0, 4).join("\\n"), warnings: [...rec.warnings], patches: patches.length, textTargets: [...new Set(textTargets)] });`);
             const value = checked.error ?? checked.value;
             try {
                 const returned = context.dump(value);
@@ -132,6 +138,7 @@ JSON.stringify({ loaded: !rec.error, error: rec.error?.message ?? "", stack: rec
         loaded: rows.filter(row => row.loaded).length,
         loadedWithWarnings: rows.filter(row => row.loaded && row.warnings.length).length,
         failed: rows.filter(row => !row.loaded).length,
+        preparedPatches: rows.reduce((count, row) => count + (row.patches ?? 0), 0),
     };
     const report = {
         scope: "Module load in fresh WebAssembly runtimes using the desktop loader and compatibility setup. Discord features and startup hooks were not exercised.",
