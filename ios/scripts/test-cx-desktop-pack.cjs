@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { createHash, randomUUID } = require("node:crypto");
 const { createRequire } = require("node:module");
+const { readExportSnapshot } = require("./cx-export-snapshot.cjs");
 
 const [sourceRoot, enginePath, outputFile] = process.argv.slice(2);
 if (!sourceRoot || !enginePath || !outputFile) {
@@ -66,7 +67,38 @@ const logger = { logger: () => ({ warn(message, error) {
         recordTrace("stop", error);
     }
 }, error() {}, debug() {}, info() {} }) };
-const webpack = ${loadModule("webpack.js")}(() => logger);
+const realWebpack = ${loadModule("webpack.js")}(() => logger);
+const missedLookups = new Map();
+const propertyFilters = new WeakMap();
+let lookupPhase = "load";
+function recordMissing(keys) {
+    if (!keys?.length || keys.length > 24 || missedLookups.size >= 256
+        || !keys.every(key => typeof key === "string" && key.length <= 128)) return;
+    const signature = JSON.stringify([lookupPhase, ...keys]);
+    missedLookups.set(signature, { phase: lookupPhase, keys });
+}
+const lookupOverrides = {
+    filters: { ...realWebpack.filters, byProps(...keys) {
+        const filter = realWebpack.filters.byProps(...keys);
+        propertyFilters.set(filter, keys);
+        return filter;
+    } },
+    find(filter, options) {
+        const result = realWebpack.find(filter, options);
+        if (result == null || options?.all && !result.length) recordMissing(propertyFilters.get(filter));
+        return result;
+    },
+    findByProps(...keys) {
+        const result = realWebpack.findByProps(...keys);
+        if (result == null) recordMissing(keys);
+        return result;
+    },
+};
+const webpack = new Proxy(realWebpack, {
+    get(target, key, receiver) {
+        return Object.hasOwn(lookupOverrides, key) ? lookupOverrides[key] : Reflect.get(target, key, receiver);
+    },
+});
 const cloudcord = window.CloudCord = {
     webpack, discord: { React: react, Dispatcher: dispatcher, store() {} },
     settings: { getData: (_key, fallback) => fallback, setData() {} },
@@ -97,6 +129,7 @@ new Function("cloudcord", "scripts", ${JSON.stringify(pack.setup)})(cloudcord, s
 `;
 
 const lifecycleProbe = `
+lookupPhase = "start";
 const lifecycleErrors = [];
 let unfinished = 0;
 let dispose;
@@ -149,7 +182,7 @@ function lifecycleResult(context, runtime, renewDeadline) {
     try {
         evaluate(lifecycleProbe);
         drainJobs();
-        evaluate("dispose?.();");
+        evaluate('lookupPhase = "stop"; dispose?.();');
         drainJobs();
         const result = JSON.parse(evaluate(`JSON.stringify({ errors: lifecycleErrors.concat(stopWarnings), traces: lifecycleTraces, unfinished,
             unsettledResources: Math.max(0, resources() - resourceBaseline), started: rec.started })`));
@@ -189,6 +222,8 @@ function runFixture(operation, data) {
 
 async function main() {
     const engine = await getQuickJS();
+    const windowsExports = readExportSnapshot(path.resolve(sourceRoot, "ios/dist/cx-modules-windows.txt"));
+    const androidExports = readExportSnapshot(path.resolve(sourceRoot, "ios/dist/cx-modules-android.txt"));
     const rows = [];
     for (const entry of pack.entries) {
         const code = pack.scripts[entry.id.replace(/^gpl\//, "")];
@@ -220,6 +255,17 @@ JSON.stringify({ loaded: !rec.error, error: rec.error?.message ?? "", stack: rec
                 else {
                     const row = { id: entry.id, ...JSON.parse(returned) };
                     if (row.loaded) row.lifecycle = lifecycleResult(context, runtime, () => { deadline = Date.now() + 250; });
+                    deadline = Date.now() + 250;
+                    const lookupResult = context.evalCode("JSON.stringify([...missedLookups.values()]);");
+                    const lookupValue = lookupResult.error ?? lookupResult.value;
+                    try {
+                        const data = context.dump(lookupValue);
+                        if (lookupResult.error) row.lookupError = data.message ?? String(data);
+                        else row.missingLookups = JSON.parse(data).map(lookup => ({ ...lookup,
+                            observedInWindowsSnapshot: windowsExports?.(lookup.keys) ?? null,
+                            observedInAndroidSnapshot: androidExports?.(lookup.keys) ?? null,
+                        }));
+                    } finally { lookupValue.dispose(); }
                     rows.push(row);
                 }
             } finally {

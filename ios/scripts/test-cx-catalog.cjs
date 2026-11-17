@@ -217,7 +217,7 @@ function writeReport(output, report) {
     const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail",
         "Desktop settings switches", "Mobile settings switches", "Command inputs"];
     if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings", "Desktop pack declared settings");
-    if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail");
+    if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail", "Missed fixture lookups (Windows/Android export names)");
     if (report.discoverFactory) header.push("Discover fixture load", "Discover fixture error", "Android lookup signatures observed", "Discover declares settings");
     const rows = [...report.candidates, ...report.additionalSharedPlugins].map(entry => [
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
@@ -225,7 +225,11 @@ function writeReport(output, report) {
         entry.desktop.settingsSwitches?.join("; "), entry.mobile.settingsSwitches?.join("; "),
         (entry.desktop.commandInputs ?? entry.mobile.commandInputs)?.join("; "),
         ...(report.desktopModuleLoad ? [entry.moduleLoad?.status, entry.moduleLoad?.error, entry.moduleLoad?.warnings.join("; "), entry.moduleLoad?.settingsFields?.join("; ")] : []),
-        ...(report.desktopLifecycle ? [entry.desktopLifecycle?.status, entry.desktopLifecycle?.reason] : []),
+        ...(report.desktopLifecycle ? [entry.desktopLifecycle?.status, entry.desktopLifecycle?.reason,
+            entry.moduleLoad?.missingLookups?.map(({ phase, keys, observedInWindowsSnapshot, observedInAndroidSnapshot }) =>
+                phase + ": " + keys.join(" + ") + " [" + [observedInWindowsSnapshot, observedInAndroidSnapshot].map(observed =>
+                    observed == null ? "unknown" : observed ? "yes" : "no").join("/") + "]").join("; "),
+        ] : []),
         ...(report.discoverFactory ? [entry.discoverFactory?.status, entry.discoverFactory?.error, entry.discoverFactory?.androidMatches, entry.discoverFactory?.settingsDeclared] : []),
     ]);
     fs.writeFileSync(output.replace(/\.json$/i, ".csv"), [header, ...rows].map(row => row.map(csvField).join(",")).join("\r\n") + "\r\n");
@@ -332,7 +336,7 @@ async function main(args) {
             const status = row ? row.loaded ? "Pass" : "Fail" : "Blocked";
             counts[status]++;
             entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [],
-                settingsFields: row?.settingsFields };
+                settingsFields: row?.settingsFields, missingLookups: row?.missingLookups, lookupError: row?.lookupError };
             if (lifecycleCounts) {
                 const lifecycle = row?.lifecycle;
                 const lifecycleStatus = lifecycle?.status ?? "Blocked";

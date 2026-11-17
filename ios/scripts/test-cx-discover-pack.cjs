@@ -1,29 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { createHash } = require("node:crypto");
+const { readExportSnapshot } = require("./cx-export-snapshot.cjs");
 
 const [sourceRoot, enginePath, output] = process.argv.slice(2);
 if (!sourceRoot || !enginePath || !output) throw new Error("Usage: test-cx-discover-pack.cjs <candidate checkout> <QuickJS package path> <report.json>");
 const { getQuickJS } = require(path.resolve(enginePath));
 const packSource = fs.readFileSync(path.resolve(sourceRoot, "ios/dist/discover-cx/mobile-conversion-preview.json"), "utf8");
 const pack = JSON.parse(packSource);
-
-function androidExports() {
-    const file = path.resolve(sourceRoot, "ios/dist/cx-modules-android.txt");
-    if (!fs.existsSync(file)) return;
-    const modules = [];
-    let groups;
-    for (const line of fs.readFileSync(file, "utf8").split(/\r?\n/)) {
-        const [kind, name] = line.split("\t", 3);
-        if (kind === "module") { groups = new Map(); modules.push(groups); }
-        if (kind !== "export" || !groups || !name) continue;
-        const last = name.lastIndexOf(".");
-        const parent = last < 0 ? "" : name.slice(0, last);
-        if (!groups.has(parent)) groups.set(parent, new Set());
-        groups.get(parent).add(name.slice(last + 1));
-    }
-    return modules.flatMap(groups => [...groups.values()]);
-}
 
 // Only the preview factory runs. All host APIs are inert and lifecycle hooks
 // are recorded without being invoked, even when the preview exports an object.
@@ -64,7 +48,7 @@ const require = name => {
 
 async function main() {
     const engine = await getQuickJS();
-    const groups = androidExports();
+    const observed = readExportSnapshot(path.resolve(sourceRoot, "ios/dist/cx-modules-android.txt"));
     const evidence = new Map();
     const rows = [];
     for (const { id } of pack.entries) {
@@ -97,7 +81,7 @@ JSON.stringify({ error, hooks, settingsDeclared, requests: [...requests.values()
                 const data = JSON.parse(result);
                 const requests = data.requests.map(keys => {
                     const key = JSON.stringify(keys);
-                    if (!evidence.has(key)) evidence.set(key, groups?.some(group => keys.every(name => group.has(name))) ?? null);
+                    if (!evidence.has(key)) evidence.set(key, observed?.(keys) ?? null);
                     return { keys, observedInAndroidSnapshot: evidence.get(key) };
                 });
                 rows.push({ id, status: data.error ? "Fail" : "Pass", error: data.error, hooks: data.hooks, settingsDeclared: data.settingsDeclared, requests, fixtureApis: data.fixtureApis });
