@@ -230,7 +230,7 @@ type CxPlugin = {
 type CxDocument = CxTheme | CxPlugin;
 type CxAppearanceOption = { target: CxHideTarget; label: string; defaultOn: boolean; };
 
-export function selectCxAppearanceOption(selected: readonly string[], target: string, checked: boolean) {
+export function selectCxAppearanceOption<Target extends string>(selected: readonly Target[], target: Target, checked: boolean) {
     return checked ? [...new Set([...selected, target])] : selected.filter(current => current !== target);
 }
 

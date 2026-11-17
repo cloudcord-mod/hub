@@ -1,7 +1,17 @@
 import { useTestingReview } from "./index";
 
-/** Web renderer shared by the Windows desktop builds. */
-export function TestingPluginsWeb({ react, assignment, storage, build, authorized, copy, openCxPort = undefined }) {
+/**
+ * @param {{
+ *   react: Parameters<typeof useTestingReview>[0],
+ *   assignment: Parameters<typeof useTestingReview>[1],
+ *   storage: Parameters<typeof useTestingReview>[2],
+ *   build: Parameters<typeof useTestingReview>[3],
+ *   authorized: Parameters<typeof useTestingReview>[4],
+ *   copy: (text: string) => Promise<void>,
+ *   openCxPort?: (name: string) => void,
+ * }} props
+ */
+export function TestingPluginsWeb({ react, assignment, storage, build, authorized, copy, openCxPort }) {
     const review = useTestingReview(react, assignment, storage, build, authorized);
     const [exportMessage, setExportMessage] = react.useState("");
     const input = {
