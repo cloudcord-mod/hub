@@ -1,11 +1,10 @@
-// Runs the production CX settings adapters against fixtures and checks the
-// separate candidate packs without executing their JavaScript.
+// Runs the production CX settings adapters and optional isolated pack checks.
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 const vm = require("node:vm");
 const { createHash } = require("node:crypto");
-const { spawnSync } = require("node:child_process");
+const { execFile, spawnSync } = require("node:child_process");
 const { pathToFileURL } = require("node:url");
 const queues = require("../../desktop/client/src/utils/cxTesting/cx-testing-queues.json");
 
@@ -58,6 +57,36 @@ function runAdapterTests() {
         if (fs.existsSync(output)) fs.unlinkSync(output);
         fs.rmdirSync(temp);
     }
+}
+
+async function runPackTest(script, sourceRoot, enginePath) {
+    const temp = fs.mkdtempSync(path.join(os.tmpdir(), "cloudcord-cx-pack-"));
+    const file = path.join(temp, "result.json");
+    try {
+        await new Promise((resolve, reject) => {
+            execFile(process.execPath, [path.join(__dirname, script), sourceRoot, enginePath, file], { timeout: 120_000 }, (error, _stdout, stderr) => {
+                // Exit 1 can be a valid report containing failing plugins.
+                if (error && (error.code !== 1 || !fs.existsSync(file))) reject(new Error(script + ": " + (stderr.trim() || error.message)));
+                else resolve();
+            });
+        });
+        return JSON.parse(fs.readFileSync(file, "utf8"));
+    } finally {
+        if (fs.existsSync(file)) fs.unlinkSync(file);
+        fs.rmdirSync(temp);
+    }
+}
+
+function matchEvidence(evidence, pack, label) {
+    if (typeof evidence.packSha256 !== "string" || evidence.packSha256 !== pack.sha256) {
+        throw new Error("The " + label + " report was produced from a different candidate pack");
+    }
+    const rows = new Map();
+    for (const row of evidence.rows) {
+        if (!pack.entries.has(row?.id) || rows.has(row.id)) throw new Error("Unexpected or duplicate " + label + " result");
+        rows.set(row.id, row);
+    }
+    return rows;
 }
 
 function checkCandidate(id, entry, pack, parse) {
@@ -116,10 +145,12 @@ function writeReport(output, report) {
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + "\n");
     const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail"];
     if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings");
+    if (report.discoverFactory) header.push("Discover fixture load", "Discover fixture error", "Android lookup signatures observed");
     const rows = [...report.candidates, ...report.additionalSharedPlugins].map(entry => [
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
         ...(report.desktopModuleLoad ? [entry.moduleLoad?.status, entry.moduleLoad?.error, entry.moduleLoad?.warnings.join("; ")] : []),
+        ...(report.discoverFactory ? [entry.discoverFactory?.status, entry.discoverFactory?.error, entry.discoverFactory?.androidMatches] : []),
     ]);
     fs.writeFileSync(output.replace(/\.json$/i, ".csv"), [header, ...rows].map(row => row.map(csvField).join(",")).join("\r\n") + "\r\n");
 }
@@ -127,22 +158,31 @@ function writeReport(output, report) {
 async function main(args) {
     let sourceRoot = root;
     let output = path.join(root, "ios/dist/cx-test-results.json");
-    let desktopLoadFile;
+    let desktopLoadFile, discoverLoadFile, enginePath;
     for (let i = 0; i < args.length; i += 2) {
         const flag = args[i], value = args[i + 1];
-        if (!value || value.startsWith("--") || !["--sources", "--output", "--desktop-load"].includes(flag)) {
-            throw new Error("Usage: node ios/scripts/test-cx-catalog.cjs [--sources <candidate checkout>] [--desktop-load <isolated load report.json>] [--output <report.json>]");
+        if (!value || value.startsWith("--") || !["--sources", "--output", "--desktop-load", "--discover-load", "--engine"].includes(flag)) {
+            throw new Error("Usage: test-cx-catalog.cjs [--sources <candidate checkout>] [--engine <QuickJS package path>] [--desktop-load <report.json>] [--discover-load <report.json>] [--output <report.json>]");
         }
         if (flag === "--sources") sourceRoot = path.resolve(value);
         else if (flag === "--output") output = path.resolve(value);
-        else desktopLoadFile = path.resolve(value);
+        else if (flag === "--desktop-load") desktopLoadFile = path.resolve(value);
+        else if (flag === "--discover-load") discoverLoadFile = path.resolve(value);
+        else enginePath = path.resolve(value);
     }
     if (!/\.json$/i.test(output)) throw new Error("The report filename must end in .json");
 
     const packs = Object.fromEntries(Object.keys(sourceFiles).map(group => [group, readPack(sourceRoot, group)]));
     const packParser = path.join(sourceRoot, "core/src/cx/parse.js");
     const parse = fs.existsSync(packParser) ? (await import(pathToFileURL(packParser).href)).parse : undefined;
+    const packTests = Promise.all([
+        desktopLoadFile ? JSON.parse(fs.readFileSync(desktopLoadFile, "utf8"))
+            : enginePath && runPackTest("test-cx-desktop-pack.cjs", sourceRoot, enginePath),
+        discoverLoadFile ? JSON.parse(fs.readFileSync(discoverLoadFile, "utf8"))
+            : enginePath && runPackTest("test-cx-discover-pack.cjs", sourceRoot, enginePath),
+    ]);
     const { rows, ...adapterSuite } = runAdapterTests();
+    const [desktopEvidence, discoverEvidence] = await packTests;
     const adapters = new Map(rows.map(row => [row.platform + ":" + row.sourceHash, row]));
     const styles = new Map(rows.filter(row => row.appearanceCss).map(row => [row.platform + ":" + row.appearanceCss.trim(), row]));
     const matched = new Set();
@@ -188,27 +228,35 @@ async function main(args) {
     });
 
     let desktopModuleLoad;
-    if (desktopLoadFile) {
-        const evidence = JSON.parse(fs.readFileSync(desktopLoadFile, "utf8"));
-        const desktopPack = packs["Desktop CX pack"];
-        if (typeof evidence.packSha256 !== "string" || evidence.packSha256 !== desktopPack.sha256) {
-            throw new Error("The module load report was produced from a different desktop pack");
-        }
-        const loaded = new Map();
-        for (const row of evidence.rows) {
-            if (!desktopPack.entries.has(row?.id) || loaded.has(row.id) || typeof row.loaded !== "boolean") {
-                throw new Error("Unexpected or duplicate module load result");
-            }
-            loaded.set(row.id, row);
-        }
+    if (desktopEvidence) {
+        const loaded = matchEvidence(desktopEvidence, packs["Desktop CX pack"], "desktop module load");
         const counts = { Pass: 0, Fail: 0, Blocked: 0 };
         for (const entry of candidates.filter(candidate => candidate.group === "Desktop CX pack")) {
             const row = loaded.get(entry.id);
+            if (row && typeof row.loaded !== "boolean") throw new Error("Invalid desktop module status: " + entry.id);
             const status = row ? row.loaded ? "Pass" : "Fail" : "Blocked";
             counts[status]++;
             entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [] };
         }
         desktopModuleLoad = { scope: "Isolated desktop module loading without startup hooks or Discord patches", counts };
+    }
+
+    let discoverFactory;
+    if (discoverEvidence) {
+        const loaded = matchEvidence(discoverEvidence, packs["Discover CX preview"], "Discover factory load");
+        const counts = { Pass: 0, Fail: 0, Blocked: 0 };
+        for (const entry of candidates.filter(candidate => candidate.group === "Discover CX preview")) {
+            const row = loaded.get(entry.id);
+            if (row && row.status !== "Pass" && row.status !== "Fail") throw new Error("Invalid Discover factory status: " + entry.id);
+            const status = row?.status ?? "Blocked";
+            counts[status]++;
+            const requests = row?.requests ?? [];
+            const androidMatches = requests.length ? requests.filter(request => request.observedInAndroidSnapshot === true).length + "/" + requests.length : "";
+            entry.discoverFactory = { status, error: row?.error ?? "Missing Discover factory result", androidMatches, requests };
+        }
+        discoverFactory = { scope: "Isolated Discover factories with inert Vendetta fixtures", counts,
+            distinctFindByProps: discoverEvidence.summary.distinctFindByProps,
+            observedAndroidSignatures: discoverEvidence.summary.observedAndroidSignatures };
     }
 
     const additional = new Map();
@@ -229,12 +277,12 @@ async function main(args) {
     }));
     const report = {
         scope: "Syntax and fixture-based adapter activation and cleanup. Device behavior requires separate results.",
-        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad,
+        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, discoverFactory,
         candidates, additionalSharedPlugins: [...additional.values()],
     };
     writeReport(output, report);
-    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, additionalSharedPlugins: additional.size, report: output }, null, 2));
-    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) || desktopModuleLoad?.counts.Fail) process.exitCode = 1;
+    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, discoverFactory, additionalSharedPlugins: additional.size, report: output }, null, 2));
+    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) || desktopModuleLoad?.counts.Fail || discoverFactory?.counts.Fail) process.exitCode = 1;
 }
 
 main(process.argv.slice(2)).catch(error => { console.error(formatError(error)); process.exitCode = 1; });
