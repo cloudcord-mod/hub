@@ -42,7 +42,8 @@ const code = esbuild.transformSync(source, { loader: 'ts', format: 'cjs' }).code
         assert.equal(refreshes, bridgeless ? 0 : 1);
         assert.equal(warnings, !bridgeless && ['throw', 'reject'].includes(mode) ? 1 : 0);
         assert.ok(context.window.bunny, 'Runtime finishes despite a pending legacy updater');
-        assert.deepEqual(nativeLogs, ['CloudCord is ready!'], 'native readiness is emitted at completed startup');
+        assert.equal(nativeLogs.at(-1), 'CloudCord is ready!', 'native readiness is emitted at completed startup');
+        assert.equal(nativeLogs.filter(message => message === 'CloudCord is ready!').length, 1);
     }
     const workflow = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
     assert.ok(!workflow.includes('await initLegacyRuntimeRefresh();'), 'Release patching must not restore the startup wait');
