@@ -2,11 +2,15 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { createHash } = require("node:crypto");
 const { inflateSync } = require("node:zlib");
 const { buildSync, transformSync } = require("esbuild");
 
 const root = path.join(__dirname, "../..");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
+const resultsPath = process.argv[2] === "--catalog-results" ? process.argv[3] : undefined;
+const adapterResults = [];
+const activationFailures = [];
 const moduleBox = { exports: {} };
 const code = buildSync({
     entryPoints: [path.join(root, "desktop/client/src/utils/cx.ts")],
@@ -4722,7 +4726,6 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 selectedChannel = prior;
             }
         }
-        const activationFailures = [];
         const installedHooks = () => ({
             commands: Object.keys(registered).sort(),
             send: transformHooks.size,
@@ -4736,21 +4739,43 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             document: documentListeners.size,
             stylesheet,
         });
-        const baseline = installedHooks();
         for (const entry of cxCatalog.plugins) {
-            selectCatalog(entry.name);
-            click(render(), "Allow for this session");
+            const baseline = installedHooks();
             const deactivate = "Disable " + entry.name;
-            if (!button(render(), deactivate)) {
-                const status = find(render(), item => item.props.accessibilityLiveRegion === "polite" || item.props.role === "status");
-                activationFailures.push([entry.name, status?.props.children]);
-                continue;
+            const errors = [];
+            try {
+                selectCatalog(entry.name);
+                click(render(), "Allow for this session");
+                if (!button(render(), deactivate)) {
+                    const status = find(render(), item => item.props.accessibilityLiveRegion === "polite" || item.props.role === "status");
+                    throw new Error(String(status?.props.children || "Activation did not show the Disable action"));
+                }
+            } catch (error) {
+                errors.push(error.message);
             }
-            click(render(), deactivate);
-            assert.equal(button(render(), deactivate), undefined, entry.name + " should deactivate");
-            assert.deepEqual(installedHooks(), baseline, entry.name + " should release its adapter registrations");
+            try {
+                if (button(render(), deactivate)) click(render(), deactivate);
+                assert.equal(button(render(), deactivate), undefined, entry.name + " should deactivate");
+                assert.deepEqual(installedHooks(), baseline, entry.name + " should release its adapter registrations");
+            } catch (error) {
+                errors.push(error.message);
+            }
+            if (errors.length) activationFailures.push({ platform, name: entry.name, errors });
+            if (resultsPath) {
+                const directives = entry.source.trim().split(/\r?\n/).slice(1);
+                const appearanceOnly = directives.every(line => /^\s+needs appearance\.(hide|style)$|^\s+(hide|style) [\w-]+$/.test(line));
+                const appearanceCss = appearanceOnly ? directives.flatMap(line => {
+                    const target = /^\s+(?:hide|style) ([\w-]+)$/.exec(line)?.[1];
+                    const rule = moduleBox.exports.cxAppearanceTargets[target];
+                    return rule?.css && !rule.desktopOnly ? [rule.css] : [];
+                }).join(" ") : "";
+                adapterResults.push({
+                    platform, name: entry.name, status: errors.length ? "Fail" : "Pass", errors,
+                    sourceHash: createHash("sha256").update(entry.source.replace(/\r\n/g, "\n").trim()).digest("hex"),
+                    appearanceCss,
+                });
+            }
         }
-        assert.deepEqual(activationFailures, [], (desktop ? "Desktop" : "Mobile") + " CX catalog activation failures");
         for (const entry of cxCatalog.themes) {
             const theme = parseCx(entry.source);
             selectCatalog(entry.name);
@@ -4807,5 +4832,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
     assert.equal(portableVendetta.wallpaper, png);
     assert.equal(portableVendetta.wallpaperOpacity, 1);
     assert.equal(portableVendetta.wallpaperBlur, 0.6);
+    assert.deepEqual(activationFailures, [], "CX catalog activation failures");
     console.log(`PASS shared CX catalog with ${cxCatalog.plugins.length} plugins and ${cxCatalog.themes.length} themes, permission approval, both command adapters and strict palette migration`);
-})().catch(error => { console.error(error); process.exitCode = 1; });
+})().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => {
+    if (resultsPath) fs.writeFileSync(resultsPath, JSON.stringify(adapterResults));
+});

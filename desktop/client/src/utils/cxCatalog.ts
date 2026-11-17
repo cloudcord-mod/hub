@@ -139,6 +139,7 @@ import plugin_catalog_narrow_channel_list from "../../../../examples/cx/catalog/
 import plugin_catalog_nepeta_s_typing_quirk from "../../../../examples/cx/catalog/plugins/nepeta-s-typing-quirk.cx";
 import plugin_catalog_no_animations from "../../../../examples/cx/catalog/plugins/no-animations.cx";
 import plugin_catalog_no_blocked_messages from "../../../../examples/cx/catalog/plugins/no-blocked-messages.cx";
+import plugin_catalog_no_chat_bar_border from "../../../../examples/cx/catalog/plugins/no-chat-bar-border.cx";
 import plugin_catalog_no_confirm_pin from "../../../../examples/cx/catalog/plugins/no-confirm-pin.cx";
 import plugin_catalog_no_draft_length_limit from "../../../../examples/cx/catalog/plugins/no-draft-length-limit.cx";
 import plugin_catalog_no_mosaic from "../../../../examples/cx/catalog/plugins/no-mosaic.cx";
@@ -453,6 +454,7 @@ export const cxCatalog = {
         { name: "Nepeta'sTypingQuirk", source: plugin_catalog_nepeta_s_typing_quirk },
         { name: "NoAnimations", source: plugin_catalog_no_animations },
         { name: "NoBlockedMessages", source: plugin_catalog_no_blocked_messages },
+        { name: "NoChatBarBorder", source: plugin_catalog_no_chat_bar_border },
         { name: "NoConfirmPin", source: plugin_catalog_no_confirm_pin },
         { name: "NoDraftLengthLimit", source: plugin_catalog_no_draft_length_limit },
         { name: "NoMosaic", source: plugin_catalog_no_mosaic },

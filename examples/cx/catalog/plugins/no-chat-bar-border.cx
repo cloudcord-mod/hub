@@ -1,0 +1,3 @@
+plugin "NoChatBarBorder":
+  needs appearance.style
+  style borderless-chat-bar

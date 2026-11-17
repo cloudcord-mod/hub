@@ -336,6 +336,11 @@ export const cxAppearanceTargets = {
         css: '[class*="channelTextArea"] [class*="scrollableContainer"], form [class*="channelTextArea"] { border-radius: 24px !important; }',
         style: { component: "FloatingChatInputContainer", values: { borderRadius: 24 } },
     },
+    "borderless-chat-bar": {
+        plugin: "NoChatBarBorder", label: "remove the chat bar border and shadow",
+        css: 'form [class*="channelTextArea"] { border: 0 !important; box-shadow: none !important; }',
+        style: { component: "FloatingChatInputContainer", values: { borderWidth: 0, shadowOpacity: 0, elevation: 0 } },
+    },
     "transparent-chat-bar": {
         plugin: "TransparentChatBar", label: "make the chat input background translucent",
         css: 'form [class*="channelTextArea"] [class*="scrollableContainer"] { background: rgb(0 0 0 / 25%) !important; backdrop-filter: blur(6px); }',
