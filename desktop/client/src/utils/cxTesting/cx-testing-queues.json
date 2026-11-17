@@ -567,7 +567,7 @@
     ["gpl/hide-emoji-button", "HideEmojiButton", "Desktop CX pack"],
     ["gpl/hide-gif-button", "HideGifButton", "Desktop CX pack"],
     ["gpl/hide-help-button", "HideHelpButton", "Desktop CX pack"],
-    ["gpl/hide-join-messages", "HideJoinMessages", "Desktop CX pack"],
+    ["gpl/hide-join-messages", "HideJoinMessages", "Desktop CX pack", "hide-join-messages.cx"],
     ["gpl/hide-media", "HideMedia", "Desktop CX pack"],
     ["gpl/hide-mention-badges", "HideMentionBadges", "Desktop CX pack"],
     ["gpl/hide-new-messages-bar", "HideNewMessagesBar", "Desktop CX pack"],

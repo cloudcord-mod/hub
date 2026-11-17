@@ -2263,20 +2263,24 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
 
         const systemPort = cxCatalog.plugins.find(entry => entry.name === "HideSystemMessages").source;
         assert.throws(() => parseCx(systemPort.replace("pins,joins,boosts", "pins,moderation")), /Choose pins, joins, or boosts/);
-        selectCatalog("HideSystemMessages");
-        click(render(), "Allow for this session");
-        const [filterSystem] = incomingHooks;
         const ordinary = { id: "regular", type: 0 };
         const safetyNotice = { id: "moderation", type: 24 };
         const systemMessages = [6, 7, 8, 9, 10, 11].map(type => ({ id: String(type), type }));
-        for (const message of systemMessages) {
-            assert.equal(filterSystem({ type: "MESSAGE_CREATE", message }), desktop ? true : false);
+        for (const [name, hiddenTypes] of [["HideSystemMessages", [6, 7, 8, 9, 10, 11]], ["HideJoinMessages", [7]]]) {
+            selectCatalog(name);
+            click(render(), "Allow for this session");
+            const [filterSystem] = incomingHooks;
+            const messages = [...systemMessages, ordinary, safetyNotice];
+            for (const message of messages) {
+                const expected = hiddenTypes.includes(message.type) ? desktop : undefined;
+                assert.equal(filterSystem({ type: "MESSAGE_CREATE", message }), expected);
+            }
+            const history = { type: "LOAD_MESSAGES_SUCCESS", messages };
+            assert.deepEqual(Array.from((filterSystem(history) ?? history).messages), messages.filter(message => !hiddenTypes.includes(message.type)));
+            click(render(), "Disable " + name);
+            assert.equal(filterSystem({ type: "MESSAGE_CREATE", message: systemMessages[1] }), undefined);
+            assert.equal(incomingHooks.length, 0);
         }
-        const history = { type: "LOAD_MESSAGES_SUCCESS", messages: [...systemMessages, ordinary, safetyNotice] };
-        assert.deepEqual(Array.from((filterSystem(history) ?? history).messages), [ordinary, safetyNotice]);
-        assert.equal(filterSystem({ type: "MESSAGE_CREATE", message: safetyNotice }), undefined);
-        click(render(), "Disable HideSystemMessages");
-        assert.equal(filterSystem({ type: "MESSAGE_CREATE", message: systemMessages[0] }), undefined);
 
         const replyDefaultPort = cxCatalog.plugins.find(entry => entry.name === "NoReplyPing").source;
         assert.throws(() => parseCx(replyDefaultPort.replace('reply-ping-default ""', 'reply-ping-default "always"')), /take no options/);

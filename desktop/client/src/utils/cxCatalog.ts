@@ -86,6 +86,7 @@ import plugin_catalog_hide_guild_boost_tag from "../../../../examples/cx/catalog
 import plugin_catalog_hide_help_button from "../../../../examples/cx/catalog/plugins/hide-help-button.cx";
 import plugin_catalog_hide_image_alt_text from "../../../../examples/cx/catalog/plugins/hide-image-alt-text.cx";
 import plugin_catalog_hide_inbox_button from "../../../../examples/cx/catalog/plugins/hide-inbox-button.cx";
+import plugin_catalog_hide_join_messages from "../../../../examples/cx/catalog/plugins/hide-join-messages.cx";
 import plugin_catalog_hide_jump_to_present from "../../../../examples/cx/catalog/plugins/hide-jump-to-present.cx";
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
 import plugin_catalog_hide_mention_badges from "../../../../examples/cx/catalog/plugins/hide-mention-badges.cx";
@@ -403,6 +404,7 @@ export const cxCatalog = {
         { name: "HideHelpButton", source: plugin_catalog_hide_help_button },
         { name: "HideImageAltText", source: plugin_catalog_hide_image_alt_text },
         { name: "HideInboxButton", source: plugin_catalog_hide_inbox_button },
+        { name: "HideJoinMessages", source: plugin_catalog_hide_join_messages },
         { name: "HideJumpToPresent", source: plugin_catalog_hide_jump_to_present },
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities },
         { name: "HideMentionBadges", source: plugin_catalog_hide_mention_badges },

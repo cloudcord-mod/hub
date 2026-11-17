@@ -10,6 +10,13 @@ const desktopGroups = ["plugins", "cloudcordplugins", "endcordplugins", "equicor
 const catalogFolder = path.join(root, "examples/cx/catalog/plugins");
 const quotedPattern = /[\x00-\x1f\x7f-\x9f\u202a-\u202e\u2066-\u2069]/u;
 const printer = ts.createPrinter({ removeComments: true });
+const systemMessageTweaks = new Map([
+    ["HideSystemMessages", { css: '[class*="systemMessage"] { display: none !important; }', categories: "pins,joins,boosts" }],
+    ["HideJoinMessages", {
+        css: '[class*="systemMessage"]:has([class*="welcome"]), li:has([class*="userJoin"]) { display: none !important; }',
+        categories: "joins",
+    }],
+]);
 
 // Shared hook names identify where a plugin runs. Group by the operation it
 // performs as well so a new host capability can serve several plugins.
@@ -1334,8 +1341,9 @@ function inspectPlugin(file, code, platform, appearance = {}, nativeEffects = {}
         if (!name) return;
         const css = literal(call.arguments[2]);
         const targets = matchAppearanceStyles(css, appearance);
-        const hideSystem = name === "HideSystemMessages" && css === '[class*="systemMessage"] { display: none !important; }';
-        const supported = (targets || hideSystem) && platform === "desktop" && !entry.isExportEquals && !source.parseDiagnostics.length
+        const systemTweak = systemMessageTweaks.get(name);
+        const systemMessages = systemTweak?.css === css && systemTweak?.categories;
+        const supported = (targets || systemMessages) && platform === "desktop" && !entry.isExportEquals && !source.parseDiagnostics.length
             && safeText(name) && name.length <= 64
             && call.arguments.length >= 3 && call.arguments.length <= 4
             && literal(call.arguments[1]) !== undefined
@@ -1347,9 +1355,9 @@ function inspectPlugin(file, code, platform, appearance = {}, nativeEffects = {}
         return {
             name, file, platform, ...inventory(source), flags: { commands: false, outgoing: false, settings: false, ui: true, styles: true },
             ...(supported ? {
-                capability: hideSystem ? "incoming-filter" : "appearance",
-                cx: ["plugin " + JSON.stringify(name) + ":", ...(hideSystem
-                    ? ["  needs messages.filterlocal", '  on incoming hide-system "pins,joins,boosts"']
+                capability: systemMessages ? "incoming-filter" : "appearance",
+                cx: ["plugin " + JSON.stringify(name) + ":", ...(systemMessages
+                    ? ["  needs messages.filterlocal", "  on incoming hide-system " + JSON.stringify(systemMessages)]
                     : appearanceLines(targets)), ""].join("\n"),
             } : {}),
         };

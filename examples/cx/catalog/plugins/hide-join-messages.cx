@@ -1,0 +1,3 @@
+plugin "HideJoinMessages":
+  needs messages.filterlocal
+  on incoming hide-system "joins"

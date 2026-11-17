@@ -247,10 +247,11 @@ assert.deepEqual(Array.from(parseCx(splitPorts[0].cx).nativeEffects), ["split-lo
 assert.deepEqual(statuses([reactionPorts[0], { ...reactionPorts[1], platform: "betterdiscord" }]), ["compare-sources", "source-review"]);
 assert.deepEqual(statuses([reactionPorts[0], { ...reactionPorts[1], cx: undefined }]), ["compare-mobile", "needs-adapter"]);
 assert.deepEqual(Array.from(parseCx(reactionPorts[0].cx).permissions), ["messages.reactshortcut"]);
-for (const [name, platform, rule] of [["HideSystemMessages", "desktop", "hide-system"], ["NoProfileThemes", "mobile", "hide-profile-themes"]]) {
+for (const [name, platform, rule] of [["HideSystemMessages", "desktop", "hide-system"], ["HideJoinMessages", "desktop", "hide-system"], ["NoProfileThemes", "mobile", "hide-profile-themes"]]) {
     const port = matches.find(record => record.name === name && record.platform === platform);
     assert.equal(port?.capability, "incoming-filter");
     assert.equal(parseCx(port.cx).incoming[0].kind, rule);
+    if (name === "HideJoinMessages") assert.deepEqual(Array.from(parseCx(port.cx).incoming[0].values), ["joins"]);
 }
 for (const [name, kind] of [["VoiceJoinMessages", "friends-voice"], ["FollowVoiceUser", "follow-voice"], ["RelationshipNotifier", "friend-removals"]]) {
     const port = matches.find(record => record.name === name && record.platform === "mobile");
