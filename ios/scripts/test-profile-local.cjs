@@ -44,7 +44,7 @@ const serializer = desktopSource.slice(desktopSource.indexOf('function toSharedP
 const serializerContext = vm.createContext({ REPLACE_BADGES_SYNC_ID: 'replace', ALL_DECORATIONS: [], getDecorationUrl: () => '' });
 vm.runInContext(esbuild.transformSync(serializer, { loader: 'ts' }).code, serializerContext);
 const desktopPayload = JSON.parse(JSON.stringify(serializerContext.toSharedProfile({ username: 'desktop_name', globalName: 'Desktop Name' })));
-const mobileHelper = page.slice(page.indexOf('function decorateSharedProfile('), page.indexOf('function clearCache('));
+const mobileHelper = page.slice(page.indexOf('const sharedDecorations ='), page.indexOf('function clearCache('));
 const mobileContext = vm.createContext({ setOwnValue: (obj, key, value) => { obj[key] = value; }, cloneSharedUser: (user, data) => ({ ...user, username: data.username, globalName: data.globalName }), shouldReplaceSharedBadges: () => false, remoteNitroEnabled: () => false, profileDate: () => null });
 Object.assign(mobileContext, require('./load-profile-appearance.cjs'));
 Object.assign(mobileContext, { NITRO_DURATIONS: [], GIFT_LEVELS: [], BADGES: [], addRenderedBadge: () => {}, applyBadgeLayout: rows => rows, badgeLayoutKey: badge => badge.id });

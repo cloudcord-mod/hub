@@ -1,17 +1,10 @@
 import * as DataStore from "@api/DataStore";
 import { copyToClipboard } from "@utils/clipboard";
-import { IS_WINDOWS } from "@utils/constants";
-import { React, UserStore } from "@webpack/common";
+import { React } from "@webpack/common";
 
-import { getTestingAssignment, testingStorageKey, testingUserId, useTestingUserId } from "../../../../../../../config/cx-testing";
+import { testingStorageKey } from "../../../../../../../config/cx-testing";
 import { TestingPluginsWeb } from "../../../../../../../config/cx-testing-web";
-
-const platform = IS_WINDOWS ? "windows" : "";
-const currentAssignment = () => getTestingAssignment(testingUserId(UserStore), platform);
-
-export function useTestingPluginsAssignment() {
-    return getTestingAssignment(useTestingUserId(React, UserStore), platform);
-}
+import { currentAssignment, useTestingPluginsAssignment } from "./testingAccess";
 
 export default function TestingPlugins() {
     const assignment = useTestingPluginsAssignment();

@@ -1,6 +1,6 @@
 const fs = require("node:fs"), vm = require("node:vm"), assert = require("node:assert/strict");
 const esbuild = require("esbuild");
-let active, visibility = {};
+let active, visibility = {}, tester;
 const imported = [];
 const React = {
     createElement: (type, props, ...children) => ({ type, props: { ...props, children } }),
@@ -20,6 +20,7 @@ const mocks = {
     "@components/ErrorBoundary": { __esModule: true, default: "Boundary" },
     "./AddonPage": { listablePlugins: () => [], PluginsPage: "Plugins", ThemesPage: "Themes" },
     "./TweaksPage": { tweakPlugins: () => [], TweaksPage: "Tweaks" },
+    "./testingAccess": { useTestingPluginsAssignment: () => tester },
 };
 const realm = { module: moduleObject, exports: moduleObject.exports, require(name) {
     if (name in mocks) return mocks[name];
@@ -56,4 +57,15 @@ assert.equal(Addons().props.children[0].props.children[0][3].props["aria-selecte
 
 visibility = { showPluginsTab: false, showThemesTab: false, showCloudSyncTab: false };
 assert.deepEqual(labels(Addons()), ["Tweaks", "CX Extensions", "Extras"]);
-console.log("PASS Add-ons tabs, CX route, visibility and optional page isolation");
+tester = { label: "Desktop 2" };
+const importsBeforeTesting = imported.length;
+const testingTabs = Addons();
+assert.deepEqual(labels(testingTabs), ["Tweaks", "CX Extensions", "Testing Plugins", "Extras"]);
+testingTabs.props.children[0].props.children[0][2].props.onClick();
+const testingPage = Addons().props.children[1].props.children[0];
+assert.equal(imported.length, importsBeforeTesting);
+assert.throws(() => testingPage.props.children[0].type(), /broken optional page/);
+assert.equal(imported.at(-1), "./TestingPlugins");
+tester = undefined;
+assert(!labels(Addons()).includes("Testing Plugins"));
+console.log("PASS Add-ons tabs, tester visibility and optional page isolation");
