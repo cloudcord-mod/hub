@@ -303,6 +303,9 @@ for (const [key, rule] of Object.entries(cxAppearanceTargets)) {
     const document = parseCx(port.cx);
     assert.equal(("style" in rule ? document.styledTargets : document.hiddenTargets)[0], key);
 }
+const pluralBannerTweak = matches.find(record => record.name === "HideServerBanners");
+assert.ok(pluralBannerTweak, "HideServerBanners should compile from its original stylesheet");
+assert.equal(parseCx(pluralBannerTweak.cx).hiddenTargets[0], "server-banner");
 const tweak = 'import { defineTweak } from "@utils/cloudcordTweak";\n' +
     'export default defineTweak("HideBotTags", "Hides bot tags", "body { display: none; }");';
 assert.equal(inspectPlugin("tweak.ts", tweak, "desktop", cxAppearanceTargets).cx, undefined);

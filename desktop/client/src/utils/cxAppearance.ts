@@ -73,6 +73,10 @@ export const cxAppearanceTargets = {
     "server-banner": {
         plugin: "HideServerBanner", label: "the channel list server banner",
         css: '[class*="bannerImage"], [class*="bannerImg"] { display: none !important; }',
+        sourceCss: [
+            '[class*="animatedContainer"][class*="bannerImage"], [class*="bannerImage"] { display: none !important; }',
+            '[class*="animatedContainer"][class*="bannerImage"], [class*="bannerImg"] { display: none !important; }',
+        ],
         mobile: ["ReanimatedGuildBanner"],
     },
     "server-boost-progress": {

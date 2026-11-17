@@ -355,7 +355,8 @@ function matchAppearanceStyles(stylesheet, appearance) {
     if (!rules) {
         rules = Object.entries(appearance).filter(([, rule]) => !rule.desktopOnly).map(target => {
             const css = normalizeAppearanceStyles(target[1].css);
-            return { target, css, hides: css && "mobile" in target[1] && hideSelectors(css) };
+            const sourceCss = target[1].sourceCss?.map(normalizeAppearanceStyles);
+            return { target, css, sourceCss, hides: css && "mobile" in target[1] && hideSelectors(css) };
         }).filter(rule => rule.css).sort((a, b) => b.css.length - a.css.length);
         appearanceMatchers.set(appearance, rules);
     }
@@ -363,6 +364,8 @@ function matchAppearanceStyles(stylesheet, appearance) {
     let css;
     try { css = normalizeAppearanceStyles(stylesheet); }
     catch { return; }
+    const sourceMatch = css && rules.find(rule => rule.sourceCss?.includes(css));
+    if (sourceMatch) return [sourceMatch.target];
     const original = css;
     while (css) {
         const rule = rules.find(rule => css.startsWith(rule.css));
