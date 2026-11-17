@@ -1,0 +1,3 @@
+plugin "QuoteMessage":
+  needs messages.quote
+  use quote-message

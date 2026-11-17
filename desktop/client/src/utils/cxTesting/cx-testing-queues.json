@@ -626,7 +626,7 @@
     ["gpl/profile-sets", "ProfileSets", "Desktop CX pack"],
     ["gpl/purge-dms", "PurgeDMs", "Desktop CX pack"],
     ["gpl/quick-mention", "QuickMention", "Desktop CX pack"],
-    ["gpl/quote-message", "QuoteMessage", "Desktop CX pack"],
+    ["gpl/quote-message", "QuoteMessage", "Desktop CX pack", "quote-message.cx"],
     ["gpl/react-error-decoder", "ReactErrorDecoder", "Desktop CX pack"],
     ["gpl/readable-spoilers", "ReadableSpoilers", "Desktop CX pack"],
     ["gpl/recent-dmswitcher", "RecentDMSwitcher", "Desktop CX pack"],

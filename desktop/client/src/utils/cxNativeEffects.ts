@@ -39,6 +39,7 @@ export const cxNativeEffects = {
     "double-click-edit": { permission: "messages.openeditor", label: "Open the editor for your own message on double-click or double-tap" },
     "double-click-reply": { permission: "messages.openreply", label: "Open a reply to another user's message on double-click or double-tap" },
     "quick-mention": { permission: "messages.insertmention", label: "Insert the selected message author's mention into the current draft" },
+    "quote-message": { permission: "messages.quote", label: "Add Quote and Copy as Quote actions to message menus" },
     "keep-long-drafts": { permission: "drafts.long", label: "Preserve long drafts in Discord’s local draft store" },
     "bypass-pin-prompt": { permission: "messages.pin", label: "Use Discord’s Pin and Unpin actions without a confirmation prompt" },
     "pin-message-shortcut": { permission: "messages.pin", label: "Pin or unpin the selected message with one menu action" },
@@ -110,6 +111,30 @@ export function getCxEmbedToggle(message: CxEmbedMessage, channelId: string, use
 }
 
 type RepeatAttachment = { filename?: string; url?: string; size?: number; };
+export type CxQuoteMessage = {
+    id?: string;
+    channel_id?: string;
+    content?: string;
+    attachments?: readonly { filename?: string; }[];
+    author?: { id?: string; username?: string; globalName?: string | null; global_name?: string | null; };
+};
+
+export function buildCxMessageQuote(message: CxQuoteMessage, guildId: string | null | undefined, nickname: string | undefined, includeLink: boolean) {
+    if (!message.author || !isCxProfileUserId(message.id) || !isCxProfileUserId(message.channel_id)) return;
+    const withoutPings = (text: string) => text.replace(/@(?=[!&]?\d{17,20}>|everyone\b|here\b)/gi, "@\u200b");
+    const attachments = (message.attachments ?? []).flatMap(file => typeof file.filename === "string" && file.filename.trim()
+        ? ["📎 " + file.filename.replace(/[\r\n]+/g, " ")] : []);
+    const body = [message.content ?? "", ...attachments].filter(Boolean).join("\n").trim() || "…";
+    const quote = withoutPings(body).split(/\r\n|\r|\n/).map(line => "> " + line.replace(/^>{1,3} ?/, "")).join("\n");
+    const author = withoutPings((nickname || message.author.globalName || message.author.global_name || message.author.username || "Unknown user")
+        .replace(/[\r\n]+/g, " ").slice(0, 80).replace(/[\\*_`~|<>\[\]]/g, "\\$&"));
+    const link = includeLink ? ` · https://discord.com/channels/${isCxProfileUserId(guildId) ? guildId : "@me"}/${message.channel_id}/${message.id}` : "";
+    const attribution = `\n— **${author}**${link}\n`;
+    const maximum = 1500 - attribution.length;
+    const clipped = quote.length > maximum ? quote.slice(0, maximum - 1).replace(/[\uD800-\uDBFF]$/, "").trimEnd() + "…" : quote;
+    return clipped + attribution;
+}
+
 export type CxRepeatMessage = {
     id?: string;
     content?: string;

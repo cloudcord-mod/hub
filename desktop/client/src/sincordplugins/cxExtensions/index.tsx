@@ -10,7 +10,7 @@ import { addServerListElement, removeServerListElement, ServerListRenderPosition
 import { TextButton } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import { CopyIcon, UpArrowIcon } from "@components/Icons";
-import { buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
+import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxUploadAnonymiser } from "@utils/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel } from "@utils/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
@@ -256,6 +256,29 @@ function registerQuickMention() {
         };
     }, MentionIcon);
     return () => { active = false; removeMessagePopoverButton(id); };
+}
+
+function registerQuoteMessage(includeLink: boolean) {
+    let active = true;
+    const patch: NavContextMenuPatchCallback = (children, { message }: { message?: Message; }) => {
+        if (!active || !message) return;
+        const channel = ChannelStore.getChannel(message.channel_id);
+        if (!channel) return;
+        const guild = channel.guild_id;
+        const nick = guild && message.author?.id ? GuildMemberStore.getNick?.(guild, message.author.id) : undefined;
+        const quote = buildCxMessageQuote(message, guild, nick ?? undefined, includeLink);
+        if (!quote) return;
+        const canInsert = () => active && SelectedChannelStore.getChannelId() === channel.id
+            && (!guild || PermissionStore.can(channel.isThread?.() ? PermissionsBits.SEND_MESSAGES_IN_THREADS : PermissionsBits.SEND_MESSAGES, channel));
+        if (canInsert()) children.push(<Menu.MenuItem id="cx-quote-message" label="Quote" action={() => {
+            if (canInsert()) ComponentDispatch.dispatchToLastSubscribed("INSERT_TEXT", { rawText: quote, plainText: quote });
+        }} />);
+        children.push(<Menu.MenuItem id="cx-copy-quote" label="Copy as Quote" action={() => {
+            if (active) void copyToClipboard(quote).then(() => showToast("Quote copied"), () => showToast("Couldn't copy the quote."));
+        }} />);
+    };
+    addContextMenuPatch("message", patch);
+    return () => { active = false; removeContextMenuPatch("message", patch); };
 }
 
 function registerPinShortcut() {
@@ -904,6 +927,9 @@ export function CxSettings() {
                             return registerMessageGesture(effect === "double-click-edit" ? "edit" : "reply");
                         case "quick-mention":
                             return registerQuickMention();
+                        case "quote-message":
+                            if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
+                            return registerQuoteMessage(effectOptions.includeLink);
                         case "keep-long-drafts":
                             longDraftUsers++;
                             return () => { longDraftUsers--; };

@@ -947,6 +947,50 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(messagePopover.size, 0);
         selectedChannel = "test-channel";
         {
+            selectCatalog("QuoteMessage");
+            click(render(), "Allow for this session");
+            selectedChannel = repeatChannel;
+            const message = { id: sender, channel_id: repeatChannel, content: "> hello <@" + other + ">\r\n@everyone",
+                author: { id: other, globalName: "Quoted *name*" }, attachments: [{ filename: "example.png" }] };
+            const expected = "> hello <@\u200b" + other + ">\n> @\u200beveryone\n> 📎 example.png\n— **Quoted \\*name\\*** · https://discord.com/channels/" + guildId + "/" + repeatChannel + "/" + sender + "\n";
+            const menu = () => {
+                if (desktop) {
+                    const entries = [];
+                    [...menuPatches].at(-1)(entries, { message });
+                    return entries;
+                }
+                const props = { message, channel: stores.ChannelStore.getChannel(repeatChannel),
+                    chatInputRef: { current: { insertText: (...args) => mentionActions.push(args) } } };
+                const wrapper = appearanceHooks.get(LongPressMessageActionSheet)(null, jsx(LongPressMessageActionSheet, props));
+                const sheet = wrapper.type(wrapper.props);
+                return sheet.type(sheet.props);
+            };
+            const quote = button(menu(), "Quote").props[desktop ? "action" : "onPress"];
+            const copy = button(menu(), "Copy as Quote").props[desktop ? "action" : "onPress"];
+            canSend = false;
+            assert.equal(button(menu(), "Quote"), undefined);
+            quote();
+            assert.equal(mentionActions.length, 1, "stale quote action must check send permission again");
+            copy();
+            assert.equal(clipboardWrites.pop(), expected);
+            canSend = true;
+            quote();
+            assert.deepEqual(mentionActions.pop(), desktop ? ["INSERT_TEXT", expected, expected] : [expected, null, false, undefined, null]);
+            await new Promise(setImmediate);
+            const copyCount = clipboardWrites.length;
+            click(render(), "Disable QuoteMessage");
+            copy();
+            assert.equal(clipboardWrites.length, copyCount);
+            assert.equal(menuPatches.size + appearanceHooks.size, 0);
+            const { buildCxMessageQuote } = moduleBox.exports;
+            assert.equal(buildCxMessageQuote(message, undefined, undefined, false).includes("discord.com/channels"), false);
+            assert.ok(buildCxMessageQuote({ ...message, content: "😀".repeat(1000) }, guildId, undefined, true).length <= 1500);
+            const source = cxCatalog.plugins.find(entry => entry.name === "QuoteMessage").source;
+            assert.equal(parseCx(source.replace("use quote-message", "use quote-message without-link")).quoteOptions.includeLink, false);
+            assert.throws(() => activateCx(source, host, []), /approval/);
+            selectedChannel = "test-channel";
+        }
+        {
             selectCatalog("RepeatMessages");
             click(render(), "Allow for this session");
             selectedChannel = repeatChannel;

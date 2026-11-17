@@ -146,9 +146,19 @@ async function main(args) {
     const adapters = new Map(rows.map(row => [row.platform + ":" + row.sourceHash, row]));
     const styles = new Map(rows.filter(row => row.appearanceCss).map(row => [row.platform + ":" + row.appearanceCss.trim(), row]));
     const matched = new Set();
-    const candidates = queues.flat().map(([id, name, group]) => {
+    const candidates = queues.flat().map(([id, name, group, portableFile]) => {
         const pack = packs[group];
         const entry = pack.entries?.get(id);
+        if (portableFile && /^[a-z0-9-]+\.cx$/.test(portableFile)) {
+            const file = path.join(root, "examples/cx/catalog/plugins", portableFile);
+            const sourceHash = fs.existsSync(file) && hash(fs.readFileSync(file, "utf8"));
+            const found = platforms.map(platform => adapters.get(platform + ":" + sourceHash));
+            if (found.some(Boolean)) {
+                matched.add(sourceHash);
+                return { id, name, group, implementation: "Declared shared port: " + portableFile,
+                    syntax: checkCandidate(id, entry, pack, parse), desktop: adapterResult(found[0]), mobile: adapterResult(found[1]) };
+            }
+        }
         if (group === "Shared declarative CX") {
             const sourceHash = entry && hash(entry.source);
             const found = platforms.map(platform => adapters.get(platform + ":" + sourceHash));

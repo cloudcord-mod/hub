@@ -23,7 +23,7 @@ export { cxProfileMenuActions, getCxProfileMedia, getCxProfileMenuCopy, isCxProf
 export { formatCxChannelName, getCxChannelNameCopy, type CxChannelLabel } from "./cxChannelNames";
 export { isCxNotificationMuted, type CxMessageAlert } from "./cxIncoming";
 export { bindCxChannelOpenRead, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, markCxServersRead, markCxServersReadAndWait, runCxFriendInvites } from "./cxClientCommands";
-export { animateCxAssets, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
+export { animateCxAssets, buildCxMessageQuote, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
 export { createCxPreviousSendHandler, planCxPreviousEdit } from "./cxPreviousMessage";
 export { bindCxSocialEvents } from "./cxSocialEvents";
 export { createCxPlusReactionHandler } from "./cxPlusReactions";
@@ -73,6 +73,7 @@ const permissionLabels = {
     "messages.openeditor": "Open Discord’s editor for your own message when you double-click or double-tap it",
     "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user’s message",
     "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+    "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
     "drafts.long": "Keep the full text of your local drafts",
     "messages.pin": "Pin or unpin a message immediately when you choose a pin action.",
     "messages.toggleembeds": "Change embed visibility on the selected message when you choose its menu action.",
@@ -198,7 +199,8 @@ export type CxTheme = {
     semanticColors?: Record<string, string>;
     rawColors?: Record<string, string>;
 };
-type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions;
+type CxQuoteOptions = { includeLink: boolean; };
+type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions;
 
 type CxPlugin = {
     kind: "plugin";
@@ -219,6 +221,7 @@ type CxPlugin = {
     cameraToneOptions?: CxCameraToneOptions;
     mutedVoiceOptions?: CxMutedVoiceOptions;
     voiceCountOptions?: CxVoiceCountOptions;
+    quoteOptions?: CxQuoteOptions;
     uploadNaming?: CxUploadNaming;
     previousRule?: CxPreviousRule;
     profileActions: CxProfileMenuAction[];
@@ -310,6 +313,7 @@ export function parseCx(source: string): CxDocument {
     let mutedVoiceOptions: CxMutedVoiceOptions | undefined;
     let cameraToneOptions: CxCameraToneOptions | undefined;
     let voiceCountOptions: CxVoiceCountOptions | undefined;
+    let quoteOptions: CxQuoteOptions | undefined;
     let uploadNaming: CxUploadNaming | undefined;
     let previousRule: CxPreviousRule | undefined;
     const profileActions = new Set<CxProfileMenuAction>();
@@ -437,6 +441,9 @@ export function parseCx(source: string): CxDocument {
                 if (flags.some(flag => !["show-empty", "hide-limit"].includes(flag)) || new Set(flags).size !== flags.length)
                     throw new Error("Voice count options are show-empty and hide-limit");
                 voiceCountOptions = { showEmpty: flags.includes("show-empty"), hideLimit: flags.includes("hide-limit") };
+            } else if (name === "quote-message") {
+                if (effect[2] && effect[2] !== "without-link") throw new Error("Quote Message supports the without-link option");
+                quoteOptions = { includeLink: effect[2] !== "without-link" };
             } else if (effect[2]) throw new Error("This client effect takes no options");
             nativeEffects.add(name);
             current = undefined;
@@ -680,7 +687,7 @@ export function parseCx(source: string): CxDocument {
         throw new Error("Remove unused CX permissions");
     return {
         kind: "plugin", name, commands, permissions: [...permissions], messageTransforms: transforms, sendConfirmation, suppressReplyPing,
-        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
+        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
     };
 }
 
@@ -868,6 +875,7 @@ function bindCx(source: string, host: CxHost, approved: readonly CxPermission[],
             "webcam-start-notifier": document.cameraToneOptions,
             "notify-when-muted": document.mutedVoiceOptions,
             "voice-channel-count": document.voiceCountOptions,
+            "quote-message": document.quoteOptions,
         };
         for (const effect of document.nativeEffects) {
             if (!host.registerNativeEffect) throw new Error("This client cannot apply " + cxNativeEffects[effect].label.toLowerCase());

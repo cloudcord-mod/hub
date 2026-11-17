@@ -158,6 +158,7 @@ import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/p
 import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugins/polish-wording.cx";
 import plugin_catalog_profile_media from "../../../../examples/cx/catalog/plugins/profile-media.cx";
 import plugin_catalog_quick_mention from "../../../../examples/cx/catalog/plugins/quick-mention.cx";
+import plugin_catalog_quote_message from "../../../../examples/cx/catalog/plugins/quote-message.cx";
 import plugin_catalog_read_all_notifications_button from "../../../../examples/cx/catalog/plugins/read-all-notifications-button.cx";
 import plugin_catalog_read_all_notifications from "../../../../examples/cx/catalog/plugins/read-all-notifications.cx";
 import plugin_catalog_readable_line_length from "../../../../examples/cx/catalog/plugins/readable-line-length.cx";
@@ -473,6 +474,7 @@ export const cxCatalog = {
         { name: "PolishWording", source: plugin_catalog_polish_wording },
         { name: "ProfileMedia", source: plugin_catalog_profile_media },
         { name: "QuickMention", source: plugin_catalog_quick_mention },
+        { name: "QuoteMessage", source: plugin_catalog_quote_message },
         { name: "ReadAllNotificationsButton", source: plugin_catalog_read_all_notifications_button },
         { name: "ReadAllNotifications", source: plugin_catalog_read_all_notifications },
         { name: "ReadableLineLength", source: plugin_catalog_readable_line_length },

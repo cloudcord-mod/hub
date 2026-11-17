@@ -5,7 +5,7 @@ import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoice
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
-import { buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
+import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
 import { createCxTimestampRegistry, type CxTimestampFormats, type CxTimestampSurface } from "@lib/api/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel, type CxVoiceMemberOptions } from "@lib/api/cx";
 import { selectCxAppearanceOption } from "@lib/api/cx";
@@ -1031,13 +1031,13 @@ function registerRenderedTree(target: string | object, change: (tree: ReactNode,
 
 type CxMobileMessageMenu = {
     channel?: { id: string; guild_id?: string; isThread?: () => boolean; };
-    message?: CxRepeatMessage & Parameters<typeof getCxEmbedToggle>[0] & { pinned?: boolean; };
+    message?: CxQuoteMessage & CxRepeatMessage & Parameters<typeof getCxEmbedToggle>[0] & { pinned?: boolean; };
     chatInputRef?: { current?: { insertText?: (text: string, start: null, appendSpace: boolean, nodes: undefined, end: null) => void; }; };
 };
 
 function registerMessageMenuActions(
     enabled: () => boolean,
-    createActions: (props: CxMobileMessageMenu, close: () => void, stillActive: () => boolean) => readonly { label: string; run: () => void; }[],
+    createActions: (props: CxMobileMessageMenu, close: () => void, stillActive: (requireSendPermission?: boolean) => boolean) => readonly { label: string; run: () => void; }[],
     requiresSendPermission = true,
 ) {
     const menu = findByFilePath("modules/messages/native/long_press/LongPressMessageActionSheet.tsx")?.default;
@@ -1055,10 +1055,10 @@ function registerMessageMenuActions(
         const { channel, message } = props;
         if (!channel || message?.channel_id !== channel.id) return tree;
         const { id: channelId, guild_id: guildId } = channel;
-        function canUseAction() {
+        function canUseAction(requireSendPermission = requiresSendPermission) {
             const permission = channel?.isThread?.() ? permissions?.SEND_MESSAGES_IN_THREADS : permissions?.SEND_MESSAGES;
             return active && enabled() && SelectedChannelStore?.getChannelId?.() === channelId
-                && (!requiresSendPermission || !guildId || permission != null && permissionStore?.can?.(permission, channel) === true);
+                && (!requireSendPermission || !guildId || permission != null && permissionStore?.can?.(permission, channel) === true);
         }
         if (!canUseAction()) return tree;
         const actions = createActions(props, () => sheetActions.hideActionSheet(), canUseAction);
@@ -1088,6 +1088,31 @@ function registerQuickMention(enabled: () => boolean) {
             close();
         } }];
     });
+}
+
+function registerQuoteMessage(enabled: () => boolean, includeLink: boolean) {
+    return registerMessageMenuActions(enabled, ({ channel, message, chatInputRef }, close, canUseAction) => {
+        if (!message) return [];
+        const guild = channel?.guild_id;
+        const author = message.author?.id;
+        const nick = guild && author ? GuildMemberStore?.getNick?.(guild, author) ?? GuildMemberStore?.getMember?.(guild, author)?.nick : undefined;
+        const quote = buildCxMessageQuote(message, guild, nick, includeLink);
+        if (!quote) return [];
+        const actions = [{ label: "Copy as Quote", run() {
+            try {
+                clipboard.setString(quote);
+                showToast.showCopyToClipboard?.();
+                close();
+            } catch { showToast("Couldn't copy the quote."); }
+        } }];
+        if (canUseAction(true) && typeof chatInputRef?.current?.insertText === "function") actions.unshift({ label: "Quote", run() {
+            const composer = chatInputRef.current;
+            if (!canUseAction(true) || typeof composer?.insertText !== "function") return;
+            composer.insertText(quote, null, false, undefined, null);
+            close();
+        } });
+        return actions;
+    }, false);
 }
 
 function registerJumpToMessageMenu(enabled: () => boolean) {
@@ -2374,6 +2399,9 @@ export default function CxExtensions() {
                         }
                         case "quick-mention":
                             return registerQuickMention(enabled);
+                        case "quote-message":
+                            if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
+                            return registerQuoteMessage(enabled, effectOptions.includeLink);
                         case "force-owner-crown": {
                             const row = findByFilePath("modules/main_tabs_v2/native/shared_components/user_list/UserRow.tsx")?.default;
                             if (!row) throw new Error("Discord’s member row is unavailable");
