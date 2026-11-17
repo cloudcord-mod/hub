@@ -9195,7 +9195,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ["gpl/jump-to-top", "JumpToTop", "Desktop CX pack"],
           ["gpl/keyboard-sounds", "KeyboardSounds", "Desktop CX pack"],
           ["gpl/last-active", "LastActive", "Desktop CX pack"],
-          ["gpl/leet-text", "LeetText", "Desktop CX pack"],
+          ["gpl/leet-text", "LeetText", "Desktop CX pack", "leet-text.cx"],
           ["gpl/local-times", "LocalTimes", "Desktop CX pack"],
           ["gpl/media-playback-speed", "MediaPlaybackSpeed", "Desktop CX pack"],
           ["gpl/mention-colors", "MentionColors", "Desktop CX pack"],
@@ -9362,7 +9362,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ["gpl/clips-enhancements", "ClipsEnhancements", "Desktop CX pack"],
           ["gpl/cloud-cord-accent", "CloudCordAccent", "Desktop CX pack"],
           ["gpl/collapsible-ui", "CollapsibleUI", "Desktop CX pack"],
-          ["gpl/color-text", "ColorText", "Desktop CX pack"],
+          ["gpl/color-text", "ColorText", "Desktop CX pack", "color-text.cx"],
           ["gpl/compact-member-list", "CompactMemberList", "Desktop CX pack"],
           ["gpl/console-janitor", "ConsoleJanitor", "Desktop CX pack"],
           ["gpl/copy-emoji-markdown", "CopyEmojiMarkdown", "Desktop CX pack"],
@@ -39855,7 +39855,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (Number.isSafeInteger(range) && range > 0)
       return low + Math.floor(Math.random() * range);
   }
-  var searchEngines, morseCodes, morseLetters, normalizations, cxCommandFunctions;
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
       "use strict";
@@ -39954,7 +39954,47 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "NFKC",
         "NFKD"
       ];
+      ansiForegrounds = [
+        "gray",
+        "red",
+        "green",
+        "yellow",
+        "blue",
+        "pink",
+        "cyan",
+        "white"
+      ];
+      ansiBackgrounds = [
+        "navy",
+        "orange",
+        "slate",
+        "teal",
+        "gray",
+        "indigo",
+        "silver",
+        "white"
+      ];
       cxCommandFunctions = {
+        colorText(text, color, background, style) {
+          var foregroundIndex = ansiForegrounds.indexOf(color);
+          var backgroundIndex = ansiBackgrounds.indexOf(background);
+          if (foregroundIndex < 0 || background && backgroundIndex < 0 || style && style !== "bold" && style !== "underline")
+            return;
+          var codes = [
+            style === "bold" ? 1 : style === "underline" ? 4 : 0,
+            30 + foregroundIndex
+          ];
+          if (background)
+            codes.push(40 + backgroundIndex);
+          var safeText = text.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g, "");
+          if (!safeText.trim())
+            return;
+          var prefix2 = `\x1B[${codes.join(";")}m`;
+          var lines = safeText.replace(/`(?=``)/g, "`\u200B").split(/\r\n|\r|\n/).map((line) => prefix2 + line + "\x1B[0m");
+          var output = "```ansi\n" + lines.join("\n") + "\n```";
+          if (output.length <= 4e3)
+            return output;
+        },
         searchLink(input, engine, hyperlink, hideEmbed) {
           if (!input.trim())
             return;
@@ -48826,6 +48866,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/color-text.cx
+  var color_text_default;
+  var init_color_text = __esm({
+    "../examples/cx/catalog/plugins/color-text.cx"() {
+      color_text_default = 'plugin "ColorText":\n  needs commands.register\n  needs messages.send\n  needs reply.local\n  on command "color":\n    input "message" text\n    input "color" choice "gray,red,green,yellow,blue,pink,cyan,white"\n    input "background" choice "navy,orange,slate,teal,gray,indigo,silver,white" optional\n    input "style" choice "bold,underline" optional\n    send "${colorText(message, color, background, style)}" else "Enter a shorter message for the colored code block."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/colorful-mentions.cx
   var colorful_mentions_default;
   var init_colorful_mentions = __esm({
@@ -51544,6 +51592,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_clear_urls();
       init_client_side_block();
       init_cloud_cord_accent();
+      init_color_text();
       init_colorful_mentions();
       init_compact_member_list();
       init_copy_bios();
@@ -51939,6 +51988,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "CloudCordAccent",
             source: cloud_cord_accent_default
+          },
+          {
+            name: "ColorText",
+            source: color_text_default
           },
           {
             name: "ColorfulMentions",
@@ -58259,7 +58312,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "84d92228b126a02eb504857c5ac19e917a833bc5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6e9c692b38aea0e74f852bcbb872fc73c102afba";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
