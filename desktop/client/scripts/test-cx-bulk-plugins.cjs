@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { buildBatchPlan, buildPlan, checkAppearancePaths, classifyPorts, fetchReviewedBetterDiscordSources, inspectPlugin, portFiles, scan, selectReadyPorts, verifyPorts } = require("./cx-bulk-plugins.cjs");
+const { buildBatchPlan, buildPlan, checkAppearancePaths, checkMobileAdapterPaths, classifyPorts, fetchReviewedBetterDiscordSources, inspectPlugin, portFiles, scan, selectReadyPorts, verifyPorts } = require("./cx-bulk-plugins.cjs");
 const { buildCatalog, loadCxRuntime } = require("./sync-cx-catalog.cjs");
 
 const source = [
@@ -522,6 +522,10 @@ assert.deepEqual(checkAppearancePaths({
     Android: new Set(["native/Route.tsx", "native/First.tsx", "native/Second.tsx"]),
     iOS: new Set(["native/Route.tsx", "native/First.tsx"]),
 }), { checked: 2, missing: [{ plugin: "Component", platform: "iOS", path: "native/Second.tsx" }] });
+assert.deepEqual(checkMobileAdapterPaths(
+    '// "modules/comment.tsx"\nfindByFilePath("modules/Chat.tsx"); findByFilePath("modules/Chat.tsx"); const upload = "lib/Uploader.tsx";',
+    { Android: new Set(["modules/Chat.tsx", "lib/Uploader.tsx"]), iOS: new Set(["modules/Chat.tsx"]) },
+), { checked: 2, missing: [{ platform: "iOS", path: "lib/Uploader.tsx" }] });
 async function testReviewedFetch() {
     const code = "reviewed source\n";
     const hash = require("node:crypto").createHash("sha256").update(code).digest("hex");

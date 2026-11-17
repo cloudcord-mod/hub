@@ -1762,6 +1762,23 @@ function checkAppearancePaths(appearance, indexes) {
     return { checked, missing };
 }
 
+function checkMobileAdapterPaths(source, indexes) {
+    const paths = new Set();
+    function collect(node) {
+        if (ts.isStringLiteralLike(node) && /^[a-z][\w-]*(?:\/[\w.@-]+)+\.tsx?$/i.test(node.text)) paths.add(node.text);
+        ts.forEachChild(node, collect);
+    }
+    collect(ts.createSourceFile("CxExtensions.tsx", source, ts.ScriptTarget.Latest, true));
+
+    const missing = [];
+    for (const [platform, index] of Object.entries(indexes)) {
+        for (const target of paths) {
+            if (!index.has(target)) missing.push({ platform, path: target });
+        }
+    }
+    return { checked: paths.size, missing };
+}
+
 function verifyPorts(files, runtime = require("./sync-cx-catalog.cjs").loadCxRuntime()) {
     const { parseCx, activateCx } = runtime;
     for (const [file, source] of files) {
@@ -1890,11 +1907,17 @@ async function main(rawArgs) {
         if (args.length !== 3) throw new Error("Expected an Android and an iOS module path list");
         const loadIndex = file => new Set(fs.readFileSync(file, "utf8").split(/\r?\n/).map(line => line.trim()).filter(Boolean));
         const { cxAppearanceTargets } = require("./sync-cx-catalog.cjs").loadCxRuntime();
-        const result = checkAppearancePaths(cxAppearanceTargets, { Android: loadIndex(args[1]), iOS: loadIndex(args[2]) });
-        if (result.missing.length) {
-            throw new Error(result.missing.map(({ plugin, platform, path }) => plugin + " missing on " + platform + " (" + path + ")").join("\n"));
+        const indexes = { Android: loadIndex(args[1]), iOS: loadIndex(args[2]) };
+        const appearance = checkAppearancePaths(cxAppearanceTargets, indexes);
+        const adapterSource = fs.readFileSync(path.join(root, "ios/runtime/src/core/ui/settings/pages/CxExtensions/index.tsx"), "utf8");
+        const adapter = checkMobileAdapterPaths(adapterSource, indexes);
+        const missing = [...appearance.missing, ...adapter.missing];
+        if (missing.length) {
+            throw new Error(missing.map(({ plugin, platform, path }) =>
+                (plugin ?? "CX mobile adapter") + " missing on " + platform + " (" + path + ")").join("\n"));
         }
-        console.log("Verified module paths for " + result.checked + " appearance ports in both mobile indexes.");
+        console.log("Found module paths for " + appearance.checked + " appearance ports and " + adapter.checked
+            + " explicit CX mobile adapter paths in both indexes.");
         return;
     }
     const sourceDirs = [];
@@ -1982,4 +2005,4 @@ if (require.main === module) {
         process.exitCode = 1;
     });
 }
-module.exports = { buildBatchPlan, buildPlan, checkAppearancePaths, classifyPorts, fetchReviewedBetterDiscordSources, inspectPlugin, portFiles, scan, selectReadyPorts, verifyPorts };
+module.exports = { buildBatchPlan, buildPlan, checkAppearancePaths, checkMobileAdapterPaths, classifyPorts, fetchReviewedBetterDiscordSources, inspectPlugin, portFiles, scan, selectReadyPorts, verifyPorts };
