@@ -108,7 +108,8 @@ function checkCandidate(id, entry, pack, parse) {
 }
 
 function adapterResult(row, reason = "Adapter test did not produce a result") {
-    return row ? result(row.status, row.errors.join("; ")) : blocked(reason);
+    return row ? { ...result(row.status, row.errors.join("; ")), settingsSwitches: row.settingsSwitches,
+        testedSwitches: row.testedSwitches, commandInputs: row.commandInputs } : blocked(reason);
 }
 
 function stylesheetForPackEntry(entry, pack, name) {
@@ -143,14 +144,19 @@ function csvField(value) {
 function writeReport(output, report) {
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + "\n");
-    const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail"];
-    if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings");
-    if (report.discoverFactory) header.push("Discover fixture load", "Discover fixture error", "Android lookup signatures observed");
+    const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail",
+        "Desktop settings switches", "Mobile settings switches", "Command inputs"];
+    if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings", "Desktop pack declared settings");
+    if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail");
+    if (report.discoverFactory) header.push("Discover fixture load", "Discover fixture error", "Android lookup signatures observed", "Discover declares settings");
     const rows = [...report.candidates, ...report.additionalSharedPlugins].map(entry => [
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
-        ...(report.desktopModuleLoad ? [entry.moduleLoad?.status, entry.moduleLoad?.error, entry.moduleLoad?.warnings.join("; ")] : []),
-        ...(report.discoverFactory ? [entry.discoverFactory?.status, entry.discoverFactory?.error, entry.discoverFactory?.androidMatches] : []),
+        entry.desktop.settingsSwitches?.join("; "), entry.mobile.settingsSwitches?.join("; "),
+        (entry.desktop.commandInputs ?? entry.mobile.commandInputs)?.join("; "),
+        ...(report.desktopModuleLoad ? [entry.moduleLoad?.status, entry.moduleLoad?.error, entry.moduleLoad?.warnings.join("; "), entry.moduleLoad?.settingsFields?.join("; ")] : []),
+        ...(report.desktopLifecycle ? [entry.desktopLifecycle?.status, entry.desktopLifecycle?.reason] : []),
+        ...(report.discoverFactory ? [entry.discoverFactory?.status, entry.discoverFactory?.error, entry.discoverFactory?.androidMatches, entry.discoverFactory?.settingsDeclared] : []),
     ]);
     fs.writeFileSync(output.replace(/\.json$/i, ".csv"), [header, ...rows].map(row => row.map(csvField).join(",")).join("\r\n") + "\r\n");
 }
@@ -227,18 +233,37 @@ async function main(args) {
         return { id, name, group, syntax: checkCandidate(id, entry, pack, parse), desktop: blocked(desktop), mobile: blocked(mobile) };
     });
 
-    let desktopModuleLoad;
+    let desktopModuleLoad, desktopLifecycle;
     if (desktopEvidence) {
         const loaded = matchEvidence(desktopEvidence, packs["Desktop CX pack"], "desktop module load");
         const counts = { Pass: 0, Fail: 0, Blocked: 0 };
+        const lifecycleCounts = desktopEvidence.summary?.lifecycle && { Pass: 0, Fail: 0, Blocked: 0 };
         for (const entry of candidates.filter(candidate => candidate.group === "Desktop CX pack")) {
             const row = loaded.get(entry.id);
             if (row && typeof row.loaded !== "boolean") throw new Error("Invalid desktop module status: " + entry.id);
             const status = row ? row.loaded ? "Pass" : "Fail" : "Blocked";
             counts[status]++;
-            entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [] };
+            entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [],
+                settingsFields: row?.settingsFields };
+            if (lifecycleCounts) {
+                const lifecycle = row?.lifecycle;
+                const lifecycleStatus = lifecycle?.status ?? "Blocked";
+                if (!Object.hasOwn(lifecycleCounts, lifecycleStatus)) throw new Error("Invalid desktop lifecycle status: " + entry.id);
+                lifecycleCounts[lifecycleStatus]++;
+                const details = lifecycle ? [
+                    ...lifecycle.errors,
+                    lifecycle.started && "Still marked started after cleanup",
+                    lifecycle.unsettledResources && lifecycle.unsettledResources + " intervals or subscriptions retained",
+                    lifecycle.unfinished && lifecycle.unfinished + " pending lifecycle promises",
+                ].filter(Boolean) : [row?.error || "No lifecycle result"];
+                entry.desktopLifecycle = result(lifecycleStatus, details.join("; "));
+            }
         }
         desktopModuleLoad = { scope: "Isolated desktop module loading without startup hooks or Discord patches", counts };
+        if (lifecycleCounts) desktopLifecycle = {
+            scope: "Isolated desktop startup and cleanup with inert Discord APIs and timer callbacks",
+            counts: lifecycleCounts,
+        };
     }
 
     let discoverFactory;
@@ -252,7 +277,8 @@ async function main(args) {
             counts[status]++;
             const requests = row?.requests ?? [];
             const androidMatches = requests.length ? requests.filter(request => request.observedInAndroidSnapshot === true).length + "/" + requests.length : "";
-            entry.discoverFactory = { status, error: row?.error ?? "Missing Discover factory result", androidMatches, requests };
+            entry.discoverFactory = { status, error: row?.error ?? "Missing Discover factory result", androidMatches, requests,
+                settingsDeclared: row?.settingsDeclared };
         }
         discoverFactory = { scope: "Isolated Discover factories with inert Vendetta fixtures", counts,
             distinctFindByProps: discoverEvidence.summary.distinctFindByProps,
@@ -277,12 +303,24 @@ async function main(args) {
     }));
     const report = {
         scope: "Syntax and fixture-based adapter activation and cleanup. Device behavior requires separate results.",
-        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, discoverFactory,
+        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, desktopLifecycle, discoverFactory,
         candidates, additionalSharedPlugins: [...additional.values()],
+        configuration: {
+            shared: Object.fromEntries(platforms.map(platform => {
+                const platformRows = rows.filter(row => row.platform === platform);
+                return [platform, { pluginsWithSwitches: platformRows.filter(row => row.settingsSwitches?.length).length,
+                    testedSwitches: platformRows.reduce((total, row) => total + (row.testedSwitches ?? 0), 0),
+                    pluginsWithCommandInputs: platformRows.filter(row => row.commandInputs?.length).length }];
+            })),
+            desktopPackEntriesDeclaringSettings: desktopEvidence?.rows.filter(row => row.settingsFields?.length).length,
+            discoverPreviewsDeclaringSettings: discoverEvidence?.rows.filter(row => row.settingsDeclared === true).length,
+        },
     };
     writeReport(output, report);
-    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, discoverFactory, additionalSharedPlugins: additional.size, report: output }, null, 2));
-    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) || desktopModuleLoad?.counts.Fail || discoverFactory?.counts.Fail) process.exitCode = 1;
+    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, desktopLifecycle, discoverFactory,
+        configuration: report.configuration, additionalSharedPlugins: additional.size, report: output }, null, 2));
+    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) ||
+        desktopModuleLoad?.counts.Fail || desktopLifecycle?.counts.Fail || discoverFactory?.counts.Fail) process.exitCode = 1;
 }
 
 main(process.argv.slice(2)).catch(error => { console.error(formatError(error)); process.exitCode = 1; });

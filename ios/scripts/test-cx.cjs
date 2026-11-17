@@ -4799,12 +4799,27 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const baseline = installedHooks();
             const deactivate = "Disable " + entry.name;
             const errors = [];
+            const settingsSwitches = reviewCx(entry.source).appearanceOptions.filter(option => desktop
+                || !moduleBox.exports.cxAppearanceTargets[option.target].desktopOnly);
+            let testedSwitches = 0;
             try {
                 selectCatalog(entry.name);
                 click(render(), "Allow for this session");
                 if (!button(render(), deactivate)) {
                     const status = find(render(), item => item.props.accessibilityLiveRegion === "polite" || item.props.role === "status");
                     throw new Error(String(status?.props.children || "Activation did not show the Disable action"));
+                }
+                for (const option of settingsSwitches) {
+                    const label = entry.name + " · " + option.label;
+                    const field = () => find(render(), item => item.props[desktop ? "aria-label" : "label"] === label);
+                    const valueKey = desktop ? "checked" : "value";
+                    const initial = field().props[valueKey];
+                    for (const checked of [!initial, initial]) {
+                        if (desktop) field().props.onChange({ currentTarget: { checked } });
+                        else field().props.onValueChange(checked);
+                        assert.equal(field().props[valueKey], checked, label + " should accept both settings");
+                    }
+                    testedSwitches++;
                 }
             } catch (error) {
                 errors.push(error.message);
@@ -4828,7 +4843,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 adapterResults.push({
                     platform, name: entry.name, status: errors.length ? "Fail" : "Pass", errors,
                     sourceHash: createHash("sha256").update(entry.source.replace(/\r\n/g, "\n").trim()).digest("hex"),
-                    appearanceCss,
+                    appearanceCss, settingsSwitches: settingsSwitches.map(option => option.label), testedSwitches,
+                    commandInputs: parseCx(entry.source).commands.flatMap(command => [
+                        ...(command.text ? [command.name + ": text"] : []),
+                        ...command.inputs.map(input => command.name + ": " + input.name),
+                    ]),
                 });
             }
         }

@@ -48,7 +48,7 @@ function stub(name) {
 const metro = {
     common: stub("metro.common"),
     findByProps: (...keys) => {
-        if (keys.every(key => typeof key === "string")) requests.set(JSON.stringify(keys), keys);
+        if (keys.length && keys.every(key => typeof key === "string")) requests.set(JSON.stringify(keys), keys);
         return stub("metro.findByProps()");
     },
 };
@@ -80,14 +80,16 @@ async function main() {
             const check = context.evalCode(bootstrap + `
 let error = "";
 let hooks = [];
+let settingsDeclared = false;
 try {
     new Function("require", "module", ${JSON.stringify(script)})(require, module);
     const candidate = module.exports?.default ?? module.exports;
     if (!candidate || typeof candidate !== "object") throw new Error("Preview did not export a plugin object");
     hooks = ["onLoad", "onUnload", "start", "stop"].filter(key => typeof candidate[key] === "function");
-    if (!hooks.length && !candidate.settings) throw new Error("Preview has no recognizable lifecycle or settings");
+    settingsDeclared = Boolean(candidate.settings);
+    if (!hooks.length && !settingsDeclared) throw new Error("Preview has no recognizable lifecycle or settings");
 } catch (failure) { error = String(failure?.message ?? failure); }
-JSON.stringify({ error, hooks, requests: [...requests.values()], fixtureApis: [...used].sort() });`);
+JSON.stringify({ error, hooks, settingsDeclared, requests: [...requests.values()], fixtureApis: [...used].sort() });`);
             const value = check.error ?? check.value;
             try {
                 const result = context.dump(value);
@@ -98,7 +100,7 @@ JSON.stringify({ error, hooks, requests: [...requests.values()], fixtureApis: [.
                     if (!evidence.has(key)) evidence.set(key, groups?.some(group => keys.every(name => group.has(name))) ?? null);
                     return { keys, observedInAndroidSnapshot: evidence.get(key) };
                 });
-                rows.push({ id, status: data.error ? "Fail" : "Pass", error: data.error, hooks: data.hooks, requests, fixtureApis: data.fixtureApis });
+                rows.push({ id, status: data.error ? "Fail" : "Pass", error: data.error, hooks: data.hooks, settingsDeclared: data.settingsDeclared, requests, fixtureApis: data.fixtureApis });
             } finally { value.dispose(); }
         } finally { context.dispose(); runtime.dispose(); }
     }
