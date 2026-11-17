@@ -1,13 +1,17 @@
 // Static inventory only. Never loads or executes plugin code.
 const fs = require("node:fs");
 const path = require("node:path");
+const { createHash } = require("node:crypto");
 const ts = require("../../desktop/client/node_modules/typescript");
 
-const root = path.resolve(process.argv[2] ?? path.join(__dirname, "../.."));
-const read = file => JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
-const desktop = read("examples/cx/catalog-gpl/dist/cloudcord-gpl-pack.json");
-const mobile = read("ios/dist/cloudcord-mobile-cx.json");
-const discover = read("ios/dist/discover-cx/mobile-conversion-preview.json");
+const workspace = path.resolve(__dirname, "../..");
+const root = path.resolve(process.argv[2] ?? workspace);
+const sourceFiles = {
+    "Desktop CX pack": "examples/cx/catalog-gpl/dist/cloudcord-gpl-pack.json",
+    "Shared declarative CX": "ios/dist/cloudcord-mobile-cx.json",
+    "Discover CX preview": "ios/dist/discover-cx/mobile-conversion-preview.json",
+};
+const sourceHashes = {};
 const globals = new Set([
     "vendetta", "bunny", "cloudcord", "DiscordNative", "VencordNative", "ReactNative",
     "window", "document", "navigator", "globalThis", "fetch", "WebSocket",
@@ -65,7 +69,7 @@ function scan(code) {
                 else dynamic.add("dynamic module specifier");
             }
             const target = address(node.expression);
-            if (target && /\.(?:findByProps|findByName|findByStoreName|findByDisplayName|findByFilePath)(?:Lazy)?$/.test(target)) {
+            if (target && /\.(?:findBy|by)(?:Props|Name|StoreName|DisplayName|FilePath)(?:Lazy)?$/.test(target)) {
                 const args = node.arguments;
                 if (args.length && args.every(ts.isStringLiteralLike)) {
                     accesses.add(`${target}(${args.map(arg => JSON.stringify(arg.text)).join(", ")})`);
@@ -85,7 +89,10 @@ function scan(code) {
 }
 
 const inventory = [];
-for (const [set, pack] of [["desktop-gpl", desktop], ["shared-declarative", mobile], ["discover-preview", discover]]) {
+for (const [group, file] of Object.entries(sourceFiles)) {
+    const text = fs.readFileSync(path.join(root, file), "utf8");
+    sourceHashes[group] = createHash("sha256").update(text).digest("hex");
+    const pack = JSON.parse(text);
     for (const entry of pack.entries) {
         const id = entry.id.replace(/^gpl\//, "");
         const permissions = [...entry.source.matchAll(/^\s+needs ([\w.-]+)\s*$/gm)].map(match => match[1]);
@@ -94,7 +101,7 @@ for (const [set, pack] of [["desktop-gpl", desktop], ["shared-declarative", mobi
         const info = pack.scripts?.[id] ? scan(pack.scripts[id]) : {
             modules: [], accesses: [], dynamic: [],
         };
-        inventory.push({ id: entry.id, set, permissions, features, ...info });
+        inventory.push({ id: entry.id, group, permissions, features, ...info });
     }
 }
 const frequency = key => {
@@ -104,6 +111,7 @@ const frequency = key => {
 };
 const result = {
     method: "Static AST over packaged scripts and CX capability declarations. Computed or indirect API calls require runtime tracing.",
+    sourceHashes,
     totals: { entries: inventory.length, entriesWithDynamicReferences: inventory.filter(entry => entry.dynamic.length).length },
     modules: frequency("modules"),
     accesses: frequency("accesses"),
@@ -111,7 +119,7 @@ const result = {
     features: frequency("features"),
     entries: inventory,
 };
-const output = path.resolve(process.argv[3] ?? path.join(root, "ios/dist/cx-api-inventory.json"));
+const output = path.resolve(process.argv[3] ?? path.join(workspace, "ios/dist/cx-api-inventory.json"));
 fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, JSON.stringify(result, null, 2) + "\n");
 console.log(JSON.stringify({ ...result.totals, modules: Object.keys(result.modules).length, accesses: Object.keys(result.accesses).length, permissions: Object.keys(result.permissions).length, output }));

@@ -28,7 +28,7 @@ import { resolveSemanticColor, semanticColors } from "@lib/ui/color";
 import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
 import { getCxMessageGesture } from "@lib/api/cx";
-import { getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
+import { findCxChannel, findCxUser, getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, decodeCxMessageBase64, resolveCxModule, runCxCleanups } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
@@ -1236,7 +1236,7 @@ function registerCopyChannelName(enabled: () => boolean) {
         channel?: Parameters<typeof getCxChannelNameCopy>[0]; onClose?: () => void;
     }) => {
         if (!props.channel) return tree;
-        const copy = getCxChannelNameCopy(props.channel, id => UserStore?.getUser?.(id)?.username);
+        const copy = getCxChannelNameCopy(props.channel, id => findCxUser<{ username?: string; }>(() => UserStore, id)?.username);
         if (!copy) return tree;
         const ActionSheetRow = row;
         return mapAppearanceElements(tree, element => element.type === sheet
@@ -1979,8 +1979,8 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                 registerIncomingRules(rules) {
                     let active = true;
                     const context = {
-                        currentUser: () => UserStore?.getCurrentUser?.()?.id,
-                        channel: (id: string) => ChannelStore?.getChannel?.(id),
+                        currentUser: () => findCxUser<{ id: string; }>(() => UserStore)?.id,
+                        channel: (id: string) => findCxChannel<Parameters<typeof isCxNotificationMuted>[1]>(() => ChannelStore, id),
                         replyAuthor: (channel: string, id: string) => MessageStore?.getMessage?.(channel, id)?.author,
                         blocked: (id: string) => RelationshipStore?.isBlocked?.(id) === true,
                         ignored: (id: string) => RelationshipStore?.isIgnored?.(id) === true,
@@ -2009,8 +2009,11 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                     const social = bindCxSocialEvents(rules, {
                         currentUser: context.currentUser, notify: context.notify,
                         isFriend: id => RelationshipStore?.isFriend?.(id) === true,
-                        userName: id => { const user = UserStore?.getUser?.(id); return user?.globalName || user?.username; },
-                        channelName: id => ChannelStore?.getChannel?.(id)?.name,
+                        userName: id => {
+                            const user = findCxUser<{ globalName?: string; username?: string; }>(() => UserStore, id);
+                            return user?.globalName || user?.username;
+                        },
+                        channelName: id => context.channel(id)?.name,
                         voiceChannel: () => SelectedChannelStore?.getVoiceChannelId?.(),
                         joinVoice: id => findByProps("selectVoiceChannel")?.selectVoiceChannel?.(id),
                         removalActions: () => findByProps("removeRelationship"),
@@ -2617,7 +2620,7 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                     });
                 },
                 getUserAvatarUrl(id) {
-                    const user = id ? UserStore?.getUser?.(id) : UserStore?.getCurrentUser?.();
+                    const user = findCxUser(() => UserStore, id);
                     if (user) return findByProps("getUserAvatarURL", "getGuildIconURL")?.getUserAvatarURL(user, true, 1024);
                 },
                 registerCommand(name, execute, acceptsText, _sendsMessage, optionalSend, inputs) {

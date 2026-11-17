@@ -21,3 +21,25 @@ export function resolveCxModule<T>(properties: readonly string[], resolve: () =>
     }
     return module as NonNullable<T>;
 }
+
+type UserLookup<T> = { getCurrentUser?: () => T; getUser?: (id: string) => T; };
+
+/** Resolve the known UserStore when a CX feature needs a user. */
+export function findCxUser<T>(resolve: () => UserLookup<T> | undefined, id?: string) {
+    try {
+        const store = resolveCxModule([id ? "getUser" : "getCurrentUser"], resolve);
+        return id ? store.getUser?.(id) : store.getCurrentUser?.();
+    } catch {
+        return undefined;
+    }
+}
+
+/** Both hosts supply their named ChannelStore because the generic export names differ. */
+export function findCxChannel<T>(resolve: () => { getChannel?: (id: string) => T; } | undefined, id: string) {
+    try {
+        const store = resolve();
+        return typeof store?.getChannel === "function" ? store.getChannel(id) : undefined;
+    } catch {
+        return undefined;
+    }
+}

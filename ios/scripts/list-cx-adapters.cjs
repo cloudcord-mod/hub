@@ -4,13 +4,18 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { createHash } = require("node:crypto");
 
-const [inventoryFile, desktopFile, mobileFile, outputFile, contractsFile] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const resultsIndex = args.indexOf("--results");
+const resultsFile = resultsIndex === -1 ? undefined : args.splice(resultsIndex, 2)[1];
+const [inventoryFile, desktopFile, mobileFile, outputFile, contractsFile] = args;
 if (!inventoryFile || !desktopFile || !mobileFile || !outputFile)
-    throw new Error("Provide inventory.json, Windows.txt, Android.txt and output.json, optionally contracts.json");
+    throw new Error("Provide inventory.json, Windows.txt, Android.txt and output.json, optionally contracts.json and --results batch.json");
+if ((resultsIndex !== -1 && !resultsFile) || args.length > 5) throw new Error("Invalid adapter report arguments");
 if (path.extname(outputFile).toLowerCase() !== ".json") throw new Error("The adapter report must end in .json");
-const inputPaths = new Set([inventoryFile, desktopFile, mobileFile].map(file => path.resolve(file).toLowerCase()));
-if (inputPaths.has(path.resolve(outputFile).toLowerCase()) || contractsFile && (
-    inputPaths.has(path.resolve(contractsFile).toLowerCase()) || path.resolve(contractsFile).toLowerCase() === path.resolve(outputFile).toLowerCase()))
+const textOutputFile = outputFile.replace(/\.json$/i, ".txt");
+const inputPaths = [inventoryFile, desktopFile, mobileFile, resultsFile].filter(Boolean).map(file => path.resolve(file).toLowerCase());
+const outputPaths = [outputFile, textOutputFile, contractsFile].filter(Boolean).map(file => path.resolve(file).toLowerCase());
+if (outputPaths.some(file => inputPaths.includes(file)) || new Set(outputPaths).size !== outputPaths.length)
     throw new Error("Reports and generated contracts require their own output files");
 const read = file => fs.readFileSync(file, "utf8");
 const inventoryText = read(inventoryFile);
@@ -18,6 +23,7 @@ const inventory = JSON.parse(inventoryText);
 const inputs = { inventory: inventoryText, desktop: read(desktopFile), mobile: read(mobileFile) };
 if (!Array.isArray(inventory.entries) || inventory.entries.length !== inventory.totals.entries)
     throw new Error("Incomplete plugin inventory");
+if (resultsFile) inputs.results = read(resultsFile);
 
 function snapshot(text, platform) {
     if (!text.startsWith("# CloudCord module inventory: " + platform + "\n")
@@ -62,14 +68,14 @@ for (const plugin of inventory.entries) {
         wrappers.get(module).add(plugin.id);
     }
     for (const reference of plugin.accesses) {
-        const lookup = /\.findByProps(?:Lazy)?\((.*)\)$/.exec(reference);
+        const lookup = /\.(?:findBy|by)Props(?:Lazy)?\((.*)\)$/.exec(reference);
         if (lookup) {
             try { request(JSON.parse("[" + lookup[1] + "]"), plugin.id, reference); }
             catch { dynamic.push({ plugin: plugin.id, reference }); }
         }
         const member = /^(?:require:@webpack\/common\.|(?:vendetta|bunny)\.metro\.common\.)([\w$]+)\.([\w$]+)$/.exec(reference);
         if (member) request([member[2]], plugin.id, reference);
-        if (/\.findBy(?:StoreName|Name|DisplayName|FilePath)(?:Lazy)?\(/.test(reference))
+        if (/\.(?:findBy|by)(?:StoreName|Name|DisplayName|FilePath)(?:Lazy)?\(/.test(reference))
             dynamic.push({ plugin: plugin.id, reference, reason: "Needs its named store, component or file adapter" });
     }
     for (const reference of plugin.dynamic) dynamic.push({ plugin: plugin.id, reference, reason: "Computed lookup needs runtime evidence" });
@@ -106,6 +112,54 @@ const rows = [...requests.values()].map(entry => {
         ...(!found.mobile.length ? { nearestMobile: nearest(snapshots.mobile, entry.properties) } : {}),
     };
 }).sort((a, b) => b.plugins.length - a.plugins.length || a.id.localeCompare(b.id));
+
+const pluginKey = entry => JSON.stringify([entry.group, entry.id]);
+function makeBacklog(results) {
+    const hashes = inventory.sourceHashes;
+    if (!hashes || Object.entries(hashes).some(([group, digest]) => results.sources?.packs?.[group] !== digest))
+        throw new Error("Bulk results and API inventory must come from the same candidate packs");
+    const byPlugin = new Map(results.candidates.map(candidate => [pluginKey(candidate), candidate]));
+    const pending = new Map();
+    for (const plugin of inventory.entries) {
+        const result = byPlugin.get(pluginKey(plugin));
+        if (!result) throw new Error("Missing bulk test for " + plugin.id);
+        if ([result.parser, result.desktop, result.mobile].every(check => check?.status === "Pass")
+            && (!result.imported || [result.imported.desktop, result.imported.mobile].every(check => check?.status === "Pass"))) continue;
+        pending.set(plugin.id, { id: plugin.id, name: result.name, group: plugin.group,
+            missingPlatforms: ["desktop", "mobile"].filter(platform => result[platform]?.status !== "Pass"
+                || result.imported?.[platform]?.status && result.imported[platform].status !== "Pass"),
+            parser: result.parser, methodContracts: [], nativeAdapters: [], wrappers: plugin.modules });
+    }
+    const groups = [];
+    for (const row of rows) {
+        const affected = row.plugins.filter(id => pending.has(id));
+        if (!affected.length) continue;
+        for (const id of affected) pending.get(id).methodContracts.push({ methods: row.properties, status: row.status });
+        groups.push({ kind: "Method signature", requirement: row.properties.join(" + "), status: row.status, plugins: affected });
+    }
+    const named = new Map();
+    for (const row of dynamic) {
+        if (!pending.has(row.plugin)) continue;
+        const lookup = /\.(?:findBy|by)((?:StoreName|Name|DisplayName|FilePath))(?:Lazy)?\((.*)\)$/.exec(row.reference);
+        if (!lookup) continue;
+        const requirement = lookup[1] + " " + lookup[2];
+        if (!named.has(requirement)) named.set(requirement, new Set());
+        named.get(requirement).add(row.plugin);
+    }
+    for (const [requirement, affected] of named) {
+        for (const id of affected) pending.get(id).nativeAdapters.push(requirement);
+        groups.push({ kind: "Named lookup", requirement, status: "Platform adapter needed", plugins: [...affected].sort() });
+    }
+    for (const [requirement, ids] of wrappers) {
+        const affected = [...ids].filter(id => pending.has(id)).sort();
+        if (affected.length) groups.push({ kind: "Module wrapper", requirement, status: "Review requested operations", plugins: affected });
+    }
+    return {
+        pendingPlugins: [...pending.values()],
+        batches: groups.sort((a, b) => b.plugins.length - a.plugins.length || a.requirement.localeCompare(b.requirement)),
+    };
+}
+const backlog = inputs.results && makeBacklog(JSON.parse(inputs.results));
 const report = {
     scope: "Static plugin requirements and export shape comparison. Function arguments and behavior require adapter tests.",
     checkedAt: new Date().toISOString(),
@@ -114,7 +168,7 @@ const report = {
     plugins: inventory.entries,
     counts: { moduleWrappers: wrappers.size, propertyContracts: rows.length, commonMethodContracts: Object.keys(contracts).length, unresolvedReferences: dynamic.length },
     modules: [...wrappers].map(([name, ids]) => ({ name, plugins: [...ids].sort() })).sort((a, b) => b.plugins.length - a.plugins.length),
-    contracts: rows, unresolved: dynamic,
+    contracts: rows, unresolved: dynamic, backlog,
 };
 fs.mkdirSync(path.dirname(path.resolve(outputFile)), { recursive: true });
 fs.writeFileSync(outputFile, JSON.stringify(report, null, 2) + "\n");
@@ -128,6 +182,11 @@ for (const row of rows) lines.push(row.id + " — " + row.status, "  " + row.plu
         .map(hit => "  nearest " + platform + " " + hit.moduleId + "/" + hit.parent + ", missing " + hit.missing.join(", "))));
 lines.push("", "UNRESOLVED REFERENCES");
 for (const row of dynamic) lines.push(row.plugin + " — " + row.reference + (row.reason ? " — " + row.reason : ""));
+if (backlog) {
+    lines.push("", `NEXT ADAPTER BATCHES (${backlog.pendingPlugins.length} pending plugins)`);
+    for (const batch of backlog.batches) lines.push(batch.kind + " " + batch.requirement + " — " + batch.status,
+        "  " + batch.plugins.join(", "));
+}
 lines.push("", "ALL PLUGIN REFERENCES");
 for (const plugin of inventory.entries) lines.push(plugin.id,
     ...plugin.modules.map(module => "  module " + module),
@@ -135,6 +194,7 @@ for (const plugin of inventory.entries) lines.push(plugin.id,
     ...plugin.features.map(feature => "  feature " + feature),
     ...plugin.accesses.map(reference => "  API " + reference),
     ...plugin.dynamic.map(reference => "  dynamic " + reference));
-fs.writeFileSync(outputFile.replace(/\.json$/i, ".txt"), lines.join("\n") + "\n");
+fs.writeFileSync(textOutputFile, lines.join("\n") + "\n");
 if (contractsFile) fs.writeFileSync(contractsFile, JSON.stringify(contracts, null, 2) + "\n");
-console.log(JSON.stringify({ ...report.counts, plugins: report.pluginCount, output: path.resolve(outputFile) }));
+console.log(JSON.stringify({ ...report.counts, plugins: report.pluginCount, pending: backlog?.pendingPlugins.length,
+    batches: backlog?.batches.length, output: path.resolve(outputFile) }));

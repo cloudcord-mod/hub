@@ -16,7 +16,7 @@ import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoice
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
 import { copyToClipboard } from "@utils/clipboard";
-import { getCxChannelNameCopy, getCxProfileMedia } from "@utils/cx";
+import { findCxChannel, findCxUser, getCxChannelNameCopy, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT } from "@utils/cx";
 import { openImageModal } from "@utils/discord";
 import { saveFile } from "@utils/web";
@@ -140,7 +140,7 @@ function registerCopyChannelName() {
     let active = true;
     const patch: NavContextMenuPatchCallback = (children, props) => {
         if (!active || !props?.channel) return;
-        const copy = getCxChannelNameCopy(props.channel, id => UserStore.getUser(id)?.username);
+        const copy = getCxChannelNameCopy(props.channel, id => findCxUser(() => UserStore, id)?.username);
         if (!copy) return;
         children.push(<Menu.MenuItem id="cx-copy-channel-name" label={copy.label} action={() => {
             if (active) void copyToClipboard(copy.name).then(
@@ -739,8 +739,8 @@ export function CxSettings({ initialSource = "" }: { initialSource?: string; } =
                     let active = true;
                     const muteStore = rules.some(rule => rule.kind === "ping-alerts") ? findStore("UserGuildSettingsStore") : undefined;
                     const context = {
-                        currentUser: () => UserStore.getCurrentUser()?.id,
-                        channel: (id: string) => ChannelStore.getChannel(id),
+                        currentUser: () => findCxUser(() => UserStore)?.id,
+                        channel: (id: string) => findCxChannel(() => ChannelStore, id),
                         replyAuthor: (channel: string, id: string) => MessageStore.getMessage(channel, id)?.author,
                         blocked: (id: string) => RelationshipStore?.isBlocked(id) === true,
                         ignored: (id: string) => RelationshipStore?.isIgnored?.(id) === true,
@@ -774,8 +774,8 @@ export function CxSettings({ initialSource = "" }: { initialSource?: string; } =
                     const social = bindCxSocialEvents(rules, {
                         currentUser: context.currentUser, notify: context.notify,
                         isFriend: id => RelationshipStore?.isFriend?.(id) === true,
-                        userName: id => { const user = UserStore?.getUser(id); return user?.globalName || user?.username; },
-                        channelName: id => ChannelStore?.getChannel(id)?.name,
+                        userName: id => { const user = findCxUser(() => UserStore, id); return user?.globalName || user?.username; },
+                        channelName: id => findCxChannel(() => ChannelStore, id)?.name,
                         voiceChannel: () => SelectedChannelStore?.getVoiceChannelId(),
                         joinVoice: id => ChannelActions.selectVoiceChannel(id),
                         removalActions: () => findByProps("removeRelationship"),
@@ -1118,7 +1118,7 @@ export function CxSettings({ initialSource = "" }: { initialSource?: string; } =
                     return () => { profileBioTransforms.delete(transform); };
                 },
                 getUserAvatarUrl(id) {
-                    const user = id ? UserStore?.getUser(id) : UserStore?.getCurrentUser?.();
+                    const user = findCxUser(() => UserStore, id);
                     if (user) return IconUtils.getUserAvatarURL(user, true, 1024);
                 },
                 registerCommand(name, execute, acceptsText, sendsMessage, optionalSend, inputs) {

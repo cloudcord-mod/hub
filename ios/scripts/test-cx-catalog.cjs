@@ -33,6 +33,20 @@ const reviewedConvertedPorts = new Map([
         file: "friend-invites.cx",
         scriptSha256: "4fd122c686bff9b718e1092daa0c2e44f7cb6ba4a6b32718f9419761f1017a31",
     }],
+    ["gpl/hide-server-banner", {
+        file: "hide-server-banner.cx",
+        scriptSha256: "127d81f6b2d5cd96c5260ce4092a8d0f57920aa709d5e631bdc25a6bdbdab53d",
+        styleSha256: "142f7a408f1cd000e7163d6b1ff74bd7f78a3ce1be4b09bdb940eba67a91e628",
+    }],
+    ["gpl/hide-server-banners", {
+        file: "hide-server-banner.cx",
+        scriptSha256: "e9237e8766fbe13665665f5dceb252929f024109c725e98bcfe2e89d3f9e8def",
+        styleSha256: "7fc44e34d774a01aca6c8a78002f1f8b769042d63f15f377ec8bccbce72222ec",
+    }],
+    ["gpl/no-draft-length-limit", {
+        file: "no-draft-length-limit.cx",
+        scriptSha256: "fd1ab34c5ebe00c73e01614952bd714994b9691e9f806b5d9aae0a05af5a12c7",
+    }],
     ["gpl/ship-calc", {
         file: "ship-calc.cx",
         scriptSha256: "77fa44318a9a0e8abfe1f7dfe86d447871890eccd17fa6939a29af7983bae2e1",
@@ -40,6 +54,10 @@ const reviewedConvertedPorts = new Map([
     ["gpl/wiki-lookup", {
         file: "wiki-lookup.cx",
         scriptSha256: "9724bb1ae4fb2432664ee6c0cfed2e67453a518611a38592f02b48ffce21dba8",
+    }],
+    ["gpl/write-upper-case", {
+        file: "write-upper-case.cx",
+        scriptSha256: "06d5912d7d8de948283689f0d5c93ff4fac3e685ee475e74798112c6ec6dd74a",
     }],
     ["discover-52", {
         file: "hide-blocked-and-ignored-messages.cx",
@@ -338,8 +356,11 @@ async function main(args) {
         const pack = packs[group];
         const entry = pack.entries?.get(id);
         const review = reviewedConvertedPorts.get(id);
-        const script = pack.scripts?.[id.replace(/^gpl\//, "")];
-        const reviewed = review && typeof script === "string" && createHash("sha256").update(script).digest("hex") === review.scriptSha256;
+        const slug = id.replace(/^gpl\//, "");
+        const script = pack.scripts?.[slug];
+        const style = pack.styles?.[slug];
+        const reviewed = review && typeof script === "string" && createHash("sha256").update(script).digest("hex") === review.scriptSha256
+            && (typeof style === "string" ? createHash("sha256").update(style).digest("hex") : undefined) === review.styleSha256;
         if (reviewed) portableFile = review.file;
         if (portableFile && /^[a-z0-9-]+\.cx$/.test(portableFile)) {
             const file = path.join(root, "examples/cx/catalog/plugins", portableFile);

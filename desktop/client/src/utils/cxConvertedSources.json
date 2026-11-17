@@ -82,6 +82,7 @@
   "plugin \"HideScrollbars\":\n  needs appearance.style\n  style hide-scrollbars\n  needs scripts.run\n  use hide-scrollbars": "plugin \"HideScrollbars\":\n  needs appearance.hide\n  hide scrollbars",
   "plugin \"HideSendButton\":\n  needs appearance.style\n  style hide-send-button\n  needs scripts.run\n  use hide-send-button": "plugin \"HideSendButton\":\n  needs appearance.hide\n  hide chat-send-button",
   "plugin \"HideServerBanner\":\n  needs appearance.style\n  style hide-server-banner\n  needs scripts.run\n  use hide-server-banner": "plugin \"HideServerBanner\":\n  needs appearance.hide\n  hide server-banner",
+  "plugin \"HideServerBanners\":\n  needs appearance.style\n  style hide-server-banners\n  needs scripts.run\n  use hide-server-banners": "plugin \"HideServerBanner\":\n  needs appearance.hide\n  hide server-banner",
   "plugin \"HideShopTab\":\n  needs appearance.style\n  style hide-shop-tab\n  needs scripts.run\n  use hide-shop-tab": "plugin \"HideShopTab\":\n  needs appearance.hide\n  hide shop-entry",
   "plugin \"HideSpoilerWarnings\":\n  needs appearance.style\n  style hide-spoiler-warnings\n  needs scripts.run\n  use hide-spoiler-warnings": "plugin \"HideSpoilerWarnings\":\n  needs appearance.hide\n  hide spoiler-media-label",
   "plugin \"HideStatusEmojis\":\n  needs appearance.style\n  style hide-status-emojis\n  needs scripts.run\n  use hide-status-emojis": "plugin \"HideStatusEmojis\":\n  needs appearance.hide\n  hide custom-status-emojis",
@@ -109,6 +110,7 @@
   "plugin \"NarrowChannelList\":\n  needs appearance.style\n  style narrow-channel-list\n  needs scripts.run\n  use narrow-channel-list": "plugin \"NarrowChannelList\":\n  needs appearance.style\n  style narrower-channel-list",
   "plugin \"NoAnimations\":\n  needs appearance.style\n  style no-animations\n  needs scripts.run\n  use no-animations": "plugin \"NoAnimations\":\n  needs appearance.style\n  style reduced-motion",
   "plugin \"NoChatBarBorder\":\n  needs appearance.style\n  style no-chat-bar-border\n  needs scripts.run\n  use no-chat-bar-border": "plugin \"NoChatBarBorder\":\n  needs appearance.style\n  style borderless-chat-bar",
+  "plugin \"NoDraftLengthLimit\":\n  needs scripts.run\n  use no-draft-length-limit": "plugin \"NoDraftLengthLimit\":\n  needs drafts.long\n  use keep-long-drafts",
   "plugin \"NoMosaic\":\n  needs scripts.run\n  use no-mosaic": "plugin \"NoMosaic\":\n  needs appearance.style\n  use flat-attachments",
   "plugin \"NoRoleHeaders\":\n  needs scripts.run\n  use no-role-headers": "plugin \"NoRoleHeaders\":\n  needs appearance.hide\n  use hide-role-headers",
   "plugin \"NoServerEmojis\":\n  needs scripts.run\n  use no-server-emojis": "plugin \"NoServerEmojis\":\n  needs appearance.hide\n  use unicode-emoji-autocomplete",
@@ -140,5 +142,6 @@
   "plugin \"WaitForSlot\":\n  needs scripts.run\n  use wait-for-slot": "plugin \"WaitForSlot\":\n  needs voice.waitslot\n  use wait-for-slot",
   "plugin \"WebcamStartNotifier\":\n  needs scripts.run\n  use webcam-start-notifier": "plugin \"WebcamStartNotifier\":\n  needs voice.cameratone\n  use webcam-start-notifier",
   "plugin \"WiderChannelList\":\n  needs appearance.style\n  style wider-channel-list\n  needs scripts.run\n  use wider-channel-list": "plugin \"WiderChannelList\":\n  needs appearance.style\n  style wider-channel-list",
-  "plugin \"WikiLookup\":\n  needs scripts.run\n  use wiki-lookup": "plugin \"WikiLookup\":\n  needs commands.register\n  needs reply.local\n  needs lookup.wikipedia\n  on command \"wiki\":\n    input \"message\" text\n    lookup wikipedia \"message\""
+  "plugin \"WikiLookup\":\n  needs scripts.run\n  use wiki-lookup": "plugin \"WikiLookup\":\n  needs commands.register\n  needs reply.local\n  needs lookup.wikipedia\n  on command \"wiki\":\n    input \"message\" text\n    lookup wikipedia \"message\"",
+  "plugin \"WriteUpperCase\":\n  needs scripts.run\n  use write-upper-case": "plugin \"WriteUpperCase\":\n  needs messages.transform\n  before send capitalizeSentences \"http, https, ok\""
 }

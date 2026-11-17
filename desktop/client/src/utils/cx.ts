@@ -1,6 +1,6 @@
 import { cxAppearanceTargets, type CxAppearanceTarget, type CxHideTarget, type CxStyleTarget } from "./cxAppearance";
 import cxConvertedSources from "./cxConvertedSources.json";
-export { resolveCxModule } from "./cxAdapters";
+export { findCxChannel, findCxUser, resolveCxModule } from "./cxAdapters";
 export { decodeCxMessageBase64 } from "./cxNativeEffects";
 import { cxClientFunctions, cxExternalLookups, translateCxText, type CxClientFunction, type CxExternalLookup, type CxFriendInviteAction } from "./cxClientCommands";
 import { chooseOne, cxCommandFunctions } from "./cxCommandFunctions";
