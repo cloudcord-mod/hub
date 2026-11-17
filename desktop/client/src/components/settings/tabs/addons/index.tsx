@@ -17,6 +17,7 @@ import type { ComponentType } from "react";
 import { wrapTab } from "../BaseTab";
 import { listablePlugins, PluginsPage, ThemesPage } from "./AddonPage";
 import { tweakPlugins, TweaksPage } from "./TweaksPage";
+import TestingPlugins, { useTestingPluginsAssignment } from "./TestingPlugins";
 
 const cl = classNameFactory("cc-addons-");
 
@@ -36,6 +37,7 @@ const PAGES: Page[] = [
     { name: "Tweaks", Icon: TweakIcon, Tab: TweaksPage, count: () => tweakPlugins().length },
     { name: "Themes", Icon: PaintbrushIcon, Tab: ThemesPage, show: v => v.showThemesTab !== false },
     { name: "CX Extensions", Icon: PluginIcon, Tab: CxPage },
+    { name: "Testing Plugins", Icon: PluginIcon, Tab: TestingPlugins },
     { name: "Sync", Icon: CloudIcon, Tab: CloudPage, show: v => v.showCloudSyncTab !== false },
     { name: "Extras", Icon: PluginIcon, Tab: ExtrasPage },
 ];
@@ -46,7 +48,8 @@ export const setNextAddonsTab = (name: string) => { nextTab = name; };
 
 function Addons() {
     const visibility = (useSettings().plugins.Settings ?? {}) as any;
-    const pages = PAGES.filter(p => p.show?.(visibility) ?? true);
+    const testing = useTestingPluginsAssignment();
+    const pages = PAGES.filter(p => (p.name !== "Testing Plugins" || testing) && (p.show?.(visibility) ?? true));
     const [current, setCurrent] = React.useState(() => {
         const wanted = nextTab;
         nextTab = null;

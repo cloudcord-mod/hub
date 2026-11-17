@@ -10,6 +10,7 @@ concurrency:
       - main
     paths:
       - "ios/**"
+      - "config/cx-testing*"
       - "desktop/client/src/utils/profileAppearance.ts"
       - "desktop/client/src/utils/connectionSettings.ts"
       - "desktop/client/src/utils/fakeMessages.ts"
@@ -48,6 +49,7 @@ jobs:
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-patcher-symbol-proxy.cjs
           node ios/scripts/test-original-rain.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-cx.cjs
+          NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-cx-testing.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-startup-errors.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-recovery-gesture.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-core-settings-bootstrap.cjs
@@ -140,6 +142,11 @@ jobs:
           cp "../ios/runtime/src/core/ui/settings/pages/Addons/index.tsx" "src/core/ui/settings/pages/Addons/index.tsx"
           mkdir -p src/core/ui/settings/pages/CxExtensions
           cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/index.tsx" "src/core/ui/settings/pages/CxExtensions/index.tsx"
+          mkdir -p src/core/ui/settings/pages/TestingPlugins src/lib/api
+          cp "../ios/runtime/src/core/ui/settings/pages/TestingPlugins/index.tsx" "src/core/ui/settings/pages/TestingPlugins/index.tsx"
+          cp "../ios/runtime/src/lib/api/pluginTesting.ts" "src/lib/api/pluginTesting.ts"
+          cp "../config/cx-testing.ts" "src/lib/api/cxTesting.ts"
+          cp "../config/cx-testing-queues.json" "src/lib/api/cx-testing-queues.json"
           cp ../desktop/client/src/utils/cx*.ts src/lib/api/
           mkdir -p src/core/plugins/shared
           cp "../ios/runtime/src/core/plugins/shared/sendMessage.ts" "src/core/plugins/shared/sendMessage.ts"

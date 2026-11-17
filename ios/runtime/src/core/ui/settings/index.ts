@@ -2,6 +2,7 @@ import PupuIcon from "@assets/icons/cloudcord.png";
 import { useProxy } from "@core/vendetta/storage";
 import { findAssetId } from "@lib/api/assets";
 import { settings } from "@lib/api/settings";
+import { useMobileTestingAssignment } from "@lib/api/pluginTesting";
 import { registerSection } from "@ui/settings";
 import type { RowConfig } from "@ui/settings";
 import { version } from "bunny-build-info";
@@ -65,6 +66,13 @@ export default function initSettings() {
                 render: () => import("@core/ui/settings/pages/Addons")
             },
             {
+                key: "CLOUDCORD_TESTING_PLUGINS",
+                title: () => "Testing Plugins",
+                icon: safeAsset("AppsIcon", "WrenchIcon"),
+                render: () => import("@core/ui/settings/pages/TestingPlugins"),
+                usePredicate: () => Boolean(useMobileTestingAssignment()),
+            },
+            {
                 key: "CLOUDCORD_PLUGIN_BROWSER",
                 title: () => "Discover plugins",
                 icon: safeAsset("ChannelListMagnifyingGlassIcon", "SearchIcon", "AppsIcon"),
@@ -79,7 +87,7 @@ export default function initSettings() {
             }
         ];
 
-    const defaultOrder = ["CLOUDCORD", "BOTCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
+    const defaultOrder = ["CLOUDCORD", "BOTCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_TESTING_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
     const configurableKeys = new Set(defaultOrder.filter(key => key !== "CLOUDCORD"));
     const configuredOrder = settings.cloudcordTabOrder ?? [];
     const orderIndex = new Map(configuredOrder.map((key, index) => [key, index]));

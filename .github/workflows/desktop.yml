@@ -10,6 +10,8 @@ on:
   push:
     paths:
       - "desktop/**"
+      - "config/cx-testing*"
+      - "ios/scripts/test-cx-testing.cjs"
       - "ios/scripts/test-custom-social-render.cjs"
       - ".github/workflows/desktop.yml"
 
@@ -102,6 +104,7 @@ jobs:
           node desktop/client/scripts/test-custom-social-ui.cjs
           node desktop/client/scripts/test-native-social-hooks.cjs
           node ios/scripts/test-custom-social-render.cjs
+          node ios/scripts/test-cx-testing.cjs
 
       - name: Check staff badge contrast after profile mount
         working-directory: desktop/client

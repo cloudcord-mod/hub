@@ -10,6 +10,10 @@
 
             "@core/*": ["./src/core/*"],
             "@lib": ["./src/lib"],
+            "@lib/api/ccpInspect": ["../../desktop/client/src/utils/ccpInspect.ts"],
+            "@lib/api/cx": ["../../desktop/client/src/utils/cx.ts"],
+            "@lib/api/cxCatalog": ["../../desktop/client/src/utils/cxCatalog.ts"],
+            "@lib/api/cxTesting": ["../../config/cx-testing.ts"],
             "@lib/*": ["./src/lib/*"],
             "@metro": ["./src/metro"],
             "@metro/*": ["./src/metro/*"],
