@@ -119,10 +119,41 @@ function adapterResult(row, reason = "Adapter test did not produce a result") {
         testedSwitches: row.testedSwitches, commandInputs: row.commandInputs } : blocked(reason);
 }
 
-function originalDesktopPortResolver(sourceRoot, pack) {
+function equivalentPluginKey(source, parseCx) {
+    const plugin = parseCx(source);
+    if (plugin.kind !== "plugin") return;
+    const commands = plugin.commands.map(command => {
+        const legacy = command.text && !command.inputs.length;
+        const explicit = !command.text && command.inputs.length === 1 && command.inputs[0].name === "message"
+            && command.inputs[0].type === "text" && command.inputs[0].required;
+        if (!legacy && !explicit) return command;
+        const input = legacy ? "text" : "message";
+        const slot = new RegExp("\\$\\{(" + input + "|[a-zA-Z]+\\(" + input + "\\))\\}", "g");
+        const rename = text => text.replace(slot, (_match, value) => "${" + value.replace(new RegExp("\\b" + input + "(?=\\)?$)"), "message") + "}");
+        // Only normalize literal and simple single-input send templates. The
+        // rest of the AST, including settings and permissions, must match.
+        if (!command.actions.every(action => action.kind === "send" && !action.choices && action.fallback === undefined
+            && !action.message.replace(slot, "").includes("${"))) return command;
+        return {
+            ...command, text: false, inputs: [{ name: "message", type: "text", required: true }],
+            actions: command.actions.map(action => ({ ...action, message: rename(action.message) })),
+        };
+    });
+    return JSON.stringify({ ...plugin, commands, optionalHides: [...plugin.optionalHides] });
+}
+
+function originalDesktopPortResolver(sourceRoot, pack, rows) {
     if (!pack.entries) return () => undefined;
     const { inspectPlugin } = require("../../desktop/client/scripts/cx-bulk-plugins.cjs");
-    const { cxAppearanceTargets, cxNativeEffects } = require("../../desktop/client/scripts/sync-cx-catalog.cjs").loadCxRuntime();
+    const { parseCx, cxAppearanceTargets, cxNativeEffects } = require("../../desktop/client/scripts/sync-cx-catalog.cjs").loadCxRuntime();
+    const testedHashes = new Set(rows.map(row => row.sourceHash));
+    const testedPrograms = new Map();
+    const folder = path.join(root, "examples/cx/catalog/plugins");
+    for (const filename of fs.readdirSync(folder).filter(name => name.endsWith(".cx"))) {
+        const source = fs.readFileSync(path.join(folder, filename), "utf8");
+        const sourceHash = hash(source);
+        if (testedHashes.has(sourceHash)) testedPrograms.set(equivalentPluginKey(source, parseCx), sourceHash);
+    }
 
     return (entry, name) => {
         const original = entry?.source.match(/^\/\/ Converted from .+ \(desktop\/client\/src\/([\w-]+\/[\w-]+(?:\.[\w-]+)*)\)\. GPL-3\.0-or-later\.$/m)?.[1];
@@ -140,7 +171,10 @@ function originalDesktopPortResolver(sourceRoot, pack) {
             const location = path.join(path.dirname(filename), companion);
             if (fs.lstatSync(location, { throwIfNoEntry: false })?.isFile()) return fs.readFileSync(location, "utf8");
         });
-        if (converted?.name === name && converted.cx) return { sourceFile, sourceHash: hash(converted.cx) };
+        if (converted?.name !== name || !converted.cx) return;
+        const convertedHash = hash(converted.cx);
+        const sourceHash = testedHashes.has(convertedHash) ? convertedHash : testedPrograms.get(equivalentPluginKey(converted.cx, parseCx));
+        if (sourceHash) return { sourceFile, sourceHash };
     };
 }
 
@@ -225,7 +259,7 @@ async function main(args) {
     const [desktopEvidence, discoverEvidence] = await packTests;
     const adapters = new Map(rows.map(row => [row.platform + ":" + row.sourceHash, row]));
     const styles = new Map(rows.filter(row => row.appearanceCss).map(row => [row.platform + ":" + row.appearanceCss.trim(), row]));
-    const originalDesktopPort = originalDesktopPortResolver(sourceRoot, packs["Desktop CX pack"]);
+    const originalDesktopPort = originalDesktopPortResolver(sourceRoot, packs["Desktop CX pack"], rows);
     const matched = new Set();
     const candidates = queues.flat().map(([id, name, group, portableFile]) => {
         const pack = packs[group];
