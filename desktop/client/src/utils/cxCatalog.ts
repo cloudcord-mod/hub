@@ -26,6 +26,7 @@ import plugin_catalog_clean_channel_name from "../../../../examples/cx/catalog/p
 import plugin_catalog_clear_urls from "../../../../examples/cx/catalog/plugins/clear-urls.cx";
 import plugin_catalog_client_side_block from "../../../../examples/cx/catalog/plugins/client-side-block.cx";
 import plugin_catalog_cloud_cord_accent from "../../../../examples/cx/catalog/plugins/cloud-cord-accent.cx";
+import plugin_catalog_color_text from "../../../../examples/cx/catalog/plugins/color-text.cx";
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
@@ -342,6 +343,7 @@ export const cxCatalog = {
         { name: "ClearURLs", source: plugin_catalog_clear_urls },
         { name: "ClientSideBlock", source: plugin_catalog_client_side_block },
         { name: "CloudCordAccent", source: plugin_catalog_cloud_cord_accent },
+        { name: "ColorText", source: plugin_catalog_color_text },
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions },
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list },
         { name: "CopyBios", source: plugin_catalog_copy_bios },

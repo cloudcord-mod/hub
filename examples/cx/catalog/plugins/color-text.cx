@@ -1,0 +1,10 @@
+plugin "ColorText":
+  needs commands.register
+  needs messages.send
+  needs reply.local
+  on command "color":
+    input "message" text
+    input "color" choice "gray,red,green,yellow,blue,pink,cyan,white"
+    input "background" choice "navy,orange,slate,teal,gray,indigo,silver,white" optional
+    input "style" choice "bold,underline" optional
+    send "${colorText(message, color, background, style)}" else "Enter a shorter message for the colored code block."

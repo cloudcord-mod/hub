@@ -27,6 +27,8 @@ const morseCodes = new Map(Object.entries({
 }));
 const morseLetters = new Map([...morseCodes].map(([letter, code]) => [code, letter]));
 const normalizations = ["NFC", "NFD", "NFKC", "NFKD"];
+const ansiForegrounds = ["gray", "red", "green", "yellow", "blue", "pink", "cyan", "white"];
+const ansiBackgrounds = ["navy", "orange", "slate", "teal", "gray", "indigo", "silver", "white"];
 
 function randomInteger(low: number, high: number) {
     const range = high - low + 1;
@@ -34,6 +36,19 @@ function randomInteger(low: number, high: number) {
 }
 
 export const cxCommandFunctions = {
+    colorText(text: string, color: string, background: string, style: string) {
+        const foregroundIndex = ansiForegrounds.indexOf(color);
+        const backgroundIndex = ansiBackgrounds.indexOf(background);
+        if (foregroundIndex < 0 || background && backgroundIndex < 0 || style && style !== "bold" && style !== "underline") return;
+        const codes = [style === "bold" ? 1 : style === "underline" ? 4 : 0, 30 + foregroundIndex];
+        if (background) codes.push(40 + backgroundIndex);
+        const safeText = text.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g, "");
+        if (!safeText.trim()) return;
+        const prefix = `\u001b[${codes.join(";")}m`;
+        const lines = safeText.replace(/`(?=``)/g, "`\u200b").split(/\r\n|\r|\n/).map(line => prefix + line + "\u001b[0m");
+        const output = "```ansi\n" + lines.join("\n") + "\n```";
+        if (output.length <= 4000) return output;
+    },
     searchLink(input: string, engine: string, hyperlink: string, hideEmbed: string) {
         if (!input.trim()) return;
         try {

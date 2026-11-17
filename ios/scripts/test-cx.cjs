@@ -4420,6 +4420,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const invokeNamed = (name, values = {}) => registered[name].execute(
             Object.entries(values).map(([name, value]) => ({ name, value })), { channel: { id: "test-channel" } }
         )?.content;
+        selectCatalog("ColorText");
+        click(render(), "Allow for this session");
+        assert.equal(registered.color.options.find(option => option.name === "color").choices.length, 8);
+        assert.equal(registered.color.options.find(option => option.name === "background").required, false);
+        assert.equal(invokeNamed("color", { message: "hello\r\n```\u001b", color: "red", background: "navy", style: "bold" }),
+            "```ansi\n\u001b[1;31;40mhello\u001b[0m\n\u001b[1;31;40m`\u200b``\u001b[0m\n```");
+        assert.equal(invokeNamed("color", { message: "hello", color: "cyan" }), "```ansi\n\u001b[0;36mhello\u001b[0m\n```");
+        assert.equal(invokeNamed("color", { message: "hello", color: "constructor" }), undefined);
+        assert.equal(invokeNamed("color", { message: "a".repeat(4000), color: "red" }), undefined);
+        assert.match(delivered.pop()[1], /Enter a shorter message/);
+        click(render(), "Disable ColorText");
+        assert.equal(registered.color, undefined);
         selectCatalog("GoogleThat");
         click(render(), "Allow for this session");
         assert.equal(registered.googlethat.options.find(option => option.name === "engine").choices.length, 10);
