@@ -5584,15 +5584,15 @@ jobs:
               if legacy_refresh_import not in text:
                   text = legacy_refresh_import + text
 
-              if "initializeFakeProfile()," not in text:
+              if 'runStartupTask("profiles",' not in text:
                   text = text.replace(
                       "        initSettings(),",
                       '        initSettings(),\n        runStartupTask("profiles", () => initializeFakeProfile()),'
                   )
-              if "initializeCloudCordVerification()," not in text:
+              if 'runStartupTask("verification",' not in text:
                   text = text.replace(
-                      "        initializeFakeProfile(),",
-                      "        initializeFakeProfile(),\n        initializeCloudCordVerification(),"
+                      '        runStartupTask("profiles", () => initializeFakeProfile()),',
+                      '        runStartupTask("profiles", () => initializeFakeProfile()),\n        runStartupTask("verification", () => initializeCloudCordVerification()),'
                   )
 
               text = text.replace(
