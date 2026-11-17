@@ -1,0 +1,3 @@
+plugin "DecodeBase64":
+  needs messages.decode
+  use decode-base64

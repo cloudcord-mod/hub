@@ -41,6 +41,7 @@ import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
+import plugin_catalog_decode_base64 from "../../../../examples/cx/catalog/plugins/decode-base64.cx";
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
 import plugin_catalog_double_click_edit from "../../../../examples/cx/catalog/plugins/double-click-edit.cx";
@@ -362,6 +363,7 @@ export const cxCatalog = {
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps },
         { name: "Dashless", source: plugin_catalog_dashless },
         { name: "Declutter", source: plugin_catalog_declutter },
+        { name: "DecodeBase64", source: plugin_catalog_decode_base64 },
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels },
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps },
         { name: "DoubleClickEdit", source: plugin_catalog_double_click_edit },

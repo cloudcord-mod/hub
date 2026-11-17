@@ -870,7 +870,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 Alert: { alert: (title, body, buttons, options) => {
                     if (title === "Clear local user notes?") confirmNotes = value => buttons[value ? 1 : 0].onPress();
                     else if (title === "Confirm message") nativeConfirmations.push({ props: { title, body }, buttons, options });
-                    else if (title === "Voice channel is full" || title === "A voice slot is open") {
+                    else if (["Voice channel is full", "A voice slot is open", "Decoded Base64"].includes(title)) {
                         queuePrompts.push({ props: { title, body, confirmText: buttons[1].text },
                             resolve: value => value ? buttons[1].onPress() : buttons[0].onPress() });
                     } else mediaAlerts.push([title, body]);
@@ -1152,6 +1152,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Disable NoConfirmPin");
             unpin();
             assert.equal(pinCalls.length, 2);
+            selectCatalog("DecodeBase64");
+            click(render(), "Allow for this session");
+            embedMessage = { ...embedMessage, content: "SGVsbG8h 8J+YgA== /w==" };
+            findAction("Decode Base64")();
+            const preview = queuePrompts.pop();
+            assert.equal(preview.props.title, "Decoded Base64");
+            assert.equal(desktop ? preview.props.body.props.children : preview.props.body, "Hello!\n\n😀");
+            preview.resolve(true);
+            assert.equal(clipboardWrites.pop(), "Hello!\n\n😀");
+            click(render(), "Disable DecodeBase64");
+            preview.resolve(true);
+            assert.equal(clipboardWrites.length, 0, "Disabling the plugin revokes a pending copy action");
             selectedChannel = "test-channel";
             embedMessage = undefined;
         }

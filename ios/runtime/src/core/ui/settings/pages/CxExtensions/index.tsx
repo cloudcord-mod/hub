@@ -29,7 +29,7 @@ import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
 import { getCxMessageGesture } from "@lib/api/cx";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
-import { createCxUserNotes, CX_USER_NOTE_LIMIT, resolveCxModule, runCxCleanups } from "@lib/api/cx";
+import { createCxUserNotes, CX_USER_NOTE_LIMIT, decodeCxMessageBase64, resolveCxModule, runCxCleanups } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
 import type { ComponentType, Context, ReactElement, ReactNode } from "react";
@@ -2466,6 +2466,18 @@ export default function CxExtensions({ initialSource = "" }: { initialSource?: s
                             return registerBypassPinPrompt(enabled);
                         case "pin-message-shortcut":
                             return registerPinShortcut(enabled);
+                        case "decode-base64":
+                            return registerMessageMenuActions(enabled, ({ message }, close, stillActive) => {
+                                const decoded = decodeCxMessageBase64(message?.content);
+                                if (!decoded) return [];
+                                return [{ label: "Decode Base64", run() {
+                                    close();
+                                    Alert.alert("Decoded Base64", decoded, [
+                                        { text: "Close", style: "cancel" },
+                                        { text: "Copy", onPress: () => { if (stillActive(false)) clipboard.setString(decoded); } },
+                                    ]);
+                                } }];
+                            }, false);
                         case "toggle-message-embeds":
                             return registerEmbedToggle(enabled);
                         case "repeat-message":

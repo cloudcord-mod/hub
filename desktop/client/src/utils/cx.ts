@@ -1,6 +1,7 @@
 import { cxAppearanceTargets, type CxAppearanceTarget, type CxHideTarget, type CxStyleTarget } from "./cxAppearance";
 import cxConvertedSources from "./cxConvertedSources.json";
 export { resolveCxModule } from "./cxAdapters";
+export { decodeCxMessageBase64 } from "./cxNativeEffects";
 import { cxClientFunctions, cxExternalLookups, translateCxText, type CxClientFunction, type CxExternalLookup, type CxFriendInviteAction } from "./cxClientCommands";
 import { chooseOne, cxCommandFunctions } from "./cxCommandFunctions";
 import { applyIncomingRule, incomingPermissions, type IncomingPayload, type IncomingRule, parseIncomingRule } from "./cxIncoming";
@@ -77,6 +78,7 @@ const permissionLabels = {
     "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user’s message",
     "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
     "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
+    "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
     "drafts.long": "Keep the full text of your local drafts",
     "messages.pin": "Pin or unpin a message immediately when you choose a pin action.",
     "messages.toggleembeds": "Change embed visibility on the selected message when you choose its menu action.",
@@ -408,7 +410,7 @@ export function parseCx(source: string): CxDocument {
             current = undefined;
             continue;
         }
-        const effect = /^  use ([a-z-]+)(?: ([a-z0-9 -]+))?$/.exec(line);
+        const effect = /^  use ([a-z][a-z0-9-]*)(?: ([a-z0-9 -]+))?$/.exec(line);
         if (effect) {
             const name = effect[1] as CxNativeEffect;
             if (!Object.prototype.hasOwnProperty.call(cxNativeEffects, name) || nativeEffects.has(name))

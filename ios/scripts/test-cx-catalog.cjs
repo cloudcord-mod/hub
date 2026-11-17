@@ -15,7 +15,11 @@ const sourceFiles = {
     "Discover CX preview": "ios/dist/discover-cx/mobile-conversion-preview.json",
 };
 const platforms = ["desktop", "mobile"];
-const reviewedDiscoverPorts = new Map([
+const reviewedConvertedPorts = new Map([
+    ["gpl/decode-base64", {
+        file: "decode-base64.cx",
+        scriptSha256: "5d7ad58849f433f36086043bbbeaf88fa934c6f301837dae945fb888c58606b8",
+    }],
     ["discover-52", {
         file: "hide-blocked-and-ignored-messages.cx",
         scriptSha256: "342a4b875291785ae731695f0fbd9f6596d3a3a12cfd57fc74a8182520099fff",
@@ -306,16 +310,17 @@ async function main(args) {
     const candidates = queues.flat().map(([id, name, group, portableFile]) => {
         const pack = packs[group];
         const entry = pack.entries?.get(id);
-        const discover = group === "Discover CX preview" && reviewedDiscoverPorts.get(id);
-        if (discover && typeof pack.scripts?.[id] === "string"
-            && createHash("sha256").update(pack.scripts[id]).digest("hex") === discover.scriptSha256) portableFile = discover.file;
+        const review = reviewedConvertedPorts.get(id);
+        const script = pack.scripts?.[id.replace(/^gpl\//, "")];
+        const reviewed = review && typeof script === "string" && createHash("sha256").update(script).digest("hex") === review.scriptSha256;
+        if (reviewed) portableFile = review.file;
         if (portableFile && /^[a-z0-9-]+\.cx$/.test(portableFile)) {
             const file = path.join(root, "examples/cx/catalog/plugins", portableFile);
             const sourceHash = fs.existsSync(file) && hash(fs.readFileSync(file, "utf8"));
             const found = platforms.map(platform => adapters.get(platform + ":" + sourceHash));
             if (found.some(Boolean)) {
                 matched.add(sourceHash);
-                return { id, name, group, implementation: (discover ? "Reviewed Discover port: " : "Declared shared port: ") + portableFile,
+                return { id, name, group, implementation: (reviewed ? "Reviewed converted port: " : "Declared shared port: ") + portableFile,
                     catalogName: (found[0] ?? found[1]).name,
                     syntax: checkCandidate(id, entry, pack, parse), desktop: adapterResult(found[0]), mobile: adapterResult(found[1]) };
             }

@@ -24,7 +24,7 @@ import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type C
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
 import { selectCxAppearanceOption } from "@utils/cx";
-import { resolveCxModule, runCxCleanups, unindentCxCode } from "@utils/cx";
+import { decodeCxMessageBase64, resolveCxModule, runCxCleanups, unindentCxCode } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -276,6 +276,24 @@ function registerQuoteMessage(includeLink: boolean) {
         }} />);
         children.push(<Menu.MenuItem id="cx-copy-quote" label="Copy as Quote" action={() => {
             if (active) void copyToClipboard(quote).then(() => showToast("Quote copied"), () => showToast("Couldn't copy the quote."));
+        }} />);
+    };
+    addContextMenuPatch("message", patch);
+    return () => { active = false; removeContextMenuPatch("message", patch); };
+}
+
+function registerDecodeBase64() {
+    let active = true;
+    const patch: NavContextMenuPatchCallback = (children, { message }) => {
+        const decoded = decodeCxMessageBase64(message?.content);
+        if (!decoded) return;
+        children.push(<Menu.MenuItem id="cx-decode-base64" label="Decode Base64" action={() => {
+            if (!active) return;
+            Alerts.show({ title: "Decoded Base64", body: <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{decoded}</pre>,
+                cancelText: "Close", confirmText: "Copy", onConfirm: () => {
+                    if (active) void copyToClipboard(decoded).catch(() => showToast("Couldn’t copy decoded text."));
+                },
+            });
         }} />);
     };
     addContextMenuPatch("message", patch);
@@ -948,6 +966,8 @@ export function CxSettings({ initialSource = "" }: { initialSource?: string; } =
                             return () => { bypassPinPromptUsers--; };
                         case "pin-message-shortcut":
                             return registerPinShortcut();
+                        case "decode-base64":
+                            return registerDecodeBase64();
                         case "toggle-message-embeds":
                             return registerEmbedToggle();
                         case "repeat-message":

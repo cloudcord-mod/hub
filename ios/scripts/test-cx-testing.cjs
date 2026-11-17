@@ -27,6 +27,7 @@ assert.equal(getTestingAssignment(undefined, "ios"), undefined);
 const assignment = getTestingAssignment("801526290623627315", "ios");
 assert(assignment.entries.every(entry => entry.group === "Shared declarative CX"));
 assert.equal(getTestingAssignment("1429837711602094201", "windows").entries.find(entry => entry.id === "gpl/image-link")?.catalogName, "ImageLink");
+assert.equal(getTestingAssignment("1429837711602094201", "windows").entries.find(entry => entry.id === "gpl/decode-base64")?.catalogName, "DecodeBase64");
 assert.equal(assignment.entries.find(entry => entry.id === "mobile/no-reply-ping")?.catalogName, "NoReplyPing");
 const bundled = expected.slice(2, 5).flatMap(([id, platform]) =>
     Array.from(getTestingAssignment(id, platform).entries).filter(entry => entry.group === "Bundled shared catalog"));

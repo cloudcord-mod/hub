@@ -41,6 +41,7 @@ export const cxNativeEffects = {
     "double-click-reply": { permission: "messages.openreply", label: "Open a reply to another user's message on double-click or double-tap" },
     "quick-mention": { permission: "messages.insertmention", label: "Insert the selected message author's mention into the current draft" },
     "quote-message": { permission: "messages.quote", label: "Add Quote and Copy as Quote actions to message menus" },
+    "decode-base64": { permission: "messages.decode", label: "Decode Base64 in the selected message and copy the result on request" },
     "keep-long-drafts": { permission: "drafts.long", label: "Preserve long drafts in Discord’s local draft store" },
     "bypass-pin-prompt": { permission: "messages.pin", label: "Use Discord’s Pin and Unpin actions without a confirmation prompt" },
     "pin-message-shortcut": { permission: "messages.pin", label: "Pin or unpin the selected message with one menu action" },
@@ -67,6 +68,35 @@ export const cxNativeEffects = {
 export type CxNativeEffect = keyof typeof cxNativeEffects;
 export const cxAvatarResolutions = [256, 512, 1024, 2048, 4096] as const;
 export type CxAvatarResolution = typeof cxAvatarResolutions[number];
+
+const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+export function decodeCxMessageBase64(content: unknown) {
+    if (typeof content !== "string" || content.length > 4000) return "";
+    const results = new Set<string>();
+    for (const [token] of content.matchAll(/(?<![\w+/=])[A-Za-z0-9+/]{4,}={0,2}(?![\w+/=])/g)) {
+        const encoded = token.replace(/=+$/, "");
+        if (encoded.length % 4 === 1 || encoded !== token && token.length % 4 !== 0) continue;
+        let bits = 0;
+        let buffer = 0;
+        let bytes = "";
+        for (const character of encoded) {
+            buffer = buffer << 6 | base64Alphabet.indexOf(character);
+            bits += 6;
+            if (bits >= 8) {
+                bits -= 8;
+                bytes += "%" + ((buffer >> bits) & 255).toString(16).padStart(2, "0");
+            }
+        }
+        if (bits && (buffer & ((1 << bits) - 1))) continue;
+        try {
+            const decoded = decodeURIComponent(bytes);
+            if (decoded.trim() && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(decoded)) results.add(decoded);
+        } catch { /* Skip invalid UTF-8. */ }
+        if (results.size === 10) break;
+    }
+    return [...results].join("\n\n");
+}
 
 export type CxSpotifyActivity = { type?: unknown; name?: unknown; details?: unknown; state?: unknown; };
 

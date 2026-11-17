@@ -22,6 +22,7 @@
   "gpl/copy-sticker-links": "CopyStickerLinks",
   "gpl/custom-timestamps": "CustomTimestamps",
   "gpl/declutter": "Declutter",
+  "gpl/decode-base64": "DecodeBase64",
   "gpl/dim-inactive-channels": "DimInactiveChannels",
   "gpl/embedded-urls": "EmbeddedURLs",
   "gpl/fake-profile-themes": "FakeProfileThemes",
