@@ -2,6 +2,10 @@ name: Build CloudCord Android Manager
 
 "on":
   workflow_dispatch:
+    inputs:
+      runtime_run_id:
+        description: Runtime build run for this exact source commit
+        type: string
   workflow_run:
     workflows: ["Build CloudCord Runtime"]
     types: [completed]
@@ -30,17 +34,17 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Download the completed runtime build
-        if: github.event_name == 'workflow_run'
+        if: github.event_name == 'workflow_run' || inputs.runtime_run_id
         uses: actions/download-artifact@v4
         with:
           name: cloudcord-mobile-shared-runtime
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id || inputs.runtime_run_id }}
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/cloudcord-runtime
 
       - name: Verify runtime for the Android loader
         env:
-          EXPECTED_RUNTIME_SOURCE: ${{ github.event.workflow_run.head_sha }}
+          EXPECTED_RUNTIME_SOURCE: ${{ github.event.workflow_run.head_sha || (inputs.runtime_run_id && github.sha) || '' }}
         run: |
           if [ -n "$EXPECTED_RUNTIME_SOURCE" ]; then
             python3 ios/scripts/verify-runtime-artifact.py "$RUNNER_TEMP/cloudcord-runtime/dist"
