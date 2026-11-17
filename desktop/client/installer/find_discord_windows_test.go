@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"golang.org/x/sys/windows"
 )
 
 func TestDiscordInstallProcess(t *testing.T) {
@@ -70,6 +72,17 @@ func TestPreparePatchClosesOnlySelectedInstallation(t *testing.T) {
 	selected := t.TempDir()
 	// A second process sharing the selected executable path mimics Electron's helpers.
 	image := makeInstall(selected)
+	var longPath [32768]uint16
+	shortPath, err := windows.UTF16PtrFromString(image)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n, err := windows.GetLongPathName(shortPath, &longPath[0], uint32(len(longPath))); err == nil && n < uint32(len(longPath)) {
+		image = windows.UTF16ToString(longPath[:n])
+	}
+	if !isDiscordInstallProcess(selected, "Discord.exe", image) {
+		t.Fatalf("could not match selected path %q to executable %q", selected, image)
+	}
 	targets := []<-chan error{start(image), start(image)}
 	PreparePatch(&DiscordInstall{path: selected, branch: "stable"})
 	for _, exited := range targets {

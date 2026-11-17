@@ -157,7 +157,18 @@ func isDiscordInstallProcess(root, name, executable string) bool {
 	}
 	versionDir := path.Dir(executable)
 	version := strings.ToLower(path.Base(versionDir))
-	return strings.HasPrefix(version, "app-") && ParseAppVersion(version) != nil && strings.EqualFold(path.Dir(versionDir), root)
+	if !strings.HasPrefix(version, "app-") || ParseAppVersion(version) == nil {
+		return false
+	}
+	processRoot := path.Dir(versionDir)
+	if strings.EqualFold(processRoot, root) {
+		return true
+	}
+	// Windows can report the long path for a process started through a short
+	// path or a junction. Compare directory identity when paths differ.
+	selected, selectedErr := os.Stat(root)
+	running, runningErr := os.Stat(processRoot)
+	return selectedErr == nil && runningErr == nil && os.SameFile(selected, running)
 }
 
 func FixOwnership(_ string) error {
