@@ -11,11 +11,11 @@ const { outputFiles: [bundle] } = buildSync({
 vm.runInNewContext(bundle.text, { module: moduleBox });
 const { getTestingAssignment, testingStorageKey, useTestingReview } = moduleBox.exports;
 const expected = [
-    ["1429837711602094201", "windows", 238],
-    ["463515440606609419", "windows", 237],
-    ["1569533258461614171", "ios", 238],
-    ["1539587971840483359", "android", 237],
-    ["1205417504718192680", "ios", 237],
+    ["1429837711602094201", "windows", 256],
+    ["463515440606609419", "windows", 257],
+    ["1569533258461614171", "ios", 256],
+    ["1539587971840483359", "android", 257],
+    ["1205417504718192680", "ios", 256],
     ["801526290623627315", "ios", 37],
 ];
 for (const [userId, platform, count] of expected) {
@@ -28,6 +28,12 @@ const assignment = getTestingAssignment("801526290623627315", "ios");
 assert(assignment.entries.every(entry => entry.group === "Shared declarative CX"));
 assert.equal(getTestingAssignment("1429837711602094201", "windows").entries.find(entry => entry.id === "gpl/image-link")?.catalogName, "ImageLink");
 assert.equal(assignment.entries.find(entry => entry.id === "mobile/no-reply-ping")?.catalogName, "NoReplyPing");
+const bundled = expected.slice(2, 5).flatMap(([id, platform]) =>
+    Array.from(getTestingAssignment(id, platform).entries).filter(entry => entry.group === "Bundled shared catalog"));
+const links = require("../../desktop/client/src/utils/cxTesting/cx-testing-catalog-links.json");
+assert.deepEqual(Object.fromEntries(bundled.map(entry => [entry.id, entry.catalogName])),
+    Object.fromEntries(Object.entries(links).filter(([id]) => id.startsWith("shared/"))));
+assert.equal(new Set(bundled.map(entry => entry.id)).size, bundled.length);
 assert.notEqual(testingStorageKey(assignment), testingStorageKey(getTestingAssignment("1569533258461614171", "ios")));
 
 let position = 0;

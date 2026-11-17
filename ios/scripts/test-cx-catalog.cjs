@@ -368,10 +368,12 @@ async function main(args) {
     };
     writeReport(output, report);
     if (testingLinks) {
-        const linked = candidates.filter(entry => entry.catalogName && entry.syntax.status === "Pass"
+        const bundled = [...additional.values()].map(entry => ({ ...entry, catalogName: entry.name }));
+        const linked = [...candidates, ...bundled].filter(entry => entry.catalogName && entry.syntax.status === "Pass"
             && platforms.every(platform => entry[platform].status === "Pass"));
         if (adapterSuite.status !== "Pass" || !linked.length) throw new Error("Run the shared adapter suite successfully before updating tester links");
         const links = Object.fromEntries(linked.sort((a, b) => a.id.localeCompare(b.id)).map(({ id, catalogName }) => [id, catalogName]));
+        if (Object.keys(links).length !== linked.length) throw new Error("Duplicate tester plugin IDs");
         fs.writeFileSync(testingLinks, JSON.stringify(links, null, 2) + "\n");
         console.log("Wrote " + linked.length + " tester links.");
     }

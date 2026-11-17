@@ -48,9 +48,20 @@ const testers = new Map<string, { platform: Platform; label: string; queue: numb
     ["801526290623627315", { platform: "ios", label: "iOS shared plugin retests", queue: -1 }],
 ]);
 const links: Readonly<Partial<Record<string, string>>> = catalogLinks;
-const entries = queues.map(queue => queue.map(([id, name, group]) => ({ id, name, group, catalogName: links[id] })));
 const sharedGroup = "Shared declarative CX";
-const mobileOrder = [sharedGroup, "Discover CX preview", "Desktop CX pack"];
+const bundledGroup = "Bundled shared catalog";
+const bundledQueues: Entry[][] = queues.map(() => []);
+for (const [id, name] of Object.entries(links)) {
+    if (!id.startsWith("shared/") || !name) continue;
+    // Keep existing results assigned to the same queue when the catalog grows.
+    const queue = [...id].reduce((sum, character) => sum + character.charCodeAt(0), 0) % queues.length;
+    bundledQueues[queue].push({ id, name, group: bundledGroup, catalogName: name });
+}
+const entries: Entry[][] = queues.map((queue, index) => [
+    ...queue.map(([id, name, group]) => ({ id, name, group, catalogName: links[id] })),
+    ...bundledQueues[index],
+]);
+const mobileOrder = [sharedGroup, bundledGroup, "Discover CX preview", "Desktop CX pack"];
 const mobileQueues = entries.map(queue => [...queue].sort((a, b) => mobileOrder.indexOf(a.group) - mobileOrder.indexOf(b.group)));
 const retests = entries.flat().filter(entry => entry.group === sharedGroup).sort((a, b) => a.name.localeCompare(b.name));
 
