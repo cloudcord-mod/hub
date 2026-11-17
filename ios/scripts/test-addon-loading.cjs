@@ -48,5 +48,27 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
     vm.runInNewContext(compile('ios/runtime/src/core/ui/settings/pages/PluginBrowser/index.tsx'), browser);
     assert.equal(typeof browser.module.exports.default, 'function');
     assert.equal(lookups, 0, 'loading the marketplace must not eagerly resolve an unavailable action-sheet module');
+    const settings = { safeMode: { enabled: true } };
+    const addon = { module: { exports: {} }, React, require: name => {
+        if (name === 'react') return { ...React, useEffect: () => {}, useCallback: fn => fn,
+            useState: initial => [typeof initial === 'function' ? initial() : initial, () => {}] };
+        if (name === 'react-native') return { View: 'View' };
+        if (name === 'fuzzysort') return { go: (_search, items) => items.map(obj => ({ obj })) };
+        if (name === 'es-toolkit') return { isNotNil: value => value != null };
+        if (name === '@metro/common') return common;
+        if (name === '@lib/utils/lazy') return { lazyDestructure: () => ({}) };
+        if (name === '@lib/api/settings') return { settings };
+        if (name === '@metro/common/components') return {
+            Text: 'Text', FlashList: 'FlashList', useSafeAreaInsets: () => ({ bottom: 0 }),
+            get HelpMessage() { throw Error('HelpMessage is unavailable on Discord 354.12'); },
+        };
+        return {};
+    } };
+    vm.runInNewContext(compile('ios/runtime/src/core/ui/components/AddonPage.tsx'), addon);
+    const renderAddon = () => walk(addon.module.exports.default({ items: [{ id: 'plugin' }], searchKeywords: [], CardComponent: Plugin,
+        safeModeHint: { message: 'Plugins are paused' } })).find(node => node.type === 'FlashList');
+    assert(walk(renderAddon().props.ListHeaderComponent).some(node => node.type === 'Text' && node.props.children.includes('Plugins are paused')));
+    settings.safeMode.enabled = false;
+    assert(!walk(renderAddon().props.ListHeaderComponent).some(node => node.type === 'Text' && node.props.children.includes('Plugins are paused')));
     console.log('PASS add-on failed-import recovery, duplicate-tap isolation, valid routing and lazy marketplace native lookup');
 })().catch(error => { console.error(error); process.exitCode = 1; });

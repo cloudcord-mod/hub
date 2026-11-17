@@ -5737,6 +5737,10 @@ jobs:
                   'ComponentType, ReactNode, useCallback, useEffect, useMemo, useState } from "react";'
               )
               text = text.replace('React.useState(', 'useState(')
+              # The legacy HelpMessage component is absent on newer Discord builds.
+              text = text.replace('HelpMessage, ', '').replace(', HelpMessage', '')
+              text = text.replace('<HelpMessage messageType={0}>', '<Text variant="text-sm/medium" color="text-muted">')
+              text = text.replace('</HelpMessage>', '</Text>')
               addon_page.write_text(text, encoding="utf-8")
 
           plugin_card = Path("src/core/ui/settings/pages/Plugins/components/PluginCard.tsx")
