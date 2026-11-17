@@ -74,8 +74,9 @@ export function parseIncomingRule(name: string, input: string): IncomingRule {
         return { kind, values, messageTypes: new Set(values.flatMap<number>(value => systemMessageTypes[value as keyof typeof systemMessageTypes])) };
     }
     if (kind === "hide-blocked") {
-        if (!values.length || values.some(value => value !== "blocked" && value !== "ignored"))
-            throw new Error("Choose blocked, ignored, or both");
+        if (!values.some(value => value === "blocked" || value === "ignored")
+            || values.some(value => !["blocked", "ignored", "replies"].includes(value)))
+            throw new Error("Choose blocked or ignored, with optional replies");
     } else if (!textual && !(kind === "stickers" && input === "*") && values.some(value => !/^\d{17,20}$/.test(value))) {
         throw new Error("Incoming rules need Discord IDs");
     }
@@ -185,17 +186,28 @@ export function applyIncomingRule(rule: IncomingRule, payload: IncomingPayload, 
         if (type !== "MESSAGE_CREATE" && type !== "MESSAGE_UPDATE" && type !== "LOAD_MESSAGES_SUCCESS") return;
         const me = rule.kind === "hide-system" ? undefined : context.currentUser();
         if (!me && rule.kind !== "hide-system") return;
+        const blockedOrIgnored = (user: unknown) => typeof user === "string" && user !== me && (
+            (rule.values.includes("blocked") && context.blocked?.(user) === true)
+            || (rule.values.includes("ignored") && context.ignored?.(user) === true));
         const hide = (item: IncomingPayload["message"]) => {
             if (!item) return false;
             if (rule.kind === "hide-system") return rule.messageTypes?.has(item.type) === true;
             const channel = item.channel_id ?? item.channelId ?? payload.channelId ?? payload.channel_id;
             const user = item.author?.id ?? (type === "MESSAGE_UPDATE" && typeof channel === "string" && typeof item.id === "string"
                 ? context.replyAuthor(channel, item.id)?.id : undefined);
+            if (rule.kind === "hide-blocked") {
+                if (blockedOrIgnored(user)) return true;
+                if (!rule.values.includes("replies")) return false;
+                const originalAuthor = (item.referenced_message ?? item.referencedMessage)?.author?.id;
+                if (typeof originalAuthor === "string") return blockedOrIgnored(originalAuthor);
+                const reference = item.message_reference ?? item.messageReference;
+                const referenceChannel = reference?.channel_id ?? reference?.channelId ?? channel;
+                const referenceId = reference?.message_id ?? reference?.messageId;
+                return typeof referenceChannel === "string" && typeof referenceId === "string"
+                    && blockedOrIgnored(context.replyAuthor(referenceChannel, referenceId)?.id);
+            }
             if (typeof user !== "string" || user === me) return false;
             if (rule.kind === "hide-users") return rule.values.includes(user);
-            if (rule.kind === "hide-blocked")
-                return rule.values.includes("blocked") && context.blocked?.(user) === true
-                    || rule.values.includes("ignored") && context.ignored?.(user) === true;
             const fields = [item.content];
             if (Array.isArray(item.embeds)) for (const embed of item.embeds.slice(0, 10)) {
                 fields.push(embed?.title ?? embed?.rawTitle, embed?.description ?? embed?.rawDescription);

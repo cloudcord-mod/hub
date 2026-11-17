@@ -2238,6 +2238,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(incomingHooks.length, 0);
         for (const [name, configuration, matched, kept] of [
             ["NoBlockedMessages", null, { author: { id: other } }, { author: { id: guildId } }],
+            ["HideBlockedAndIgnoredMessages", null, { author: { id: sender } }, { author: { id: guildId } }],
             ["ClientSideBlock", sender, { author: { id: sender } }, { author: { id: other } }],
             ["BlockKeywords", "spoiler,c.a", { author: { id: sender }, embeds: [{ title: "Plot SPOILER!" }] },
                 { author: { id: sender }, content: "spoilers and cXa" }],
@@ -2259,6 +2260,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(hook({ type: "MESSAGE_UPDATE", message: { id: "partial", channel_id: "test-channel" } }), blocked);
             assert.equal(hook({ type: "MESSAGE_CREATE", message: kept }), undefined);
             assert.equal(hook({ type: "MESSAGE_CREATE", optimistic: true, message: matched }), undefined);
+            if (name === "NoBlockedMessages" || name === "HideBlockedAndIgnoredMessages") {
+                const reply = { ...kept, referenced_message: { author: { id: other } } };
+                const cachedReply = { ...kept, messageReference: { messageId: "partial", channelId: "test-channel" } };
+                const unresolved = { ...kept, message_reference: { message_id: "missing", channel_id: "test-channel" } };
+                const filterReplies = name === "HideBlockedAndIgnoredMessages";
+                assert.equal(hook({ type: "MESSAGE_CREATE", message: reply }), filterReplies ? blocked : undefined);
+                assert.equal(hook({ type: "MESSAGE_UPDATE", message: cachedReply }), filterReplies ? blocked : undefined);
+                assert.equal(hook({ type: "MESSAGE_CREATE", message: unresolved }), undefined);
+                const history = { type: "LOAD_MESSAGES_SUCCESS", messages: [reply, cachedReply, unresolved] };
+                assert.deepEqual(Array.from((hook(history) ?? history).messages), filterReplies ? [unresolved] : history.messages);
+            }
             const own = { ...matched, author: { id: me } };
             assert.equal(hook({ type: "MESSAGE_CREATE", message: own }), undefined);
             const history = { type: "LOAD_MESSAGES_SUCCESS", messages: [matched, own, kept] };

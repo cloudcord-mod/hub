@@ -15,6 +15,8 @@ The [desktop client license](../../../../desktop/client/LICENSE) contains the GP
 
 NoBlockedMessages adapts the chat filtering feature by rushii, Samu, jamesbt365, Elvyra, and Etorix. The CX rule can target blocked users, ignored users, or both.
 
+HideBlockedAndIgnoredMessages adapts the local chat filter by Zykrah and シグマ siguma. The `replies` option also filters replies to blocked or ignored users.
+
 BlockKeywords by catcraft and secp192k1 matches literal words and phrases in message text and embed titles or descriptions. ClientSideBlock by Samwich and KamiRu filters chat by author ID. Both use CX source settings. Regular expressions, profile and voice filtering, and changes to content outside chat remain features of their original plugins.
 
 ## Native client effects

@@ -16,6 +16,10 @@ const sourceFiles = {
 };
 const platforms = ["desktop", "mobile"];
 const reviewedDiscoverPorts = new Map([
+    ["discover-52", {
+        file: "hide-blocked-and-ignored-messages.cx",
+        scriptSha256: "342a4b875291785ae731695f0fbd9f6596d3a3a12cfd57fc74a8182520099fff",
+    }],
     // This preview's source was reviewed for the same pin confirmation behavior.
     ["discover-79", {
         file: "bypass-pin-prompt.cx",

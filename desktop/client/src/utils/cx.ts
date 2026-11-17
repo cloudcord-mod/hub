@@ -723,6 +723,8 @@ export function reviewCx(source: string) {
                     ? "Show colors encoded in bios when the profile has no native theme"
                     : "Prefer colors encoded in bios over the profile's native theme"];
                 if (rule.kind === "hide-system") return ["Hide system messages for " + rule.values.join(", ")];
+                if (rule.kind === "hide-blocked" && rule.values.includes("replies"))
+                    return ["Also hide replies to " + rule.values.filter(value => value !== "replies").join(" or ") + " users"];
                 if (rule.kind === "open-link") return [rule.link
                     ? "Open " + rule.link + " when a message contains “" + rule.values[0] + "”"
                     : "Edit the source to set the HTTPS destination"];
