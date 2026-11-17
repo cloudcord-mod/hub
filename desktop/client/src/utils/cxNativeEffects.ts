@@ -74,7 +74,10 @@ const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123
 export function decodeCxMessageBase64(content: unknown) {
     if (typeof content !== "string" || content.length > 4000) return "";
     const results = new Set<string>();
-    for (const [token] of content.matchAll(/(?<![\w+/=])[A-Za-z0-9+/]{4,}={0,2}(?![\w+/=])/g)) {
+    for (const match of content.matchAll(/[A-Za-z0-9+/]{4,}={0,2}/g)) {
+        const [token] = match;
+        const offset = match.index;
+        if (/[\w+/=]/.test(content.charAt(offset - 1)) || /[\w+/=]/.test(content.charAt(offset + token.length))) continue;
         const encoded = token.replace(/=+$/, "");
         if (encoded.length % 4 === 1 || encoded !== token && token.length % 4 !== 0) continue;
         let bits = 0;

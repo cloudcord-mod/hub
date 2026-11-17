@@ -294,14 +294,17 @@ async function main(args) {
     const packs = Object.fromEntries(Object.keys(sourceFiles).map(group => [group, readPack(sourceRoot, group)]));
     const packParser = path.join(sourceRoot, "core/src/cx/parse.js");
     const parse = fs.existsSync(packParser) ? (await import(pathToFileURL(packParser).href)).parse : undefined;
-    const packTests = Promise.all([
-        desktopLoadFile ? JSON.parse(fs.readFileSync(desktopLoadFile, "utf8"))
-            : enginePath && runPackTest("test-cx-desktop-pack.cjs", sourceRoot, enginePath),
-        discoverLoadFile ? JSON.parse(fs.readFileSync(discoverLoadFile, "utf8"))
-            : enginePath && runPackTest("test-cx-discover-pack.cjs", sourceRoot, enginePath),
-    ]);
     const { rows, ...adapterSuite } = runAdapterTests();
-    const [desktopEvidence, discoverEvidence] = await packTests;
+    const packRunnerErrors = {};
+    async function loadPackEvidence(script, evidenceFile) {
+        if (evidenceFile) return JSON.parse(fs.readFileSync(evidenceFile, "utf8"));
+        if (!enginePath) return;
+        try { return await runPackTest(script, sourceRoot, enginePath); }
+        catch (error) { packRunnerErrors[script] = formatError(error); }
+    }
+    // Two fresh QuickJS/Wasm processes can exhaust the host working set.
+    const desktopEvidence = await loadPackEvidence("test-cx-desktop-pack.cjs", desktopLoadFile);
+    const discoverEvidence = await loadPackEvidence("test-cx-discover-pack.cjs", discoverLoadFile);
     const adapters = new Map(rows.map(row => [row.platform + ":" + row.sourceHash, row]));
     const styles = new Map(rows.filter(row => row.appearanceCss).map(row => [row.platform + ":" + row.appearanceCss.trim(), row]));
     const originalDesktopPort = originalDesktopPortResolver(sourceRoot, packs["Desktop CX pack"], rows);
@@ -469,7 +472,7 @@ async function main(args) {
             candidates: checkoutVersion(sourceRoot),
             packs: Object.fromEntries(Object.entries(packs).map(([group, pack]) => [group, pack.sha256 ?? null])),
         },
-        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
+        candidateCount: candidates.length, totals, adapterSuite, packRunnerErrors, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
         errorGroups: groupBatchErrors([...candidates, ...additional.values()]),
         candidates, additionalSharedPlugins: [...additional.values()],
         configuration: {
@@ -494,10 +497,10 @@ async function main(args) {
         fs.writeFileSync(testingLinks, JSON.stringify(links, null, 2) + "\n");
         console.log("Wrote " + linked.length + " tester links.");
     }
-    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
+    console.log(JSON.stringify({ candidateCount: candidates.length, totals, packRunnerErrors, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
         frequentErrors: report.errorGroups.slice(0, 8).map(({ check, message, count }) => ({ check, message, count })),
         configuration: report.configuration, additionalSharedPlugins: additional.size, report: output }, null, 2));
-    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) ||
+    if (adapterSuite.status === "Fail" || Object.keys(packRunnerErrors).length || Object.values(totals).some(counts => counts.Fail) ||
         desktopModuleLoad?.counts.Fail || desktopLifecycle?.counts.Fail || discoverFactory?.counts.Fail || discoverLifecycle?.counts.Fail) process.exitCode = 1;
 }
 
