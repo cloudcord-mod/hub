@@ -39984,6 +39984,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var words = text.trim().split(/\s+/).filter(Boolean).length;
           return `${words} word${words === 1 ? "" : "s"}, ${text.length} character${text.length === 1 ? "" : "s"}`;
         },
+        countLines: (text) => String(text.split(/\r\n|\r|\n/).length),
+        uniqueLines: (text) => [
+          ...new Set(text.split(/\r\n|\r|\n/))
+        ].join("\n"),
+        rot13: (text) => text.replace(/[a-z]/gi, (letter) => {
+          var base = letter <= "Z" ? 65 : 97;
+          return String.fromCharCode(base + (letter.charCodeAt(0) - base + 13) % 26);
+        }),
         transform(text, style, repeat, reverse, normalize) {
           if (style === "upper")
             text = text.toUpperCase();
@@ -40937,6 +40945,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (entry.scope === "server" && !guildId)
       return;
     try {
+      if (action === "profile-bio") {
+        var bio = profiles?.getUserProfile?.(id)?.bio;
+        return typeof bio === "string" && bio.trim() ? bio : void 0;
+      }
       var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
       var colors = profile?.themeColors;
       if (!Array.isArray(colors) || colors.length < 2)
@@ -40963,6 +40975,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           label: "Copy User Mention",
           scope: "none",
           format: (id) => "<@" + id + ">"
+        },
+        "profile-bio": {
+          label: "Copy Bio",
+          scope: "user"
         },
         "profile-colors": {
           label: "Copy Profile Colors",
@@ -41478,6 +41494,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "clean-channel-names": {
           permission: "appearance.style",
           label: "Remove decorations from displayed channel names"
+        },
+        "dashless-channel-names": {
+          permission: "appearance.style",
+          label: "Replace hyphens with spaces in text channel names"
         },
         "title-channel-names": {
           permission: "appearance.style",
@@ -45594,8 +45614,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (typeof channel.type !== "number" || !channel.name || !label2)
       return label2;
     var cleaned = modes.clean ? cleanChannelName(label2, channel.type) : label2;
-    if (!modes.titles || !channel.guild_id)
+    if (!channel.guild_id)
       return cleaned;
+    if (!modes.titles)
+      return modes.dashless && channel.type === 0 ? cleaned.replace(/-/g, " ") : cleaned;
     return cleaned.replace(/[-_]+/g, " ").trim().replace(RegExp("\\p{L}[\\p{L}\\p{M}\\d]*(?:['\u2019][\\p{L}\\p{M}\\d]+)*", "gu"), (word, index) => {
       var conventional = conventionalCase.get(word.toLowerCase());
       if (conventional && (index > 0 || conventional !== conventional.toLowerCase()))
@@ -48772,6 +48794,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-bios.cx
+  var copy_bios_default;
+  var init_copy_bios = __esm({
+    "../examples/cx/catalog/plugins/copy-bios.cx"() {
+      copy_bios_default = 'plugin "CopyBios":\n  needs profilemenu.copy\n  on profile menu copy profile-bio\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-emoji-markdown.cx
   var copy_emoji_markdown_default;
   var init_copy_emoji_markdown = __esm({
@@ -48828,11 +48858,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/count-lines.cx
+  var count_lines_default;
+  var init_count_lines = __esm({
+    "../examples/cx/catalog/plugins/count-lines.cx"() {
+      count_lines_default = 'plugin "Count Lines":\n  needs commands.register\n  needs reply.local\n  on command "countlines" with text:\n    reply "${countLines(text)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/custom-timestamps.cx
   var custom_timestamps_default;
   var init_custom_timestamps = __esm({
     "../examples/cx/catalog/plugins/custom-timestamps.cx"() {
       custom_timestamps_default = 'plugin "CustomTimestamps":\n  needs appearance.style\n  format timestamp cozy "[calendar]"\n  format timestamp compact "LT"\n  format timestamp tooltip "LLLL \u2022 [relative]"\n  format timestamp accessibility "[calendar]"\n  format timestamp today "[Today at] HH:mm:ss"\n  format timestamp yesterday "[Yesterday at] HH:mm:ss"\n  format timestamp week "ddd DD.MM.YYYY HH:mm:ss"\n  format timestamp older "ddd DD.MM.YYYY HH:mm:ss"\n  format timestamp markdown "LLLL \u2022 [relative]"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/dashless.cx
+  var dashless_default;
+  var init_dashless = __esm({
+    "../examples/cx/catalog/plugins/dashless.cx"() {
+      dashless_default = 'plugin "Dashless":\n  needs appearance.style\n  use dashless-channel-names\n';
     }
   });
 
@@ -50215,6 +50261,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/rot13-text.cx
+  var rot13_text_default;
+  var init_rot13_text = __esm({
+    "../examples/cx/catalog/plugins/rot13-text.cx"() {
+      rot13_text_default = 'plugin "ROT13 Text":\n  needs commands.register\n  needs reply.local\n  on command "rot13text" with text:\n    reply "${rot13(text)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/round-server-icons.cx
   var round_server_icons_default;
   var init_round_server_icons = __esm({
@@ -50428,6 +50482,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_unindent = __esm({
     "../examples/cx/catalog/plugins/unindent.cx"() {
       unindent_default = 'plugin "Unindent":\n  needs messages.transform\n  before send unindentCode\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/unique-lines.cx
+  var unique_lines_default;
+  var init_unique_lines = __esm({
+    "../examples/cx/catalog/plugins/unique-lines.cx"() {
+      unique_lines_default = 'plugin "Unique Lines":\n  needs commands.register\n  needs reply.local\n  on command "uniquelines" with text:\n    reply "${uniqueLines(text)}"\n';
     }
   });
 
@@ -51420,6 +51482,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_cloud_cord_accent();
       init_colorful_mentions();
       init_compact_member_list();
+      init_copy_bios();
       init_copy_emoji_markdown();
       init_copy_file_contents();
       init_copy_media_link();
@@ -51427,7 +51490,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_copy_sticker_links();
       init_copy_user_mention();
       init_copy_user_urls();
+      init_count_lines();
       init_custom_timestamps();
+      init_dashless();
       init_declutter();
       init_dim_inactive_channels();
       init_dont_round_my_timestamps();
@@ -51556,6 +51621,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_reply_ping_control();
       init_reverse_image_search();
       init_reverse_text();
+      init_rot13_text();
       init_round_server_icons();
       init_rounded_chat_bar();
       init_scheduled_messages();
@@ -51583,6 +51649,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_translate();
       init_transparent_chat_bar();
       init_unindent();
+      init_unique_lines();
       init_unit_converter();
       init_unsuppress_embeds();
       init_user_notes();
@@ -51816,6 +51883,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: compact_member_list_default
           },
           {
+            name: "CopyBios",
+            source: copy_bios_default
+          },
+          {
             name: "CopyEmojiMarkdown",
             source: copy_emoji_markdown_default
           },
@@ -51844,8 +51915,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: copy_user_urls_default
           },
           {
+            name: "Count Lines",
+            source: count_lines_default
+          },
+          {
             name: "CustomTimestamps",
             source: custom_timestamps_default
+          },
+          {
+            name: "Dashless",
+            source: dashless_default
           },
           {
             name: "Declutter",
@@ -52360,6 +52439,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: reverse_text_default
           },
           {
+            name: "ROT13 Text",
+            source: rot13_text_default
+          },
+          {
             name: "RoundServerIcons",
             source: round_server_icons_default
           },
@@ -52466,6 +52549,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "Unindent",
             source: unindent_default
+          },
+          {
+            name: "Unique Lines",
+            source: unique_lines_default
           },
           {
             name: "UnitConverter",
@@ -53036,7 +53123,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         return;
       active = false;
       channelNames[mode]--;
-      if (!channelNames.clean && !channelNames.titles) {
+      if (!channelNames.clean && !channelNames.titles && !channelNames.dashless) {
         stopChannelNames?.();
         stopChannelNames = void 0;
       }
@@ -55256,7 +55343,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 clipboard.setString(text);
                 showToast.showCopyToClipboard?.();
               } else
-                showToast("No profile colors found.");
+                showToast(action === "profile-bio" ? "No profile bio found." : "No profile colors found.");
             }
           }
         ];
@@ -55956,6 +56043,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               case "clean-channel-names":
               case "title-channel-names":
                 return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles", enabled);
+              case "dashless-channel-names":
+                return registerChannelNames("dashless", enabled);
               case "static-typing-dots":
                 return registerStaticTypingDots();
               case "hide-disabled-emojis":
@@ -56768,7 +56857,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       timestampUsers = 0;
       channelNames = {
         clean: 0,
-        titles: 0
+        titles: 0,
+        dashless: 0
       };
       UserStore3 = findByStoreNameLazy("UserStore");
       ChannelStore = findByStoreNameLazy("ChannelStore");
@@ -58053,7 +58143,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f0adf8def46d86d27061dfef3a1124db373d15ce";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5a16ced8230d3c22fe953a292a52b88f8b3678fa";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
