@@ -58,6 +58,7 @@ export const cxNativeEffects = {
     "read-all-servers-button": { permission: "servers.markread", label: "Add a server list button to mark loaded server channels as read" },
     "sticker-links": { permission: "stickers.links", label: "Add Copy Sticker Link and Open Sticker Link actions" },
     "clean-channel-names": { permission: "appearance.style", label: "Remove decorations from displayed channel names" },
+    "dashless-channel-names": { permission: "appearance.style", label: "Replace hyphens with spaces in text channel names" },
     "title-channel-names": { permission: "appearance.style", label: "Format displayed server channel names as titles" },
 } as const;
 

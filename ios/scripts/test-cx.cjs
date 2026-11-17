@@ -380,7 +380,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             UnreadSettingNoticeStore2: { maybeAutoUpgradeChannel: upgradeChannel },
             UserStore: { getCurrentUser: () => ({ id: activeAccount }), getUser: id => [me, sender, other].includes(id) ? { id } : undefined },
             UserProfileStore: {
-                getUserProfile: id => id === sender ? { themeColors: Object.freeze([0, 0x12abcd]), banner: "a_" + "a".repeat(32) } : undefined,
+                getUserProfile: id => id === sender ? { bio: "Hello from the **profile**", themeColors: Object.freeze([0, 0x12abcd]), banner: "a_" + "a".repeat(32) } : undefined,
                 getGuildMemberProfile: (id, guild) => id === sender && guild === guildId ? { themeColors: [0x123, 0xffffff] } : undefined,
             },
             ChannelStore: { getChannel: id => id === queueChannel.id ? queueChannel : id === jumpChannel.id ? jumpChannel : ({ id, name: "test", recipients: [sender], nsfw: id === "nsfw-channel", guild_id: id === "guild-channel" || id === repeatChannel ? guildId : undefined,
@@ -1785,6 +1785,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         actionList(other, guildId)[0].action();
         assert.equal(notifications.pop(), "No profile colors found.");
         click(render(), "Disable CopyProfileColors");
+        selectCatalog("CopyBios");
+        click(render(), "Allow for this session");
+        const [copyBio] = actionList(sender);
+        assert.equal(copyBio.label, "Copy Bio");
+        copyBio.action();
+        assert.equal(clipboardWrites.at(-1), "Hello from the **profile**");
+        actionList(other)[0].action();
+        assert.equal(notifications.pop(), "No profile bio found.");
+        click(render(), "Disable CopyBios");
+        assert.equal(menuPatches.size + appearanceHooks.size, 0);
         {
             const port = cxCatalog.plugins.find(entry => entry.name === "UserNotes").source;
             assert.throws(() => activateCx(port, host, ["profilemenu.copy"]), /approval/);
@@ -3397,6 +3407,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(readChannelName(), "🎈 ʜᴇʟʟᴏ World");
         click(render(), "Disable BetterChatNames");
         assert.equal(readChannelName(), rawChannel.name);
+        selectCatalog("Dashless");
+        click(render(), "Allow for this session");
+        assert.equal(readChannelName(), "🎈 ʜᴇʟʟᴏ world");
+        selectCatalog("CleanChannelName");
+        click(render(), "Allow for this session");
+        assert.equal(readChannelName(), "hello world");
+        click(render(), "Disable Dashless");
+        assert.equal(readChannelName(), "hello-world");
+        click(render(), "Disable CleanChannelName");
+        assert.equal(readChannelName(), rawChannel.name);
         assert.equal(channelStore.getChannel, baseGetChannel);
         assert.equal(channelNameModule.default, nativeChannelName);
         assert.equal(channelRowModule.renderChannelContent, nativeChannelRow);
@@ -4374,6 +4394,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.ok(vibes.includes(invokeNamed("vibe")));
         assert.throws(() => parseCx(vibeSource.replace("✦ the vibes are immaculate ✦", "${token}")), /literal messages/);
         click(render(), "Disable VibeCheck");
+        for (const [name, command, input, expected] of [
+            ["Count Lines", "countlines", "one\r\ntwo\rthree\n", "4"],
+            ["Unique Lines", "uniquelines", "one\r\ntwo\rone\n", "one\ntwo\n"],
+            ["ROT13 Text", "rot13text", "Abc-Nop é🙂", "Nop-Abc é🙂"],
+        ]) {
+            selectCatalog(name);
+            click(render(), "Allow for this session");
+            assert.equal(invokeNamed(command, { text: input }), undefined);
+            assert.equal(delivered.at(-1)[1], expected);
+            click(render(), "Disable " + name);
+            assert.equal(registered[command], undefined);
+        }
         selectCatalog("MoreCommands");
         click(render(), "Allow for this session");
         assert.equal(Object.keys(registered).length, 35);

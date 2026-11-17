@@ -28,10 +28,11 @@ export function cleanChannelName(name: string, type: number) {
 const conventionalCase = new Map(["a", "and", "at", "for", "of", "or", "the", "to", "FAQ", "GitHub", "VC"]
     .map(word => [word.toLowerCase(), word]));
 
-export function formatCxChannelName(label: string, channel: CxChannelLabel, modes: { clean: number; titles: number; }) {
+export function formatCxChannelName(label: string, channel: CxChannelLabel, modes: { clean: number; titles: number; dashless?: number; }) {
     if (typeof channel.type !== "number" || !channel.name || !label) return label;
     const cleaned = modes.clean ? cleanChannelName(label, channel.type) : label;
-    if (!modes.titles || !channel.guild_id) return cleaned;
+    if (!channel.guild_id) return cleaned;
+    if (!modes.titles) return modes.dashless && channel.type === 0 ? cleaned.replace(/-/g, " ") : cleaned;
     return cleaned.replace(/[-_]+/g, " ").trim().replace(/\p{L}[\p{L}\p{M}\d]*(?:['’][\p{L}\p{M}\d]+)*/gu,
         (word, index) => {
             const conventional = conventionalCase.get(word.toLowerCase());

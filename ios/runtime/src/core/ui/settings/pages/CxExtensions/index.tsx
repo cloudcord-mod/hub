@@ -93,7 +93,7 @@ function registerTimestampFormats(formats: CxTimestampFormats) {
     };
 }
 
-const channelNames = { clean: 0, titles: 0 };
+const channelNames = { clean: 0, titles: 0, dashless: 0 };
 let stopChannelNames: (() => void) | undefined;
 
 function registerChannelNames(mode: keyof typeof channelNames, enabled: () => boolean) {
@@ -123,7 +123,7 @@ function registerChannelNames(mode: keyof typeof channelNames, enabled: () => bo
         if (!active) return;
         active = false;
         channelNames[mode]--;
-        if (!channelNames.clean && !channelNames.titles) {
+        if (!channelNames.clean && !channelNames.titles && !channelNames.dashless) {
             stopChannelNames?.();
             stopChannelNames = undefined;
         }
@@ -1792,7 +1792,7 @@ function registerProfileMenuAction(action: CxProfileMenuAction) {
                 if (text) {
                     clipboard.setString(text);
                     showToast.showCopyToClipboard?.();
-                } else showToast("No profile colors found.");
+                } else showToast(action === "profile-bio" ? "No profile bio found." : "No profile colors found.");
             } }];
         },
     });
@@ -2260,6 +2260,8 @@ export default function CxExtensions() {
                         case "clean-channel-names":
                         case "title-channel-names":
                             return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles", enabled);
+                        case "dashless-channel-names":
+                            return registerChannelNames("dashless", enabled);
                         case "static-typing-dots":
                             return registerStaticTypingDots();
                         case "hide-disabled-emojis":

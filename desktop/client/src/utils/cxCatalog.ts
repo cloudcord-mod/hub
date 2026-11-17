@@ -28,6 +28,7 @@ import plugin_catalog_client_side_block from "../../../../examples/cx/catalog/pl
 import plugin_catalog_cloud_cord_accent from "../../../../examples/cx/catalog/plugins/cloud-cord-accent.cx";
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
+import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
 import plugin_catalog_copy_media_link from "../../../../examples/cx/catalog/plugins/copy-media-link.cx";
@@ -35,7 +36,9 @@ import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
+import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
+import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
@@ -164,6 +167,7 @@ import plugin_catalog_repeat_messages from "../../../../examples/cx/catalog/plug
 import plugin_catalog_reply_ping_control from "../../../../examples/cx/catalog/plugins/reply-ping-control.cx";
 import plugin_catalog_reverse_image_search from "../../../../examples/cx/catalog/plugins/reverse-image-search.cx";
 import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins/reverse-text.cx";
+import plugin_catalog_rot13_text from "../../../../examples/cx/catalog/plugins/rot13-text.cx";
 import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/plugins/round-server-icons.cx";
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
@@ -191,6 +195,7 @@ import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
+import plugin_catalog_unique_lines from "../../../../examples/cx/catalog/plugins/unique-lines.cx";
 import plugin_catalog_unit_converter from "../../../../examples/cx/catalog/plugins/unit-converter.cx";
 import plugin_catalog_unsuppress_embeds from "../../../../examples/cx/catalog/plugins/unsuppress-embeds.cx";
 import plugin_catalog_user_notes from "../../../../examples/cx/catalog/plugins/user-notes.cx";
@@ -337,6 +342,7 @@ export const cxCatalog = {
         { name: "CloudCordAccent", source: plugin_catalog_cloud_cord_accent },
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions },
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list },
+        { name: "CopyBios", source: plugin_catalog_copy_bios },
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown },
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents },
         { name: "CopyMediaLink", source: plugin_catalog_copy_media_link },
@@ -344,7 +350,9 @@ export const cxCatalog = {
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links },
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention },
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls },
+        { name: "Count Lines", source: plugin_catalog_count_lines },
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps },
+        { name: "Dashless", source: plugin_catalog_dashless },
         { name: "Declutter", source: plugin_catalog_declutter },
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels },
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps },
@@ -473,6 +481,7 @@ export const cxCatalog = {
         { name: "ReplyPingControl", source: plugin_catalog_reply_ping_control },
         { name: "ReverseImageSearch", source: plugin_catalog_reverse_image_search },
         { name: "ReverseText", source: plugin_catalog_reverse_text },
+        { name: "ROT13 Text", source: plugin_catalog_rot13_text },
         { name: "RoundServerIcons", source: plugin_catalog_round_server_icons },
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages },
@@ -500,6 +509,7 @@ export const cxCatalog = {
         { name: "Translate", source: plugin_catalog_translate },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar },
         { name: "Unindent", source: plugin_catalog_unindent },
+        { name: "Unique Lines", source: plugin_catalog_unique_lines },
         { name: "UnitConverter", source: plugin_catalog_unit_converter },
         { name: "UnsuppressEmbeds", source: plugin_catalog_unsuppress_embeds },
         { name: "UserNotes", source: plugin_catalog_user_notes },

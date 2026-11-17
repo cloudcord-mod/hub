@@ -1,6 +1,7 @@
 export const cxProfileMenuActions = {
     "user-url": { label: "Copy User URL", scope: "none", format: (id: string) => "<https://discord.com/users/" + id + ">" },
     "user-mention": { label: "Copy User Mention", scope: "none", format: (id: string) => "<@" + id + ">" },
+    "profile-bio": { label: "Copy Bio", scope: "user" },
     "profile-colors": { label: "Copy Profile Colors", scope: "user" },
     "server-profile-colors": { label: "Copy Server Profile Colors", scope: "server" },
 } as const;
@@ -33,7 +34,7 @@ export function getCxProfileMedia(id: string, user: { avatar?: unknown; discrimi
 }
 
 type ProfileStore = {
-    getUserProfile?: (id: string) => { themeColors?: unknown; } | null | undefined;
+    getUserProfile?: (id: string) => { themeColors?: unknown; bio?: unknown; } | null | undefined;
     getGuildMemberProfile?: (id: string, guildId: string) => { themeColors?: unknown; } | null | undefined;
 };
 
@@ -42,6 +43,10 @@ export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, pr
     if (entry.scope === "none") return entry.format(id);
     if (entry.scope === "server" && !guildId) return;
     try {
+        if (action === "profile-bio") {
+            const bio = profiles?.getUserProfile?.(id)?.bio;
+            return typeof bio === "string" && bio.trim() ? bio : undefined;
+        }
         const profile = entry.scope === "server"
             ? profiles?.getGuildMemberProfile?.(id, guildId!) : profiles?.getUserProfile?.(id);
         const colors = profile?.themeColors;

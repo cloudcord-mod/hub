@@ -1,0 +1,5 @@
+plugin "Unique Lines":
+  needs commands.register
+  needs reply.local
+  on command "uniquelines" with text:
+    reply "${uniqueLines(text)}"

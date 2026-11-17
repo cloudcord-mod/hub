@@ -69,6 +69,12 @@ export const cxCommandFunctions = {
         const words = text.trim().split(/\s+/).filter(Boolean).length;
         return `${words} word${words === 1 ? "" : "s"}, ${text.length} character${text.length === 1 ? "" : "s"}`;
     },
+    countLines: (text: string) => String(text.split(/\r\n|\r|\n/).length),
+    uniqueLines: (text: string) => [...new Set(text.split(/\r\n|\r|\n/))].join("\n"),
+    rot13: (text: string) => text.replace(/[a-z]/gi, letter => {
+        const base = letter <= "Z" ? 65 : 97;
+        return String.fromCharCode(base + (letter.charCodeAt(0) - base + 13) % 26);
+    }),
     transform(text: string, style: string, repeat: string, reverse: string, normalize: string) {
         if (style === "upper") text = text.toUpperCase();
         if (style === "lower") text = text.toLowerCase();

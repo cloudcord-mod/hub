@@ -1,0 +1,5 @@
+plugin "ROT13 Text":
+  needs commands.register
+  needs reply.local
+  on command "rot13text" with text:
+    reply "${rot13(text)}"

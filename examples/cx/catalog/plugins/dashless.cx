@@ -1,0 +1,3 @@
+plugin "Dashless":
+  needs appearance.style
+  use dashless-channel-names

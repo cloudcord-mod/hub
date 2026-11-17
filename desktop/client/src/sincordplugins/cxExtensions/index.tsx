@@ -392,7 +392,7 @@ let splitSender: ReturnType<typeof createCxSplitSender> | undefined;
 let uploadAnonymiser: CxUploadAnonymiser | undefined;
 const staticTypingDots = () => staticTypingDotUsers > 0;
 const messageGestures = { edit: 0, reply: 0 };
-const channelNames = { clean: 0, titles: 0 };
+const channelNames = { clean: 0, titles: 0, dashless: 0 };
 let editingChannelId: string | undefined;
 let stopChannelNames: (() => void) | undefined;
 
@@ -427,7 +427,7 @@ function registerChannelNames(mode: keyof typeof channelNames) {
         if (!active) return;
         active = false;
         channelNames[mode]--;
-        if (!channelNames.clean && !channelNames.titles) {
+        if (!channelNames.clean && !channelNames.titles && !channelNames.dashless) {
             stopChannelNames?.();
             stopChannelNames = undefined;
         }
@@ -767,7 +767,7 @@ export function CxSettings() {
                             if (!active) return;
                             const text = getCxProfileMenuCopy(action, id, UserProfileStore, guildId);
                             if (text) void copyToClipboard(text).catch(() => showToast("Couldn't copy to clipboard."));
-                            else showToast("No profile colors found.");
+                            else showToast(action === "profile-bio" ? "No profile bio found." : "No profile colors found.");
                         }} />);
                     };
                     const menus = ["user-context", "user-profile-actions", "user-profile-overflow-menu"];
@@ -835,6 +835,8 @@ export function CxSettings() {
                         case "clean-channel-names":
                         case "title-channel-names":
                             return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles");
+                        case "dashless-channel-names":
+                            return registerChannelNames("dashless");
                         case "static-typing-dots":
                             return registerStaticTypingDots();
                         case "code-block-gap":

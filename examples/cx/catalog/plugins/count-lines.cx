@@ -1,0 +1,5 @@
+plugin "Count Lines":
+  needs commands.register
+  needs reply.local
+  on command "countlines" with text:
+    reply "${countLines(text)}"
