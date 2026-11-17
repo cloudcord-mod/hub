@@ -31,6 +31,15 @@ const hash = source => createHash("sha256").update(source.replace(/\r\n/g, "\n")
 const result = (status, reason = "") => ({ status, reason });
 const blocked = reason => result("Blocked", reason);
 
+function checkoutVersion(folder) {
+    const commit = spawnSync("git", ["rev-parse", "--verify", "HEAD"], { cwd: folder, encoding: "utf8" });
+    const changes = spawnSync("git", ["status", "--porcelain", "--untracked-files=normal"], { cwd: folder, encoding: "utf8" });
+    return {
+        commit: commit.status === 0 ? commit.stdout.trim() : null,
+        modified: changes.status === 0 ? changes.stdout.trim().length > 0 : null,
+    };
+}
+
 function readPack(sourceRoot, group) {
     const file = path.join(sourceRoot, sourceFiles[group]);
     try {
@@ -215,7 +224,7 @@ function writeReport(output, report) {
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + "\n");
     const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail",
-        "Desktop settings switches", "Mobile settings switches", "Command inputs"];
+        "Desktop settings switches", "Mobile settings switches", "Command inputs", "Checked at", "Adapter source commit", "Adapter source modified", "Candidate pack SHA-256"];
     if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings", "Desktop pack declared settings");
     if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail", "Missed fixture lookups (Windows/Android export names)");
     if (report.discoverFactory) header.push("Discover fixture load", "Discover fixture error", "Android lookup signatures observed", "Discover declares settings");
@@ -225,6 +234,8 @@ function writeReport(output, report) {
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
         entry.desktop.settingsSwitches?.join("; "), entry.mobile.settingsSwitches?.join("; "),
         (entry.desktop.commandInputs ?? entry.mobile.commandInputs)?.join("; "),
+        report.checkedAt, report.sources.adapters.commit, report.sources.adapters.modified,
+        report.sources.packs[entry.group],
         ...(report.desktopModuleLoad ? [entry.moduleLoad?.status, entry.moduleLoad?.error, entry.moduleLoad?.warnings.join("; "), entry.moduleLoad?.settingsFields?.join("; ")] : []),
         ...(report.desktopLifecycle ? [entry.desktopLifecycle?.status, entry.desktopLifecycle?.reason,
             entry.moduleLoad?.missingLookups?.map(({ phase, keys, observedInWindowsSnapshot, observedInAndroidSnapshot }) =>
@@ -431,6 +442,12 @@ async function main(args) {
     }));
     const report = {
         scope: "Syntax and fixture-based adapter activation and cleanup. Device behavior requires separate results.",
+        checkedAt: new Date().toISOString(),
+        sources: {
+            adapters: checkoutVersion(root),
+            candidates: checkoutVersion(sourceRoot),
+            packs: Object.fromEntries(Object.entries(packs).map(([group, pack]) => [group, pack.sha256 ?? null])),
+        },
         candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
         errorGroups: groupBatchErrors([...candidates, ...additional.values()]),
         candidates, additionalSharedPlugins: [...additional.values()],
