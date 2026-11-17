@@ -7,6 +7,29 @@ const start = source.indexOf('let recoveryStarted');
 const end = source.indexOf('\nif (typeof window.__r');
 const initialize = require(process.env.CLOUDCORD_ESBUILD || 'esbuild').transformSync(source.slice(start, end), { loader: 'ts' }).code;
 (async () => {
+    const main = fs.readFileSync(path.join(__dirname, '../runtime/src/index.ts'), 'utf8');
+    const taskSource = main.slice(main.indexOf('async function runStartupTask'), main.indexOf('export default async'));
+    const tasks = vm.createContext({ console: { log() {}, error() {} } });
+    vm.runInContext(require(process.env.CLOUDCORD_ESBUILD || 'esbuild').transformSync(taskSource, { loader: 'ts' }).code, tasks);
+    let resolvePending;
+    let stopped = false;
+    const pending = tasks.runStartupTask('pending', () => new Promise(resolve => { resolvePending = resolve; }));
+    const results = await Promise.all([
+        tasks.runStartupTask('sync failure', () => { throw new Error('missing native module'); }),
+        tasks.runStartupTask('async failure', async () => { throw new Error('network unavailable'); }),
+        tasks.runStartupTask('working', () => () => { stopped = true; }),
+    ]);
+    assert.equal(tasks.__CLOUDCORD_STARTUP_TASKS__['pending'].status, 'starting');
+    assert.match(tasks.__CLOUDCORD_STARTUP_TASKS__['sync failure'].error, /missing native module/);
+    assert.equal(tasks.__CLOUDCORD_STARTUP_TASKS__['async failure'].status, 'failed');
+    assert.equal(tasks.__CLOUDCORD_STARTUP_TASKS__['working'].status, 'ready');
+    results[2]();
+    assert.equal(stopped, true);
+    resolvePending();
+    await pending;
+    assert.equal(tasks.__CLOUDCORD_STARTUP_TASKS__['pending'].status, 'ready');
+    console.log('startup tasks: independent sync and async failures, pending diagnosis, and retained cleanup');
+
     for (const phase of ['cache', 'runtime', 'success', 'pending']) {
         const messages = [];
         let started = false;

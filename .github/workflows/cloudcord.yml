@@ -5587,7 +5587,7 @@ jobs:
               if "initializeFakeProfile()," not in text:
                   text = text.replace(
                       "        initSettings(),",
-                      "        initSettings(),\n        initializeFakeProfile(),"
+                      '        initSettings(),\n        runStartupTask("profiles", () => initializeFakeProfile()),'
                   )
               if "initializeCloudCordVerification()," not in text:
                   text = text.replace(

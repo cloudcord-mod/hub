@@ -19,6 +19,23 @@ import { initDebugger } from "@lib/api/debug";
 
 import * as lib from "./lib";
 
+async function runStartupTask(name: string, start: () => unknown) {
+    const tasks = (globalThis as any).__CLOUDCORD_STARTUP_TASKS__ ??= {};
+    const task = tasks[name] = { status: "starting", error: "" };
+    console.log(`CloudCord starting ${name}`);
+    try {
+        const cleanup = await start();
+        task.status = "ready";
+        console.log(`CloudCord started ${name}`);
+        return typeof cleanup === "function" ? cleanup as () => unknown : undefined;
+    } catch (error) {
+        task.status = "failed";
+        task.error = String(error instanceof Error ? error.message : error);
+        console.error(`CloudCord ${name} startup failed`, error);
+        return undefined;
+    }
+}
+
 export default async () => {
     if ((globalThis as any).__CLOUDCORD_ORIGINAL_RAIN__) {
         const prefs = require("@lib/api/settings").settings;
@@ -38,22 +55,22 @@ export default async () => {
     // Load everything in parallel. The shared build workflow wraps core
     // settings separately and applies the version-specific fallbacks.
     await Promise.all([
-        initThemes(),
-        updateFonts(),
-        injectFluxInterceptor(),
+        runStartupTask("themes", () => initThemes()),
+        runStartupTask("fonts", () => updateFonts()),
+        runStartupTask("events", () => injectFluxInterceptor()),
         patchSettings(),
-        patchLogHook(),
-        patchCommands(),
-        patchJsx(),
-        initVendettaObject(),
-        initFetchI18nStrings(),
+        runStartupTask("logging", () => patchLogHook()),
+        runStartupTask("commands", () => patchCommands()),
+        runStartupTask("components", () => patchJsx()),
+        runStartupTask("plugin API", () => initVendettaObject()),
+        runStartupTask("translations", () => initFetchI18nStrings()),
         initSettings(),
-        initBotCordSwitcher(),
-        initFixes(),
-        patchErrorBoundary(),
-        updatePlugins(),
-        initPlugins(),
-        VdPluginManager.initPlugins(),
+        runStartupTask("account switcher", () => initBotCordSwitcher()),
+        runStartupTask("compatibility fixes", () => initFixes()),
+        runStartupTask("crash screen", () => patchErrorBoundary()),
+        runStartupTask("plugin updates", () => updatePlugins()),
+        runStartupTask("core plugins", () => initPlugins()),
+        runStartupTask("installed plugins", () => VdPluginManager.initPlugins()),
     ]).then(
         u => u.forEach(f => f && lib.unload.push(f))
     );
