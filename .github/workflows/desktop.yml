@@ -43,8 +43,9 @@ jobs:
           go-version: "1.26.2"
           cache-dependency-path: desktop/client/installer/go.sum
 
-      - name: Check interrupted installer downloads
-        run: go test desktop/client/installer/runtime_download.go desktop/client/installer/runtime_download_test.go desktop/client/installer/operation.go desktop/client/installer/operation_test.go
+      - name: Check Windows installer operations
+        working-directory: desktop/client/installer
+        run: go test -tags cli ./...
 
       - name: Install Windows resource tool
         shell: bash

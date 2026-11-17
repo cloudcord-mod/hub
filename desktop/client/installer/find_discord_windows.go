@@ -12,6 +12,7 @@ import (
 	path "path/filepath"
 	"strings"
 	"sync"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
@@ -106,27 +107,57 @@ func PreparePatch(di *DiscordInstall) {
 	killLock.Lock()
 	defer killLock.Unlock()
 
-	name := windowsNames[di.branch]
-	Log.Debug("Trying to kill", name)
-	pid := findProcessIdByName(name + ".exe")
-	if pid == 0 {
-		Log.Debug("Didn't find process matching name")
+	root, err := path.Abs(di.path)
+	if err != nil {
+		Log.Warn("Could not resolve Discord installation path:", err)
 		return
 	}
-
-	proc, err := os.FindProcess(int(pid))
+	if resolved, err := path.EvalSymlinks(root); err == nil {
+		root = resolved
+	}
+	snapshot, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
 	if err != nil {
-		Log.Warn("Failed to find process with pid", pid)
+		Log.Warn("Could not enumerate Discord processes:", err)
 		return
 	}
+	defer windows.CloseHandle(snapshot)
 
-	err = proc.Kill()
-	if err != nil {
-		Log.Warn("Failed to kill", name+":", err)
-	} else {
-		Log.Debug("Waiting for", name, "to exit")
-		_, _ = proc.Wait()
+	name := windowsNames[di.branch] + ".exe"
+	entry := windows.ProcessEntry32{Size: uint32(unsafe.Sizeof(windows.ProcessEntry32{}))}
+	var stopped []windows.Handle
+	for err = windows.Process32First(snapshot, &entry); err == nil; err = windows.Process32Next(snapshot, &entry) {
+		if !strings.EqualFold(windows.UTF16ToString(entry.ExeFile[:]), name) {
+			continue
+		}
+		handle, err := windows.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION|windows.PROCESS_TERMINATE|windows.SYNCHRONIZE, false, entry.ProcessID)
+		if err != nil {
+			continue
+		}
+		var executable [32768]uint16
+		size := uint32(len(executable))
+		if windows.QueryFullProcessImageName(handle, 0, &executable[0], &size) == nil &&
+			isDiscordInstallProcess(root, name, windows.UTF16ToString(executable[:size])) && windows.TerminateProcess(handle, 0) == nil {
+			stopped = append(stopped, handle)
+		} else {
+			_ = windows.CloseHandle(handle)
+		}
 	}
+	deadline := time.Now().Add(5 * time.Second)
+	for _, handle := range stopped {
+		if remaining := time.Until(deadline); remaining > 0 {
+			_, _ = windows.WaitForSingleObject(handle, uint32(remaining.Milliseconds()))
+		}
+		_ = windows.CloseHandle(handle)
+	}
+}
+
+func isDiscordInstallProcess(root, name, executable string) bool {
+	if !strings.EqualFold(path.Base(executable), name) {
+		return false
+	}
+	versionDir := path.Dir(executable)
+	version := strings.ToLower(path.Base(versionDir))
+	return strings.HasPrefix(version, "app-") && ParseAppVersion(version) != nil && strings.EqualFold(path.Dir(versionDir), root)
 }
 
 func FixOwnership(_ string) error {
@@ -145,22 +176,4 @@ func CheckScuffedInstall() bool {
 		}
 	}
 	return false
-}
-
-func findProcessIdByName(name string) uint32 {
-	snapshot, err := windows.CreateToolhelp32Snapshot(windows.TH32CS_SNAPPROCESS, 0)
-	if err != nil {
-		return 0
-	}
-
-	procEntry := windows.ProcessEntry32{Size: uint32(unsafe.Sizeof(windows.ProcessEntry32{}))}
-	for {
-		err = windows.Process32Next(snapshot, &procEntry)
-		if err != nil {
-			return 0
-		}
-		if windows.UTF16ToString(procEntry.ExeFile[:]) == name {
-			return procEntry.ProcessID
-		}
-	}
 }

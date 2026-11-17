@@ -11,7 +11,6 @@ import (
 	"os"
 	"os/exec"
 	path "path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/ProtonMail/go-appdir"
@@ -80,15 +79,7 @@ type DiscordInstall struct {
 	isOpenAsar       *bool
 }
 
-func KillDiscordProcess() {
-	if runtime.GOOS == "windows" {
-		killProcessesByName("Discord.exe", "DiscordCanary.exe", "DiscordPTB.exe", "DiscordDevelopment.exe")
-	}
-}
-
 func patchAppAsar(dir string, isSystemElectron bool) (err error) {
-	KillDiscordProcess()
-
 	appAsar := path.Join(dir, "app.asar")
 	_appAsar := path.Join(dir, "_app.asar")
 
@@ -141,13 +132,12 @@ func patchAppAsar(dir string, isSystemElectron bool) (err error) {
 
 func (di *DiscordInstall) patch() error {
 	Log.Info("Patching " + di.path + "...")
+	PreparePatch(di)
 	if LatestHash != InstalledHash {
 		if err := InstallLatestBuilds(); err != nil {
 			return err
 		}
 	}
-
-	PreparePatch(di)
 
 	if di.isPatched {
 		Log.Info(di.path, "is already patched. Unpatching first...")
