@@ -15,6 +15,13 @@ const sourceFiles = {
     "Discover CX preview": "ios/dist/discover-cx/mobile-conversion-preview.json",
 };
 const platforms = ["desktop", "mobile"];
+const reviewedDiscoverPorts = new Map([
+    // This preview's source was reviewed for the same pin confirmation behavior.
+    ["discover-79", {
+        file: "bypass-pin-prompt.cx",
+        scriptSha256: "03957dc90487598cc40e3252005b9f9a797b595514433c44cc7c4a09bf00278a",
+    }],
+]);
 const formatError = error => String(error.message ?? error);
 const hash = source => createHash("sha256").update(source.replace(/\r\n/g, "\n").trim()).digest("hex");
 const result = (status, reason = "") => ({ status, reason });
@@ -112,6 +119,31 @@ function adapterResult(row, reason = "Adapter test did not produce a result") {
         testedSwitches: row.testedSwitches, commandInputs: row.commandInputs } : blocked(reason);
 }
 
+function originalDesktopPortResolver(sourceRoot, pack) {
+    if (!pack.entries) return () => undefined;
+    const { inspectPlugin } = require("../../desktop/client/scripts/cx-bulk-plugins.cjs");
+    const { cxAppearanceTargets, cxNativeEffects } = require("../../desktop/client/scripts/sync-cx-catalog.cjs").loadCxRuntime();
+
+    return (entry, name) => {
+        const original = entry?.source.match(/^\/\/ Converted from .+ \(desktop\/client\/src\/([\w-]+\/[\w-]+(?:\.[\w-]+)*)\)\. GPL-3\.0-or-later\.$/m)?.[1];
+        if (!original) return;
+        const directory = "desktop/client/src/" + original;
+        const sourceLocation = path.join(sourceRoot, directory);
+        const rootEntry = fs.lstatSync(sourceLocation, { throwIfNoEntry: false });
+        const sourceFile = rootEntry?.isDirectory()
+            ? ["/index.tsx", "/index.ts"].map(ext => directory + ext).find(file => fs.lstatSync(path.join(sourceRoot, file), { throwIfNoEntry: false })?.isFile())
+            : rootEntry?.isFile() && /\.tsx?$/.test(directory) ? directory : undefined;
+        if (!sourceFile) return;
+        const filename = path.join(sourceRoot, sourceFile);
+        const converted = inspectPlugin(sourceFile, fs.readFileSync(filename, "utf8"), "desktop", cxAppearanceTargets, cxNativeEffects, companion => {
+            if (!/^(?:\.\/)?[\w.-]+\.(?:css|tsx?)$/.test(companion)) return;
+            const location = path.join(path.dirname(filename), companion);
+            if (fs.lstatSync(location, { throwIfNoEntry: false })?.isFile()) return fs.readFileSync(location, "utf8");
+        });
+        if (converted?.name === name && converted.cx) return { sourceFile, sourceHash: hash(converted.cx) };
+    };
+}
+
 function stylesheetForPackEntry(entry, pack, name) {
     if (!entry) return;
     const slug = entry.id.slice(4);
@@ -191,17 +223,21 @@ async function main(args) {
     const [desktopEvidence, discoverEvidence] = await packTests;
     const adapters = new Map(rows.map(row => [row.platform + ":" + row.sourceHash, row]));
     const styles = new Map(rows.filter(row => row.appearanceCss).map(row => [row.platform + ":" + row.appearanceCss.trim(), row]));
+    const originalDesktopPort = originalDesktopPortResolver(sourceRoot, packs["Desktop CX pack"]);
     const matched = new Set();
     const candidates = queues.flat().map(([id, name, group, portableFile]) => {
         const pack = packs[group];
         const entry = pack.entries?.get(id);
+        const discover = group === "Discover CX preview" && reviewedDiscoverPorts.get(id);
+        if (discover && typeof pack.scripts?.[id] === "string"
+            && createHash("sha256").update(pack.scripts[id]).digest("hex") === discover.scriptSha256) portableFile = discover.file;
         if (portableFile && /^[a-z0-9-]+\.cx$/.test(portableFile)) {
             const file = path.join(root, "examples/cx/catalog/plugins", portableFile);
             const sourceHash = fs.existsSync(file) && hash(fs.readFileSync(file, "utf8"));
             const found = platforms.map(platform => adapters.get(platform + ":" + sourceHash));
             if (found.some(Boolean)) {
                 matched.add(sourceHash);
-                return { id, name, group, implementation: "Declared shared port: " + portableFile,
+                return { id, name, group, implementation: (discover ? "Reviewed Discover port: " : "Declared shared port: ") + portableFile,
                     syntax: checkCandidate(id, entry, pack, parse), desktop: adapterResult(found[0]), mobile: adapterResult(found[1]) };
             }
         }
@@ -224,6 +260,14 @@ async function main(args) {
                 return { id, name, group, implementation: "Shared style port: " + shared.name,
                     syntax: checkCandidate(id, entry, pack, parse),
                     desktop: adapterResult(found[0]), mobile: adapterResult(found[1]) };
+            }
+            const original = originalDesktopPort(entry, name);
+            const matches = original && platforms.map(platform => adapters.get(platform + ":" + original.sourceHash));
+            const port = matches && (matches[0] ?? matches[1]);
+            if (port) {
+                matched.add(original.sourceHash);
+                return { id, name, group, implementation: "Converter-backed shared port: " + port.name, implementationSource: original.sourceFile,
+                    syntax: checkCandidate(id, entry, pack, parse), desktop: adapterResult(matches[0]), mobile: adapterResult(matches[1]) };
             }
         }
         const desktop = group === "Discover CX preview" ? "The preview needs a Vendetta-compatible host"
