@@ -14,6 +14,13 @@ on:
       runtime_run_id:
         description: Runtime build run for this exact source commit
         type: string
+      runner:
+        description: macOS runner for a manual packaging build
+        type: choice
+        default: macos-15
+        options:
+          - macos-15
+          - macos-26
   workflow_run:
     workflows: ["Build CloudCord Runtime"]
     branches: [main]
@@ -23,7 +30,7 @@ jobs:
   build:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     # Repackage whenever the verified 344-compatible runtime changes.
-    runs-on: macos-15
+    runs-on: ${{ inputs.runner || 'macos-15' }}
     steps:
       - uses: actions/checkout@v4
         with:
