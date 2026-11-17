@@ -9,6 +9,7 @@ old_candidates = '''        listOf(
 if source.count(old_candidates) != 1:
     raise SystemExit("Unexpected script loader class candidates")
 source = source.replace(old_candidates, '''        listOf(
+            "os.i", // Discord Android 354.12 JSBundleLoaderDelegate
             "org.chromium.net.j",
             "com.facebook.react.runtime.ReactInstance\\$loadJSBundle$1",''')
 old = ').mapNotNull { classLoader.safeLoadClass(it) }.forEach { hook(it) }'
@@ -18,14 +19,25 @@ path.write_text(source, encoding="utf-8")
 
 payload_path = path.with_name("PayloadGlobalModule.kt")
 payload = payload_path.read_text(encoding="utf-8")
-old_script_loader = '''        val scriptLoader = classLoader.safeLoadClass("com.facebook.react.runtime.ReactInstance\\$loadJSBundle$1")'''
+old_script_loader = '''        val scriptLoader = classLoader.safeLoadClass("com.facebook.react.runtime.ReactInstance\\$loadJSBundle$1")
+            ?: classLoader.safeLoadClass("com.facebook.react.runtime.ReactInstance$1")'''
 if payload.count(old_script_loader) != 1:
     raise SystemExit("Unexpected payload script loader selection")
-payload = payload.replace(old_script_loader, '''        val scriptLoader = classLoader.safeLoadClass("org.chromium.net.j")
-            ?: classLoader.safeLoadClass("com.facebook.react.runtime.ReactInstance\\$loadJSBundle$1")''')
+payload = payload.replace(old_script_loader, '''        val scriptLoaders = listOf(
+            "os.i",
+            "org.chromium.net.j",
+            "com.facebook.react.runtime.ReactInstance\\$loadJSBundle$1",
+            "com.facebook.react.runtime.ReactInstance$1"
+        ).mapNotNull { classLoader.safeLoadClass(it) }''')
 old = '        listOf(catalystInstance, scriptLoader).forEach { if (it != null) hook(it, hook) }'
 if payload.count(old) != 1:
     raise SystemExit("Unexpected payload script loader discovery")
+payload = payload.replace(old, '''        (listOfNotNull(catalystInstance) + scriptLoaders).forEach { instance ->
+            runCatching { hook(instance, hook) }
+                .onFailure { Log.e("Failed to hook CloudCord loader metadata in ${instance.name}", it) }
+        }''')
+payload = payload.replace('import io.github.revenge.xposed.Module\n',
+                          'import io.github.revenge.xposed.Module\nimport io.github.revenge.xposed.Utils.Log\n')
 payload = payload.replace('scriptLoader!!.method(', 'param.method.declaringClass.method(')
 old = '''        val hook = MethodHookBuilder().run {
             before {

@@ -99,6 +99,9 @@ jobs:
           grep -F -q 'inject CloudCord into Discord' _kettu_xposed/app/src/main/AndroidManifest.xml
           grep -F -q 'text = "CloudCord Recovery"' _kettu_xposed/app/src/main/kotlin/io/github/revenge/xposed/modules/LogBoxModule.kt
           grep -F -q '__CLOUDCORD_RUNTIME_REVISION__' dist/cc.js
+          for hook in HookScriptLoaderModule PayloadGlobalModule; do
+            grep -F -q '"os.i"' "_kettu_xposed/app/src/main/kotlin/io/github/revenge/xposed/modules/$hook.kt"
+          done
           grep -R -F -q 'org.chromium.net.j' _kettu_xposed/app/src/main
           grep -R -F -q 'ReactInstance\$loadJSBundle$1' _kettu_xposed/app/src/main
           grep -R -F -q 'loadScriptFromAssets' _kettu_xposed/app/src/main
