@@ -256,7 +256,7 @@ async function main(args) {
                     lifecycle.unsettledResources && lifecycle.unsettledResources + " intervals or subscriptions retained",
                     lifecycle.unfinished && lifecycle.unfinished + " pending lifecycle promises",
                 ].filter(Boolean) : [row?.error || "No lifecycle result"];
-                entry.desktopLifecycle = result(lifecycleStatus, details.join("; "));
+                entry.desktopLifecycle = { ...result(lifecycleStatus, details.join("; ")), traces: lifecycle?.traces };
             }
         }
         desktopModuleLoad = { scope: "Isolated desktop module loading without startup hooks or Discord patches", counts };

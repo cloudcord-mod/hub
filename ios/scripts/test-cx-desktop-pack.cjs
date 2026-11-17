@@ -54,8 +54,17 @@ const react = {
     isValidElement: value => Boolean(value?.type),
 };
 const stopWarnings = [];
+const lifecycleTraces = [];
+function recordTrace(stage, error) {
+    if (typeof error?.stack === "string") lifecycleTraces.push({
+        stage, stack: error.stack.split("\\n").slice(0, 6).join("\\n"),
+    });
+}
 const logger = { logger: () => ({ warn(message, error) {
-    if (String(message).endsWith("failed to stop")) stopWarnings.push(String(error?.message ?? error ?? message));
+    if (String(message).endsWith("failed to stop")) {
+        stopWarnings.push(String(error?.message ?? error ?? message));
+        recordTrace("stop", error);
+    }
 }, error() {}, debug() {}, info() {} }) };
 const webpack = ${loadModule("webpack.js")}(() => logger);
 const cloudcord = window.CloudCord = {
@@ -105,6 +114,7 @@ for (const target of new Set([rec.def, rec.plugin])) {
                 unfinished++;
                 Promise.resolve(value).then(() => { unfinished--; }, error => {
                     unfinished--; lifecycleErrors.push(method + ": " + String(error?.message ?? error));
+                    recordTrace(method, error);
                 });
             }
             return value;
@@ -112,7 +122,10 @@ for (const target of new Set([rec.def, rec.plugin])) {
     }
 }
 try { dispose = scripts.startScript(rec.id); }
-catch (error) { lifecycleErrors.push("start: " + String(error?.message ?? error)); }
+catch (error) {
+    lifecycleErrors.push("start: " + String(error?.message ?? error));
+    recordTrace("start", error);
+}
 `;
 
 function lifecycleResult(context, runtime, renewDeadline) {
@@ -138,7 +151,7 @@ function lifecycleResult(context, runtime, renewDeadline) {
         drainJobs();
         evaluate("dispose?.();");
         drainJobs();
-        const result = JSON.parse(evaluate(`JSON.stringify({ errors: lifecycleErrors.concat(stopWarnings), unfinished,
+        const result = JSON.parse(evaluate(`JSON.stringify({ errors: lifecycleErrors.concat(stopWarnings), traces: lifecycleTraces, unfinished,
             unsettledResources: Math.max(0, resources() - resourceBaseline), started: rec.started })`));
         const status = result.errors.length || result.started || result.unsettledResources ? "Fail" : result.unfinished ? "Blocked" : "Pass";
         return { status, ...result };
