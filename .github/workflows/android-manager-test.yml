@@ -119,6 +119,8 @@ jobs:
             android-manager-test/pipeline-results/second-session/*.txt
             android-manager-test/pipeline-results/startup-ui.xml
             android-manager-test/pipeline-results/startup-screen.png
+            android-manager-test/*.txt
+            android-manager-test/discord.png
       - name: Upload patch log
         if: always()
         uses: actions/upload-artifact@v4

@@ -5,8 +5,8 @@ import io
 import urllib.request
 import zipfile
 
-url = "https://github.com/JingMatrix/LSPatch/releases/download/v1.2/lspatch-v1.2-487-release.jar"
-digest = "d238fdc414d121b7fa454d8b4ccf420df3a8c97d563761861ff92bd9c5da2165"
+url = "https://github.com/JingMatrix/LSPatch/releases/download/canary-489/lspatch-v1.2-489-release.jar"
+digest = "0cc9edf41f56ccaf701bf6af0a94c4b367185e439883debbf449a4e91b625f37"
 with urllib.request.urlopen(url, timeout=120) as response:
     engine = response.read()
 if hashlib.sha256(engine).hexdigest() != digest:
@@ -31,4 +31,4 @@ with zipfile.ZipFile(io.BytesIO(engine)) as archive:
                 raise SystemExit("Invalid LSPatch asset path")
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(archive.read(entry))
-print("Prepared JingMatrix LSPatch v1.2 (487), SHA-256 verified")
+print("Prepared JingMatrix LSPatch v1.2 canary (489), SHA-256 verified")
