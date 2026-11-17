@@ -39400,6 +39400,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }
           }
         },
+        "borderless-chat-bar": {
+          plugin: "NoChatBarBorder",
+          label: "remove the chat bar border and shadow",
+          css: 'form [class*="channelTextArea"] { border: 0 !important; box-shadow: none !important; }',
+          style: {
+            component: "FloatingChatInputContainer",
+            values: {
+              borderWidth: 0,
+              shadowOpacity: 0,
+              elevation: 0
+            }
+          }
+        },
         "transparent-chat-bar": {
           plugin: "TransparentChatBar",
           label: "make the chat input background translucent",
@@ -50037,6 +50050,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/no-chat-bar-border.cx
+  var no_chat_bar_border_default;
+  var init_no_chat_bar_border = __esm({
+    "../examples/cx/catalog/plugins/no-chat-bar-border.cx"() {
+      no_chat_bar_border_default = 'plugin "NoChatBarBorder":\n  needs appearance.style\n  style borderless-chat-bar\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/no-confirm-pin.cx
   var no_confirm_pin_default;
   var init_no_confirm_pin = __esm({
@@ -51593,6 +51614,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_nepeta_s_typing_quirk();
       init_no_animations();
       init_no_blocked_messages();
+      init_no_chat_bar_border();
       init_no_confirm_pin();
       init_no_draft_length_limit();
       init_no_mosaic();
@@ -52325,6 +52347,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "NoBlockedMessages",
             source: no_blocked_messages_default
+          },
+          {
+            name: "NoChatBarBorder",
+            source: no_chat_bar_border_default
           },
           {
             name: "NoConfirmPin",
@@ -58143,7 +58169,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5a16ced8230d3c22fe953a292a52b88f8b3678fa";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5be1af5dbcb3d8afa3c8c2bf55d13123124153bc";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
