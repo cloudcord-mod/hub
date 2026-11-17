@@ -28,7 +28,7 @@ import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
 import { getCxMessageGesture } from "@lib/api/cx";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
-import { createCxUserNotes, CX_USER_NOTE_LIMIT } from "@lib/api/cx";
+import { createCxUserNotes, CX_USER_NOTE_LIMIT, runCxCleanups } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
 import type { ComponentType, Context, ReactElement, ReactNode } from "react";
@@ -1154,14 +1154,14 @@ function registerJumpToMessageMenu(enabled: () => boolean) {
     const cleanups = [stopMessage];
     function stop() {
         active = false;
-        for (const cleanup of cleanups.splice(0).reverse()) cleanup();
+        runCxCleanups(cleanups.splice(0).reverse());
     }
     try {
         for (const target of ["ChannelLongPressActionSheetConnected", "ThreadLongPressActionSheetConnected", "ForumPostLongPressActionSheet"]) {
             cleanups.push(registerRenderedTree(target, addChannelActions));
         }
         return stop;
-    } catch (error) { stop(); throw error; }
+    } catch (error) { try { stop(); } finally { throw error; } }
 }
 
 function playCxVoiceTone(name: "user_join" | "user_leave") {
@@ -1196,7 +1196,7 @@ function registerWaitForSlot(options: CxVoiceQueueOptions, enabled: () => boolea
         enabled,
     }, options);
     const cleanups = [queue.stop];
-    function stop() { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); }
+    function stop() { runCxCleanups(cleanups.splice(0).reverse()); }
     try {
         cleanups.push(overrideCxMethods(actions, {
             selectVoiceChannel: (args, invoke) => queue.promptFull(args[0]) ? undefined : invoke(args),
@@ -1223,7 +1223,7 @@ function registerWaitForSlot(options: CxVoiceQueueOptions, enabled: () => boolea
                 ] }) : element);
         }));
         return stop;
-    } catch (error) { stop(); throw error; }
+    } catch (error) { try { stop(); } finally { throw error; } }
 }
 
 function registerCopyChannelName(enabled: () => boolean) {

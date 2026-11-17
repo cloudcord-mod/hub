@@ -23,7 +23,7 @@ import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
-import { selectCxAppearanceOption } from "@utils/cx";
+import { runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -120,7 +120,7 @@ function registerWaitForSlot(options: CxVoiceQueueOptions) {
         }
     };
     const cleanups = [queue.stop];
-    function stop() { for (const cleanup of cleanups.splice(0).reverse()) cleanup(); }
+    function stop() { runCxCleanups(cleanups.splice(0).reverse()); }
     try {
         cleanups.push(overrideCxMethods(ChannelActions, {
             selectVoiceChannel: (args, invoke) => queue.promptFull(args[0]) ? undefined : invoke(args),
@@ -132,7 +132,7 @@ function registerWaitForSlot(options: CxVoiceQueueOptions) {
         addContextMenuPatch("channel-context", patch);
         cleanups.push(() => removeContextMenuPatch("channel-context", patch));
         return stop;
-    } catch (error) { stop(); throw error; }
+    } catch (error) { try { stop(); } finally { throw error; } }
 }
 
 function registerCopyChannelName() {
