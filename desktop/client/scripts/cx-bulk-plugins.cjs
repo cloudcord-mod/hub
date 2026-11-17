@@ -739,6 +739,58 @@ function compileOutgoing(plugin) {
     if (rules.length) return { capability: "outgoing-text", lines: [...permissions, ...rules] };
 }
 
+function compileProfileClipboard(plugin, source, entry) {
+    if (!fieldsAre(plugin, ["name", "description", "authors", "tags", "contextMenus"])) return;
+    const authors = value(plugin, "authors");
+    const tags = value(plugin, "tags");
+    if (!safeText(literal(value(plugin, "name"))) || !safeText(literal(value(plugin, "description")))
+        || !authors || !ts.isArrayLiteralExpression(authors) || !authors.elements.every(author =>
+            ts.isPropertyAccessExpression(author) && ["Devs", "SincordDevs"].includes(identifier(author.expression)))
+        || tags && (!ts.isArrayLiteralExpression(tags) || !tags.elements.every(tag => safeText(literal(tag))))) return;
+    const menus = value(plugin, "contextMenus");
+    if (!menus || !ts.isObjectLiteralExpression(menus) || menus.properties.length !== 1) return;
+    const menu = menus.properties[0];
+    if (!ts.isPropertyAssignment(menu) || literal(menu.name) !== "user-context") return;
+    const callback = identifier(menu.initializer);
+    const declarations = new Map();
+    for (const node of source.statements) {
+        if (node === entry || ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) continue;
+        if (ts.isImportDeclaration(node)) {
+            if (!node.importClause || !["@api/ContextMenu", "@components/Icons", "@utils/clipboard", "@utils/constants",
+                "@utils/types", "@vencord/discord-types", "@webpack/common"].includes(node.moduleSpecifier.text)) return;
+            continue;
+        }
+        if (!ts.isVariableStatement(node) || !(node.declarationList.flags & ts.NodeFlags.Const)
+            || node.declarationList.declarations.length !== 1) return;
+        const { name, initializer } = node.declarationList.declarations[0];
+        const key = identifier(name);
+        if (!key || declarations.has(key) || !initializer || !ts.isArrowFunction(initializer) || initializer.modifiers?.length) return;
+        declarations.set(key, initializer);
+    }
+    const action = declarations.get(callback);
+    if (!action || action.parameters.length !== 2
+        || printed(action.parameters[0].name, source) !== "children" || printed(action.parameters[1].name, source) !== "{ user }"
+        || action.parameters.some(parameter => parameter.initializer || parameter.dotDotDotToken)
+        || !imported(source, "Menu", "@webpack/common") || !imported(source, "copyToClipboard", "@utils/clipboard")) return;
+    const body = printed(action.body, source).replace(/\s+/g, " ");
+    // Both originals append a single clipboard action and differ only in its label and format.
+    for (const [kind, label, output, icon] of [
+        ["user-url", "Copy User URL", "<https://discord.com/users/${user.id}>", "LinkIcon"],
+        ["user-mention", "Copy User Mention", "<@${user.id}>", "MentionIcon"],
+    ]) {
+        const expected = '{ if (!user) return; children.push(<Menu.MenuItem id="vc-copy-' + kind + '" label="' + label
+            + '" action={() => copyToClipboard(`' + output + '`)} icon={' + icon + '}/>); }';
+        if (body !== expected) continue;
+        const inlineIcon = declarations.get(icon);
+        const hasIcon = kind === "user-url"
+            ? declarations.size === 1 && imported(source, icon, "@components/Icons")
+            : declarations.size === 2 && inlineIcon?.parameters.length === 0
+                && /^\(<svg className="mentionicon" height="20" width="20" viewBox="0 0 24 24" fill="currentColor"> <path d="[a-zA-Z0-9., -]+"\/> <\/svg>\)$/
+                    .test(printed(inlineIcon.body, source).replace(/\s+/g, " "));
+        if (hasIcon) return { capability: "profile-clipboard", lines: ["  needs profilemenu.copy", "  on profile menu copy " + kind] };
+    }
+}
+
 function compileOriginRewrites(plugin, source) {
     if (!fieldsAre(plugin, ["name", "description", "authors", "tags", "searchTerms", "dependencies", "replaceUrl", "onBeforeMessageSend"])) return;
     const declarations = source.statements.filter(ts.isVariableStatement);
@@ -1423,9 +1475,9 @@ function inspectPlugin(file, code, platform, appearance = {}, nativeEffects = {}
     const managedStyle = platform === "desktop" && factory === "definePlugin" && !entry.isExportEquals
         && imported(source, "definePlugin", "@utils/types") && !source.parseDiagnostics.length && hasLicense
         && safeText(name) && name.length <= 64 && compileManagedStyle(plugin, source, entry, appearance, readStylesheet);
-    const storeEffect = platform === "desktop" && factory === "definePlugin" && !entry.isExportEquals
+    const desktopEffect = platform === "desktop" && factory === "definePlugin" && !entry.isExportEquals
         && imported(source, "definePlugin", "@utils/types") && !source.parseDiagnostics.length && hasLicense
-        && compileDesktopEffect(name, plugin, source, entry, nativeEffects);
+        && (compileDesktopEffect(name, plugin, source, entry, nativeEffects) || compileProfileClipboard(plugin, source, entry));
     const externalLookup = platform === "desktop" && compileExternalLookup(name, code);
     const timestamps = platform === "desktop" && compileTimestampFormats(name, source, readStylesheet);
     const declutter = platform === "desktop" && name === "Declutter" && compileDeclutter(source, appearance);
@@ -1433,7 +1485,8 @@ function inspectPlugin(file, code, platform, appearance = {}, nativeEffects = {}
         ? compileMobileFilter(name, file, plugin, source) || compileMobileClientCommands(file, plugin, source)
             || compileMobileNativeEffect(file, plugin, source, nativeEffects) || compileMobilePreviousEdit(file, plugin, source)
             || compileMobileSocialEvents(file, plugin, source)
-        : externalLookup || storeEffect || timestamps || declutter || managedStyle || supported && (originRewrite || compileCommands(plugin, source) || compileOutgoing(plugin)));
+        : externalLookup || desktopEffect || timestamps || declutter || managedStyle
+            || supported && (originRewrite || compileCommands(plugin, source) || compileOutgoing(plugin)));
     return {
         name, file, platform, flags, ...inventory(source),
         ...(compiled ? { capability: compiled.capability, cx: ["plugin " + JSON.stringify(name) + ":", ...compiled.lines, ""].join("\n") } : {}),

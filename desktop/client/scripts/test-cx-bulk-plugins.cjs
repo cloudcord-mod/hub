@@ -105,6 +105,14 @@ const compose = records.find(record => record.name === "CompactCompose");
 assert.equal(compose.status, "needs-adapter");
 assert.ok(compose.targets.includes("css:min-height"));
 const matches = records.filter(record => record.cx);
+for (const [name, action] of [["CopyUserURLs", "user-url"], ["CopyUserMention", "user-mention"]]) {
+    const port = matches.find(record => record.name === name && record.platform === "desktop");
+    assert.equal(port?.capability, "profile-clipboard");
+    assert.deepEqual(Array.from(parseCx(port.cx).profileActions), [action]);
+    const code = fs.readFileSync(path.resolve(__dirname, "../../..", port.file), "utf8");
+    assert.equal(inspectPlugin(port.file, code.replace("${user.id}", "${user.username}"), "desktop").cx, undefined);
+    assert.equal(inspectPlugin(port.file, code.replace("if (!user) return;", "if (!user) return; console.log(user);"), "desktop").cx, undefined);
+}
 const declutter = matches.find(record => record.name === "Declutter");
 assert.equal(declutter?.capability, "configurable-appearance");
 assert.equal(parseCx(declutter.cx).optionalHides.get("nameplates"), true);
