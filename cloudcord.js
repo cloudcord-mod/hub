@@ -9075,10 +9075,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
-  // src/lib/api/cx-testing-queues.json
+  // src/lib/api/cxTesting/cx-testing-queues.json
   var cx_testing_queues_default;
   var init_cx_testing_queues = __esm({
-    "src/lib/api/cx-testing-queues.json"() {
+    "src/lib/api/cxTesting/cx-testing-queues.json"() {
       cx_testing_queues_default = [
         [
           ["mobile/all-call-time-counter", "AllCallTimeCounter", "Shared declarative CX"],
@@ -9802,7 +9802,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
-  // src/lib/api/cxTesting.ts
+  // src/lib/api/cxTesting/index.ts
   function testingUserId(store) {
     try {
       return store?.getCurrentUser?.()?.id;
@@ -10011,7 +10011,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   var testers, entries, sharedGroup, mobileOrder, mobileQueues, retests;
   var init_cxTesting = __esm({
-    "src/lib/api/cxTesting.ts"() {
+    "src/lib/api/cxTesting/index.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
@@ -58053,7 +58053,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6452b5dff11fbf9f1298b1763c82b2de06601fff";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f0adf8def46d86d27061dfef3a1124db373d15ce";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
