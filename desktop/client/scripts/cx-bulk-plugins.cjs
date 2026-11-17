@@ -1173,6 +1173,28 @@ function compileMobileSocialEvents(file, plugin, source) {
 
 const sharedSourceRecipes = [
     {
+        capability: "outgoing-transform",
+        sources: {
+            "desktop/client/src/cloudcordplugins/autoVaporwave/index.ts": "c0fbb5196b1df7dce2768bf4f8192c969f03eeb4fc9f69e61b529a1f0cec316e",
+        },
+        lines: ["  needs messages.transform", "  before send fullwidth"],
+    },
+    {
+        capability: "client-command",
+        sources: {
+            "desktop/client/src/cloudcordplugins/boldText/index.ts": "c050db11e044858b7fc4c001724cc07a966cf6a5ba7a4a86a2ffb2721e0cb245",
+        },
+        lines: ["  needs commands.register", "  needs messages.send", '  on command "bold":',
+            '    input "message" text', '    send "${bold(message)}"'],
+    },
+    {
+        capability: "native-effect",
+        sources: {
+            "desktop/client/src/plugins/dontRoundMyTimestamps/index.ts": "ddd9c4e1ab22627b4f63944de5030535f02c377ce3c9aa8e5ae88dc35db60f7c",
+        },
+        lines: ["  needs appearance.style", "  use floor-relative-time"],
+    },
+    {
         capability: "appearance",
         sources: {
             "desktop/client/src/plugins/blurNsfw/index.ts": "292e1074f5153a353f41f4b350505e00a879c81f8268f49e218324f6697e0c26",
