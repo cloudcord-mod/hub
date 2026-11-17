@@ -156,20 +156,16 @@ jobs:
         run: |
           set -e
           pnpm buildWeb
-          unzip -l dist/extension-chrome.zip | grep -q 'dist/CloudCord.js'
-          unzip -l dist/extension-firefox.zip | grep -q 'dist/CloudCord.js'
           for archive in dist/extension-chrome.zip dist/extension-firefox.zip; do
+            files=$(unzip -Z1 "$archive")
+            grep -Fxq 'dist/CloudCord.js' <<< "$files"
+            if grep -Fxq 'dist/Discord.js' <<< "$files"; then
+              echo "stale Discord.js found in $archive"
+              exit 1
+            fi
             unzip -p "$archive" dist/cx/midnight.cx > /dev/null
             unzip -p "$archive" dist/cx/pilot/character-counter.cx > /dev/null
           done
-          if unzip -l dist/extension-chrome.zip | grep -q 'dist/Discord.js'; then
-            echo "stale Discord.js found in Chrome package"
-            exit 1
-          fi
-          if unzip -l dist/extension-firefox.zip | grep -q 'dist/Discord.js'; then
-            echo "stale Discord.js found in Firefox package"
-            exit 1
-          fi
           test -f dist/CloudCord.user.js
 
       - name: Upload browser clients
