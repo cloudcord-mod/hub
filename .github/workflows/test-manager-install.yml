@@ -6,6 +6,13 @@ on:
         description: Check for delayed exits in the patched Discord 354.12 Android 15 build
         type: boolean
         default: false
+      patched_run_id:
+        description: Build run containing the patched Discord APKs
+        default: '44135168195'
+      fresh_install_attempts:
+        description: Independent fresh installations to test (1 through 5)
+        type: number
+        default: 3
 permissions:
   contents: read
   actions: read
@@ -71,10 +78,22 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Validate patched build and attempts
+        uses: actions/github-script@v7
+        env:
+          PATCHED_RUN_ID: ${{ inputs.patched_run_id }}
+          FRESH_INSTALL_ATTEMPTS: ${{ inputs.fresh_install_attempts }}
+        with:
+          script: |
+            if (!/^\d+$/.test(process.env.PATCHED_RUN_ID)) throw Error('Invalid patched build run');
+            if (!/^[1-5]$/.test(process.env.FRESH_INSTALL_ATTEMPTS)) throw Error('Choose 1 through 5 fresh installs');
+            const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id: Number(process.env.PATCHED_RUN_ID)});
+            if (run.conclusion !== 'success') throw Error('The patched build must have succeeded');
+            core.info(`Testing patched APKs from ${run.html_url} at ${run.head_sha}`);
       - uses: actions/download-artifact@v4
         with:
           name: CloudCordManager-patched-apks
-          run-id: 44135168195
+          run-id: ${{ inputs.patched_run_id }}
           github-token: ${{ github.token }}
           path: patched
       - name: Enable emulator acceleration
@@ -84,6 +103,8 @@ jobs:
           sudo udevadm trigger --name-match=kvm
       - name: Check patched Discord for delayed exits
         uses: reactivecircus/android-emulator-runner@v2
+        env:
+          FRESH_INSTALL_ATTEMPTS: ${{ inputs.fresh_install_attempts }}
         with:
           api-level: 35
           arch: x86_64
