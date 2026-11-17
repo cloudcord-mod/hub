@@ -4,7 +4,8 @@ mkdir -p pipeline-results
 trap 'adb logcat -d > pipeline-results/logcat.txt || true' EXIT
 adb install --no-streaming app/build/outputs/apk/debug/app-debug.apk
 adb install --no-streaming app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-version="$(curl --fail --silent --show-error --retry 3 https://tracker.vendetta.rocks/tracker/index | python3 -c 'import json,sys; print(json.load(sys.stdin)["latest"]["stable"])')"
+version="${CLOUDCORD_TEST_DISCORD_VERSION:-$(curl --fail --silent --show-error --retry 3 https://tracker.vendetta.rocks/tracker/index | python3 -c 'import json,sys; print(json.load(sys.stdin)["latest"]["stable"])')}"
+[[ "$version" =~ ^[0-9]+$ ]]
 abi="$(adb shell getprop ro.product.cpu.abi | tr -d '\r' | sed 's/-v/_v/')"
 mkdir -p pipeline-input
 for part in base config.en config.xxhdpi "config.$abi"; do
