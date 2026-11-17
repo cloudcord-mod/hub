@@ -47972,6 +47972,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     } catch (e) {
     }
   }
+  function runCxCleanups(callbacks2) {
+    var errors = [];
+    for (var cleanup of callbacks2) {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    }
+    if (errors.length)
+      throw errors[0];
+  }
   function bindCx(source, host, approved, selected) {
     var document = parseCx(source);
     if (document.kind === "theme")
@@ -48025,16 +48037,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ...optionCleanups.values()
       ].reverse();
       optionCleanups.clear();
-      var firstError;
-      for (var cleanup of callbacks2) {
-        try {
-          cleanup();
-        } catch (error) {
-          firstError ??= error;
-        }
-      }
-      if (firstError !== void 0)
-        throw firstError;
+      runCxCleanups(callbacks2);
     }
     try {
       var _loop2 = function(stage2) {
@@ -48442,10 +48445,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         entry?.binding.stop();
       },
       clear() {
-        for (var [id, entry] of active) {
-          active.delete(id);
-          entry.binding.stop();
-        }
+        var entries2 = [
+          ...active.values()
+        ];
+        active.clear();
+        runCxCleanups(entries2.map((entry) => () => entry.binding.stop()));
       }
     };
   }
@@ -54694,8 +54698,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ];
     function stop() {
       active = false;
-      for (var cleanup of cleanups.splice(0).reverse())
-        cleanup();
+      runCxCleanups(cleanups.splice(0).reverse());
     }
     try {
       for (var target of [
@@ -54707,8 +54710,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
       return stop;
     } catch (error) {
-      stop();
-      throw error;
+      try {
+        stop();
+      } finally {
+        throw error;
+      }
     }
   }
   function playCxVoiceTone(name) {
@@ -54756,8 +54762,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       queue.stop
     ];
     function stop() {
-      for (var cleanup of cleanups.splice(0).reverse())
-        cleanup();
+      runCxCleanups(cleanups.splice(0).reverse());
     }
     try {
       cleanups.push(overrideCxMethods(actions, {
@@ -54790,8 +54795,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }));
       return stop;
     } catch (error) {
-      stop();
-      throw error;
+      try {
+        stop();
+      } finally {
+        throw error;
+      }
     }
   }
   function registerCopyChannelName(enabled) {
@@ -58218,6 +58226,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   __export(src_exports, {
     default: () => src_default
   });
+  function runStartupTask(name, start) {
+    return _async_to_generator(function* () {
+      var tasks = globalThis.__CLOUDCORD_STARTUP_TASKS__ ??= {};
+      var task = tasks[name] = {
+        status: "starting",
+        error: ""
+      };
+      console.log(`CloudCord starting ${name}`);
+      try {
+        var cleanup = yield start();
+        task.status = "ready";
+        console.log(`CloudCord started ${name}`);
+        return typeof cleanup === "function" ? cleanup : void 0;
+      } catch (error) {
+        task.status = "failed";
+        task.error = String(error instanceof Error ? error.message : error);
+        console.error(`CloudCord ${name} startup failed`, error);
+        return void 0;
+      }
+    })();
+  }
   var src_default;
   var init_src = __esm({
     "src/index.ts"() {
@@ -58280,22 +58309,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
         cloudCordCoreUnloads.push(...globalThis.__CLOUDCORD_CORE_SETTINGS_BOOTSTRAP__?.unloads ?? []);
         yield Promise.all([
-          initThemes(),
-          updateFonts(),
-          injectFluxInterceptor(),
-          patchLogHook(),
-          patchCommands(),
-          patchJsx(),
-          initVendettaObject(),
-          initFetchI18nStrings(),
-          initializeFakeProfile(),
-          initializeCloudCordVerification(),
-          initBotCordSwitcher(),
-          fixes_default(),
-          patchErrorBoundary(),
-          updatePlugins(),
-          initPlugins(),
-          VdPluginManager.initPlugins()
+          runStartupTask("themes", () => initThemes()),
+          runStartupTask("fonts", () => updateFonts()),
+          runStartupTask("events", () => injectFluxInterceptor()),
+          runStartupTask("logging", () => patchLogHook()),
+          runStartupTask("commands", () => patchCommands()),
+          runStartupTask("components", () => patchJsx()),
+          runStartupTask("plugin API", () => initVendettaObject()),
+          runStartupTask("translations", () => initFetchI18nStrings()),
+          runStartupTask("profiles", () => initializeFakeProfile()),
+          runStartupTask("verification", () => initializeCloudCordVerification()),
+          runStartupTask("account switcher", () => initBotCordSwitcher()),
+          runStartupTask("compatibility fixes", () => fixes_default()),
+          runStartupTask("crash screen", () => patchErrorBoundary()),
+          runStartupTask("plugin updates", () => updatePlugins()),
+          runStartupTask("core plugins", () => initPlugins()),
+          runStartupTask("installed plugins", () => VdPluginManager.initPlugins())
         ]).then((u) => [
           ...cloudCordCoreUnloads,
           ...u
@@ -58312,7 +58341,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6e9c692b38aea0e74f852bcbb872fc73c102afba";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6466c78ceb3580efabcee510479eaac889fe93e5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
