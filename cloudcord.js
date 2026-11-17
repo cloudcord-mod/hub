@@ -9707,7 +9707,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ["gpl/profile-sets", "ProfileSets", "Desktop CX pack"],
           ["gpl/purge-dms", "PurgeDMs", "Desktop CX pack"],
           ["gpl/quick-mention", "QuickMention", "Desktop CX pack"],
-          ["gpl/quote-message", "QuoteMessage", "Desktop CX pack"],
+          ["gpl/quote-message", "QuoteMessage", "Desktop CX pack", "quote-message.cx"],
           ["gpl/react-error-decoder", "ReactErrorDecoder", "Desktop CX pack"],
           ["gpl/readable-spoilers", "ReadableSpoilers", "Desktop CX pack"],
           ["gpl/recent-dmswitcher", "RecentDMSwitcher", "Desktop CX pack"],
@@ -41038,6 +41038,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       label: suppressed ? "Unsuppress Embeds" : "Suppress Embeds"
     };
   }
+  function buildCxMessageQuote(message, guildId, nickname, includeLink) {
+    if (!message.author || !isCxProfileUserId(message.id) || !isCxProfileUserId(message.channel_id))
+      return;
+    var withoutPings = (text) => text.replace(/@(?=[!&]?\d{17,20}>|everyone\b|here\b)/gi, "@\u200B");
+    var attachments = (message.attachments ?? []).flatMap((file) => typeof file.filename === "string" && file.filename.trim() ? [
+      "\u{1F4CE} " + file.filename.replace(/[\r\n]+/g, " ")
+    ] : []);
+    var body = [
+      message.content ?? "",
+      ...attachments
+    ].filter(Boolean).join("\n").trim() || "\u2026";
+    var quote = withoutPings(body).split(/\r\n|\r|\n/).map((line) => "> " + line.replace(/^>{1,3} ?/, "")).join("\n");
+    var author = withoutPings((nickname || message.author.globalName || message.author.global_name || message.author.username || "Unknown user").replace(/[\r\n]+/g, " ").slice(0, 80).replace(/[\\*_`~|<>\[\]]/g, "\\$&"));
+    var link = includeLink ? ` \xB7 https://discord.com/channels/${isCxProfileUserId(guildId) ? guildId : "@me"}/${message.channel_id}/${message.id}` : "";
+    var attribution = `
+\u2014 **${author}**${link}
+`;
+    var maximum = 1500 - attribution.length;
+    var clipped = quote.length > maximum ? quote.slice(0, maximum - 1).replace(/[\uD800-\uDBFF]$/, "").trimEnd() + "\u2026" : quote;
+    return clipped + attribution;
+  }
   function buildCxRepeatMessage(message, channelId, reply) {
     if (!isCxProfileUserId(message.id) || !isCxProfileUserId(channelId))
       return;
@@ -41431,6 +41452,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "quick-mention": {
           permission: "messages.insertmention",
           label: "Insert the selected message author's mention into the current draft"
+        },
+        "quote-message": {
+          permission: "messages.quote",
+          label: "Add Quote and Copy as Quote actions to message menus"
         },
         "keep-long-drafts": {
           permission: "drafts.long",
@@ -47335,6 +47360,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             showEmpty: flags3.includes("show-empty"),
             hideLimit: flags3.includes("hide-limit")
           };
+        } else if (name3 === "quote-message") {
+          if (effect2[2] && effect2[2] !== "without-link")
+            throw new Error("Quote Message supports the without-link option");
+          quoteOptions = {
+            includeLink: effect2[2] !== "without-link"
+          };
         } else if (effect2[2])
           throw new Error("This client effect takes no options");
         nativeEffects.add(name3);
@@ -47704,6 +47735,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var mutedVoiceOptions;
     var cameraToneOptions;
     var voiceCountOptions;
+    var quoteOptions;
     var uploadNaming;
     var previousRule;
     var profileActions = /* @__PURE__ */ new Set();
@@ -47798,6 +47830,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       cameraToneOptions,
       mutedVoiceOptions,
       voiceCountOptions,
+      quoteOptions,
       uploadNaming,
       previousRule,
       profileActions: [
@@ -48272,7 +48305,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "wait-for-slot": document.voiceQueueOptions,
         "webcam-start-notifier": document.cameraToneOptions,
         "notify-when-muted": document.mutedVoiceOptions,
-        "voice-channel-count": document.voiceCountOptions
+        "voice-channel-count": document.voiceCountOptions,
+        "quote-message": document.quoteOptions
       };
       for (var effect of document.nativeEffects) {
         if (!host.registerNativeEffect)
@@ -48446,6 +48480,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "messages.openeditor": "Open Discord\u2019s editor for your own message when you double-click or double-tap it",
         "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user\u2019s message",
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+        "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
         "drafts.long": "Keep the full text of your local drafts",
         "messages.pin": "Pin or unpin a message immediately when you choose a pin action.",
         "messages.toggleembeds": "Change embed visibility on the selected message when you choose its menu action.",
@@ -50202,6 +50237,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/quote-message.cx
+  var quote_message_default;
+  var init_quote_message = __esm({
+    "../examples/cx/catalog/plugins/quote-message.cx"() {
+      quote_message_default = 'plugin "QuoteMessage":\n  needs messages.quote\n  use quote-message\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/read-all-notifications-button.cx
   var read_all_notifications_button_default;
   var init_read_all_notifications_button = __esm({
@@ -51633,6 +51676,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_polish_wording();
       init_profile_media();
       init_quick_mention();
+      init_quote_message();
       init_read_all_notifications_button();
       init_read_all_notifications();
       init_readable_line_length();
@@ -52423,6 +52467,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "QuickMention",
             source: quick_mention_default
+          },
+          {
+            name: "QuoteMessage",
+            source: quote_message_default
           },
           {
             name: "ReadAllNotificationsButton",
@@ -54452,9 +54500,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (!channel || message?.channel_id !== channel.id)
         return tree;
       var { id: channelId, guild_id: guildId } = channel;
-      function canUseAction() {
+      function canUseAction(requireSendPermission = requiresSendPermission) {
         var permission = channel?.isThread?.() ? permissions?.SEND_MESSAGES_IN_THREADS : permissions?.SEND_MESSAGES;
-        return active && enabled() && SelectedChannelStore?.getChannelId?.() === channelId && (!requiresSendPermission || !guildId || permission != null && permissionStore?.can?.(permission, channel) === true);
+        return active && enabled() && SelectedChannelStore?.getChannelId?.() === channelId && (!requireSendPermission || !guildId || permission != null && permissionStore?.can?.(permission, channel) === true);
       }
       if (!canUseAction())
         return tree;
@@ -54503,6 +54551,44 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       ];
     });
+  }
+  function registerQuoteMessage(enabled, includeLink) {
+    return registerMessageMenuActions(enabled, ({ channel, message, chatInputRef }, close, canUseAction) => {
+      if (!message)
+        return [];
+      var guild = channel?.guild_id;
+      var author = message.author?.id;
+      var nick = guild && author ? GuildMemberStore?.getNick?.(guild, author) ?? GuildMemberStore?.getMember?.(guild, author)?.nick : void 0;
+      var quote = buildCxMessageQuote(message, guild, nick, includeLink);
+      if (!quote)
+        return [];
+      var actions = [
+        {
+          label: "Copy as Quote",
+          run() {
+            try {
+              clipboard.setString(quote);
+              showToast.showCopyToClipboard?.();
+              close();
+            } catch (e) {
+              showToast("Couldn't copy the quote.");
+            }
+          }
+        }
+      ];
+      if (canUseAction(true) && typeof chatInputRef?.current?.insertText === "function")
+        actions.unshift({
+          label: "Quote",
+          run() {
+            var composer = chatInputRef.current;
+            if (!canUseAction(true) || typeof composer?.insertText !== "function")
+              return;
+            composer.insertText(quote, null, false, void 0, null);
+            close();
+          }
+        });
+      return actions;
+    }, false);
   }
   function registerJumpToMessageMenu(enabled) {
     var rest = findByProps("HTTP")?.HTTP ?? findByProps("get", "post", "patch", "del");
@@ -56213,6 +56299,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }
               case "quick-mention":
                 return registerQuickMention(enabled);
+              case "quote-message":
+                if (!effectOptions || !("includeLink" in effectOptions))
+                  throw new Error("Missing quote options");
+                return registerQuoteMessage(enabled, effectOptions.includeLink);
               case "force-owner-crown": {
                 var row = findByFilePath("modules/main_tabs_v2/native/shared_components/user_list/UserRow.tsx")?.default;
                 if (!row)
@@ -58169,7 +58259,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5be1af5dbcb3d8afa3c8c2bf55d13123124153bc";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "84d92228b126a02eb504857c5ac19e917a833bc5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
