@@ -24,7 +24,8 @@ const blocked = reason => result("Blocked", reason);
 function readPack(sourceRoot, group) {
     const file = path.join(sourceRoot, sourceFiles[group]);
     try {
-        const { entries, scripts, styles, patches } = JSON.parse(fs.readFileSync(file, "utf8"));
+        const source = fs.readFileSync(file, "utf8");
+        const { entries, scripts, styles, patches } = JSON.parse(source);
         if (!Array.isArray(entries)) throw new Error("Missing entries array");
         const byId = new Map();
         for (const entry of entries) {
@@ -33,7 +34,7 @@ function readPack(sourceRoot, group) {
             }
             byId.set(entry.id, entry);
         }
-        return { entries: byId, scripts, styles, patches };
+        return { entries: byId, scripts, styles, patches, sha256: createHash("sha256").update(source).digest("hex") };
     } catch (error) {
         return { error: error.code === "ENOENT" ? "Source file missing: " + sourceFiles[group] : formatError(error) };
     }
@@ -114,9 +115,11 @@ function writeReport(output, report) {
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + "\n");
     const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail"];
+    if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings");
     const rows = [...report.candidates, ...report.additionalSharedPlugins].map(entry => [
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
+        ...(report.desktopModuleLoad ? [entry.moduleLoad?.status, entry.moduleLoad?.error, entry.moduleLoad?.warnings.join("; ")] : []),
     ]);
     fs.writeFileSync(output.replace(/\.json$/i, ".csv"), [header, ...rows].map(row => row.map(csvField).join(",")).join("\r\n") + "\r\n");
 }
@@ -124,13 +127,15 @@ function writeReport(output, report) {
 async function main(args) {
     let sourceRoot = root;
     let output = path.join(root, "ios/dist/cx-test-results.json");
+    let desktopLoadFile;
     for (let i = 0; i < args.length; i += 2) {
         const flag = args[i], value = args[i + 1];
-        if (!value || value.startsWith("--") || !["--sources", "--output"].includes(flag)) {
-            throw new Error("Usage: node ios/scripts/test-cx-catalog.cjs [--sources <candidate checkout>] [--output <report.json>]");
+        if (!value || value.startsWith("--") || !["--sources", "--output", "--desktop-load"].includes(flag)) {
+            throw new Error("Usage: node ios/scripts/test-cx-catalog.cjs [--sources <candidate checkout>] [--desktop-load <isolated load report.json>] [--output <report.json>]");
         }
         if (flag === "--sources") sourceRoot = path.resolve(value);
-        else output = path.resolve(value);
+        else if (flag === "--output") output = path.resolve(value);
+        else desktopLoadFile = path.resolve(value);
     }
     if (!/\.json$/i.test(output)) throw new Error("The report filename must end in .json");
 
@@ -172,6 +177,30 @@ async function main(args) {
         return { id, name, group, syntax: checkCandidate(id, entry, pack, parse), desktop: blocked(desktop), mobile: blocked(mobile) };
     });
 
+    let desktopModuleLoad;
+    if (desktopLoadFile) {
+        const evidence = JSON.parse(fs.readFileSync(desktopLoadFile, "utf8"));
+        const desktopPack = packs["Desktop CX pack"];
+        if (typeof evidence.packSha256 !== "string" || evidence.packSha256 !== desktopPack.sha256) {
+            throw new Error("The module load report was produced from a different desktop pack");
+        }
+        const loaded = new Map();
+        for (const row of evidence.rows) {
+            if (!desktopPack.entries.has(row?.id) || loaded.has(row.id) || typeof row.loaded !== "boolean") {
+                throw new Error("Unexpected or duplicate module load result");
+            }
+            loaded.set(row.id, row);
+        }
+        const counts = { Pass: 0, Fail: 0, Blocked: 0 };
+        for (const entry of candidates.filter(candidate => candidate.group === "Desktop CX pack")) {
+            const row = loaded.get(entry.id);
+            const status = row ? row.loaded ? "Pass" : "Fail" : "Blocked";
+            counts[status]++;
+            entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [] };
+        }
+        desktopModuleLoad = { scope: "Isolated desktop module loading without startup hooks or Discord patches", counts };
+    }
+
     const additional = new Map();
     for (const row of rows) {
         if (matched.has(row.sourceHash)) continue;
@@ -190,12 +219,12 @@ async function main(args) {
     }));
     const report = {
         scope: "Syntax and fixture-based adapter activation and cleanup. Device behavior requires separate results.",
-        candidateCount: candidates.length, totals, adapterSuite,
+        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad,
         candidates, additionalSharedPlugins: [...additional.values()],
     };
     writeReport(output, report);
-    console.log(JSON.stringify({ candidateCount: candidates.length, totals, additionalSharedPlugins: additional.size, report: output }, null, 2));
-    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail)) process.exitCode = 1;
+    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, additionalSharedPlugins: additional.size, report: output }, null, 2));
+    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) || desktopModuleLoad?.counts.Fail) process.exitCode = 1;
 }
 
 main(process.argv.slice(2)).catch(error => { console.error(formatError(error)); process.exitCode = 1; });
