@@ -219,6 +219,7 @@ function writeReport(output, report) {
     if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings", "Desktop pack declared settings");
     if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail", "Missed fixture lookups (Windows/Android export names)");
     if (report.discoverFactory) header.push("Discover fixture load", "Discover fixture error", "Android lookup signatures observed", "Discover declares settings");
+    if (report.discoverLifecycle) header.push("Discover lifecycle (fixture)", "Discover lifecycle detail");
     const rows = [...report.candidates, ...report.additionalSharedPlugins].map(entry => [
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
@@ -231,8 +232,28 @@ function writeReport(output, report) {
                     observed == null ? "unknown" : observed ? "yes" : "no").join("/") + "]").join("; "),
         ] : []),
         ...(report.discoverFactory ? [entry.discoverFactory?.status, entry.discoverFactory?.error, entry.discoverFactory?.androidMatches, entry.discoverFactory?.settingsDeclared] : []),
+        ...(report.discoverLifecycle ? [entry.discoverLifecycle?.status, entry.discoverLifecycle?.reason] : []),
     ]);
     fs.writeFileSync(output.replace(/\.json$/i, ".csv"), [header, ...rows].map(row => row.map(csvField).join(",")).join("\r\n") + "\r\n");
+}
+
+function groupBatchErrors(candidates) {
+    const groups = new Map();
+    for (const entry of candidates) {
+        for (const check of ["syntax", "desktop", "mobile", "moduleLoad", "desktopLifecycle", "discoverFactory", "discoverLifecycle"]) {
+            const outcome = entry[check];
+            if (outcome?.status !== "Fail") continue;
+            const issues = outcome.issues ?? [outcome.error ?? outcome.reason ?? "Unknown error"];
+            for (const message of new Set(issues)) {
+                const key = JSON.stringify([check, message]);
+                const group = groups.get(key) ?? { check, message, plugins: [] };
+                group.plugins.push(entry.id);
+                groups.set(key, group);
+            }
+        }
+    }
+    return [...groups.values()].map(group => ({ ...group, count: group.plugins.length }))
+        .sort((a, b) => b.count - a.count || a.check.localeCompare(b.check) || a.message.localeCompare(b.message));
 }
 
 async function main(args) {
@@ -348,7 +369,7 @@ async function main(args) {
                     lifecycle.unsettledResources && lifecycle.unsettledResources + " intervals or subscriptions retained",
                     lifecycle.unfinished && lifecycle.unfinished + " pending lifecycle promises",
                 ].filter(Boolean) : [row?.error || "No lifecycle result"];
-                entry.desktopLifecycle = { ...result(lifecycleStatus, details.join("; ")), traces: lifecycle?.traces };
+                entry.desktopLifecycle = { ...result(lifecycleStatus, details.join("; ")), issues: details, traces: lifecycle?.traces };
             }
         }
         desktopModuleLoad = { scope: "Isolated desktop module loading without startup hooks or Discord patches", counts };
@@ -358,10 +379,11 @@ async function main(args) {
         };
     }
 
-    let discoverFactory;
+    let discoverFactory, discoverLifecycle;
     if (discoverEvidence) {
         const loaded = matchEvidence(discoverEvidence, packs["Discover CX preview"], "Discover factory load");
         const counts = { Pass: 0, Fail: 0, Blocked: 0 };
+        const lifecycleCounts = discoverEvidence.summary.lifecycle && { Pass: 0, Fail: 0, Blocked: 0 };
         for (const entry of candidates.filter(candidate => candidate.group === "Discover CX preview")) {
             const row = loaded.get(entry.id);
             if (row && row.status !== "Pass" && row.status !== "Fail") throw new Error("Invalid Discover factory status: " + entry.id);
@@ -370,11 +392,24 @@ async function main(args) {
             const requests = row?.requests ?? [];
             const androidMatches = requests.length ? requests.filter(request => request.observedInAndroidSnapshot === true).length + "/" + requests.length : "";
             entry.discoverFactory = { status, error: row?.error ?? "Missing Discover factory result", androidMatches, requests,
-                settingsDeclared: row?.settingsDeclared };
+                settingsDeclared: row?.settingsDeclared, trace: row?.factoryTrace };
+            if (lifecycleCounts) {
+                const lifecycle = row?.lifecycle;
+                const lifecycleStatus = lifecycle?.status ?? "Blocked";
+                if (!Object.hasOwn(lifecycleCounts, lifecycleStatus)) throw new Error("Invalid Discover lifecycle status: " + entry.id);
+                lifecycleCounts[lifecycleStatus]++;
+                const errors = lifecycle ? [...lifecycle.errors,
+                    ...Object.entries(lifecycle.retained ?? {}).filter(([, count]) => count)
+                        .map(([kind, count]) => count + " " + kind + " retained"),
+                    lifecycle.pending && lifecycle.pending + " pending lifecycle promises",
+                ].filter(Boolean) : [row?.error || "No lifecycle result"];
+                entry.discoverLifecycle = { ...result(lifecycleStatus, errors.join("; ")), issues: errors, traces: lifecycle?.traces };
+            }
         }
         discoverFactory = { scope: "Isolated Discover factories with inert Vendetta fixtures", counts,
             distinctFindByProps: discoverEvidence.summary.distinctFindByProps,
             observedAndroidSignatures: discoverEvidence.summary.observedAndroidSignatures };
+        if (lifecycleCounts) discoverLifecycle = { scope: "Discover startup and cleanup with inert Vendetta APIs", counts: lifecycleCounts };
     }
 
     const additional = new Map();
@@ -395,7 +430,8 @@ async function main(args) {
     }));
     const report = {
         scope: "Syntax and fixture-based adapter activation and cleanup. Device behavior requires separate results.",
-        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, desktopLifecycle, discoverFactory,
+        candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
+        errorGroups: groupBatchErrors([...candidates, ...additional.values()]),
         candidates, additionalSharedPlugins: [...additional.values()],
         configuration: {
             shared: Object.fromEntries(platforms.map(platform => {
@@ -419,10 +455,11 @@ async function main(args) {
         fs.writeFileSync(testingLinks, JSON.stringify(links, null, 2) + "\n");
         console.log("Wrote " + linked.length + " tester links.");
     }
-    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, desktopLifecycle, discoverFactory,
+    console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
+        frequentErrors: report.errorGroups.slice(0, 8).map(({ check, message, count }) => ({ check, message, count })),
         configuration: report.configuration, additionalSharedPlugins: additional.size, report: output }, null, 2));
     if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) ||
-        desktopModuleLoad?.counts.Fail || desktopLifecycle?.counts.Fail || discoverFactory?.counts.Fail) process.exitCode = 1;
+        desktopModuleLoad?.counts.Fail || desktopLifecycle?.counts.Fail || discoverFactory?.counts.Fail || discoverLifecycle?.counts.Fail) process.exitCode = 1;
 }
 
 main(process.argv.slice(2)).catch(error => { console.error(formatError(error)); process.exitCode = 1; });
