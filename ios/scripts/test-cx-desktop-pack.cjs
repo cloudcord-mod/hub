@@ -39,13 +39,67 @@ const dispatcher = {
     subscribe(event, callback) { dispatchSubscriptions.set(callback, event); },
     unsubscribe(_event, callback) { dispatchSubscriptions.delete(callback); },
 };
-globalThis.document = {
-    documentElement: {}, head: {}, addEventListener() {}, removeEventListener() {},
-    createElement(tag) {
-        const element = { style: { transform: "", transition: "" } };
-        if (tag === "canvas") element.getContext = kind => kind === "2d" ? { canvas: element } : null;
-        return element;
+const eventListeners = new Set();
+const observers = new Set();
+const elements = new Set();
+function events(target) {
+    const captures = options => typeof options === "boolean" ? options : Boolean(options?.capture);
+    const listener = (kind, callback, capture) => [...eventListeners].find(record => record.target === target && record.kind === kind
+            && record.callback === callback && record.capture === capture);
+    target.addEventListener = (kind, callback, options) => {
+        const capture = captures(options);
+        if (!callback || listener(kind, callback, capture)) return;
+        eventListeners.add({ target, kind, callback, capture });
+    };
+    target.removeEventListener = (kind, callback, options) => eventListeners.delete(listener(kind, callback, captures(options)));
+    return target;
+}
+function createElement(tag) {
+    const element = events({ tagName: tag.toUpperCase(), id: "", className: "", parentNode: null, children: [],
+        style: {
+            transform: "", transition: "",
+            setProperty(name, value) { this[name] = value; },
+            removeProperty(name) { const value = this[name]; delete this[name]; return value; },
+            getPropertyValue(name) { return this[name] ?? ""; },
+        },
+        appendChild(child) {
+            for (let parent = this; parent; parent = parent.parentNode) {
+                if (parent === child) throw new Error("Cannot insert a node into itself");
+            }
+            child.remove();
+            child.parentNode = this;
+            this.children.push(child);
+            return child;
+        },
+        append(...children) { for (const child of children) this.appendChild(child); },
+        removeChild(child) {
+            const index = this.children.indexOf(child);
+            if (index !== -1) this.children.splice(index, 1);
+            if (child.parentNode === this) child.parentNode = null;
+            return child;
+        },
+        remove() { this.parentNode?.removeChild(this); },
+        get isConnected() { return this === document.documentElement || Boolean(this.parentNode?.isConnected); },
+    });
+    if (tag === "canvas") element.getContext = kind => kind === "2d" ? { canvas: element } : null;
+    elements.add(element);
+    return element;
+}
+globalThis.document = events({ documentElement: createElement("html"), head: createElement("head"), body: createElement("body"),
+    createElement, createElementNS: (_namespace, tag) => createElement(tag),
+    getElementById: id => [...elements].find(element => element.isConnected && element.id === id) ?? null,
+    querySelectorAll(selector) {
+        return [...elements].filter(element => element.isConnected && (selector[0] === "#" ? selector.slice(1) === element.id
+            : selector[0] === "." ? element.className.split(" ").includes(selector.slice(1)) : selector.toUpperCase() === element.tagName));
     },
+    querySelector(selector) { return this.querySelectorAll(selector)[0] ?? null; },
+});
+document.documentElement.append(document.head, document.body);
+events(globalThis);
+globalThis.MutationObserver = class {
+    observe(target) { if (target) observers.add(this); }
+    disconnect() { observers.delete(this); }
+    takeRecords() { return []; }
 };
 globalThis.location = { href: "https://discord.invalid/channels/@me", origin: "https://discord.invalid" };
 const react = {
@@ -133,8 +187,9 @@ lookupPhase = "start";
 const lifecycleErrors = [];
 let unfinished = 0;
 let dispose;
-const resources = () => intervals.size + subscriptions.size + dispatchSubscriptions.size;
-const resourceBaseline = resources();
+const resources = () => ({ intervals, subscriptions: [...subscriptions, ...dispatchSubscriptions.keys()],
+    listeners: eventListeners, observers, nodes: [...elements].filter(element => element.isConnected) });
+const resourceBaseline = Object.fromEntries(Object.entries(resources()).map(([kind, handles]) => [kind, new Set(handles)]));
 for (const target of new Set([rec.def, rec.plugin])) {
     for (const method of ["start", "stop"]) {
         const original = target?.[method];
@@ -185,8 +240,10 @@ function lifecycleResult(context, runtime, renewDeadline) {
         evaluate('lookupPhase = "stop"; dispose?.();');
         drainJobs();
         const result = JSON.parse(evaluate(`JSON.stringify({ errors: lifecycleErrors.concat(stopWarnings), traces: lifecycleTraces, unfinished,
-            unsettledResources: Math.max(0, resources() - resourceBaseline), started: rec.started })`));
-        const status = result.errors.length || result.started || result.unsettledResources ? "Fail" : result.unfinished ? "Blocked" : "Pass";
+            retained: Object.fromEntries(Object.entries(resources()).map(([kind, handles]) =>
+                [kind, [...handles].filter(handle => !resourceBaseline[kind].has(handle)).length])),
+            started: rec.started })`));
+        const status = result.errors.length || result.started || Object.values(result.retained).some(Boolean) ? "Fail" : result.unfinished ? "Blocked" : "Pass";
         return { status, ...result };
     } catch (error) {
         return { status: "Fail", errors: [error.message] };

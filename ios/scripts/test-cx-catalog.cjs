@@ -367,6 +367,7 @@ async function main(args) {
                     ...lifecycle.errors,
                     lifecycle.started && "Still marked started after cleanup",
                     lifecycle.unsettledResources && lifecycle.unsettledResources + " intervals or subscriptions retained",
+                    ...Object.entries(lifecycle.retained ?? {}).filter(([, count]) => count).map(([kind, count]) => count + " " + kind + " retained"),
                     lifecycle.unfinished && lifecycle.unfinished + " pending lifecycle promises",
                 ].filter(Boolean) : [row?.error || "No lifecycle result"];
                 entry.desktopLifecycle = { ...result(lifecycleStatus, details.join("; ")), issues: details, traces: lifecycle?.traces };
