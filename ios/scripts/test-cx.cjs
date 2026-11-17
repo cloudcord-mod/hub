@@ -106,6 +106,23 @@ assert.equal(callbacks.size, 0);
 session.clear();
 assert.equal(background, undefined);
 
+const stopFailure = new Error("unsubscribe failed");
+const stopped = [];
+const failingStopHost = {
+    ...host,
+    registerCommand(name) {
+        return () => { stopped.push(name); throw stopFailure; };
+    },
+    applyTheme() { return () => { stopped.push("theme"); }; },
+};
+session.enable(plugin, failingStopHost, grants);
+session.enable(theme, failingStopHost, []);
+assert.throws(() => session.clear(), error => error === stopFailure);
+assert.equal(stopped.join(), "hello,theme", "A failed plugin cleanup must not leave the theme or other plugins enabled");
+assert.equal(session.list().length, 0);
+session.clear();
+assert.equal(stopped.length, 2, "Cleared extensions must not be stopped twice");
+
 callbacks.set("other", () => {});
 assert.throws(() => activateCx(plugin + '\n  on command "other":\n    toast "Hi"', host, grants), /Duplicate/);
 assert.equal(callbacks.has("hello"), false);

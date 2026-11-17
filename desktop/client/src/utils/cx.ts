@@ -792,6 +792,15 @@ type CxBinding = {
     isAppearanceOptionEnabled?: (target: CxHideTarget) => boolean;
 };
 
+export function runCxCleanups(callbacks: Iterable<() => void>) {
+    const errors: unknown[] = [];
+    for (const cleanup of callbacks) {
+        try { cleanup(); }
+        catch (error) { errors.push(error); }
+    }
+    if (errors.length) throw errors[0];
+}
+
 function bindCx(source: string, host: CxHost, approved: readonly CxPermission[], selected?: readonly string[]): CxBinding {
     const document = parseCx(source);
     if (document.kind === "theme") return { stop: host.applyTheme(document) };
@@ -831,12 +840,7 @@ function bindCx(source: string, host: CxHost, approved: readonly CxPermission[],
         activeLookups.clear();
         const callbacks = [...cleanups.splice(0), ...optionCleanups.values()].reverse();
         optionCleanups.clear();
-        let firstError: unknown;
-        for (const cleanup of callbacks) {
-            try { cleanup(); }
-            catch (error) { firstError ??= error; }
-        }
-        if (firstError !== undefined) throw firstError;
+        runCxCleanups(callbacks);
     }
     try {
         if (document.sendConfirmation) {
@@ -1131,10 +1135,9 @@ export function createCxSession() {
             entry?.binding.stop();
         },
         clear() {
-            for (const [id, entry] of active) {
-                active.delete(id);
-                entry.binding.stop();
-            }
+            const entries = [...active.values()];
+            active.clear();
+            runCxCleanups(entries.map(entry => () => entry.binding.stop()));
         },
     };
 }
