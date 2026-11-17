@@ -36,7 +36,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: CloudCord-Android-loader
-          run-id: 44134581819
+          run-id: 44165221447
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/cloudcord-loader
       - name: Prepare CloudCord branding and pinned module
@@ -45,8 +45,8 @@ jobs:
           node android-manager-test/prepare-cloudcord.cjs
           python3 android-manager-test/prepare-lspatch.py
           module="$RUNNER_TEMP/cloudcord-loader/cloudcord-module.apk"
-          echo "46f56026d7e758cced8b49f48867b10b9ad212f14a8d557c964639981db823bc  $module" | sha256sum --check
-          unzip -p "$module" assets/revenge.bundle | sha256sum | grep -q '^e3f031566b12f8bd1e7dc3a014ded056282b57efe5367aa59456b33004ef394e  '
+          echo "c9981cf13cfed484e257c7fe1d649d61496f45007585eb738638662c7e40d331  $module" | sha256sum --check
+          unzip -p "$module" assets/revenge.bundle | sha256sum | grep -q '^73318fde355af6d5f1db6ca73b899fab4eadca0e910c77f441a897b83f298eb0  '
           mkdir -p android-manager-test/app/src/main/assets
           unzip -p "$module" assets/xposed_init > "$RUNNER_TEMP/cloudcord-xposed-init"
           test -s "$RUNNER_TEMP/cloudcord-xposed-init"
