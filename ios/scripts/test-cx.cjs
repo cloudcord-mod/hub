@@ -4988,6 +4988,29 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 });
             }
         }
+        for (const [source, implementation] of Object.entries(convertedSources)) {
+            const { name } = reviewCx(implementation);
+            const baseline = installedHooks();
+            const errors = [];
+            const deactivate = "Disable " + name;
+            const editor = find(render(), item => item.type === (desktop ? "textarea" : "TextInput"));
+            if (desktop) editor.props.onChange({ currentTarget: { value: source } });
+            else editor.props.onChangeText(source);
+            try {
+                click(render(), "Review CX");
+                assert.deepEqual(installedHooks(), baseline, name + " must wait for approval after importing");
+                click(render(), "Allow for this session");
+                assert.ok(button(render(), deactivate), name + " must activate after importing");
+            } catch (error) {
+                errors.push(error.message);
+            } finally {
+                if (button(render(), deactivate)) click(render(), deactivate);
+                assert.deepEqual(installedHooks(), baseline, name + " should release registrations after importing");
+            }
+            if (errors.length) activationFailures.push({ platform, name, errors });
+            if (resultsPath) adapterResults.push({ platform, name, status: errors.length ? "Fail" : "Pass", errors,
+                imported: true, sourceHash: createHash("sha256").update(source).digest("hex") });
+        }
         for (const entry of cxCatalog.themes) {
             const theme = parseCx(entry.source);
             selectCatalog(entry.name);

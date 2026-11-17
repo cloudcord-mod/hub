@@ -2,6 +2,7 @@
   "plugin \"AmoledMode\":\n  needs appearance.style\n  style amoled-mode\n  needs scripts.run\n  use amoled-mode": "plugin \"AmoledMode\":\n  needs appearance.style\n  style amoled-background",
   "plugin \"AnonymiseFileNames\":\n  needs scripts.run\n  use anonymise-file-names": "plugin \"AnonymiseFileNames\":\n  needs uploads.rename\n  needs commands.register\n  needs reply.local\n  before upload anonymise random 7\n  on command \"spoiler\":\n    input \"value\" boolean optional\n    set upload spoilers \"value\"",
   "plugin \"AutoVaporwave\":\n  needs scripts.run\n  use auto-vaporwave": "plugin \"AutoVaporwave\":\n  needs messages.transform\n  before send fullwidth",
+  "plugin \"AvatarGrabber\":\n  needs scripts.run\n  use avatar-grabber": "plugin \"AvatarGrabber\":\n  needs commands.register\n  needs messages.send\n  needs profile.avatar\n  needs reply.local\n  on command \"avatar\":\n    input \"user\" user optional\n    send \"${avatar(user)}\" else \"Couldn't find that user.\"",
   "plugin \"BetterGifAltText\":\n  needs scripts.run\n  use better-gif-alt-text": "plugin \"BetterGifAltText\":\n  needs media.labels\n  use descriptive-gif-alt",
   "plugin \"BetterPlusReacts\":\n  needs scripts.run\n  use better-plus-reacts": "plugin \"BetterPlusReacts\":\n  needs messages.reactshortcut\n  use plus-reactions",
   "plugin \"BiggerCodeBlocks\":\n  needs appearance.style\n  style bigger-code-blocks\n  needs scripts.run\n  use bigger-code-blocks": "plugin \"BiggerCodeBlocks\":\n  needs appearance.style\n  style code-block-size",
@@ -11,6 +12,7 @@
   "plugin \"BoldText\":\n  needs scripts.run\n  use bold-text": "plugin \"BoldText\":\n  needs commands.register\n  needs messages.send\n  on command \"bold\" with text:\n    send \"${bold(text)}\"",
   "plugin \"BypassPinPrompt\":\n  needs scripts.run\n  use bypass-pin-prompt": "plugin \"BypassPinPrompt\":\n  needs messages.pin\n  use bypass-pin-prompt",
   "plugin \"BypassPinPrompt\":\n  needs scripts.run\n  use discover-79": "plugin \"BypassPinPrompt\":\n  needs messages.pin\n  use bypass-pin-prompt",
+  "plugin \"Calculator\":\n  needs scripts.run\n  use calculator": "plugin \"Calculator\":\n  needs commands.register\n  needs messages.send\n  needs reply.local\n  on command \"calc\" with text:\n    send \"${calculate(text)}\" else \"Enter numbers and + - * / % or parentheses.\"",
   "plugin \"CenteredChat\":\n  needs appearance.style\n  style centered-chat\n  needs scripts.run\n  use centered-chat": "plugin \"CenteredChat\":\n  needs appearance.style\n  style centered-chat",
   "plugin \"ClapText\":\n  needs scripts.run\n  use clap-text": "plugin \"ClapText\":\n  needs commands.register\n  needs messages.send\n  on command \"clap\" with text:\n    send \"${clap(text)}\"",
   "plugin \"CleanChannelName\":\n  needs scripts.run\n  use clean-channel-name": "plugin \"CleanChannelName\":\n  needs appearance.style\n  use clean-channel-names",
@@ -36,6 +38,7 @@
   "plugin \"FixImagesQuality\":\n  needs scripts.run\n  use fix-images-quality": "plugin \"FixImagesQuality\":\n  needs media.imagequality\n  use attachment-image-quality",
   "plugin \"FloatingChatBar\":\n  needs appearance.style\n  style floating-chat-bar\n  needs scripts.run\n  use floating-chat-bar": "plugin \"FloatingChatBar\":\n  needs appearance.style\n  style floating-chat-bar",
   "plugin \"ForceOwnerCrown\":\n  needs scripts.run\n  use force-owner-crown": "plugin \"ForceOwnerCrown\":\n  needs appearance.style\n  use force-owner-crown",
+  "plugin \"FriendInvites\":\n  needs scripts.run\n  use friend-invites": "plugin \"FriendInvites\":\n  needs commands.register\n  needs reply.local\n  needs friends.invites.create\n  needs friends.invites.list\n  needs friends.invites.revoke\n  on command \"create-friend-invite\":\n    create friend invites\n  on command \"view-friend-invites\":\n    list friend invites\n  on command \"revoke-friend-invites\":\n    revoke friend invites",
   "plugin \"HideActiveNow\":\n  needs appearance.style\n  style hide-active-now\n  needs scripts.run\n  use hide-active-now": "plugin \"HideActiveNow\":\n  needs appearance.hide\n  hide active-now",
   "plugin \"HideAddServerButton\":\n  needs appearance.style\n  style hide-add-server-button\n  needs scripts.run\n  use hide-add-server-button": "plugin \"HideAddServerButton\":\n  needs appearance.hide\n  hide add-server-button",
   "plugin \"HideAppsButton\":\n  needs appearance.style\n  style hide-apps-button\n  needs scripts.run\n  use hide-apps-button": "plugin \"HideAppsButton\":\n  needs appearance.hide\n  hide chat-apps-button",
@@ -122,6 +125,7 @@
   "plugin \"RoundedAvatarsSquare\":\n  needs appearance.style\n  style rounded-avatars-square\n  needs scripts.run\n  use rounded-avatars-square": "plugin \"RoundedAvatarsSquare\":\n  needs appearance.style\n  style rounded-square-avatars",
   "plugin \"RoundedChatBar\":\n  needs appearance.style\n  style rounded-chat-bar\n  needs scripts.run\n  use rounded-chat-bar": "plugin \"RoundedChatBar\":\n  needs appearance.style\n  style rounded-chat-bar",
   "plugin \"RoundServerIcons\":\n  needs appearance.style\n  style round-server-icons\n  needs scripts.run\n  use round-server-icons": "plugin \"RoundServerIcons\":\n  needs appearance.style\n  style round-server-icons",
+  "plugin \"ShipCalc\":\n  needs scripts.run\n  use ship-calc": "plugin \"ShipCalc\":\n  needs commands.register\n  needs messages.send\n  on command \"ship\":\n    input \"a\" text\n    input \"b\" text\n    send \"${ship(a, b)}\"",
   "plugin \"ShowSongName\":\n  needs scripts.run\n  use show-song-name": "plugin \"ShowSongName\":\n  needs appearance.style\n  use spotify-song-name",
   "plugin \"SortReactions\":\n  needs scripts.run\n  use sort-reactions": "plugin \"SortReactions\":\n  needs appearance.style\n  use sort-reactions-by-count",
   "plugin \"SpaceOut\":\n  needs scripts.run\n  use space-out": "plugin \"SpaceOut\":\n  needs commands.register\n  needs messages.send\n  on command \"spaceout\" with text:\n    send \"${spaced(text)}\"",
@@ -135,5 +139,6 @@
   "plugin \"VibeCheck\":\n  needs scripts.run\n  use vibe-check": "plugin \"VibeCheck\":\n  needs commands.register\n  needs messages.send\n  on command \"vibe\":\n    send one of [\"✦ the vibes are immaculate ✦\", \"🌴 endless summer, endless mall 🌴\", \"📼 rewinding to a time that never was 📼\", \"🛍️ welcome to the mall, population: you 🛍️\", \"🌅 chasing a sunset that never sets 🌅\", \"💾 saving your aesthetic... done 💾\", \"🪩 disco ball energy detected 🪩\", \"🌊 floating on a sea of neon 🌊\", \"☎️ this call is being routed through 1987 ☎️\", \"🍹 sipping something pink by the fountain 🍹\"]",
   "plugin \"WaitForSlot\":\n  needs scripts.run\n  use wait-for-slot": "plugin \"WaitForSlot\":\n  needs voice.waitslot\n  use wait-for-slot",
   "plugin \"WebcamStartNotifier\":\n  needs scripts.run\n  use webcam-start-notifier": "plugin \"WebcamStartNotifier\":\n  needs voice.cameratone\n  use webcam-start-notifier",
-  "plugin \"WiderChannelList\":\n  needs appearance.style\n  style wider-channel-list\n  needs scripts.run\n  use wider-channel-list": "plugin \"WiderChannelList\":\n  needs appearance.style\n  style wider-channel-list"
+  "plugin \"WiderChannelList\":\n  needs appearance.style\n  style wider-channel-list\n  needs scripts.run\n  use wider-channel-list": "plugin \"WiderChannelList\":\n  needs appearance.style\n  style wider-channel-list",
+  "plugin \"WikiLookup\":\n  needs scripts.run\n  use wiki-lookup": "plugin \"WikiLookup\":\n  needs commands.register\n  needs reply.local\n  needs lookup.wikipedia\n  on command \"wiki\":\n    input \"message\" text\n    lookup wikipedia \"message\""
 }

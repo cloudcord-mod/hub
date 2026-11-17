@@ -7,6 +7,7 @@ const { createHash } = require("node:crypto");
 const { execFile, spawnSync } = require("node:child_process");
 const { pathToFileURL } = require("node:url");
 const queues = require("../../desktop/client/src/utils/cxTesting/cx-testing-queues.json");
+const convertedSources = require("../../desktop/client/src/utils/cxConvertedSources.json");
 
 const root = path.resolve(__dirname, "../..");
 const sourceFiles = {
@@ -16,9 +17,29 @@ const sourceFiles = {
 };
 const platforms = ["desktop", "mobile"];
 const reviewedConvertedPorts = new Map([
+    ["gpl/avatar-grabber", {
+        file: "avatar-grabber.cx",
+        scriptSha256: "63f8cc0ebec53a441fb66ff87d0423b821e5d122ece4105f27aa5a713e6bb37f",
+    }],
+    ["gpl/calculator", {
+        file: "calculator.cx",
+        scriptSha256: "0160c64e86b2595e6372a8d177b6743c85b84242736fb628d438e5f8dfdee0f9",
+    }],
     ["gpl/decode-base64", {
         file: "decode-base64.cx",
         scriptSha256: "5d7ad58849f433f36086043bbbeaf88fa934c6f301837dae945fb888c58606b8",
+    }],
+    ["gpl/friend-invites", {
+        file: "friend-invites.cx",
+        scriptSha256: "4fd122c686bff9b718e1092daa0c2e44f7cb6ba4a6b32718f9419761f1017a31",
+    }],
+    ["gpl/ship-calc", {
+        file: "ship-calc.cx",
+        scriptSha256: "77fa44318a9a0e8abfe1f7dfe86d447871890eccd17fa6939a29af7983bae2e1",
+    }],
+    ["gpl/wiki-lookup", {
+        file: "wiki-lookup.cx",
+        scriptSha256: "9724bb1ae4fb2432664ee6c0cfed2e67453a518611a38592f02b48ffce21dba8",
     }],
     ["discover-52", {
         file: "hide-blocked-and-ignored-messages.cx",
@@ -227,7 +248,7 @@ function csvField(value) {
 function writeReport(output, report) {
     fs.mkdirSync(path.dirname(output), { recursive: true });
     fs.writeFileSync(output, JSON.stringify(report, null, 2) + "\n");
-    const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Runtime parser", "Runtime parser detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail",
+    const header = ["Plugin ID", "Plugin", "Source group", "Tested implementation", "Syntax", "Syntax detail", "Runtime parser", "Runtime parser detail", "Desktop adapter", "Desktop detail", "Mobile adapter", "Mobile detail", "Desktop import", "Desktop import detail", "Mobile import", "Mobile import detail",
         "Desktop settings switches", "Mobile settings switches", "Command inputs", "Checked at", "Adapter source commit", "Adapter source modified", "Candidate pack SHA-256"];
     if (report.desktopModuleLoad) header.push("Desktop module load", "Module load error", "Module load warnings", "Desktop pack declared settings");
     if (report.desktopLifecycle) header.push("Desktop lifecycle (fixture)", "Desktop lifecycle detail", "Missed fixture lookups (Windows/Android export names)");
@@ -237,6 +258,7 @@ function writeReport(output, report) {
         entry.id, entry.name, entry.group, entry.implementation, entry.syntax.status, entry.syntax.reason,
         entry.parser?.status, entry.parser?.reason,
         entry.desktop.status, entry.desktop.reason, entry.mobile.status, entry.mobile.reason,
+        entry.imported?.desktop.status, entry.imported?.desktop.reason, entry.imported?.mobile.status, entry.imported?.mobile.reason,
         entry.desktop.settingsSwitches?.join("; "), entry.mobile.settingsSwitches?.join("; "),
         (entry.desktop.commandInputs ?? entry.mobile.commandInputs)?.join("; "),
         report.checkedAt, report.sources.adapters.commit, report.sources.adapters.modified,
@@ -294,7 +316,9 @@ async function main(args) {
     const packs = Object.fromEntries(Object.keys(sourceFiles).map(group => [group, readPack(sourceRoot, group)]));
     const packParser = path.join(sourceRoot, "core/src/cx/parse.js");
     const parse = fs.existsSync(packParser) ? (await import(pathToFileURL(packParser).href)).parse : undefined;
-    const { rows, ...adapterSuite } = runAdapterTests();
+    const { rows: tested, ...adapterSuite } = runAdapterTests();
+    const rows = tested.filter(row => !row.imported);
+    const imported = new Map(tested.filter(row => row.imported).map(row => [row.platform + ":" + row.sourceHash, row]));
     const packRunnerErrors = {};
     async function loadPackEvidence(script, evidenceFile) {
         if (evidenceFile) return JSON.parse(fs.readFileSync(evidenceFile, "utf8"));
@@ -372,6 +396,12 @@ async function main(args) {
         if (!source) {
             candidate.parser = blocked("Converted source is missing");
             continue;
+        }
+        const alias = source.replace(/^\uFEFF/, "").split(/\r?\n/).filter(line => !line.trimStart().startsWith("//")).join("\n").trim();
+        if (Object.hasOwn(convertedSources, alias)) {
+            const key = hash(alias);
+            candidate.imported = Object.fromEntries(platforms.map(platform => [platform,
+                adapterResult(imported.get(platform + ":" + key), "No import test result for this converted file")]));
         }
         try {
             parseRuntime(source);
@@ -487,10 +517,11 @@ async function main(args) {
         },
     };
     writeReport(output, report);
+    const importsPass = entry => !entry.imported || platforms.every(platform => entry.imported[platform].status === "Pass");
     if (testingLinks) {
         const bundled = [...additional.values()].map(entry => ({ ...entry, catalogName: entry.name }));
         const linked = [...candidates, ...bundled].filter(entry => entry.catalogName && entry.syntax.status === "Pass"
-            && platforms.every(platform => entry[platform].status === "Pass"));
+            && importsPass(entry) && platforms.every(platform => entry[platform].status === "Pass"));
         if (adapterSuite.status !== "Pass" || !linked.length) throw new Error("Run the shared adapter suite successfully before updating tester links");
         const links = Object.fromEntries(linked.sort((a, b) => a.id.localeCompare(b.id)).map(({ id, catalogName }) => [id, catalogName]));
         if (Object.keys(links).length !== linked.length) throw new Error("Duplicate tester plugin IDs");
@@ -500,7 +531,7 @@ async function main(args) {
     console.log(JSON.stringify({ candidateCount: candidates.length, totals, packRunnerErrors, desktopModuleLoad, desktopLifecycle, discoverFactory, discoverLifecycle,
         frequentErrors: report.errorGroups.slice(0, 8).map(({ check, message, count }) => ({ check, message, count })),
         configuration: report.configuration, additionalSharedPlugins: additional.size, report: output }, null, 2));
-    if (adapterSuite.status === "Fail" || Object.keys(packRunnerErrors).length || Object.values(totals).some(counts => counts.Fail) ||
+    if (adapterSuite.status === "Fail" || Object.keys(packRunnerErrors).length || !candidates.every(importsPass) || Object.values(totals).some(counts => counts.Fail) ||
         desktopModuleLoad?.counts.Fail || desktopLifecycle?.counts.Fail || discoverFactory?.counts.Fail || discoverLifecycle?.counts.Fail) process.exitCode = 1;
 }
 
