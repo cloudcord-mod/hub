@@ -1,8 +1,9 @@
 import queues from "./cx-testing-queues.json";
+import catalogLinks from "./cx-testing-catalog-links.json";
 
 type Platform = "windows" | "ios" | "android";
 export type TestingStatus = "Pass" | "Fail" | "Blocked";
-type Entry = { id: string; name: string; group: string; };
+type Entry = { id: string; name: string; group: string; catalogName?: string; };
 export type TestingAssignment = { userId: string; platform: Platform; label: string; entries: Entry[]; };
 type Build = { cloudcord: string; discord: string; };
 type Result = Build & { status: TestingStatus; error: string; };
@@ -46,7 +47,8 @@ const testers = new Map<string, { platform: Platform; label: string; queue: numb
     ["1205417504718192680", { platform: "ios", label: "Mobile 3", queue: 2 }],
     ["801526290623627315", { platform: "ios", label: "iOS shared plugin retests", queue: -1 }],
 ]);
-const entries = queues.map(queue => queue.map(([id, name, group]) => ({ id, name, group })));
+const links: Readonly<Partial<Record<string, string>>> = catalogLinks;
+const entries = queues.map(queue => queue.map(([id, name, group]) => ({ id, name, group, catalogName: links[id] })));
 const sharedGroup = "Shared declarative CX";
 const mobileOrder = [sharedGroup, "Discover CX preview", "Desktop CX pack"];
 const mobileQueues = entries.map(queue => [...queue].sort((a, b) => mobileOrder.indexOf(a.group) - mobileOrder.indexOf(b.group)));

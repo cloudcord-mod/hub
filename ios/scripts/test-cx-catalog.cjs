@@ -196,19 +196,21 @@ function writeReport(output, report) {
 async function main(args) {
     let sourceRoot = root;
     let output = path.join(root, "ios/dist/cx-test-results.json");
-    let desktopLoadFile, discoverLoadFile, enginePath;
+    let desktopLoadFile, discoverLoadFile, enginePath, testingLinks;
     for (let i = 0; i < args.length; i += 2) {
         const flag = args[i], value = args[i + 1];
-        if (!value || value.startsWith("--") || !["--sources", "--output", "--desktop-load", "--discover-load", "--engine"].includes(flag)) {
-            throw new Error("Usage: test-cx-catalog.cjs [--sources <candidate checkout>] [--engine <QuickJS package path>] [--desktop-load <report.json>] [--discover-load <report.json>] [--output <report.json>]");
+        if (!value || value.startsWith("--") || !["--sources", "--output", "--desktop-load", "--discover-load", "--engine", "--testing-links"].includes(flag)) {
+            throw new Error("Usage: test-cx-catalog.cjs [--sources <candidate checkout>] [--engine <QuickJS package path>] [--desktop-load <report.json>] [--discover-load <report.json>] [--output <report.json>] [--testing-links <catalog links.json>]");
         }
         if (flag === "--sources") sourceRoot = path.resolve(value);
         else if (flag === "--output") output = path.resolve(value);
         else if (flag === "--desktop-load") desktopLoadFile = path.resolve(value);
         else if (flag === "--discover-load") discoverLoadFile = path.resolve(value);
+        else if (flag === "--testing-links") testingLinks = path.resolve(value);
         else enginePath = path.resolve(value);
     }
     if (!/\.json$/i.test(output)) throw new Error("The report filename must end in .json");
+    if (testingLinks && (!/\.json$/i.test(testingLinks) || testingLinks === output)) throw new Error("Testing links require a separate JSON file");
 
     const packs = Object.fromEntries(Object.keys(sourceFiles).map(group => [group, readPack(sourceRoot, group)]));
     const packParser = path.join(sourceRoot, "core/src/cx/parse.js");
@@ -238,6 +240,7 @@ async function main(args) {
             if (found.some(Boolean)) {
                 matched.add(sourceHash);
                 return { id, name, group, implementation: (discover ? "Reviewed Discover port: " : "Declared shared port: ") + portableFile,
+                    catalogName: (found[0] ?? found[1]).name,
                     syntax: checkCandidate(id, entry, pack, parse), desktop: adapterResult(found[0]), mobile: adapterResult(found[1]) };
             }
         }
@@ -248,6 +251,7 @@ async function main(args) {
             const reason = !entry ? pack.error ?? "Plugin source missing from pack"
                 : "No adapter result matches this exact CX source";
             return { id, name, group, implementation: found.some(Boolean) ? "Exact shared CX source" : undefined,
+                catalogName: (found[0] ?? found[1])?.name,
                 syntax: found.some(Boolean) ? result("Pass") : checkCandidate(id, entry, pack, parse),
                 desktop: adapterResult(found[0], reason), mobile: adapterResult(found[1], reason) };
         }
@@ -258,6 +262,7 @@ async function main(args) {
             if (shared) {
                 matched.add(shared.sourceHash);
                 return { id, name, group, implementation: "Shared style port: " + shared.name,
+                    catalogName: shared.name,
                     syntax: checkCandidate(id, entry, pack, parse),
                     desktop: adapterResult(found[0]), mobile: adapterResult(found[1]) };
             }
@@ -267,6 +272,7 @@ async function main(args) {
             if (port) {
                 matched.add(original.sourceHash);
                 return { id, name, group, implementation: "Converter-backed shared port: " + port.name, implementationSource: original.sourceFile,
+                    catalogName: port.name,
                     syntax: checkCandidate(id, entry, pack, parse), desktop: adapterResult(matches[0]), mobile: adapterResult(matches[1]) };
             }
         }
@@ -361,6 +367,14 @@ async function main(args) {
         },
     };
     writeReport(output, report);
+    if (testingLinks) {
+        const linked = candidates.filter(entry => entry.catalogName && entry.syntax.status === "Pass"
+            && platforms.every(platform => entry[platform].status === "Pass"));
+        if (adapterSuite.status !== "Pass" || !linked.length) throw new Error("Run the shared adapter suite successfully before updating tester links");
+        const links = Object.fromEntries(linked.sort((a, b) => a.id.localeCompare(b.id)).map(({ id, catalogName }) => [id, catalogName]));
+        fs.writeFileSync(testingLinks, JSON.stringify(links, null, 2) + "\n");
+        console.log("Wrote " + linked.length + " tester links.");
+    }
     console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, desktopLifecycle, discoverFactory,
         configuration: report.configuration, additionalSharedPlugins: additional.size, report: output }, null, 2));
     if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) ||

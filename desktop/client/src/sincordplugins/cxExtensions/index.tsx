@@ -665,11 +665,16 @@ function AnonymousUploadButton({ upload }: { upload: Parameters<CxUploadAnonymis
     }}>{selected ? "Anonymous name" : "Original name"}</button>;
 }
 
-export function CxSettings() {
-    const [source, setSource] = useState("");
+function prepareCandidate(source: string) {
+    const review = reviewCx(source);
+    return { source, review, selected: review.appearanceOptions.filter(option => option.defaultOn).map(option => option.target) };
+}
+
+export function CxSettings({ initialSource = "" }: { initialSource?: string; } = {}) {
+    const [source, setSource] = useState(initialSource.length <= CX_INLINE_EDITOR_LIMIT ? initialSource : "");
     const [search, setSearch] = useState("");
     const [pages, setPages] = useState({ Plugins: 0, Themes: 0 });
-    const [candidate, setCandidate] = useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
+    const [candidate, setCandidate] = useState(() => initialSource ? prepareCandidate(initialSource) : undefined);
     const [, refreshOptions] = useState(0);
     const [status, setStatus] = useState("");
     const selection = useRef(0);
@@ -679,8 +684,7 @@ export function CxSettings() {
         selection.current++;
         setCandidate(undefined);
         try {
-            const preview = reviewCx(next);
-            setCandidate({ source: next, review: preview, selected: preview.appearanceOptions.filter(option => option.defaultOn).map(option => option.target) });
+            setCandidate(prepareCandidate(next));
             setStatus("");
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));

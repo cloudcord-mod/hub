@@ -1925,22 +1925,25 @@ function supportsMobileHide({ target }: { target: keyof typeof cxAppearanceTarge
     return !("desktopOnly" in cxAppearanceTargets[target]);
 }
 
-export default function CxExtensions() {
-    const [source, setSource] = React.useState("");
+function prepareCandidate(source: string) {
+    const review = reviewCx(source);
+    return { source, review, selected: review.appearanceOptions.filter(option => option.defaultOn && supportsMobileHide(option)).map(option => option.target) };
+}
+
+export default function CxExtensions({ initialSource = "" }: { initialSource?: string; } = {}) {
+    const [source, setSource] = React.useState(initialSource.length <= CX_INLINE_EDITOR_LIMIT ? initialSource : "");
     const [showCatalog, setShowCatalog] = React.useState(false);
     const [search, setSearch] = React.useState("");
     const [pages, setPages] = React.useState({ Plugins: 0, Themes: 0 });
     const [status, setStatus] = React.useState("");
-    const [candidate, setCandidate] = React.useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
+    const [candidate, setCandidate] = React.useState(() => initialSource ? prepareCandidate(initialSource) : undefined);
     const [, refreshOptions] = React.useState(0);
     const searchText = search.trim().toLowerCase();
 
     function review(next: string) {
         setCandidate(undefined);
         try {
-            const preview = reviewCx(next);
-            setCandidate({ source: next, review: preview, selected: preview.appearanceOptions
-                .filter(option => option.defaultOn && supportsMobileHide(option)).map(option => option.target) });
+            setCandidate(prepareCandidate(next));
             setStatus("");
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));

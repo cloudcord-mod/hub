@@ -1,7 +1,7 @@
 import { useTestingReview } from "./index";
 
 /** Web renderer shared by the Windows desktop builds. */
-export function TestingPluginsWeb({ react, assignment, storage, build, authorized, copy }) {
+export function TestingPluginsWeb({ react, assignment, storage, build, authorized, copy, openCxPort = undefined }) {
     const review = useTestingReview(react, assignment, storage, build, authorized);
     const [exportMessage, setExportMessage] = react.useState("");
     const input = {
@@ -45,6 +45,11 @@ export function TestingPluginsWeb({ react, assignment, storage, build, authorize
                         <p>{review.entry.id} · {review.entry.group}</p>
                         <p>{review.review?.status ?? "Pending"} · {review.index + 1} of {review.count}</p>
                     </div>
+                    {review.entry.catalogName && openCxPort && <div>
+                        {button("Review " + review.entry.catalogName, () => {
+                            if (authorized()) openCxPort(review.entry.catalogName);
+                        }, disabled)}
+                    </div>}
                     <label>Exact error or blocker
                         <textarea rows={3} style={input} maxLength={3000} value={review.error} onChange={event => review.setError(event.target.value)} />
                     </label>

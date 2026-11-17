@@ -1,9 +1,11 @@
 import { createFileBackend } from "@core/vendetta/storage";
 import { testingStorageKey, useTestingReview, type TestingAssignment } from "@lib/api/cxTesting";
+import { cxCatalog } from "@lib/api/cxCatalog";
 import { writeFile } from "@lib/api/native/fs";
 import { NativeClientInfoModule } from "@lib/api/native/modules";
 import { currentTestingAssignment, useMobileTestingAssignment } from "@lib/api/pluginTesting";
-import { React } from "@metro/common";
+import { wrapOnPress } from "@lib/ui/settings/patches/shared";
+import { NavigationNative, React } from "@metro/common";
 import { Button, Stack, Text, TextInput } from "@metro/common/components";
 import { version } from "bunny-build-info";
 import { ScrollView, View } from "react-native";
@@ -22,6 +24,12 @@ function TestingReview({ assignment }: { assignment: TestingAssignment; }) {
     const cloudcord = typeof revision === "string" && revision ? version + " " + revision : version;
     const review = useTestingReview(React, assignment, storage, { cloudcord, discord }, authorized);
     const [exportMessage, setExportMessage] = React.useState("");
+    const navigation = NavigationNative.useNavigation();
+    const catalogName = review.entry?.catalogName;
+    const portSource = catalogName && cxCatalog.plugins.find(entry => entry.name === catalogName)?.source;
+    const openCxPort = React.useMemo(() => catalogName && portSource
+        ? wrapOnPress(undefined, navigation, async () => require("@core/ui/settings/pages/CxExtensions"), catalogName, { initialSource: portSource }, "push")
+        : undefined, [catalogName, navigation, portSource]);
 
     async function saveResults() {
         const text = review.export();
@@ -54,6 +62,8 @@ function TestingReview({ assignment }: { assignment: TestingAssignment; }) {
                         <Text variant="heading-lg/semibold">{review.entry.name}</Text>
                         <Text variant="text-sm/normal">{review.entry.id} · {review.entry.group}</Text>
                         <Text variant="text-sm/medium">{review.review?.status ?? "Pending"} · {review.index + 1} of {review.count}</Text>
+                        {openCxPort && <Button size="md" variant="secondary" text={"Review " + catalogName}
+                            disabled={disabled} onPress={() => { if (authorized()) void openCxPort(); }} />}
                         {field("Exact error or blocker", review.error, review.setError, 3000)}
                         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                             <Button size="md" variant="primary" text="Approve" disabled={disabled} onPress={() => void review.save("Pass")} />

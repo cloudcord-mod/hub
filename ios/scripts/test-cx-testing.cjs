@@ -26,6 +26,8 @@ assert.equal(getTestingAssignment("999999999999999999", "windows"), undefined);
 assert.equal(getTestingAssignment(undefined, "ios"), undefined);
 const assignment = getTestingAssignment("801526290623627315", "ios");
 assert(assignment.entries.every(entry => entry.group === "Shared declarative CX"));
+assert.equal(getTestingAssignment("1429837711602094201", "windows").entries.find(entry => entry.id === "gpl/image-link")?.catalogName, "ImageLink");
+assert.equal(assignment.entries.find(entry => entry.id === "mobile/no-reply-ping")?.catalogName, "NoReplyPing");
 assert.notEqual(testingStorageKey(assignment), testingStorageKey(getTestingAssignment("1569533258461614171", "ios")));
 
 let position = 0;

@@ -892,6 +892,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             searchFor(name);
             click(render(), name);
         };
+        const colorPort = cxCatalog.plugins.find(entry => entry.name === "ColorText").source;
+        const linkedReview = page({ initialSource: colorPort });
+        assert.equal(find(linkedReview, item => item.props.value === colorPort)?.props.value, colorPort);
+        assert.ok(button(linkedReview, "Allow for this session"));
+        assert.equal(button(linkedReview, "Disable ColorText"), undefined);
+        assert.equal(registered.color, undefined);
+        states.length = 0;
         selectCatalog("QuickMention");
         click(render(), "Allow for this session");
         selectedChannel = "guild-channel";

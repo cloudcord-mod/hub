@@ -147,6 +147,7 @@ jobs:
           cp "../ios/runtime/src/lib/api/pluginTesting.ts" "src/lib/api/pluginTesting.ts"
           cp "../desktop/client/src/utils/cxTesting/index.ts" "src/lib/api/cxTesting/index.ts"
           cp "../desktop/client/src/utils/cxTesting/cx-testing-queues.json" "src/lib/api/cxTesting/cx-testing-queues.json"
+          cp "../desktop/client/src/utils/cxTesting/cx-testing-catalog-links.json" "src/lib/api/cxTesting/cx-testing-catalog-links.json"
           cp ../desktop/client/src/utils/cx*.ts src/lib/api/
           mkdir -p src/core/plugins/shared
           cp "../ios/runtime/src/core/plugins/shared/sendMessage.ts" "src/core/plugins/shared/sendMessage.ts"
