@@ -40,6 +40,17 @@ vm.runInNewContext(code, {
     }),
 });
 const { activateCx, createCxSession, parseCx, reviewCx } = moduleBox.exports;
+const { resolveCxModule } = moduleBox.exports;
+const adapterContracts = require("../../desktop/client/src/utils/cxAdapterContracts.json");
+for (const contract of Object.values(adapterContracts)) {
+    let called = 0;
+    const module = Object.fromEntries(contract.properties.map(property => [property, () => { called++; }]));
+    assert.equal(resolveCxModule(contract.properties, () => module), module);
+    assert.equal(called, 0, "Checking an adapter must not execute Discord actions");
+    delete module[contract.properties[0]];
+    assert.throws(() => resolveCxModule(contract.properties, () => module), /missing/);
+}
+assert.throws(() => resolveCxModule(["getToken"], () => { assert.fail("Token lookup must not run"); }), /no shared module contract/);
 const convertedSources = require("../../desktop/client/src/utils/cxConvertedSources.json");
 for (const [converted, implementation] of Object.entries(convertedSources)) {
     assert.deepEqual(parseCx(converted), parseCx(implementation), "Converted file must use its reviewed implementation");

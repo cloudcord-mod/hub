@@ -29,7 +29,7 @@ import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
 import { getCxMessageGesture } from "@lib/api/cx";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
-import { createCxUserNotes, CX_USER_NOTE_LIMIT, runCxCleanups } from "@lib/api/cx";
+import { createCxUserNotes, CX_USER_NOTE_LIMIT, resolveCxModule, runCxCleanups } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
 import type { ComponentType, Context, ReactElement, ReactNode } from "react";
@@ -1320,13 +1320,10 @@ function registerBypassPinPrompt(enabled: () => boolean) {
 }
 
 function registerPinShortcut(enabled: () => boolean) {
-    const pins = findByProps("pinMessage", "unpinMessage");
+    const pins = resolveCxModule(["pinMessage", "unpinMessage"], () => findByProps("pinMessage", "unpinMessage"));
     const permissions = findByProps("Fonts", "Permissions")?.Permissions;
     const permission = permissions?.PIN_MESSAGES ?? permissions?.MANAGE_MESSAGES;
     const permissionStore = findByStoreName("PermissionStore");
-    if (typeof pins?.pinMessage !== "function" || typeof pins?.unpinMessage !== "function") {
-        throw new Error("Discord's pin actions are unavailable");
-    }
     return registerMessageMenuActions(enabled, ({ message, channel }, close) => {
         if (!message || !channel) return [];
         const canPin = () => !channel.guild_id || permission != null && permissionStore?.can?.(permission, channel) === true;

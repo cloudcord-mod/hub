@@ -150,6 +150,7 @@ jobs:
           cp "../desktop/client/src/utils/cxTesting/cx-testing-catalog-links.json" "src/lib/api/cxTesting/cx-testing-catalog-links.json"
           cp ../desktop/client/src/utils/cx*.ts src/lib/api/
           cp ../desktop/client/src/utils/cxConvertedSources.json src/lib/api/cxConvertedSources.json
+          cp ../desktop/client/src/utils/cxAdapterContracts.json src/lib/api/cxAdapterContracts.json
           mkdir -p src/core/plugins/shared
           cp "../ios/runtime/src/core/plugins/shared/sendMessage.ts" "src/core/plugins/shared/sendMessage.ts"
           mkdir -p src/core/ui/settings/pages/PluginBrowser

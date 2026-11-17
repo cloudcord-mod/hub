@@ -1,9 +1,9 @@
 // Static inventory only. Never loads or executes plugin code.
 const fs = require("node:fs");
 const path = require("node:path");
-const ts = require("../../core/node_modules/typescript");
+const ts = require("../../desktop/client/node_modules/typescript");
 
-const root = path.resolve(__dirname, "../..");
+const root = path.resolve(process.argv[2] ?? path.join(__dirname, "../.."));
 const read = file => JSON.parse(fs.readFileSync(path.join(root, file), "utf8"));
 const desktop = read("examples/cx/catalog-gpl/dist/cloudcord-gpl-pack.json");
 const mobile = read("ios/dist/cloudcord-mobile-cx.json");
@@ -111,6 +111,7 @@ const result = {
     features: frequency("features"),
     entries: inventory,
 };
-const output = path.join(root, "ios/dist/cx-api-inventory.json");
+const output = path.resolve(process.argv[3] ?? path.join(root, "ios/dist/cx-api-inventory.json"));
+fs.mkdirSync(path.dirname(output), { recursive: true });
 fs.writeFileSync(output, JSON.stringify(result, null, 2) + "\n");
 console.log(JSON.stringify({ ...result.totals, modules: Object.keys(result.modules).length, accesses: Object.keys(result.accesses).length, permissions: Object.keys(result.permissions).length, output }));

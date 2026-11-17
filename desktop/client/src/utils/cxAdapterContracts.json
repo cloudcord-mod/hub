@@ -1,0 +1,234 @@
+{
+  "[\"getCurrentUser\"]": {
+    "properties": [
+      "getCurrentUser"
+    ],
+    "types": {
+      "getCurrentUser": "function"
+    }
+  },
+  "[\"getGuild\"]": {
+    "properties": [
+      "getGuild"
+    ],
+    "types": {
+      "getGuild": "function"
+    }
+  },
+  "[\"openUserSettings\"]": {
+    "properties": [
+      "openUserSettings"
+    ],
+    "types": {
+      "openUserSettings": "function"
+    }
+  },
+  "[\"getGuilds\"]": {
+    "properties": [
+      "getGuilds"
+    ],
+    "types": {
+      "getGuilds": "function"
+    }
+  },
+  "[\"getUser\"]": {
+    "properties": [
+      "getUser"
+    ],
+    "types": {
+      "getUser": "function"
+    }
+  },
+  "[\"relativeTimeRounding\"]": {
+    "properties": [
+      "relativeTimeRounding"
+    ],
+    "types": {
+      "relativeTimeRounding": "function"
+    }
+  },
+  "[\"getStickersByGuildId\"]": {
+    "properties": [
+      "getStickersByGuildId"
+    ],
+    "types": {
+      "getStickersByGuildId": "function"
+    }
+  },
+  "[\"cloneDeep\"]": {
+    "properties": [
+      "cloneDeep"
+    ],
+    "types": {
+      "cloneDeep": "function"
+    }
+  },
+  "[\"pinMessage\"]": {
+    "properties": [
+      "pinMessage"
+    ],
+    "types": {
+      "pinMessage": "function"
+    }
+  },
+  "[\"unpinMessage\"]": {
+    "properties": [
+      "unpinMessage"
+    ],
+    "types": {
+      "unpinMessage": "function"
+    }
+  },
+  "[\"getRolesSnapshot\"]": {
+    "properties": [
+      "getRolesSnapshot"
+    ],
+    "types": {
+      "getRolesSnapshot": "function"
+    }
+  },
+  "[\"getSortedRoles\"]": {
+    "properties": [
+      "getSortedRoles"
+    ],
+    "types": {
+      "getSortedRoles": "function"
+    }
+  },
+  "[\"parseGuildEventDescription\"]": {
+    "properties": [
+      "parseGuildEventDescription"
+    ],
+    "types": {
+      "parseGuildEventDescription": "function"
+    }
+  },
+  "[\"getGuildBannerURL\"]": {
+    "properties": [
+      "getGuildBannerURL"
+    ],
+    "types": {
+      "getGuildBannerURL": "function"
+    }
+  },
+  "[\"parseTopic\"]": {
+    "properties": [
+      "parseTopic"
+    ],
+    "types": {
+      "parseTopic": "function"
+    }
+  },
+  "[\"getOrEnsurePrivateChannel\"]": {
+    "properties": [
+      "getOrEnsurePrivateChannel"
+    ],
+    "types": {
+      "getOrEnsurePrivateChannel": "function"
+    }
+  },
+  "[\"getApplicationIconURL\"]": {
+    "properties": [
+      "getApplicationIconURL"
+    ],
+    "types": {
+      "getApplicationIconURL": "function"
+    }
+  },
+  "[\"openPrivateChannel\"]": {
+    "properties": [
+      "openPrivateChannel"
+    ],
+    "types": {
+      "openPrivateChannel": "function"
+    }
+  },
+  "[\"toggleSelfDeaf\"]": {
+    "properties": [
+      "toggleSelfDeaf"
+    ],
+    "types": {
+      "toggleSelfDeaf": "function"
+    }
+  },
+  "[\"toggleSelfMute\"]": {
+    "properties": [
+      "toggleSelfMute"
+    ],
+    "types": {
+      "toggleSelfMute": "function"
+    }
+  },
+  "[\"relativeTimeThreshold\"]": {
+    "properties": [
+      "relativeTimeThreshold"
+    ],
+    "types": {
+      "relativeTimeThreshold": "function"
+    }
+  },
+  "[\"filesize\"]": {
+    "properties": [
+      "filesize"
+    ],
+    "types": {
+      "filesize": "function"
+    }
+  },
+  "[\"truncatechars\"]": {
+    "properties": [
+      "truncatechars"
+    ],
+    "types": {
+      "truncatechars": "function"
+    }
+  },
+  "[\"setUploads\"]": {
+    "properties": [
+      "setUploads"
+    ],
+    "types": {
+      "setUploads": "function"
+    }
+  },
+  "[\"parseInlineReply\"]": {
+    "properties": [
+      "parseInlineReply"
+    ],
+    "types": {
+      "parseInlineReply": "function"
+    }
+  },
+  "[\"setLoopback\"]": {
+    "properties": [
+      "setLoopback"
+    ],
+    "types": {
+      "setLoopback": "function"
+    }
+  },
+  "[\"setDisableLocalVideo\"]": {
+    "properties": [
+      "setDisableLocalVideo"
+    ],
+    "types": {
+      "setDisableLocalVideo": "function"
+    }
+  },
+  "[\"toggleLocalMute\"]": {
+    "properties": [
+      "toggleLocalMute"
+    ],
+    "types": {
+      "toggleLocalMute": "function"
+    }
+  },
+  "[\"toggleLocalSoundboardMute\"]": {
+    "properties": [
+      "toggleLocalSoundboardMute"
+    ],
+    "types": {
+      "toggleLocalSoundboardMute": "function"
+    }
+  }
+}

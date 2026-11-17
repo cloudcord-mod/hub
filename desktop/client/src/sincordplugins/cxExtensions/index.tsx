@@ -24,7 +24,7 @@ import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type C
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
 import { selectCxAppearanceOption } from "@utils/cx";
-import { runCxCleanups, unindentCxCode } from "@utils/cx";
+import { resolveCxModule, runCxCleanups, unindentCxCode } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -283,6 +283,7 @@ function registerQuoteMessage(includeLink: boolean) {
 }
 
 function registerPinShortcut() {
+    const pins = resolveCxModule(["pinMessage", "unpinMessage"], () => PinActions);
     let active = true;
     const permission = PermissionsBits.PIN_MESSAGES ?? PermissionsBits.MANAGE_MESSAGES;
     const patch: NavContextMenuPatchCallback = (children, { message }) => {
@@ -297,7 +298,7 @@ function registerPinShortcut() {
             try {
                 const latest = MessageStore.getMessage(channel.id, action.id);
                 const current = latest && getCxPinAction(latest, channel.id, canPin());
-                if (current?.method === action.method) await PinActions[current.method](channel, current.id);
+                if (current?.method === action.method) await pins[current.method](channel, current.id);
             } catch {
                 showToast("Couldn’t change the message pin.");
             }
