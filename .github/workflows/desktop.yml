@@ -10,7 +10,6 @@ on:
   push:
     paths:
       - "desktop/**"
-      - "config/cx-testing*"
       - "ios/scripts/test-cx-testing.cjs"
       - "ios/scripts/test-custom-social-render.cjs"
       - ".github/workflows/desktop.yml"

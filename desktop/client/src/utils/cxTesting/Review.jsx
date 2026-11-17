@@ -1,4 +1,4 @@
-import { useTestingReview } from "./cx-testing.ts";
+import { useTestingReview } from "./index";
 
 /** Web renderer shared by the Windows desktop builds. */
 export function TestingPluginsWeb({ react, assignment, storage, build, authorized, copy }) {

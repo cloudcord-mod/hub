@@ -5,7 +5,7 @@ const { buildSync } = require("esbuild");
 
 const moduleBox = { exports: {} };
 const { outputFiles: [bundle] } = buildSync({
-    entryPoints: [path.join(__dirname, "../../config/cx-testing.ts")],
+    entryPoints: [path.join(__dirname, "../../desktop/client/src/utils/cxTesting/index.ts")],
     bundle: true, format: "cjs", write: false,
 });
 vm.runInNewContext(bundle.text, { module: moduleBox });

@@ -1,7 +1,7 @@
 import { IS_WINDOWS } from "@utils/constants";
 import { React, UserStore } from "@webpack/common";
 
-import { getTestingAssignment, testingUserId, useTestingUserId } from "../../../../../../../config/cx-testing";
+import { getTestingAssignment, testingUserId, useTestingUserId } from "@utils/cxTesting";
 
 const platform = IS_WINDOWS ? "windows" : "";
 export const currentAssignment = () => getTestingAssignment(testingUserId(UserStore), platform);

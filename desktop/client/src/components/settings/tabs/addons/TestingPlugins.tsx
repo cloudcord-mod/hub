@@ -2,8 +2,8 @@ import * as DataStore from "@api/DataStore";
 import { copyToClipboard } from "@utils/clipboard";
 import { React } from "@webpack/common";
 
-import { testingStorageKey } from "../../../../../../../config/cx-testing";
-import { TestingPluginsWeb } from "../../../../../../../config/cx-testing-web";
+import { testingStorageKey } from "@utils/cxTesting";
+import { TestingPluginsWeb } from "@utils/cxTesting/Review";
 import { currentAssignment, useTestingPluginsAssignment } from "./testingAccess";
 
 export default function TestingPlugins() {
