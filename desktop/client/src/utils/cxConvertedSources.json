@@ -23,6 +23,7 @@
   "plugin \"CopyEmojiMarkdown\":\n  needs scripts.run\n  use copy-emoji-markdown": "plugin \"CopyEmojiMarkdown\":\n  needs emoji.clipboard\n  use copy-emoji-markdown",
   "plugin \"CopyFileContents\":\n  needs appearance.style\n  style copy-file-contents\n  needs scripts.run\n  use copy-file-contents": "plugin \"CopyFileContents\":\n  needs attachments.clipboard\n  use copy-text-attachment",
   "plugin \"CopyMediaLink\":\n  needs scripts.run\n  use copy-media-link": "plugin \"CopyMediaLink\":\n  needs media.clipboard\n  use copy-media-link",
+  "plugin \"CopyProfileColors\":\n  needs scripts.run\n  use copy-profile-colors": "plugin \"CopyProfileColors\":\n  needs profilemenu.copy\n  on profile menu copy profile-colors\n  on profile menu copy server-profile-colors",
   "plugin \"CopyStickerLinks\":\n  needs scripts.run\n  use copy-sticker-links": "plugin \"CopyStickerLinks\":\n  needs stickers.links\n  use sticker-links",
   "plugin \"CopyUserMention\":\n  needs scripts.run\n  use copy-user-mention": "plugin \"CopyUserMention\":\n  needs profilemenu.copy\n  on profile menu copy user-mention",
   "plugin \"CopyUserURLs\":\n  needs scripts.run\n  use copy-user-urls": "plugin \"CopyUserURLs\":\n  needs profilemenu.copy\n  on profile menu copy user-url",

@@ -25,6 +25,10 @@ const reviewedConvertedPorts = new Map([
         file: "calculator.cx",
         scriptSha256: "0160c64e86b2595e6372a8d177b6743c85b84242736fb628d438e5f8dfdee0f9",
     }],
+    ["gpl/copy-profile-colors", {
+        file: "copy-profile-colors.cx",
+        scriptSha256: "a746a6737c62095b883461a09d9dc418461216a3c000fd7908a435482834a227",
+    }],
     ["gpl/decode-base64", {
         file: "decode-base64.cx",
         scriptSha256: "5d7ad58849f433f36086043bbbeaf88fa934c6f301837dae945fb888c58606b8",
