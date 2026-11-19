@@ -303,6 +303,45 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
     display: block;
 }
 
+.cpx-preview-modes {
+    margin-block: 8px;
+    flex-wrap: wrap;
+}
+
+.cpx-live-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.cpx-live-badges img {
+    width: 19px;
+    height: 19px;
+    object-fit: contain;
+}
+
+.cpx-chat-preview {
+    display: flex;
+    gap: 10px;
+    border-radius: 10px;
+    background: var(--cpx-surface);
+    color: var(--text-normal);
+    padding: 12px;
+    overflow-wrap: anywhere;
+}
+
+.cpx-chat-preview > img {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.cpx-chat-preview p {
+    margin-top: 4px;
+}
+
 .cpx-badge-preview span {
     color: var(--text-muted, #b6b6c5);
     font-size: 12px;

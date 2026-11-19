@@ -4390,6 +4390,7 @@ jobs:
               const S = require("@core/ui/settings/components/ProfileStudio");
               const [, redraw] = useReducer((x: number) => x + 1, 0);
               const [name, setName] = useState("");
+              const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null);
               const items: SavedProfile[] = Array.isArray((rootSettings as any).fakeProfileSaved) ? (rootSettings as any).fakeProfileSaved : [];
               const commit = (next: SavedProfile[]) => { (rootSettings as any).fakeProfileSaved = next; redraw(); };
               const currentJson = JSON.stringify(savedSnapshot(current));
@@ -4431,17 +4432,18 @@ jobs:
                   { text: "Cancel", style: "cancel" },
                   { text: "Delete", style: "destructive", onPress: () => commit(items.filter(other => other.id !== item.id)) }
               ]);
-              const rename = (item: SavedProfile) => {
-                  const prompt = (Alert as any).prompt;
-                  if (typeof prompt !== "function") return;
-                  prompt("Rename", undefined, (text: string) => { if (text?.trim()) commit(items.map(other => other.id === item.id ? { ...other, name: text.trim().slice(0, 40) } : other)); }, "plain-text", item.name);
+              const saveName = () => {
+                  const value = renaming?.name.trim();
+                  if (!renaming || !value) return;
+                  commit(items.map(item => item.id === renaming.id ? { ...item, name: value } : item));
+                  setRenaming(null);
               };
               const hex = (value: any) => typeof value === "string" && value ? value : typeof value === "number" ? "#" + value.toString(16).padStart(6, "0") : undefined;
               return <View style={{ gap: 20 }}>
                   <S.Panel>
                       <S.Section title="Save your profile" description="Keep copies of your custom profile and switch between them. Saved on this device.">
                           <S.Field label="Name"><TextInput value={name} placeholder={"Main, Alt or Profile " + (items.length + 1)} maxLength={40} onChangeText={setName} /></S.Field>
-                          <S.Button label="Save current profile" primary onPress={saveCurrent} />
+                          <S.Button label="Save current look" primary onPress={saveCurrent} />
                       </S.Section>
                   </S.Panel>
                   {!items.length ? <Text variant="text-sm/medium" color="text-muted">No saved profiles yet. Set up your profile, then save it here to come back to it later.</Text> : null}
@@ -4449,7 +4451,12 @@ jobs:
                       const data = item.data || {};
                       const active = JSON.stringify(data) === currentJson;
                       const colors = data.profileColorsEnabled;
-                      const badges = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([, , , icon]) => icon).filter(Boolean);
+                      const rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({ id, iconSrc }));
+                      if (data.nitroEnabled) rows.push({ id: nitroBadgeId(data.nitroMonths), iconSrc: milestoneIcon(data.nitroMonths, NITRO_ICONS) });
+                      if (data.boostMonths > 0) rows.push({ id: "boost", iconSrc: boosterIcon(data.boostMonths) });
+                      const gift = GIFT_LEVELS[data.giftLevel];
+                      if (gift) rows.push({ id: "gifting", iconSrc: gift.icon });
+                      const badges = [...new Set(applyBadgeLayout(rows, data).map(row => row.iconSrc).filter(Boolean))];
                       return <View key={item.id} style={{ gap: 10 }}>
                           <S.DiscordProfileCard name={data.displayName || realUser?.globalName || realUser?.username || "You"} username={data.username || realUser?.username || "username"} pronouns={data.pronouns}
                               avatar={data.avatarMedia?.uri || realAvatar} banner={data.bannerMedia?.uri} primary={colors ? hex(data.primaryColor) : undefined} secondary={colors ? hex(data.accentColor) : undefined}
@@ -4457,10 +4464,16 @@ jobs:
                               customStatus={data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : undefined} bio={data.bio}
                               activity={data.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === data.customActivity?.type)?.label || "", name: data.customActivity.name, details: data.customActivity.details } : null} />
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 }}>
-                              <Pressable style={{ flex: 1, gap: 2 }} onLongPress={() => rename(item)} accessibilityHint="Long-press to rename">
-                                  <Text variant="text-md/bold" color="text-normal" numberOfLines={1}>{item.name}</Text>
+                              <View style={{ flex: 1, gap: 2 }}>
+                                  {renaming?.id === item.id
+                                      ? <TextInput accessibilityLabel="Look name" value={renaming.name} maxLength={40} onChangeText={value => setRenaming({ id: item.id, name: value })} onSubmitEditing={saveName} />
+                                      : <Text variant="text-md/bold" color="text-normal" numberOfLines={1}>{item.name}</Text>}
                                   {active ? <Text variant="text-xs/bold" style={{ color: "#23A55A" }}>● In use</Text> : <Text variant="text-xs/medium" color="text-muted">Saved {new Date(item.savedAt).toLocaleDateString()}</Text>}
-                              </Pressable>
+                              </View>
+                              {renaming?.id === item.id ? <>
+                                  <S.Button label="Save name" disabled={!renaming.name.trim()} onPress={saveName} />
+                                  <S.Button label="Cancel" onPress={() => setRenaming(null)} />
+                              </> : <S.Button label="Rename" onPress={() => setRenaming({ id: item.id, name: item.name })} />}
                           </View>
                           <View style={{ flexDirection: "row", gap: 8 }}>
                               <S.Button label={active ? "In use" : "Use profile"} primary disabled={active} grow onPress={() => { onUse(item.data); redraw(); showToast("Now using \u201c" + item.name + "\u201d"); }} />
@@ -4896,6 +4909,10 @@ jobs:
                               accent={preview.profileColorsEnabled ? preview.primaryColor : undefined} status={preview.presenceStatus || "online"}
                               enabled={preview.enabled} onToggle={() => update("enabled", !preview.enabled, true)} syncLabel={rootSettings.fakeProfileLocalOnly ? "This device" : "Synced"}
                               onPreview={openPreview} quickLook={showPreview} onQuickLook={() => setShowPreview(!showPreview)} />
+                          <View style={{ flexDirection: "row", gap: 8 }}>
+                              <K.Button label="Badges" grow onPress={() => setActiveTab("badges")} />
+                              <K.Button label="Saved looks" grow onPress={() => setActiveTab("saved")} />
+                          </View>
                           {showPreview ? <Card><View style={{ padding: 16 }}>
                               <K.PreviewCard name={preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "You"} username={preview.username || realCurrentUser?.username || "username"} pronouns={preview.pronouns}
                                   avatar={preview.avatarMedia?.uri || (() => { try { return realCurrentUser?.getAvatarURL?.() || undefined; } catch { return undefined; } })()} banner={preview.bannerMedia?.uri}
@@ -4904,6 +4921,8 @@ jobs:
                                   status={preview.customActivity?.type === 1 && preview.customActivity.url && streamURL(preview.customActivity.url) ? "streaming" : preview.presenceStatus || "online"}
                                   customStatus={preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : undefined}
                                   activity={preview.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === preview.customActivity?.type)?.label || "", name: preview.customActivity.name, details: preview.customActivity.details } : null}
+                                  badges={[...new Set(editableBadgeRows().filter(row => !preview.hiddenBadgeIds.includes(row.id)).map(row => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : undefined)).filter(Boolean))] as string[]}
+                                  onBadges={() => setActiveTab("badges")} onSaved={() => setActiveTab("saved")}
                                   bio={preview.bio} frame={preview.profileFrame ? catalog?.frames.find(item => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : undefined}
                                   effect={preview.profileEffect ? catalog?.effects.find(item => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : undefined} />
                           </View></Card> : null}

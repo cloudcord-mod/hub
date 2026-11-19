@@ -1791,6 +1791,13 @@ function BadgeLayoutEditor({ data, userId, onChange }: { data: CustomProfileData
     </div>;
 }
 
+function profilePreviewBadges(data: CustomProfileData, userId: string) {
+    const hidden = new Set(data.hiddenBadgeIds);
+    return badgeLayoutRows(data, userId).flatMap(badge => badge.iconSrc && !hidden.has(badge.id)
+        ? [{ id: badge.id, icon: badge.iconSrc, label: badge.description || badge.id }]
+        : []);
+}
+
 function CustomProfileModal({ rootProps }: { rootProps: any; }) {
     const myId = AuthenticationStore?.getId?.() || "";
     const [selectedAccountId, setSelectedAccountId] = React.useState(myId);
@@ -2016,7 +2023,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
 
     return (<ModalRoot {...rootProps} size="large" className="cpx-root">
         <ModalHeader separator={false} className="cpx-header">
-            <div className="cpx-header-title"><EditIcon size={18} /><span>Custom Profile</span></div>
+            <div className="cpx-header-title"><EditIcon size={18} /><span>Profile Studio</span></div>
             {accounts.length > 1 && <div className="cpx-account">
                 <Select
                     options={accounts.map((acc: any) => ({ value: acc.id, label: acc.globalName || acc.username }))}
@@ -2035,6 +2042,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                 <TabList value={tab} onChange={setTab} />
                 <div className="cpx-panel" id="cpx-panel" role="tabpanel" aria-labelledby={`cpx-tab-${tab}`} key={tab}>{panels[tab]}</div>
                 <ProfilePreview data={data} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar}
+                    badges={profilePreviewBadges(data, selectedAccountId)} onBadges={() => setTab("badges")} onSaved={() => setTab("saved")}
                     decorationUrl={currentDecoration?.url} nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined}
                     effectName={data.profileEffect ? catalogData?.effects.find(item => item.skuId === data.profileEffect?.skuId)?.title || "Selected" : undefined}
                     frameName={data.profileFrame ? catalogData?.frames.find(item => item.skuId === data.profileFrame?.skuId)?.label || "Selected" : undefined} />
@@ -3063,7 +3071,7 @@ function SavedProfilesPanel({ current, onLoad, fallbackName, fallbackUsername, f
         <Section title="Saved profiles" description="Keep copies of your custom profile and switch between them. Saved on this device.">
             <div className="cpx-inline">
                 <input className="cpx-input" value={name} maxLength={40} placeholder={`Name, like "Main" or "Profile ${items.length + 1}"`} onChange={event => setName(event.currentTarget.value)} onKeyDown={event => { if (event.key === "Enter") saveCurrent(); }} />
-                <button type="button" className="cpx-btn cpx-btn-primary" onClick={saveCurrent}>Save current profile</button>
+                <button type="button" className="cpx-btn cpx-btn-primary" onClick={saveCurrent}>Save current look</button>
             </div>
         </Section>
         {!items.length && <span className="cpx-hint">No saved profiles yet. Set up your profile, then save it here to come back to it later.</span>}
@@ -3071,7 +3079,7 @@ function SavedProfilesPanel({ current, onLoad, fallbackName, fallbackUsername, f
             {items.map(item => {
                 const data = item.data;
                 const active = JSON.stringify(data) === currentJson;
-                const badges = (() => { try { return badgeLayoutRows(data, UserStore.getCurrentUser()?.id ?? "").filter(badge => badge.iconSrc).map(badge => ({ id: String(badge.id), icon: String(badge.iconSrc), label: String(badge.description || "") })); } catch { return []; } })();
+                const badges = profilePreviewBadges(data, UserStore.getCurrentUser()?.id ?? "");
                 const rename = () => { commit(items.map(other => other.id === item.id ? { ...other, name: renameText.trim() || other.name } : other)); setRenaming(null); };
                 return <div key={item.id} className="cpx-saved-item">
                     <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar}

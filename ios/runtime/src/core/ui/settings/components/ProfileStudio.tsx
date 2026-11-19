@@ -54,7 +54,7 @@ export const STUDIO_TABS: { id: StudioTab; label: string; blurb: string; icons: 
     { id: "dates", label: "Dates", blurb: "Account created and member since", icons: ["CalendarIcon", "ClockIcon"] },
     { id: "custom", label: "Custom badges", blurb: "Upload your own badge (beta)", icons: ["ImageIcon", "StarIcon"] },
     { id: "templates", label: "Templates", blurb: "Browse and publish community profile looks", icons: ["GridSquareIcon", "SparklesIcon"] },
-    { id: "saved", label: "Saved", blurb: "Switch between saved copies of your profile", icons: ["BookmarkIcon", "FolderIcon", "StarIcon"] },
+    { id: "saved", label: "Saved looks", blurb: "Switch between saved copies of your profile", icons: ["BookmarkIcon", "FolderIcon", "StarIcon"] },
     { id: "others", label: "Others", blurb: "Other profiles, fake server and extras", icons: ["PeopleIcon", "UserIcon"] }
 ];
 const tabInfo = (tab: StudioTab) => STUDIO_TABS.find(item => item.id === tab) ?? STUDIO_TABS[0];
@@ -104,7 +104,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
             </Pressable>
             <View style={{ flexDirection: "row", gap: GAP.sm }}>
                 <Action label="Preview in Discord" onPress={onPreview} primary grow />
-                <Action label={quickLook ? "Hide quick look" : "Quick look"} onPress={onQuickLook} grow />
+                <Action label={quickLook ? "Hide live preview" : "Live preview"} onPress={onQuickLook} grow />
             </View>
         </View>
     </View>;
@@ -382,14 +382,27 @@ export function BadgeGrid({ items }: { items: BadgeChoice[] }) {
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect }: {
+export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }: {
     name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; decoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
+    badges?: string[]; onBadges?: () => void; onSaved?: () => void;
 }) {
+    const [layout, setLayout] = useState<"Profile" | "Popout" | "Chat">("Profile");
     const edge = primary || C.brand;
     const card = C.page();
     return <View style={{ gap: GAP.sm }}>
-        <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
+        <Text variant="heading-md/bold" style={{ color: C.text() }}>Live preview</Text>
+        <View style={{ flexDirection: "row", gap: GAP.sm }}>
+            {(["Profile", "Popout", "Chat"] as const).map(mode => <Action key={mode} label={mode} grow primary={layout === mode} onPress={() => setLayout(mode)} />)}
+        </View>
+        {layout === "Chat" ? <View style={{ flexDirection: "row", gap: GAP.md, padding: GAP.md, borderRadius: R.md, backgroundColor: card }}>
+            {avatar ? <Image source={{ uri: avatar }} style={{ width: 38, height: 38, borderRadius: 19 }} /> : null}
+            <View style={{ flex: 1, gap: 4 }}>
+                <Text variant="text-md/bold" style={{ color: C.text() }}>{name}{tagText ? ` · ${tagText}` : ""}</Text>
+                <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
+            </View>
+        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent}
+            decoration={decoration} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} badges={badges} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: accent || edge }}>
                 {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
             </View>
@@ -408,6 +421,9 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                     </View> : null}
                 </View>
                 <Text variant="text-sm/medium" numberOfLines={1} style={{ color: C.muted() }}>@{username}{pronouns ? ` · ${pronouns}` : ""}</Text>
+                {badges.length ? <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                    {badges.map(uri => <Image key={uri} source={{ uri }} resizeMode="contain" style={{ width: 20, height: 20 }} />)}
+                </View> : null}
                 {customStatus ? <Text variant="text-sm/medium" numberOfLines={2} style={{ color: C.text() }}>{customStatus}</Text> : null}
                 {activity?.name ? <View style={{ padding: GAP.sm, borderRadius: R.sm, backgroundColor: C.panel(), gap: 2 }}>
                     <Text variant="text-xs/bold" style={{ color: C.muted() }}>{activity.verb.toUpperCase()}</Text>
@@ -420,8 +436,11 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                     {effect ? <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, backgroundColor: C.panel() }}><Text variant="text-xs/semibold" style={{ color: C.muted() }}>Effect: {effect}</Text></View> : null}
                 </View> : null}
             </View>
+        </View>}
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: GAP.sm }}>
+            {onBadges && <Action label="Badges" onPress={onBadges} />}
+            {onSaved && <Action label="Saved looks" onPress={onSaved} />}
         </View>
-        <Text variant="text-xs/medium" style={{ color: C.muted() }}>Quick look only. Discord draws frames and effects on your real profile.</Text>
     </View>;
 }
 
