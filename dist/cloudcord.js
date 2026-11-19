@@ -20946,7 +20946,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   grow: true
                 }),
                 /* @__PURE__ */ jsx(Action, {
-                  label: quickLook ? "Hide quick look" : "Quick look",
+                  label: quickLook ? "Hide live preview" : "Live preview",
                   onPress: onQuickLook,
                   grow: true
                 })
@@ -22025,7 +22025,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }, index))
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect }) {
+  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }) {
+    var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.brand;
     var card = C3.page();
     return /* @__PURE__ */ jsxs(import_react_native24.View, {
@@ -22033,7 +22034,90 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         gap: GAP.sm
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsx(Text, {
+          variant: "heading-md/bold",
+          style: {
+            color: C3.text()
+          },
+          children: "Live preview"
+        }),
+        /* @__PURE__ */ jsx(import_react_native24.View, {
+          style: {
+            flexDirection: "row",
+            gap: GAP.sm
+          },
+          children: [
+            "Profile",
+            "Popout",
+            "Chat"
+          ].map((mode) => /* @__PURE__ */ jsx(Action, {
+            label: mode,
+            grow: true,
+            primary: layout === mode,
+            onPress: () => setLayout(mode)
+          }, mode))
+        }),
+        layout === "Chat" ? /* @__PURE__ */ jsxs(import_react_native24.View, {
+          style: {
+            flexDirection: "row",
+            gap: GAP.md,
+            padding: GAP.md,
+            borderRadius: R2.md,
+            backgroundColor: card
+          },
+          children: [
+            avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+              source: {
+                uri: avatar
+              },
+              style: {
+                width: 38,
+                height: 38,
+                borderRadius: 19
+              }
+            }) : null,
+            /* @__PURE__ */ jsxs(import_react_native24.View, {
+              style: {
+                flex: 1,
+                gap: 4
+              },
+              children: [
+                /* @__PURE__ */ jsxs(Text, {
+                  variant: "text-md/bold",
+                  style: {
+                    color: C3.text()
+                  },
+                  children: [
+                    name,
+                    tagText ? ` \xB7 ${tagText}` : ""
+                  ]
+                }),
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-sm/medium",
+                  style: {
+                    color: C3.muted()
+                  },
+                  children: "Hey! This is how your profile looks in chat."
+                })
+              ]
+            })
+          ]
+        }) : layout === "Popout" ? /* @__PURE__ */ jsx(DiscordProfileCard, {
+          name,
+          username,
+          pronouns,
+          avatar,
+          banner,
+          primary,
+          secondary: accent,
+          decoration,
+          status,
+          customStatus,
+          bio,
+          activity,
+          tagText,
+          badges
+        }) : /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
             borderRadius: R2.lg,
             padding: 3,
@@ -22193,6 +22277,23 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     pronouns ? ` \xB7 ${pronouns}` : ""
                   ]
                 }),
+                badges.length ? /* @__PURE__ */ jsx(import_react_native24.View, {
+                  style: {
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: 6
+                  },
+                  children: badges.map((uri) => /* @__PURE__ */ jsx(import_react_native24.Image, {
+                    source: {
+                      uri
+                    },
+                    resizeMode: "contain",
+                    style: {
+                      width: 20,
+                      height: 20
+                    }
+                  }, uri))
+                }) : null,
                 customStatus ? /* @__PURE__ */ jsx(Text, {
                   variant: "text-sm/medium",
                   numberOfLines: 2,
@@ -22291,12 +22392,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-xs/medium",
+        /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
-            color: C3.muted()
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: GAP.sm
           },
-          children: "Quick look only. Discord draws frames and effects on your real profile."
+          children: [
+            onBadges && /* @__PURE__ */ jsx(Action, {
+              label: "Badges",
+              onPress: onBadges
+            }),
+            onSaved && /* @__PURE__ */ jsx(Action, {
+              label: "Saved looks",
+              onPress: onSaved
+            })
+          ]
         })
       ]
     });
@@ -22757,7 +22868,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         },
         {
           id: "saved",
-          label: "Saved",
+          label: "Saved looks",
           blurb: "Switch between saved copies of your profile",
           icons: [
             "BookmarkIcon",
@@ -30698,6 +30809,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [, redraw] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
     var [name, setName] = (0, import_react9.useState)("");
+    var [renaming, setRenaming] = (0, import_react9.useState)(null);
     var items = Array.isArray(rootSettings.fakeProfileSaved) ? rootSettings.fakeProfileSaved : [];
     var commit = (next) => {
       rootSettings.fakeProfileSaved = next;
@@ -30803,17 +30915,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         onPress: () => commit(items.filter((other) => other.id !== item.id))
       }
     ]);
-    var rename = (item) => {
-      var prompt = import_react_native28.Alert.prompt;
-      if (typeof prompt !== "function")
+    var saveName = () => {
+      var value = renaming?.name.trim();
+      if (!renaming || !value)
         return;
-      prompt("Rename", void 0, (text) => {
-        if (text?.trim())
-          commit(items.map((other) => other.id === item.id ? {
-            ...other,
-            name: text.trim().slice(0, 40)
-          } : other));
-      }, "plain-text", item.name);
+      commit(items.map((item) => item.id === renaming.id ? {
+        ...item,
+        name: value
+      } : item));
+      setRenaming(null);
     };
     var hex = (value) => typeof value === "string" && value ? value : typeof value === "number" ? "#" + value.toString(16).padStart(6, "0") : void 0;
     return /* @__PURE__ */ jsxs(import_react_native28.View, {
@@ -30836,7 +30946,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               }),
               /* @__PURE__ */ jsx(S2.Button, {
-                label: "Save current profile",
+                label: "Save current look",
                 primary: true,
                 onPress: saveCurrent
               })
@@ -30852,7 +30962,29 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var data = item.data || {};
           var active = JSON.stringify(data) === currentJson;
           var colors = data.profileColorsEnabled;
-          var badges = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([, , , icon3]) => icon3).filter(Boolean);
+          var rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({
+            id,
+            iconSrc
+          }));
+          if (data.nitroEnabled)
+            rows.push({
+              id: nitroBadgeId(data.nitroMonths),
+              iconSrc: milestoneIcon(data.nitroMonths, NITRO_ICONS)
+            });
+          if (data.boostMonths > 0)
+            rows.push({
+              id: "boost",
+              iconSrc: boosterIcon(data.boostMonths)
+            });
+          var gift = GIFT_LEVELS[data.giftLevel];
+          if (gift)
+            rows.push({
+              id: "gifting",
+              iconSrc: gift.icon
+            });
+          var badges = [
+            ...new Set(applyBadgeLayout(rows, data).map((row) => row.iconSrc).filter(Boolean))
+          ];
           return /* @__PURE__ */ jsxs(import_react_native28.View, {
             style: {
               gap: 10
@@ -30878,43 +31010,71 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   details: data.customActivity.details
                 } : null
               }),
-              /* @__PURE__ */ jsx(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native28.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 10,
                   paddingHorizontal: 2
                 },
-                children: /* @__PURE__ */ jsxs(import_react_native28.Pressable, {
-                  style: {
-                    flex: 1,
-                    gap: 2
-                  },
-                  onLongPress: () => rename(item),
-                  accessibilityHint: "Long-press to rename",
-                  children: [
-                    /* @__PURE__ */ jsx(Text, {
-                      variant: "text-md/bold",
-                      color: "text-normal",
-                      numberOfLines: 1,
-                      children: item.name
-                    }),
-                    active ? /* @__PURE__ */ jsx(Text, {
-                      variant: "text-xs/bold",
-                      style: {
-                        color: "#23A55A"
-                      },
-                      children: "\u25CF In use"
-                    }) : /* @__PURE__ */ jsxs(Text, {
-                      variant: "text-xs/medium",
-                      color: "text-muted",
-                      children: [
-                        "Saved ",
-                        new Date(item.savedAt).toLocaleDateString()
-                      ]
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    style: {
+                      flex: 1,
+                      gap: 2
+                    },
+                    children: [
+                      renaming?.id === item.id ? /* @__PURE__ */ jsx(TextInput4, {
+                        accessibilityLabel: "Look name",
+                        value: renaming.name,
+                        maxLength: 40,
+                        onChangeText: (value) => setRenaming({
+                          id: item.id,
+                          name: value
+                        }),
+                        onSubmitEditing: saveName
+                      }) : /* @__PURE__ */ jsx(Text, {
+                        variant: "text-md/bold",
+                        color: "text-normal",
+                        numberOfLines: 1,
+                        children: item.name
+                      }),
+                      active ? /* @__PURE__ */ jsx(Text, {
+                        variant: "text-xs/bold",
+                        style: {
+                          color: "#23A55A"
+                        },
+                        children: "\u25CF In use"
+                      }) : /* @__PURE__ */ jsxs(Text, {
+                        variant: "text-xs/medium",
+                        color: "text-muted",
+                        children: [
+                          "Saved ",
+                          new Date(item.savedAt).toLocaleDateString()
+                        ]
+                      })
+                    ]
+                  }),
+                  renaming?.id === item.id ? /* @__PURE__ */ jsxs(Fragment, {
+                    children: [
+                      /* @__PURE__ */ jsx(S2.Button, {
+                        label: "Save name",
+                        disabled: !renaming.name.trim(),
+                        onPress: saveName
+                      }),
+                      /* @__PURE__ */ jsx(S2.Button, {
+                        label: "Cancel",
+                        onPress: () => setRenaming(null)
+                      })
+                    ]
+                  }) : /* @__PURE__ */ jsx(S2.Button, {
+                    label: "Rename",
+                    onPress: () => setRenaming({
+                      id: item.id,
+                      name: item.name
                     })
-                  ]
-                })
+                  })
+                ]
               }),
               /* @__PURE__ */ jsxs(import_react_native28.View, {
                 style: {
@@ -31725,6 +31885,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             quickLook: showPreview,
             onQuickLook: () => setShowPreview(!showPreview)
           }),
+          /* @__PURE__ */ jsxs(import_react_native28.View, {
+            style: {
+              flexDirection: "row",
+              gap: 8
+            },
+            children: [
+              /* @__PURE__ */ jsx(K2.Button, {
+                label: "Badges",
+                grow: true,
+                onPress: () => setActiveTab("badges")
+              }),
+              /* @__PURE__ */ jsx(K2.Button, {
+                label: "Saved looks",
+                grow: true,
+                onPress: () => setActiveTab("saved")
+              })
+            ]
+          }),
           showPreview ? /* @__PURE__ */ jsx(Card2, {
             children: /* @__PURE__ */ jsx(import_react_native28.View, {
               style: {
@@ -31755,6 +31933,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   name: preview.customActivity.name,
                   details: preview.customActivity.details
                 } : null,
+                badges: [
+                  ...new Set(editableBadgeRows().filter((row) => !preview.hiddenBadgeIds.includes(row.id)).map((row) => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : void 0)).filter(Boolean))
+                ],
+                onBadges: () => setActiveTab("badges"),
+                onSaved: () => setActiveTab("saved"),
                 bio: preview.bio,
                 frame: preview.profileFrame ? catalog?.frames.find((item) => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : void 0,
                 effect: preview.profileEffect ? catalog?.effects.find((item) => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : void 0
@@ -58485,7 +58668,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "632b8af1d96596d71cb2156b669eadbe0aa872d8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "bffba03c9995afb01a5feb20b69992fb12e18843";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
