@@ -2,7 +2,7 @@ const fs = require('fs');
 const vm = require('vm');
 const assert = require('assert/strict');
 const source = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
-const helper = source.slice(source.indexOf('          function addOfficialBadge('), source.indexOf('          function showGiftingBadgeOverlay('));
+const helper = source.slice(source.indexOf('          function addOfficialBadge('), source.indexOf('          function openBadgeDirectoryFallback('));
 const rows = new Map();
 const context = { badgeRenderProps: rows, CLOUDCORD_BADGE_ICON: 'logo.png', safeStore: () => ({ theme: 'dark' }), addRenderedBadge: (result, id) => { result.push({ id }); rows.set(id, {}); } };
 vm.createContext(context);

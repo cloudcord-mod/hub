@@ -8,6 +8,7 @@
  */
 
 import { logger } from "./logger";
+import type { CSSProperties } from "react";
 import { profileStorage, ProfileStorageKey } from "./storage";
 import "./style.css";
 import "./editor.css";
@@ -617,9 +618,9 @@ function nitroSinceFor(level: number, savedDate?: string): Date {
     const months = NITRO_LEVEL_MONTHS[level] ?? 0;
     const next = NITRO_LEVEL_MONTHS[level + 1];
     const saved = monthsAgo(months, savedDate);
-    const age = (Date.now() - saved.getTime()) / (30.44 * 86400_000);
-    if (age >= months && (next === undefined || age < next)) return saved;
-    return monthsAgo(months);
+    const tierStart = monthsAgo(months);
+    if (saved <= tierStart && (next === undefined || saved > monthsAgo(next))) return saved;
+    return tierStart;
 }
 
 function monthsAgo(months: number, explicitDate?: string): Date {
@@ -667,7 +668,7 @@ function applyNativeProfileMetadata(target: any, data: CustomProfileData, includ
     const nitroLevel = Number(data.nitroLevel ?? -1);
     const hasNitro = data.nitro === true && Number.isInteger(nitroLevel) && nitroLevel >= 0 && nitroLevel < NITRO_LEVEL_MONTHS.length;
     if (hasNitro || replace) {
-        const nitroSince = hasNitro ? monthsAgo(NITRO_LEVEL_MONTHS[nitroLevel], data.nitroSince) : null;
+        const nitroSince = hasNitro ? nitroSinceFor(nitroLevel, data.nitroSince) : null;
         target.premiumType = hasNitro ? 2 : 0;
         target.premium_type = target.premiumType;
         target.premiumSince = nitroSince;
@@ -1663,6 +1664,8 @@ function BadgePicker({ selected, onChange, nitroType, onNitroType, giftLevel, on
         onCustomIds([...next]);
     };
     const hasOldName = customIds.includes("oldname");
+    const nitro = NITRO_LEVELS[nitroType];
+    const gift = GIFT_LEVELS[giftLevel];
     return <div className="cpx-badges">
         <Switch label="Hide my real badges" description="When you pick badges here, show only these instead of your real Discord badges." checked={replaceRealBadges} onChange={onReplaceRealBadges} />
 
@@ -1684,6 +1687,16 @@ function BadgePicker({ selected, onChange, nitroType, onNitroType, giftLevel, on
             <BadgeCard radio label="None" active={giftLevel === -1} onClick={() => onGiftLevel(-1)} />
             {GIFT_LEVELS.map((level, index) => <BadgeCard radio key={level.id} label={level.name} icon={level.icon} active={giftLevel === index} onClick={() => onGiftLevel(index)} />)}
         </BadgeGroup>
+        {(nitro || gift) && <div className="cpx-badge-previews" aria-label="Selected cosmetic badges">
+            {nitro && <div className="cpx-badge-preview" style={{ "--cpx-badge-accent": nitro.light } as CSSProperties}>
+                <img src={nitro.art} alt="" width={52} height={52} />
+                <div><strong>{nitroType === 0 ? "Nitro" : `Nitro ${nitro.label}`}</strong><span>Cosmetic preview</span></div>
+            </div>}
+            {gift && <div className="cpx-badge-preview" style={{ "--cpx-badge-accent": gift.light } as CSSProperties}>
+                <img src={gift.icon} alt="" width={52} height={52} />
+                <div><strong>{gift.name}</strong><span>Gifting badge preview</span></div>
+            </div>}
+        </div>}
 
         <BadgeGroup title="Special">
             <BadgeCard label="Completed a Quest" icon="https://cdn.discordapp.com/badge-icons/7d9ae358c8c5e118768335dbe68b4fb8.png" active={customIds.includes("quest")} onClick={() => toggleId("quest")} />
@@ -2563,8 +2576,8 @@ function buildProfileBadges(userId: string): ProfileBadge[] {
         const nl = profileData.nitroLevel ?? -1;
         const bm = profileData.boostMonths ?? -1;
         const gl = profileData.giftLevel ?? -1;
-        const hasNitroFake = profileData.nitro === true && nl >= 0 && nl < NITRO_LEVELS.length;
-        const hasBoostFake = bm >= 0 && bm < BOOST_ICONS.length;
+        const hasNitroFake = profileData.nitro === true && Number.isInteger(nl) && nl >= 0 && nl < NITRO_LEVELS.length;
+        const hasBoostFake = Number.isInteger(bm) && bm >= 0 && bm < BOOST_ICONS.length;
         const f = profileData.badgeFlags ?? 0; const badges: ProfileBadge[] = [];
         // Keep Discord's badge sequence while retaining CloudCord's full Nitro
         // milestone hover card on Windows.
@@ -2580,7 +2593,7 @@ function buildProfileBadges(userId: string): ProfileBadge[] {
             props: { style },
             position: 0
         });
-        if (gl >= 0 && gl < GIFT_LEVELS.length) {
+        if (Number.isInteger(gl) && gl >= 0 && gl < GIFT_LEVELS.length) {
             const gift = GIFT_LEVELS[gl];
             badges.push({ id: "sp_gifting", description: gift.name, iconSrc: gift.icon, position: 0, props: { style } });
         }
@@ -2642,12 +2655,12 @@ function rewriteFetchedProfile(action: any) {
     try {
         raw.badges = discordProfileBadges(userId, data, raw.badges);
         const level = Number(data.nitroLevel ?? -1);
-        if (data.nitro === true && level >= 0 && level < NITRO_LEVEL_MONTHS.length) {
+        if (data.nitro === true && Number.isInteger(level) && level >= 0 && level < NITRO_LEVEL_MONTHS.length) {
             raw.premium_type = 2;
             raw.premium_since = nitroSinceFor(level, data.nitroSince).toISOString();
         }
         const boost = Number(data.boostMonths ?? -1);
-        if (boost >= 0 && boost < BOOST_LEVEL_MONTHS.length) raw.premium_guild_since = monthsAgo(BOOST_LEVEL_MONTHS[boost]).toISOString();
+        if (Number.isInteger(boost) && boost >= 0 && boost < BOOST_LEVEL_MONTHS.length) raw.premium_guild_since = monthsAgo(BOOST_LEVEL_MONTHS[boost]).toISOString();
     } catch (e) { logger.warn("Rewriting fetched profile failed", e); }
     return false;
 }

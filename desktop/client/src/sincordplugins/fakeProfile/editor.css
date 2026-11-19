@@ -275,3 +275,36 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 .cpx-tpl-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .cpx-tpl-chip { border: 1px solid var(--cpx-border, rgba(255,255,255,.12)); background: transparent; color: var(--cpx-muted); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 .cpx-tpl-chip[aria-pressed="true"] { color: #fff; background: var(--brand-500, #5865f2); border-color: transparent; }
+.cpx-badge-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cpx-badge-preview {
+    display: flex;
+    flex: 1 1 190px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--cpx-badge-accent) 28%, transparent);
+    background: color-mix(in srgb, var(--cpx-badge-accent) 9%, var(--background-secondary, #252530));
+    color: var(--text-normal, #f0f0f5);
+}
+
+.cpx-badge-preview img {
+    flex: none;
+    object-fit: contain;
+}
+
+.cpx-badge-preview strong,
+.cpx-badge-preview span {
+    display: block;
+}
+
+.cpx-badge-preview span {
+    color: var(--text-muted, #b6b6c5);
+    font-size: 12px;
+    margin-top: 3px;
+}

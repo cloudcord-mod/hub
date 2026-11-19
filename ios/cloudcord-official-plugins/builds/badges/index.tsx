@@ -15,9 +15,6 @@ interface SharedProfile {
     nitro?: boolean;
     nitroLevel?: number;
     nitroSince?: string;
-    createdAt?: string;
-    signupDate?: string;
-    joinedSince?: string;
     giftLevel?: number;
 }
 
@@ -55,17 +52,24 @@ const SHARED_PROFILE_API = "https://getcloudcord.com";
 const NITRO_MONTHS = [0, 1, 3, 6, 12, 24, 36, 60, 72];
 const GIFT_COUNTS = [1, 2, 3, 6, 10, 20] as const;
 function nativeProfileInput(input: any, profile: SharedProfile) {
-    const nitroLevel = Number.isInteger(profile.nitroLevel) ? Math.max(0, Math.min(NITRO_MONTHS.length - 1, profile.nitroLevel!)) : 0;
-    const sinceText = profile.nitroSince || profile.createdAt || profile.signupDate || profile.joinedSince;
-    const premiumSince = sinceText ? new Date(sinceText.length === 10 ? `${sinceText}T12:00:00Z` : sinceText) : new Date();
-    if (!sinceText) premiumSince.setMonth(premiumSince.getMonth() - NITRO_MONTHS[nitroLevel]);
-    const giftLevel = Number.isInteger(profile.giftLevel) ? Math.max(0, Math.min(GIFT_COUNTS.length - 1, profile.giftLevel!)) : -1;
+    const configuredNitro = profile.nitroLevel ?? (profile.nitro === true ? 0 : -1);
+    const hasNitro = profile.nitro !== false && Number.isInteger(configuredNitro) && configuredNitro >= 0 && configuredNitro < NITRO_MONTHS.length;
+    const fallback = new Date();
+    const day = fallback.getDate();
+    fallback.setDate(1);
+    fallback.setMonth(fallback.getMonth() - (NITRO_MONTHS[configuredNitro] ?? 0));
+    fallback.setDate(Math.min(day, new Date(fallback.getFullYear(), fallback.getMonth() + 1, 0).getDate()));
+    const sinceText = profile.nitroSince?.slice(0, 10);
+    const saved = new Date(`${sinceText}T12:00:00Z`);
+    const premiumSince = Number.isFinite(saved.getTime()) && saved <= new Date() && saved.toISOString().slice(0, 10) === sinceText ? saved : fallback;
+    const configuredGift = profile.giftLevel ?? -1;
+    const giftLevel = Number.isInteger(configuredGift) && configuredGift >= 0 && configuredGift < GIFT_COUNTS.length ? configuredGift : -1;
     const giftCount = giftLevel >= 0 ? GIFT_COUNTS[giftLevel] : undefined;
     const nativeFields = {
-        premiumType: profile.nitro === true || Number.isInteger(profile.nitroLevel) ? 2 : input?.premiumType,
-        premiumSince: profile.nitro === true || Number.isInteger(profile.nitroLevel) ? premiumSince : input?.premiumSince,
-        premium_type: profile.nitro === true || Number.isInteger(profile.nitroLevel) ? 2 : input?.premium_type,
-        premium_since: profile.nitro === true || Number.isInteger(profile.nitroLevel) ? premiumSince.toISOString() : input?.premium_since,
+        premiumType: hasNitro ? 2 : input?.premiumType,
+        premiumSince: hasNitro ? premiumSince : input?.premiumSince,
+        premium_type: hasNitro ? 2 : input?.premium_type,
+        premium_since: hasNitro ? premiumSince.toISOString() : input?.premium_since,
         giftCount: giftCount ?? input?.giftCount,
         giftingBadgeTier: giftLevel >= 0 ? giftLevel + 1 : input?.giftingBadgeTier,
         gift_count: giftCount ?? input?.gift_count,

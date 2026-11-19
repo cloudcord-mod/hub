@@ -912,7 +912,6 @@ jobs:
           const simpleSheets = findByProps("showSimpleActionSheet") as any;
           // Discord's own premium gifting action sheet.  Keeping this lazy is
           // important because the premium module is split-loaded on mobile.
-          const openGiftingBadgeInfoActionSheet = findByNameLazy("openGiftingBadgeInfoActionSheet", false) as any;
           const LinearGradient = (findByProps("LinearGradient") as any)?.LinearGradient as any;
 
           const NITRO_DURATIONS = [0, 1, 3, 6, 12, 24, 36, 60, 72];
@@ -1966,29 +1965,10 @@ jobs:
               if (row) { row.tintColor = tintColor; row.style = { tintColor }; }
           }
 
-          function showGiftingBadgeOverlay(selectedLabel?: string) {
-              try {
-                  const index = Math.max(0, GIFT_LEVELS.findIndex(gift => selectedLabel?.startsWith(gift.name)));
-                  const gift = GIFT_LEVELS[index];
-                  const opener = typeof openGiftingBadgeInfoActionSheet === "function"
-                      ? openGiftingBadgeInfoActionSheet
-                      : openGiftingBadgeInfoActionSheet?.default ?? openGiftingBadgeInfoActionSheet?.openGiftingBadgeInfoActionSheet;
-                  if (typeof opener !== "function") throw new Error("Discord gifting badge overlay is unavailable");
-
-                  // These are Discord's native field names across the supported
-                  // mobile builds. Unknown keys are intentionally harmless.
-                  opener({
-                      giftCount: gift.count,
-                      giftingBadgeTier: index + 1,
-                      gifting_badge_tier: index + 1,
-                      tier: index + 1,
-                      selectedTier: index + 1,
-                      source: "PROFILE_BADGE"
-                  });
-              } catch (error: any) {
-                  diagnostics.last = error?.message || "Could not open gifting badges";
-                  Alert.alert("Gifting Badge", "Discord's native gifting badge overlay is unavailable in this Discord version.");
-              }
+          function openBadgeDirectoryFallback() {
+              void Linking.openURL("https://discord.com/feature/badges").catch(error => {
+                  diagnostics.last = error?.message || "Could not open Badge Directory";
+              });
           }
 
           function selectedBadgeObjects(existing: any, forEditor = false) {
@@ -2268,13 +2248,12 @@ jobs:
           function addMonths(date: Date, months: number) { const next = new Date(date); next.setMonth(next.getMonth() + months); return next; }
           // Discord picks the Nitro tier from the "since" date, so a saved date only counts inside the chosen tier.
           function nitroSinceFor(months: number, saved?: string) {
-              const next = NITRO_DURATIONS[NITRO_DURATIONS.indexOf(months) + 1];
-              const date = typeof saved === "string" && /^\d{4}-\d{2}-\d{2}/.test(saved) ? new Date(saved.slice(0, 10) + "T12:00:00Z") : null;
-              if (date && Number.isFinite(date.getTime())) {
-                  const age = (Date.now() - date.getTime()) / (30.44 * 86400000);
-                  if (age >= months && (next === undefined || age < next)) return date;
-              }
-              return monthsAgo(months);
+              const index = NITRO_DURATIONS.indexOf(months);
+              const next = index >= 0 ? NITRO_DURATIONS[index + 1] : undefined;
+              const date = profileDate(saved);
+              const tierStart = monthsAgo(months);
+              if (date && date <= tierStart && (next === undefined || date > monthsAgo(next))) return date;
+              return tierStart;
           }
           // Discord's tiered activity badges, with tier names and thresholds from its badge directory.
           const ACTIVITY_BADGES: { key: string; badgeId: number; title: string; tiers: [string, number][]; label: (amount: number) => string }[] = [
@@ -2517,23 +2496,10 @@ jobs:
                               // forward tintColor to its inner image. Render the
                               // official mark with an explicit RN Image tint.
                               if (String(props.id || "").startsWith("cloudcord-official-")) {
-                                  return <Pressable accessibilityRole="button" accessibilityLabel={String(props.label)} onPress={() => Alert.alert(String(props.label))}><Image source={props.source} resizeMode="contain" style={{ width: 20, height: 20, tintColor: props.tintColor }} /></Pressable>;
+                                  return <Pressable accessibilityRole="button" accessibilityLabel={String(props.label)} onPress={rendered.props.onPress ?? openBadgeDirectoryFallback}><Image source={props.source} resizeMode="contain" style={{ width: 20, height: 20, tintColor: props.tintColor }} /></Pressable>;
                               }
                               Object.assign(rendered.props, props);
-                              if (String(props.id || "").includes("gifting")) {
-                                  rendered.props.onPress = () => showGiftingBadgeOverlay(String(props.label || ""));
-                                  rendered.props.accessibilityRole = "button";
-                                  return;
-                              }
                           }
-                          // Discord's default tap opens its badges tab. Show the badge's own name and
-                          // description instead, like the tooltip on desktop.
-                          const label = String(rendered.props.label || rendered.props.description || rendered.props.tooltip || rendered.props.accessibilityLabel || "").trim();
-                          if (!label) return;
-                          const ours = /^(?:cloudcord-|fakeprofile-)/.test(renderedId);
-                          const detail = String(rendered.props.description && rendered.props.description !== label ? rendered.props.description : "");
-                          rendered.props.onPress = () => Alert.alert(label, [detail, ours ? "A CloudCord badge. People using CloudCord can see it." : ""].filter(Boolean).join(String.fromCharCode(10, 10)) || undefined);
-                          rendered.props.accessibilityRole = "button";
                       });
                       diagnostics.patches += 1;
                   } catch {}
@@ -5107,6 +5073,14 @@ jobs:
                                   </K.Section>
                                   <K.Section title="Nitro badge" description="Changes with how long you've had Nitro.">
                                       <K.BadgeGrid items={[{ key: "none", label: "None", active: !preview.nitroEnabled, onPress: () => update("nitroEnabled", false, true) }, ...NITRO_DURATIONS.map(months => ({ key: String(months), label: NITRO_LABELS.get(months) || durationLabel(months), icon: milestoneIcon(months, NITRO_ICONS), active: preview.nitroEnabled && preview.nitroMonths === months, onPress: () => { update("nitroEnabled", true, true); update("nitroMonths", months, true); } }))]} />
+                                      {preview.nitroEnabled ? <View style={{ gap: 8 }}>
+                                          <Text variant="text-sm/bold" color="text-normal">Cosmetic subscriber date</Text>
+                                          <TextInput key={preview.nitroMonths} accessibilityLabel="Cosmetic subscriber date" defaultValue={preview.nitroSince ?? ""} placeholder="YYYY-MM-DD" placeholderTextColor="#777" autoCorrect={false} maxLength={10} keyboardType="numbers-and-punctuation" onEndEditing={event => {
+                                              const value = event.nativeEvent.text.trim();
+                                              if (value !== (preview.nitroSince ?? "")) update("nitroSince", value, true);
+                                          }} style={{ color: "#fff", backgroundColor: "#1e1f22", borderRadius: 9, padding: 12 }} />
+                                          <Text variant="text-sm/normal" color="text-muted">Subscriber since {shortDate(nitroSinceFor(preview.nitroMonths, preview.nitroSince))}</Text>
+                                      </View> : null}
                                   </K.Section>
                                   <K.Section title="Server booster">
                                       <K.BadgeGrid items={BOOST_DURATIONS.map(months => ({ key: String(months), label: boosterLabel(months), icon: months ? milestoneIcon(months, BOOST_ICONS) : undefined, active: preview.boostMonths === months, onPress: () => update("boostMonths", months, true) }))} />
