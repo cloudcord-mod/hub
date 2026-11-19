@@ -25733,25 +25733,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
     }
   }
-  function showGiftingBadgeOverlay(selectedLabel) {
-    try {
-      var index = Math.max(0, GIFT_LEVELS.findIndex((gift2) => selectedLabel?.startsWith(gift2.name)));
-      var gift = GIFT_LEVELS[index];
-      var opener = typeof openGiftingBadgeInfoActionSheet === "function" ? openGiftingBadgeInfoActionSheet : openGiftingBadgeInfoActionSheet?.default ?? openGiftingBadgeInfoActionSheet?.openGiftingBadgeInfoActionSheet;
-      if (typeof opener !== "function")
-        throw new Error("Discord gifting badge overlay is unavailable");
-      opener({
-        giftCount: gift.count,
-        giftingBadgeTier: index + 1,
-        gifting_badge_tier: index + 1,
-        tier: index + 1,
-        selectedTier: index + 1,
-        source: "PROFILE_BADGE"
-      });
-    } catch (error) {
-      diagnostics.last = error?.message || "Could not open gifting badges";
-      import_react_native28.Alert.alert("Gifting Badge", "Discord's native gifting badge overlay is unavailable in this Discord version.");
-    }
+  function openBadgeDirectoryFallback() {
+    void import_react_native28.Linking.openURL("https://discord.com/feature/badges").catch((error) => {
+      diagnostics.last = error?.message || "Could not open Badge Directory";
+    });
   }
   function selectedBadgeObjects(existing, forEditor = false) {
     var _loop2 = function(id2, description2, icon23) {
@@ -26149,14 +26134,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return next;
   }
   function nitroSinceFor(months, saved) {
-    var next = NITRO_DURATIONS[NITRO_DURATIONS.indexOf(months) + 1];
-    var date = typeof saved === "string" && /^\d{4}-\d{2}-\d{2}/.test(saved) ? /* @__PURE__ */ new Date(saved.slice(0, 10) + "T12:00:00Z") : null;
-    if (date && Number.isFinite(date.getTime())) {
-      var age = (Date.now() - date.getTime()) / (30.44 * 864e5);
-      if (age >= months && (next === void 0 || age < next))
-        return date;
-    }
-    return monthsAgo(months);
+    var index = NITRO_DURATIONS.indexOf(months);
+    var next = index >= 0 ? NITRO_DURATIONS[index + 1] : void 0;
+    var date = profileDate(saved);
+    var tierStart = monthsAgo(months);
+    if (date && date <= tierStart && (next === void 0 || date > monthsAgo(next)))
+      return date;
+    return tierStart;
   }
   function activityFromIds(ids) {
     var _loop2 = function(group2) {
@@ -26546,7 +26530,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               return /* @__PURE__ */ jsx(import_react_native28.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: String(props.label),
-                onPress: () => import_react_native28.Alert.alert(String(props.label)),
+                onPress: rendered.props.onPress ?? openBadgeDirectoryFallback,
                 children: /* @__PURE__ */ jsx(import_react_native28.Image, {
                   source: props.source,
                   resizeMode: "contain",
@@ -26559,22 +26543,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               });
             }
             Object.assign(rendered.props, props);
-            if (String(props.id || "").includes("gifting")) {
-              rendered.props.onPress = () => showGiftingBadgeOverlay(String(props.label || ""));
-              rendered.props.accessibilityRole = "button";
-              return;
-            }
           }
-          var label2 = String(rendered.props.label || rendered.props.description || rendered.props.tooltip || rendered.props.accessibilityLabel || "").trim();
-          if (!label2)
-            return;
-          var ours = /^(?:cloudcord-|fakeprofile-)/.test(renderedId);
-          var detail = String(rendered.props.description && rendered.props.description !== label2 ? rendered.props.description : "");
-          rendered.props.onPress = () => import_react_native28.Alert.alert(label2, [
-            detail,
-            ours ? "A CloudCord badge. People using CloudCord can see it." : ""
-          ].filter(Boolean).join(String.fromCharCode(10, 10)) || void 0);
-          rendered.props.accessibilityRole = "button";
         });
         diagnostics.patches += 1;
       } catch (e) {
@@ -32652,29 +32621,71 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     }) : null
                   ]
                 }),
-                /* @__PURE__ */ jsx(K2.Section, {
+                /* @__PURE__ */ jsxs(K2.Section, {
                   title: "Nitro badge",
                   description: "Changes with how long you've had Nitro.",
-                  children: /* @__PURE__ */ jsx(K2.BadgeGrid, {
-                    items: [
-                      {
-                        key: "none",
-                        label: "None",
-                        active: !preview.nitroEnabled,
-                        onPress: () => update("nitroEnabled", false, true)
+                  children: [
+                    /* @__PURE__ */ jsx(K2.BadgeGrid, {
+                      items: [
+                        {
+                          key: "none",
+                          label: "None",
+                          active: !preview.nitroEnabled,
+                          onPress: () => update("nitroEnabled", false, true)
+                        },
+                        ...NITRO_DURATIONS.map((months) => ({
+                          key: String(months),
+                          label: NITRO_LABELS.get(months) || durationLabel(months),
+                          icon: milestoneIcon(months, NITRO_ICONS),
+                          active: preview.nitroEnabled && preview.nitroMonths === months,
+                          onPress: () => {
+                            update("nitroEnabled", true, true);
+                            update("nitroMonths", months, true);
+                          }
+                        }))
+                      ]
+                    }),
+                    preview.nitroEnabled ? /* @__PURE__ */ jsxs(import_react_native28.View, {
+                      style: {
+                        gap: 8
                       },
-                      ...NITRO_DURATIONS.map((months) => ({
-                        key: String(months),
-                        label: NITRO_LABELS.get(months) || durationLabel(months),
-                        icon: milestoneIcon(months, NITRO_ICONS),
-                        active: preview.nitroEnabled && preview.nitroMonths === months,
-                        onPress: () => {
-                          update("nitroEnabled", true, true);
-                          update("nitroMonths", months, true);
-                        }
-                      }))
-                    ]
-                  })
+                      children: [
+                        /* @__PURE__ */ jsx(Text, {
+                          variant: "text-sm/bold",
+                          color: "text-normal",
+                          children: "Cosmetic subscriber date"
+                        }),
+                        /* @__PURE__ */ jsx(TextInput4, {
+                          accessibilityLabel: "Cosmetic subscriber date",
+                          defaultValue: preview.nitroSince ?? "",
+                          placeholder: "YYYY-MM-DD",
+                          placeholderTextColor: "#777",
+                          autoCorrect: false,
+                          maxLength: 10,
+                          keyboardType: "numbers-and-punctuation",
+                          onEndEditing: (event) => {
+                            var value = event.nativeEvent.text.trim();
+                            if (value !== (preview.nitroSince ?? ""))
+                              update("nitroSince", value, true);
+                          },
+                          style: {
+                            color: "#fff",
+                            backgroundColor: "#1e1f22",
+                            borderRadius: 9,
+                            padding: 12
+                          }
+                        }, preview.nitroMonths),
+                        /* @__PURE__ */ jsxs(Text, {
+                          variant: "text-sm/normal",
+                          color: "text-muted",
+                          children: [
+                            "Subscriber since ",
+                            shortDate(nitroSinceFor(preview.nitroMonths, preview.nitroSince))
+                          ]
+                        })
+                      ]
+                    }) : null
+                  ]
                 }),
                 /* @__PURE__ */ jsx(K2.Section, {
                   title: "Server booster",
@@ -33001,7 +33012,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, openGiftingBadgeInfoActionSheet, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, KNOWN_BADGE_INFO, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, KNOWN_BADGE_INFO, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -33495,7 +33506,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       useDisplayProfileModule = findByNameLazy("useDisplayProfile", false);
       badgeRenderProps = /* @__PURE__ */ new Map();
       simpleSheets = findByProps("showSimpleActionSheet");
-      openGiftingBadgeInfoActionSheet = findByNameLazy("openGiftingBadgeInfoActionSheet", false);
       LinearGradient = findByProps("LinearGradient")?.LinearGradient;
       NITRO_DURATIONS = [
         0,
@@ -58341,7 +58351,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6466c78ceb3580efabcee510479eaac889fe93e5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2a68fb8af02728ef74d6f8bfe39cbd60727e1718";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
