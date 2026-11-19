@@ -25733,9 +25733,127 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
     }
   }
-  function openBadgeDirectoryFallback() {
-    void import_react_native28.Linking.openURL("https://discord.com/feature/badges").catch((error) => {
-      diagnostics.last = error?.message || "Could not open Badge Directory";
+  function openNativeBadgeDirectory(navigation2) {
+    for (var navigator = navigation2; navigator; navigator = navigator.getParent?.()) {
+      var route = navigator.getState?.()?.routeNames?.find((name) => /^(?:userprofilebadgedirectory|profilebadgedirectory|badgedirectory|profilebadges|settingsbadges|badges)$/.test(name.replace(/[^a-z]/gi, "").toLowerCase()));
+      if (route) {
+        navigator.navigate(route, {
+          userId: currentUserId
+        });
+        return true;
+      }
+    }
+    return false;
+  }
+  function OwnBadgeButton({ badge, label: label2 }) {
+    var navigation2 = NavigationNative.useNavigation();
+    var [visible, setVisible] = (0, import_react9.useState)(false);
+    var open = () => {
+      try {
+        if (openNativeBadgeDirectory(navigation2))
+          return;
+      } catch (e) {
+      }
+      setVisible(true);
+    };
+    var rows = visible ? editableBadgeRows().filter((row) => !preview.hiddenBadgeIds.includes(row.id)) : [];
+    return /* @__PURE__ */ jsxs(Fragment, {
+      children: [
+        /* @__PURE__ */ jsx(import_react_native28.Pressable, {
+          accessibilityRole: "button",
+          accessibilityLabel: label2,
+          accessibilityHint: "Open Badges",
+          onPress: open,
+          children: /* @__PURE__ */ jsx(import_react_native28.View, {
+            pointerEvents: "none",
+            importantForAccessibility: "no-hide-descendants",
+            accessibilityElementsHidden: true,
+            children: badge
+          })
+        }),
+        visible && /* @__PURE__ */ jsx(import_react_native28.Modal, {
+          visible: true,
+          animationType: "slide",
+          presentationStyle: "fullScreen",
+          onRequestClose: () => setVisible(false),
+          children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            style: {
+              flex: 1,
+              backgroundColor: "#171921",
+              paddingTop: 56,
+              paddingHorizontal: 20
+            },
+            children: [
+              /* @__PURE__ */ jsxs(import_react_native28.View, {
+                style: {
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 20
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Text, {
+                    variant: "heading-xl/bold",
+                    color: "text-normal",
+                    children: "CloudCord Badges"
+                  }),
+                  /* @__PURE__ */ jsx(Button2, {
+                    text: "Done",
+                    onPress: () => setVisible(false)
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsxs(import_react_native28.ScrollView, {
+                contentContainerStyle: {
+                  gap: 12,
+                  paddingBottom: 32
+                },
+                children: [
+                  !rows.length && /* @__PURE__ */ jsx(Text, {
+                    color: "text-muted",
+                    children: "No visible badges."
+                  }),
+                  rows.map((row) => {
+                    var icon3 = row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : row.icon);
+                    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+                      style: {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 14,
+                        padding: 14,
+                        borderRadius: 12,
+                        backgroundColor: "#242733"
+                      },
+                      children: [
+                        (row.source || icon3) && /* @__PURE__ */ jsx(import_react_native28.Image, {
+                          source: row.source || {
+                            uri: icon3
+                          },
+                          resizeMode: "contain",
+                          style: {
+                            width: 32,
+                            height: 32
+                          }
+                        }),
+                        /* @__PURE__ */ jsx(import_react_native28.View, {
+                          style: {
+                            flex: 1
+                          },
+                          children: /* @__PURE__ */ jsx(Text, {
+                            variant: "text-md/semibold",
+                            color: "text-normal",
+                            children: row.description || row.label || row.id
+                          })
+                        })
+                      ]
+                    }, row.id);
+                  })
+                ]
+              })
+            ]
+          })
+        })
+      ]
     });
   }
   function selectedBadgeObjects(existing, forEditor = false) {
@@ -26467,8 +26585,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         if (!Array.isArray(result))
           return result;
         var id = String(typeof user === "string" ? user : user?.userId || user?.id || user?.user?.id || user?.userProfile?.userId || user?.userProfile?.user?.id || user?.profile?.userId || user?.displayProfile?.userId || user?.displayProfile?.user?.id || "");
+        var ownRows = (rows) => isCurrentUser(id) ? rows.map((row) => row && typeof row === "object" ? {
+          ...row,
+          profileUserId: id
+        } : row) : rows;
         if (isRealProfileView(id))
-          return result;
+          return ownRows(result);
         if (id) {
           nativeBadgeRows.set(id, [
             ...result
@@ -26480,16 +26602,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         if (!isCurrentUser(id))
           requestSharedProfile(id);
         if (badgesHiddenFor(id))
-          return result;
+          return ownRows(result);
         var staffBadge = cloudCordStaffBadge(id);
         var ordered = [];
         if (staffBadge)
           addOfficialBadge(ordered, staffBadge, user, isCurrentUser(id) ? preview.enabled ? preview : null : getProfileOverride(id) ?? null);
         var existing = result.filter((item) => !String(item?.id || "").startsWith("cloudcord-official"));
-        return appendPublishedBadges([
+        return ownRows(appendPublishedBadges([
           ...ordered,
           ...existing
-        ], id);
+        ], id));
       });
       diagnostics.patches += 1;
     } catch (error) {
@@ -26525,25 +26647,37 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return;
           var renderedId = String(rendered.props.id || "");
           var props = /^(?:cloudcord-|fakeprofile-)/.test(renderedId) ? badgeRenderProps.get(rendered.props.id) : void 0;
+          var owner = renderedUserId(rendered.props) || renderedUserId(rendered.props.badge);
+          var own = isCurrentUser(owner);
+          var label2 = String(props?.label || rendered.props.accessibilityLabel || rendered.props.label || rendered.props.description || "Badge");
           if (props) {
             if (String(props.id || "").startsWith("cloudcord-official-")) {
-              return /* @__PURE__ */ jsx(import_react_native28.Pressable, {
+              var image = /* @__PURE__ */ jsx(import_react_native28.Image, {
+                source: props.source,
+                resizeMode: "contain",
+                style: {
+                  width: 20,
+                  height: 20,
+                  tintColor: props.tintColor
+                }
+              });
+              return own ? /* @__PURE__ */ jsx(OwnBadgeButton, {
+                badge: image,
+                label: label2
+              }) : /* @__PURE__ */ jsx(import_react_native28.Pressable, {
                 accessibilityRole: "button",
-                accessibilityLabel: String(props.label),
-                onPress: rendered.props.onPress ?? openBadgeDirectoryFallback,
-                children: /* @__PURE__ */ jsx(import_react_native28.Image, {
-                  source: props.source,
-                  resizeMode: "contain",
-                  style: {
-                    width: 20,
-                    height: 20,
-                    tintColor: props.tintColor
-                  }
-                })
+                accessibilityLabel: label2,
+                onPress: rendered.props.onPress ?? (() => import_react_native28.Alert.alert(label2)),
+                children: image
               });
             }
             Object.assign(rendered.props, props);
           }
+          if (own)
+            return /* @__PURE__ */ jsx(OwnBadgeButton, {
+              badge: rendered,
+              label: label2
+            });
         });
         diagnostics.patches += 1;
       } catch (e) {
@@ -58351,7 +58485,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2a68fb8af02728ef74d6f8bfe39cbd60727e1718";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "632b8af1d96596d71cb2156b669eadbe0aa872d8";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
