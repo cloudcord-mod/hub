@@ -469,7 +469,8 @@ jobs:
               return <S.Row label={label} icon={icon} selected={selected} onPress={onPress} />;
           }
           import { Component, cloneElement, createElement, isValidElement, useEffect, useReducer, useRef, useState } from "react";
-          import { Alert, AppState, FlatList, Image, Linking, NativeModules, Pressable, ScrollView, View } from "react-native";
+          import type { ReactElement } from "react";
+          import { Alert, AppState, FlatList, Image, Linking, Modal, NativeModules, Pressable, ScrollView, View } from "react-native";
 
           type MediaValue = { uri: string; name: string; type: string; width?: number; height?: number; normalized?: boolean } | null;
           type PreviewSettings = {
@@ -1965,10 +1966,48 @@ jobs:
               if (row) { row.tintColor = tintColor; row.style = { tintColor }; }
           }
 
-          function openBadgeDirectoryFallback() {
-              void Linking.openURL("https://discord.com/feature/badges").catch(error => {
-                  diagnostics.last = error?.message || "Could not open Badge Directory";
-              });
+          function openNativeBadgeDirectory(navigation: any) {
+              for (let navigator = navigation; navigator; navigator = navigator.getParent?.()) {
+                  const route = navigator.getState?.()?.routeNames?.find((name: string) => /^(?:userprofilebadgedirectory|profilebadgedirectory|badgedirectory|profilebadges|settingsbadges|badges)$/.test(name.replace(/[^a-z]/gi, "").toLowerCase()));
+                  if (route) {
+                      navigator.navigate(route, { userId: currentUserId });
+                      return true;
+                  }
+              }
+              return false;
+          }
+
+          function OwnBadgeButton({ badge, label }: { badge: ReactElement; label: string }) {
+              const navigation = NavigationNative.useNavigation();
+              const [visible, setVisible] = useState(false);
+              const open = () => {
+                  try { if (openNativeBadgeDirectory(navigation)) return; } catch {}
+                  setVisible(true);
+              };
+              const rows = visible ? editableBadgeRows().filter(row => !preview.hiddenBadgeIds.includes(row.id)) : [];
+              return <>
+                  <Pressable accessibilityRole="button" accessibilityLabel={label} accessibilityHint="Open Badges" onPress={open}>
+                      <View pointerEvents="none" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>{badge}</View>
+                  </Pressable>
+                  {visible && <Modal visible animationType="slide" presentationStyle="fullScreen" onRequestClose={() => setVisible(false)}>
+                      <View style={{ flex: 1, backgroundColor: "#171921", paddingTop: 56, paddingHorizontal: 20 }}>
+                          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                              <Text variant="heading-xl/bold" color="text-normal">CloudCord Badges</Text>
+                              <Button text="Done" onPress={() => setVisible(false)} />
+                          </View>
+                          <ScrollView contentContainerStyle={{ gap: 12, paddingBottom: 32 }}>
+                              {!rows.length && <Text color="text-muted">No visible badges.</Text>}
+                              {rows.map(row => {
+                                  const icon = row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : row.icon);
+                                  return <View key={row.id} style={{ flexDirection: "row", alignItems: "center", gap: 14, padding: 14, borderRadius: 12, backgroundColor: "#242733" }}>
+                                      {(row.source || icon) && <Image source={row.source || { uri: icon }} resizeMode="contain" style={{ width: 32, height: 32 }} />}
+                                      <View style={{ flex: 1 }}><Text variant="text-md/semibold" color="text-normal">{row.description || row.label || row.id}</Text></View>
+                                  </View>;
+                              })}
+                          </ScrollView>
+                      </View>
+                  </Modal>}
+              </>;
           }
 
           function selectedBadgeObjects(existing: any, forEditor = false) {
@@ -2449,7 +2488,10 @@ jobs:
                   after("default", useBadgesModule as any, ([user], result) => {
                       if (!Array.isArray(result)) return result;
                       const id = String(typeof user === "string" ? user : user?.userId || user?.id || user?.user?.id || user?.userProfile?.userId || user?.userProfile?.user?.id || user?.profile?.userId || user?.displayProfile?.userId || user?.displayProfile?.user?.id || "");
-                      if (isRealProfileView(id)) return result;
+                      const ownRows = (rows: any[]) => isCurrentUser(id)
+                          ? rows.map(row => row && typeof row === "object" ? { ...row, profileUserId: id } : row)
+                          : rows;
+                      if (isRealProfileView(id)) return ownRows(result);
                       if (id) {
                           nativeBadgeRows.set(id, [...result]);
                           if (nativeBadgeRows.size > 100) nativeBadgeRows.delete(nativeBadgeRows.keys().next().value!);
@@ -2458,12 +2500,12 @@ jobs:
                       if (!isCurrentUser(id)) requestSharedProfile(id);
                       // Fake Discord badges come with Discord's own profile data (see
                       // rewriteFetchedProfile); only CloudCord's own badges are added here.
-                      if (badgesHiddenFor(id)) return result;
+                      if (badgesHiddenFor(id)) return ownRows(result);
                       const staffBadge = cloudCordStaffBadge(id);
                       const ordered: any[] = [];
                       if (staffBadge) addOfficialBadge(ordered, staffBadge, user, isCurrentUser(id) ? (preview.enabled ? preview : null) : getProfileOverride(id) ?? null);
                       const existing = result.filter(item => !String(item?.id || "").startsWith("cloudcord-official"));
-                      return appendPublishedBadges([...ordered, ...existing], id);
+                      return ownRows(appendPublishedBadges([...ordered, ...existing], id));
                   });
                   diagnostics.patches += 1;
               } catch (error: any) {
@@ -2491,15 +2533,20 @@ jobs:
                           // only CloudCord's own badges and the editor preview are drawn here.
                           const renderedId = String(rendered.props.id || "");
                           const props = /^(?:cloudcord-|fakeprofile-)/.test(renderedId) ? badgeRenderProps.get(rendered.props.id) : undefined;
+                          const owner = renderedUserId(rendered.props) || renderedUserId(rendered.props.badge);
+                          const own = isCurrentUser(owner);
+                          const label = String(props?.label || rendered.props.accessibilityLabel || rendered.props.label || rendered.props.description || "Badge");
                           if (props) {
                               // The native badge wrapper does not consistently
                               // forward tintColor to its inner image. Render the
                               // official mark with an explicit RN Image tint.
                               if (String(props.id || "").startsWith("cloudcord-official-")) {
-                                  return <Pressable accessibilityRole="button" accessibilityLabel={String(props.label)} onPress={rendered.props.onPress ?? openBadgeDirectoryFallback}><Image source={props.source} resizeMode="contain" style={{ width: 20, height: 20, tintColor: props.tintColor }} /></Pressable>;
+                                  const image = <Image source={props.source} resizeMode="contain" style={{ width: 20, height: 20, tintColor: props.tintColor }} />;
+                                  return own ? <OwnBadgeButton badge={image} label={label} /> : <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={rendered.props.onPress ?? (() => Alert.alert(label))}>{image}</Pressable>;
                               }
                               Object.assign(rendered.props, props);
                           }
+                          if (own) return <OwnBadgeButton badge={rendered} label={label} />;
                       });
                       diagnostics.patches += 1;
                   } catch {}

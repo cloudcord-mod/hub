@@ -51,6 +51,7 @@ for (remote of [false, true]) {
     const result = callback([{ id: '123456789012345' }], native);
     // Fake badges now arrive in Discord's own profile data; the renderer leaves them as they are.
     assert.deepEqual(Array.from(result, row => row.id), native.map(row => row.id));
+    assert.equal(result[0].profileUserId, remote ? undefined : '123456789012345');
 }
 enabled = false;
 context.preview.nitroEnabled = false;
