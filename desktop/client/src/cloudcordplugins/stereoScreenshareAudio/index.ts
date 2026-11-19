@@ -9,6 +9,14 @@ import definePlugin from "@utils/types";
 
 const orig = {};
 
+function updateSdp(params: string) {
+    const fields = params.split(";").map(field => field.trim()).filter(Boolean).filter(field => {
+        const name = field.split("=", 1)[0].trim().toLowerCase();
+        return name !== "stereo" && name !== "sprop-stereo";
+    });
+    return [...fields, "stereo=1", "sprop-stereo=1"].join(";");
+}
+
 const mungeSDP = sdp => {
     if (!sdp) return sdp;
     const opusPts = new Set();
@@ -26,9 +34,7 @@ const mungeSDP = sdp => {
     // and update the params to include stereo and sprop-stereo
     return sdp.replace(/^a=fmtp:(\d+)\s+(.+)$/gmi, (full, pt, params) => {
         if (!opusPts.has(pt)) return full;
-        if (/(\bstereo=1\b)|(\bsprop-stereo=1\b)/i.test(params)) return full;
-        const sep = params.endsWith(";") ? "" : ";";
-        return `a=fmtp:${pt} ${params}${sep}stereo=1;sprop-stereo=1`;
+        return `a=fmtp:${pt} ${updateSdp(params)}`;
     });
 };
 
@@ -44,6 +50,7 @@ export default definePlugin({
     authors: [Devs.rootpoi, Devs.kraethis, Devs.ewlle],
 
     async start() {
+        if (typeof RTCPeerConnection === "undefined") throw new Error("WebRTC is unavailable");
         const SRD = RTCPeerConnection.prototype.setRemoteDescription as any;
         const SLD = RTCPeerConnection.prototype.setLocalDescription as any;
 
@@ -68,6 +75,7 @@ export default definePlugin({
     },
 
     async stop() {
+        if (typeof RTCPeerConnection === "undefined") return;
         // only restore if our own wrapper is still the active one,
         // otherwise another plugin owns the chain and we leave it alone
         const srd = RTCPeerConnection.prototype.setRemoteDescription as any;

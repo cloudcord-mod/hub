@@ -10,7 +10,7 @@ import definePlugin from "@utils/types";
 const SUGGESTED_HEADER_TEXT = "Suggested";
 
 let observer: MutationObserver | null = null;
-let scanQueued = false;
+let pendingScan: number | undefined;
 const dismissed = new WeakSet<Element>();
 
 function dismissSuggested() {
@@ -32,11 +32,10 @@ function dismissSuggested() {
 }
 
 function queueScan() {
-    if (scanQueued) return;
-    scanQueued = true;
-    requestAnimationFrame(() => {
-        scanQueued = false;
-        dismissSuggested();
+    if (!observer || pendingScan !== undefined) return;
+    pendingScan = requestAnimationFrame(() => {
+        pendingScan = undefined;
+        if (observer) dismissSuggested();
     });
 }
 
@@ -54,5 +53,7 @@ export default definePlugin({
     stop() {
         observer?.disconnect();
         observer = null;
+        if (pendingScan !== undefined) cancelAnimationFrame(pendingScan);
+        pendingScan = undefined;
     },
 });

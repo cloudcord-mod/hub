@@ -26,20 +26,24 @@ const settings = definePluginSettings({
     }
 });
 
+let enabled = false;
 let currentChannel: string | null = null;
 const leveled = new Set<string>();
 
 function applyToUser(userId: string) {
     const me = UserStore.getCurrentUser();
-    if (!me || userId === me.id) return;
+    if (!me || userId === me.id) return false;
     try {
         VoiceVolume.setLocalVolume(userId, settings.store.targetVolume);
+        return true;
     } catch (e) {
         logger.error("setLocalVolume failed", e);
+        return false;
     }
 }
 
 function levelChannel() {
+    if (!enabled) return;
     const channelId = SelectedChannelStore.getVoiceChannelId() ?? null;
     if (channelId !== currentChannel) {
         leveled.clear();
@@ -50,11 +54,11 @@ function levelChannel() {
     const states = VoiceStateStore.getVoiceStatesForChannel(channelId) as Record<string, { userId: string; }> | null;
     if (!states) return;
 
+    for (const userId of leveled) if (!Object.hasOwn(states, userId)) leveled.delete(userId);
     const meId = UserStore.getCurrentUser()?.id;
     for (const userId of Object.keys(states)) {
         if (userId === meId || leveled.has(userId)) continue;
-        applyToUser(userId);
-        leveled.add(userId);
+        if (applyToUser(userId)) leveled.add(userId);
     }
 }
 
@@ -77,10 +81,12 @@ export default definePlugin({
     },
 
     start() {
+        enabled = true;
         levelChannel();
     },
 
     stop() {
+        enabled = false;
         leveled.clear();
         currentChannel = null;
     }

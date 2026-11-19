@@ -42,6 +42,7 @@ const settings = definePluginSettings({
     },
 });
 
+let enabled = false;
 let gaming = false;
 let memoryTimer: ReturnType<typeof setInterval> | null = null;
 // Only the videos we paused, so we never resume something the user paused.
@@ -60,13 +61,14 @@ function resumeLooping() {
     for (const video of paused) if (video.isConnected) video.play().catch(() => { });
     paused.clear();
 }
-function active() { return !settings.store.onlyWhileGaming || gaming; }
+function active() { return enabled && (!settings.store.onlyWhileGaming || gaming); }
 
 function apply() {
     const on = active();
     document.documentElement.classList.toggle(CLASS, on);
     document.documentElement.classList.toggle(CLASS + "-cosmetics", on && settings.store.hideCosmetics);
-    const wantTimer = on && gaming && settings.store.freeMemory;
+    const processUtils = (window as any).DiscordNative?.processUtils;
+    const wantTimer = on && gaming && settings.store.freeMemory && typeof processUtils?.purgeMemory === "function";
     if (wantTimer && !memoryTimer) { purgeMemory(); memoryTimer = setInterval(purgeMemory, 5 * 60_000); }
     else if (!wantTimer && memoryTimer) { clearInterval(memoryTimer); memoryTimer = null; }
     if (on && settings.store.pauseMedia) pauseLooping(); else resumeLooping();
@@ -85,12 +87,15 @@ export default definePlugin({
         },
     },
     start() {
+        enabled = true;
         try { gaming = (RunningGameStore?.getRunningGames?.() ?? []).length > 0; } catch { gaming = false; }
         window.addEventListener("blur", pauseLooping);
         window.addEventListener("focus", resumeLooping);
         apply();
     },
     stop() {
+        enabled = false;
+        gaming = false;
         window.removeEventListener("blur", pauseLooping);
         window.removeEventListener("focus", resumeLooping);
         if (memoryTimer) { clearInterval(memoryTimer); memoryTimer = null; }
