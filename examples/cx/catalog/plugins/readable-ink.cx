@@ -1,0 +1,5 @@
+plugin "Readable Ink":
+  needs commands.register
+  needs reply.local
+  on command "readableink" with text:
+    reply "${readableInk(text)}" else "Enter a hex background color to compare black and white text."

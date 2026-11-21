@@ -1,0 +1,7 @@
+plugin "CSV Column":
+  needs commands.register
+  needs reply.local
+  on command "csvcolumn":
+    input "document" text
+    input "column" text
+    reply "${csvColumn(document, column)}" else "Paste up to 150 CSV rows and choose a column number starting at 1."

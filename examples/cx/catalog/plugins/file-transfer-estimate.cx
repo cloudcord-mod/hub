@@ -1,0 +1,7 @@
+plugin "File Transfer Estimate":
+  needs commands.register
+  needs reply.local
+  on command "transferestimate":
+    input "size" text
+    input "megabits" text
+    reply "${transferEta(size, megabits)}" else "Enter a file size such as 300 MB and a connection speed in Mbps."

@@ -1,0 +1,9 @@
+plugin "Resize Dimensions":
+  needs commands.register
+  needs reply.local
+  on command "resizedimensions":
+    input "width" text
+    input "height" text
+    input "target" text
+    input "axis" choice "width,height"
+    reply "${resizeDimensions(width, height, target, axis)}" else "Enter positive pixel dimensions, the new size, and the side you want to set."

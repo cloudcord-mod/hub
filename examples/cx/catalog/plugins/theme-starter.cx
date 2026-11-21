@@ -1,0 +1,8 @@
+plugin "Theme Starter":
+  needs commands.register
+  needs reply.local
+  on command "themestarter":
+    input "name" text
+    input "background" text
+    input "accent" text
+    reply "${themeStarter(name, background, accent)}" else "Enter a one-line theme name and two hex colors. Paste the result into Themes to try it."

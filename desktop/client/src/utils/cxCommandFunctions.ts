@@ -43,6 +43,26 @@ function hexChannels(input: string) {
     if (/^[\da-f]{6}$/i.test(hex)) return hex.match(/../g)!.map(value => Number.parseInt(value, 16));
 }
 
+function hexColor(channels: number[]) {
+    return "#" + channels.map(channel => Math.round(channel).toString(16).padStart(2, "0")).join("");
+}
+
+function mixChannels(from: number[], to: number[], weight: number) {
+    return from.map((channel, index) => channel + (to[index] - channel) * weight);
+}
+
+function relativeLuminance(channels: number[]) {
+    const [red, green, blue] = channels.map(channel => {
+        const value = channel / 255;
+        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+function contrast(a: number, b: number) {
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
 function utcMidnight(input: string) {
     const date = input.trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
@@ -108,6 +128,14 @@ function fileSizeUnits(base: number, labels: string[]) {
 const decimalFileUnits = fileSizeUnits(1000, ["B", "kB", "MB", "GB", "TB", "PB"]);
 const binaryFileUnits = fileSizeUnits(1024, ["B", "KiB", "MiB", "GiB", "TiB", "PiB"]);
 const displayNumber = (value: number) => String(Number(value.toPrecision(12)));
+
+function fileSizeBytes(text: string) {
+    const match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
+    if (!match) return;
+    const unit = match[2] === "KB" ? "kB" : match[2];
+    const bytes = Number(match[1]) * (decimalFileUnits.get(unit) ?? binaryFileUnits.get(unit)!);
+    if (Number.isFinite(bytes) && bytes <= Number.MAX_SAFE_INTEGER) return bytes;
+}
 
 function planningRows(text: string) {
     return text.split(/\r\n|\r|\n/).map(row => row.trim()).filter(Boolean);
@@ -293,11 +321,8 @@ export const cxCommandFunctions = {
         ].join(" · ");
     },
     convertFileSize(text: string) {
-        const match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
-        if (!match) return;
-        const inputUnit = match[2] === "KB" ? "kB" : match[2];
-        const bytes = Number(match[1]) * (decimalFileUnits.get(inputUnit) ?? binaryFileUnits.get(inputUnit)!);
-        if (!Number.isFinite(bytes) || bytes > Number.MAX_SAFE_INTEGER) return;
+        const bytes = fileSizeBytes(text);
+        if (bytes === undefined) return;
         const format = (units: Map<string, number>) => {
             const [unit, divisor] = [...units].reverse().find(([, scale]) => scale <= bytes) ?? ["B", 1];
             return displayNumber(bytes / divisor) + " " + unit;
@@ -366,17 +391,40 @@ export const cxCommandFunctions = {
         if (channels) return `\`rgb(${channels.join(", ")})\``;
     },
     colorContrast(foreground: string, background: string) {
-        const colors = [hexChannels(foreground), hexChannels(background)];
-        const luminances = colors.map(channels => channels?.map(channel => {
-            const rgb = channel / 255;
-            return rgb <= 0.04045 ? rgb / 12.92 : ((rgb + 0.055) / 1.055) ** 2.4;
-        }));
-        const [text, surface] = luminances;
+        const text = hexChannels(foreground), surface = hexChannels(background);
         if (!text || !surface) return;
-        const relativeLuminance = ([red, green, blue]: number[]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-        const a = relativeLuminance(text), b = relativeLuminance(surface);
-        const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        const ratio = contrast(relativeLuminance(text), relativeLuminance(surface));
         return `Contrast ≈ ${ratio.toFixed(2)}:1\nWCAG AA normal text ${ratio >= 4.5 ? "passes" : "fails"}\nWCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
+    },
+    colorMix(first: string, second: string, percent: string) {
+        const from = hexChannels(first), to = hexChannels(second);
+        const weight = integerText(percent);
+        if (!from || !to || weight === undefined || weight < 0 || weight > 100) return;
+        return `\`${hexColor(mixChannels(from, to, weight / 100))}\``;
+    },
+    readableInk(background: string) {
+        const surface = hexChannels(background);
+        if (!surface) return;
+        const luminance = relativeLuminance(surface);
+        return ([[0, "#000000"], [1, "#ffffff"]] as const).map(([ink, hex]) => [contrast(luminance, ink), hex] as const)
+            .sort(([a], [b]) => b - a).map(([ratio, hex]) => `\`${hex}\` · ${ratio.toFixed(2)}:1`).join("\n");
+    },
+    themeStarter(name: string, background: string, accent: string) {
+        const title = name.trim();
+        const surface = hexChannels(background), brand = hexChannels(accent);
+        if (!title || title.length > 64 || /[\u0000-\u001f\u007f]/.test(title) || !surface || !brand) return;
+        const luminance = relativeLuminance(surface);
+        const dark = contrast(luminance, 1) >= contrast(luminance, 0);
+        const ink = dark ? [255, 255, 255] : [0, 0, 0];
+        return planningBlock([
+            `theme ${JSON.stringify(title).replaceAll("`", "\\u0060")}:`,
+            "  mode: " + (dark ? "dark" : "light"),
+            "  background: " + hexColor(surface),
+            "  surface: " + hexColor(mixChannels(surface, ink, 0.08)),
+            "  sidebar: " + hexColor(mixChannels(surface, ink, 0.04)),
+            "  text: " + hexColor(ink),
+            "  accent: " + hexColor(brand),
+        ].join("\n"));
     },
     rgbToHex(input: string) {
         const text = input.trim();
@@ -554,6 +602,24 @@ export const cxCommandFunctions = {
         while (b) [a, b] = [b, a % b];
         return `\`${w / a}:${h / a}\` · ${w} × ${h} px`;
     },
+    resizeDimensions(width: string, height: string, target: string, axis: string) {
+        const w = integerText(width), h = integerText(height), size = integerText(target);
+        if (w === undefined || h === undefined || size === undefined || [w, h, size].some(value => value < 1 || value > 100000)
+            || (axis !== "width" && axis !== "height")) return;
+        const other = Math.max(1, Math.round(size * (axis === "width" ? h / w : w / h)));
+        if (other > 100000) return;
+        return (axis === "width" ? [size, other] : [other, size]).join(" × ") + " px";
+    },
+    transferEta(size: string, megabits: string) {
+        const bytes = fileSizeBytes(size);
+        const value = megabits.trim();
+        if (bytes === undefined || !/^\d+(?:\.\d+)?$/.test(value)) return;
+        const speed = Number(value);
+        if (!Number.isFinite(speed) || speed < 0.001 || speed > 1_000_000) return;
+        const seconds = Math.ceil(bytes * 8 / (speed * 1_000_000));
+        const hours = Math.floor(seconds / 3600);
+        return `About ${hours}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s at ${displayNumber(speed)} Mbps`;
+    },
     utf8Size(text: string) {
         let bytes = 0;
         for (const character of text) {
@@ -608,6 +674,13 @@ export const cxCommandFunctions = {
     },
     csvToMarkdown(input: string) {
         return markdownTable(csvRows(input));
+    },
+    csvColumn(input: string, column: string) {
+        const position = integerText(column);
+        if (position === undefined || position < 1 || position > 64 || input.length > 12000) return;
+        const rows = csvRows(input);
+        if (!rows.length || rows.length > 150 || rows.some(row => row[position - 1] === undefined)) return;
+        return planningBlock(rows.map(row => '"' + row[position - 1].replaceAll('"', '""') + '"').join("\n"));
     },
     markdownChecklist(input: string) {
         const lines = input.split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);

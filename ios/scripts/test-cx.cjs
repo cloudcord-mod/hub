@@ -2620,6 +2620,33 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(Object.keys(registered).length, 0, platform + " unregisters on disable");
 
         for (const [plugin, examples] of [
+            ["Color Mixer", [
+                ["mixcolors", { first: "#f00", second: "#00f", percent: "50" }, /^\x60#800080\x60$/],
+                ["mixcolors", { first: "#f00", second: "#00f", percent: "-1" }, /^Enter two hex colors/],
+            ]],
+            ["Readable Ink", [
+                ["readableink", { text: "#000" }, /^\x60#ffffff\x60 · 21\.00:1\n\x60#000000\x60 · 1\.00:1$/],
+                ["readableink", { text: "#fff" }, /^\x60#000000\x60 · 21\.00:1\n\x60#ffffff\x60 · 1\.00:1$/],
+            ]],
+            ["Theme Starter", [
+                ["themestarter", { name: 'Night "Sky"', background: "#000", accent: "#8bf" }, /theme "Night \\"Sky\\"":\n  mode: dark\n  background: #000000.*\n  text: #ffffff\n  accent: #88bbff/s],
+                ["themestarter", { name: "Day", background: "#fff", accent: "#124" }, /theme "Day":\n  mode: light.*\n  text: #000000\n  accent: #112244/s],
+                ["themestarter", { name: "a\nb", background: "#fff", accent: "#124" }, /^Enter a one-line/],
+            ]],
+            ["Resize Dimensions", [
+                ["resizedimensions", { width: "1920", height: "1080", target: "480", axis: "width" }, /^480 × 270 px$/],
+                ["resizedimensions", { width: "1920", height: "1080", target: "720", axis: "height" }, /^1280 × 720 px$/],
+                ["resizedimensions", { width: "0", height: "720", target: "480", axis: "width" }, /^Enter positive pixel/],
+            ]],
+            ["File Transfer Estimate", [
+                ["transferestimate", { size: "300 MB", megabits: "20" }, /^About 0h 2m 0s at 20 Mbps$/],
+                ["transferestimate", { size: "1 MiB", megabits: "1" }, /^About 0h 0m 9s at 1 Mbps$/],
+                ["transferestimate", { size: "1 MB", megabits: "0" }, /^Enter a file size/],
+            ]],
+            ["CSV Column", [
+                ["csvcolumn", { document: 'Name,Result\r\nA,"yes, now"\nB,"new\nlines"', column: "2" }, /\n"Result"\n"yes, now"\n"new\nlines"\n/],
+                ["csvcolumn", { document: "Name,Result\nA", column: "2" }, /^Paste up to 150/],
+            ]],
             ["Timestamp Styles", [
                 ["timestampstyles", { text: "1970-01-01T04:00:00+03:00" }, /Short time · <t:3600:t>.*Time with seconds · <t:3600:T>.*Relative · <t:3600:R>/s],
                 ["timestampstyles", { text: "1970-01-01T04:00:00" }, /^Enter a date and time with a timezone/],
@@ -2761,7 +2788,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Allow for this session");
             for (const [name, args, expected] of examples) {
                 assert.equal(registered[name].execute(Object.entries(args).map(([name, value]) => ({ name, value })), diagnosticContext), undefined);
-                assert.match(delivered.pop()?.[1] ?? "", expected, plugin + " replies privately on " + platform);
+                const output = delivered.pop()?.[1] ?? "";
+                assert.match(output, expected, plugin + " replies privately on " + platform);
+                if (name === "themestarter" && output.startsWith("\x60\x60\x60")) {
+                    const theme = parseCx(output.split("\n").slice(1, -1).join("\n"));
+                    assert.equal(theme.kind, "theme");
+                    assert.equal(theme.name, args.name);
+                }
             }
             click(render(), "Disable " + plugin);
         }

@@ -1,0 +1,8 @@
+plugin "Color Mixer":
+  needs commands.register
+  needs reply.local
+  on command "mixcolors":
+    input "first" text
+    input "second" text
+    input "percent" text
+    reply "${colorMix(first, second, percent)}" else "Enter two hex colors and a whole number from 0 to 100 for the second color’s share."
