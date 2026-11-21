@@ -39307,6 +39307,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   });
 
   // src/lib/api/cxAppearance.ts
+  function hideDesktopClass(plugin2, label2, className) {
+    var prefix2 = className + "_";
+    return {
+      plugin: plugin2,
+      label: label2,
+      css: `[class^="${prefix2}"], [class*=" ${prefix2}"] { display: none !important; }`,
+      desktopOnly: true,
+      mobile: [],
+      catalogOriginal: true
+    };
+  }
   var cxAppearanceTargets;
   var init_cxAppearance = __esm({
     "src/lib/api/cxAppearance.ts"() {
@@ -39572,6 +39583,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           mobile: [],
           catalogOriginal: true
         },
+        "message-length-promotion": hideDesktopClass("HideMessageLengthPromotion", "the Nitro promotion shown with long messages", "messageLengthUpsellContainer"),
+        "orb-wallet-nitro-promotion": hideDesktopClass("HideOrbWalletNitroPromotion", "the Nitro promotion in the Orbs Wallet", "orbWalletNitroUpsellCard"),
+        "orb-wallet-seasonal-promotion": hideDesktopClass("HideOrbWalletSeasonalPromotion", "the Black Friday card in the Orbs Wallet", "orbWalletBlackFridayCardWrapper"),
+        "monthly-reward-promotions": hideDesktopClass("HideMonthlyRewardPromotions", "promotional cards in the monthly rewards panel", "promoCardContainer"),
+        "soundboard-nitro-banner": hideDesktopClass("HideSoundboardNitroBanner", "the Nitro promotion banner in the soundboard", "upsellBanner"),
+        "sticker-autocomplete": hideDesktopClass("HideStickerAutocomplete", "sticker suggestions while typing in chat", "stickerAutoComplete"),
+        "premium-group-promotion": hideDesktopClass("HidePremiumGroupPromotion", "the premium group promotion in the offer dialog", "premiumGroupUpsellWrapper"),
         "voice-krisp-button": {
           plugin: "ShowPing",
           label: "the desktop Krisp button beside the voice connection controls",
@@ -50967,6 +50985,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-message-length-promotion.cx
+  var hide_message_length_promotion_default;
+  var init_hide_message_length_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-message-length-promotion.cx"() {
+      hide_message_length_promotion_default = 'plugin "HideMessageLengthPromotion":\n  needs appearance.hide\n  hide message-length-promotion\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-monthly-reward-promotions.cx
+  var hide_monthly_reward_promotions_default;
+  var init_hide_monthly_reward_promotions = __esm({
+    "../examples/cx/catalog/plugins/hide-monthly-reward-promotions.cx"() {
+      hide_monthly_reward_promotions_default = 'plugin "HideMonthlyRewardPromotions":\n  needs appearance.hide\n  hide monthly-reward-promotions\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-nameplates.cx
   var hide_nameplates_default;
   var init_hide_nameplates = __esm({
@@ -50999,11 +51033,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-orb-wallet-nitro-promotion.cx
+  var hide_orb_wallet_nitro_promotion_default;
+  var init_hide_orb_wallet_nitro_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-orb-wallet-nitro-promotion.cx"() {
+      hide_orb_wallet_nitro_promotion_default = 'plugin "HideOrbWalletNitroPromotion":\n  needs appearance.hide\n  hide orb-wallet-nitro-promotion\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-orb-wallet-seasonal-promotion.cx
+  var hide_orb_wallet_seasonal_promotion_default;
+  var init_hide_orb_wallet_seasonal_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-orb-wallet-seasonal-promotion.cx"() {
+      hide_orb_wallet_seasonal_promotion_default = 'plugin "HideOrbWalletSeasonalPromotion":\n  needs appearance.hide\n  hide orb-wallet-seasonal-promotion\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-pins-button.cx
   var hide_pins_button_default;
   var init_hide_pins_button = __esm({
     "../examples/cx/catalog/plugins/hide-pins-button.cx"() {
       hide_pins_button_default = 'plugin "HidePinsButton":\n  needs appearance.hide\n  hide pinned-messages-button\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-premium-group-promotion.cx
+  var hide_premium_group_promotion_default;
+  var init_hide_premium_group_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-premium-group-promotion.cx"() {
+      hide_premium_group_promotion_default = 'plugin "HidePremiumGroupPromotion":\n  needs appearance.hide\n  hide premium-group-promotion\n';
     }
   });
 
@@ -51119,6 +51177,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-soundboard-nitro-banner.cx
+  var hide_soundboard_nitro_banner_default;
+  var init_hide_soundboard_nitro_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-soundboard-nitro-banner.cx"() {
+      hide_soundboard_nitro_banner_default = 'plugin "HideSoundboardNitroBanner":\n  needs appearance.hide\n  hide soundboard-nitro-banner\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-spoiler-warnings.cx
   var hide_spoiler_warnings_default;
   var init_hide_spoiler_warnings = __esm({
@@ -51132,6 +51198,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_hide_status_emojis = __esm({
     "../examples/cx/catalog/plugins/hide-status-emojis.cx"() {
       hide_status_emojis_default = 'plugin "HideStatusEmojis":\n  needs appearance.hide\n  hide custom-status-emojis\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-sticker-autocomplete.cx
+  var hide_sticker_autocomplete_default;
+  var init_hide_sticker_autocomplete = __esm({
+    "../examples/cx/catalog/plugins/hide-sticker-autocomplete.cx"() {
+      hide_sticker_autocomplete_default = 'plugin "HideStickerAutocomplete":\n  needs appearance.hide\n  hide sticker-autocomplete\n';
     }
   });
 
@@ -53410,11 +53484,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_member_activities();
       init_hide_member_list_button();
       init_hide_mention_badges();
+      init_hide_message_length_promotion();
+      init_hide_monthly_reward_promotions();
       init_hide_nameplates();
       init_hide_new_messages_bar();
       init_hide_nitro_tab();
       init_hide_notification_bell();
+      init_hide_orb_wallet_nitro_promotion();
+      init_hide_orb_wallet_seasonal_promotion();
       init_hide_pins_button();
+      init_hide_premium_group_promotion();
       init_hide_profile_banner_images();
       init_hide_profile_connections();
       init_hide_profile_effects();
@@ -53429,8 +53508,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_send_button();
       init_hide_server_banner();
       init_hide_shop_tab();
+      init_hide_soundboard_nitro_banner();
       init_hide_spoiler_warnings();
       init_hide_status_emojis();
+      init_hide_sticker_autocomplete();
       init_hide_sticker_button();
       init_hide_sticker_picker_promotions();
       init_hide_sticker_search_suggestions();
@@ -54737,6 +54818,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             appearanceRevision: "71ff42f973686ad65b32085da67363ea82e0ddace83c2b3f3091f855bce2eaef"
           },
           {
+            name: "HideMessageLengthPromotion",
+            source: hide_message_length_promotion_default,
+            description: "Hide the Nitro promotion shown with long messages",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
+            name: "HideMonthlyRewardPromotions",
+            source: hide_monthly_reward_promotions_default,
+            description: "Hide promotional cards in the monthly rewards panel",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
             name: "HideNameplates",
             source: hide_nameplates_default,
             description: "Hide nameplates",
@@ -54773,6 +54872,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             appearanceRevision: "7ba7ebf67f69bf87b478780c25dc22ee79e44f0f381e0339fbc78c50ace61320"
           },
           {
+            name: "HideOrbWalletNitroPromotion",
+            source: hide_orb_wallet_nitro_promotion_default,
+            description: "Hide the Nitro promotion in the Orbs Wallet",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
+            name: "HideOrbWalletSeasonalPromotion",
+            source: hide_orb_wallet_seasonal_promotion_default,
+            description: "Hide the Black Friday card in the Orbs Wallet",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
             name: "HidePinsButton",
             source: hide_pins_button_default,
             description: "Hide the pinned messages shortcut",
@@ -54780,6 +54897,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               "Appearance"
             ],
             appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67"
+          },
+          {
+            name: "HidePremiumGroupPromotion",
+            source: hide_premium_group_promotion_default,
+            description: "Hide the premium group promotion in the offer dialog",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Hide Profile Banner Images",
@@ -54913,6 +55039,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d"
           },
           {
+            name: "HideSoundboardNitroBanner",
+            source: hide_soundboard_nitro_banner_default,
+            description: "Hide the Nitro promotion banner in the soundboard",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
             name: "HideSpoilerWarnings",
             source: hide_spoiler_warnings_default,
             description: "Hide the spoiler label on images",
@@ -54929,6 +55064,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               "Appearance"
             ],
             appearanceRevision: "863bbb51f3b1d5c1c32cd6c8bbf52e32b16f9a6bd64f94a36d06f32eea77fea3"
+          },
+          {
+            name: "HideStickerAutocomplete",
+            source: hide_sticker_autocomplete_default,
+            description: "Hide sticker suggestions while typing in chat",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStickerButton",
@@ -62754,7 +62898,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f23a71cd1cc72ab13bef52fd29c292a9b2df5f4a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f2e8ffd2cd7f04623b18e3c69d4a14587004ccc";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
