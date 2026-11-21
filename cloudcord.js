@@ -48397,7 +48397,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       throw new Error("Invalid text or length");
     return decoded;
   }
-  function searchCxCatalog(entries2, search) {
+  function searchCxCatalog(entries2, search, category = "All") {
+    if (category !== "All")
+      entries2 = entries2.filter((entry) => entry.categories?.includes(category));
     var query = search.trim().toLowerCase();
     if (!query)
       return entries2;
@@ -49635,7 +49637,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     };
   }
-  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage;
+  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES;
   var init_cx = __esm({
     "src/lib/api/cx.ts"() {
       "use strict";
@@ -49839,6 +49841,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "uploads.rename"
       ] : actionPermissions[action.kind];
       sendsMessage = (action) => action.kind === "send" || action.kind === "reply or send";
+      CX_CATALOG_CATEGORIES = [
+        "All",
+        "Appearance",
+        "Chat",
+        "Commands",
+        "Media",
+        "Profiles",
+        "Servers & channels",
+        "Voice & calls",
+        "Themes"
+      ];
     }
   });
 
@@ -53665,22 +53678,34 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             commands: [
               "ccp-count",
               "ccp-inspect"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "AllCallTimeCounter",
             source: all_call_time_counter_default,
-            description: "Show elapsed call time next to members in server voice channels"
+            description: "Show elapsed call time next to members in server voice channels",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "AlwaysAnimate",
             source: always_animate_default,
-            description: "Animate avatars, banners, and server icons"
+            description: "Animate avatars, banners, and server icons",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "AmoledMode",
             source: amoled_mode_default,
-            description: "use black backgrounds in dark mode"
+            description: "use black backgrounds in dark mode",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "AnonymiseFileNames",
@@ -53688,6 +53713,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Use random upload names by default",
             commands: [
               "spoiler"
+            ],
+            categories: [
+              "Commands",
+              "Media"
             ]
           },
           {
@@ -53696,12 +53725,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/someone",
             commands: [
               "someone"
+            ],
+            categories: [
+              "Chat",
+              "Commands",
+              "Servers & channels"
             ]
           },
           {
             name: "AutoVaporwave",
             source: auto_vaporwave_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "AvatarGrabber",
@@ -53709,65 +53746,104 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/avatar",
             commands: [
               "avatar"
+            ],
+            categories: [
+              "Chat",
+              "Commands",
+              "Media",
+              "Profiles"
             ]
           },
           {
             name: "BetterChatNames",
             source: better_chat_names_default,
-            description: "Format displayed server channel names as titles"
+            description: "Format displayed server channel names as titles",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BetterGifAltText",
             source: better_gif_alt_text_default,
-            description: "Use meaningful filenames for GIFs with generic alt text"
+            description: "Use meaningful filenames for GIFs with generic alt text",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "BetterPlusReacts",
             source: better_plus_reacts_default,
-            description: "React to the matching previous message when you send a plus shortcut"
+            description: "React to the matching previous message when you send a plus shortcut",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "BiggerAvatarsInChat",
             source: bigger_avatars_in_chat_default,
             description: "Makes avatars in chat larger",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BiggerChatText",
             source: bigger_chat_text_default,
             description: "Slightly larger message text",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BiggerCodeBlocks",
             source: bigger_code_blocks_default,
-            description: "increase code block text size"
+            description: "increase code block text size",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BiggerJumboEmojis",
             source: bigger_jumbo_emojis_default,
             description: "Makes emoji-only messages bigger",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BiggerServerIcons",
             source: bigger_server_icons_default,
-            description: "make server icons larger"
+            description: "make server icons larger",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BlockKeywords",
             source: block_keywords_default,
-            description: "Edit the source to enter keywords"
+            description: "Edit the source to enter keywords",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "BlurImagesUntilHover",
             source: blur_images_until_hover_default,
-            description: "conceal chat images and videos until you reveal them"
+            description: "conceal chat images and videos until you reveal them",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BlurNSFW",
             source: blur_nsfw_default,
-            description: "conceal attachments in age-restricted channels until you reveal them"
+            description: "conceal attachments in age-restricted channels until you reveal them",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BoldText",
@@ -53775,18 +53851,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/bold",
             commands: [
               "bold"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "BoldUsernames",
             source: bold_usernames_default,
             description: "Makes usernames in chat bolder",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "BypassPinPrompt",
             source: bypass_pin_prompt_default,
-            description: "Use Discord\u2019s Pin and Unpin actions without a confirmation prompt"
+            description: "Use Discord\u2019s Pin and Unpin actions without a confirmation prompt",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "Calculator",
@@ -53794,23 +53880,37 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/calc",
             commands: [
               "calc"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "CallTimeCounter",
             source: call_time_counter_default,
-            description: "Show the elapsed time in your current call"
+            description: "Show the elapsed time in your current call",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "CenteredChat",
             source: centered_chat_default,
-            description: "center the message list on wide screens"
+            description: "center the message list on wide screens",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "ChatButtonsBegone",
             source: chat_buttons_begone_default,
             description: "Hide the listed interface elements on this device",
-            keywords: "Hide the chat attachment button Hide the chat gift button Hide the GIF picker shortcut Hide the sticker picker shortcut Hide the composer expression picker shortcut Hide the chat apps button Hide the Shop entry Hide the threads shortcut in the channel header Hide avatar decorations Hide profile badge rows Hide profile effects"
+            keywords: "Hide the chat attachment button Hide the chat gift button Hide the GIF picker shortcut Hide the sticker picker shortcut Hide the composer expression picker shortcut Hide the chat apps button Hide the Shop entry Hide the threads shortcut in the channel header Hide avatar decorations Hide profile badge rows Hide profile effects",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "ClapText",
@@ -53818,27 +53918,43 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/clap",
             commands: [
               "clap"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "CleanChannelName",
             source: clean_channel_name_default,
-            description: "Remove decorations from displayed channel names"
+            description: "Remove decorations from displayed channel names",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "ClearURLs",
             source: clear_urls_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ClientSideBlock",
             source: client_side_block_default,
-            description: "Edit the source to enter Discord IDs"
+            description: "Edit the source to enter Discord IDs",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "CloudCordAccent",
             source: cloud_cord_accent_default,
-            description: "apply the CloudCord accent"
+            description: "apply the CloudCord accent",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Color Converter",
@@ -53847,6 +53963,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             commands: [
               "hextorgb",
               "rgbtohex"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -53855,35 +53974,54 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/color",
             commands: [
               "color"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "ColorfulMentions",
             source: colorful_mentions_default,
-            description: "tint inline mentions purple"
+            description: "tint inline mentions purple",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "CompactCompose",
             source: compact_compose_default,
             description: "Slims the composer and fades its action buttons until hover or focus",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "CompactMemberList",
             source: compact_member_list_default,
-            description: "reduce the spacing in the server member list"
+            description: "reduce the spacing in the server member list",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "CompactMessages",
             source: compact_messages_default,
             description: "Tighter spacing between messages",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "CompactServerList",
             source: compact_server_list_default,
             description: "Makes the server list narrower",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Compare Lines",
@@ -53891,69 +54029,108 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/comparelines",
             commands: [
               "comparelines"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "CopyBios",
             source: copy_bios_default,
-            description: "Copy Bio"
+            description: "Copy Bio",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "CopyEmojiMarkdown",
             source: copy_emoji_markdown_default,
-            description: "Add a Copy Emoji Markdown action to the emoji menu"
+            description: "Add a Copy Emoji Markdown action to the emoji menu",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "CopyFileContents",
             source: copy_file_contents_default,
-            description: "Copy the contents of the selected text attachment"
+            description: "Copy the contents of the selected text attachment",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "CopyMediaLink",
             source: copy_media_link_default,
-            description: "Add a clipboard action to media and link menus"
+            description: "Add a clipboard action to media and link menus",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "CopyMessageReference",
             source: copy_message_reference_default,
-            description: "Copy the selected message\u2019s Markdown link, timestamp, or author mention"
+            description: "Copy the selected message\u2019s Markdown link, timestamp, or author mention",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "CopyProfileColors",
             source: copy_profile_colors_default,
             description: "Copy Profile Colors",
-            keywords: "Copy Server Profile Colors"
+            keywords: "Copy Server Profile Colors",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "CopyProfileNames",
             source: copy_profile_names_default,
             description: "Copy Username",
-            keywords: "Copy Display Name"
+            keywords: "Copy Display Name",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "Copy Raw Text",
             source: copy_raw_text_default,
-            description: "Add Copy Raw Text to message menus"
+            description: "Add Copy Raw Text to message menus",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "CopyServerBio",
             source: copy_server_bio_default,
-            description: "Copy Server Bio"
+            description: "Copy Server Bio",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "CopyStickerLinks",
             source: copy_sticker_links_default,
-            description: "Add Copy Sticker Link and Open Sticker Link actions"
+            description: "Add Copy Sticker Link and Open Sticker Link actions",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "CopyUserMention",
             source: copy_user_mention_default,
-            description: "Copy User Mention"
+            description: "Copy User Mention",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "CopyUserURLs",
             source: copy_user_urls_default,
-            description: "Copy User URL"
+            description: "Copy User URL",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "Count Lines",
@@ -53961,18 +54138,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/countlines",
             commands: [
               "countlines"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "CustomTimestamps",
             source: custom_timestamps_default,
             description: "Format cozy timestamps as [calendar]",
-            keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL \u2022 [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL \u2022 [relative]"
+            keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL \u2022 [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL \u2022 [relative]",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Dashless",
             source: dashless_default,
-            description: "Replace hyphens with spaces in text channel names"
+            description: "Replace hyphens with spaces in text channel names",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Days Between",
@@ -53980,23 +54166,36 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/daysbetween",
             commands: [
               "daysbetween"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "Declutter",
             source: declutter_default,
             description: "Hide the listed interface elements on this device",
-            keywords: "Hide avatar decorations Hide nameplates Hide profile effects Hide server tags Hide the Shop entry Hide the Nitro entry Hide the Quests entry Hide the server boost progress bar Hide the chat gift button"
+            keywords: "Hide avatar decorations Hide nameplates Hide profile effects Hide server tags Hide the Shop entry Hide the Nitro entry Hide the Quests entry Hide the server boost progress bar Hide the chat gift button",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "DecodeBase64",
             source: decode_base64_default,
-            description: "Decode Base64 in the selected message and copy the result on request"
+            description: "Decode Base64 in the selected message and copy the result on request",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "DimInactiveChannels",
             source: dim_inactive_channels_default,
-            description: "dim channel names without unread messages"
+            description: "dim channel names without unread messages",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Discord Timestamp",
@@ -54005,38 +54204,59 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             commands: [
               "discordtimestamp",
               "discordlocaltimestamp"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "DontRoundMyTimestamps",
             source: dont_round_my_timestamps_default,
-            description: "Round relative timestamps down"
+            description: "Round relative timestamps down",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "DoubleClickEdit",
             source: double_click_edit_default,
-            description: "Open the editor for your own message on double-click or double-tap"
+            description: "Open the editor for your own message on double-click or double-tap",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "DoubleClickToReply",
             source: double_click_to_reply_default,
-            description: "Open a reply to another user's message on double-click or double-tap"
+            description: "Open a reply to another user's message on double-click or double-tap",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "EmbeddedURLs",
             source: embedded_urls_default,
             description: "https://www.tiktok.com \u2192 https://www.tnktok.com",
-            keywords: "https://vt.tiktok.com \u2192 https://www.tnktok.com https://x.com \u2192 https://www.fxtwitter.com https://www.twitter.com \u2192 https://www.fxtwitter.com https://www.instagram.com \u2192 https://www.kkinstagram.com"
+            keywords: "https://vt.tiktok.com \u2192 https://www.tnktok.com https://x.com \u2192 https://www.fxtwitter.com https://www.twitter.com \u2192 https://www.fxtwitter.com https://www.instagram.com \u2192 https://www.kkinstagram.com",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "Equius'sTypingQuirk",
             source: equius_s_typing_quirk_default,
-            description: "Apply 9 text rules to message sends and preserve links"
+            description: "Apply 9 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "EridanTypingQuirk",
             source: eridan_typing_quirk_default,
-            description: "Apply 4 text rules to message sends and preserve links"
+            description: "Apply 4 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "FakeProfileThemes",
@@ -54044,58 +54264,92 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Show colors encoded in bios when the profile has no native theme",
             commands: [
               "cx-profile-colors"
+            ],
+            categories: [
+              "Appearance",
+              "Commands"
             ]
           },
           {
             name: "FeferiTypingQuirk",
             source: feferi_typing_quirk_default,
-            description: "Apply 168 text rules to message sends and preserve links"
+            description: "Apply 168 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "FileNameRandomization",
             source: file_name_randomization_default,
-            description: "Use format upload names when selected for a file"
+            description: "Use format upload names when selected for a file",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "FixCodeblockGap",
             source: fix_codeblock_gap_default,
-            description: "Remove the extra blank line after fenced code blocks"
+            description: "Remove the extra blank line after fenced code blocks",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "FixFileExtensions",
             source: fix_file_extensions_default,
-            description: "Use supported filename extensions for listed attachment formats"
+            description: "Use supported filename extensions for listed attachment formats",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "FixImagesQuality",
             source: fix_images_quality_default,
-            description: "Improve attachment previews and load originals in the media viewer"
+            description: "Improve attachment previews and load originals in the media viewer",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "FloatingChatBar",
             source: floating_chat_bar_default,
-            description: "lift the chat bar above the bottom edge"
+            description: "lift the chat bar above the bottom edge",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "FocusMode",
             source: focus_mode_default,
             description: "Hides the member list for a wider chat",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "FollowVoiceUser",
             source: follow_voice_user_default,
-            description: "Edit the source to enter Discord IDs"
+            description: "Edit the source to enter Discord IDs",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "ForceOwnerCrown",
             source: force_owner_crown_default,
-            description: "Show the server owner\u2019s native crown in the member list"
+            description: "Show the server owner\u2019s native crown in the member list",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "foreignCopyHandler",
             source: foreign_copy_handler_default,
-            description: "Add Copy Channel Name and Copy Category Name actions"
+            description: "Add Copy Channel Name and Copy Category Name actions",
+            categories: [
+              "Servers & channels"
+            ]
           },
           {
             name: "FriendInvites",
@@ -54105,12 +54359,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               "create-friend-invite",
               "view-friend-invites",
               "revoke-friend-invites"
+            ],
+            categories: [
+              "Commands",
+              "Profiles"
             ]
           },
           {
             name: "Gamzee'sTypingQuirk",
             source: gamzee_s_typing_quirk_default,
-            description: "Apply 1 text rules to message sends and preserve links"
+            description: "Apply 1 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "GoogleThat",
@@ -54118,435 +54379,699 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/googlethat",
             commands: [
               "googlethat"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "GrayscaleImages",
             source: grayscale_images_default,
             description: "Shows images in grayscale until hovered",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideActiveNow",
             source: hide_active_now_default,
-            description: "Hide the active friends panel"
+            description: "Hide the active friends panel",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideAddFriendHint",
             source: hide_add_friend_hint_default,
             description: "Hide the hint below the Add Friend field",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideAddServerButton",
             source: hide_add_server_button_default,
-            description: "Hide the add-a-server button"
+            description: "Hide the add-a-server button",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideAppsButton",
             source: hide_apps_button_default,
-            description: "Hide the chat apps button"
+            description: "Hide the chat apps button",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideAvatarDecorations",
             source: hide_avatar_decorations_default,
-            description: "Hide avatar decorations"
+            description: "Hide avatar decorations",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideBadges",
             source: hide_badges_default,
-            description: "Hide profile badge rows"
+            description: "Hide profile badge rows",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideBlockedAndIgnoredMessages",
             source: hide_blocked_and_ignored_messages_default,
-            description: "Hide matching incoming messages and history on this device"
+            description: "Hide matching incoming messages and history on this device",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "HideBoostGoal",
             source: hide_boost_goal_default,
-            description: "Hide the server boost progress bar"
+            description: "Hide the server boost progress bar",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideBotTags",
             source: hide_bot_tags_default,
-            description: "Hide APP and BOT tags"
+            description: "Hide APP and BOT tags",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideCallButtons",
             source: hide_call_buttons_default,
-            description: "Hide the buttons to start calls in DMs"
+            description: "Hide the buttons to start calls in DMs",
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ]
           },
           {
             name: "HideChannelTopic",
             source: hide_channel_topic_default,
-            description: "Hide channel topics"
+            description: "Hide channel topics",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideCharacterCount",
             source: hide_character_count_default,
-            description: "Hide the chat character counter"
+            description: "Hide the chat character counter",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideClanTags",
             source: hide_clan_tags_default,
-            description: "Hide server tags"
+            description: "Hide server tags",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideCustomStatuses",
             source: hide_custom_statuses_default,
-            description: "Hide custom statuses in the member list"
+            description: "Hide custom statuses in the member list",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideDisabledEmojis",
             source: hide_disabled_emojis_default,
-            description: "Hide unavailable emoji in Discord\u2019s emoji picker"
+            description: "Hide unavailable emoji in Discord\u2019s emoji picker",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideDiscoverButton",
             source: hide_discover_button_default,
             description: "Hides the Discover button in the server list",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideDmSearch",
             source: hide_dm_search_default,
-            description: "Hide the search button in the DM list"
+            description: "Hide the search button in the DM list",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideDownloadAppsButton",
             source: hide_download_apps_button_default,
             description: "Hides the download-apps button in the server list",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideEditedLabel",
             source: hide_edited_label_default,
-            description: "Hide the edited label in chat"
+            description: "Hide the edited label in chat",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideEmbeds",
             source: hide_embeds_default,
-            description: "Hide link embeds in chat"
+            description: "Hide link embeds in chat",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideEmojiButton",
             source: hide_emoji_button_default,
-            description: "Hide the composer expression picker shortcut"
+            description: "Hide the composer expression picker shortcut",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideEmptyFolders",
             source: hide_empty_folders_default,
-            description: "Hide empty expanded server folders"
+            description: "Hide empty expanded server folders",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideFriendRequestsBadge",
             source: hide_friend_requests_badge_default,
-            description: "Hide the pending friend requests counter"
+            description: "Hide the pending friend requests counter",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideGifButton",
             source: hide_gif_button_default,
-            description: "Hide the GIF picker shortcut"
+            description: "Hide the GIF picker shortcut",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideGiftButton",
             source: hide_gift_button_default,
-            description: "Hide the chat gift button"
+            description: "Hide the chat gift button",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideGuildBoostTag",
             source: hide_guild_boost_tag_default,
-            description: "Hide the server boost gem"
+            description: "Hide the server boost gem",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideHelpButton",
             source: hide_help_button_default,
-            description: "Hide the Help entry"
+            description: "Hide the Help entry",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideImageAltText",
             source: hide_image_alt_text_default,
-            description: "Hide the image description control"
+            description: "Hide the image description control",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideInboxButton",
             source: hide_inbox_button_default,
-            description: "Hide the notifications entry"
+            description: "Hide the notifications entry",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideJoinMessages",
             source: hide_join_messages_default,
-            description: "Hide system messages for joins"
+            description: "Hide system messages for joins",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "HideJumpToPresent",
             source: hide_jump_to_present_default,
-            description: "Hide the jump-to-present bar"
+            description: "Hide the jump-to-present bar",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideKeyboardTips",
             source: hide_keyboard_tips_default,
             description: "Hides the keyboard tips under the chat bar",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideMemberActivities",
             source: hide_member_activities_default,
-            description: "Hide game and music activity text in the member list"
+            description: "Hide game and music activity text in the member list",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideMemberListButton",
             source: hide_member_list_button_default,
             description: "Hides the member list toggle in the channel header",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideMentionBadges",
             source: hide_mention_badges_default,
-            description: "Hide mention count badges"
+            description: "Hide mention count badges",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideNameplates",
             source: hide_nameplates_default,
-            description: "Hide nameplates"
+            description: "Hide nameplates",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideNewMessagesBar",
             source: hide_new_messages_bar_default,
-            description: "Hide the new messages bar"
+            description: "Hide the new messages bar",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideNitroTab",
             source: hide_nitro_tab_default,
-            description: "Hide the Nitro entry"
+            description: "Hide the Nitro entry",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideNotificationBell",
             source: hide_notification_bell_default,
-            description: "Hide the channel notification settings shortcut"
+            description: "Hide the channel notification settings shortcut",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HidePinsButton",
             source: hide_pins_button_default,
-            description: "Hide the pinned messages shortcut"
+            description: "Hide the pinned messages shortcut",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Hide Profile Banner Images",
             source: hide_profile_banner_images_default,
-            description: "Hide Discord-hosted profile banner images except your own and those of friends"
+            description: "Hide Discord-hosted profile banner images except your own and those of friends",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideProfileConnections",
             source: hide_profile_connections_default,
-            description: "Hide connections in profile cards"
+            description: "Hide connections in profile cards",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideProfileEffects",
             source: hide_profile_effects_default,
-            description: "Hide profile effects"
+            description: "Hide profile effects",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideProfileFriendRequestBanner",
             source: hide_profile_friend_request_banner_default,
             description: "Hide friend request banners in profiles",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideProfileMutuals",
             source: hide_profile_mutuals_default,
-            description: "Hide mutual friends and servers in profile cards"
+            description: "Hide mutual friends and servers in profile cards",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideProfileNotes",
             source: hide_profile_notes_default,
-            description: "Hide local notes in profile cards"
+            description: "Hide local notes in profile cards",
+            categories: [
+              "Appearance",
+              "Profiles"
+            ]
           },
           {
             name: "HideQuestsTab",
             source: hide_quests_tab_default,
-            description: "Hide the Quests entry"
+            description: "Hide the Quests entry",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideReactions",
             source: hide_reactions_default,
-            description: "Hide message reactions"
+            description: "Hide message reactions",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideReplyPreviews",
             source: hide_reply_previews_default,
-            description: "Hide reply previews in chat"
+            description: "Hide reply previews in chat",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideRoleIcons",
             source: hide_role_icons_default,
-            description: "Hide role icons"
+            description: "Hide role icons",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideScrollbars",
             source: hide_scrollbars_default,
-            description: "Hide scroll indicators"
+            description: "Hide scroll indicators",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideSendButton",
             source: hide_send_button_default,
-            description: "Hide the chat send button"
+            description: "Hide the chat send button",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideServerBanner",
             source: hide_server_banner_default,
-            description: "Hide the channel list server banner"
+            description: "Hide the channel list server banner",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideShopTab",
             source: hide_shop_tab_default,
-            description: "Hide the Shop entry"
+            description: "Hide the Shop entry",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideSpoilerWarnings",
             source: hide_spoiler_warnings_default,
-            description: "Hide the spoiler label on images"
+            description: "Hide the spoiler label on images",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStatusEmojis",
             source: hide_status_emojis_default,
-            description: "Hide emojis in custom status bubbles"
+            description: "Hide emojis in custom status bubbles",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStickerButton",
             source: hide_sticker_button_default,
-            description: "Hide the sticker picker shortcut"
+            description: "Hide the sticker picker shortcut",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStickerPickerPromotions",
             source: hide_sticker_picker_promotions_default,
             description: "Hide shop and promotional cards in the sticker picker",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStickerSearchSuggestions",
             source: hide_sticker_search_suggestions_default,
             description: "Hide suggested searches in the sticker picker",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStickers",
             source: hide_stickers_default,
-            description: "Hide stickers in chat"
+            description: "Hide stickers in chat",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideStreamPreviews",
             source: hide_stream_previews_default,
-            description: "Hide voice-channel stream previews"
+            description: "Hide voice-channel stream previews",
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ]
           },
           {
             name: "HideSuggestedChannels",
             source: hide_suggested_channels_default,
-            description: "Hide the suggested channels section"
+            description: "Hide the suggested channels section",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideSystemMessages",
             source: hide_system_messages_default,
-            description: "Hide system messages for pins, joins, boosts"
+            description: "Hide system messages for pins, joins, boosts",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "HideThreadSuggestions",
             source: hide_thread_suggestions_default,
             description: "Hide thread suggestions above the composer",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideThreadsButton",
             source: hide_threads_button_default,
-            description: "Hide the threads shortcut in the channel header"
+            description: "Hide the threads shortcut in the channel header",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideTimestamps",
             source: hide_timestamps_default,
-            description: "Hide timestamps next to chat messages"
+            description: "Hide timestamps next to chat messages",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideTypingIndicator",
             source: hide_typing_indicator_default,
-            description: "Hide the typing indicator"
+            description: "Hide the typing indicator",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideUnreadPills",
             source: hide_unread_pills_default,
-            description: "Hide the server sidebar unread pills"
+            description: "Hide the server sidebar unread pills",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideUploadButton",
             source: hide_upload_button_default,
-            description: "Hide the chat attachment button"
+            description: "Hide the chat attachment button",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideUserPanelActivity",
             source: hide_user_panel_activity_default,
             description: "Hides your activity line in the user panel",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HideVoicePanelTips",
             source: hide_voice_panel_tips_default,
             description: "Hides tips in the voice connection panel",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ]
           },
           {
             name: "HideVoiceUserAvatars",
             source: hide_voice_user_avatars_default,
-            description: "Hide avatars next to users in voice channels"
+            description: "Hide avatars next to users in voice channels",
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ]
           },
           {
             name: "HighContrastText",
             source: high_contrast_text_default,
-            description: "increase text contrast"
+            description: "increase text contrast",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "High-Res Profile Images",
             source: high_res_profile_images_default,
-            description: "Request higher-resolution Discord avatars (256 px)"
+            description: "Request higher-resolution Discord avatars (256 px)",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HighlightLinks",
             source: highlight_links_default,
-            description: "underline message links"
+            description: "underline message links",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HighlightMentions",
             source: highlight_mentions_default,
-            description: "highlight messages that mention you in purple"
+            description: "highlight messages that mention you in purple",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HoldYourTongue",
             source: hold_your_tongue_default,
-            description: "Confirm before sending text containing lipton green tea citrus"
+            description: "Confirm before sending text containing lipton green tea citrus",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "HopOn",
             source: hop_on_default,
-            description: "Edit the source to set the HTTPS destination"
+            description: "Edit the source to set the HTTPS destination",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "HoverHighlightMessages",
             source: hover_highlight_messages_default,
             description: "Highlights the message under your cursor",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "IgnoreCalls",
             source: ignore_calls_default,
-            description: "Edit the source to enter Discord IDs"
+            description: "Edit the source to enter Discord IDs",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "ImageFilename",
             source: image_filename_default,
-            description: "Show image filenames and GIF links"
+            description: "Show image filenames and GIF links",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "ImageLink",
             source: image_link_default,
-            description: "Show image links alongside their chat previews"
+            description: "Show image links alongside their chat previews",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "InRole",
@@ -54554,12 +55079,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/inrole",
             commands: [
               "inrole"
+            ],
+            categories: [
+              "Commands",
+              "Servers & channels"
             ]
           },
           {
             name: "Ingtoninator",
             source: ingtoninator_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "JSON Check",
@@ -54567,6 +55099,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/jsoncheck",
             commands: [
               "jsoncheck"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -54575,28 +55110,43 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/formatjson",
             commands: [
               "formatjson"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "JumpToTop",
             source: jump_to_top_default,
-            description: "Add a channel header button to jump to the first message"
+            description: "Add a channel header button to jump to the first message",
+            categories: [
+              "Servers & channels"
+            ]
           },
           {
             name: "JumpTo",
             source: jump_to_default,
-            description: "Jump to the first or last message from channel and message menus"
+            description: "Jump to the first or last message from channel and message menus",
+            categories: [
+              "Servers & channels"
+            ]
           },
           {
             name: "KeywordNotify",
             source: keyword_notify_default,
-            description: "Edit the source to enter keywords"
+            description: "Edit the source to enter keywords",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "LargerChatText",
             source: larger_chat_text_default,
             description: "Makes chat text larger",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "LeetText",
@@ -54604,6 +55154,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/leet",
             commands: [
               "leet"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
@@ -54612,18 +55166,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/linestocsv",
             commands: [
               "linestocsv"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "LinkConverter",
             source: link_converter_default,
             description: "send \xB7 https://reddit.com \u2192 https://rxddit.com",
-            keywords: "profile \xB7 https://reddit.com \u2192 https://rxddit.com send \xB7 https://www.reddit.com \u2192 https://rxddit.com profile \xB7 https://www.reddit.com \u2192 https://rxddit.com send \xB7 https://old.reddit.com \u2192 https://rxddit.com profile \xB7 https://old.reddit.com \u2192 https://rxddit.com send \xB7 https://x.com \u2192 https://fxtwitter.com profile \xB7 https://x.com \u2192 https://fxtwitter.com send \xB7 https://www.x.com \u2192 https://fxtwitter.com profile \xB7 https://www.x.com \u2192 https://fxtwitter.com send \xB7 https://instagram.com \u2192 https://vxinstagram.com profile \xB7 h"
+            keywords: "profile \xB7 https://reddit.com \u2192 https://rxddit.com send \xB7 https://www.reddit.com \u2192 https://rxddit.com profile \xB7 https://www.reddit.com \u2192 https://rxddit.com send \xB7 https://old.reddit.com \u2192 https://rxddit.com profile \xB7 https://old.reddit.com \u2192 https://rxddit.com send \xB7 https://x.com \u2192 https://fxtwitter.com profile \xB7 https://x.com \u2192 https://fxtwitter.com send \xB7 https://www.x.com \u2192 https://fxtwitter.com profile \xB7 https://www.x.com \u2192 https://fxtwitter.com send \xB7 https://instagram.com \u2192 https://vxinstagram.com profile \xB7 h",
+            categories: [
+              "Chat",
+              "Profiles"
+            ]
           },
           {
             name: "LocalChannelNotes",
             source: local_channel_notes_default,
-            description: "Add a local note editor to channel menus"
+            description: "Add a local note editor to channel menus",
+            categories: [
+              "Servers & channels"
+            ]
           },
           {
             name: "Markdown Escape",
@@ -54631,23 +55195,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/escapemarkdown",
             commands: [
               "escapemarkdown"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "MessageBurst",
             source: message_burst_default,
-            description: "Edit your own previous text message when you send a correction or quick follow-up"
+            description: "Edit your own previous text message when you send a correction or quick follow-up",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "MessageNotifier",
             source: message_notifier_default,
-            description: "Edit the source to enter Discord IDs"
+            description: "Edit the source to enter Discord IDs",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "MonospaceChat",
             source: monospace_chat_default,
             description: "Shows chat text in a monospace font",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "MoreCommands",
@@ -54689,114 +55265,181 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               "music",
               "stars",
               "lovegiving"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "MutedChannelsFaded",
             source: muted_channels_faded_default,
-            description: "fade muted channels"
+            description: "fade muted channels",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NarrowChannelList",
             source: narrow_channel_list_default,
-            description: "make the channel list narrower"
+            description: "make the channel list narrower",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Nepeta'sTypingQuirk",
             source: nepeta_s_typing_quirk_default,
-            description: "Apply 165 text rules to message sends and preserve links"
+            description: "Apply 165 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NoAnimations",
             source: no_animations_default,
-            description: "reduce interface animations and transitions"
+            description: "reduce interface animations and transitions",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoBlockedMessages",
             source: no_blocked_messages_default,
-            description: "Hide matching incoming messages and history on this device"
+            description: "Hide matching incoming messages and history on this device",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NoChatBarBorder",
             source: no_chat_bar_border_default,
-            description: "remove the chat bar border and shadow"
+            description: "remove the chat bar border and shadow",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoConfirmPin",
             source: no_confirm_pin_default,
-            description: "Pin or unpin the selected message with one menu action"
+            description: "Pin or unpin the selected message with one menu action",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NoDraftLengthLimit",
             source: no_draft_length_limit_default,
-            description: "Preserve long drafts in Discord\u2019s local draft store"
+            description: "Preserve long drafts in Discord\u2019s local draft store",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NoMessageHoverBar",
             source: no_message_hover_bar_default,
             description: "Hides the buttons that appear when hovering a message",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoMosaic",
             source: no_mosaic_default,
-            description: "Show chat attachments individually without the media grid"
+            description: "Show chat attachments individually without the media grid",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoPendingCount",
             source: no_pending_count_default,
-            description: "Hide the pending friend request count"
+            description: "Hide the pending friend request count",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoProfileThemes",
             source: no_profile_themes_default,
-            description: "Hide other users\u2019 theme colors when their profiles load"
+            description: "Hide other users\u2019 theme colors when their profiles load",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoReplyMention",
             source: no_reply_mention_default,
-            description: "Send replies without pinging the person you reply to"
+            description: "Send replies without pinging the person you reply to",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NoReplyPing",
             source: no_reply_ping_default,
-            description: "Turn reply pings off initially and keep the composer toggle available"
+            description: "Turn reply pings off initially and keep the composer toggle available",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NoRoleHeaders",
             source: no_role_headers_default,
-            description: "Hide role section headers in the server member list"
+            description: "Hide role section headers in the server member list",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoServerEmojis",
             source: no_server_emojis_default,
-            description: "Show only standard Unicode emoji in chat autocomplete"
+            description: "Show only standard Unicode emoji in chat autocomplete",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoShadows",
             source: no_shadows_default,
             description: "Removes drop shadows for a flatter look",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoTypingAnimation",
             source: no_typing_animation_default,
-            description: "Keep Discord's typing dots still"
+            description: "Keep Discord's typing dots still",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "NoUnblockToJump",
             source: no_unblock_to_jump_default,
-            description: "Skip the blocked, ignored, or spam author prompt when jumping to a message"
+            description: "Skip the blocked, ignored, or spam author prompt when jumping to a message",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NormalizeMessageLinks",
             source: normalize_message_links_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "NotifyWhenMuted",
             source: notify_when_muted_default,
-            description: "Play a sound when you try to speak while muted"
+            description: "Play a sound when you try to speak while muted",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "Number Lines",
@@ -54804,42 +55447,67 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/numberlines",
             commands: [
               "numberlines"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "OpenSteamLinksInApp",
             source: open_steam_links_in_app_default,
-            description: "Send clicked Steam links to the Steam app"
+            description: "Send clicked Steam links to the Steam app",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "PingNotifications",
             source: ping_notifications_default,
-            description: "Show message previews for the selected mentions, friends, and direct messages"
+            description: "Show message previews for the selected mentions, friends, and direct messages",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "PolishWording",
             source: polish_wording_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ProfileMedia",
             source: profile_media_default,
-            description: "Add View and Download actions for Discord avatars and banners"
+            description: "Add View and Download actions for Discord avatars and banners",
+            categories: [
+              "Media",
+              "Profiles"
+            ]
           },
           {
             name: "QuickMention",
             source: quick_mention_default,
-            description: "Insert the selected message author's mention into the current draft"
+            description: "Insert the selected message author's mention into the current draft",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "QuoteMessage",
             source: quote_message_default,
-            description: "Add Quote and Copy as Quote actions to message menus"
+            description: "Add Quote and Copy as Quote actions to message menus",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ReadAllNotificationsButton",
             source: read_all_notifications_button_default,
-            description: "Add a server list button to mark loaded server channels as read"
+            description: "Add a server list button to mark loaded server channels as read",
+            categories: [
+              "Servers & channels"
+            ]
           },
           {
             name: "ReadAllNotifications",
@@ -54847,43 +55515,68 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/readall",
             commands: [
               "readall"
+            ],
+            categories: [
+              "Commands",
+              "Servers & channels"
             ]
           },
           {
             name: "ReadableLineLength",
             source: readable_line_length_default,
-            description: "limit the width of long message lines"
+            description: "limit the width of long message lines",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "ReadableSpoilers",
             source: readable_spoilers_default,
-            description: "outline concealed spoilers"
+            description: "outline concealed spoilers",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "RealtimeTimestamps",
             source: realtime_timestamps_default,
             description: "Format cozy timestamps as HH:mm:ss",
-            keywords: "Format compact timestamps as HH:mm:ss Format tooltip timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss Format markdown timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss"
+            keywords: "Format compact timestamps as HH:mm:ss Format tooltip timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss Format markdown timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "RelationshipNotifier",
             source: relationship_notifier_default,
-            description: "Show a local notification when a friend removes you"
+            description: "Show a local notification when a friend removes you",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "RepeatMessages",
             source: repeat_messages_default,
-            description: "Send the selected message again with its attachments and stickers"
+            description: "Send the selected message again with its attachments and stickers",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ReplyPingControl",
             source: reply_ping_control_default,
-            description: "Choose whether incoming replies ping you on this device"
+            description: "Choose whether incoming replies ping you on this device",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ReverseImageSearch",
             source: reverse_image_search_default,
-            description: "Add a Search Image action with a choice of search engines"
+            description: "Add a Search Image action with a choice of search engines",
+            categories: [
+              "Media"
+            ]
           },
           {
             name: "ReverseText",
@@ -54891,6 +55584,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/reverse",
             commands: [
               "reverse"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
@@ -54899,29 +55596,44 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/rot13text",
             commands: [
               "rot13text"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "RoundServerIcons",
             source: round_server_icons_default,
-            description: "round server icons"
+            description: "round server icons",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "RoundedAvatarsSquare",
             source: rounded_avatars_square_default,
             description: "give avatars softer square corners",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "RoundedChatBar",
             source: rounded_chat_bar_default,
-            description: "round the chat bar"
+            description: "round the chat bar",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "RoundedImages",
             source: rounded_images_default,
             description: "Rounder corners on images and videos in chat",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "ScheduledMessages",
@@ -54929,22 +55641,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/schedule",
             commands: [
               "schedule"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "ScrollToLatest",
             source: scroll_to_latest_default,
-            description: "Open channels at the latest message and mark them read"
+            description: "Open channels at the latest message and mark them read",
+            categories: [
+              "Servers & channels"
+            ]
           },
           {
             name: "SedEnhanced",
             source: sed_enhanced_default,
-            description: "Edit your own previous text message when you send a correction or quick follow-up"
+            description: "Edit your own previous text message when you send a correction or quick follow-up",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "SendTimestamps",
             source: send_timestamps_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ShipCalc",
@@ -54952,38 +55677,61 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/ship",
             commands: [
               "ship"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "ShowPing",
             source: show_ping_default,
             description: "Show your live call latency in milliseconds",
-            keywords: "Hide the desktop Krisp button beside the voice connection controls"
+            keywords: "Hide the desktop Krisp button beside the voice connection controls",
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ]
           },
           {
             name: "ShowSongName",
             source: show_song_name_default,
-            description: "Show the song title in Spotify activity status"
+            description: "Show the song title in Spotify activity status",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Signature",
             source: signature_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "SilenceUsers",
             source: silence_users_default,
-            description: "Edit the source to enter Discord IDs"
+            description: "Edit the source to enter Discord IDs",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "SilentMessageToggle",
             source: silent_message_toggle_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "SilentTyping",
             source: silent_typing_default,
-            description: "Stop sending your typing indicator"
+            description: "Stop sending your typing indicator",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "Slugify Text",
@@ -54991,25 +55739,37 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/slugifytext",
             commands: [
               "slugifytext"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "SmallerAvatarsInChat",
             source: smaller_avatars_in_chat_default,
             description: "Makes avatars in chat smaller",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "SmallerChatText",
             source: smaller_chat_text_default,
             description: "Makes chat text smaller",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "SmoothScrolling",
             source: smooth_scrolling_default,
             description: "Smooth scrolling everywhere",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Snowflake Created At",
@@ -55017,18 +55777,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/snowflakecreated",
             commands: [
               "snowflakecreated"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "SoftCorners",
             source: soft_corners_default,
             description: "Rounder corners on cards, popouts and modals",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "SolluxTypingQuirk",
             source: sollux_typing_quirk_default,
-            description: "Apply 4 text rules to message sends and preserve links"
+            description: "Apply 4 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "Sort Lines",
@@ -55036,12 +55805,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/sortlines",
             commands: [
               "sortlines"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "SortReactions",
             source: sort_reactions_default,
-            description: "Show the most-used reactions first under each message"
+            description: "Show the most-used reactions first under each message",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "SpaceOut",
@@ -55049,18 +55824,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/spaceout",
             commands: [
               "spaceout"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "SpaciousMessages",
             source: spacious_messages_default,
             description: "increase spacing between message groups",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "SplitLargeMessages",
             source: split_large_messages_default,
-            description: "Split long drafts into at most eight messages when slowmode is off"
+            description: "Split long drafts into at most eight messages when slowmode is off",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "SpotifyShareCommands",
@@ -55070,13 +55855,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               "track",
               "album",
               "artist"
+            ],
+            categories: [
+              "Chat",
+              "Commands",
+              "Media"
             ]
           },
           {
             name: "SquareAvatars",
             source: square_avatars_default,
             description: "give avatars round-square corners",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Starify",
@@ -55084,44 +55877,69 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/starify",
             commands: [
               "starify"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "StickerBlocker",
             source: sticker_blocker_default,
-            description: "Hide all stickers"
+            description: "Hide all stickers",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "StickyDateDividers",
             source: sticky_date_dividers_default,
             description: "Keeps the current day label at the top while scrolling",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "StopAutoUnread",
             source: stop_auto_unread_default,
-            description: "Keep your chosen channel notification settings"
+            description: "Keep your chosen channel notification settings",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "TalkInReverse",
             source: talk_in_reverse_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "TereziTypingQuirk",
             source: terezi_typing_quirk_default,
-            description: "Apply 3 text rules to message sends and preserve links"
+            description: "Apply 3 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "TextReplace",
             source: text_replace_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ThinScrollbars",
             source: thin_scrollbars_default,
             description: "Thinner scrollbars",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Translate",
@@ -55129,12 +55947,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/translate",
             commands: [
               "translate"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "TransparentChatBar",
             source: transparent_chat_bar_default,
-            description: "make the chat input background translucent"
+            description: "make the chat input background translucent",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Trim Lines",
@@ -55142,6 +55967,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/trimlines",
             commands: [
               "trimlines"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -55150,12 +55978,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/unicodeinfo",
             commands: [
               "unicodeinfo"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "Unindent",
             source: unindent_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "Unique Lines",
@@ -55163,6 +55997,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/uniquelines",
             commands: [
               "uniquelines"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -55171,12 +56008,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/convert",
             commands: [
               "convert"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "UnsuppressEmbeds",
             source: unsuppress_embeds_default,
-            description: "Suppress or unsuppress embeds in the selected message"
+            description: "Suppress or unsuppress embeds in the selected message",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "URL Component Codec",
@@ -55185,12 +56029,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             commands: [
               "urlencode",
               "urldecode"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "UserNotes",
             source: user_notes_default,
-            description: "Add a local user note editor to profile menus"
+            description: "Add a local user note editor to profile menus",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "UserTags",
@@ -55198,6 +56048,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Tag users in profile menus and search those tags on this device",
             commands: [
               "find-user-tags"
+            ],
+            categories: [
+              "Commands",
+              "Profiles"
             ]
           },
           {
@@ -55206,43 +56060,68 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/vibe",
             commands: [
               "vibe"
+            ],
+            categories: [
+              "Chat",
+              "Commands"
             ]
           },
           {
             name: "VoiceCount",
             source: voice_count_default,
-            description: "Show occupancy and capacity in the channel list"
+            description: "Show occupancy and capacity in the channel list",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "VoiceJoinMessages",
             source: voice_join_messages_default,
-            description: "Show local notifications when friends join or move between voice channels"
+            description: "Show local notifications when friends join or move between voice channels",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "Vriska'sTypingQuirk",
             source: vriska_s_typing_quirk_default,
-            description: "Apply 38 text rules to message sends and preserve links"
+            description: "Apply 38 text rules to message sends and preserve links",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "WaitForSlot",
             source: wait_for_slot_default,
-            description: "Queue for a full voice channel and respond when a slot opens"
+            description: "Queue for a full voice channel and respond when a slot opens",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "WebcamStartNotifier",
             source: webcam_start_notifier_default,
-            description: "Play different tones when someone turns their camera on or off"
+            description: "Play different tones when someone turns their camera on or off",
+            categories: [
+              "Voice & calls"
+            ]
           },
           {
             name: "WiderChannelList",
             source: wider_channel_list_default,
-            description: "make the channel list wider"
+            description: "make the channel list wider",
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "WiderChat",
             source: wider_chat_default,
             description: "Lets messages use the full width of the window",
-            desktopOnly: true
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "WikiLookup",
@@ -55250,12 +56129,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/wiki",
             commands: [
               "wiki"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "WordCount",
             source: word_count_default,
-            description: "Show word and character counts below messages longer than five words"
+            description: "Show word and character counts below messages longer than five words",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "Word Frequency",
@@ -55263,518 +56148,827 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "/wordfrequency",
             commands: [
               "wordfrequency"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
             name: "WriteUpperCase",
             source: write_upper_case_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "ZeroWidthSanitizer",
             source: zero_width_sanitizer_default,
-            description: "Change text before Discord sends messages you compose"
+            description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
           }
         ],
         themes: [
           {
             name: "Midnight",
-            source: midnight_default
+            source: midnight_default,
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "BasicBackground (Chat)",
             source: basic_background_chat_default,
-            description: "Wallpaper"
+            description: "Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Blue Hour",
             source: blue_hour_default,
-            description: "Wallpaper"
+            description: "Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9",
             source: catppuccin_frappe_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte",
             source: catppuccin_latte_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato",
             source: catppuccin_macchiato_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha",
             source: catppuccin_mocha_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Moss",
             source: distra_moss_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Dracula for BetterDiscord",
             source: dracula_betterdiscord_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Dreamy",
             source: dreamy_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Edgerunners - Night City Gradient",
             source: edgerunners_night_city_gradient_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Lotus",
             source: enmity_lotus_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Mars",
             source: enmity_mars_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Mist",
             source: enmity_mist_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Nord for Enmity",
             source: enmity_nord_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Futuristic - Aurora",
             source: futuristic_aurora_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Futuristic - Ice",
             source: futuristic_ice_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Futuristic - Nebula",
             source: futuristic_nebula_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Futuristic - Orbit",
             source: futuristic_orbit_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Futuristic - Void",
             source: futuristic_void_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Glorious Sunset",
             source: glorious_sunset_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Catppuccin Macchiato",
             source: refact0r_midnight_catppuccin_macchiato_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Catppuccin Mocha",
             source: refact0r_midnight_catppuccin_mocha_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Default",
             source: refact0r_midnight_default_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Light",
             source: refact0r_midnight_light_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Lilypichu",
             source: refact0r_midnight_lilypichu_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Nord",
             source: refact0r_midnight_nord_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Ros\xE9 Pine Moon",
             source: refact0r_midnight_rose_pine_moon_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Ros\xE9 Pine",
             source: refact0r_midnight_rose_pine_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Tokyo Night",
             source: refact0r_midnight_tokyo_night_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Midnight - Vencord",
             source: refact0r_midnight_vencord_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Cream Yellow v1.3.4",
             source: taki_cream_yellow_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Gruv Yellow v3.3.4",
             source: taki_gruv_yellow_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Ratio Redesigned v1.1.3",
             source: taki_ratio_redesigned_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Ratio v1.1.3",
             source: taki_ratio_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Scarlet Love v1.0.5",
             source: taki_scarlet_love_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Vendetta Teal v1.2.3",
             source: taki_vendetta_teal_amoled_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Flamingo",
             source: vendetta_catppuccin_frappe_flamingo_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Green",
             source: vendetta_catppuccin_frappe_green_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Lavender",
             source: vendetta_catppuccin_frappe_lavender_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Maroon",
             source: vendetta_catppuccin_frappe_maroon_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Mauve",
             source: vendetta_catppuccin_frappe_mauve_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Peach",
             source: vendetta_catppuccin_frappe_peach_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Pink",
             source: vendetta_catppuccin_frappe_pink_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Red",
             source: vendetta_catppuccin_frappe_red_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Rosewater",
             source: vendetta_catppuccin_frappe_rosewater_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Sapphire",
             source: vendetta_catppuccin_frappe_sapphire_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Sky",
             source: vendetta_catppuccin_frappe_sky_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Teal",
             source: vendetta_catppuccin_frappe_teal_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Frapp\xE9 - Yellow",
             source: vendetta_catppuccin_frappe_yellow_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Flamingo",
             source: vendetta_catppuccin_latte_flamingo_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Green",
             source: vendetta_catppuccin_latte_green_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Lavender",
             source: vendetta_catppuccin_latte_lavender_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Maroon",
             source: vendetta_catppuccin_latte_maroon_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Mauve",
             source: vendetta_catppuccin_latte_mauve_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Peach",
             source: vendetta_catppuccin_latte_peach_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Pink",
             source: vendetta_catppuccin_latte_pink_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Red",
             source: vendetta_catppuccin_latte_red_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Rosewater",
             source: vendetta_catppuccin_latte_rosewater_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Sapphire",
             source: vendetta_catppuccin_latte_sapphire_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Sky",
             source: vendetta_catppuccin_latte_sky_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Teal",
             source: vendetta_catppuccin_latte_teal_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Latte - Yellow",
             source: vendetta_catppuccin_latte_yellow_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Flamingo",
             source: vendetta_catppuccin_macchiato_flamingo_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Green",
             source: vendetta_catppuccin_macchiato_green_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Lavender",
             source: vendetta_catppuccin_macchiato_lavender_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Maroon",
             source: vendetta_catppuccin_macchiato_maroon_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Mauve",
             source: vendetta_catppuccin_macchiato_mauve_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Peach",
             source: vendetta_catppuccin_macchiato_peach_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Pink",
             source: vendetta_catppuccin_macchiato_pink_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Red",
             source: vendetta_catppuccin_macchiato_red_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Rosewater",
             source: vendetta_catppuccin_macchiato_rosewater_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Sapphire",
             source: vendetta_catppuccin_macchiato_sapphire_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Sky",
             source: vendetta_catppuccin_macchiato_sky_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Teal",
             source: vendetta_catppuccin_macchiato_teal_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Macchiato - Yellow",
             source: vendetta_catppuccin_macchiato_yellow_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Flamingo",
             source: vendetta_catppuccin_mocha_flamingo_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Green",
             source: vendetta_catppuccin_mocha_green_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Lavender",
             source: vendetta_catppuccin_mocha_lavender_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Maroon",
             source: vendetta_catppuccin_mocha_maroon_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Mauve",
             source: vendetta_catppuccin_mocha_mauve_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Peach",
             source: vendetta_catppuccin_mocha_peach_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Pink",
             source: vendetta_catppuccin_mocha_pink_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Red",
             source: vendetta_catppuccin_mocha_red_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Rosewater",
             source: vendetta_catppuccin_mocha_rosewater_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Sapphire",
             source: vendetta_catppuccin_mocha_sapphire_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Sky",
             source: vendetta_catppuccin_mocha_sky_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Teal",
             source: vendetta_catppuccin_mocha_teal_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Catppuccin Mocha - Yellow",
             source: vendetta_catppuccin_mocha_yellow_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Ros\xE9 Pine - No Wallpaper",
             source: vendetta_rosepine_nobg_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Ros\xE9 Pine",
             source: vendetta_rosepine_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Ros\xE9 Pine Dawn",
             source: vendetta_rosepinedawn_default,
-            description: "Light theme"
+            description: "Light theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Ros\xE9 Pine Moon",
             source: vendetta_rosepinemoon_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Amoled Orange Mountains",
             source: wizzy_amoled_orange_mountains_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "OneColor",
             source: wizzy_onecolor_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Orange Mountains",
             source: wizzy_orange_mountains_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "OrangeOLED",
             source: wizzy_orange_oled_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Pixel City Lite",
             source: wizzy_pixel_city_lite_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Purple Mountains",
             source: wizzy_purple_mountains_default,
-            description: "Dark theme \xB7 Wallpaper"
+            description: "Dark theme \xB7 Wallpaper",
+            categories: [
+              "Themes"
+            ]
           },
           {
             name: "Vulcan",
             source: wizzy_vulcan_default,
-            description: "Dark theme"
+            description: "Dark theme",
+            categories: [
+              "Themes"
+            ]
           }
         ]
       };
@@ -58457,6 +59651,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       Plugins: 0,
       Themes: 0
     });
+    var [category, setCategory] = React2.useState("All");
     var [status, setStatus] = React2.useState("");
     var [candidate, setCandidate] = React2.useState();
     var [, refreshOptions] = React2.useState(0);
@@ -59647,6 +60842,43 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   padding: 12
                 }
               }),
+              /* @__PURE__ */ jsx(import_react_native43.View, {
+                style: {
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 6
+                },
+                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native43.Pressable, {
+                  accessibilityRole: "button",
+                  accessibilityLabel: `Filter by ${value}`,
+                  accessibilityState: {
+                    selected: category === value
+                  },
+                  onPress: () => {
+                    setCategory(value);
+                    setPages({
+                      Plugins: 0,
+                      Themes: 0
+                    });
+                  },
+                  style: {
+                    paddingHorizontal: 12,
+                    minHeight: 44,
+                    justifyContent: "center",
+                    borderRadius: 16,
+                    borderWidth: 1,
+                    borderColor: resolveSemanticColor(category === value ? semanticColors.INTERACTIVE_TEXT_DEFAULT : semanticColors.BORDER_SUBTLE),
+                    backgroundColor: resolveSemanticColor(semanticColors.CARD_BACKGROUND_DEFAULT)
+                  },
+                  children: /* @__PURE__ */ jsx(import_react_native43.Text, {
+                    style: {
+                      color: resolveSemanticColor(semanticColors.TEXT_DEFAULT),
+                      fontWeight: category === value ? "700" : "400"
+                    },
+                    children: value
+                  })
+                }, value))
+              }),
               [
                 [
                   "Plugins",
@@ -59657,11 +60889,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   cxCatalog.themes
                 ]
               ].map(([kind, entries2]) => {
-                var matches = searchCxCatalog(entries2, search);
+                if (category !== "All" && kind === "Themes" !== (category === "Themes"))
+                  return null;
+                var matches = searchCxCatalog(entries2, search, category);
                 var page = pages[kind];
                 var start = page * 12;
                 return /* @__PURE__ */ jsxs(TableRowGroup, {
-                  title: kind,
+                  title: `${kind} (${matches.length})`,
                   children: [
                     matches.slice(start, start + 12).map((entry) => /* @__PURE__ */ jsx(TableRow, {
                       label: entry.name,
@@ -61181,7 +62415,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e0d5558c13a12043cce36f430da6bc977787c317";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5b1934f29353a3bb6ec710fd77f0c984415b27ba";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
