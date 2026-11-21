@@ -38122,7 +38122,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   });
 
   // src/core/ui/settings/pages/Themes/ThemeCard.tsx
-  function ThemeCard({ item: theme }) {
+  function ThemeCard({ item: theme, overridden, beforeSelect }) {
     var navigation2 = NavigationNative.useNavigation();
     var [removed, setRemoved] = React2.useState(false);
     if (removed)
@@ -38133,9 +38133,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       headerSublabel: authors ? `by ${authors.map((i) => i.name).join(", ")}` : "",
       descriptionLabel: theme.data.description ?? "No description.",
       toggleType: !settings.safeMode?.enabled ? "radio" : void 0,
-      toggleValue: () => themes[theme.id].selected,
+      toggleValue: () => !overridden && themes[theme.id].selected,
       onToggleChange: (v2) => _async_to_generator(function* () {
         try {
+          if (v2)
+            beforeSelect?.();
           yield selectTheme(v2 ? theme : null);
           showToast(v2 ? `Applied ${theme.data.name}` : "Theme disabled", findAssetId("Check"));
         } catch (e) {
@@ -39373,4149 +39375,686 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
-  // src/core/plugins/shared/sendMessage.ts
-  function onSendMessage(transform) {
-    return before("sendMessage", messageUtil, (args) => {
-      var message = args[1];
-      if (message && typeof message === "object") {
-        try {
-          transform(message, args[3]);
-        } catch (e) {
-        }
-      }
-      return args;
-    });
-  }
-  function onEditMessage(transform) {
-    var editor = findByProps("editMessage", "startEditMessage");
-    if (typeof editor?.editMessage !== "function")
-      throw new Error("Discord message edits are unavailable");
-    return before("editMessage", editor, (args) => {
-      var message = args[2];
-      if (message && typeof message === "object") {
-        try {
-          transform(message);
-        } catch (e) {
-        }
-      }
-      return args;
-    });
-  }
-  var init_sendMessage = __esm({
-    "src/core/plugins/shared/sendMessage.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_patcher();
-      init_metro();
-      init_common();
-    }
+  // src/core/ui/settings/pages/Addons/index.tsx
+  var Addons_exports = {};
+  __export(Addons_exports, {
+    default: () => Addons
   });
-
-  // src/lib/api/cxAppearance.ts
-  function hideDesktopClass(plugin2, label2, className) {
-    var prefix2 = className + "_";
-    return {
-      plugin: plugin2,
-      label: label2,
-      css: `[class^="${prefix2}"], [class*=" ${prefix2}"] { display: none !important; }`,
-      desktopOnly: true,
-      mobile: [],
-      catalogOriginal: true
-    };
-  }
-  var cxAppearanceTargets;
-  var init_cxAppearance = __esm({
-    "src/lib/api/cxAppearance.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      cxAppearanceTargets = {
-        // PlainFolderIcon by botato (GPL-3.0-or-later).
-        "plain-folder-icon": {
-          plugin: "PlainFolderIcon",
-          label: "Replace the mini server icons in collapsed folders with a plain folder icon",
-          css: ".cc-cx-plain-folder-icon { transition: none !important; transform: translateZ(0); background-color: color-mix(in oklab, var(--custom-folder-color, var(--badge-background-default)) 40%, transparent); }",
-          desktopOnly: true,
-          style: {}
-        },
-        // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
-        "larger-chat-text": {
-          plugin: "LargerChatText",
-          label: "Makes chat text larger",
-          css: '[class*="messageContent"] { font-size: 17px !important; line-height: 1.45 !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "bigger-chat-text": {
-          plugin: "BiggerChatText",
-          label: "Slightly larger message text",
-          css: '[class*="markup"][class*="messageContent"] { font-size: 1.08rem !important; line-height: 1.45 !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "smaller-chat-text": {
-          plugin: "SmallerChatText",
-          label: "Makes chat text smaller",
-          css: '[class*="messageContent"] { font-size: 14px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "compact-messages": {
-          plugin: "CompactMessages",
-          label: "Tighter spacing between messages",
-          css: '[class*="messageListItem"] [class*="cozy"] { padding-top: 1px !important; padding-bottom: 1px !important; } [class*="groupStart"] { margin-top: 8px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "monospace-chat": {
-          plugin: "MonospaceChat",
-          label: "Shows chat text in a monospace font",
-          css: '[class*="messageContent"] { font-family: var(--font-code) !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "square-avatars": {
-          plugin: "SquareAvatars",
-          label: "give avatars round-square corners",
-          css: 'img[class*="avatar"], [class*="avatar"] foreignObject { border-radius: 22% !important; mask: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "rounded-square-avatars": {
-          plugin: "RoundedAvatarsSquare",
-          label: "give avatars softer square corners",
-          css: '[class*="avatar"] img, img[class*="avatar"] { border-radius: 28% !important; } [class*="avatar"] svg mask rect, mask[id*="avatar"] circle { rx: 28%; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "spacious-message-groups": {
-          plugin: "SpaciousMessages",
-          label: "increase spacing between message groups",
-          css: '[class*="groupStart"] { margin-top: 22px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "bigger-avatars-in-chat": {
-          plugin: "BiggerAvatarsInChat",
-          label: "Makes avatars in chat larger",
-          css: '[class*="messageListItem"] img[class*="avatar"] { width: 48px !important; height: 48px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "bigger-jumbo-emojis": {
-          plugin: "BiggerJumboEmojis",
-          label: "Makes emoji-only messages bigger",
-          css: 'img[class*="emoji"][class*="jumboable"] { width: 64px !important; height: 64px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "bold-usernames": {
-          plugin: "BoldUsernames",
-          label: "Makes usernames in chat bolder",
-          css: '[class*="username_"] { font-weight: 700 !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "compact-compose": {
-          plugin: "CompactCompose",
-          label: "Slims the composer and fades its action buttons until hover or focus",
-          css: '\n[class*="channelTextArea"] { margin-top: 0 !important; margin-bottom: 6px !important; }\n[class*="channelTextArea"] [class*="scrollableContainer"] { min-height: 40px; }\n[class*="channelTextArea"] [class*="buttons"],\n[class*="channelTextArea"] button[class*="attachButton"] { opacity: 0.35; transition: opacity 0.15s ease; }\n[class*="channelTextArea"]:hover [class*="buttons"],\n[class*="channelTextArea"]:focus-within [class*="buttons"],\n[class*="channelTextArea"]:hover button[class*="attachButton"],\n[class*="channelTextArea"]:focus-within button[class*="attachButton"] { opacity: 1; }\n',
-          desktopOnly: true,
-          style: {}
-        },
-        "compact-server-list": {
-          plugin: "CompactServerList",
-          label: "Makes the server list narrower",
-          css: 'nav[aria-label="Servers sidebar"] { width: 60px !important; } nav[aria-label="Servers sidebar"] [class*="listItem"] { margin-bottom: 4px; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "focus-mode": {
-          plugin: "FocusMode",
-          label: "Hides the member list for a wider chat",
-          css: '[class*="membersWrap"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "grayscale-images": {
-          plugin: "GrayscaleImages",
-          label: "Shows images in grayscale until hovered",
-          css: '[class*="imageWrapper"] img { filter: grayscale(1); transition: filter .2s; } [class*="imageWrapper"]:hover img { filter: none; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hide-discover-button": {
-          plugin: "HideDiscoverButton",
-          label: "Hides the Discover button in the server list",
-          css: '[data-list-item-id="guildsnav___guild-discover-button"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hide-download-apps-button": {
-          plugin: "HideDownloadAppsButton",
-          label: "Hides the download-apps button in the server list",
-          css: '[data-list-item-id="guildsnav___app-download-button"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hide-keyboard-tips": {
-          plugin: "HideKeyboardTips",
-          label: "Hides the keyboard tips under the chat bar",
-          css: '[class*="typingDots"] ~ [class*="tip"], [class*="channelTextAreaTips"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hide-member-list-button": {
-          plugin: "HideMemberListButton",
-          label: "Hides the member list toggle in the channel header",
-          css: '[aria-label="Hide Member List"], [aria-label="Show Member List"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hide-user-panel-activity": {
-          plugin: "HideUserPanelActivity",
-          label: "Hides your activity line in the user panel",
-          css: '[class*="panels"] [class*="activityPanel"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hide-voice-panel-tips": {
-          plugin: "HideVoicePanelTips",
-          label: "Hides tips in the voice connection panel",
-          css: '[class*="rtcConnectionStatus"] [class*="tip"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "hover-highlight-messages": {
-          plugin: "HoverHighlightMessages",
-          label: "Highlights the message under your cursor",
-          css: '[class*="messageListItem"]:hover { background: rgb(255 255 255 / 4%); }',
-          desktopOnly: true,
-          style: {}
-        },
-        "no-message-hover-bar": {
-          plugin: "NoMessageHoverBar",
-          label: "Hides the buttons that appear when hovering a message",
-          css: '[class*="buttonsInner"] { display: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "no-shadows": {
-          plugin: "NoShadows",
-          label: "Removes drop shadows for a flatter look",
-          css: "* { box-shadow: none !important; }",
-          desktopOnly: true,
-          style: {}
-        },
-        "rounded-images": {
-          plugin: "RoundedImages",
-          label: "Rounder corners on images and videos in chat",
-          css: '[class*="imageWrapper"], [class*="imageWrapper"] img, [class*="wrapperPlaying"] { border-radius: 12px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "smaller-avatars-in-chat": {
-          plugin: "SmallerAvatarsInChat",
-          label: "Makes avatars in chat smaller",
-          css: '[class*="messageListItem"] img[class*="avatar"] { width: 32px !important; height: 32px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "smooth-scrolling": {
-          plugin: "SmoothScrolling",
-          label: "Smooth scrolling everywhere",
-          css: "* { scroll-behavior: smooth; }",
-          desktopOnly: true,
-          style: {}
-        },
-        "soft-corners": {
-          plugin: "SoftCorners",
-          label: "Rounder corners on cards, popouts and modals",
-          css: '[class*="popout"], [class*="card_"], [class*="modal"], [class*="menu_"] { border-radius: 14px !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "sticky-date-dividers": {
-          plugin: "StickyDateDividers",
-          label: "Keeps the current day label at the top while scrolling",
-          css: '[class*="divider"][class*="hasContent"] { position: sticky; top: 0; z-index: 2; background: var(--background-base-lower, var(--background-primary)); }',
-          desktopOnly: true,
-          style: {}
-        },
-        "thin-scrollbars": {
-          plugin: "ThinScrollbars",
-          label: "Thinner scrollbars",
-          css: "::-webkit-scrollbar { width: 6px !important; height: 6px !important; } ::-webkit-scrollbar-thumb { border-radius: 6px !important; }",
-          desktopOnly: true,
-          style: {}
-        },
-        "wider-chat": {
-          plugin: "WiderChat",
-          label: "Lets messages use the full width of the window",
-          css: '[class*="messageListItem"] [class*="contents"] { max-width: none !important; } [class*="chatContent"] { max-width: none !important; }',
-          desktopOnly: true,
-          style: {}
-        },
-        "thread-suggestions": {
-          plugin: "HideThreadSuggestions",
-          label: "thread suggestions above the composer",
-          css: '[class^="threadSuggestionBar_"], [class*=" threadSuggestionBar_"] { display: none !important; }',
-          desktopOnly: true,
-          mobile: [],
-          catalogOriginal: true
-        },
-        "sticker-search-suggestions": {
-          plugin: "HideStickerSearchSuggestions",
-          label: "suggested searches in the sticker picker",
-          css: '[class^="searchSuggestions_"], [class*=" searchSuggestions_"] { display: none !important; }',
-          desktopOnly: true,
-          mobile: [],
-          catalogOriginal: true
-        },
-        "sticker-picker-promotions": {
-          plugin: "HideStickerPickerPromotions",
-          label: "shop and promotional cards in the sticker picker",
-          css: '[class^="packHeaderShopWrapper_"], [class*=" packHeaderShopWrapper_"], [class^="emptyGuildUpsell_"], [class*=" emptyGuildUpsell_"] { display: none !important; }',
-          desktopOnly: true,
-          mobile: [],
-          catalogOriginal: true
-        },
-        "add-friend-hint": {
-          plugin: "HideAddFriendHint",
-          label: "the hint below the Add Friend field",
-          css: '[class^="addFriendHint_"], [class*=" addFriendHint_"] { display: none !important; }',
-          desktopOnly: true,
-          mobile: [],
-          catalogOriginal: true
-        },
-        "profile-friend-request-banner": {
-          plugin: "HideProfileFriendRequestBanner",
-          label: "friend request banners in profiles",
-          css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
-          desktopOnly: true,
-          mobile: [],
-          catalogOriginal: true
-        },
-        "message-length-promotion": hideDesktopClass("HideMessageLengthPromotion", "the Nitro promotion shown with long messages", "messageLengthUpsellContainer"),
-        "orb-wallet-nitro-promotion": hideDesktopClass("HideOrbWalletNitroPromotion", "the Nitro promotion in the Orbs Wallet", "orbWalletNitroUpsellCard"),
-        "orb-wallet-seasonal-promotion": hideDesktopClass("HideOrbWalletSeasonalPromotion", "the Black Friday card in the Orbs Wallet", "orbWalletBlackFridayCardWrapper"),
-        "monthly-reward-promotions": hideDesktopClass("HideMonthlyRewardPromotions", "promotional cards in the monthly rewards panel", "promoCardContainer"),
-        "soundboard-nitro-banner": hideDesktopClass("HideSoundboardNitroBanner", "the Nitro promotion banner in the soundboard", "upsellBanner"),
-        "sticker-autocomplete": hideDesktopClass("HideStickerAutocomplete", "sticker suggestions while typing in chat", "stickerAutoComplete"),
-        "premium-group-promotion": hideDesktopClass("HidePremiumGroupPromotion", "the premium group promotion in the offer dialog", "premiumGroupUpsellWrapper"),
-        "voice-krisp-button": {
-          plugin: "ShowPing",
-          label: "the desktop Krisp button beside the voice connection controls",
-          css: '[class*="voiceButtonsContainer_"] > button[aria-label$="Krisp" i] { display: none !important; }',
-          desktopOnly: true,
-          mobile: []
-        },
-        "bot-tags": {
-          plugin: "HideBotTags",
-          label: "APP and BOT tags",
-          css: '[class*="botTag"] { display: none !important; }',
-          mobile: [
-            "BotTag"
-          ]
-        },
-        "role-icons": {
-          plugin: "HideRoleIcons",
-          label: "role icons",
-          css: 'img[class*="roleIcon"] { display: none !important; }',
-          mobile: [
-            "RoleIcon"
-          ]
-        },
-        "server-tags": {
-          plugin: "HideClanTags",
-          label: "server tags",
-          css: '[class*="clanTag"], [class*="chipletContainer"] { display: none !important; }',
-          mobile: [
-            "GuildTag"
-          ]
-        },
-        "typing-indicator": {
-          plugin: "HideTypingIndicator",
-          label: "the typing indicator",
-          css: '[class*="typing_"][class*="base"], [class*="typingDots"] { display: none !important; }',
-          mobile: [
-            "TypingIndicator",
-            "TypingIndicatorInner"
-          ]
-        },
-        "jump-to-present": {
-          plugin: "HideJumpToPresent",
-          label: "the jump-to-present bar",
-          css: '[class*="jumpToPresentBar"] { display: none !important; }',
-          mobile: [
-            "JumpToPresentButton"
-          ]
-        },
-        "message-reactions": {
-          plugin: "HideReactions",
-          label: "message reactions",
-          css: '[class*="reactions_"] { display: none !important; }',
-          mobile: [
-            "MessageReactions",
-            "MessageReactionsContent"
-          ]
-        },
-        "profile-effects": {
-          plugin: "HideProfileEffects",
-          label: "profile effects",
-          css: '[class*="profileEffects"] { display: none !important; }',
-          mobile: [
-            "ProfileEffect",
-            "WrappedProfileEffect"
-          ]
-        },
-        "new-messages-bar": {
-          plugin: "HideNewMessagesBar",
-          label: "the new messages bar",
-          css: '[class*="newMessagesBar"] { display: none !important; }',
-          mobile: [
-            "NewMessagesChatBar"
-          ]
-        },
-        "voice-stream-previews": {
-          plugin: "HideStreamPreviews",
-          label: "voice-channel stream previews",
-          css: '[class*="streamPreview"] { display: none !important; }',
-          mobile: [
-            "VoicePanelStreamPreview"
-          ]
-        },
-        "voice-user-avatars": {
-          plugin: "HideVoiceUserAvatars",
-          label: "avatars next to users in voice channels",
-          css: '[class*="voiceUser"] [class*="avatar"] { display: none !important; }',
-          mobile: {
-            renderTree: "modules/guild_sidebar/native/VoiceUserItem.tsx",
-            hideComponents: [
-              "Avatar"
-            ]
-          }
-        },
-        "nameplates": {
-          plugin: "HideNameplates",
-          label: "nameplates",
-          css: '[class*="nameplate"] { display: none !important; }',
-          mobile: [
-            "Nameplate"
-          ]
-        },
-        "avatar-decorations": {
-          plugin: "HideAvatarDecorations",
-          label: "avatar decorations",
-          css: '[class*="avatarDecoration"] { display: none !important; }',
-          mobile: [
-            "CutoutableAvatarDecoration"
-          ]
-        },
-        "server-banner": {
-          plugin: "HideServerBanner",
-          label: "the channel list server banner",
-          css: '[class*="animatedContainer"][class*="bannerImage"], [class*="bannerImage"] { display: none !important; }',
-          mobile: [
-            "ReanimatedGuildBanner"
-          ]
-        },
-        "server-boost-progress": {
-          plugin: "HideBoostGoal",
-          label: "the server boost progress bar",
-          css: '[class*="boostProgressBar"], [class*="progressBar"][class*="guild"] { display: none !important; }',
-          mobile: {
-            hideComponentPaths: [
-              "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingProgressBar.tsx"
-            ]
-          }
-        },
-        "server-boost-gem": {
-          plugin: "HideGuildBoostTag",
-          label: "the server boost gem",
-          css: '[class*="premiumGuildIcon"], [aria-label*="Server Boost"] svg { display: none !important; }',
-          mobile: {
-            hideComponentPaths: [
-              "modules/premium/powerups/native/GuildPowerupsBoostGem.tsx"
-            ]
-          }
-        },
-        "chat-gift-button": {
-          plugin: "HideGiftButton",
-          label: "the chat gift button",
-          css: 'button[aria-label="Send a gift"] { display: none !important; }',
-          mobile: [
-            "PremiumAnimatedGiftButton"
-          ]
-        },
-        "chat-emoji-button": {
-          plugin: "HideEmojiButton",
-          label: "the composer expression picker shortcut",
-          css: 'button[aria-label="Select emoji"] { display: none !important; }',
-          mobile: {
-            hideComponentPaths: [
-              "modules/chat_input/native/accessories/ChatInputExpressionButton.tsx"
-            ]
-          }
-        },
-        "chat-gif-picker": {
-          plugin: "HideGifButton",
-          label: "the GIF picker shortcut",
-          css: 'button[aria-label="Open GIF picker"] { display: none !important; }',
-          mobile: {
-            expressionPickerTab: "gif"
-          }
-        },
-        "chat-sticker-picker": {
-          plugin: "HideStickerButton",
-          label: "the sticker picker shortcut",
-          css: 'button[aria-label="Open sticker picker"] { display: none !important; }',
-          mobile: {
-            expressionPickerTab: "sticker"
-          }
-        },
-        "add-server-button": {
-          plugin: "HideAddServerButton",
-          label: "the add-a-server button",
-          css: '[data-list-item-id="guildsnav___create-join-button"] { display: none !important; }',
-          mobile: [
-            "GuildsBarCreateJoinButton"
-          ]
-        },
-        "profile-badges": {
-          plugin: "HideBadges",
-          label: "profile badge rows",
-          css: '[class*="badgeList"] { display: none !important; }',
-          mobile: [
-            "ProfileBadgeRows"
-          ]
-        },
-        "profile-notes": {
-          plugin: "HideProfileNotes",
-          label: "local notes in profile cards",
-          catalogOriginal: true,
-          css: '[class*="noteText_"], [class*="notePreview_"] { display: none !important; }',
-          mobile: {
-            hideComponentPaths: [
-              "modules/user_profile/native/UserProfileNote.tsx"
-            ]
-          }
-        },
-        "profile-connections": {
-          plugin: "HideProfileConnections",
-          label: "connections in profile cards",
-          catalogOriginal: true,
-          css: '[class*="connectedAccounts_"] { display: none !important; }',
-          mobile: {
-            hideComponentPaths: [
-              "modules/user_profile/native/UserProfileConnections.tsx",
-              "modules/user_profile/native/LegacyUserProfileConnections.tsx"
-            ]
-          }
-        },
-        "profile-mutuals": {
-          plugin: "HideProfileMutuals",
-          label: "mutual friends and servers in profile cards",
-          catalogOriginal: true,
-          css: '[class*="mutuals_"], [class*="mutualGuilds_"] { display: none !important; }',
-          mobile: {
-            hideComponentPaths: [
-              "modules/user_profile/native/UserProfileMutuals.tsx",
-              "modules/user_profile/native/UserProfileMutualGuilds.tsx"
-            ]
-          }
-        },
-        "custom-status-emojis": {
-          plugin: "HideStatusEmojis",
-          label: "emojis in custom status bubbles",
-          css: '[class*="customStatus"] img[class*="emoji"] { display: none !important; }',
-          mobile: {
-            customStatusEmojis: [
-              "CustomStatusBubble",
-              "UserProfileCustomStatusBubble"
-            ]
-          }
-        },
-        "member-activities": {
-          plugin: "HideMemberActivities",
-          label: "game and music activity text in the member list",
-          css: '[class*="member_"] [class*="activityText"] { display: none !important; }',
-          mobile: {
-            memberActivityText: true
-          }
-        },
-        "member-custom-status": {
-          plugin: "HideCustomStatuses",
-          label: "custom statuses in the member list",
-          css: '[class*="memberInner"] [class*="activity"], [class*="member_"] [class*="subText"] { display: none !important; }',
-          mobile: {
-            memberCustomStatus: true
-          }
-        },
-        "reply-previews": {
-          plugin: "HideReplyPreviews",
-          label: "reply previews in chat",
-          css: '[class*="repliedMessage"] { display: none !important; }',
-          mobile: [
-            "ReplyMessageContent"
-          ]
-        },
-        "chat-apps-button": {
-          plugin: "HideAppsButton",
-          label: "the chat apps button",
-          css: 'button[aria-label="Apps"] { display: none !important; }',
-          mobile: [
-            "ChatInputActionButtonApps"
-          ]
-        },
-        "chat-upload-button": {
-          plugin: "HideUploadButton",
-          label: "the chat attachment button",
-          css: '[class*="attachWrapper"] { display: none !important; }',
-          mobile: {
-            renderTree: "modules/chat_input/native/action_buttons/ChatInputActions.tsx",
-            hideControlIcons: [
-              "MediaKeyboardButtonIcon",
-              "ImageIcon"
-            ],
-            hideLongPressMenu: true
-          }
-        },
-        "channel-threads-button": {
-          plugin: "HideThreadsButton",
-          label: "the threads shortcut in the channel header",
-          css: '[aria-label="Threads"] { display: none !important; }',
-          mobile: {
-            renderComponent: "ChannelActionButtons",
-            hideControlIcons: [
-              "ThreadIcon"
-            ]
-          }
-        },
-        "chat-character-counter": {
-          plugin: "HideCharacterCount",
-          label: "the chat character counter",
-          css: '[class*="characterCount"] { display: none !important; }',
-          mobile: [
-            "ChatInputCharCounter"
-          ]
-        },
-        "chat-send-button": {
-          plugin: "HideSendButton",
-          label: "the chat send button",
-          css: 'button[aria-label="Send Message"] { display: none !important; }',
-          mobile: [
-            "ChatInputSendButton"
-          ]
-        },
-        "dm-call-buttons": {
-          plugin: "HideCallButtons",
-          label: "the buttons to start calls in DMs",
-          css: '[aria-label="Start Voice Call"], [aria-label="Start Video Call"] { display: none !important; }',
-          mobile: {
-            renderTree: "modules/main_tabs_v2/native/channel/header/PrivateChannelButtons.tsx",
-            hideIcons: [
-              "PhoneCallIcon",
-              "VideoIcon"
-            ],
-            keepWhilePresent: [
-              "PhoneHangUpIcon",
-              "VoiceNormalIcon"
-            ]
-          }
-        },
-        "dm-list-search": {
-          plugin: "HideDmSearch",
-          label: "the search button in the DM list",
-          css: '[class*="privateChannels"] [class*="searchBar"] { display: none !important; }',
-          mobile: {
-            renderTree: "modules/main_tabs_v2/native/tabs/messages/MessagesHeader.tsx",
-            hideLabels: [
-              "5h0QOP"
-            ]
-          }
-        },
-        "message-embeds": {
-          plugin: "HideEmbeds",
-          label: "link embeds in chat",
-          css: 'article[class*="embed"] { display: none !important; }',
-          mobile: [
-            "EmbedCard"
-          ]
-        },
-        "message-edited-label": {
-          plugin: "HideEditedLabel",
-          label: "the edited label in chat",
-          css: '[class*="edited_"] { display: none !important; }',
-          mobile: {
-            messagePresentation: "edited"
-          }
-        },
-        "message-timestamps": {
-          plugin: "HideTimestamps",
-          label: "timestamps next to chat messages",
-          css: '[class*="messageListItem"] time, [class*="timestamp_"] { display: none !important; }',
-          mobile: {
-            messagePresentation: "timestamps"
-          }
-        },
-        "message-stickers": {
-          plugin: "HideStickers",
-          label: "stickers in chat",
-          css: '[class*="stickerAsset"] { display: none !important; }',
-          mobile: {
-            messagePresentation: "stickers"
-          }
-        },
-        "active-now": {
-          plugin: "HideActiveNow",
-          label: "the active friends panel",
-          css: '[class*="nowPlayingColumn"] { display: none !important; }',
-          mobile: [
-            "MessagesItemHappeningNow"
-          ]
-        },
-        "channel-topic": {
-          plugin: "HideChannelTopic",
-          label: "channel topics",
-          css: '[class*="topic_"][class*="expandable"], section[aria-label="Channel header"] [class*="topic_"] { display: none !important; }',
-          mobile: [
-            "ChannelDetailsTopic"
-          ]
-        },
-        "shop-entry": {
-          plugin: "HideShopTab",
-          label: "the Shop entry",
-          css: 'a[href="/shop"], [data-list-item-id$="___shop"] { display: none !important; }',
-          mobile: [
-            "CollectiblesShopEntryButton"
-          ]
-        },
-        "help-entry": {
-          plugin: "HideHelpButton",
-          label: "the Help entry",
-          css: 'a[href*="support.discord.com"][class*="anchor"], [aria-label="Help"] { display: none !important; }',
-          mobile: {
-            settingsEntry: "modules/user_settings/defs/native/SupportSetting.tsx"
-          }
-        },
-        "nitro-entry": {
-          plugin: "HideNitroTab",
-          label: "the Nitro entry",
-          css: 'a[href="/store"], [data-list-item-id$="___nitro"] { display: none !important; }',
-          mobile: {
-            settingsEntry: "modules/user_settings/defs/native/PremiumSetting.tsx"
-          }
-        },
-        "quests-entry": {
-          plugin: "HideQuestsTab",
-          label: "the Quests entry",
-          css: 'a[href="/quest-home"], [data-list-item-id$="___quests"] { display: none !important; }',
-          mobile: {
-            settingsEntry: "modules/user_settings/defs/native/QuestHomeSetting.tsx"
-          }
-        },
-        "inbox-button": {
-          plugin: "HideInboxButton",
-          label: "the notifications entry",
-          css: '[aria-label="Inbox"] { display: none !important; }',
-          mobile: [
-            "YouBarNotificationsButton"
-          ]
-        },
-        "notification-settings": {
-          plugin: "HideNotificationBell",
-          label: "the channel notification settings shortcut",
-          css: '[aria-label="Notification Settings"] { display: none !important; }',
-          mobile: [
-            "NotificationSettingsButton"
-          ]
-        },
-        "pinned-messages-button": {
-          plugin: "HidePinsButton",
-          label: "the pinned messages shortcut",
-          css: '[aria-label="Pinned Messages"] { display: none !important; }',
-          mobile: {
-            tableRow: {
-              key: "rowPinnedMessages"
-            }
-          }
-        },
-        "friend-requests-badge": {
-          plugin: "HideFriendRequestsBadge",
-          label: "the pending friend requests counter",
-          css: 'a[href="/channels/@me"] [class*="numberBadge"] { display: none !important; }',
-          mobile: {
-            tableRow: {
-              subLabelFor: "fyA115"
-            }
-          }
-        },
-        "image-alt-text": {
-          plugin: "HideImageAltText",
-          label: "the image description control",
-          css: '[class*="altText"] { display: none !important; }',
-          mobile: [
-            "MediaModalOverlayAltTextButton"
-          ]
-        },
-        "spoiler-media-label": {
-          plugin: "HideSpoilerWarnings",
-          label: "the spoiler label on images",
-          css: '[class*="spoilerWarning"] { display: none !important; }',
-          mobile: {
-            renderTree: "modules/media_viewer/native/components/MediaModalSpoilerOverlay.tsx",
-            hideText: [
-              "F+x38C"
-            ]
-          }
-        },
-        "spoiler-outline": {
-          plugin: "ReadableSpoilers",
-          label: "outline concealed spoilers",
-          css: '[class*="spoilerContent"]:not([class*="spoilerContentHidden"]), span[class*="spoilerText"]:not([class*="hidden"]) {}[class*="spoilerContent"], [class*="spoilerWarning"] { outline: 1px dashed rgb(1 205 254 / 70%); outline-offset: 1px; border-radius: 4px; box-shadow: 0 0 6px rgb(255 113 206 / 35%); }',
-          style: {
-            spoilerOutline: {
-              borderWidth: 1,
-              borderColor: "rgba(1, 205, 254, 0.7)",
-              borderStyle: "dashed",
-              borderRadius: 4
-            }
-          }
-        },
-        "contrast-text": {
-          plugin: "HighContrastText",
-          label: "increase text contrast",
-          css: ":root { --text-default: #ffffff; --text-normal: #ffffff; --text-muted: #c7c9d1; }",
-          style: {
-            semantic: {
-              TEXT_DEFAULT: "#ffffff",
-              TEXT_NORMAL: "#ffffff",
-              TEXT_STRONG: "#ffffff",
-              TEXT_MUTED: "#c7c9d1",
-              TEXT_SUBTLE: "#c7c9d1"
-            }
-          }
-        },
-        "cloudcord-accent": {
-          plugin: "CloudCordAccent",
-          label: "apply the CloudCord accent",
-          css: ":root { --brand-500: #7c5cff; --brand-560: #6d4ef0; --brand-600: #5b3ce6; --brand-experiment: #7c5cff; }",
-          style: {
-            raw: {
-              BRAND_500: "#7c5cff",
-              BRAND_560: "#6d4ef0",
-              BRAND_600: "#5b3ce6"
-            },
-            semantic: {
-              TEXT_LINK: "#7c5cff",
-              TEXT_BRAND: "#7c5cff",
-              ICON_BRAND: "#7c5cff",
-              BACKGROUND_BRAND: "#7c5cff"
-            }
-          }
-        },
-        "amoled-background": {
-          plugin: "AmoledMode",
-          label: "use black backgrounds in dark mode",
-          css: ".theme-dark, .theme-midnight { --background-primary: #000; --background-secondary: #000; --background-secondary-alt: #050505; --background-tertiary: #000; --background-base-low: #000; --background-base-lower: #000; --background-base-lowest: #000; --background-surface-high: #0a0a0a; --chat-background-default: #000; }",
-          style: {
-            darkOnly: true,
-            semantic: {
-              BACKGROUND_PRIMARY: "#000000",
-              BACKGROUND_SECONDARY: "#000000",
-              BACKGROUND_SECONDARY_ALT: "#050505",
-              BACKGROUND_TERTIARY: "#000000",
-              BACKGROUND_MOBILE_PRIMARY: "#000000",
-              BACKGROUND_MOBILE_SECONDARY: "#000000",
-              BACKGROUND_BASE_LOW: "#000000",
-              BACKGROUND_BASE_LOWER: "#000000",
-              BACKGROUND_BASE_LOWEST: "#000000",
-              BACKGROUND_SURFACE_HIGH: "#0a0a0a",
-              CHAT_BACKGROUND_DEFAULT: "#000000"
-            }
-          }
-        },
-        "code-block-size": {
-          plugin: "BiggerCodeBlocks",
-          label: "increase code block text size",
-          css: 'code[class*="hljs"], [class*="codeContainer"] code { font-size: 15px !important; line-height: 1.5 !important; }',
-          style: {
-            component: "MarkupCodeBlock",
-            key: "codeBlock",
-            values: {
-              fontSize: 15,
-              lineHeight: 22.5
-            }
-          }
-        },
-        "colorful-mentions": {
-          plugin: "ColorfulMentions",
-          label: "tint inline mentions purple",
-          css: '[class*="mention"][class*="interactive"] { background: rgb(124 92 255 / 25%) !important; color: #c9bcff !important; border-radius: 6px; }',
-          style: {
-            semantic: {
-              MENTION_BACKGROUND: "#7c5cff40",
-              MENTION_FOREGROUND: "#c9bcff"
-            }
-          }
-        },
-        "highlight-mentions": {
-          plugin: "HighlightMentions",
-          label: "highlight messages that mention you in purple",
-          css: '[class*="mentioned"] { background: rgb(124 92 255 / 18%) !important; box-shadow: inset 3px 0 0 #7c5cff; }',
-          style: {
-            mentionHighlight: "#7c5cff2e"
-          }
-        },
-        "underlined-links": {
-          plugin: "HighlightLinks",
-          label: "underline message links",
-          css: '[class*="messageContent"] a { text-decoration: underline !important; text-underline-offset: 2px; }',
-          style: {
-            component: "MarkupLink",
-            key: "link",
-            values: {
-              textDecorationLine: "underline"
-            }
-          }
-        },
-        "floating-chat-bar": {
-          plugin: "FloatingChatBar",
-          label: "lift the chat bar above the bottom edge",
-          css: 'form [class*="channelTextArea"] { margin-bottom: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 25%); }',
-          style: {
-            component: "FloatingChatInputContainer",
-            values: {
-              marginBottom: 8,
-              shadowColor: "#000000",
-              shadowOffset: {
-                width: 0,
-                height: 4
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 8,
-              elevation: 4
-            }
-          }
-        },
-        "rounded-chat-bar": {
-          plugin: "RoundedChatBar",
-          label: "round the chat bar",
-          css: '[class*="channelTextArea"] [class*="scrollableContainer"], form [class*="channelTextArea"] { border-radius: 24px !important; }',
-          style: {
-            component: "FloatingChatInputContainer",
-            values: {
-              borderRadius: 24
-            }
-          }
-        },
-        "borderless-chat-bar": {
-          plugin: "NoChatBarBorder",
-          label: "remove the chat bar border and shadow",
-          css: 'form [class*="channelTextArea"] { border: 0 !important; box-shadow: none !important; }',
-          style: {
-            component: "FloatingChatInputContainer",
-            values: {
-              borderWidth: 0,
-              shadowOpacity: 0,
-              elevation: 0
-            }
-          }
-        },
-        "transparent-chat-bar": {
-          plugin: "TransparentChatBar",
-          label: "make the chat input background translucent",
-          css: 'form [class*="channelTextArea"] [class*="scrollableContainer"] { background: rgb(0 0 0 / 25%) !important; backdrop-filter: blur(6px); }',
-          style: {
-            semantic: {
-              MOBILE_CHATINPUT_BACKGROUND_DEFAULT: "#00000040",
-              MOBILE_CHATINPUT_BACKGROUND_ACTIVE: "#00000040"
-            }
-          }
-        },
-        "round-server-icons": {
-          plugin: "RoundServerIcons",
-          label: "round server icons",
-          css: 'nav[aria-label="Servers sidebar"] [class*="wrapper"] foreignObject { mask: none !important; border-radius: 50%; }',
-          style: {
-            component: "GuildsBarAnimatedItemWrapper",
-            props: {
-              circle: true
-            },
-            skipWhenTrue: "preventClipping"
-          }
-        },
-        "bigger-server-icons": {
-          plugin: "BiggerServerIcons",
-          label: "make server icons larger",
-          css: 'nav[aria-label="Servers sidebar"] [class*="listItem"] svg[class*="svg"] { transform: scale(1.1); }',
-          style: {
-            serverIconScale: 1.1
-          }
-        },
-        "empty-server-folders": {
-          plugin: "HideEmptyFolders",
-          label: "empty expanded server folders",
-          css: '[class*="folder"][class*="expanded"]:empty { display: none !important; }',
-          mobile: {
-            emptyServerFolders: true
-          }
-        },
-        "scrollbars": {
-          plugin: "HideScrollbars",
-          label: "scroll indicators",
-          css: "::-webkit-scrollbar { width: 0 !important; height: 0 !important; }",
-          mobile: {
-            scrollIndicators: true
-          }
-        },
-        "server-unread-pills": {
-          plugin: "HideUnreadPills",
-          label: "the server sidebar unread pills",
-          css: '[class*="unreadMentionsIndicator"] { display: none !important; }',
-          mobile: [
-            "GuildsBarUnreadBars"
-          ]
-        },
-        "mention-badges": {
-          plugin: "HideMentionBadges",
-          label: "mention count badges",
-          css: '[class*="numberBadge"] { display: none !important; }',
-          mobile: {
-            mentionBadges: true
-          }
-        },
-        "centered-chat": {
-          plugin: "CenteredChat",
-          label: "center the message list on wide screens",
-          css: '[class*="messagesWrapper"] ol[class*="scrollerInner"] { max-width: 1100px; margin: 0 auto; }',
-          style: {
-            centeredMessageList: "modules/messages/native/Messages.tsx",
-            width: 1100
-          }
-        },
-        "readable-line-length": {
-          plugin: "ReadableLineLength",
-          label: "limit the width of long message lines",
-          css: '[class*="messageContent"] { max-width: 80ch; }',
-          style: {
-            messageWidthRenderer: "modules/messages/native/renderer/createMessageContent.tsx",
-            width: 640
-          }
-        },
-        "wider-channel-list": {
-          plugin: "WiderChannelList",
-          label: "make the channel list wider",
-          css: '[class*="sidebar_"] { width: 280px !important; }',
-          style: {
-            drawerWidthDelta: 40
-          }
-        },
-        "narrower-channel-list": {
-          plugin: "NarrowChannelList",
-          label: "make the channel list narrower",
-          css: '[class*="sidebar_"] { width: 200px !important; }',
-          style: {
-            drawerWidthDelta: -40
-          }
-        },
-        "compact-member-list": {
-          plugin: "CompactMemberList",
-          label: "reduce the spacing in the server member list",
-          css: '[class*="member_"] { padding-top: 0 !important; padding-bottom: 0 !important; height: 38px !important; }',
-          style: {
-            compactMemberList: true
-          }
-        },
-        "muted-channel-opacity": {
-          plugin: "MutedChannelsFaded",
-          label: "fade muted channels",
-          css: '[class*="modeMuted"] { opacity: .45 !important; }',
-          style: {
-            renderedComponents: [
-              "ChannelContent",
-              "ChannelContentComponent"
-            ],
-            condition: "muted",
-            values: {
-              opacity: 0.45
-            }
-          }
-        },
-        "inactive-channel-opacity": {
-          plugin: "DimInactiveChannels",
-          label: "dim channel names without unread messages",
-          css: '[class*="containerDefault"] [class*="modeMuted"], [class*="containerDefault"]:not(:has([class*="unread"])) [class*="name_"] { opacity: .6; }',
-          style: {
-            renderedComponents: [
-              "ChannelTitle"
-            ],
-            condition: "inactive",
-            values: {
-              opacity: 0.6
-            }
-          }
-        },
-        "reduced-motion": {
-          plugin: "NoAnimations",
-          label: "reduce interface animations and transitions",
-          css: "*, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }",
-          style: {
-            reducedMotion: true
-          }
-        },
-        "blur-chat-media": {
-          plugin: "BlurImagesUntilHover",
-          label: "conceal chat images and videos until you reveal them",
-          css: '[class*="imageWrapper"] img, [class*="imageWrapper"] video { filter: blur(18px); transition: filter .2s; } [class*="imageWrapper"]:hover img, [class*="imageWrapper"]:hover video { filter: none; }',
-          style: {
-            blurredMedia: "all"
-          }
-        },
-        "blur-nsfw-attachments": {
-          plugin: "BlurNSFW",
-          label: "conceal attachments in age-restricted channels until you reveal them",
-          css: '.cc-cx-nsfw-media [class*="imageContainer"], .cc-cx-nsfw-media [class*="wrapperPaused"] { filter: blur(10px); transition: filter .2s; } .cc-cx-nsfw-media [class*="imageContainer"]:hover, .cc-cx-nsfw-media [class*="wrapperPaused"]:hover { filter: blur(0); }',
-          style: {
-            blurredMedia: "nsfw"
-          }
-        }
-      };
-    }
-  });
-
-  // src/lib/api/cxClientCommands.ts
-  function lookupWikipedia(input, signal) {
-    return _async_to_generator(function* () {
-      var query = input.trim();
-      if (!query || query.length > 120 || query === "." || query === "..")
-        return "Enter a Wikipedia article title up to 120 characters.";
-      var escaped = (value) => value.replace(/@/g, "\uFF20").replace(/[\\\x60*_~|<>[\]]/g, "\\$&");
-      var title = encodeURIComponent(query);
-      var response = yield fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + title, {
-        credentials: "omit",
-        redirect: "error",
-        headers: {
-          "Api-User-Agent": "CloudCord (https://getcloudcord.com)"
-        },
-        signal
-      });
-      if (response.status === 404)
-        return "No Wikipedia article found for **" + escaped(query) + "**.";
-      if (!response.ok)
-        throw new Error("Wikipedia lookup failed");
-      var data = yield response.json();
-      if (data.type === "disambiguation" || typeof data.extract !== "string" || !data.extract.trim()) {
-        return "**" + escaped(query) + "** is ambiguous. Try a more specific title.";
-      }
-      var heading = typeof data.title === "string" ? data.title : query;
-      var page = data.content_urls?.desktop?.page;
-      var url2 = typeof page === "string" && /^https:\/\/en\.wikipedia\.org\/wiki\/[^\s<>]{1,500}$/.test(page) ? page : "https://en.wikipedia.org/wiki/" + title;
-      var excerpt = escaped(data.extract.trim().slice(0, 1200));
-      return "**" + escaped(heading.slice(0, 120)) + "**\n" + excerpt.slice(0, 1600) + "\n<" + url2 + ">";
-    })();
-  }
-  function translateCxText(text, target, signal) {
-    return _async_to_generator(function* () {
-      var query = Object.entries({
-        client: "gtx",
-        sl: "auto",
-        tl: target,
-        dt: "t",
-        q: text
-      }).map(([key, value]) => key + "=" + encodeURIComponent(value)).join("&");
-      if (query.length > 16e3)
-        throw new Error("Translation input is too long");
-      var response = yield fetch("https://translate.googleapis.com/translate_a/single?" + query, {
-        credentials: "omit",
-        redirect: "error",
-        signal
-      });
-      if (!response.ok)
-        throw new Error("Translation request failed");
-      var data = yield response.json();
-      if (!Array.isArray(data) || !Array.isArray(data[0]))
-        throw new Error("Invalid translation response");
-      var translated = data[0].map((part) => Array.isArray(part) && typeof part[0] === "string" ? part[0] : "").join("");
-      if (!translated.trim() || translated.length > 4e3)
-        throw new Error("Invalid translation text");
-      var language = typeof data[2] === "string" && /^[a-z]{2,3}(?:-[a-z]{2,8})?$/i.test(data[2]) ? data[2] : "auto";
-      return {
-        translated,
-        language
-      };
-    })();
-  }
-  function formatCxSpotify(action, text, track) {
-    if (!track)
-      return;
-    var artist = track.artists?.[0];
-    var external = artist?.external_urls?.spotify;
-    var artistId = typeof external === "string" ? /^https:\/\/open\.spotify\.com\/artist\/([a-z0-9]{22})(?:\?[^#]*)?$/i.exec(external)?.[1] : void 0;
-    var [type, id] = action === "spotifyTrack" ? [
-      "track",
-      track.id
-    ] : action === "spotifyAlbum" ? [
-      "album",
-      track.album?.id
-    ] : [
-      "artist",
-      artistId ?? artist?.id
-    ];
-    if (typeof id !== "string" || !/^[a-z0-9]{22}$/i.test(id))
-      return;
-    return [
-      text.trim(),
-      "https://open.spotify.com/" + type + "/" + id
-    ].filter(Boolean).join(" ");
-  }
-  function formatCxRandomMember(text, members, currentUser) {
-    var ids = members.map((member2) => member2?.userId).filter((id) => id !== currentUser && /^\d{15,22}$/.test(id));
-    var member = ids[Math.floor(Math.random() * ids.length)];
-    if (member)
-      return ("<@" + member + "> " + text).trim();
-  }
-  function inviteDetails(invite, list) {
-    if (typeof invite?.code !== "string" || !/^[a-z0-9-]{1,48}$/i.test(invite.code))
-      return;
-    var timestamp = typeof invite.expires_at === "string" ? Date.parse(invite.expires_at) : NaN;
-    var expiry = Number.isFinite(timestamp) ? " \xB7 Expires <t:" + Math.round(timestamp / 1e3) + ":R>" : "";
-    var max = Number.isSafeInteger(invite.max_uses) ? invite.max_uses : "?";
-    var uses = Number.isSafeInteger(invite.uses) ? invite.uses : "?";
-    return "discord.gg/" + invite.code + expiry + (list ? " \xB7 Used " + uses + "/" + max : " \xB7 Max uses: " + max);
-  }
-  function runCxFriendInvites(action, api) {
-    return _async_to_generator(function* () {
-      if (!api)
-        throw new Error("Friend invites are unavailable");
-      if (action === "create")
-        return inviteDetails(yield api.createFriendInvite(), false) ?? "Discord did not return an invite link.";
-      if (action === "revoke") {
-        yield api.revokeFriendInvites();
-        return "All friend invites have been revoked.";
-      }
-      var invites2 = yield api.getAllFriendInvites();
-      var lines = invites2.slice(0, 15).map((invite) => inviteDetails(invite, true)).filter(Boolean);
-      if (!lines.length)
-        return "You have no active friend invites.";
-      return lines.join("\n") + (invites2.length > 15 ? "\n\u2026 " + (invites2.length - 15) + " more." : "");
-    })();
-  }
-  function formatCxRoleMembers(role, guild, members, getUser) {
-    if (!guild)
-      return "Use this in a server.";
-    var matching = members.filter((member) => role === guild || member?.roles?.includes(role));
-    if (!matching.length)
-      return "Nobody loaded has that role. Open the member list to load more members.";
-    var names = matching.slice(0, 32).map(({ userId, nick }) => {
-      var user = getUser(userId);
-      return (nick || user?.globalName || user?.username || userId).slice(0, 64).replace(/[\\*_~`<>@\r\n]/g, (char) => char === "@" ? "\uFF20" : char === "\r" || char === "\n" ? " " : "\\" + char);
-    });
-    return "**" + matching.length + " loaded member" + (matching.length === 1 ? "" : "s") + "** with <@&" + role + ">:\n" + names.join(", ") + (matching.length > names.length ? ", \u2026" : "");
-  }
-  function markCxServersRead(stores, acknowledge) {
-    var channels2 = /* @__PURE__ */ new Map();
-    for (var { id } of Object.values(stores.guilds.getGuilds())) {
-      var listed = stores.channels.getChannels(id);
-      var threads = Object.values(stores.threads?.getActiveJoinedThreadsForGuild(id) ?? {}).flatMap((group) => Object.values(group));
-      for (var row of [
-        ...listed?.SELECTABLE ?? [],
-        ...listed?.VOCAL ?? [],
-        ...threads
-      ]) {
-        var channelId = row?.channel?.id;
-        if (!channelId || channels2.has(channelId) || !stores.read.hasUnread(channelId))
-          continue;
-        var messageId = stores.read.lastMessageId(channelId);
-        if (messageId)
-          channels2.set(channelId, {
-            channelId,
-            messageId,
-            readStateType: 0
+  function icon2(...names) {
+    for (var name of names) {
+      try {
+        var id = findAssetId(name);
+        if (id)
+          return /* @__PURE__ */ jsx(TableRow.Icon, {
+            source: id
           });
+      } catch (e) {
       }
     }
-    if (!channels2.size)
-      return "Everything is already read.";
-    acknowledge([
-      ...channels2.values()
+    return void 0;
+  }
+  function Addons() {
+    var navigation2 = NavigationNative.useNavigation();
+    var open = React2.useMemo(() => {
+      var actions = /* @__PURE__ */ new Map();
+      return (title, load) => {
+        if (!actions.has(title))
+          actions.set(title, wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+            return load();
+          })(), title, void 0, "push"));
+        return actions.get(title)();
+      };
+    }, [
+      navigation2
     ]);
-    return "Marked " + channels2.size + " channel" + (channels2.size === 1 ? "" : "s") + " as read.";
+    return /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
+      contentContainerStyle: {
+        paddingBottom: 38
+      },
+      children: /* @__PURE__ */ jsx(Stack, {
+        style: {
+          paddingVertical: 24,
+          paddingHorizontal: 12
+        },
+        spacing: 24,
+        children: /* @__PURE__ */ jsxs(TableRowGroup, {
+          title: "Add-ons",
+          children: [
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Plugins",
+              subLabel: "Manage and configure your plugins",
+              icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
+              onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Discover plugins",
+              subLabel: "Browse and install new plugins",
+              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "SettingsIcon"),
+              onPress: () => open("Discover plugins", () => (init_PluginBrowser(), __toCommonJS(PluginBrowser_exports)))
+            }),
+            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Themes",
+              subLabel: "Manage your Discord themes",
+              icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
+              onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
+            }),
+            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Discover themes",
+              subLabel: "Browse community themes and use one in a tap",
+              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "PaintPaletteIcon"),
+              onPress: () => open("Discover themes", () => (init_ThemeStore(), __toCommonJS(ThemeStore_exports)))
+            }),
+            isFontSupported() ? /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Fonts",
+              subLabel: "Choose and manage fonts",
+              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon"),
+              onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
+            }) : /* @__PURE__ */ jsx(TableRow, {
+              label: "Fonts",
+              subLabel: "Custom fonts are unavailable on this loader",
+              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon")
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Extras",
+              subLabel: "Fake Nitro, gift links, boosts, friend requests and account tools",
+              icon: icon2("GiftIcon", "NitroWheelIcon", "StarIcon", "SettingsIcon"),
+              onPress: () => open("Extras", () => ({
+                default: (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).ExtrasPage
+              }))
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Cloudsync",
+              subLabel: "Back up and sync your settings",
+              icon: icon2("CloudIcon", "SyncIcon", "SettingsIcon"),
+              onPress: () => open("Cloudsync", () => (init_StoreCloud(), __toCommonJS(StoreCloud_exports)))
+            })
+          ]
+        })
+      })
+    });
   }
-  function markCxServersReadAndWait(stores, acknowledge) {
-    return _async_to_generator(function* () {
-      var result;
-      var summary = markCxServersRead(stores, (channels2) => {
-        result = acknowledge(channels2);
-      });
-      yield result;
-      return summary;
-    })();
-  }
-  function bindCxChannelOpenRead({ dispatcher: dispatcher2, selected, user, read, jump, enabled = () => true }) {
-    if (typeof dispatcher2?.subscribe !== "function" || typeof read?.lastMessageId !== "function")
-      throw new Error("Discord channel read state is unavailable");
-    var pending2;
-    var generation = 0;
-    var previous;
-    var previousUser;
-    function onSelect({ channelId, messageId: targetId, jumpToMessageId }) {
-      var account = user();
-      if (targetId || jumpToMessageId) {
-        clearTimeout(pending2);
-        generation++;
-        previous = void 0;
-        return;
-      }
-      if (enabled() && channelId === previous && account === previousUser)
-        return;
-      clearTimeout(pending2);
-      var request = ++generation;
-      previous = void 0;
-      if (!enabled() || !account || typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId))
-        return;
-      previous = channelId;
-      previousUser = account;
-      pending2 = setTimeout(() => _async_to_generator(function* () {
-        try {
-          if (!enabled() || user() !== account || selected() !== channelId || !read.hasUnread(channelId))
-            return;
-          var messageId = read.lastMessageId(channelId);
-          if (!messageId || !/^\d{17,20}$/.test(messageId))
-            return;
-          yield dispatcher2.dispatch({
-            type: "BULK_ACK",
-            context: "APP",
-            channels: [
-              {
-                channelId,
-                messageId,
-                readStateType: 0
-              }
-            ]
-          });
-          if (user() !== account)
-            return;
-          yield dispatcher2.dispatch({
-            type: "CHANNEL_LOCAL_ACK",
-            channelId
-          });
-          if (request === generation && enabled() && user() === account && selected() === channelId)
-            yield jump({
-              channelId,
-              messageId,
-              flash: false
-            });
-        } catch (e) {
-        }
-      })(), 0);
-    }
-    dispatcher2.subscribe("CHANNEL_SELECT", onSelect);
-    return () => {
-      generation++;
-      clearTimeout(pending2);
-      dispatcher2.unsubscribe("CHANNEL_SELECT", onSelect);
-    };
-  }
-  var cxClientFunctions, cxExternalLookups;
-  var init_cxClientCommands = __esm({
-    "src/lib/api/cxClientCommands.ts"() {
+  var import_react_native43;
+  var init_Addons = __esm({
+    "src/core/ui/settings/pages/Addons/index.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_async_to_generator();
-      cxClientFunctions = {
-        roleMembers: {
-          permission: "guild.members",
-          input: "role"
-        },
-        randomMember: {
-          permission: "guild.randommember",
-          input: "text"
-        },
-        spotifyTrack: {
-          permission: "spotify.activity",
-          input: "text"
-        },
-        spotifyAlbum: {
-          permission: "spotify.activity",
-          input: "text"
-        },
-        spotifyArtist: {
-          permission: "spotify.activity",
-          input: "text"
-        }
-      };
-      cxExternalLookups = {
-        wikipedia: {
-          permission: "lookup.wikipedia",
-          run: lookupWikipedia
-        }
-      };
+      init_jsxRuntime();
+      import_react_native43 = __toESM(require_react_native());
+      init_common();
+      init_components();
+      init_loader();
+      init_assets();
+      init_shared();
     }
   });
 
-  // src/lib/api/cxCommandFunctions.ts
-  function chooseOne(items) {
-    return items[Math.floor(Math.random() * items.length)];
-  }
-  function randomInteger(low, high) {
-    var range = high - low + 1;
-    if (Number.isSafeInteger(range) && range > 0)
-      return low + Math.floor(Math.random() * range);
-  }
-  function hexChannels(input) {
-    var hex = input.trim().replace(/^#/, "");
-    if (/^[\da-f]{3}$/i.test(hex))
-      hex = [
-        ...hex
-      ].map((digit) => digit.repeat(2)).join("");
-    if (/^[\da-f]{6}$/i.test(hex))
-      return hex.match(/../g).map((value) => Number.parseInt(value, 16));
-  }
-  function utcMidnight(input) {
-    var date = input.trim();
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
-      return;
-    var instant = /* @__PURE__ */ new Date(date + "T00:00:00Z");
-    if (Number.isFinite(instant.getTime()) && instant.toISOString().startsWith(date + "T"))
-      return instant.getTime();
-  }
-  function integerText(input) {
-    var text = input.trim();
-    if (!/^[+-]?\d+$/.test(text))
-      return;
-    var value = Number(text);
-    return Number.isSafeInteger(value) ? value : void 0;
-  }
-  function durationSeconds(input) {
-    var text = input.trim();
-    if (!/^(?:\d{1,10}[dhms] *){1,4}$/i.test(text))
-      return;
-    var seen = /* @__PURE__ */ new Set();
-    var seconds = 0;
-    for (var [, digits, unit] of text.toLowerCase().matchAll(/(\d+)([dhms])/g)) {
-      if (seen.has(unit))
-        return;
-      seen.add(unit);
-      seconds += Number(digits) * durationUnits.get(unit);
-    }
-    return seconds;
-  }
-  function isoUnixMilliseconds(input) {
-    var parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
-    if (!parsed)
-      return;
-    var [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
-    var midnight = utcMidnight(date);
-    if (midnight === void 0 || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59)
-      return;
-    var offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
-    return midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1e3 + Number(fraction.padEnd(3, "0"));
-  }
-  function jsonTokens(text) {
-    try {
-      JSON.parse(text);
-    } catch (e) {
-      return;
-    }
-    return text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
-  }
-  function markdownTable(rows) {
-    var columns = rows[0]?.length ?? 0;
-    if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
-      return;
-    var row = (cells) => "| " + cells.map((cell) => cell.trim().replace(/[\\|]/g, "\\$&").replace(/\r\n|\r|\n/g, "<br>").replace(/`(?=``)/g, "`\u200B")).join(" | ") + " |";
-    var output = [
-      row(rows[0]),
-      row(Array.from({
-        length: columns
-      }, () => "---")),
-      ...rows.slice(1).map(row)
-    ].join("\n");
-    return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
-  }
-  function csvRows(input) {
-    var rows = [];
-    var field = /(?:"((?:[^"]|"")*)"|([^",\r\n]*))(,|\r\n|\r|\n|$)/y;
-    var cells = [];
-    while (field.lastIndex <= input.length) {
-      var match = field.exec(input);
-      if (!match)
-        return [];
-      var [, quoted2, plain, separator] = match;
-      cells.push(quoted2 === void 0 ? plain : quoted2.replaceAll('""', '"'));
-      if (separator === ",")
-        continue;
-      rows.push(cells);
-      if (!separator || field.lastIndex === input.length)
-        break;
-      cells = [];
-    }
-    return rows;
-  }
-  function parsePublicHttpUrl(text) {
-    if (!/^https?:\/\//i.test(text) || text.length > 3e3 || /[\s\\]/.test(text))
-      return;
-    try {
-      var url2 = new URL(text);
-      if (!url2.username && !url2.password)
-        return url2;
-    } catch (e) {
-    }
-  }
-  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, base64Alphabet, dayMilliseconds, durationUnits, cxCommandFunctions;
-  var init_cxCommandFunctions = __esm({
-    "src/lib/api/cxCommandFunctions.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      searchEngines = /* @__PURE__ */ new Map([
-        [
-          "Google",
-          "https://www.google.com/search?q="
-        ],
-        [
-          "Bing",
-          "https://www.bing.com/search?q="
-        ],
-        [
-          "Yahoo",
-          "https://search.yahoo.com/search?p="
-        ],
-        [
-          "DuckDuckGo",
-          "https://duckduckgo.com/?q="
-        ],
-        [
-          "Baidu",
-          "https://www.baidu.com/s?wd="
-        ],
-        [
-          "Yandex",
-          "https://yandex.com/search/?text="
-        ],
-        [
-          "Ecosia",
-          "https://www.ecosia.org/search?q="
-        ],
-        [
-          "Ask",
-          "https://www.ask.com/web?q="
-        ],
-        [
-          "AOL",
-          "https://search.aol.com/aol/search?q="
-        ],
-        [
-          "LetMeGoogleThatForYou",
-          "https://letmegooglethat.com/?q="
-        ]
-      ]);
-      morseCodes = new Map(Object.entries({
-        A: ".-",
-        B: "-...",
-        C: "-.-.",
-        D: "-..",
-        E: ".",
-        F: "..-.",
-        G: "--.",
-        H: "....",
-        I: "..",
-        J: ".---",
-        K: "-.-",
-        L: ".-..",
-        M: "--",
-        N: "-.",
-        O: "---",
-        P: ".--.",
-        Q: "--.-",
-        R: ".-.",
-        S: "...",
-        T: "-",
-        U: "..-",
-        V: "...-",
-        W: ".--",
-        X: "-..-",
-        Y: "-.--",
-        Z: "--..",
-        0: "-----",
-        1: ".----",
-        2: "..---",
-        3: "...--",
-        4: "....-",
-        5: ".....",
-        6: "-....",
-        7: "--...",
-        8: "---..",
-        9: "----.",
-        " ": "/"
-      }));
-      morseLetters = new Map([
-        ...morseCodes
-      ].map(([letter, code]) => [
-        code,
-        letter
-      ]));
-      normalizations = [
-        "NFC",
-        "NFD",
-        "NFKC",
-        "NFKD"
-      ];
-      ansiForegrounds = [
-        "gray",
-        "red",
-        "green",
-        "yellow",
-        "blue",
-        "pink",
-        "cyan",
-        "white"
-      ];
-      ansiBackgrounds = [
-        "navy",
-        "orange",
-        "slate",
-        "teal",
-        "gray",
-        "indigo",
-        "silver",
-        "white"
-      ];
-      codeFence = "```";
-      base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-      dayMilliseconds = 864e5;
-      durationUnits = /* @__PURE__ */ new Map([
-        [
-          "d",
-          86400
-        ],
-        [
-          "h",
-          3600
-        ],
-        [
-          "m",
-          60
-        ],
-        [
-          "s",
-          1
-        ]
-      ]);
-      cxCommandFunctions = {
-        snowflakeTimestamp(input) {
-          var text = input.trim();
-          if (!/^\d{17,20}$/.test(text))
-            return;
-          var snowflake3 = BigInt(text);
-          if (snowflake3 > 0xffffffffffffffffn || text[0] === "0")
-            return;
-          var timestamp = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
-          return `Created <t:${timestamp}:F> (<t:${timestamp}:R>).`;
-        },
-        sortLines: (text) => text.split(/\r\n|\r|\n/).sort((a, b3) => {
-          var left = a.toLowerCase();
-          var right = b3.toLowerCase();
-          return left < right ? -1 : left > right ? 1 : 0;
-        }).join("\n"),
-        trimLines: (text) => text.split(/\r\n|\r|\n/).map((line) => line.trim()).join("\n"),
-        linesToCsv: (text) => {
-          var fields = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
-          return fields.map((field) => `"${field.replaceAll('"', '""')}"`).join(",");
-        },
-        numberLines: (text) => {
-          var lines = text.split(/\r\n|\r|\n/);
-          if (lines.at(-1) === "")
-            lines.pop();
-          return lines.map((line, index) => `${index + 1}. ${line}`).join("\n");
-        },
-        slugifyText: (text) => text.normalize("NFKD").replace(RegExp("\\p{M}", "gu"), "").toLowerCase().replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), "-").replace(/^-|-$/g, ""),
-        unicodeInfo(text) {
-          var points = Array.from(text, (character) => "U+" + character.codePointAt(0).toString(16).toUpperCase().padStart(4, "0"));
-          if (!points.length || points.length > 128)
-            return;
-          return `${points.length} Unicode code points \xB7 ${text.length} UTF-16 code units
-\`${points.join(" ")}\``;
-        },
-        encodeUrlComponent(text) {
-          try {
-            var encoded = encodeURIComponent(text);
-            return encoded.length <= 3900 ? encoded : "Encoded text is too long for one reply.";
-          } catch (e) {
-            return "This text contains invalid Unicode.";
-          }
-        },
-        decodeUrlComponent(text) {
-          try {
-            return decodeURIComponent(text);
-          } catch (e) {
-            return "This text contains an invalid URL escape.";
-          }
-        },
-        escapeMarkdown(text) {
-          var escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
-          return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
-        },
-        checkJson(text) {
-          try {
-            JSON.parse(text);
-            return "Valid JSON.";
-          } catch (e) {
-            return "Invalid JSON.";
-          }
-        },
-        formatJson(text) {
-          var tokens2 = jsonTokens(text);
-          if (!tokens2)
-            return "Invalid JSON.";
-          var depth = 0;
-          var result = "";
-          for (var index = 0; index < tokens2.length; index++) {
-            var token = tokens2[index];
-            var previous = tokens2[index - 1];
-            var closes = token === "}" || token === "]";
-            if (closes)
-              depth--;
-            var empty = closes && (previous === "{" || previous === "[");
-            if (!empty && (closes || previous === "{" || previous === "[" || previous === ",")) {
-              result += "\n" + "  ".repeat(depth);
-            }
-            result += token.startsWith('"') ? token.replaceAll("`", "\\u0060") : token;
-            if (token === ":")
-              result += " ";
-            if (token === "{" || token === "[")
-              depth++;
-            if (result.length > 3900)
-              return "Formatted JSON is too long for one reply.";
-          }
-          return codeFence + "json\n" + result + "\n" + codeFence;
-        },
-        compactJson(text) {
-          var tokens2 = jsonTokens(text);
-          if (!tokens2)
-            return "Invalid JSON.";
-          var result = tokens2.join("").replaceAll("`", "\\u0060");
-          return result.length <= 3900 ? codeFence + "json\n" + result + "\n" + codeFence : "Compacted JSON is too long for one reply.";
-        },
-        jsonKeys(text) {
-          try {
-            var value = JSON.parse(text);
-            if (!value || Array.isArray(value) || typeof value !== "object")
-              return "Enter a JSON object.";
-            var keys = JSON.stringify(Object.keys(value), null, 2).replaceAll("`", "\\u0060");
-            return keys.length <= 3900 ? codeFence + "json\n" + keys + "\n" + codeFence : "The key list is too long for one reply.";
-          } catch (e) {
-            return "Invalid JSON.";
-          }
-        },
-        commonLines(first, second) {
-          var otherLines = new Set(second.split(/\r\n|\r|\n/));
-          var common = [
-            ...new Set(first.split(/\r\n|\r|\n/).filter((line) => line && otherLines.has(line)))
-          ];
-          if (!common.length)
-            return "No matching nonempty lines.";
-          var result = common.join("\n").replace(/`(?=``)/g, "`\u200B");
-          return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Matching lines are too long for one reply.";
-        },
-        compareLines(before3, after2) {
-          var lines = (value) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
-          var previous = lines(before3);
-          var current = lines(after2);
-          var unmatched = (source, other) => {
-            var counts = /* @__PURE__ */ new Map();
-            for (var line of other)
-              counts.set(line, (counts.get(line) ?? 0) + 1);
-            return source.filter((line2) => {
-              var count = counts.get(line2) ?? 0;
-              if (!count)
-                return true;
-              counts.set(line2, count - 1);
-              return false;
-            });
-          };
-          var removed = unmatched(previous, current);
-          var added = unmatched(current, previous);
-          if (!removed.length && !added.length)
-            return "Both inputs contain the same lines, ignoring order.";
-          var changes = [
-            ...removed.map((line) => "- " + line),
-            ...added.map((line) => "+ " + line)
-          ].join("\n").replaceAll(codeFence, "`\u200B``");
-          return changes.length <= 3900 ? codeFence + "diff\n" + changes + "\n" + codeFence : "Line changes are too long for one reply.";
-        },
-        wordFrequency(text) {
-          var counts = /* @__PURE__ */ new Map();
-          for (var word of text.toLowerCase().match(RegExp("[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*", "gu")) ?? []) {
-            counts.set(word, (counts.get(word) ?? 0) + 1);
-          }
-          return [
-            ...counts
-          ].sort(([, left], [, right]) => right - left).slice(0, 10).map(([word2, count]) => (word2.length > 80 ? word2.slice(0, 80) + "\u2026" : word2) + " \u2014 " + count).join("\n") || "No words found.";
-        },
-        hexToRgb(input) {
-          var channels2 = hexChannels(input);
-          if (channels2)
-            return `\`rgb(${channels2.join(", ")})\``;
-        },
-        colorContrast(foreground, background) {
-          var colors = [
-            hexChannels(foreground),
-            hexChannels(background)
-          ];
-          var luminances = colors.map((channels2) => channels2?.map((channel) => {
-            var rgb = channel / 255;
-            return rgb <= 0.04045 ? rgb / 12.92 : ((rgb + 0.055) / 1.055) ** 2.4;
-          }));
-          var [text, surface] = luminances;
-          if (!text || !surface)
-            return;
-          var relativeLuminance = ([red, green, blue]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-          var a = relativeLuminance(text), b3 = relativeLuminance(surface);
-          var ratio = (Math.max(a, b3) + 0.05) / (Math.min(a, b3) + 0.05);
-          return `Contrast \u2248 ${ratio.toFixed(2)}:1
-WCAG AA normal text ${ratio >= 4.5 ? "passes" : "fails"}
-WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
-        },
-        rgbToHex(input) {
-          var text = input.trim();
-          var channels2 = /^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/.exec(text) ?? /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i.exec(text);
-          if (!channels2)
-            return;
-          var values = channels2.slice(1).map(Number);
-          if (values.some((value) => value > 255))
-            return;
-          return "`#" + values.map((value) => value.toString(16).padStart(2, "0")).join("") + "`";
-        },
-        hslToHex(input) {
-          var text = input.trim().replace(/^hsl\((.*)\)$/i, "$1").trim();
-          var parts = text.includes(",") ? text.split(",").map((part) => part.trim()) : text.split(/\s+/);
-          var match = /^([+-]?\d+(?:\.\d+)?)(?:deg)? (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)%$/i.exec(parts.join(" "));
-          if (!match)
-            return;
-          var [angle, saturation, lightness] = match.slice(1).map(Number);
-          if (!Number.isFinite(angle) || saturation > 100 || lightness > 100)
-            return;
-          var hue = (angle % 360 + 360) % 360;
-          var light = lightness / 100;
-          var amplitude = saturation / 100 * Math.min(light, 1 - light);
-          var component = (offset) => {
-            var sector = (offset + hue / 30) % 12;
-            var value = light - amplitude * Math.max(-1, Math.min(sector - 3, 9 - sector, 1));
-            return Math.round(255 * value).toString(16).padStart(2, "0");
-          };
-          return "`#" + [
-            0,
-            8,
-            4
-          ].map(component).join("") + "`";
-        },
-        daysBetween(start, end) {
-          var first = utcMidnight(start), last = utcMidnight(end);
-          if (first === void 0 || last === void 0)
-            return;
-          var days = (last - first) / dayMilliseconds;
-          return `${days} ${Math.abs(days) === 1 ? "day" : "days"}`;
-        },
-        offsetDate(input, dayOffset) {
-          var start = utcMidnight(input), days = integerText(dayOffset);
-          if (start === void 0 || days === void 0)
-            return;
-          var date = new Date(start + days * dayMilliseconds);
-          if (Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999)
-            return `\`${date.toISOString().slice(0, 10)}\``;
-        },
-        isoWeek(input) {
-          var start = utcMidnight(input);
-          if (start === void 0)
-            return;
-          var thursday = new Date(start);
-          var weekday = thursday.getUTCDay() || 7;
-          thursday.setUTCDate(thursday.getUTCDate() + 4 - weekday);
-          var year = thursday.getUTCFullYear();
-          var firstDay = new Date(thursday);
-          firstDay.setUTCMonth(0, 1);
-          var week = Math.floor((thursday.getTime() - firstDay.getTime()) / (7 * dayMilliseconds)) + 1;
-          var yearLabel = (year < 0 ? "-" : "") + String(Math.abs(year)).padStart(4, "0");
-          return yearLabel + "-W" + String(week).padStart(2, "0") + "-" + weekday;
-        },
-        unixToIso(input, unit) {
-          var value = integerText(input);
-          if (value === void 0 || unit !== "seconds" && unit !== "milliseconds")
-            return;
-          var instant = new Date(unit === "seconds" ? value * 1e3 : value);
-          if (Number.isFinite(instant.getTime()))
-            return `\`${instant.toISOString()}\``;
-        },
-        isoToUnix(input) {
-          var ms = isoUnixMilliseconds(input);
-          if (ms !== void 0)
-            return `Seconds \`${ms / 1e3}\`
-Milliseconds \`${ms}\``;
-        },
-        convertDuration(input) {
-          var seconds = durationSeconds(input);
-          if (seconds === void 0)
-            return;
-          var days = Math.floor(seconds / 86400);
-          var hours = Math.floor(seconds % 86400 / 3600);
-          var minutes = Math.floor(seconds % 3600 / 60);
-          return `${days}d ${hours}h ${minutes}m ${seconds % 60}s \xB7 ${seconds} seconds`;
-        },
-        countdownTimestamp(input) {
-          var duration = durationSeconds(input);
-          if (!duration)
-            return;
-          var timestamp = Math.ceil(Date.now() / 1e3) + duration;
-          if (timestamp <= 864e10)
-            return `<t:${timestamp}:R> \xB7 \`<t:${timestamp}:R>\``;
-        },
-        meetingTimestamp(input) {
-          var ms = isoUnixMilliseconds(input);
-          if (ms === void 0)
-            return;
-          var timestamp = Math.floor(ms / 1e3);
-          return `<t:${timestamp}:F> (<t:${timestamp}:R>)
-Copy \`<t:${timestamp}:F>\``;
-        },
-        discordLinkDetails(input) {
-          var text = input.trim().replace(/^<([^<>]+)>$/, "$1");
-          var match = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/channels\/(@me|\d{17,20})\/(\d{17,20})(?:\/(\d{17,20}))?\/?$/i.exec(text);
-          if (!match)
-            return;
-          var [, guild, channel, message] = match;
-          var direct = guild.toLowerCase() === "@me";
-          var ids = [
-            direct ? void 0 : guild,
-            channel,
-            message
-          ];
-          if (ids.some((id) => id && (id.startsWith("0") || BigInt(id) > 0xffffffffffffffffn)))
-            return;
-          return [
-            direct ? "Direct message" : `Server \`${guild}\``,
-            `Channel \`${channel}\``,
-            ...message ? [
-              `Message \`${message}\``
-            ] : []
-          ].join("\n");
-        },
-        convertNumberBase(input, from, to) {
-          var match = /^([+-]?)([0-9a-z]{1,256})$/i.exec(input.trim());
-          var source = integerText(from), destination = integerText(to);
-          if (!match || source === void 0 || destination === void 0 || source < 2 || source > 36 || destination < 2 || destination > 36)
-            return;
-          var base = BigInt(source);
-          var value = 0n;
-          for (var character of match[2]) {
-            var digit = Number.parseInt(character, 36);
-            if (digit >= source)
-              return;
-            value = value * base + BigInt(digit);
-          }
-          return `\`${(match[1] === "-" ? -value : value).toString(destination).toUpperCase()}\``;
-        },
-        aspectRatio(width, height) {
-          var w = integerText(width), h = integerText(height);
-          if (w === void 0 || h === void 0 || w < 1 || h < 1)
-            return;
-          var a = w, b3 = h;
-          while (b3)
-            [a, b3] = [
-              b3,
-              a % b3
-            ];
-          return `\`${w / a}:${h / a}\` \xB7 ${w} \xD7 ${h} px`;
-        },
-        utf8Size(text) {
-          var bytes = 0;
-          for (var character of text) {
-            var code = character.codePointAt(0);
-            bytes += code <= 127 ? 1 : code <= 2047 ? 2 : code <= 65535 ? 3 : 4;
-          }
-          return `${bytes} UTF-8 ${bytes === 1 ? "byte" : "bytes"}`;
-        },
-        inspectUrl(input) {
-          var text = input.trim();
-          var url2 = parsePublicHttpUrl(text);
-          if (!url2)
-            return;
-          var count = url2.search.slice(1).split("&").filter(Boolean).length;
-          return `Scheme \`${url2.protocol.slice(0, -1)}\`
-Host \`${url2.host.replaceAll("`", "%60")}\`
-Query parameters ${count}
-Fragment ${url2.hash ? "present" : "absent"}`;
-        },
-        stripTracking(input) {
-          var text = input.trim();
-          if (!parsePublicHttpUrl(text))
-            return;
-          var match = /^([^?#]+)\?([^#]*)(#.*)?$/.exec(text);
-          if (!match)
-            return "No known tracking parameters found.";
-          var fields = match[2].split("&");
-          var kept = fields.filter((field) => {
-            try {
-              var name = decodeURIComponent(field.split("=", 1)[0]).toLowerCase();
-              return !/^(?:utm_(?:source|medium|campaign|term|content|id|source_platform|creative_format|marketing_tactic)|fbclid|gclid|dclid|msclkid)$/.test(name);
-            } catch (e) {
-              return true;
-            }
-          });
-          if (fields.length === kept.length)
-            return "No known tracking parameters found.";
-          var query = kept.some(Boolean) ? "?" + kept.join("&") : "";
-          var result = match[1] + query + (match[3] ?? "");
-          return codeFence + "\n" + result.replace(/`(?=``)/g, "`\u200B") + "\n" + codeFence;
-        },
-        encodeBase64(text) {
-          var encoded;
-          try {
-            encoded = encodeURIComponent(text);
-          } catch (e) {
-            return "This text contains invalid Unicode.";
-          }
-          var bytes = encoded.replace(/%([a-f0-9]{2})/gi, (_2, hex) => String.fromCharCode(Number.parseInt(hex, 16)));
-          if (Math.ceil(bytes.length / 3) * 4 > 3900)
-            return "Encoded text is too long for one reply.";
-          var output = "";
-          for (var index = 0; index < bytes.length; index += 3) {
-            var a = bytes.charCodeAt(index);
-            var b3 = bytes.charCodeAt(index + 1) || 0;
-            var c2 = bytes.charCodeAt(index + 2) || 0;
-            output += base64Alphabet[a >> 2] + base64Alphabet[(a & 3) << 4 | b3 >> 4] + (index + 1 < bytes.length ? base64Alphabet[(b3 & 15) << 2 | c2 >> 6] : "=") + (index + 2 < bytes.length ? base64Alphabet[c2 & 63] : "=");
-          }
-          return codeFence + "\n" + output + "\n" + codeFence;
-        },
-        tsvToMarkdown(input) {
-          return markdownTable(input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row) => row.split("	")));
-        },
-        csvToMarkdown(input) {
-          return markdownTable(csvRows(input));
-        },
-        markdownChecklist(input) {
-          var lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
-          if (!lines.length)
-            return;
-          var checklist = lines.map((line) => /^- \[[ xX]\]\s/.test(line) ? line : "- [ ] " + line.replace(/^[-*+]\s+/, "")).join("\n").replace(/`(?=``)/g, "`\u200B");
-          return checklist.length <= 3900 ? codeFence + "markdown\n" + checklist + "\n" + codeFence : "The checklist is too long for one reply.";
-        },
-        checklistProgress(input) {
-          var items = [
-            ...input.matchAll(/^[ \t]*(?:[-*+]|\d+\.)[ \t]+\[([ xX])\](?:[ \t]+|$)/gm)
-          ];
-          if (!items.length)
-            return "No Markdown checklist items found.";
-          var completed = items.filter(([, state2]) => state2 !== " ").length;
-          return `${completed} of ${items.length} complete \xB7 ${Math.round(100 * completed / items.length)}% \xB7 ${items.length - completed} remaining`;
-        },
-        discordTimestamp(seconds, format) {
-          var input = seconds.trim();
-          if (!/^-?\d+$/.test(input) || !/^[tTdDfFR]$/.test(format))
-            return;
-          var timestamp = Number(input);
-          if (Number.isSafeInteger(timestamp) && Math.abs(timestamp) <= 864e10) {
-            return `\`<t:${timestamp}:${format}>\``;
-          }
-        },
-        discordLocalTimestamp(date, time, format) {
-          var day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
-          var clock = /^(\d{2}):(\d{2})$/.exec(time.trim());
-          if (!day || !clock || !/^[tTdDfFR]$/.test(format))
-            return;
-          var [year, month, dayOfMonth] = day.slice(1).map(Number);
-          var [hour, minute] = clock.slice(1).map(Number);
-          var instant = /* @__PURE__ */ new Date(0);
-          instant.setFullYear(year, month - 1, dayOfMonth);
-          instant.setHours(hour, minute, 0, 0);
-          if (instant.getFullYear() !== year || instant.getMonth() !== month - 1 || instant.getDate() !== dayOfMonth || instant.getHours() !== hour || instant.getMinutes() !== minute)
-            return;
-          return `\`<t:${instant.getTime() / 1e3}:${format}>\``;
-        },
-        colorText(text, color, background, style) {
-          var foregroundIndex = ansiForegrounds.indexOf(color);
-          var backgroundIndex = ansiBackgrounds.indexOf(background);
-          if (foregroundIndex < 0 || background && backgroundIndex < 0 || style && style !== "bold" && style !== "underline")
-            return;
-          var codes = [
-            style === "bold" ? 1 : style === "underline" ? 4 : 0,
-            30 + foregroundIndex
-          ];
-          if (background)
-            codes.push(40 + backgroundIndex);
-          var safeText = text.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g, "");
-          if (!safeText.trim())
-            return;
-          var prefix2 = `\x1B[${codes.join(";")}m`;
-          var lines = safeText.replace(/`(?=``)/g, "`\u200B").split(/\r\n|\r|\n/).map((line) => prefix2 + line + "\x1B[0m");
-          var output = "```ansi\n" + lines.join("\n") + "\n```";
-          if (output.length <= 4e3)
-            return output;
-        },
-        searchLink(input, engine, hyperlink, hideEmbed) {
-          if (!input.trim())
-            return;
-          try {
-            var encoded = encodeURIComponent(input).replaceAll("(", "%28").replaceAll(")", "%29");
-            var url2 = (searchEngines.get(engine) ?? searchEngines.get("Google")) + encoded;
-            var destination = hideEmbed === "true" ? "<" + url2 + ">" : url2;
-            return hyperlink === "true" ? "[" + input.replace(/[\\[\]]/g, "\\$&") + "](" + destination + ")" : destination;
-          } catch (e) {
-            return;
-          }
-        },
-        // ShipCalc by rootpoi, kraethis, and ewlle.
-        ship(a, b3) {
-          var pair = [
-            a.trim().toLowerCase(),
-            b3.trim().toLowerCase()
-          ].sort().join("\u{1F495}");
-          var hash = 0;
-          for (var i = 0; i < pair.length; i++)
-            hash = hash * 31 + pair.charCodeAt(i) >>> 0;
-          var score = hash % 101;
-          var heart = score > 80 ? "\u{1F49E}" : score > 50 ? "\u{1F496}" : score > 25 ? "\u{1F497}" : "\u{1F494}";
-          return `${heart} **${a}** + **${b3}** = **${score}%**`;
-        },
-        choose: (choices) => chooseOne(choices.split(",").map((choice) => choice.trim()).filter(Boolean)),
-        roll(sides) {
-          var result = randomInteger(1, sides ? Number(sides) : 6);
-          if (result !== void 0)
-            return `You rolled a ${result}`;
-        },
-        randomNumber(minimum, maximum) {
-          var min = Number(minimum);
-          var max = Number(maximum);
-          var number = randomInteger(Math.min(min, max), Math.max(min, max));
-          if (number !== void 0)
-            return String(number);
-        },
-        wordCount(text) {
-          var words = text.trim().split(/\s+/).filter(Boolean).length;
-          return `${words} word${words === 1 ? "" : "s"}, ${text.length} character${text.length === 1 ? "" : "s"}`;
-        },
-        countLines: (text) => String(text.split(/\r\n|\r|\n/).length),
-        uniqueLines: (text) => [
-          ...new Set(text.split(/\r\n|\r|\n/))
-        ].join("\n"),
-        rot13: (text) => text.replace(/[a-z]/gi, (letter) => {
-          var base = letter <= "Z" ? 65 : 97;
-          return String.fromCharCode(base + (letter.charCodeAt(0) - base + 13) % 26);
-        }),
-        transform(text, style, repeat, reverse, normalize) {
-          if (style === "upper")
-            text = text.toUpperCase();
-          if (style === "lower")
-            text = text.toLowerCase();
-          if (style === "locale-upper")
-            text = text.toLocaleUpperCase();
-          if (style === "locale-lower")
-            text = text.toLocaleLowerCase();
-          if (normalizations.includes(normalize))
-            text = text.normalize(normalize);
-          if (style === "reverse" !== (reverse === "true"))
-            text = [
-              ...text
-            ].reverse().join("");
-          var count = repeat ? Number(repeat) : 1;
-          if (count > 0 && count <= 4e3 && text.length * count <= 4e3)
-            return text.repeat(count);
-        },
-        ask(question) {
-          return question + " - " + chooseOne([
-            "Yes",
-            "No",
-            "Maybe",
-            "Ask again later",
-            "Definitely not",
-            "It is certain"
-          ]);
-        },
-        currentTime() {
-          return "> **Current Time**: " + (/* @__PURE__ */ new Date()).toLocaleString();
-        },
-        mock(text) {
-          return text.split("").map((char, i) => i % 2 ? char.toUpperCase() : char.toLowerCase()).join("");
-        },
-        morse(text) {
-          if (!/^[.\-/ ]+$/.test(text))
-            return [
-              ...text.toUpperCase()
-            ].map((char) => morseCodes.get(char) ?? "").join(" ");
-          var decoded = text.split(" ").map((code) => morseLetters.get(code) ?? "").join("").toLowerCase();
-          return decoded.charAt(0).toUpperCase() + decoded.slice(1);
-        }
-      };
-    }
+  // src/core/ui/settings/pages/TestingPlugins/index.tsx
+  var TestingPlugins_exports = {};
+  __export(TestingPlugins_exports, {
+    default: () => TestingPlugins
   });
-
-  // src/lib/api/cxMessageTransforms.ts
-  function reverseText(text) {
-    return [
-      ...text
-    ].reverse().join("");
-  }
-  function parseCxHttpsOrigin(value) {
-    if (!httpsOrigin.test(value))
-      throw new Error("Use a bare HTTPS domain for link rewrites");
-    return value.toLowerCase();
-  }
-  function rewriteCxOrigin(text, rules) {
-    var match = /^(https:\/\/[^/?#\s]+)(\/[^?#\s]*)?(\?[^#\s]*)?(?:#[^\s]*)?$/i.exec(text.trim());
-    if (!match || RegExp(`[\\x00-\\x20\\x7f\\\\<>"']`, "u").test(match[0]))
-      return text;
-    var [, origin, path = "/", query = ""] = match;
-    var destination = rules.get(origin.toLowerCase());
-    return destination ? destination + path + query : text;
-  }
-  function rewriteCxLinks(text, rules) {
-    return text.replace(/(^|[\s<("'[{])https?:\/\/([a-z0-9.-]+)/gi, (original, before3, host, offset) => {
-      var end = offset + original.length;
-      var next = text[end];
-      if (next && !/[/?#\s<>]/.test(next) && !/^["')\]},!]+(?=$|[\s<>])/.test(text.slice(end)))
-        return original;
-      var domain = host.replace(/\.+$/, "");
-      var destination = rules.get("https://" + domain.toLowerCase());
-      return destination ? before3 + destination + host.slice(domain.length) : original;
-    });
-  }
-  function ingtonify(text) {
-    var links2 = [
-      ...text.matchAll(/https?:\/\/[^\s]+\.[^\s]+/gi)
-    ];
-    var words = [
-      ...text.matchAll(RegExp("\\p{L}+", "gu"))
-    ].filter(({ 0: word2, index }) => !/^(?:i)$/i.test(word2) && !/[aeouy]$/i.test(word2) && !links2.some((link) => index >= link.index && index < link.index + link[0].length));
-    var match = words[Math.floor(Math.random() * words.length)];
-    if (!match)
-      return text;
-    var word = match[0];
-    var upper = word.toUpperCase();
-    var overlap = upper.match(/(?:INGTON|INGTO|INGT|ING|IN|I)$/)?.[0].length ?? 0;
-    var suffix = "INGTON".slice(overlap);
-    var end = match.index + word.length;
-    return text.slice(0, end) + (word === upper ? suffix : suffix.toLowerCase()) + text.slice(end);
-  }
-  function cleanTrackingLink(url2) {
-    var match = /^(https?:\/\/([^/?#]+)[^?#]*)\?([^#]*)(#.*)?$/i.exec(url2);
-    if (!match)
-      return url2;
-    var [, base, host, query, fragment = ""] = match;
-    var pairs = query.split("&");
-    var kept = pairs.filter((pair) => {
-      var name = pair.split("=")[0];
-      try {
-        var key = decodeURIComponent(name.replace(/\+/g, " "));
-        if (/^[st]$/i.test(key))
-          return !/(^|\.)(?:twitter\.com|x\.com)(?::\d+)?$/i.test(host);
-        return !tracking.test(key);
-      } catch (e) {
-        return true;
-      }
-    });
-    var rest = kept.filter(Boolean).join("&");
-    return kept.length === pairs.length ? url2 : base + (rest ? "?" + rest : "") + fragment;
-  }
-  function preserveCase(original, replacement) {
-    if (original === original.toUpperCase())
-      return replacement.toUpperCase();
-    if (original[0] === original[0].toUpperCase())
-      return replacement[0].toUpperCase() + replacement.slice(1);
-    return replacement;
-  }
-  function polishWording(input, options = "apostrophes") {
-    if (input.includes("\uE000"))
-      return input;
-    var selected = new Set(options.split(",").map((option) => option.trim()));
-    var protectedText = [];
-    var text = input.replace(/\x60{3}[\s\S]*?\x60{3}|\x60[^\x60]*\x60|https?:\/\/[^\s<>]+|<(?:[@#:][^>\s]+|a:[^>\s]+)>/gi, (match) => "\uE000" + (protectedText.push(match) - 1) + "\uE000");
-    if (selected.has("apostrophes") || selected.has("expand"))
-      text = text.replace(missingPattern, (word) => preserveCase(word, missing.get(word.toLowerCase())));
-    if (selected.has("capitalize"))
-      text = text.replace(/(^\s*|[.!?]\s+)([a-z])/g, (_2, before3, letter) => before3 + letter.toUpperCase()).replace(/\bi\b/g, "I");
-    if (selected.has("expand"))
-      text = text.replace(expandedPattern, (word) => preserveCase(word, expanded.get(word.toLowerCase())));
-    if (selected.has("punctuation") && text.trim() && !RegExp(`[\\uE000.!?\u2026:;)\\]"'*_~\\x60]\\s*$|\\p{Extended_Pictographic}\\s*$`, "u").test(text))
-      text = text.replace(/\s*$/, ".");
-    return text.replace(/\uE000(\d+)\uE000/g, (_2, index) => protectedText[Number(index)]);
-  }
-  function formatLocalTime(hour, minute, meridiem, now) {
-    if (minute > 59 || (meridiem ? hour < 1 || hour > 12 : hour > 23))
-      return;
-    if (meridiem)
-      hour = hour % 12 + (meridiem.toUpperCase() === "PM" ? 12 : 0);
-    var target = new Date(now);
-    target.setHours(hour, minute, 0, 0);
-    if (target < now) {
-      target.setDate(target.getDate() + 1);
-      target.setHours(hour, minute, 0, 0);
-    }
-    return "<t:" + Math.floor(target.getTime() / 1e3) + ":t>";
-  }
-  var httpsOrigin, tracking, contractions, expanded, missing, wordPattern, missingPattern, expandedPattern, polishOptions, messageTransforms;
-  var init_cxMessageTransforms = __esm({
-    "src/lib/api/cxMessageTransforms.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      httpsOrigin = /^https:\/\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{0,62}$/i;
-      tracking = /^(?:utm_.*|fbclid|gclid|dclid|msclkid|mc_(?:cid|eid)|igshid|igsh|si|feature|ref_src|ref_url|_hsenc|_hsmi|yclid|twclid|share_id|spm|vero_(?:id|conv)|wt_?mc|oly_(?:anon|enc)_id|rb_clickid)$/i;
-      contractions = {
-        "wasn't": "was not",
-        "can't": "cannot",
-        "don't": "do not",
-        "won't": "will not",
-        "isn't": "is not",
-        "aren't": "are not",
-        "haven't": "have not",
-        "hasn't": "has not",
-        "hadn't": "had not",
-        "doesn't": "does not",
-        "didn't": "did not",
-        "shouldn't": "should not",
-        "wouldn't": "would not",
-        "couldn't": "could not",
-        "that's": "that is",
-        "what's": "what is",
-        "there's": "there is",
-        "how's": "how is",
-        "where's": "where is",
-        "when's": "when is",
-        "who's": "who is",
-        "why's": "why is",
-        "you'll": "you will",
-        "i'll": "I will",
-        "they'll": "they will",
-        "it'll": "it will",
-        "i'm": "I am",
-        "you're": "you are",
-        "they're": "they are",
-        "he's": "he is",
-        "she's": "she is",
-        "i've": "I have",
-        "you've": "you have",
-        "we've": "we have",
-        "they've": "they have",
-        "you'd": "you would",
-        "he'd": "he would",
-        "she'd": "she would",
-        "it'd": "it would",
-        "we'd": "we would",
-        "they'd": "they would",
-        "y'all": "you all",
-        "here's": "here is"
-      };
-      expanded = new Map(Object.entries(contractions));
-      missing = new Map([
-        ...expanded.keys()
-      ].map((word) => [
-        word.replace("'", ""),
-        word
-      ]));
-      wordPattern = (words) => new RegExp("\\b(?:" + [
-        ...words.keys()
-      ].join("|") + ")\\b", "gi");
-      missingPattern = wordPattern(missing);
-      expandedPattern = wordPattern(expanded);
-      polishOptions = /* @__PURE__ */ new Set([
-        "apostrophes",
-        "expand",
-        "capitalize",
-        "punctuation"
-      ]);
-      messageTransforms = {
-        reverse: reverseText,
-        // NormalizeMessageLinks by bb010g.
-        normalizeDiscordLinks: (text) => text.replace(/https:\/\/(?:canary\.|ptb\.)discord(?:app)?\.com\/channels\//g, "https://discord.com/channels/"),
-        // Unindent by Vee.
-        unindentCode: (text) => text.replace(/(```[^\n`]*\n)([\s\S]*?)(```)/g, (_2, opening, code, closing) => {
-          var lines = code.split("\n");
-          var minimum = Infinity;
-          for (var line of lines) {
-            if (line.trim())
-              minimum = Math.min(minimum, /^[\t ]*/.exec(line)[0].length);
-          }
-          if (!Number.isFinite(minimum) || minimum === 0)
-            return opening + code + closing;
-          return opening + lines.map((line2) => line2.replace(/^[\t ]+/, (indent) => indent.slice(minimum))).join("\n") + closing;
-        }),
-        // WriteUpperCase by Samwich and KrystalSkull.
-        capitalizeSentences: (text, exclusions = "http, https, ok") => {
-          var prefixes = exclusions.split(",").map((prefix2) => prefix2.trim().toLowerCase()).filter(Boolean);
-          return text.split(/([.!?]+['")\]]*\s+)/).map((part, index) => index % 2 || prefixes.some((prefix2) => part.toLowerCase().startsWith(prefix2)) ? part : part.charAt(0).toUpperCase() + part.slice(1)).join("");
-        },
-        ingtonify,
-        polishWording,
-        clearTrackingLinks: (text) => text.replace(/https?:\/\/[^\s<>]+/gi, (match) => {
-          var url2 = match.replace(/[.,;!?]+$/, "");
-          var extraClosing = (url2.match(/\)/g)?.length ?? 0) - (url2.match(/\(/g)?.length ?? 0);
-          if (extraClosing > 0)
-            url2 = url2.replace(/\)+$/, (ending) => ending.slice(0, -extraClosing));
-          return cleanTrackingLink(url2) + match.slice(url2.length);
-        }),
-        // Signature by Vee, Rini, ImBanana and KrystalSkull.
-        signature: (text, signature = "a chronic discord user") => text.trim() ? text + "\n> " + signature : text,
-        // SilentMessageToggle by Nuckyz, CatNoir and Z1xus.
-        silentMessage: (text) => text.trim() && !/^@silent(?:\s|$)/.test(text) ? "@silent " + text : text,
-        // AutoVaporwave and ZeroWidthSanitizer by rootpoi, kraethis, and ewlle.
-        fullwidth: (text) => text.replace(/[ -~]/g, (char) => char === " " ? "\u3000" : String.fromCharCode(char.charCodeAt(0) + 65248)),
-        stripInvisible: (text) => text.replace(/[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u206a-\u206f\ufeff\u00ad]/g, ""),
-        sendTimestamps: (text) => {
-          var now = /* @__PURE__ */ new Date();
-          return text.replace(/\x60{3}[\s\S]*?\x60{3}|\x60{2}[\s\S]*?\x60{2}|\x60(\d{1,2}):(\d{2}) ?(am|pm)?\x60/gi, (match, hour, minute, meridiem) => hour === void 0 ? match : formatLocalTime(Number(hour), Number(minute), meridiem, now) ?? match);
-        }
-      };
-    }
-  });
-
-  // src/lib/api/cxProfileColors.ts
-  function decodeCxProfileColors(bio) {
-    if (typeof bio !== "string")
-      return;
-    var match = taggedPalette.exec(bio.slice(0, 4096));
-    if (!match)
-      return;
-    return match.slice(1).map((hex) => parseInt([
-      ...hex
-    ].map((char) => String.fromCodePoint(char.codePointAt(0) - tagOffset)).join(""), 16));
-  }
-  function formatCxProfileColors(primary, accent) {
-    var colors = [
-      primary,
-      accent
-    ].map((color) => color.trim().replace(/^#/, "").toLowerCase());
-    if (!colors.every((color) => /^[a-f0-9]{6}$/.test(color)))
-      return;
-    var encoded = [
-      ..."[#" + colors.join(",#") + "]"
-    ].map((char) => String.fromCodePoint(char.charCodeAt(0) + tagOffset)).join("");
-    return "Copy the code block into your Discord bio. The color code is invisible.\n```\n" + encoded + "\n```";
-  }
-  var tagOffset, taggedPalette;
-  var init_cxProfileColors = __esm({
-    "src/lib/api/cxProfileColors.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      tagOffset = 917504;
-      taggedPalette = RegExp("\\u{e005b}\\u{e0023}([\\u{e0061}-\\u{e0066}\\u{e0041}-\\u{e0046}\\u{e0030}-\\u{e0039}]{1,6})\\u{e002c}\\u{e0023}([\\u{e0061}-\\u{e0066}\\u{e0041}-\\u{e0046}\\u{e0030}-\\u{e0039}]{1,6})\\u{e005d}", "u");
-    }
-  });
-
-  // src/lib/api/cxIncoming.ts
-  function parseIncomingRule(name, input) {
-    if (!Object.prototype.hasOwnProperty.call(incomingPermissions, name))
-      throw new Error("Unknown incoming rule");
-    var kind = name;
-    if (kind === "ping-alerts") {
-      var values = [
-        ...new Set(input.split(",").map((value) => value.trim()))
-      ];
-      if (values.some((value) => ![
-        "mentions",
-        "friends",
-        "dms",
-        "active",
-        "include-muted"
-      ].includes(value)) || !values.some((value) => [
-        "mentions",
-        "friends",
-        "dms"
-      ].includes(value))) {
-        throw new Error("Choose mentions, friends, or dms, with optional active and include-muted");
-      }
-      return {
-        kind,
-        values
-      };
-    }
-    if (kind === "open-link") {
-      var [phrase, link, extra] = input.split("|").map((part) => part.trim());
-      if (!phrase || phrase.length > 80 || link === void 0 || extra !== void 0)
-        throw new Error("Use a short phrase followed by | and an HTTPS destination");
-      if (!link)
-        return {
-          kind,
-          values: [
-            phrase
-          ]
-        };
-      var match = /^(https:\/\/[^/?#]+)(?:[/?#][a-z0-9._~%!$&()*+,;=:@/?#-]*)?$/i.exec(link);
-      if (!match)
-        throw new Error("Use an HTTPS destination without credentials or a custom scheme");
-      try {
-        parseCxHttpsOrigin(match[1]);
-      } catch (e) {
-        throw new Error("Use an HTTPS destination without credentials or a custom scheme");
-      }
-      return {
-        kind,
-        values: [
-          phrase
-        ],
-        link
-      };
-    }
-    if (kind === "profile-bio-colors") {
-      if (input !== "prefer-native" && input !== "prefer-bio")
-        throw new Error("Choose prefer-native or prefer-bio");
-      return {
-        kind,
-        values: [
-          input
-        ]
-      };
-    }
-    var always = false;
-    if (kind === "reply-pings") {
-      var match1 = /^(always|never)(?::(.*))?$/.exec(input);
-      if (!match1)
-        throw new Error("Reply pings require always or never, followed by optional exception IDs");
-      always = match1[1] === "always";
-      input = match1[2] ?? "";
-    }
-    var textual = kind === "keywords" || kind === "hide-keywords";
-    var values1 = [
-      ...new Set(input.split(textual ? /,/ : /[\s,]+/).map((value) => value.trim()).filter(Boolean))
-    ];
-    if (values1.length > 24)
-      throw new Error("Too many incoming rule values");
-    if (kind === "follow-voice" && values1.length > 1)
-      throw new Error("Choose one friend ID to follow");
-    if (kind === "reply-ping-default" && input.trim())
-      throw new Error("Reply ping defaults take no options");
-    if (kind === "friend-removals" && values1.length)
-      throw new Error("Friend removal notices take no options");
-    if (kind === "hide-profile-themes" && values1.length)
-      throw new Error("Profile theme hiding takes no options");
-    if (kind === "hide-system") {
-      if (!values1.length || values1.some((value) => !Object.prototype.hasOwnProperty.call(systemMessageTypes, value)))
-        throw new Error("Choose pins, joins, or boosts");
-      return {
-        kind,
-        values: values1,
-        messageTypes: new Set(values1.flatMap((value) => systemMessageTypes[value]))
-      };
-    }
-    if (kind === "hide-blocked") {
-      if (!values1.some((value) => value === "blocked" || value === "ignored") || values1.some((value) => value !== "blocked" && value !== "ignored" && value !== "replies"))
-        throw new Error("Choose blocked, ignored, or both, with optional replies");
-    } else if (!textual && !(kind === "stickers" && input === "*") && values1.some((value) => !/^\d{17,20}$/.test(value))) {
-      throw new Error("Incoming rules need Discord IDs");
-    }
-    if (kind === "hide-keywords" && values1.length) {
-      var phrases = values1.map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-      return {
-        kind,
-        values: values1,
-        matcher: new RegExp("\\b(?:" + phrases.join("|") + ")\\b", "i")
-      };
-    }
-    return {
-      kind,
-      values: values1,
-      always
-    };
-  }
-  function isCxNotificationMuted(id, channel, store) {
-    var guild = channel.guild_id;
-    if (channel.isMuted?.() || store?.isChannelMuted?.(guild ?? null, id))
-      return true;
-    if (!guild)
-      return store?.getMutedChannels?.()?.includes?.(id) === true;
-    return store?.isGuildOrCategoryOrChannelMuted?.(guild, id) === true || store?.isMuted?.(guild) === true || store?.isCategoryMuted?.(guild, id) === true || Boolean(channel.parent_id && store?.isChannelMuted?.(guild, channel.parent_id));
-  }
-  function stripStickers(message, rule) {
-    var stickers = message?.sticker_items ?? message?.stickerItems ?? message?.stickers;
-    if (!Array.isArray(stickers) || !stickers.length)
-      return message;
-    var kept = rule.values[0] === "*" ? [] : stickers.filter((sticker) => !rule.values.includes(String(sticker?.id)));
-    if (kept.length === stickers.length)
-      return message;
-    return {
-      ...message,
-      sticker_items: kept,
-      stickerItems: kept,
-      stickers: kept
-    };
-  }
-  function stripProfileTheme(profile) {
-    if (!profile || typeof profile !== "object" || !(Array.isArray(profile.theme_colors) || Array.isArray(profile.themeColors)))
-      return profile;
-    var next = {
-      ...profile
-    };
-    delete next.theme_colors;
-    delete next.themeColors;
-    return next;
-  }
-  function applyIncomingRule(rule, payload, context) {
-    var { type, message } = payload;
-    if (rule.kind === "reply-ping-default") {
-      if (type === "CREATE_PENDING_REPLY" && payload.shouldMention === true)
-        return {
-          shouldMention: false
-        };
-      return;
-    }
-    if (rule.kind === "friends-voice" || rule.kind === "follow-voice" || rule.kind === "friend-removals")
-      return;
-    if (rule.kind === "profile-bio-colors") {
-      if (type !== "USER_PROFILE_FETCH_SUCCESS")
-        return;
-      var envelope = payload.userProfile ?? payload;
-      var profile = envelope.user_profile ?? envelope;
-      if (rule.values[0] === "prefer-native" && [
-        profile.theme_colors,
-        profile.themeColors
-      ].some((colors2) => Array.isArray(colors2) && colors2.length))
-        return;
-      var colors = decodeCxProfileColors(profile.bio);
-      if (!colors)
-        return;
-      var change = {
-        theme_colors: colors,
-        themeColors: colors
-      };
-      var patch = profile === envelope ? change : {
-        user_profile: {
-          ...profile,
-          ...change
-        }
-      };
-      return envelope === payload ? patch : {
-        userProfile: {
-          ...envelope,
-          ...patch
-        }
-      };
-    }
-    if (rule.kind === "hide-profile-themes") {
-      if (type !== "USER_PROFILE_FETCH_SUCCESS")
-        return;
-      var envelope1 = payload.userProfile ?? payload;
-      var id = envelope1.user?.id ?? payload.userId;
-      var me = context.currentUser();
-      if (!me || typeof id !== "string" || id === me)
-        return;
-      var userProfile = envelope1.user_profile;
-      var guildProfile = envelope1.guild_member_profile;
-      var user = stripProfileTheme(userProfile);
-      var guild = stripProfileTheme(guildProfile);
-      var profile1 = !userProfile ? stripProfileTheme(envelope1) : envelope1;
-      if (user === userProfile && guild === guildProfile && profile1 === envelope1)
-        return;
-      var patch1 = {
-        ...user !== userProfile ? {
-          user_profile: user
-        } : {},
-        ...guild !== guildProfile ? {
-          guild_member_profile: guild
-        } : {}
-      };
-      if (envelope1 !== payload)
-        return {
-          userProfile: {
-            ...profile1,
-            ...patch1
-          }
-        };
-      return profile1 === envelope1 ? patch1 : {
-        ...patch1,
-        theme_colors: void 0,
-        themeColors: void 0
-      };
-    }
-    if (rule.kind === "hide-users" || rule.kind === "hide-keywords" || rule.kind === "hide-blocked" || rule.kind === "hide-system") {
-      if (!rule.values.length || payload.optimistic)
-        return;
-      if (type !== "MESSAGE_CREATE" && type !== "MESSAGE_UPDATE" && type !== "LOAD_MESSAGES_SUCCESS")
-        return;
-      var me1 = rule.kind === "hide-system" ? void 0 : context.currentUser();
-      if (!me1 && rule.kind !== "hide-system")
-        return;
-      var excludedAuthor = (user2) => typeof user2 === "string" && user2 !== me1 && (rule.values.includes("blocked") && context.blocked?.(user2) === true || rule.values.includes("ignored") && context.ignored?.(user2) === true);
-      var hide = (item) => {
-        if (!item)
-          return false;
-        if (rule.kind === "hide-system")
-          return rule.messageTypes?.has(item.type) === true;
-        var channel3 = item.channel_id ?? item.channelId ?? payload.channelId ?? payload.channel_id;
-        var user2 = item.author?.id ?? (type === "MESSAGE_UPDATE" && typeof channel3 === "string" && typeof item.id === "string" ? context.replyAuthor(channel3, item.id)?.id : void 0);
-        if (rule.kind === "hide-blocked") {
-          if (excludedAuthor(user2))
-            return true;
-          if (!rule.values.includes("replies"))
-            return false;
-          var reference = item.message_reference ?? item.messageReference;
-          var replyChannel = reference?.channel_id ?? reference?.channelId ?? channel3;
-          var replyId = reference?.message_id ?? reference?.messageId;
-          var repliedTo = (item.referenced_message ?? item.referencedMessage)?.author?.id ?? (typeof replyChannel === "string" && typeof replyId === "string" ? context.replyAuthor(replyChannel, replyId)?.id : void 0);
-          return excludedAuthor(repliedTo);
-        }
-        if (typeof user2 !== "string" || user2 === me1)
-          return false;
-        if (rule.kind === "hide-users")
-          return rule.values.includes(user2);
-        var fields = [
-          item.content
-        ];
-        if (Array.isArray(item.embeds))
-          for (var embed of item.embeds.slice(0, 10)) {
-            fields.push(embed?.title ?? embed?.rawTitle, embed?.description ?? embed?.rawDescription);
-          }
-        return fields.some((field) => typeof field === "string" && rule.matcher?.test(field.slice(0, 4e3)));
-      };
-      if (type === "LOAD_MESSAGES_SUCCESS") {
-        if (!Array.isArray(payload.messages))
-          return;
-        var messages = payload.messages.filter((item) => !hide(item));
-        if (messages.length !== payload.messages.length)
-          return {
-            messages
-          };
-      } else if (hide(message)) {
-        return false;
-      }
-      return;
-    }
-    if (rule.kind === "stickers") {
-      if (type === "MESSAGE_CREATE" || type === "MESSAGE_UPDATE") {
-        var next = stripStickers(message, rule);
-        return next !== message ? {
-          message: next
-        } : void 0;
-      }
-      if (type === "LOAD_MESSAGES_SUCCESS" && Array.isArray(payload.messages)) {
-        var messages1 = payload.messages.map((item) => stripStickers(item, rule));
-        if (messages1.some((item, index) => item !== payload.messages[index]))
-          return {
-            messages: messages1
-          };
-      }
-      return;
-    }
-    if (rule.kind === "calls") {
-      if (type !== "CALL_CREATE" && type !== "CALL_UPDATE" || !Array.isArray(payload.ringing) || !rule.values.length)
-        return;
-      var me2 = context.currentUser();
-      if (!me2 || !payload.ringing.includes(me2))
-        return;
-      var id1 = payload.channelId ?? payload.channel_id;
-      if (typeof id1 !== "string")
-        return;
-      var recipients = context.channel(id1)?.recipients;
-      var peer = recipients?.length === 1 ? recipients[0] : void 0;
-      if (rule.values.includes(id1) || rule.values.includes(typeof peer === "string" ? peer : peer?.id ?? ""))
-        return {
-          ringing: payload.ringing.filter((user2) => user2 !== me2)
-        };
-      return;
-    }
-    if (type !== "MESSAGE_CREATE" || payload.optimistic || typeof message?.author?.id !== "string")
-      return;
-    var me3 = context.currentUser();
-    var author = message.author.id;
-    if (rule.kind === "open-link") {
-      var channel = message.channel_id ?? message.channelId ?? payload.channelId;
-      if (!rule.link || !me3 || !context.openLink || typeof channel !== "string" || context.selectedChannel?.() !== channel || message.state === "SENDING" || context.blocked?.(author) || typeof message.content !== "string" || !message.content.slice(0, 4e3).toLowerCase().includes(rule.values[0].toLowerCase()))
-        return;
-      var now = Date.now();
-      var last = lastLinkOpen.get(context);
-      if (last !== void 0 && now - last < 1e4)
-        return;
-      lastLinkOpen.set(context, now);
-      context.openLink(rule.link, channel, me3);
-      return;
-    }
-    if (!me3 || author === me3)
-      return;
-    var mentions = Array.isArray(message.mentions) ? message.mentions : [];
-    var isMe = (mention) => (typeof mention === "string" ? mention : mention?.id) === me3;
-    if (rule.kind === "ping-alerts") {
-      var channelId = message.channel_id ?? message.channelId;
-      var alerts = context.pingAlerts;
-      if (!alerts || typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId) || typeof message.id !== "string" || !/^\d{17,20}$/.test(message.id) || message.state === "SENDING" || alerts.status(me3) === "dnd" || !rule.values.includes("active") && context.selectedChannel?.() === channelId)
-        return;
-      var channel1 = context.channel(channelId);
-      if (!channel1)
-        return;
-      var dm = channel1.type === 1 || channel1.type === 3;
-      if (!(rule.values.includes("mentions") && mentions.some(isMe) || rule.values.includes("friends") && !dm && alerts.isFriend(author) || rule.values.includes("dms") && dm))
-        return;
-      if (!rule.values.includes("include-muted") && (alerts.muted(channelId, channel1) || context.blocked?.(author) || dm && channel1.recipients?.some((recipient) => context.blocked?.(typeof recipient === "string" ? recipient : recipient.id))))
-        return;
-      var names = new Map(mentions.flatMap((mention) => typeof mention?.username === "string" && typeof mention?.id === "string" ? [
-        [
-          mention.id,
-          mention.username
-        ]
-      ] : []));
-      var content = typeof message.content === "string" ? message.content.slice(0, 4e3) : "";
-      var body = content.replace(/<@!?(\d{17,20})>/g, (token, id2) => names.has(id2) ? "@" + names.get(id2) : token);
-      var authorName = typeof message.author.username === "string" ? message.author.username : "Someone";
-      var channelName = channel1.name || (channel1.type === 3 ? "Group DM" : dm ? "DM" : "Server");
-      alerts.notify({
-        title: authorName.slice(0, 64) + " in " + channelName.slice(0, 64),
-        body: body.slice(0, 200) + (body.length > 200 ? "\u2026" : ""),
-        author,
-        channel: channelId,
-        message: message.id,
-        guild: channel1.guild_id
-      });
-      return;
-    }
-    if (rule.kind === "silence-users") {
-      if (rule.values.includes(author)) {
-        return {
-          message: {
-            ...message,
-            mention_everyone: false,
-            mention_roles: [],
-            mentions: mentions.filter((mention) => !isMe(mention))
-          }
-        };
-      }
-      return;
-    }
-    if (rule.kind === "reply-pings") {
-      var ref = message.message_reference ?? message.messageReference;
-      var channelId1 = ref?.channel_id ?? ref?.channelId ?? message.channel_id;
-      var messageId = ref?.message_id ?? ref?.messageId;
-      var replyAuthor = (message.referenced_message ?? message.referencedMessage)?.author ?? (typeof channelId1 === "string" && typeof messageId === "string" ? context.replyAuthor(channelId1, messageId) : void 0);
-      if (replyAuthor?.id !== me3)
-        return;
-      var shouldPing = rule.always !== rule.values.includes(author);
-      if (shouldPing === mentions.some(isMe))
-        return;
-      return {
-        message: {
-          ...message,
-          mentions: shouldPing ? [
-            ...mentions,
-            replyAuthor
-          ] : mentions.filter((mention) => !isMe(mention))
-        }
-      };
-    }
-    var content1 = typeof message.content === "string" ? message.content.slice(0, 4e3) : "";
-    var matches = rule.kind === "users" ? rule.values.includes(author) : !message.author.bot && rule.values.some((value) => content1.toLowerCase().includes(value.toLowerCase()));
-    if (matches) {
-      var channel2 = typeof message.channel_id === "string" ? context.channel(message.channel_id)?.name : void 0;
-      var name = message.author.global_name ?? message.author.globalName ?? message.author.username ?? "Someone";
-      context.notify(String(name).slice(0, 64) + (channel2 ? " in #" + channel2.slice(0, 64) : "") + ": " + (content1 || "sent an attachment").slice(0, 80));
-    }
-  }
-  var incomingPermissions, systemMessageTypes, lastLinkOpen;
-  var init_cxIncoming = __esm({
-    "src/lib/api/cxIncoming.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_cxMessageTransforms();
-      init_cxProfileColors();
-      incomingPermissions = {
-        stickers: "messages.filterstickers",
-        "silence-users": "messages.silencementions",
-        "reply-pings": "replies.controlping",
-        "reply-ping-default": "replies.suppressping",
-        calls: "calls.suppressring",
-        keywords: "messages.watchlocal",
-        users: "messages.watchlocal",
-        "ping-alerts": "messages.pingalerts",
-        "hide-users": "messages.filterlocal",
-        "hide-keywords": "messages.filterlocal",
-        "hide-blocked": "messages.filterlocal",
-        "hide-system": "messages.filterlocal",
-        "hide-profile-themes": "appearance.style",
-        "profile-bio-colors": "appearance.style",
-        "friends-voice": "voice.notifyfriends",
-        "follow-voice": "voice.followfriend",
-        "friend-removals": "friends.notifyremoval",
-        "open-link": "links.openonmessage"
-      };
-      systemMessageTypes = {
-        pins: [
-          6
-        ],
-        joins: [
-          7
-        ],
-        boosts: [
-          8,
-          9,
-          10,
-          11
-        ]
-      };
-      lastLinkOpen = /* @__PURE__ */ new WeakMap();
-    }
-  });
-
-  // src/lib/api/cxNumeric.ts
-  function convertUnits(input) {
-    if (input.length > 192)
-      return;
-    var match = /^(-?\d+(?:[.,]\d+)?)\s*(°?[cf]|km\/h|[a-z]+)$/.exec(input.trim().toLowerCase());
-    if (!match)
-      return;
-    var value = Number(match[1].replace(",", "."));
-    var unit = match[2].replace("\xB0", "");
-    if (unit === "c")
-      return `${value}\xB0C = ${+(value * 9 / 5 + 32).toFixed(2)}\xB0F`;
-    if (unit === "f")
-      return `${value}\xB0F = ${+((value - 32) * 5 / 9).toFixed(2)}\xB0C`;
-    if (!Object.prototype.hasOwnProperty.call(units, unit))
-      return;
-    var [target, multiplier] = units[unit];
-    return `${value} ${unit} = ${+(value * multiplier).toFixed(2)} ${target}`;
-  }
-  function calculate(input) {
-    if (input.length > 192 || !/^[\d\s+*/().%\-]+$/.test(input))
-      return;
-    var tokens2 = input.match(/\d+(?:\.\d*)?|\.\d+|\*\*|\+\+|--|[^\s]/g) ?? [];
-    var cursor = 0;
-    function operand() {
-      var token = tokens2[cursor++];
-      if (token === "(") {
-        var value2 = expression(1);
-        if (tokens2[cursor++] !== ")")
-          throw new Error("Unclosed expression");
-        return value2;
-      }
-      if (token === "+" || token === "-") {
-        var value1 = operand();
-        if (tokens2[cursor] === "**")
-          throw new Error("Use parentheses around a signed base");
-        return token === "-" ? -value1 : value1;
-      }
-      if (!token || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(token))
-        throw new Error("Expected a number");
-      return Number(token);
-    }
-    function expression(minimum) {
-      var value2 = operand();
-      while (cursor < tokens2.length) {
-        var symbol = tokens2[cursor];
-        var operator = operators[symbol];
-        if (!operator || operator.precedence < minimum)
-          break;
-        cursor++;
-        var right = expression(operator.precedence + (symbol === "**" ? 0 : 1));
-        value2 = operator.apply(value2, right);
-      }
-      return value2;
-    }
-    try {
-      var value = expression(1);
-      if (cursor === tokens2.length && Number.isFinite(value))
-        return `\`${input.trim()}\` = **${value}**`;
-    } catch (e) {
-    }
-  }
-  var units, operators;
-  var init_cxNumeric = __esm({
-    "src/lib/api/cxNumeric.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      units = {
-        km: [
-          "mi",
-          0.621371
-        ],
-        mi: [
-          "km",
-          1.609344
-        ],
-        m: [
-          "ft",
-          3.28084
-        ],
-        ft: [
-          "m",
-          0.3048
-        ],
-        cm: [
-          "in",
-          0.393701
-        ],
-        in: [
-          "cm",
-          2.54
-        ],
-        kg: [
-          "lb",
-          2.20462
-        ],
-        lb: [
-          "kg",
-          0.453592
-        ],
-        g: [
-          "oz",
-          0.035274
-        ],
-        oz: [
-          "g",
-          28.3495
-        ],
-        l: [
-          "gal",
-          0.264172
-        ],
-        gal: [
-          "l",
-          3.78541
-        ],
-        ml: [
-          "floz",
-          0.033814
-        ],
-        floz: [
-          "ml",
-          29.5735
-        ],
-        "km/h": [
-          "mph",
-          0.621371
-        ],
-        mph: [
-          "km/h",
-          1.609344
-        ]
-      };
-      operators = {
-        "+": {
-          precedence: 1,
-          apply: (left, right) => left + right
-        },
-        "-": {
-          precedence: 1,
-          apply: (left, right) => left - right
-        },
-        "*": {
-          precedence: 2,
-          apply: (left, right) => left * right
-        },
-        "/": {
-          precedence: 2,
-          apply: (left, right) => left / right
-        },
-        "%": {
-          precedence: 2,
-          apply: (left, right) => left % right
-        },
-        "**": {
-          precedence: 3,
-          apply: (left, right) => left ** right
-        }
-      };
-    }
-  });
-
-  // src/lib/api/cxProfileMenu.ts
-  function isCxProfileUserId(id) {
-    return typeof id === "string" && /^\d{17,20}$/.test(id);
-  }
-  function getCxProfileMedia(id, user, banner) {
-    if (!isCxProfileUserId(id))
-      return [];
-    var name = user.username?.replace(/[^\w.-]+/g, "_").slice(0, 64) || id;
-    var assets2 = [];
-    if (!user.avatar) {
-      var legacy = user.discriminator && /^[0-9]{4}$/.test(user.discriminator) && Number(user.discriminator);
-      var index = legacy ? legacy % 5 : Number((BigInt(id) >> 22n) % 6n);
-      assets2.push({
-        kind: "Avatar",
-        url: "https://cdn.discordapp.com/embed/avatars/" + index + ".png",
-        filename: "avatar_" + name + ".png",
-        animated: false
-      });
-    }
-    for (var [kind, path, hash] of [
-      [
-        "Avatar",
-        "avatars",
-        user.avatar
-      ],
-      [
-        "Banner",
-        "banners",
-        banner
-      ]
-    ]) {
-      if (typeof hash !== "string" || !/^(?:a_)?[0-9a-f]{32}$/.test(hash))
-        continue;
-      var animated = hash.startsWith("a_");
-      var extension = animated ? "gif" : "png";
-      assets2.push({
-        kind,
-        animated,
-        filename: kind.toLowerCase() + "_" + name + "." + extension,
-        url: "https://cdn.discordapp.com/" + path + "/" + id + "/" + hash + "." + extension + "?size=4096"
-      });
-    }
-    return assets2;
-  }
-  function nonBlankText(value) {
-    return typeof value === "string" && value.trim() ? value : void 0;
-  }
-  function getCxProfileMenuCopy(action, id, profiles, guildId, users, members) {
-    var entry = cxProfileMenuActions[action];
-    if (entry.scope === "none")
-      return entry.format(id);
-    if (entry.scope === "server" && !guildId)
-      return;
-    try {
-      if (entry.scope === "identity") {
-        var user = users?.getUser?.(id);
-        return nonBlankText(action === "username" ? user?.username : user?.globalName);
-      }
-      if (action === "server-nickname" && guildId) {
-        return nonBlankText(members?.getMember?.(guildId, id)?.nick);
-      }
-      var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
-      if (action === "profile-bio" || action === "server-profile-bio")
-        return nonBlankText(profile?.bio);
-      if (action === "profile-pronouns")
-        return nonBlankText(profile?.pronouns);
-      var colors = profile?.themeColors;
-      if (!Array.isArray(colors) || colors.length < 2)
-        return;
-      var hex = colors.slice(0, 2).map((color) => Number.isInteger(color) && color >= 0 && color <= 16777215 ? "#" + color.toString(16).padStart(6, "0") : void 0);
-      if (hex[0] && hex[1])
-        return "Primary-color " + hex[0] + ", Secondary-Color " + hex[1];
-    } catch (e) {
-    }
-  }
-  var cxProfileMenuActions;
-  var init_cxProfileMenu = __esm({
-    "src/lib/api/cxProfileMenu.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      cxProfileMenuActions = {
-        "user-url": {
-          label: "Copy User URL",
-          scope: "none",
-          format: (id) => "<https://discord.com/users/" + id + ">"
-        },
-        "user-mention": {
-          label: "Copy User Mention",
-          scope: "none",
-          format: (id) => "<@" + id + ">"
-        },
-        "username": {
-          label: "Copy Username",
-          scope: "identity"
-        },
-        "display-name": {
-          label: "Copy Display Name",
-          scope: "identity"
-        },
-        "profile-bio": {
-          label: "Copy Bio",
-          scope: "user",
-          unavailable: "No profile bio found."
-        },
-        "server-profile-bio": {
-          label: "Copy Server Bio",
-          scope: "server"
-        },
-        "profile-pronouns": {
-          label: "Copy Pronouns",
-          scope: "user",
-          unavailable: "No profile pronouns found."
-        },
-        "server-nickname": {
-          label: "Copy Server Nickname",
-          scope: "server"
-        },
-        "profile-colors": {
-          label: "Copy Profile Colors",
-          scope: "user",
-          unavailable: "No profile colors found."
-        },
-        "server-profile-colors": {
-          label: "Copy Server Profile Colors",
-          scope: "server"
-        }
-      };
-    }
-  });
-
-  // src/lib/api/cxNativeEffects.ts
-  function getCxSpotifySongName(activity) {
-    if (activity?.type === 2 && activity.name === "Spotify" && typeof activity.details === "string" && activity.details.trim()) {
-      return activity.details;
-    }
-  }
-  function sortCxReactions(reactions) {
-    return reactions.length < 2 ? reactions : [
-      ...reactions
-    ].sort((a, b3) => b3.count - a.count);
-  }
-  function getCxPinAction(message, channel, canPin) {
-    if (!canPin || !isCxProfileUserId(channel) || message.channel_id !== channel || !isCxProfileUserId(message.id) || typeof message.pinned !== "boolean")
-      return;
-    return {
-      id: message.id,
-      method: message.pinned ? "unpinMessage" : "pinMessage",
-      label: message.pinned ? "Unpin Without Confirmation" : "Pin Without Confirmation"
-    };
-  }
-  function getCxEmbedToggle(message, channelId, userId, permissions) {
-    var { id, flags } = message;
-    if (!isCxProfileUserId(id) || !isCxProfileUserId(channelId) || message.channel_id !== channelId || !isCxProfileUserId(userId) || typeof flags !== "number" || !Number.isSafeInteger(flags) || flags < 0 || (message.author?.id === userId ? !permissions.canEmbed : !permissions.canManage))
-      return;
-    var suppressed = (flags & 4) !== 0;
-    if (!suppressed && !message.embeds?.length && !(message.messageSnapshots ?? message.message_snapshots)?.some((snapshot2) => snapshot2.message?.embeds?.length))
-      return;
-    return {
-      id,
-      flags: flags + (suppressed ? -4 : 4),
-      label: suppressed ? "Unsuppress Embeds" : "Suppress Embeds"
-    };
-  }
-  function getCxMessageClipboard(effect, message, channel) {
-    if (effect === "copy-raw-text") {
-      var text = message?.content;
-      return typeof text === "string" && text.length ? [
-        {
-          key: "raw-text",
-          label: "Copy Raw Text",
-          text
-        }
-      ] : [];
-    }
-    if (!message || !isCxProfileUserId(message.id))
-      return [];
-    var snowflake3 = BigInt(message.id);
-    if (snowflake3 > 0xffffffffffffffffn || message.id[0] === "0")
-      return [];
-    var seconds = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
-    var items = [
-      {
-        key: "message-timestamp",
-        label: "Copy Message Timestamp",
-        text: "<t:" + seconds + ":F>"
-      }
-    ];
-    var author = message.author?.id;
-    if (isCxProfileUserId(author)) {
-      items.push({
-        key: "message-author",
-        label: "Copy Message Author Mention",
-        text: "<@" + author + ">"
-      });
-    }
-    if (channel && channel.id === message.channel_id && isCxProfileUserId(channel.id)) {
-      var guild = channel.guild_id == null ? "@me" : channel.guild_id;
-      if (guild === "@me" || isCxProfileUserId(guild)) {
-        items.unshift({
-          key: "markdown-message-link",
-          label: "Copy Markdown Message Link",
-          text: "[Discord message](https://discord.com/channels/" + guild + "/" + channel.id + "/" + message.id + ")"
-        });
-      }
-    }
-    return items;
-  }
-  function buildCxMessageQuote(message, guildId, nickname, includeLink) {
-    if (!message.author || !isCxProfileUserId(message.id) || !isCxProfileUserId(message.channel_id))
-      return;
-    var withoutPings = (text) => text.replace(/@(?=[!&]?\d{17,20}>|everyone\b|here\b)/gi, "@\u200B");
-    var attachments = (message.attachments ?? []).flatMap((file) => typeof file.filename === "string" && file.filename.trim() ? [
-      "\u{1F4CE} " + file.filename.replace(/[\r\n]+/g, " ")
-    ] : []);
-    var body = [
-      message.content ?? "",
-      ...attachments
-    ].filter(Boolean).join("\n").trim() || "\u2026";
-    var quote = withoutPings(body).split(/\r\n|\r|\n/).map((line) => "> " + line.replace(/^>{1,3} ?/, "")).join("\n");
-    var author = withoutPings((nickname || message.author.globalName || message.author.global_name || message.author.username || "Unknown user").replace(/[\r\n]+/g, " ").slice(0, 80).replace(/[\\*_`~|<>\[\]]/g, "\\$&"));
-    var link = includeLink ? ` \xB7 https://discord.com/channels/${isCxProfileUserId(guildId) ? guildId : "@me"}/${message.channel_id}/${message.id}` : "";
-    var attribution = `
-\u2014 **${author}**${link}
-`;
-    var maximum = 1500 - attribution.length;
-    var clipped = quote.length > maximum ? quote.slice(0, maximum - 1).replace(/[\uD800-\uDBFF]$/, "").trimEnd() + "\u2026" : quote;
-    return clipped + attribution;
-  }
-  function buildCxRepeatMessage(message, channelId, reply) {
-    if (!isCxProfileUserId(message.id) || !isCxProfileUserId(channelId))
-      return;
-    var attachments = [
-      ...message.attachments ?? [],
-      ...(message.messageSnapshots ?? message.message_snapshots ?? []).flatMap((snapshot2) => snapshot2.message?.attachments ?? [])
-    ].flatMap(({ filename, url: url2 }) => {
-      if (typeof filename !== "string" || typeof url2 !== "string" || !/^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/attachments\/[^\s<>]+$/i.test(url2))
-        return [];
-      return [
-        " - " + filename.replace(/[\r\n]+/g, " ") + " (" + url2 + ")"
-      ];
-    });
-    var text = typeof message.content === "string" ? message.content : "";
-    var content = attachments.length ? text + "\nAttachments:\n" + attachments.join("\n") : text;
-    var stickerIds = (message.stickerItems ?? message.sticker_items ?? []).map((sticker) => sticker.id).filter(isCxProfileUserId);
-    if (!content.trim() && !stickerIds.length)
-      return;
-    return {
-      content,
-      options: {
-        allowedMentions: {
-          parse: [],
-          replied_user: false
-        },
-        messageReference: reply ? {
-          channel_id: channelId,
-          message_id: message.id
-        } : void 0,
-        stickerIds
-      }
-    };
-  }
-  function getCxMessageGesture(message, currentUser, gestures) {
-    var author = message?.author?.id;
-    if (!message || !author || !currentUser || message.deleted || ((message.flags ?? 0) & 64) !== 0 || message.state && message.state !== "SENT" || message.type !== 0 && message.type !== 19)
-      return;
-    if (author === currentUser)
-      return gestures.edit && typeof message.content === "string" && message.content ? "edit" : void 0;
-    if (gestures.reply)
-      return "reply";
-  }
-  function fixCxFileExtensions(files) {
-    if (!Array.isArray(files))
-      return;
-    for (var file of files) {
-      try {
-        var filename = file?.filename;
-        if (typeof filename !== "string")
-          continue;
-        var parts = /^(.*[^/\\.])\.([a-z0-9]+)$/i.exec(filename);
-        if (!parts || /\.tar$/i.test(parts[1]))
-          continue;
-        var replacement = replacementExtensions.get(parts[2].toLowerCase());
-        if (replacement)
-          file.filename = parts[1] + "." + replacement;
-      } catch (e) {
-      }
-    }
-  }
-  function floorCxRelativeTime(target, enabled = () => true) {
-    if (typeof target?.relativeTimeRounding !== "function")
-      throw new Error("Discord relative timestamps are unavailable");
-    var state2 = roundingUsers.get(target);
-    if (!state2) {
-      var previous = target.relativeTimeRounding();
-      var round = (value) => enabled() ? Math.floor(value) : previous(value);
-      if (!target.relativeTimeRounding(round))
-        throw new Error("Could not change Discord relative timestamps");
-      state2 = {
-        previous,
-        applied: round,
-        count: 0
-      };
-      roundingUsers.set(target, state2);
-    }
-    state2.count++;
-    var active = true;
-    return () => {
-      if (!active)
-        return;
-      active = false;
-      if (--state2.count === 0) {
-        roundingUsers.delete(target);
-        if (target.relativeTimeRounding() === state2.applied)
-          target.relativeTimeRounding(state2.previous);
-      }
-    };
-  }
-  function overrideCxMethods(target, overrides, enabled = () => true) {
-    var cleanups = [];
-    var active = true;
-    function stop() {
-      active = false;
-      for (var cleanup of cleanups.splice(0).reverse())
-        cleanup();
-    }
-    if (!target)
-      throw new Error("Discord's module is unavailable");
-    var methods = target;
-    try {
-      var _loop2 = function(key2, override2) {
-        var original = methods[key2];
-        if (typeof original !== "function")
-          return "continue";
-        var previous = Object.getOwnPropertyDescriptor(target, key2);
-        function wrapped(...args) {
-          var invoke = (next) => Reflect.apply(original, this, next);
-          return active && enabled() ? override2(args, invoke) : invoke(args);
-        }
-        if (previous && !previous.configurable) {
-          if (!("value" in previous) || !previous.writable)
-            return "continue";
-          Object.defineProperty(target, key2, {
-            value: wrapped
-          });
-        } else {
-          Object.defineProperty(target, key2, {
-            value: wrapped,
-            writable: true,
-            configurable: true,
-            enumerable: previous?.enumerable ?? false
-          });
-        }
-        overrideLayers.set(wrapped, {
-          target,
-          key: key2,
-          previous,
-          active: () => active
-        });
-        cleanups.push(() => {
-          var current = Object.getOwnPropertyDescriptor(target, key2);
-          if (current?.value !== wrapped)
-            return;
-          var restore = previous;
-          while (typeof restore?.value === "function") {
-            var layer = overrideLayers.get(restore.value);
-            if (!layer || layer.target !== target || layer.key !== key2 || layer.active())
-              break;
-            restore = layer.previous;
-          }
-          if (restore)
-            Object.defineProperty(target, key2, restore);
-          else
-            Reflect.deleteProperty(target, key2);
-        });
-      };
-      for (var [key, override] of Object.entries(overrides))
-        _loop2(key, override);
-      if (!cleanups.length)
-        throw new Error("Discord's methods are unavailable or read-only");
-    } catch (error) {
-      stop();
-      throw error;
-    }
-    return stop;
-  }
-  function filterCxEmojiAutocomplete(store, mode, intentions, enabled) {
-    var methods = store;
-    if (typeof methods?.searchWithoutFetchingLatest !== "function" || typeof methods.getSearchResultsOrder !== "function")
-      throw new Error("Discord's emoji search is unavailable");
-    var shouldKeep;
-    return overrideCxMethods(store, {
-      searchWithoutFetchingLatest(args, invoke) {
-        var options = args[0];
-        if (options?.intention == null || !(options.intention === intentions?.AUTO_SUGGESTION || options.intention === (intentions?.CHAT ?? 3) && typeof options.count === "number" && options.count > 0))
-          return invoke(args);
-        var channel = options.channel;
-        var guild = channel?.getGuildId?.() ?? channel?.guild_id;
-        var previous = shouldKeep;
-        shouldKeep = (emoji) => emoji?.type !== 1 || mode === "local" && Boolean(guild) && emoji.guildId === guild;
-        try {
-          return invoke(args);
-        } finally {
-          shouldKeep = previous;
-        }
-      },
-      getSearchResultsOrder(args, invoke) {
-        var [emojis, ...rest] = args;
-        if (!shouldKeep || !Array.isArray(emojis))
-          return invoke(args);
-        var filtered = emojis.filter(shouldKeep);
-        return invoke(filtered.length === emojis.length ? args : [
-          filtered,
-          ...rest
-        ]);
-      }
-    }, enabled);
-  }
-  function animateCxAssets(target, bannerTakesOptions, enabled) {
-    var animateArgument = (args, invoke) => {
-      var next = [
-        ...args
-      ];
-      next[1] = true;
-      return invoke(next);
-    };
-    var animateOptions = ([options, ...args], invoke) => options && typeof options === "object" ? invoke([
-      {
-        ...options,
-        canAnimate: true
-      },
-      ...args
-    ]) : invoke([
-      options,
-      ...args
+  function TestingReview({ assignment }) {
+    var backend = React2.useMemo(() => createFileBackend(testingStorageKey(assignment) + ".json"), [
+      assignment.userId,
+      assignment.platform
     ]);
-    return overrideCxMethods(target, {
-      getUserAvatarURL: animateArgument,
-      getGuildMemberAvatarURL: animateArgument,
-      getUserBannerURL: bannerTakesOptions ? animateOptions : animateArgument,
-      getGuildIconURL: animateOptions
-    }, enabled);
-  }
-  function raiseCxAvatarResolution(target, size, enabled) {
-    var avatarUrl2 = /^(https:\/\/|\/\/)(?:cdn\.discordapp\.com|media\.discordapp\.net)\/(?:guilds\/\d+\/users\/\d+\/)?avatars\/\d+\/[\w-]+\.(?:png|webp|gif|jpe?g|avif)(\?[^#\s]*)?$/i;
-    return overrideCxMethods(target, {
-      getUserAvatarURL(args, invoke) {
-        var url2 = invoke(args);
-        if (typeof url2 !== "string")
-          return url2;
-        var match = avatarUrl2.exec(url2);
-        if (!match)
-          return url2;
-        var existingSize = /([?&])size=([^&]*)/i;
-        var existing = Number(existingSize.exec(url2)?.[2] ?? 0);
-        if (existing >= size)
-          return url2;
-        if (existingSize.test(url2))
-          return url2.replace(existingSize, "$1size=" + size);
-        return url2 + (/[?&]$/.test(url2) ? "" : match[2] ? "&" : "?") + "size=" + size;
-      }
-    }, enabled);
-  }
-  function decodeCxMessageBase64(content) {
-    if (typeof content !== "string" || content.length > 4e3)
-      return "";
-    var results = /* @__PURE__ */ new Set();
-    for (var match of content.matchAll(/[A-Za-z0-9+/]{4,}={0,2}/g)) {
-      var [token] = match;
-      var offset = match.index;
-      if (/[\w+/=]/.test(content.charAt(offset - 1)) || /[\w+/=]/.test(content.charAt(offset + token.length)))
-        continue;
-      var encoded = token.replace(/=+$/, "");
-      if (encoded.length % 4 === 1 || encoded !== token && token.length % 4 !== 0)
-        continue;
-      var bits = 0;
-      var buffer = 0;
-      var bytes = "";
-      for (var character of encoded) {
-        buffer = buffer << 6 | base64Alphabet2.indexOf(character);
-        bits += 6;
-        if (bits >= 8) {
-          bits -= 8;
-          bytes += "%" + (buffer >> bits & 255).toString(16).padStart(2, "0");
-        }
-      }
-      if (bits && buffer & (1 << bits) - 1)
-        continue;
-      try {
-        var decoded = decodeURIComponent(bytes);
-        if (decoded.trim() && !RegExp("[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]", "u").test(decoded))
-          results.add(decoded);
-      } catch (e) {
-      }
-      if (results.size === 10)
-        break;
-    }
-    return [
-      ...results
-    ].join("\n\n");
-  }
-  function hideCxProfileBannerImages(target, keepBanner, enabled) {
-    var officialBanner = /^(?:https:)?\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/(?:banners\/(\d{17,20})\/|guilds\/\d+\/users\/(\d{17,20})\/banners\/)/i;
-    return overrideCxMethods(target, {
-      getUserBannerURL(args, invoke) {
-        var url2 = invoke(args);
-        var match = typeof url2 === "string" ? officialBanner.exec(url2) : null;
-        var owner = match?.[1] ?? match?.[2];
-        return owner && !keepBanner(owner) ? void 0 : url2;
-      }
-    }, enabled);
-  }
-  function formatCxWordCount(content) {
-    if (typeof content !== "string")
-      return;
-    var words = content.match(/\S+/g)?.length ?? 0;
-    if (words > 5)
-      return `${words} words, ${content.length} characters`;
-  }
-  var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers, base64Alphabet2;
-  var init_cxNativeEffects = __esm({
-    "src/lib/api/cxNativeEffects.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_cxProfileMenu();
-      cxNativeEffects = {
-        "user-notes": {
-          permission: "profile.localnotes",
-          label: "Add a local user note editor to profile menus"
-        },
-        "channel-notes": {
-          permission: "channels.notes",
-          label: "Add a local note editor to channel menus"
-        },
-        "user-tags": {
-          permission: "profile.localtags",
-          label: "Tag users in profile menus and search those tags on this device"
-        },
-        "silent-typing": {
-          permission: "typing.suppress",
-          label: "Stop sending your typing indicator"
-        },
-        "static-typing-dots": {
-          permission: "appearance.style",
-          label: "Keep Discord's typing dots still"
-        },
-        "code-block-gap": {
-          permission: "appearance.style",
-          label: "Remove the extra blank line after fenced code blocks"
-        },
-        "force-owner-crown": {
-          permission: "appearance.style",
-          label: "Show the server owner\u2019s native crown in the member list"
-        },
-        "spotify-song-name": {
-          permission: "appearance.style",
-          label: "Show the song title in Spotify activity status"
-        },
-        "sort-reactions-by-count": {
-          permission: "appearance.style",
-          label: "Show the most-used reactions first under each message"
-        },
-        "plus-reactions": {
-          permission: "messages.reactshortcut",
-          label: "React to the matching previous message when you send a plus shortcut"
-        },
-        "fix-file-extensions": {
-          permission: "uploads.rename",
-          label: "Use supported filename extensions for listed attachment formats"
-        },
-        "pending-friend-count": {
-          permission: "appearance.hide",
-          label: "Hide the pending friend request count"
-        },
-        "hide-role-headers": {
-          permission: "appearance.hide",
-          label: "Hide role section headers in the server member list"
-        },
-        "animated-assets": {
-          permission: "appearance.style",
-          label: "Animate avatars, banners, and server icons"
-        },
-        "floor-relative-time": {
-          permission: "appearance.style",
-          label: "Round relative timestamps down"
-        },
-        "avatar-resolution": {
-          permission: "appearance.avatarresolution",
-          label: "Request higher-resolution Discord avatars"
-        },
-        "avatar-crop-zoom": {
-          permission: "appearance.avatarcrop",
-          label: "Increase the zoom limit in Discord's avatar crop tool",
-          desktopOnly: true
-        },
-        "stop-auto-unread": {
-          permission: "notifications.preventautoupgrade",
-          label: "Keep your chosen channel notification settings"
-        },
-        "notification-volume": {
-          permission: "notifications.volume",
-          label: "Adjust the volume of Discord notifications and in-app sounds",
-          desktopOnly: true
-        },
-        "flat-attachments": {
-          permission: "appearance.style",
-          label: "Show chat attachments individually without the media grid"
-        },
-        "split-long-messages": {
-          permission: "messages.split",
-          label: "Split long drafts into at most eight messages when slowmode is off"
-        },
-        "unicode-emoji-autocomplete": {
-          permission: "appearance.hide",
-          label: "Show only standard Unicode emoji in chat autocomplete"
-        },
-        "local-emoji-autocomplete": {
-          permission: "appearance.hide",
-          label: "Show Unicode emoji and emoji from the current server in chat autocomplete"
-        },
-        "hide-disabled-emojis": {
-          permission: "appearance.hide",
-          label: "Hide unavailable emoji in Discord\u2019s emoji picker"
-        },
-        "copy-emoji-markdown": {
-          permission: "emoji.clipboard",
-          label: "Add a Copy Emoji Markdown action to the emoji menu"
-        },
-        "reverse-image-search": {
-          permission: "media.search",
-          label: "Add a Search Image action with a choice of search engines"
-        },
-        "copy-media-link": {
-          permission: "media.clipboard",
-          label: "Add a clipboard action to media and link menus"
-        },
-        "open-steam-links": {
-          permission: "links.steam",
-          label: "Send clicked Steam links to the Steam app"
-        },
-        "profile-media": {
-          permission: "profilemenu.media",
-          label: "Add View and Download actions for Discord avatars and banners"
-        },
-        "copy-channel-name": {
-          permission: "channels.clipboard",
-          label: "Add Copy Channel Name and Copy Category Name actions"
-        },
-        "copy-role-color": {
-          permission: "guild.roleclipboard",
-          label: "Copy the selected server role's hex color",
-          desktopOnly: true
-        },
-        "copy-role-mention": {
-          permission: "guild.roleclipboard",
-          label: "Copy mention markup for the selected server role",
-          desktopOnly: true
-        },
-        "view-role-icon": {
-          permission: "guild.rolemedia",
-          label: "Open the selected server role's icon in Discord's image viewer",
-          desktopOnly: true
-        },
-        "view-server-media": {
-          permission: "servers.mediaview",
-          label: "View the selected server's icon and banner",
-          desktopOnly: true
-        },
-        "copy-server-media-links": {
-          permission: "servers.mediacopy",
-          label: "Copy links to the selected server's icon and banner",
-          desktopOnly: true
-        },
-        "copy-server-details": {
-          permission: "servers.detailscopy",
-          label: "Copy the selected server's name or description",
-          desktopOnly: true
-        },
-        "view-group-dm-icon": {
-          permission: "channels.iconview",
-          label: "View the selected group DM's icon",
-          desktopOnly: true
-        },
-        "hide-suggested-channels": {
-          permission: "appearance.hide",
-          label: "Hide the suggested channels section"
-        },
-        "copy-text-attachment": {
-          permission: "attachments.clipboard",
-          label: "Copy the contents of the selected text attachment"
-        },
-        "attachment-image-quality": {
-          permission: "media.imagequality",
-          label: "Improve attachment previews and load originals in the media viewer"
-        },
-        "original-attachment-images": {
-          permission: "media.imagequality",
-          label: "Load original attachment images in chat and the media viewer"
-        },
-        "image-filename": {
-          permission: "media.labels",
-          label: "Show image filenames and GIF links"
-        },
-        "image-full-url": {
-          permission: "media.labels",
-          label: "Show the full URL of images and GIFs"
-        },
-        "descriptive-gif-alt": {
-          permission: "media.labels",
-          label: "Use meaningful filenames for GIFs with generic alt text"
-        },
-        "preserve-image-links": {
-          permission: "media.labels",
-          label: "Show image links alongside their chat previews"
-        },
-        "double-click-edit": {
-          permission: "messages.openeditor",
-          label: "Open the editor for your own message on double-click or double-tap"
-        },
-        "double-click-reply": {
-          permission: "messages.openreply",
-          label: "Open a reply to another user's message on double-click or double-tap"
-        },
-        "quick-mention": {
-          permission: "messages.insertmention",
-          label: "Insert the selected message author's mention into the current draft"
-        },
-        "plain-url-paste": {
-          permission: "messages.paste",
-          label: "Paste URLs as plain text when replacing selected text in chat",
-          desktopOnly: true
-        },
-        "no-middle-click-paste": {
-          permission: "messages.paste",
-          label: "Disable Linux middle-click paste",
-          desktopOnly: true,
-          linuxOnly: true
-        },
-        "hide-profile-banner-images": {
-          permission: "appearance.hide",
-          label: "Hide Discord-hosted profile banner images except your own and those of friends"
-        },
-        "decode-base64": {
-          permission: "messages.decode",
-          label: "Decode Base64 in the selected message and copy the result on request"
-        },
-        "copy-raw-text": {
-          permission: "messages.copytext",
-          label: "Add Copy Raw Text to message menus"
-        },
-        "copy-message-reference": {
-          permission: "messages.copyreference",
-          label: "Copy the selected message\u2019s Markdown link, timestamp, or author mention"
-        },
-        "reveal-spoilers-shortcut": {
-          permission: "messages.revealspoilers",
-          label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added",
-          desktopOnly: true
-        },
-        "reply-timestamp": {
-          permission: "messages.replytimestamp",
-          label: "Show the original message's timestamp on loaded reply previews",
-          desktopOnly: true
-        },
-        "message-latency": {
-          permission: "messages.senddelay",
-          label: "Show an estimated send-delay indicator on messages",
-          desktopOnly: true
-        },
-        "message-word-count": {
-          permission: "messages.wordcount",
-          label: "Show word and character counts below messages longer than five words"
-        },
-        "quote-message": {
-          permission: "messages.quote",
-          label: "Add Quote and Copy as Quote actions to message menus"
-        },
-        "keep-long-drafts": {
-          permission: "drafts.long",
-          label: "Preserve long drafts in Discord\u2019s local draft store"
-        },
-        "bypass-pin-prompt": {
-          permission: "messages.pin",
-          label: "Use Discord\u2019s Pin and Unpin actions without a confirmation prompt"
-        },
-        "pin-message-shortcut": {
-          permission: "messages.pin",
-          label: "Pin or unpin the selected message with one menu action"
-        },
-        "toggle-message-embeds": {
-          permission: "messages.toggleembeds",
-          label: "Suppress or unsuppress embeds in the selected message"
-        },
-        "repeat-message": {
-          permission: "messages.repeat",
-          label: "Send the selected message again with its attachments and stickers"
-        },
-        "scroll-to-latest": {
-          permission: "channels.markonopen",
-          label: "Open channels at the latest message and mark them read"
-        },
-        "show-voice-ping": {
-          permission: "voice.latency",
-          label: "Show your live call latency in milliseconds"
-        },
-        "voice-channel-count": {
-          permission: "voice.channelcount",
-          label: "Show occupancy and capacity in the channel list"
-        },
-        "webcam-start-notifier": {
-          permission: "voice.cameratone",
-          label: "Play different tones when someone turns their camera on or off"
-        },
-        "notify-when-muted": {
-          permission: "voice.mutedtone",
-          label: "Play a sound when you try to speak while muted"
-        },
-        "wait-for-slot": {
-          permission: "voice.waitslot",
-          label: "Queue for a full voice channel and respond when a slot opens"
-        },
-        "all-call-time-counter": {
-          permission: "voice.membertime",
-          label: "Show elapsed call time next to members in server voice channels"
-        },
-        "call-time-counter": {
-          permission: "voice.calltime",
-          label: "Show the elapsed time in your current call"
-        },
-        "jump-without-unblocking": {
-          permission: "messages.jumpblocked",
-          label: "Skip the blocked, ignored, or spam author prompt when jumping to a message"
-        },
-        "jump-to-message-menu": {
-          permission: "channels.searchjump",
-          label: "Jump to the first or last message from channel and message menus"
-        },
-        "jump-to-first-message": {
-          permission: "channels.jump",
-          label: "Add a channel header button to jump to the first message"
-        },
-        "read-all-servers-button": {
-          permission: "servers.markread",
-          label: "Add a server list button to mark loaded server channels as read"
-        },
-        "sticker-links": {
-          permission: "stickers.links",
-          label: "Add Copy Sticker Link and Open Sticker Link actions"
-        },
-        "clean-channel-names": {
-          permission: "appearance.style",
-          label: "Remove decorations from displayed channel names"
-        },
-        "dashless-channel-names": {
-          permission: "appearance.style",
-          label: "Replace hyphens with spaces in text channel names"
-        },
-        "title-channel-names": {
-          permission: "appearance.style",
-          label: "Format displayed server channel names as titles"
-        }
-      };
-      cxAvatarResolutions = [
-        256,
-        512,
-        1024,
-        2048,
-        4096
-      ];
-      extensionGroups = {
-        ogg: [
-          "ogv",
-          "oga",
-          "ogx",
-          "ogm",
-          "spx",
-          "aac",
-          "wma"
-        ],
-        jpg: [
-          "jpe",
-          "jif",
-          "jfi",
-          "pjpeg",
-          "pjp",
-          "bmp",
-          "tiff",
-          "tif"
-        ],
-        svg: [
-          "svgz",
-          "ai",
-          "eps"
-        ],
-        mp4: [
-          "m4v",
-          "m4r",
-          "m4p",
-          "avi",
-          "mkv",
-          "wmv",
-          "flv",
-          "3gp"
-        ],
-        m4a: [
-          "m4b",
-          "aiff"
-        ],
-        mov: [
-          "movie",
-          "qt",
-          "asf",
-          "rm",
-          "rmvb"
-        ],
-        png: [
-          "ico",
-          "cur"
-        ]
-      };
-      replacementExtensions = new Map(Object.entries(extensionGroups).flatMap(([extension, aliases]) => aliases.map((alias) => [
-        alias,
-        extension
-      ])));
-      roundingUsers = /* @__PURE__ */ new WeakMap();
-      overrideLayers = /* @__PURE__ */ new WeakMap();
-      base64Alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    }
-  });
-
-  // src/lib/api/cxPreviousMessage.ts
-  function parseCxPreviousRule(line) {
-    if (line === "  before send correct-previous")
-      return {
-        kind: "correct"
-      };
-    var match = /^  before send merge-previous ([1-9]|[12][0-9]|30)( space)?$/.exec(line);
-    if (match)
-      return {
-        kind: "merge",
-        seconds: Number(match[1]),
-        space: Boolean(match[2])
-      };
-  }
-  function planCxPreviousEdit(rule, channel, currentUser, draft, previous, now) {
-    if (!currentUser || !draft.trim() || draft.length > 2e3)
-      return;
-    var sed = correction.exec(draft.trim());
-    if (rule.kind === "correct" && (!sed || sed[1].length > 240 || sed[3].length !== new Set(sed[3]).size))
-      return;
-    if (rule.kind === "merge" && sed)
-      return;
-    var message = previous();
-    if (!message?.id || message.author?.id !== currentUser || typeof message.content !== "string" || message.attachments?.length || (message.channel_id ?? message.channelId ?? channel) !== channel)
-      return;
-    var content;
-    if (rule.kind === "correct" && sed) {
-      var literal = unescapeSed(sed[1]).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      content = message.content.replace(new RegExp(literal, sed[3]), () => unescapeSed(sed[2]));
-    } else if (rule.kind === "merge") {
-      if (message.type !== void 0 && message.type !== 0)
-        return;
-      var time = Number(new Date(message.timestamp));
-      var age = now - time;
-      if (!(age >= 0 && age < rule.seconds * 1e3))
-        return;
-      content = message.content + (rule.space ? " " : "\n") + draft;
-    }
-    if (!content?.trim() || content.length > 2e3 || content === message.content)
-      return;
-    return {
-      id: message.id,
-      content
+    var storage = {
+      read: backend.get,
+      write: backend.set
     };
-  }
-  function createCxPreviousSendHandler(rule, host) {
-    var editing = /* @__PURE__ */ new Set();
-    return (channel, draft, hasExtraContent) => {
-      if (hasExtraContent || typeof draft !== "string" || editing.has(channel))
-        return;
-      var plan = planCxPreviousEdit(rule, channel, host.currentUser(), draft, () => host.previous(channel, rule.kind === "correct"), Date.now());
-      if (!plan)
-        return;
-      editing.add(channel);
-      return Promise.resolve().then(() => host.edit(channel, plan.id, plan.content)).catch(() => {
+    var authorized = () => currentTestingAssignment()?.userId === assignment.userId;
+    var discord = "";
+    try {
+      var info = NativeClientInfoModule.getConstants();
+      if (info.Version && info.Build)
+        discord = String(info.Version) + " (" + String(info.Build) + ")";
+      else if (info.Version || info.Build)
+        discord = String(info.Version ?? info.Build);
+    } catch (e) {
+    }
+    var revision = globalThis.__CLOUDCORD_RUNTIME_REVISION__;
+    var cloudcord = typeof revision === "string" && revision ? "v1.4.3 " + revision : "v1.4.3";
+    var review = useTestingReview(React2, assignment, storage, {
+      cloudcord,
+      discord
+    }, authorized);
+    var [exportMessage, setExportMessage] = React2.useState("");
+    function saveResults() {
+      return _async_to_generator(function* () {
+        var text = review.export();
+        if (!text)
+          return;
+        var filename = "cx-testing-" + assignment.platform + "-" + assignment.userId + ".csv";
         try {
-          host.error();
+          yield writeFile(filename, text, {
+            prefix: ""
+          });
+          setExportMessage("Saved " + filename + " in the app folder.");
         } catch (e) {
+          setExportMessage("Could not save the CSV.");
         }
-      }).finally(() => editing.delete(channel));
-    };
+      })();
+    }
+    var disabled = !review.ready || review.saving;
+    var field = (label2, value, onChange, maxLength) => /* @__PURE__ */ jsxs(Stack, {
+      spacing: 5,
+      children: [
+        /* @__PURE__ */ jsx(Text, {
+          variant: "text-sm/medium",
+          children: label2
+        }),
+        /* @__PURE__ */ jsx(TextInput, {
+          size: "lg",
+          value,
+          maxLength,
+          onChange: (input) => onChange(typeof input === "string" ? input : input?.nativeEvent?.text ?? "")
+        })
+      ]
+    });
+    return /* @__PURE__ */ jsx(import_react_native44.ScrollView, {
+      keyboardShouldPersistTaps: "handled",
+      contentContainerStyle: {
+        padding: 16,
+        paddingBottom: 40
+      },
+      children: /* @__PURE__ */ jsxs(Stack, {
+        spacing: 14,
+        children: [
+          /* @__PURE__ */ jsxs(Text, {
+            variant: "text-md/medium",
+            children: [
+              assignment.label,
+              " \xB7 ",
+              review.completed,
+              " of ",
+              assignment.entries.length,
+              " reviewed"
+            ]
+          }),
+          field("Search assigned plugins", review.search, review.searchFor, 120),
+          field("CloudCord build", review.build.cloudcord, (value) => review.setBuild("cloudcord", value), 100),
+          field("Discord build", review.build.discord, (value) => review.setBuild("discord", value), 100),
+          review.entry ? /* @__PURE__ */ jsxs(Stack, {
+            spacing: 10,
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "heading-lg/semibold",
+                children: review.entry.name
+              }),
+              /* @__PURE__ */ jsxs(Text, {
+                variant: "text-sm/normal",
+                children: [
+                  review.entry.id,
+                  " \xB7 ",
+                  review.entry.group
+                ]
+              }),
+              /* @__PURE__ */ jsxs(Text, {
+                variant: "text-sm/medium",
+                children: [
+                  review.review?.status ?? "Pending",
+                  " \xB7 ",
+                  review.index + 1,
+                  " of ",
+                  review.count
+                ]
+              }),
+              field("Exact error or blocker", review.error, review.setError, 3e3),
+              /* @__PURE__ */ jsxs(import_react_native44.View, {
+                style: {
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "primary",
+                    text: "Approve",
+                    disabled,
+                    onPress: () => void review.save("Pass")
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "destructive",
+                    text: "Disapprove",
+                    disabled,
+                    onPress: () => void review.save("Fail")
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "secondary",
+                    text: "Blocked",
+                    disabled,
+                    onPress: () => void review.save("Blocked")
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsxs(import_react_native44.View, {
+                style: {
+                  flexDirection: "row",
+                  gap: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "secondary",
+                    text: "Previous",
+                    disabled: review.saving || review.index === 0,
+                    onPress: () => review.move(-1)
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "secondary",
+                    text: "Next",
+                    disabled: review.saving || review.index + 1 >= review.count,
+                    onPress: () => review.move(1)
+                  })
+                ]
+              })
+            ]
+          }) : /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/normal",
+            children: "No assigned plugins match your search."
+          }),
+          /* @__PURE__ */ jsx(Button, {
+            size: "md",
+            variant: "secondary",
+            text: "Save results as CSV",
+            disabled: !review.completed || review.saving,
+            onPress: () => void saveResults()
+          }),
+          !!(review.message || !review.ready) && /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/medium",
+            children: review.message || "Loading results\u2026"
+          }),
+          !!exportMessage && /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/medium",
+            children: exportMessage
+          })
+        ]
+      })
+    });
   }
-  var correction, unescapeSed;
-  var init_cxPreviousMessage = __esm({
-    "src/lib/api/cxPreviousMessage.ts"() {
+  function TestingPlugins() {
+    var assignment = useMobileTestingAssignment();
+    return assignment ? /* @__PURE__ */ jsx(TestingReview, {
+      assignment
+    }, assignment.userId) : null;
+  }
+  var import_react_native44;
+  var init_TestingPlugins = __esm({
+    "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
-      correction = /^s\/((?:\\.|[^/])+)\/((?:\\.|[^/])*)\/([gi]*)$/;
-      unescapeSed = (text) => text.replace(/\\([/\\])/g, "$1");
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_storage();
+      init_cxTesting();
+      init_fs();
+      init_modules();
+      init_pluginTesting();
+      init_common();
+      init_components();
+      import_react_native44 = __toESM(require_react_native());
     }
   });
 
-  // src/lib/api/cxTextRules.ts
-  function parseCxTextRule(line, quoted2) {
-    var replacement = replace.exec(line);
-    if (replacement) {
-      var [, alternatives, value, ignoreCase, wholeWord] = replacement;
-      var words;
+  // src/core/ui/settings/index.ts
+  var settings_exports3 = {};
+  __export(settings_exports3, {
+    PupuIcon: () => cloudcord_default,
+    default: () => initSettings
+  });
+  function safeAsset(...names) {
+    for (var name of names) {
       try {
-        words = JSON.parse(alternatives);
+        var asset = findAssetId(name);
+        if (asset)
+          return asset;
       } catch (e) {
-        throw new Error("Use a list of literal text alternatives");
       }
-      if (!Array.isArray(words) || words.length < 1 || words.length > 16 || new Set(words).size !== words.length || words.some((word) => typeof word !== "string" || !word.trim() || word.length > 64 || RegExp("[\\x00-\\x1f\\x7f-\\x9f\\u202a-\\u202e\\u2066-\\u2069]", "u").test(word)))
-        throw new Error("Use up to 16 distinct, nonempty text alternatives");
-      if (wholeWord && words.some((word) => !RegExp("^\\w(?:.*\\w)?$", "u").test(word)))
-        throw new Error("Whole-word alternatives must begin and end with word characters");
-      var boundary = wholeWord ? "\\b" : "";
-      return {
-        kind: "replace",
-        pattern: new RegExp(boundary + "(?:" + words.map(escape).join("|") + ")" + boundary, ignoreCase ? "gi" : "g"),
-        replacement: quoted2(value, 64, true)
-      };
     }
-    var prepend = prefix.exec(line);
-    if (prepend)
-      return {
-        kind: "prefix",
-        value: quoted2(prepend[1], 64)
-      };
-    if (line === "    alternate-case")
-      return {
-        kind: "alternate-case"
-      };
-    var shorten = shortenRun.exec(line);
-    if (shorten) {
-      var letter = quoted2(shorten[1], 1);
-      return {
-        kind: "shorten-run",
-        pattern: new RegExp(escape(letter) + "+", "g"),
-        fill: quoted2(shorten[2], 1)
-      };
-    }
-    throw new Error("Unknown text rewrite rule");
+    return cloudcord_default;
   }
-  function applyCxTextRules(text, rules) {
-    var _loop2 = function(rule2) {
-      if (rule2.kind === "prefix") {
-        parts[0] = rule2.value + parts[0];
-        return "continue";
-      }
-      var upper = true;
-      var length = 0;
-      for (var i = 0; i < parts.length; i++) {
-        if (i % 2 === 0) {
-          if (rule2.kind === "replace")
-            parts[i] = parts[i].replace(rule2.pattern, () => rule2.replacement);
-          else if (rule2.kind === "shorten-run")
-            parts[i] = parts[i].replace(rule2.pattern, (run) => rule2.fill.repeat(Math.max(1, run.length - 1)) + run[0]);
-          else
-            parts[i] = parts[i].replace(/[a-z]/gi, (letter) => {
-              var value = upper ? letter.toUpperCase() : letter.toLowerCase();
-              upper = !upper;
-              return value;
-            });
-        }
-        length += parts[i].length;
-        if (length > 4e3)
-          return {
-            v: text
-          };
-      }
+  function initSettings() {
+    if (settings.cloudcordDiagnosticsEnabled === true)
+      void Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)).then((module) => module.initializeDiagnosticsCapture()).catch(() => {
+      });
+    var coreItem = {
+      key: "CLOUDCORD",
+      title: () => "Overview",
+      icon: safeAsset("CircleInformationIcon-primary", "CircleInformationIcon", "InfoIcon"),
+      render: () => Promise.resolve().then(() => (init_General(), General_exports)),
+      useTrailing: () => `(${"v1.4.3"})`
     };
-    if (!text.trim())
-      return text;
-    var parts = text.split(links);
-    for (var rule of rules) {
-      var _ret = _loop2(rule);
-      if (_type_of(_ret) === "object")
-        return _ret.v;
-    }
-    return parts.join("");
+    var hiddenControlsItem = {
+      key: "CLOUDCORD_HIDDEN_CONTROLS",
+      title: () => "Developer options",
+      icon: safeAsset("WrenchIcon", "SettingsIcon"),
+      render: () => Promise.resolve().then(() => (init_Customization(), Customization_exports)),
+      usePredicate: () => useProxy(settings).cloudcordSectionHidden ?? false,
+      useTrailing: () => "\xB7",
+      nativeSection: "developer"
+    };
+    var baseItems = [
+      coreItem,
+      {
+        key: "BOTCORD",
+        title: () => "Botcord",
+        icon: safeAsset("RobotIcon", "AppsIcon"),
+        render: () => Promise.resolve().then(() => (init_BotCord(), BotCord_exports))
+      },
+      {
+        key: "FAKE_PROFILE",
+        title: () => "Profile",
+        icon: safeAsset("UserIcon", "SettingsIcon"),
+        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))
+      },
+      {
+        key: "STORE_CLOUD",
+        title: () => "Cloudsync",
+        icon: {
+          uri: "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png"
+        },
+        render: () => Promise.resolve().then(() => (init_StoreCloud(), StoreCloud_exports))
+      },
+      {
+        key: "BUNNY_PLUGINS",
+        title: () => "Add-ons",
+        icon: safeAsset("AppsIcon"),
+        render: () => Promise.resolve().then(() => (init_Addons(), Addons_exports))
+      },
+      {
+        key: "CLOUDCORD_TESTING_PLUGINS",
+        title: () => "Testing Plugins",
+        icon: safeAsset("AppsIcon", "WrenchIcon"),
+        render: () => Promise.resolve().then(() => (init_TestingPlugins(), TestingPlugins_exports)),
+        usePredicate: () => Boolean(useMobileTestingAssignment())
+      },
+      {
+        key: "CLOUDCORD_PLUGIN_BROWSER",
+        title: () => "Discover plugins",
+        icon: safeAsset("ChannelListMagnifyingGlassIcon", "SearchIcon", "AppsIcon"),
+        render: () => Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports))
+      },
+      {
+        key: "CLOUDCORD_DIAGNOSTICS",
+        title: () => "Diagnostics",
+        icon: safeAsset("WrenchIcon", "SettingsIcon"),
+        render: () => Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)),
+        usePredicate: () => useProxy(settings).cloudcordDiagnosticsEnabled === true
+      }
+    ];
+    var defaultOrder = [
+      "CLOUDCORD",
+      "BOTCORD",
+      "FAKE_PROFILE",
+      "BUNNY_PLUGINS",
+      "CLOUDCORD_TESTING_PLUGINS",
+      "CLOUDCORD_DIAGNOSTICS"
+    ];
+    var configurableKeys = new Set(defaultOrder.filter((key) => key !== "CLOUDCORD"));
+    var configuredOrder = settings.cloudcordTabOrder ?? [];
+    var orderIndex = new Map(configuredOrder.map((key, index) => [
+      key,
+      index
+    ]));
+    var items = [
+      ...baseItems,
+      hiddenControlsItem
+    ].filter((row) => ![
+      "STORE_CLOUD",
+      "CLOUDCORD_PLUGIN_BROWSER",
+      "CLOUDCORD_RECOVERY"
+    ].includes(row.key)).map((row) => {
+      if (row.nativeSection)
+        return row;
+      var originalPredicate = row.usePredicate;
+      return {
+        ...row,
+        usePredicate: () => {
+          var state2 = useProxy(settings);
+          var originalVisible = originalPredicate?.() ?? true;
+          if (state2.cloudcordSectionHidden ?? false)
+            return false;
+          if (configurableKeys.has(row.key) && (state2.cloudcordHiddenTabs ?? []).includes(row.key))
+            return false;
+          return originalVisible;
+        }
+      };
+    }).sort((a, b3) => {
+      var rank = (key) => key === "CLOUDCORD" ? -1 : key === "BUNNY_DEVELOPER" ? Number.MAX_SAFE_INTEGER : orderIndex.get(key) ?? (defaultOrder.includes(key) ? defaultOrder.indexOf(key) : defaultOrder.length);
+      return rank(a.key) - rank(b3.key);
+    });
+    registerSection({
+      name: "CloudCord",
+      items
+    });
+    globalThis.__CLOUDCORD_SETTINGS_CORE_REGISTERED__ = true;
+    registerSection({
+      name: "Bunny",
+      items: []
+    });
+    registerSection({
+      name: "Revenge",
+      items: []
+    });
+    registerSection({
+      name: "Vendetta",
+      items: []
+    });
   }
-  var quotedText, replace, prefix, shortenRun, escape, links;
-  var init_cxTextRules = __esm({
-    "src/lib/api/cxTextRules.ts"() {
+  var init_settings3 = __esm({
+    "src/core/ui/settings/index.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
-      init_type_of();
-      quotedText = '"(?:[^"\\\\]|\\\\.)*"';
-      replace = new RegExp(`^    replace (\\[.{1,1800}\\]) with (${quotedText})( ignore-case)?( whole-word)?$`);
-      prefix = new RegExp(`^    prefix (${quotedText})$`);
-      shortenRun = new RegExp(`^    shorten-run (${quotedText}) with (${quotedText})$`);
-      escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      links = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+      init_cloudcord();
+      init_storage();
+      init_assets();
+      init_settings();
+      init_pluginTesting();
+      init_settings2();
+    }
+  });
+
+  // src/core/ui/settings/pages/CloudCordVerification/index.tsx
+  function initializeCloudCordVerification() {
+  }
+  var init_CloudCordVerification = __esm({
+    "src/core/ui/settings/pages/CloudCordVerification/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/core/ui/botcord/FloatingSwitcher.tsx
+  function initBotCordSwitcher() {
+    return () => {
+    };
+  }
+  var init_FloatingSwitcher = __esm({
+    "src/core/ui/botcord/FloatingSwitcher.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/core/ui/reporter/components/ErrorBoundaryScreen.tsx
+  function ErrorBoundaryScreen(props) {
+    var styles2 = useStyles4();
+    var debugInfo = getDebugInfo();
+    return /* @__PURE__ */ jsx(ErrorBoundary, {
+      children: /* @__PURE__ */ jsx(SafeAreaProvider, {
+        children: /* @__PURE__ */ jsxs(SafeAreaView, {
+          style: styles2.container,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native45.View, {
+              style: {
+                gap: 4
+              },
+              children: [
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "display-lg",
+                  children: "Uh oh."
+                }),
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-md/normal",
+                  children: "A crash occurred while rendering a component. This could be caused by a plugin, CloudCord, or Discord itself."
+                }),
+                /* @__PURE__ */ jsxs(Text, {
+                  variant: "text-sm/normal",
+                  color: "text-muted",
+                  children: [
+                    debugInfo.os.name,
+                    "; ",
+                    debugInfo.discord.build,
+                    " (",
+                    debugInfo.discord.version,
+                    "); ",
+                    debugInfo.bunny.version
+                  ]
+                })
+              ]
+            }),
+            /* @__PURE__ */ jsxs(import_react_native45.ScrollView, {
+              fadingEdgeLength: 64,
+              contentContainerStyle: {
+                gap: 12
+              },
+              children: [
+                /* @__PURE__ */ jsx(Codeblock, {
+                  selectable: true,
+                  children: props.error.message
+                }),
+                hasStack(props.error) && /* @__PURE__ */ jsx(ErrorStackCard, {
+                  error: props.error
+                }),
+                isComponentStack(props.error) ? /* @__PURE__ */ jsx(ErrorComponentStackCard, {
+                  componentStack: props.error.componentStack
+                }) : null
+              ]
+            }),
+            /* @__PURE__ */ jsxs(Card, {
+              style: {
+                gap: 6
+              },
+              children: [
+                /* @__PURE__ */ jsx(Button, {
+                  text: "Reload Discord",
+                  onPress: () => BundleUpdaterManager.reload()
+                }),
+                !settings.safeMode?.enabled && /* @__PURE__ */ jsx(Button, {
+                  text: "Reload in Safe Mode",
+                  onPress: () => toggleSafeMode()
+                }),
+                /* @__PURE__ */ jsx(Button, {
+                  variant: "destructive",
+                  text: "Retry Render",
+                  onPress: () => props.rerender()
+                })
+              ]
+            })
+          ]
+        })
+      })
+    });
+  }
+  var import_react_native45, useStyles4;
+  var init_ErrorBoundaryScreen = __esm({
+    "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_isStack();
+      init_debug();
+      init_modules();
+      init_settings();
+      init_components2();
+      init_styles();
+      init_common();
+      init_components();
+      import_react_native45 = __toESM(require_react_native());
+      init_ErrorComponentStackCard();
+      init_ErrorStackCard();
+      useStyles4 = createStyles({
+        container: {
+          flex: 1,
+          backgroundColor: tokens.colors.BG_BASE_SECONDARY,
+          paddingHorizontal: 16,
+          height: "100%",
+          gap: 12
+        }
+      });
+    }
+  });
+
+  // src/core/debug/patches/patchErrorBoundary.tsx
+  function getErrorBoundaryContext() {
+    var ctxt = findByNameLazy("ErrorBoundary")[_lazyContextSymbol];
+    return new Promise((resolve) => ctxt.getExports((exp) => resolve(exp.prototype)));
+  }
+  function patchErrorBoundary() {
+    return after.await("render", getErrorBoundaryContext(), function() {
+      if (!this.state.error)
+        return;
+      return /* @__PURE__ */ jsx(ErrorBoundaryScreen, {
+        error: this.state.error,
+        rerender: () => this.setState({
+          info: null,
+          error: null
+        })
+      });
+    });
+  }
+  var init_patchErrorBoundary = __esm({
+    "src/core/debug/patches/patchErrorBoundary.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_ErrorBoundaryScreen();
+      init_patcher();
+      init_lazy2();
+      init_wrappers();
+    }
+  });
+
+  // src/core/fixes.ts
+  function onDispatch({ locale }) {
+    try {
+      findByProps("isMoment", "locale")?.locale(locale.toLowerCase());
+    } catch (e) {
+      logger.error("Failed to fix timestamps...", e);
+    }
+    FluxDispatcher.unsubscribe("I18N_LOAD_SUCCESS", onDispatch);
+  }
+  var fixes_default;
+  var init_fixes = __esm({
+    "src/core/fixes.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_logger();
+      init_common();
+      init_wrappers();
+      fixes_default = () => {
+        FluxDispatcher.subscribe("I18N_LOAD_SUCCESS", onDispatch);
+      };
     }
   });
 
@@ -47127,6 +43666,4622 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // globals:lodash
+  var require_lodash = __commonJS({
+    "globals:lodash"(exports, module) {
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      module.exports = require_depsModule()["lodash"];
+    }
+  });
+
+  // globals:util
+  var require_util = __commonJS({
+    "globals:util"(exports, module) {
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      module.exports = require_depsModule()["util"];
+    }
+  });
+
+  // src/core/vendetta/api.tsx
+  var import_react16, import_react_native46, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
+  var init_api3 = __esm({
+    "src/core/vendetta/api.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_alerts2();
+      init_storage();
+      init_storage();
+      init_themes();
+      init_assets();
+      init_commands();
+      init_debug();
+      init_loader();
+      init_patcher();
+      init_settings();
+      init_utils();
+      init_cyrb64();
+      init_logger();
+      init_metro();
+      init_modules2();
+      init_common();
+      init_components();
+      init_components();
+      init_color();
+      init_components2();
+      init_styles();
+      init_toasts();
+      init_dist();
+      import_react16 = __toESM(require_react());
+      import_react_native46 = __toESM(require_react_native());
+      init_plugins();
+      makeIcon = (leading) => leading;
+      CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
+      CompatSwitchRow = TableSwitchRow ?? Forms.FormSwitchRow ?? CompatRow;
+      CompatSection = TableRowGroup ?? Forms.FormSection ?? ReactNative.View;
+      PatchedFormRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatRow, {
+        label: props.label,
+        subLabel: props.subLabel,
+        icon: makeIcon(props.leading),
+        trailing: props.trailing,
+        onPress: props.onPress,
+        disabled: props.disabled,
+        arrow: props.arrow
+      });
+      PatchedFormRow.Icon = Forms.FormRow?.Icon ?? TableRow?.Icon ?? (() => null);
+      PatchedFormRow.Arrow = Forms.FormRow?.Arrow ?? TableRow?.Arrow ?? (() => null);
+      PatchedFormSwitchRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSwitchRow, {
+        label: props.label,
+        subLabel: props.subLabel,
+        icon: makeIcon(props.leading),
+        value: !!props.value,
+        onValueChange: props.onValueChange,
+        disabled: props.disabled
+      });
+      PatchedFormSection = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSection, {
+        title: props.title,
+        ...props
+      }, props.children);
+      PatchedForms = {
+        ...Forms,
+        FormRow: PatchedFormRow,
+        FormSwitchRow: PatchedFormSwitchRow,
+        FormSection: PatchedFormSection,
+        FormDivider: () => null
+      };
+      initVendettaObject = () => {
+        var createStackBasedFilter = (fn) => {
+          return (filter) => {
+            return fn(factories_exports.createSimpleFilter(filter, cyrb64Hash(new Error().stack)));
+          };
+        };
+        var api = globalThis.vendetta = {
+          patcher: {
+            before: patcher_default.before,
+            after: patcher_default.after,
+            instead: patcher_default.instead
+          },
+          metro: {
+            modules: metroModules,
+            find: createStackBasedFilter(findExports),
+            findAll: createStackBasedFilter(findAllExports),
+            findByProps: (...props) => {
+              if (props.length === 1 && props[0] === "KeyboardAwareScrollView") {
+                props.push("listenToKeyboardEvents");
+              }
+              var ret = findByProps(...props);
+              if (ret == null) {
+                if (props.includes("ActionSheetTitleHeader")) {
+                  var module = findByProps("ActionSheetRow");
+                  return {
+                    ...module,
+                    ActionSheetTitleHeader: module.BottomSheetTitleHeader,
+                    ActionSheetContentContainer: ({ children }) => {
+                      (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
+                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native46.View, null, children);
+                    }
+                  };
+                }
+              }
+              return ret;
+            },
+            findByPropsAll: (...props) => findByPropsAll(...props),
+            findByName: (name, defaultExp) => {
+              if (name === "create" && typeof defaultExp === "undefined") {
+                return findByName("create", false).default;
+              }
+              return findByName(name, defaultExp ?? true);
+            },
+            findByNameAll: (name, defaultExp = true) => findByNameAll(name, defaultExp),
+            findByDisplayName: (displayName2, defaultExp = true) => findByDisplayName(displayName2, defaultExp),
+            findByDisplayNameAll: (displayName2, defaultExp = true) => findByDisplayNameAll(displayName2, defaultExp),
+            findByTypeName: (typeName, defaultExp = true) => findByTypeName(typeName, defaultExp),
+            findByTypeNameAll: (typeName, defaultExp = true) => findByTypeNameAll(typeName, defaultExp),
+            findByStoreName: (name) => findByStoreName(name),
+            common: {
+              constants,
+              channels,
+              i18n,
+              url,
+              toasts,
+              stylesheet: {
+                createThemedStyleSheet
+              },
+              clipboard,
+              assets,
+              invites,
+              commands,
+              navigation,
+              navigationStack,
+              NavigationNative,
+              Flux,
+              FluxDispatcher,
+              React: React2,
+              ReactNative,
+              moment: require_moment(),
+              chroma: require_chroma(),
+              lodash: require_lodash(),
+              util: require_util()
+            }
+          },
+          constants: {
+            DISCORD_SERVER: "https://discord.gg/n9QQ4XhhJP",
+            GITHUB: "https://github.com/vendetta-mod",
+            PROXY_PREFIX: "https://vd-plugins.github.io/proxy",
+            HTTP_REGEX: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
+            HTTP_REGEX_MULTI: /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&//=]*)/g,
+            DISCORD_SERVER_ID: "1015931589865246730",
+            PLUGINS_CHANNEL_ID: "1091880384561684561",
+            THEMES_CHANNEL_ID: "1091880434939482202"
+          },
+          utils: {
+            findInReactTree: (tree, filter) => findInReactTree(tree, filter),
+            findInTree: (tree, filter, options) => findInTree(tree, filter, options),
+            safeFetch: (input, options, timeout) => safeFetch(input, options, timeout),
+            unfreeze: (obj) => Object.isFrozen(obj) ? {
+              ...obj
+            } : obj,
+            without: (object, ...keys) => omit(object, keys)
+          },
+          debug: {
+            connectToDebugger: (url2) => connectToDebugger2(url2),
+            getDebugInfo: () => getDebugInfo()
+          },
+          ui: {
+            components: {
+              Forms: PatchedForms,
+              General: ReactNative,
+              Alert: LegacyAlert,
+              Button: CompatButton,
+              HelpMessage: (...props) => /* @__PURE__ */ jsx(HelpMessage, {
+                ...props
+              }),
+              SafeAreaView: (...props) => /* @__PURE__ */ jsx(SafeAreaView, {
+                ...props
+              }),
+              Summary,
+              ErrorBoundary,
+              Codeblock,
+              Search: Search_default
+            },
+            toasts: {
+              showToast: (content, asset) => showToast(content, asset)
+            },
+            alerts: {
+              showConfirmationAlert: (options) => showConfirmationAlert(options),
+              showCustomAlert: (component, props) => showCustomAlert(component, props),
+              showInputAlert: (options) => showInputAlert(options)
+            },
+            assets: {
+              all: new Proxy({}, {
+                get(cache, p) {
+                  if (typeof p !== "string")
+                    return void 0;
+                  if (cache[p])
+                    return cache[p];
+                  for (var asset of iterateAssets()) {
+                    if (asset.name)
+                      return cache[p] = asset;
+                  }
+                },
+                ownKeys(cache) {
+                  var keys = /* @__PURE__ */ new Set();
+                  for (var asset of iterateAssets()) {
+                    cache[asset.name] = asset;
+                    keys.add(asset.name);
+                  }
+                  return [
+                    ...keys
+                  ];
+                }
+              }),
+              find: (filter) => findAsset(filter),
+              getAssetByName: (name) => findAsset(name),
+              getAssetByID: (id) => findAsset(id),
+              getAssetIDByName: (name) => findAssetId(name)
+            },
+            semanticColors,
+            rawColors
+          },
+          plugins: {
+            plugins: VdPluginManager.plugins,
+            fetchPlugin: (source) => VdPluginManager.fetchPlugin(source),
+            installPlugin: (source, enabled = true) => VdPluginManager.installPlugin(source, enabled),
+            startPlugin: (id) => VdPluginManager.startPlugin(id),
+            stopPlugin: (id, disable = true) => VdPluginManager.stopPlugin(id, disable),
+            removePlugin: (id) => VdPluginManager.removePlugin(id),
+            getSettings: (id) => VdPluginManager.getSettings(id)
+          },
+          themes: {
+            themes,
+            fetchTheme: (id, selected) => fetchTheme(id, selected),
+            installTheme: (id) => installTheme(id),
+            selectTheme: (id) => selectTheme(id === "default" ? null : themes[id]),
+            removeTheme: (id) => removeTheme(id),
+            getCurrentTheme: () => getThemeFromLoader(),
+            updateThemes: () => updateThemes()
+          },
+          commands: {
+            registerCommand
+          },
+          storage: {
+            createProxy: (target) => createProxy(target),
+            useProxy: (_storage) => useProxy(_storage),
+            createStorage: (backend) => createStorage(backend),
+            wrapSync: (store) => wrapSync(store),
+            awaitSyncWrapper: (store) => awaitStorage(store),
+            createMMKVBackend: (store) => createMMKVBackend(store),
+            createFileBackend: (file) => {
+              if (isPyonLoader() && file === "vendetta_theme.json") {
+                file = "pyon/current-theme.json";
+              }
+              return createFileBackend(file);
+            }
+          },
+          settings,
+          loader: {
+            identity: getVendettaLoaderIdentity() ?? void 0,
+            config: loaderConfig
+          },
+          logger: {
+            log: (...message) => console.log(...message),
+            info: (...message) => console.info(...message),
+            warn: (...message) => console.warn(...message),
+            error: (...message) => console.error(...message),
+            time: (...message) => console.time(...message),
+            trace: (...message) => console.trace(...message),
+            verbose: (...message) => console.log(...message)
+          },
+          version: versionHash,
+          unload: () => {
+            delete globalThis.vendetta;
+          }
+        };
+        return () => api.unload();
+      };
+    }
+  });
+
+  // src/lib/api/native/legacyRuntimeRefresh.ts
+  function invokeLegacyReload() {
+    return _async_to_generator(function* () {
+      var reader = import_react_native47.NativeModules.FileReaderModule ?? import_react_native47.NativeModules.RCTFileReaderModule;
+      if (typeof reader?.readAsDataURL !== "function")
+        return false;
+      yield reader.readAsDataURL({
+        rain: {
+          method: "updater.reload",
+          args: []
+        }
+      });
+      return true;
+    })();
+  }
+  function isCurrentCloudCordLoader() {
+    var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
+    return Boolean(nativeLoader && Number(nativeLoader.cloudcordAutoUpdateVersion ?? 0) >= 2);
+  }
+  function initLegacyRuntimeRefresh() {
+    return _async_to_generator(function* () {
+      var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
+      if (!nativeLoader || isCurrentCloudCordLoader())
+        return;
+      yield awaitStorage(loaderConfig);
+      var config = loaderConfig;
+      config.customLoadUrl ??= {
+        enabled: false,
+        url: ""
+      };
+      if (config.customLoadUrl.enabled && config.customLoadUrl.url && !config.customLoadUrl.url.startsWith("https://cloudcord.xohus.lol/"))
+        return;
+      config.customLoadUrl.url = CURRENT_RUNTIME_URL;
+      config.customLoadUrl.enabled = true;
+      try {
+        yield invokeLegacyReload();
+      } catch (e) {
+      }
+    })();
+  }
+  var import_react_native47, CURRENT_RUNTIME_URL;
+  var init_legacyRuntimeRefresh = __esm({
+    "src/lib/api/native/legacyRuntimeRefresh.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_storage();
+      init_settings();
+      import_react_native47 = __toESM(require_react_native());
+      CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
+    }
+  });
+
+  // src/global.d.ts
+  var init_global_d = __esm({
+    "src/global.d.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/modules.d.ts
+  var init_modules_d = __esm({
+    "src/modules.d.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/lib/ui/index.ts
+  var ui_exports = {};
+  __export(ui_exports, {
+    alerts: () => alerts_exports,
+    components: () => components_exports2,
+    settings: () => settings_exports2,
+    sheets: () => sheets_exports,
+    styles: () => styles_exports,
+    toasts: () => toasts_exports
+  });
+  var init_ui = __esm({
+    "src/lib/ui/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_alerts();
+      init_components2();
+      init_settings2();
+      init_sheets();
+      init_styles();
+      init_toasts();
+    }
+  });
+
+  // src/lib/index.ts
+  var lib_exports = {};
+  __export(lib_exports, {
+    _jsx: () => jsxRuntime_exports,
+    api: () => api_exports,
+    fonts: () => fonts_exports,
+    managers: () => managers,
+    metro: () => metro_exports,
+    plugins: () => plugins_exports2,
+    themes: () => themes_exports,
+    ui: () => ui_exports,
+    unload: () => unload,
+    utils: () => utils_exports
+  });
+  function unload() {
+    for (var d of _disposer)
+      if (typeof d === "function")
+        d();
+    delete globalThis.bunny;
+  }
+  var managers, _disposer;
+  var init_lib = __esm({
+    "src/lib/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_global_d();
+      init_modules_d();
+      init_fonts();
+      init_plugins4();
+      init_themes();
+      init_api();
+      init_ui();
+      init_utils();
+      init_metro();
+      init_fonts();
+      init_plugins4();
+      init_themes();
+      init_jsxRuntime();
+      init_lazy();
+      managers = proxyLazy(() => {
+        console.warn("bunny.managers.* is deprecated, and moved the top level (bunny.*). bunny.managers will be eventually removed soon");
+        return {
+          get fonts() {
+            return fonts_exports;
+          },
+          get plugins() {
+            return plugins_exports2;
+          },
+          get themes() {
+            return themes_exports;
+          }
+        };
+      }, {
+        hint: "object"
+      });
+      _disposer = [];
+      unload.push = (fn) => {
+        _disposer.push(fn);
+      };
+    }
+  });
+
+  // src/core/plugins/shared/sendMessage.ts
+  function onSendMessage(transform) {
+    return before("sendMessage", messageUtil, (args) => {
+      var message = args[1];
+      if (message && typeof message === "object") {
+        try {
+          transform(message, args[3]);
+        } catch (e) {
+        }
+      }
+      return args;
+    });
+  }
+  function onEditMessage(transform) {
+    var editor = findByProps("editMessage", "startEditMessage");
+    if (typeof editor?.editMessage !== "function")
+      throw new Error("Discord message edits are unavailable");
+    return before("editMessage", editor, (args) => {
+      var message = args[2];
+      if (message && typeof message === "object") {
+        try {
+          transform(message);
+        } catch (e) {
+        }
+      }
+      return args;
+    });
+  }
+  var init_sendMessage = __esm({
+    "src/core/plugins/shared/sendMessage.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_patcher();
+      init_metro();
+      init_common();
+    }
+  });
+
+  // src/lib/api/cxAppearance.ts
+  function hideDesktopClass(plugin2, label2, className) {
+    var prefix2 = className + "_";
+    return {
+      plugin: plugin2,
+      label: label2,
+      css: `[class^="${prefix2}"], [class*=" ${prefix2}"] { display: none !important; }`,
+      desktopOnly: true,
+      mobile: [],
+      catalogOriginal: true
+    };
+  }
+  var cxAppearanceTargets;
+  var init_cxAppearance = __esm({
+    "src/lib/api/cxAppearance.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      cxAppearanceTargets = {
+        // PlainFolderIcon by botato (GPL-3.0-or-later).
+        "plain-folder-icon": {
+          plugin: "PlainFolderIcon",
+          label: "Replace the mini server icons in collapsed folders with a plain folder icon",
+          css: ".cc-cx-plain-folder-icon { transition: none !important; transform: translateZ(0); background-color: color-mix(in oklab, var(--custom-folder-color, var(--badge-background-default)) 40%, transparent); }",
+          desktopOnly: true,
+          style: {}
+        },
+        // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
+        "larger-chat-text": {
+          plugin: "LargerChatText",
+          label: "Makes chat text larger",
+          css: '[class*="messageContent"] { font-size: 17px !important; line-height: 1.45 !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "bigger-chat-text": {
+          plugin: "BiggerChatText",
+          label: "Slightly larger message text",
+          css: '[class*="markup"][class*="messageContent"] { font-size: 1.08rem !important; line-height: 1.45 !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "smaller-chat-text": {
+          plugin: "SmallerChatText",
+          label: "Makes chat text smaller",
+          css: '[class*="messageContent"] { font-size: 14px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "compact-messages": {
+          plugin: "CompactMessages",
+          label: "Tighter spacing between messages",
+          css: '[class*="messageListItem"] [class*="cozy"] { padding-top: 1px !important; padding-bottom: 1px !important; } [class*="groupStart"] { margin-top: 8px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "monospace-chat": {
+          plugin: "MonospaceChat",
+          label: "Shows chat text in a monospace font",
+          css: '[class*="messageContent"] { font-family: var(--font-code) !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "square-avatars": {
+          plugin: "SquareAvatars",
+          label: "give avatars round-square corners",
+          css: 'img[class*="avatar"], [class*="avatar"] foreignObject { border-radius: 22% !important; mask: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "rounded-square-avatars": {
+          plugin: "RoundedAvatarsSquare",
+          label: "give avatars softer square corners",
+          css: '[class*="avatar"] img, img[class*="avatar"] { border-radius: 28% !important; } [class*="avatar"] svg mask rect, mask[id*="avatar"] circle { rx: 28%; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "spacious-message-groups": {
+          plugin: "SpaciousMessages",
+          label: "increase spacing between message groups",
+          css: '[class*="groupStart"] { margin-top: 22px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "bigger-avatars-in-chat": {
+          plugin: "BiggerAvatarsInChat",
+          label: "Makes avatars in chat larger",
+          css: '[class*="messageListItem"] img[class*="avatar"] { width: 48px !important; height: 48px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "bigger-jumbo-emojis": {
+          plugin: "BiggerJumboEmojis",
+          label: "Makes emoji-only messages bigger",
+          css: 'img[class*="emoji"][class*="jumboable"] { width: 64px !important; height: 64px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "bold-usernames": {
+          plugin: "BoldUsernames",
+          label: "Makes usernames in chat bolder",
+          css: '[class*="username_"] { font-weight: 700 !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "compact-compose": {
+          plugin: "CompactCompose",
+          label: "Slims the composer and fades its action buttons until hover or focus",
+          css: '\n[class*="channelTextArea"] { margin-top: 0 !important; margin-bottom: 6px !important; }\n[class*="channelTextArea"] [class*="scrollableContainer"] { min-height: 40px; }\n[class*="channelTextArea"] [class*="buttons"],\n[class*="channelTextArea"] button[class*="attachButton"] { opacity: 0.35; transition: opacity 0.15s ease; }\n[class*="channelTextArea"]:hover [class*="buttons"],\n[class*="channelTextArea"]:focus-within [class*="buttons"],\n[class*="channelTextArea"]:hover button[class*="attachButton"],\n[class*="channelTextArea"]:focus-within button[class*="attachButton"] { opacity: 1; }\n',
+          desktopOnly: true,
+          style: {}
+        },
+        "compact-server-list": {
+          plugin: "CompactServerList",
+          label: "Makes the server list narrower",
+          css: 'nav[aria-label="Servers sidebar"] { width: 60px !important; } nav[aria-label="Servers sidebar"] [class*="listItem"] { margin-bottom: 4px; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "focus-mode": {
+          plugin: "FocusMode",
+          label: "Hides the member list for a wider chat",
+          css: '[class*="membersWrap"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "server-banners": {
+          plugin: "HideServerBanners",
+          label: "Hides banners at the top of server channel lists",
+          css: '[class*="animatedContainer"][class*="bannerImage"], [class*="bannerImg"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: []
+        },
+        "grayscale-images": {
+          plugin: "GrayscaleImages",
+          label: "Shows images in grayscale until hovered",
+          css: '[class*="imageWrapper"] img { filter: grayscale(1); transition: filter .2s; } [class*="imageWrapper"]:hover img { filter: none; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hide-discover-button": {
+          plugin: "HideDiscoverButton",
+          label: "Hides the Discover button in the server list",
+          css: '[data-list-item-id="guildsnav___guild-discover-button"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hide-download-apps-button": {
+          plugin: "HideDownloadAppsButton",
+          label: "Hides the download-apps button in the server list",
+          css: '[data-list-item-id="guildsnav___app-download-button"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hide-keyboard-tips": {
+          plugin: "HideKeyboardTips",
+          label: "Hides the keyboard tips under the chat bar",
+          css: '[class*="typingDots"] ~ [class*="tip"], [class*="channelTextAreaTips"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hide-member-list-button": {
+          plugin: "HideMemberListButton",
+          label: "Hides the member list toggle in the channel header",
+          css: '[aria-label="Hide Member List"], [aria-label="Show Member List"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hide-user-panel-activity": {
+          plugin: "HideUserPanelActivity",
+          label: "Hides your activity line in the user panel",
+          css: '[class*="panels"] [class*="activityPanel"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hide-voice-panel-tips": {
+          plugin: "HideVoicePanelTips",
+          label: "Hides tips in the voice connection panel",
+          css: '[class*="rtcConnectionStatus"] [class*="tip"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "hover-highlight-messages": {
+          plugin: "HoverHighlightMessages",
+          label: "Highlights the message under your cursor",
+          css: '[class*="messageListItem"]:hover { background: rgb(255 255 255 / 4%); }',
+          desktopOnly: true,
+          style: {}
+        },
+        "no-message-hover-bar": {
+          plugin: "NoMessageHoverBar",
+          label: "Hides the buttons that appear when hovering a message",
+          css: '[class*="buttonsInner"] { display: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "no-shadows": {
+          plugin: "NoShadows",
+          label: "Removes drop shadows for a flatter look",
+          css: "* { box-shadow: none !important; }",
+          desktopOnly: true,
+          style: {}
+        },
+        "rounded-images": {
+          plugin: "RoundedImages",
+          label: "Rounder corners on images and videos in chat",
+          css: '[class*="imageWrapper"], [class*="imageWrapper"] img, [class*="wrapperPlaying"] { border-radius: 12px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "smaller-avatars-in-chat": {
+          plugin: "SmallerAvatarsInChat",
+          label: "Makes avatars in chat smaller",
+          css: '[class*="messageListItem"] img[class*="avatar"] { width: 32px !important; height: 32px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "smooth-scrolling": {
+          plugin: "SmoothScrolling",
+          label: "Smooth scrolling everywhere",
+          css: "* { scroll-behavior: smooth; }",
+          desktopOnly: true,
+          style: {}
+        },
+        "soft-corners": {
+          plugin: "SoftCorners",
+          label: "Rounder corners on cards, popouts and modals",
+          css: '[class*="popout"], [class*="card_"], [class*="modal"], [class*="menu_"] { border-radius: 14px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "sticky-date-dividers": {
+          plugin: "StickyDateDividers",
+          label: "Keeps the current day label at the top while scrolling",
+          css: '[class*="divider"][class*="hasContent"] { position: sticky; top: 0; z-index: 2; background: var(--background-base-lower, var(--background-primary)); }',
+          desktopOnly: true,
+          style: {}
+        },
+        "thin-scrollbars": {
+          plugin: "ThinScrollbars",
+          label: "Thinner scrollbars",
+          css: "::-webkit-scrollbar { width: 6px !important; height: 6px !important; } ::-webkit-scrollbar-thumb { border-radius: 6px !important; }",
+          desktopOnly: true,
+          style: {}
+        },
+        "wider-chat": {
+          plugin: "WiderChat",
+          label: "Lets messages use the full width of the window",
+          css: '[class*="messageListItem"] [class*="contents"] { max-width: none !important; } [class*="chatContent"] { max-width: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "thread-suggestions": {
+          plugin: "HideThreadSuggestions",
+          label: "thread suggestions above the composer",
+          css: '[class^="threadSuggestionBar_"], [class*=" threadSuggestionBar_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "sticker-search-suggestions": {
+          plugin: "HideStickerSearchSuggestions",
+          label: "suggested searches in the sticker picker",
+          css: '[class^="searchSuggestions_"], [class*=" searchSuggestions_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "sticker-picker-promotions": {
+          plugin: "HideStickerPickerPromotions",
+          label: "shop and promotional cards in the sticker picker",
+          css: '[class^="packHeaderShopWrapper_"], [class*=" packHeaderShopWrapper_"], [class^="emptyGuildUpsell_"], [class*=" emptyGuildUpsell_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "add-friend-hint": {
+          plugin: "HideAddFriendHint",
+          label: "the hint below the Add Friend field",
+          css: '[class^="addFriendHint_"], [class*=" addFriendHint_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "profile-friend-request-banner": {
+          plugin: "HideProfileFriendRequestBanner",
+          label: "friend request banners in profiles",
+          css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "message-length-promotion": hideDesktopClass("HideMessageLengthPromotion", "the Nitro promotion shown with long messages", "messageLengthUpsellContainer"),
+        "orb-wallet-nitro-promotion": hideDesktopClass("HideOrbWalletNitroPromotion", "the Nitro promotion in the Orbs Wallet", "orbWalletNitroUpsellCard"),
+        "orb-wallet-seasonal-promotion": hideDesktopClass("HideOrbWalletSeasonalPromotion", "the Black Friday card in the Orbs Wallet", "orbWalletBlackFridayCardWrapper"),
+        "monthly-reward-promotions": hideDesktopClass("HideMonthlyRewardPromotions", "promotional cards in the monthly rewards panel", "promoCardContainer"),
+        "soundboard-nitro-banner": hideDesktopClass("HideSoundboardNitroBanner", "the Nitro promotion banner in the soundboard", "upsellBanner"),
+        "sticker-autocomplete": hideDesktopClass("HideStickerAutocomplete", "sticker suggestions while typing in chat", "stickerAutoComplete"),
+        "premium-group-promotion": hideDesktopClass("HidePremiumGroupPromotion", "the premium group promotion in the offer dialog", "premiumGroupUpsellWrapper"),
+        "voice-krisp-button": {
+          plugin: "ShowPing",
+          label: "the desktop Krisp button beside the voice connection controls",
+          css: '[class*="voiceButtonsContainer_"] > button[aria-label$="Krisp" i] { display: none !important; }',
+          desktopOnly: true,
+          mobile: []
+        },
+        "bot-tags": {
+          plugin: "HideBotTags",
+          label: "APP and BOT tags",
+          css: '[class*="botTag"] { display: none !important; }',
+          mobile: [
+            "BotTag"
+          ]
+        },
+        "role-icons": {
+          plugin: "HideRoleIcons",
+          label: "role icons",
+          css: 'img[class*="roleIcon"] { display: none !important; }',
+          mobile: [
+            "RoleIcon"
+          ]
+        },
+        "server-tags": {
+          plugin: "HideClanTags",
+          label: "server tags",
+          css: '[class*="clanTag"], [class*="chipletContainer"] { display: none !important; }',
+          mobile: [
+            "GuildTag"
+          ]
+        },
+        "typing-indicator": {
+          plugin: "HideTypingIndicator",
+          label: "the typing indicator",
+          css: '[class*="typing_"][class*="base"], [class*="typingDots"] { display: none !important; }',
+          mobile: [
+            "TypingIndicator",
+            "TypingIndicatorInner"
+          ]
+        },
+        "jump-to-present": {
+          plugin: "HideJumpToPresent",
+          label: "the jump-to-present bar",
+          css: '[class*="jumpToPresentBar"] { display: none !important; }',
+          mobile: [
+            "JumpToPresentButton"
+          ]
+        },
+        "message-reactions": {
+          plugin: "HideReactions",
+          label: "message reactions",
+          css: '[class*="reactions_"] { display: none !important; }',
+          mobile: [
+            "MessageReactions",
+            "MessageReactionsContent"
+          ]
+        },
+        "profile-effects": {
+          plugin: "HideProfileEffects",
+          label: "profile effects",
+          css: '[class*="profileEffects"] { display: none !important; }',
+          mobile: [
+            "ProfileEffect",
+            "WrappedProfileEffect"
+          ]
+        },
+        "new-messages-bar": {
+          plugin: "HideNewMessagesBar",
+          label: "the new messages bar",
+          css: '[class*="newMessagesBar"] { display: none !important; }',
+          mobile: [
+            "NewMessagesChatBar"
+          ]
+        },
+        "voice-stream-previews": {
+          plugin: "HideStreamPreviews",
+          label: "voice-channel stream previews",
+          css: '[class*="streamPreview"] { display: none !important; }',
+          mobile: [
+            "VoicePanelStreamPreview"
+          ]
+        },
+        "voice-user-avatars": {
+          plugin: "HideVoiceUserAvatars",
+          label: "avatars next to users in voice channels",
+          css: '[class*="voiceUser"] [class*="avatar"] { display: none !important; }',
+          mobile: {
+            renderTree: "modules/guild_sidebar/native/VoiceUserItem.tsx",
+            hideComponents: [
+              "Avatar"
+            ]
+          }
+        },
+        "nameplates": {
+          plugin: "HideNameplates",
+          label: "nameplates",
+          css: '[class*="nameplate"] { display: none !important; }',
+          mobile: [
+            "Nameplate"
+          ]
+        },
+        "avatar-decorations": {
+          plugin: "HideAvatarDecorations",
+          label: "avatar decorations",
+          css: '[class*="avatarDecoration"] { display: none !important; }',
+          mobile: [
+            "CutoutableAvatarDecoration"
+          ]
+        },
+        "server-banner": {
+          plugin: "HideServerBanner",
+          label: "the channel list server banner",
+          css: '[class*="animatedContainer"][class*="bannerImage"], [class*="bannerImage"] { display: none !important; }',
+          mobile: [
+            "ReanimatedGuildBanner"
+          ]
+        },
+        "server-boost-progress": {
+          plugin: "HideBoostGoal",
+          label: "the server boost progress bar",
+          css: '[class*="boostProgressBar"], [class*="progressBar"][class*="guild"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingProgressBar.tsx"
+            ]
+          }
+        },
+        "server-boost-gem": {
+          plugin: "HideGuildBoostTag",
+          label: "the server boost gem",
+          css: '[class*="premiumGuildIcon"], [aria-label*="Server Boost"] svg { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/premium/powerups/native/GuildPowerupsBoostGem.tsx"
+            ]
+          }
+        },
+        "chat-gift-button": {
+          plugin: "HideGiftButton",
+          label: "the chat gift button",
+          css: 'button[aria-label="Send a gift"] { display: none !important; }',
+          mobile: [
+            "PremiumAnimatedGiftButton"
+          ]
+        },
+        "chat-emoji-button": {
+          plugin: "HideEmojiButton",
+          label: "the composer expression picker shortcut",
+          css: 'button[aria-label="Select emoji"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/chat_input/native/accessories/ChatInputExpressionButton.tsx"
+            ]
+          }
+        },
+        "chat-gif-picker": {
+          plugin: "HideGifButton",
+          label: "the GIF picker shortcut",
+          css: 'button[aria-label="Open GIF picker"] { display: none !important; }',
+          mobile: {
+            expressionPickerTab: "gif"
+          }
+        },
+        "chat-sticker-picker": {
+          plugin: "HideStickerButton",
+          label: "the sticker picker shortcut",
+          css: 'button[aria-label="Open sticker picker"] { display: none !important; }',
+          mobile: {
+            expressionPickerTab: "sticker"
+          }
+        },
+        "add-server-button": {
+          plugin: "HideAddServerButton",
+          label: "the add-a-server button",
+          css: '[data-list-item-id="guildsnav___create-join-button"] { display: none !important; }',
+          mobile: [
+            "GuildsBarCreateJoinButton"
+          ]
+        },
+        "profile-badges": {
+          plugin: "HideBadges",
+          label: "profile badge rows",
+          css: '[class*="badgeList"] { display: none !important; }',
+          mobile: [
+            "ProfileBadgeRows"
+          ]
+        },
+        "profile-notes": {
+          plugin: "HideProfileNotes",
+          label: "local notes in profile cards",
+          catalogOriginal: true,
+          css: '[class*="noteText_"], [class*="notePreview_"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileNote.tsx"
+            ]
+          }
+        },
+        "profile-connections": {
+          plugin: "HideProfileConnections",
+          label: "connections in profile cards",
+          catalogOriginal: true,
+          css: '[class*="connectedAccounts_"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileConnections.tsx",
+              "modules/user_profile/native/LegacyUserProfileConnections.tsx"
+            ]
+          }
+        },
+        "profile-mutuals": {
+          plugin: "HideProfileMutuals",
+          label: "mutual friends and servers in profile cards",
+          catalogOriginal: true,
+          css: '[class*="mutuals_"], [class*="mutualGuilds_"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileMutuals.tsx",
+              "modules/user_profile/native/UserProfileMutualGuilds.tsx"
+            ]
+          }
+        },
+        "custom-status-emojis": {
+          plugin: "HideStatusEmojis",
+          label: "emojis in custom status bubbles",
+          css: '[class*="customStatus"] img[class*="emoji"] { display: none !important; }',
+          mobile: {
+            customStatusEmojis: [
+              "CustomStatusBubble",
+              "UserProfileCustomStatusBubble"
+            ]
+          }
+        },
+        "member-activities": {
+          plugin: "HideMemberActivities",
+          label: "game and music activity text in the member list",
+          css: '[class*="member_"] [class*="activityText"] { display: none !important; }',
+          mobile: {
+            memberActivityText: true
+          }
+        },
+        "member-custom-status": {
+          plugin: "HideCustomStatuses",
+          label: "custom statuses in the member list",
+          css: '[class*="memberInner"] [class*="activity"], [class*="member_"] [class*="subText"] { display: none !important; }',
+          mobile: {
+            memberCustomStatus: true
+          }
+        },
+        "reply-previews": {
+          plugin: "HideReplyPreviews",
+          label: "reply previews in chat",
+          css: '[class*="repliedMessage"] { display: none !important; }',
+          mobile: [
+            "ReplyMessageContent"
+          ]
+        },
+        "chat-apps-button": {
+          plugin: "HideAppsButton",
+          label: "the chat apps button",
+          css: 'button[aria-label="Apps"] { display: none !important; }',
+          mobile: [
+            "ChatInputActionButtonApps"
+          ]
+        },
+        "chat-upload-button": {
+          plugin: "HideUploadButton",
+          label: "the chat attachment button",
+          css: '[class*="attachWrapper"] { display: none !important; }',
+          mobile: {
+            renderTree: "modules/chat_input/native/action_buttons/ChatInputActions.tsx",
+            hideControlIcons: [
+              "MediaKeyboardButtonIcon",
+              "ImageIcon"
+            ],
+            hideLongPressMenu: true
+          }
+        },
+        "channel-threads-button": {
+          plugin: "HideThreadsButton",
+          label: "the threads shortcut in the channel header",
+          css: '[aria-label="Threads"] { display: none !important; }',
+          mobile: {
+            renderComponent: "ChannelActionButtons",
+            hideControlIcons: [
+              "ThreadIcon"
+            ]
+          }
+        },
+        "chat-character-counter": {
+          plugin: "HideCharacterCount",
+          label: "the chat character counter",
+          css: '[class*="characterCount"] { display: none !important; }',
+          mobile: [
+            "ChatInputCharCounter"
+          ]
+        },
+        "chat-send-button": {
+          plugin: "HideSendButton",
+          label: "the chat send button",
+          css: 'button[aria-label="Send Message"] { display: none !important; }',
+          mobile: [
+            "ChatInputSendButton"
+          ]
+        },
+        "dm-call-buttons": {
+          plugin: "HideCallButtons",
+          label: "the buttons to start calls in DMs",
+          css: '[aria-label="Start Voice Call"], [aria-label="Start Video Call"] { display: none !important; }',
+          mobile: {
+            renderTree: "modules/main_tabs_v2/native/channel/header/PrivateChannelButtons.tsx",
+            hideIcons: [
+              "PhoneCallIcon",
+              "VideoIcon"
+            ],
+            keepWhilePresent: [
+              "PhoneHangUpIcon",
+              "VoiceNormalIcon"
+            ]
+          }
+        },
+        "dm-list-search": {
+          plugin: "HideDmSearch",
+          label: "the search button in the DM list",
+          css: '[class*="privateChannels"] [class*="searchBar"] { display: none !important; }',
+          mobile: {
+            renderTree: "modules/main_tabs_v2/native/tabs/messages/MessagesHeader.tsx",
+            hideLabels: [
+              "5h0QOP"
+            ]
+          }
+        },
+        "message-embeds": {
+          plugin: "HideEmbeds",
+          label: "link embeds in chat",
+          css: 'article[class*="embed"] { display: none !important; }',
+          mobile: [
+            "EmbedCard"
+          ]
+        },
+        "message-edited-label": {
+          plugin: "HideEditedLabel",
+          label: "the edited label in chat",
+          css: '[class*="edited_"] { display: none !important; }',
+          mobile: {
+            messagePresentation: "edited"
+          }
+        },
+        "message-timestamps": {
+          plugin: "HideTimestamps",
+          label: "timestamps next to chat messages",
+          css: '[class*="messageListItem"] time, [class*="timestamp_"] { display: none !important; }',
+          mobile: {
+            messagePresentation: "timestamps"
+          }
+        },
+        "message-stickers": {
+          plugin: "HideStickers",
+          label: "stickers in chat",
+          css: '[class*="stickerAsset"] { display: none !important; }',
+          mobile: {
+            messagePresentation: "stickers"
+          }
+        },
+        "active-now": {
+          plugin: "HideActiveNow",
+          label: "the active friends panel",
+          css: '[class*="nowPlayingColumn"] { display: none !important; }',
+          mobile: [
+            "MessagesItemHappeningNow"
+          ]
+        },
+        "channel-topic": {
+          plugin: "HideChannelTopic",
+          label: "channel topics",
+          css: '[class*="topic_"][class*="expandable"], section[aria-label="Channel header"] [class*="topic_"] { display: none !important; }',
+          mobile: [
+            "ChannelDetailsTopic"
+          ]
+        },
+        "shop-entry": {
+          plugin: "HideShopTab",
+          label: "the Shop entry",
+          css: 'a[href="/shop"], [data-list-item-id$="___shop"] { display: none !important; }',
+          mobile: [
+            "CollectiblesShopEntryButton"
+          ]
+        },
+        "help-entry": {
+          plugin: "HideHelpButton",
+          label: "the Help entry",
+          css: 'a[href*="support.discord.com"][class*="anchor"], [aria-label="Help"] { display: none !important; }',
+          mobile: {
+            settingsEntry: "modules/user_settings/defs/native/SupportSetting.tsx"
+          }
+        },
+        "nitro-entry": {
+          plugin: "HideNitroTab",
+          label: "the Nitro entry",
+          css: 'a[href="/store"], [data-list-item-id$="___nitro"] { display: none !important; }',
+          mobile: {
+            settingsEntry: "modules/user_settings/defs/native/PremiumSetting.tsx"
+          }
+        },
+        "quests-entry": {
+          plugin: "HideQuestsTab",
+          label: "the Quests entry",
+          css: 'a[href="/quest-home"], [data-list-item-id$="___quests"] { display: none !important; }',
+          mobile: {
+            settingsEntry: "modules/user_settings/defs/native/QuestHomeSetting.tsx"
+          }
+        },
+        "inbox-button": {
+          plugin: "HideInboxButton",
+          label: "the notifications entry",
+          css: '[aria-label="Inbox"] { display: none !important; }',
+          mobile: [
+            "YouBarNotificationsButton"
+          ]
+        },
+        "notification-settings": {
+          plugin: "HideNotificationBell",
+          label: "the channel notification settings shortcut",
+          css: '[aria-label="Notification Settings"] { display: none !important; }',
+          mobile: [
+            "NotificationSettingsButton"
+          ]
+        },
+        "pinned-messages-button": {
+          plugin: "HidePinsButton",
+          label: "the pinned messages shortcut",
+          css: '[aria-label="Pinned Messages"] { display: none !important; }',
+          mobile: {
+            tableRow: {
+              key: "rowPinnedMessages"
+            }
+          }
+        },
+        "friend-requests-badge": {
+          plugin: "HideFriendRequestsBadge",
+          label: "the pending friend requests counter",
+          css: 'a[href="/channels/@me"] [class*="numberBadge"] { display: none !important; }',
+          mobile: {
+            tableRow: {
+              subLabelFor: "fyA115"
+            }
+          }
+        },
+        "image-alt-text": {
+          plugin: "HideImageAltText",
+          label: "the image description control",
+          css: '[class*="altText"] { display: none !important; }',
+          mobile: [
+            "MediaModalOverlayAltTextButton"
+          ]
+        },
+        "spoiler-media-label": {
+          plugin: "HideSpoilerWarnings",
+          label: "the spoiler label on images",
+          css: '[class*="spoilerWarning"] { display: none !important; }',
+          mobile: {
+            renderTree: "modules/media_viewer/native/components/MediaModalSpoilerOverlay.tsx",
+            hideText: [
+              "F+x38C"
+            ]
+          }
+        },
+        "spoiler-outline": {
+          plugin: "ReadableSpoilers",
+          label: "outline concealed spoilers",
+          css: '[class*="spoilerContent"]:not([class*="spoilerContentHidden"]), span[class*="spoilerText"]:not([class*="hidden"]) {}[class*="spoilerContent"], [class*="spoilerWarning"] { outline: 1px dashed rgb(1 205 254 / 70%); outline-offset: 1px; border-radius: 4px; box-shadow: 0 0 6px rgb(255 113 206 / 35%); }',
+          style: {
+            spoilerOutline: {
+              borderWidth: 1,
+              borderColor: "rgba(1, 205, 254, 0.7)",
+              borderStyle: "dashed",
+              borderRadius: 4
+            }
+          }
+        },
+        "contrast-text": {
+          plugin: "HighContrastText",
+          label: "increase text contrast",
+          css: ":root { --text-default: #ffffff; --text-normal: #ffffff; --text-muted: #c7c9d1; }",
+          style: {
+            semantic: {
+              TEXT_DEFAULT: "#ffffff",
+              TEXT_NORMAL: "#ffffff",
+              TEXT_STRONG: "#ffffff",
+              TEXT_MUTED: "#c7c9d1",
+              TEXT_SUBTLE: "#c7c9d1"
+            }
+          }
+        },
+        "cloudcord-accent": {
+          plugin: "CloudCordAccent",
+          label: "apply the CloudCord accent",
+          css: ":root { --brand-500: #7c5cff; --brand-560: #6d4ef0; --brand-600: #5b3ce6; --brand-experiment: #7c5cff; }",
+          style: {
+            raw: {
+              BRAND_500: "#7c5cff",
+              BRAND_560: "#6d4ef0",
+              BRAND_600: "#5b3ce6"
+            },
+            semantic: {
+              TEXT_LINK: "#7c5cff",
+              TEXT_BRAND: "#7c5cff",
+              ICON_BRAND: "#7c5cff",
+              BACKGROUND_BRAND: "#7c5cff"
+            }
+          }
+        },
+        "amoled-background": {
+          plugin: "AmoledMode",
+          label: "use black backgrounds in dark mode",
+          css: ".theme-dark, .theme-midnight { --background-primary: #000; --background-secondary: #000; --background-secondary-alt: #050505; --background-tertiary: #000; --background-base-low: #000; --background-base-lower: #000; --background-base-lowest: #000; --background-surface-high: #0a0a0a; --chat-background-default: #000; }",
+          style: {
+            darkOnly: true,
+            semantic: {
+              BACKGROUND_PRIMARY: "#000000",
+              BACKGROUND_SECONDARY: "#000000",
+              BACKGROUND_SECONDARY_ALT: "#050505",
+              BACKGROUND_TERTIARY: "#000000",
+              BACKGROUND_MOBILE_PRIMARY: "#000000",
+              BACKGROUND_MOBILE_SECONDARY: "#000000",
+              BACKGROUND_BASE_LOW: "#000000",
+              BACKGROUND_BASE_LOWER: "#000000",
+              BACKGROUND_BASE_LOWEST: "#000000",
+              BACKGROUND_SURFACE_HIGH: "#0a0a0a",
+              CHAT_BACKGROUND_DEFAULT: "#000000"
+            }
+          }
+        },
+        "code-block-size": {
+          plugin: "BiggerCodeBlocks",
+          label: "increase code block text size",
+          css: 'code[class*="hljs"], [class*="codeContainer"] code { font-size: 15px !important; line-height: 1.5 !important; }',
+          style: {
+            component: "MarkupCodeBlock",
+            key: "codeBlock",
+            values: {
+              fontSize: 15,
+              lineHeight: 22.5
+            }
+          }
+        },
+        "colorful-mentions": {
+          plugin: "ColorfulMentions",
+          label: "tint inline mentions purple",
+          css: '[class*="mention"][class*="interactive"] { background: rgb(124 92 255 / 25%) !important; color: #c9bcff !important; border-radius: 6px; }',
+          style: {
+            semantic: {
+              MENTION_BACKGROUND: "#7c5cff40",
+              MENTION_FOREGROUND: "#c9bcff"
+            }
+          }
+        },
+        "highlight-mentions": {
+          plugin: "HighlightMentions",
+          label: "highlight messages that mention you in purple",
+          css: '[class*="mentioned"] { background: rgb(124 92 255 / 18%) !important; box-shadow: inset 3px 0 0 #7c5cff; }',
+          style: {
+            mentionHighlight: "#7c5cff2e"
+          }
+        },
+        "underlined-links": {
+          plugin: "HighlightLinks",
+          label: "underline message links",
+          css: '[class*="messageContent"] a { text-decoration: underline !important; text-underline-offset: 2px; }',
+          style: {
+            component: "MarkupLink",
+            key: "link",
+            values: {
+              textDecorationLine: "underline"
+            }
+          }
+        },
+        "floating-chat-bar": {
+          plugin: "FloatingChatBar",
+          label: "lift the chat bar above the bottom edge",
+          css: 'form [class*="channelTextArea"] { margin-bottom: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 25%); }',
+          style: {
+            component: "FloatingChatInputContainer",
+            values: {
+              marginBottom: 8,
+              shadowColor: "#000000",
+              shadowOffset: {
+                width: 0,
+                height: 4
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              elevation: 4
+            }
+          }
+        },
+        "rounded-chat-bar": {
+          plugin: "RoundedChatBar",
+          label: "round the chat bar",
+          css: '[class*="channelTextArea"] [class*="scrollableContainer"], form [class*="channelTextArea"] { border-radius: 24px !important; }',
+          style: {
+            component: "FloatingChatInputContainer",
+            values: {
+              borderRadius: 24
+            }
+          }
+        },
+        "borderless-chat-bar": {
+          plugin: "NoChatBarBorder",
+          label: "remove the chat bar border and shadow",
+          css: 'form [class*="channelTextArea"] { border: 0 !important; box-shadow: none !important; }',
+          style: {
+            component: "FloatingChatInputContainer",
+            values: {
+              borderWidth: 0,
+              shadowOpacity: 0,
+              elevation: 0
+            }
+          }
+        },
+        "transparent-chat-bar": {
+          plugin: "TransparentChatBar",
+          label: "make the chat input background translucent",
+          css: 'form [class*="channelTextArea"] [class*="scrollableContainer"] { background: rgb(0 0 0 / 25%) !important; backdrop-filter: blur(6px); }',
+          style: {
+            semantic: {
+              MOBILE_CHATINPUT_BACKGROUND_DEFAULT: "#00000040",
+              MOBILE_CHATINPUT_BACKGROUND_ACTIVE: "#00000040"
+            }
+          }
+        },
+        "round-server-icons": {
+          plugin: "RoundServerIcons",
+          label: "round server icons",
+          css: 'nav[aria-label="Servers sidebar"] [class*="wrapper"] foreignObject { mask: none !important; border-radius: 50%; }',
+          style: {
+            component: "GuildsBarAnimatedItemWrapper",
+            props: {
+              circle: true
+            },
+            skipWhenTrue: "preventClipping"
+          }
+        },
+        "bigger-server-icons": {
+          plugin: "BiggerServerIcons",
+          label: "make server icons larger",
+          css: 'nav[aria-label="Servers sidebar"] [class*="listItem"] svg[class*="svg"] { transform: scale(1.1); }',
+          style: {
+            serverIconScale: 1.1
+          }
+        },
+        "empty-server-folders": {
+          plugin: "HideEmptyFolders",
+          label: "empty expanded server folders",
+          css: '[class*="folder"][class*="expanded"]:empty { display: none !important; }',
+          mobile: {
+            emptyServerFolders: true
+          }
+        },
+        "scrollbars": {
+          plugin: "HideScrollbars",
+          label: "scroll indicators",
+          css: "::-webkit-scrollbar { width: 0 !important; height: 0 !important; }",
+          mobile: {
+            scrollIndicators: true
+          }
+        },
+        "server-unread-pills": {
+          plugin: "HideUnreadPills",
+          label: "the server sidebar unread pills",
+          css: '[class*="unreadMentionsIndicator"] { display: none !important; }',
+          mobile: [
+            "GuildsBarUnreadBars"
+          ]
+        },
+        "mention-badges": {
+          plugin: "HideMentionBadges",
+          label: "mention count badges",
+          css: '[class*="numberBadge"] { display: none !important; }',
+          mobile: {
+            mentionBadges: true
+          }
+        },
+        "centered-chat": {
+          plugin: "CenteredChat",
+          label: "center the message list on wide screens",
+          css: '[class*="messagesWrapper"] ol[class*="scrollerInner"] { max-width: 1100px; margin: 0 auto; }',
+          style: {
+            centeredMessageList: "modules/messages/native/Messages.tsx",
+            width: 1100
+          }
+        },
+        "readable-line-length": {
+          plugin: "ReadableLineLength",
+          label: "limit the width of long message lines",
+          css: '[class*="messageContent"] { max-width: 80ch; }',
+          style: {
+            messageWidthRenderer: "modules/messages/native/renderer/createMessageContent.tsx",
+            width: 640
+          }
+        },
+        "wider-channel-list": {
+          plugin: "WiderChannelList",
+          label: "make the channel list wider",
+          css: '[class*="sidebar_"] { width: 280px !important; }',
+          style: {
+            drawerWidthDelta: 40
+          }
+        },
+        "narrower-channel-list": {
+          plugin: "NarrowChannelList",
+          label: "make the channel list narrower",
+          css: '[class*="sidebar_"] { width: 200px !important; }',
+          style: {
+            drawerWidthDelta: -40
+          }
+        },
+        "compact-member-list": {
+          plugin: "CompactMemberList",
+          label: "reduce the spacing in the server member list",
+          css: '[class*="member_"] { padding-top: 0 !important; padding-bottom: 0 !important; height: 38px !important; }',
+          style: {
+            compactMemberList: true
+          }
+        },
+        "muted-channel-opacity": {
+          plugin: "MutedChannelsFaded",
+          label: "fade muted channels",
+          css: '[class*="modeMuted"] { opacity: .45 !important; }',
+          style: {
+            renderedComponents: [
+              "ChannelContent",
+              "ChannelContentComponent"
+            ],
+            condition: "muted",
+            values: {
+              opacity: 0.45
+            }
+          }
+        },
+        "inactive-channel-opacity": {
+          plugin: "DimInactiveChannels",
+          label: "dim channel names without unread messages",
+          css: '[class*="containerDefault"] [class*="modeMuted"], [class*="containerDefault"]:not(:has([class*="unread"])) [class*="name_"] { opacity: .6; }',
+          style: {
+            renderedComponents: [
+              "ChannelTitle"
+            ],
+            condition: "inactive",
+            values: {
+              opacity: 0.6
+            }
+          }
+        },
+        "reduced-motion": {
+          plugin: "NoAnimations",
+          label: "reduce interface animations and transitions",
+          css: "*, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }",
+          style: {
+            reducedMotion: true
+          }
+        },
+        "blur-chat-media": {
+          plugin: "BlurImagesUntilHover",
+          label: "conceal chat images and videos until you reveal them",
+          css: '[class*="imageWrapper"] img, [class*="imageWrapper"] video { filter: blur(18px); transition: filter .2s; } [class*="imageWrapper"]:hover img, [class*="imageWrapper"]:hover video { filter: none; }',
+          style: {
+            blurredMedia: "all"
+          }
+        },
+        "blur-nsfw-attachments": {
+          plugin: "BlurNSFW",
+          label: "conceal attachments in age-restricted channels until you reveal them",
+          css: '.cc-cx-nsfw-media [class*="imageContainer"], .cc-cx-nsfw-media [class*="wrapperPaused"] { filter: blur(10px); transition: filter .2s; } .cc-cx-nsfw-media [class*="imageContainer"]:hover, .cc-cx-nsfw-media [class*="wrapperPaused"]:hover { filter: blur(0); }',
+          style: {
+            blurredMedia: "nsfw"
+          }
+        }
+      };
+    }
+  });
+
+  // src/lib/api/cxClientCommands.ts
+  function lookupWikipedia(input, signal) {
+    return _async_to_generator(function* () {
+      var query = input.trim();
+      if (!query || query.length > 120 || query === "." || query === "..")
+        return "Enter a Wikipedia article title up to 120 characters.";
+      var escaped = (value) => value.replace(/@/g, "\uFF20").replace(/[\\\x60*_~|<>[\]]/g, "\\$&");
+      var title = encodeURIComponent(query);
+      var response = yield fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + title, {
+        credentials: "omit",
+        redirect: "error",
+        headers: {
+          "Api-User-Agent": "CloudCord (https://getcloudcord.com)"
+        },
+        signal
+      });
+      if (response.status === 404)
+        return "No Wikipedia article found for **" + escaped(query) + "**.";
+      if (!response.ok)
+        throw new Error("Wikipedia lookup failed");
+      var data = yield response.json();
+      if (data.type === "disambiguation" || typeof data.extract !== "string" || !data.extract.trim()) {
+        return "**" + escaped(query) + "** is ambiguous. Try a more specific title.";
+      }
+      var heading = typeof data.title === "string" ? data.title : query;
+      var page = data.content_urls?.desktop?.page;
+      var url2 = typeof page === "string" && /^https:\/\/en\.wikipedia\.org\/wiki\/[^\s<>]{1,500}$/.test(page) ? page : "https://en.wikipedia.org/wiki/" + title;
+      var excerpt = escaped(data.extract.trim().slice(0, 1200));
+      return "**" + escaped(heading.slice(0, 120)) + "**\n" + excerpt.slice(0, 1600) + "\n<" + url2 + ">";
+    })();
+  }
+  function translateCxText(text, target, signal) {
+    return _async_to_generator(function* () {
+      var query = Object.entries({
+        client: "gtx",
+        sl: "auto",
+        tl: target,
+        dt: "t",
+        q: text
+      }).map(([key, value]) => key + "=" + encodeURIComponent(value)).join("&");
+      if (query.length > 16e3)
+        throw new Error("Translation input is too long");
+      var response = yield fetch("https://translate.googleapis.com/translate_a/single?" + query, {
+        credentials: "omit",
+        redirect: "error",
+        signal
+      });
+      if (!response.ok)
+        throw new Error("Translation request failed");
+      var data = yield response.json();
+      if (!Array.isArray(data) || !Array.isArray(data[0]))
+        throw new Error("Invalid translation response");
+      var translated = data[0].map((part) => Array.isArray(part) && typeof part[0] === "string" ? part[0] : "").join("");
+      if (!translated.trim() || translated.length > 4e3)
+        throw new Error("Invalid translation text");
+      var language = typeof data[2] === "string" && /^[a-z]{2,3}(?:-[a-z]{2,8})?$/i.test(data[2]) ? data[2] : "auto";
+      return {
+        translated,
+        language
+      };
+    })();
+  }
+  function formatCxSpotify(action, text, track) {
+    if (!track)
+      return;
+    var artist = track.artists?.[0];
+    var external = artist?.external_urls?.spotify;
+    var artistId = typeof external === "string" ? /^https:\/\/open\.spotify\.com\/artist\/([a-z0-9]{22})(?:\?[^#]*)?$/i.exec(external)?.[1] : void 0;
+    var [type, id] = action === "spotifyTrack" ? [
+      "track",
+      track.id
+    ] : action === "spotifyAlbum" ? [
+      "album",
+      track.album?.id
+    ] : [
+      "artist",
+      artistId ?? artist?.id
+    ];
+    if (typeof id !== "string" || !/^[a-z0-9]{22}$/i.test(id))
+      return;
+    return [
+      text.trim(),
+      "https://open.spotify.com/" + type + "/" + id
+    ].filter(Boolean).join(" ");
+  }
+  function formatCxRandomMember(text, members, currentUser) {
+    var ids = members.map((member2) => member2?.userId).filter((id) => id !== currentUser && /^\d{15,22}$/.test(id));
+    var member = ids[Math.floor(Math.random() * ids.length)];
+    if (member)
+      return ("<@" + member + "> " + text).trim();
+  }
+  function inviteDetails(invite, list) {
+    if (typeof invite?.code !== "string" || !/^[a-z0-9-]{1,48}$/i.test(invite.code))
+      return;
+    var timestamp = typeof invite.expires_at === "string" ? Date.parse(invite.expires_at) : NaN;
+    var expiry = Number.isFinite(timestamp) ? " \xB7 Expires <t:" + Math.round(timestamp / 1e3) + ":R>" : "";
+    var max = Number.isSafeInteger(invite.max_uses) ? invite.max_uses : "?";
+    var uses = Number.isSafeInteger(invite.uses) ? invite.uses : "?";
+    return "discord.gg/" + invite.code + expiry + (list ? " \xB7 Used " + uses + "/" + max : " \xB7 Max uses: " + max);
+  }
+  function runCxFriendInvites(action, api) {
+    return _async_to_generator(function* () {
+      if (!api)
+        throw new Error("Friend invites are unavailable");
+      if (action === "create")
+        return inviteDetails(yield api.createFriendInvite(), false) ?? "Discord did not return an invite link.";
+      if (action === "revoke") {
+        yield api.revokeFriendInvites();
+        return "All friend invites have been revoked.";
+      }
+      var invites2 = yield api.getAllFriendInvites();
+      var lines = invites2.slice(0, 15).map((invite) => inviteDetails(invite, true)).filter(Boolean);
+      if (!lines.length)
+        return "You have no active friend invites.";
+      return lines.join("\n") + (invites2.length > 15 ? "\n\u2026 " + (invites2.length - 15) + " more." : "");
+    })();
+  }
+  function formatCxRoleMembers(role, guild, members, getUser) {
+    if (!guild)
+      return "Use this in a server.";
+    var matching = members.filter((member) => role === guild || member?.roles?.includes(role));
+    if (!matching.length)
+      return "Nobody loaded has that role. Open the member list to load more members.";
+    var names = matching.slice(0, 32).map(({ userId, nick }) => {
+      var user = getUser(userId);
+      return (nick || user?.globalName || user?.username || userId).slice(0, 64).replace(/[\\*_~`<>@\r\n]/g, (char) => char === "@" ? "\uFF20" : char === "\r" || char === "\n" ? " " : "\\" + char);
+    });
+    return "**" + matching.length + " loaded member" + (matching.length === 1 ? "" : "s") + "** with <@&" + role + ">:\n" + names.join(", ") + (matching.length > names.length ? ", \u2026" : "");
+  }
+  function markCxServersRead(stores, acknowledge) {
+    var channels2 = /* @__PURE__ */ new Map();
+    for (var { id } of Object.values(stores.guilds.getGuilds())) {
+      var listed = stores.channels.getChannels(id);
+      var threads = Object.values(stores.threads?.getActiveJoinedThreadsForGuild(id) ?? {}).flatMap((group) => Object.values(group));
+      for (var row of [
+        ...listed?.SELECTABLE ?? [],
+        ...listed?.VOCAL ?? [],
+        ...threads
+      ]) {
+        var channelId = row?.channel?.id;
+        if (!channelId || channels2.has(channelId) || !stores.read.hasUnread(channelId))
+          continue;
+        var messageId = stores.read.lastMessageId(channelId);
+        if (messageId)
+          channels2.set(channelId, {
+            channelId,
+            messageId,
+            readStateType: 0
+          });
+      }
+    }
+    if (!channels2.size)
+      return "Everything is already read.";
+    acknowledge([
+      ...channels2.values()
+    ]);
+    return "Marked " + channels2.size + " channel" + (channels2.size === 1 ? "" : "s") + " as read.";
+  }
+  function markCxServersReadAndWait(stores, acknowledge) {
+    return _async_to_generator(function* () {
+      var result;
+      var summary = markCxServersRead(stores, (channels2) => {
+        result = acknowledge(channels2);
+      });
+      yield result;
+      return summary;
+    })();
+  }
+  function bindCxChannelOpenRead({ dispatcher: dispatcher2, selected, user, read, jump, enabled = () => true }) {
+    if (typeof dispatcher2?.subscribe !== "function" || typeof read?.lastMessageId !== "function")
+      throw new Error("Discord channel read state is unavailable");
+    var pending2;
+    var generation = 0;
+    var previous;
+    var previousUser;
+    function onSelect({ channelId, messageId: targetId, jumpToMessageId }) {
+      var account = user();
+      if (targetId || jumpToMessageId) {
+        clearTimeout(pending2);
+        generation++;
+        previous = void 0;
+        return;
+      }
+      if (enabled() && channelId === previous && account === previousUser)
+        return;
+      clearTimeout(pending2);
+      var request = ++generation;
+      previous = void 0;
+      if (!enabled() || !account || typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId))
+        return;
+      previous = channelId;
+      previousUser = account;
+      pending2 = setTimeout(() => _async_to_generator(function* () {
+        try {
+          if (!enabled() || user() !== account || selected() !== channelId || !read.hasUnread(channelId))
+            return;
+          var messageId = read.lastMessageId(channelId);
+          if (!messageId || !/^\d{17,20}$/.test(messageId))
+            return;
+          yield dispatcher2.dispatch({
+            type: "BULK_ACK",
+            context: "APP",
+            channels: [
+              {
+                channelId,
+                messageId,
+                readStateType: 0
+              }
+            ]
+          });
+          if (user() !== account)
+            return;
+          yield dispatcher2.dispatch({
+            type: "CHANNEL_LOCAL_ACK",
+            channelId
+          });
+          if (request === generation && enabled() && user() === account && selected() === channelId)
+            yield jump({
+              channelId,
+              messageId,
+              flash: false
+            });
+        } catch (e) {
+        }
+      })(), 0);
+    }
+    dispatcher2.subscribe("CHANNEL_SELECT", onSelect);
+    return () => {
+      generation++;
+      clearTimeout(pending2);
+      dispatcher2.unsubscribe("CHANNEL_SELECT", onSelect);
+    };
+  }
+  var cxClientFunctions, cxExternalLookups;
+  var init_cxClientCommands = __esm({
+    "src/lib/api/cxClientCommands.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      cxClientFunctions = {
+        roleMembers: {
+          permission: "guild.members",
+          input: "role"
+        },
+        randomMember: {
+          permission: "guild.randommember",
+          input: "text"
+        },
+        spotifyTrack: {
+          permission: "spotify.activity",
+          input: "text"
+        },
+        spotifyAlbum: {
+          permission: "spotify.activity",
+          input: "text"
+        },
+        spotifyArtist: {
+          permission: "spotify.activity",
+          input: "text"
+        }
+      };
+      cxExternalLookups = {
+        wikipedia: {
+          permission: "lookup.wikipedia",
+          run: lookupWikipedia
+        }
+      };
+    }
+  });
+
+  // src/lib/api/cxCommandFunctions.ts
+  function chooseOne(items) {
+    return items[Math.floor(Math.random() * items.length)];
+  }
+  function randomInteger(low, high) {
+    var range = high - low + 1;
+    if (Number.isSafeInteger(range) && range > 0)
+      return low + Math.floor(Math.random() * range);
+  }
+  function hexChannels(input) {
+    var hex = input.trim().replace(/^#/, "");
+    if (/^[\da-f]{3}$/i.test(hex))
+      hex = [
+        ...hex
+      ].map((digit) => digit.repeat(2)).join("");
+    if (/^[\da-f]{6}$/i.test(hex))
+      return hex.match(/../g).map((value) => Number.parseInt(value, 16));
+  }
+  function utcMidnight(input) {
+    var date = input.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+      return;
+    var instant = /* @__PURE__ */ new Date(date + "T00:00:00Z");
+    if (Number.isFinite(instant.getTime()) && instant.toISOString().startsWith(date + "T"))
+      return instant.getTime();
+  }
+  function integerText(input) {
+    var text = input.trim();
+    if (!/^[+-]?\d+$/.test(text))
+      return;
+    var value = Number(text);
+    return Number.isSafeInteger(value) ? value : void 0;
+  }
+  function durationSeconds(input) {
+    var text = input.trim();
+    if (!/^(?:\d{1,10}[dhms] *){1,4}$/i.test(text))
+      return;
+    var seen = /* @__PURE__ */ new Set();
+    var seconds = 0;
+    for (var [, digits, unit] of text.toLowerCase().matchAll(/(\d+)([dhms])/g)) {
+      if (seen.has(unit))
+        return;
+      seen.add(unit);
+      seconds += Number(digits) * durationUnits.get(unit);
+    }
+    return seconds;
+  }
+  function isoUnixMilliseconds(input) {
+    var parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
+    if (!parsed)
+      return;
+    var [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
+    var midnight = utcMidnight(date);
+    if (midnight === void 0 || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59)
+      return;
+    var offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
+    return midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1e3 + Number(fraction.padEnd(3, "0"));
+  }
+  function jsonTokens(text) {
+    try {
+      JSON.parse(text);
+    } catch (e) {
+      return;
+    }
+    return text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
+  }
+  function markdownTable(rows) {
+    var columns = rows[0]?.length ?? 0;
+    if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
+      return;
+    var row = (cells) => "| " + cells.map((cell) => cell.trim().replace(/[\\|]/g, "\\$&").replace(/\r\n|\r|\n/g, "<br>").replace(/`(?=``)/g, "`\u200B")).join(" | ") + " |";
+    var output = [
+      row(rows[0]),
+      row(Array.from({
+        length: columns
+      }, () => "---")),
+      ...rows.slice(1).map(row)
+    ].join("\n");
+    return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
+  }
+  function csvRows(input) {
+    var rows = [];
+    var field = /(?:"((?:[^"]|"")*)"|([^",\r\n]*))(,|\r\n|\r|\n|$)/y;
+    var cells = [];
+    while (field.lastIndex <= input.length) {
+      var match = field.exec(input);
+      if (!match)
+        return [];
+      var [, quoted2, plain, separator] = match;
+      cells.push(quoted2 === void 0 ? plain : quoted2.replaceAll('""', '"'));
+      if (separator === ",")
+        continue;
+      rows.push(cells);
+      if (!separator || field.lastIndex === input.length)
+        break;
+      cells = [];
+    }
+    return rows;
+  }
+  function parsePublicHttpUrl(text) {
+    if (!/^https?:\/\//i.test(text) || text.length > 3e3 || /[\s\\]/.test(text))
+      return;
+    try {
+      var url2 = new URL(text);
+      if (!url2.username && !url2.password)
+        return url2;
+    } catch (e) {
+    }
+  }
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, base64Alphabet, dayMilliseconds, durationUnits, cxCommandFunctions;
+  var init_cxCommandFunctions = __esm({
+    "src/lib/api/cxCommandFunctions.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      searchEngines = /* @__PURE__ */ new Map([
+        [
+          "Google",
+          "https://www.google.com/search?q="
+        ],
+        [
+          "Bing",
+          "https://www.bing.com/search?q="
+        ],
+        [
+          "Yahoo",
+          "https://search.yahoo.com/search?p="
+        ],
+        [
+          "DuckDuckGo",
+          "https://duckduckgo.com/?q="
+        ],
+        [
+          "Baidu",
+          "https://www.baidu.com/s?wd="
+        ],
+        [
+          "Yandex",
+          "https://yandex.com/search/?text="
+        ],
+        [
+          "Ecosia",
+          "https://www.ecosia.org/search?q="
+        ],
+        [
+          "Ask",
+          "https://www.ask.com/web?q="
+        ],
+        [
+          "AOL",
+          "https://search.aol.com/aol/search?q="
+        ],
+        [
+          "LetMeGoogleThatForYou",
+          "https://letmegooglethat.com/?q="
+        ]
+      ]);
+      morseCodes = new Map(Object.entries({
+        A: ".-",
+        B: "-...",
+        C: "-.-.",
+        D: "-..",
+        E: ".",
+        F: "..-.",
+        G: "--.",
+        H: "....",
+        I: "..",
+        J: ".---",
+        K: "-.-",
+        L: ".-..",
+        M: "--",
+        N: "-.",
+        O: "---",
+        P: ".--.",
+        Q: "--.-",
+        R: ".-.",
+        S: "...",
+        T: "-",
+        U: "..-",
+        V: "...-",
+        W: ".--",
+        X: "-..-",
+        Y: "-.--",
+        Z: "--..",
+        0: "-----",
+        1: ".----",
+        2: "..---",
+        3: "...--",
+        4: "....-",
+        5: ".....",
+        6: "-....",
+        7: "--...",
+        8: "---..",
+        9: "----.",
+        " ": "/"
+      }));
+      morseLetters = new Map([
+        ...morseCodes
+      ].map(([letter, code]) => [
+        code,
+        letter
+      ]));
+      normalizations = [
+        "NFC",
+        "NFD",
+        "NFKC",
+        "NFKD"
+      ];
+      ansiForegrounds = [
+        "gray",
+        "red",
+        "green",
+        "yellow",
+        "blue",
+        "pink",
+        "cyan",
+        "white"
+      ];
+      ansiBackgrounds = [
+        "navy",
+        "orange",
+        "slate",
+        "teal",
+        "gray",
+        "indigo",
+        "silver",
+        "white"
+      ];
+      codeFence = "```";
+      base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      dayMilliseconds = 864e5;
+      durationUnits = /* @__PURE__ */ new Map([
+        [
+          "d",
+          86400
+        ],
+        [
+          "h",
+          3600
+        ],
+        [
+          "m",
+          60
+        ],
+        [
+          "s",
+          1
+        ]
+      ]);
+      cxCommandFunctions = {
+        snowflakeTimestamp(input) {
+          var text = input.trim();
+          if (!/^\d{17,20}$/.test(text))
+            return;
+          var snowflake3 = BigInt(text);
+          if (snowflake3 > 0xffffffffffffffffn || text[0] === "0")
+            return;
+          var timestamp = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
+          return `Created <t:${timestamp}:F> (<t:${timestamp}:R>).`;
+        },
+        sortLines: (text) => text.split(/\r\n|\r|\n/).sort((a, b3) => {
+          var left = a.toLowerCase();
+          var right = b3.toLowerCase();
+          return left < right ? -1 : left > right ? 1 : 0;
+        }).join("\n"),
+        trimLines: (text) => text.split(/\r\n|\r|\n/).map((line) => line.trim()).join("\n"),
+        linesToCsv: (text) => {
+          var fields = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
+          return fields.map((field) => `"${field.replaceAll('"', '""')}"`).join(",");
+        },
+        numberLines: (text) => {
+          var lines = text.split(/\r\n|\r|\n/);
+          if (lines.at(-1) === "")
+            lines.pop();
+          return lines.map((line, index) => `${index + 1}. ${line}`).join("\n");
+        },
+        slugifyText: (text) => text.normalize("NFKD").replace(RegExp("\\p{M}", "gu"), "").toLowerCase().replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), "-").replace(/^-|-$/g, ""),
+        unicodeInfo(text) {
+          var points = Array.from(text, (character) => "U+" + character.codePointAt(0).toString(16).toUpperCase().padStart(4, "0"));
+          if (!points.length || points.length > 128)
+            return;
+          return `${points.length} Unicode code points \xB7 ${text.length} UTF-16 code units
+\`${points.join(" ")}\``;
+        },
+        encodeUrlComponent(text) {
+          try {
+            var encoded = encodeURIComponent(text);
+            return encoded.length <= 3900 ? encoded : "Encoded text is too long for one reply.";
+          } catch (e) {
+            return "This text contains invalid Unicode.";
+          }
+        },
+        decodeUrlComponent(text) {
+          try {
+            return decodeURIComponent(text);
+          } catch (e) {
+            return "This text contains an invalid URL escape.";
+          }
+        },
+        escapeMarkdown(text) {
+          var escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
+          return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
+        },
+        checkJson(text) {
+          try {
+            JSON.parse(text);
+            return "Valid JSON.";
+          } catch (e) {
+            return "Invalid JSON.";
+          }
+        },
+        formatJson(text) {
+          var tokens2 = jsonTokens(text);
+          if (!tokens2)
+            return "Invalid JSON.";
+          var depth = 0;
+          var result = "";
+          for (var index = 0; index < tokens2.length; index++) {
+            var token = tokens2[index];
+            var previous = tokens2[index - 1];
+            var closes = token === "}" || token === "]";
+            if (closes)
+              depth--;
+            var empty = closes && (previous === "{" || previous === "[");
+            if (!empty && (closes || previous === "{" || previous === "[" || previous === ",")) {
+              result += "\n" + "  ".repeat(depth);
+            }
+            result += token.startsWith('"') ? token.replaceAll("`", "\\u0060") : token;
+            if (token === ":")
+              result += " ";
+            if (token === "{" || token === "[")
+              depth++;
+            if (result.length > 3900)
+              return "Formatted JSON is too long for one reply.";
+          }
+          return codeFence + "json\n" + result + "\n" + codeFence;
+        },
+        compactJson(text) {
+          var tokens2 = jsonTokens(text);
+          if (!tokens2)
+            return "Invalid JSON.";
+          var result = tokens2.join("").replaceAll("`", "\\u0060");
+          return result.length <= 3900 ? codeFence + "json\n" + result + "\n" + codeFence : "Compacted JSON is too long for one reply.";
+        },
+        jsonKeys(text) {
+          try {
+            var value = JSON.parse(text);
+            if (!value || Array.isArray(value) || typeof value !== "object")
+              return "Enter a JSON object.";
+            var keys = JSON.stringify(Object.keys(value), null, 2).replaceAll("`", "\\u0060");
+            return keys.length <= 3900 ? codeFence + "json\n" + keys + "\n" + codeFence : "The key list is too long for one reply.";
+          } catch (e) {
+            return "Invalid JSON.";
+          }
+        },
+        commonLines(first, second) {
+          var otherLines = new Set(second.split(/\r\n|\r|\n/));
+          var common = [
+            ...new Set(first.split(/\r\n|\r|\n/).filter((line) => line && otherLines.has(line)))
+          ];
+          if (!common.length)
+            return "No matching nonempty lines.";
+          var result = common.join("\n").replace(/`(?=``)/g, "`\u200B");
+          return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Matching lines are too long for one reply.";
+        },
+        compareLines(before3, after2) {
+          var lines = (value) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
+          var previous = lines(before3);
+          var current = lines(after2);
+          var unmatched = (source, other) => {
+            var counts = /* @__PURE__ */ new Map();
+            for (var line of other)
+              counts.set(line, (counts.get(line) ?? 0) + 1);
+            return source.filter((line2) => {
+              var count = counts.get(line2) ?? 0;
+              if (!count)
+                return true;
+              counts.set(line2, count - 1);
+              return false;
+            });
+          };
+          var removed = unmatched(previous, current);
+          var added = unmatched(current, previous);
+          if (!removed.length && !added.length)
+            return "Both inputs contain the same lines, ignoring order.";
+          var changes = [
+            ...removed.map((line) => "- " + line),
+            ...added.map((line) => "+ " + line)
+          ].join("\n").replaceAll(codeFence, "`\u200B``");
+          return changes.length <= 3900 ? codeFence + "diff\n" + changes + "\n" + codeFence : "Line changes are too long for one reply.";
+        },
+        wordFrequency(text) {
+          var counts = /* @__PURE__ */ new Map();
+          for (var word of text.toLowerCase().match(RegExp("[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*", "gu")) ?? []) {
+            counts.set(word, (counts.get(word) ?? 0) + 1);
+          }
+          return [
+            ...counts
+          ].sort(([, left], [, right]) => right - left).slice(0, 10).map(([word2, count]) => (word2.length > 80 ? word2.slice(0, 80) + "\u2026" : word2) + " \u2014 " + count).join("\n") || "No words found.";
+        },
+        hexToRgb(input) {
+          var channels2 = hexChannels(input);
+          if (channels2)
+            return `\`rgb(${channels2.join(", ")})\``;
+        },
+        colorContrast(foreground, background) {
+          var colors = [
+            hexChannels(foreground),
+            hexChannels(background)
+          ];
+          var luminances = colors.map((channels2) => channels2?.map((channel) => {
+            var rgb = channel / 255;
+            return rgb <= 0.04045 ? rgb / 12.92 : ((rgb + 0.055) / 1.055) ** 2.4;
+          }));
+          var [text, surface] = luminances;
+          if (!text || !surface)
+            return;
+          var relativeLuminance = ([red, green, blue]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+          var a = relativeLuminance(text), b3 = relativeLuminance(surface);
+          var ratio = (Math.max(a, b3) + 0.05) / (Math.min(a, b3) + 0.05);
+          return `Contrast \u2248 ${ratio.toFixed(2)}:1
+WCAG AA normal text ${ratio >= 4.5 ? "passes" : "fails"}
+WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
+        },
+        rgbToHex(input) {
+          var text = input.trim();
+          var channels2 = /^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/.exec(text) ?? /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i.exec(text);
+          if (!channels2)
+            return;
+          var values = channels2.slice(1).map(Number);
+          if (values.some((value) => value > 255))
+            return;
+          return "`#" + values.map((value) => value.toString(16).padStart(2, "0")).join("") + "`";
+        },
+        hslToHex(input) {
+          var text = input.trim().replace(/^hsl\((.*)\)$/i, "$1").trim();
+          var parts = text.includes(",") ? text.split(",").map((part) => part.trim()) : text.split(/\s+/);
+          var match = /^([+-]?\d+(?:\.\d+)?)(?:deg)? (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)%$/i.exec(parts.join(" "));
+          if (!match)
+            return;
+          var [angle, saturation, lightness] = match.slice(1).map(Number);
+          if (!Number.isFinite(angle) || saturation > 100 || lightness > 100)
+            return;
+          var hue = (angle % 360 + 360) % 360;
+          var light = lightness / 100;
+          var amplitude = saturation / 100 * Math.min(light, 1 - light);
+          var component = (offset) => {
+            var sector = (offset + hue / 30) % 12;
+            var value = light - amplitude * Math.max(-1, Math.min(sector - 3, 9 - sector, 1));
+            return Math.round(255 * value).toString(16).padStart(2, "0");
+          };
+          return "`#" + [
+            0,
+            8,
+            4
+          ].map(component).join("") + "`";
+        },
+        daysBetween(start, end) {
+          var first = utcMidnight(start), last = utcMidnight(end);
+          if (first === void 0 || last === void 0)
+            return;
+          var days = (last - first) / dayMilliseconds;
+          return `${days} ${Math.abs(days) === 1 ? "day" : "days"}`;
+        },
+        offsetDate(input, dayOffset) {
+          var start = utcMidnight(input), days = integerText(dayOffset);
+          if (start === void 0 || days === void 0)
+            return;
+          var date = new Date(start + days * dayMilliseconds);
+          if (Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999)
+            return `\`${date.toISOString().slice(0, 10)}\``;
+        },
+        isoWeek(input) {
+          var start = utcMidnight(input);
+          if (start === void 0)
+            return;
+          var thursday = new Date(start);
+          var weekday = thursday.getUTCDay() || 7;
+          thursday.setUTCDate(thursday.getUTCDate() + 4 - weekday);
+          var year = thursday.getUTCFullYear();
+          var firstDay = new Date(thursday);
+          firstDay.setUTCMonth(0, 1);
+          var week = Math.floor((thursday.getTime() - firstDay.getTime()) / (7 * dayMilliseconds)) + 1;
+          var yearLabel = (year < 0 ? "-" : "") + String(Math.abs(year)).padStart(4, "0");
+          return yearLabel + "-W" + String(week).padStart(2, "0") + "-" + weekday;
+        },
+        unixToIso(input, unit) {
+          var value = integerText(input);
+          if (value === void 0 || unit !== "seconds" && unit !== "milliseconds")
+            return;
+          var instant = new Date(unit === "seconds" ? value * 1e3 : value);
+          if (Number.isFinite(instant.getTime()))
+            return `\`${instant.toISOString()}\``;
+        },
+        isoToUnix(input) {
+          var ms = isoUnixMilliseconds(input);
+          if (ms !== void 0)
+            return `Seconds \`${ms / 1e3}\`
+Milliseconds \`${ms}\``;
+        },
+        convertDuration(input) {
+          var seconds = durationSeconds(input);
+          if (seconds === void 0)
+            return;
+          var days = Math.floor(seconds / 86400);
+          var hours = Math.floor(seconds % 86400 / 3600);
+          var minutes = Math.floor(seconds % 3600 / 60);
+          return `${days}d ${hours}h ${minutes}m ${seconds % 60}s \xB7 ${seconds} seconds`;
+        },
+        countdownTimestamp(input) {
+          var duration = durationSeconds(input);
+          if (!duration)
+            return;
+          var timestamp = Math.ceil(Date.now() / 1e3) + duration;
+          if (timestamp <= 864e10)
+            return `<t:${timestamp}:R> \xB7 \`<t:${timestamp}:R>\``;
+        },
+        meetingTimestamp(input) {
+          var ms = isoUnixMilliseconds(input);
+          if (ms === void 0)
+            return;
+          var timestamp = Math.floor(ms / 1e3);
+          return `<t:${timestamp}:F> (<t:${timestamp}:R>)
+Copy \`<t:${timestamp}:F>\``;
+        },
+        discordLinkDetails(input) {
+          var text = input.trim().replace(/^<([^<>]+)>$/, "$1");
+          var match = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/channels\/(@me|\d{17,20})\/(\d{17,20})(?:\/(\d{17,20}))?\/?$/i.exec(text);
+          if (!match)
+            return;
+          var [, guild, channel, message] = match;
+          var direct = guild.toLowerCase() === "@me";
+          var ids = [
+            direct ? void 0 : guild,
+            channel,
+            message
+          ];
+          if (ids.some((id) => id && (id.startsWith("0") || BigInt(id) > 0xffffffffffffffffn)))
+            return;
+          return [
+            direct ? "Direct message" : `Server \`${guild}\``,
+            `Channel \`${channel}\``,
+            ...message ? [
+              `Message \`${message}\``
+            ] : []
+          ].join("\n");
+        },
+        convertNumberBase(input, from, to) {
+          var match = /^([+-]?)([0-9a-z]{1,256})$/i.exec(input.trim());
+          var source = integerText(from), destination = integerText(to);
+          if (!match || source === void 0 || destination === void 0 || source < 2 || source > 36 || destination < 2 || destination > 36)
+            return;
+          var base = BigInt(source);
+          var value = 0n;
+          for (var character of match[2]) {
+            var digit = Number.parseInt(character, 36);
+            if (digit >= source)
+              return;
+            value = value * base + BigInt(digit);
+          }
+          return `\`${(match[1] === "-" ? -value : value).toString(destination).toUpperCase()}\``;
+        },
+        aspectRatio(width, height) {
+          var w = integerText(width), h = integerText(height);
+          if (w === void 0 || h === void 0 || w < 1 || h < 1)
+            return;
+          var a = w, b3 = h;
+          while (b3)
+            [a, b3] = [
+              b3,
+              a % b3
+            ];
+          return `\`${w / a}:${h / a}\` \xB7 ${w} \xD7 ${h} px`;
+        },
+        utf8Size(text) {
+          var bytes = 0;
+          for (var character of text) {
+            var code = character.codePointAt(0);
+            bytes += code <= 127 ? 1 : code <= 2047 ? 2 : code <= 65535 ? 3 : 4;
+          }
+          return `${bytes} UTF-8 ${bytes === 1 ? "byte" : "bytes"}`;
+        },
+        inspectUrl(input) {
+          var text = input.trim();
+          var url2 = parsePublicHttpUrl(text);
+          if (!url2)
+            return;
+          var count = url2.search.slice(1).split("&").filter(Boolean).length;
+          return `Scheme \`${url2.protocol.slice(0, -1)}\`
+Host \`${url2.host.replaceAll("`", "%60")}\`
+Query parameters ${count}
+Fragment ${url2.hash ? "present" : "absent"}`;
+        },
+        stripTracking(input) {
+          var text = input.trim();
+          if (!parsePublicHttpUrl(text))
+            return;
+          var match = /^([^?#]+)\?([^#]*)(#.*)?$/.exec(text);
+          if (!match)
+            return "No known tracking parameters found.";
+          var fields = match[2].split("&");
+          var kept = fields.filter((field) => {
+            try {
+              var name = decodeURIComponent(field.split("=", 1)[0]).toLowerCase();
+              return !/^(?:utm_(?:source|medium|campaign|term|content|id|source_platform|creative_format|marketing_tactic)|fbclid|gclid|dclid|msclkid)$/.test(name);
+            } catch (e) {
+              return true;
+            }
+          });
+          if (fields.length === kept.length)
+            return "No known tracking parameters found.";
+          var query = kept.some(Boolean) ? "?" + kept.join("&") : "";
+          var result = match[1] + query + (match[3] ?? "");
+          return codeFence + "\n" + result.replace(/`(?=``)/g, "`\u200B") + "\n" + codeFence;
+        },
+        encodeBase64(text) {
+          var encoded;
+          try {
+            encoded = encodeURIComponent(text);
+          } catch (e) {
+            return "This text contains invalid Unicode.";
+          }
+          var bytes = encoded.replace(/%([a-f0-9]{2})/gi, (_2, hex) => String.fromCharCode(Number.parseInt(hex, 16)));
+          if (Math.ceil(bytes.length / 3) * 4 > 3900)
+            return "Encoded text is too long for one reply.";
+          var output = "";
+          for (var index = 0; index < bytes.length; index += 3) {
+            var a = bytes.charCodeAt(index);
+            var b3 = bytes.charCodeAt(index + 1) || 0;
+            var c2 = bytes.charCodeAt(index + 2) || 0;
+            output += base64Alphabet[a >> 2] + base64Alphabet[(a & 3) << 4 | b3 >> 4] + (index + 1 < bytes.length ? base64Alphabet[(b3 & 15) << 2 | c2 >> 6] : "=") + (index + 2 < bytes.length ? base64Alphabet[c2 & 63] : "=");
+          }
+          return codeFence + "\n" + output + "\n" + codeFence;
+        },
+        tsvToMarkdown(input) {
+          return markdownTable(input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row) => row.split("	")));
+        },
+        csvToMarkdown(input) {
+          return markdownTable(csvRows(input));
+        },
+        markdownChecklist(input) {
+          var lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+          if (!lines.length)
+            return;
+          var checklist = lines.map((line) => /^- \[[ xX]\]\s/.test(line) ? line : "- [ ] " + line.replace(/^[-*+]\s+/, "")).join("\n").replace(/`(?=``)/g, "`\u200B");
+          return checklist.length <= 3900 ? codeFence + "markdown\n" + checklist + "\n" + codeFence : "The checklist is too long for one reply.";
+        },
+        checklistProgress(input) {
+          var items = [
+            ...input.matchAll(/^[ \t]*(?:[-*+]|\d+\.)[ \t]+\[([ xX])\](?:[ \t]+|$)/gm)
+          ];
+          if (!items.length)
+            return "No Markdown checklist items found.";
+          var completed = items.filter(([, state2]) => state2 !== " ").length;
+          return `${completed} of ${items.length} complete \xB7 ${Math.round(100 * completed / items.length)}% \xB7 ${items.length - completed} remaining`;
+        },
+        discordTimestamp(seconds, format) {
+          var input = seconds.trim();
+          if (!/^-?\d+$/.test(input) || !/^[tTdDfFR]$/.test(format))
+            return;
+          var timestamp = Number(input);
+          if (Number.isSafeInteger(timestamp) && Math.abs(timestamp) <= 864e10) {
+            return `\`<t:${timestamp}:${format}>\``;
+          }
+        },
+        discordLocalTimestamp(date, time, format) {
+          var day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
+          var clock = /^(\d{2}):(\d{2})$/.exec(time.trim());
+          if (!day || !clock || !/^[tTdDfFR]$/.test(format))
+            return;
+          var [year, month, dayOfMonth] = day.slice(1).map(Number);
+          var [hour, minute] = clock.slice(1).map(Number);
+          var instant = /* @__PURE__ */ new Date(0);
+          instant.setFullYear(year, month - 1, dayOfMonth);
+          instant.setHours(hour, minute, 0, 0);
+          if (instant.getFullYear() !== year || instant.getMonth() !== month - 1 || instant.getDate() !== dayOfMonth || instant.getHours() !== hour || instant.getMinutes() !== minute)
+            return;
+          return `\`<t:${instant.getTime() / 1e3}:${format}>\``;
+        },
+        colorText(text, color, background, style) {
+          var foregroundIndex = ansiForegrounds.indexOf(color);
+          var backgroundIndex = ansiBackgrounds.indexOf(background);
+          if (foregroundIndex < 0 || background && backgroundIndex < 0 || style && style !== "bold" && style !== "underline")
+            return;
+          var codes = [
+            style === "bold" ? 1 : style === "underline" ? 4 : 0,
+            30 + foregroundIndex
+          ];
+          if (background)
+            codes.push(40 + backgroundIndex);
+          var safeText = text.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/g, "");
+          if (!safeText.trim())
+            return;
+          var prefix2 = `\x1B[${codes.join(";")}m`;
+          var lines = safeText.replace(/`(?=``)/g, "`\u200B").split(/\r\n|\r|\n/).map((line) => prefix2 + line + "\x1B[0m");
+          var output = "```ansi\n" + lines.join("\n") + "\n```";
+          if (output.length <= 4e3)
+            return output;
+        },
+        searchLink(input, engine, hyperlink, hideEmbed) {
+          if (!input.trim())
+            return;
+          try {
+            var encoded = encodeURIComponent(input).replaceAll("(", "%28").replaceAll(")", "%29");
+            var url2 = (searchEngines.get(engine) ?? searchEngines.get("Google")) + encoded;
+            var destination = hideEmbed === "true" ? "<" + url2 + ">" : url2;
+            return hyperlink === "true" ? "[" + input.replace(/[\\[\]]/g, "\\$&") + "](" + destination + ")" : destination;
+          } catch (e) {
+            return;
+          }
+        },
+        // ShipCalc by rootpoi, kraethis, and ewlle.
+        ship(a, b3) {
+          var pair = [
+            a.trim().toLowerCase(),
+            b3.trim().toLowerCase()
+          ].sort().join("\u{1F495}");
+          var hash = 0;
+          for (var i = 0; i < pair.length; i++)
+            hash = hash * 31 + pair.charCodeAt(i) >>> 0;
+          var score = hash % 101;
+          var heart = score > 80 ? "\u{1F49E}" : score > 50 ? "\u{1F496}" : score > 25 ? "\u{1F497}" : "\u{1F494}";
+          return `${heart} **${a}** + **${b3}** = **${score}%**`;
+        },
+        choose: (choices) => chooseOne(choices.split(",").map((choice) => choice.trim()).filter(Boolean)),
+        roll(sides) {
+          var result = randomInteger(1, sides ? Number(sides) : 6);
+          if (result !== void 0)
+            return `You rolled a ${result}`;
+        },
+        randomNumber(minimum, maximum) {
+          var min = Number(minimum);
+          var max = Number(maximum);
+          var number = randomInteger(Math.min(min, max), Math.max(min, max));
+          if (number !== void 0)
+            return String(number);
+        },
+        wordCount(text) {
+          var words = text.trim().split(/\s+/).filter(Boolean).length;
+          return `${words} word${words === 1 ? "" : "s"}, ${text.length} character${text.length === 1 ? "" : "s"}`;
+        },
+        countLines: (text) => String(text.split(/\r\n|\r|\n/).length),
+        uniqueLines: (text) => [
+          ...new Set(text.split(/\r\n|\r|\n/))
+        ].join("\n"),
+        rot13: (text) => text.replace(/[a-z]/gi, (letter) => {
+          var base = letter <= "Z" ? 65 : 97;
+          return String.fromCharCode(base + (letter.charCodeAt(0) - base + 13) % 26);
+        }),
+        transform(text, style, repeat, reverse, normalize) {
+          if (style === "upper")
+            text = text.toUpperCase();
+          if (style === "lower")
+            text = text.toLowerCase();
+          if (style === "locale-upper")
+            text = text.toLocaleUpperCase();
+          if (style === "locale-lower")
+            text = text.toLocaleLowerCase();
+          if (normalizations.includes(normalize))
+            text = text.normalize(normalize);
+          if (style === "reverse" !== (reverse === "true"))
+            text = [
+              ...text
+            ].reverse().join("");
+          var count = repeat ? Number(repeat) : 1;
+          if (count > 0 && count <= 4e3 && text.length * count <= 4e3)
+            return text.repeat(count);
+        },
+        ask(question) {
+          return question + " - " + chooseOne([
+            "Yes",
+            "No",
+            "Maybe",
+            "Ask again later",
+            "Definitely not",
+            "It is certain"
+          ]);
+        },
+        currentTime() {
+          return "> **Current Time**: " + (/* @__PURE__ */ new Date()).toLocaleString();
+        },
+        mock(text) {
+          return text.split("").map((char, i) => i % 2 ? char.toUpperCase() : char.toLowerCase()).join("");
+        },
+        morse(text) {
+          if (!/^[.\-/ ]+$/.test(text))
+            return [
+              ...text.toUpperCase()
+            ].map((char) => morseCodes.get(char) ?? "").join(" ");
+          var decoded = text.split(" ").map((code) => morseLetters.get(code) ?? "").join("").toLowerCase();
+          return decoded.charAt(0).toUpperCase() + decoded.slice(1);
+        }
+      };
+    }
+  });
+
+  // src/lib/api/cxMessageTransforms.ts
+  function reverseText(text) {
+    return [
+      ...text
+    ].reverse().join("");
+  }
+  function parseCxHttpsOrigin(value) {
+    if (!httpsOrigin.test(value))
+      throw new Error("Use a bare HTTPS domain for link rewrites");
+    return value.toLowerCase();
+  }
+  function rewriteCxOrigin(text, rules) {
+    var match = /^(https:\/\/[^/?#\s]+)(\/[^?#\s]*)?(\?[^#\s]*)?(?:#[^\s]*)?$/i.exec(text.trim());
+    if (!match || RegExp(`[\\x00-\\x20\\x7f\\\\<>"']`, "u").test(match[0]))
+      return text;
+    var [, origin, path = "/", query = ""] = match;
+    var destination = rules.get(origin.toLowerCase());
+    return destination ? destination + path + query : text;
+  }
+  function rewriteCxLinks(text, rules) {
+    return text.replace(/(^|[\s<("'[{])https?:\/\/([a-z0-9.-]+)/gi, (original, before3, host, offset) => {
+      var end = offset + original.length;
+      var next = text[end];
+      if (next && !/[/?#\s<>]/.test(next) && !/^["')\]},!]+(?=$|[\s<>])/.test(text.slice(end)))
+        return original;
+      var domain = host.replace(/\.+$/, "");
+      var destination = rules.get("https://" + domain.toLowerCase());
+      return destination ? before3 + destination + host.slice(domain.length) : original;
+    });
+  }
+  function ingtonify(text) {
+    var links2 = [
+      ...text.matchAll(/https?:\/\/[^\s]+\.[^\s]+/gi)
+    ];
+    var words = [
+      ...text.matchAll(RegExp("\\p{L}+", "gu"))
+    ].filter(({ 0: word2, index }) => !/^(?:i)$/i.test(word2) && !/[aeouy]$/i.test(word2) && !links2.some((link) => index >= link.index && index < link.index + link[0].length));
+    var match = words[Math.floor(Math.random() * words.length)];
+    if (!match)
+      return text;
+    var word = match[0];
+    var upper = word.toUpperCase();
+    var overlap = upper.match(/(?:INGTON|INGTO|INGT|ING|IN|I)$/)?.[0].length ?? 0;
+    var suffix = "INGTON".slice(overlap);
+    var end = match.index + word.length;
+    return text.slice(0, end) + (word === upper ? suffix : suffix.toLowerCase()) + text.slice(end);
+  }
+  function cleanTrackingLink(url2) {
+    var match = /^(https?:\/\/([^/?#]+)[^?#]*)\?([^#]*)(#.*)?$/i.exec(url2);
+    if (!match)
+      return url2;
+    var [, base, host, query, fragment = ""] = match;
+    var pairs = query.split("&");
+    var kept = pairs.filter((pair) => {
+      var name = pair.split("=")[0];
+      try {
+        var key = decodeURIComponent(name.replace(/\+/g, " "));
+        if (/^[st]$/i.test(key))
+          return !/(^|\.)(?:twitter\.com|x\.com)(?::\d+)?$/i.test(host);
+        return !tracking.test(key);
+      } catch (e) {
+        return true;
+      }
+    });
+    var rest = kept.filter(Boolean).join("&");
+    return kept.length === pairs.length ? url2 : base + (rest ? "?" + rest : "") + fragment;
+  }
+  function preserveCase(original, replacement) {
+    if (original === original.toUpperCase())
+      return replacement.toUpperCase();
+    if (original[0] === original[0].toUpperCase())
+      return replacement[0].toUpperCase() + replacement.slice(1);
+    return replacement;
+  }
+  function polishWording(input, options = "apostrophes") {
+    if (input.includes("\uE000"))
+      return input;
+    var selected = new Set(options.split(",").map((option) => option.trim()));
+    var protectedText = [];
+    var text = input.replace(/\x60{3}[\s\S]*?\x60{3}|\x60[^\x60]*\x60|https?:\/\/[^\s<>]+|<(?:[@#:][^>\s]+|a:[^>\s]+)>/gi, (match) => "\uE000" + (protectedText.push(match) - 1) + "\uE000");
+    if (selected.has("apostrophes") || selected.has("expand"))
+      text = text.replace(missingPattern, (word) => preserveCase(word, missing.get(word.toLowerCase())));
+    if (selected.has("capitalize"))
+      text = text.replace(/(^\s*|[.!?]\s+)([a-z])/g, (_2, before3, letter) => before3 + letter.toUpperCase()).replace(/\bi\b/g, "I");
+    if (selected.has("expand"))
+      text = text.replace(expandedPattern, (word) => preserveCase(word, expanded.get(word.toLowerCase())));
+    if (selected.has("punctuation") && text.trim() && !RegExp(`[\\uE000.!?\u2026:;)\\]"'*_~\\x60]\\s*$|\\p{Extended_Pictographic}\\s*$`, "u").test(text))
+      text = text.replace(/\s*$/, ".");
+    return text.replace(/\uE000(\d+)\uE000/g, (_2, index) => protectedText[Number(index)]);
+  }
+  function formatLocalTime(hour, minute, meridiem, now) {
+    if (minute > 59 || (meridiem ? hour < 1 || hour > 12 : hour > 23))
+      return;
+    if (meridiem)
+      hour = hour % 12 + (meridiem.toUpperCase() === "PM" ? 12 : 0);
+    var target = new Date(now);
+    target.setHours(hour, minute, 0, 0);
+    if (target < now) {
+      target.setDate(target.getDate() + 1);
+      target.setHours(hour, minute, 0, 0);
+    }
+    return "<t:" + Math.floor(target.getTime() / 1e3) + ":t>";
+  }
+  var httpsOrigin, tracking, contractions, expanded, missing, wordPattern, missingPattern, expandedPattern, polishOptions, messageTransforms;
+  var init_cxMessageTransforms = __esm({
+    "src/lib/api/cxMessageTransforms.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      httpsOrigin = /^https:\/\/(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{0,62}$/i;
+      tracking = /^(?:utm_.*|fbclid|gclid|dclid|msclkid|mc_(?:cid|eid)|igshid|igsh|si|feature|ref_src|ref_url|_hsenc|_hsmi|yclid|twclid|share_id|spm|vero_(?:id|conv)|wt_?mc|oly_(?:anon|enc)_id|rb_clickid)$/i;
+      contractions = {
+        "wasn't": "was not",
+        "can't": "cannot",
+        "don't": "do not",
+        "won't": "will not",
+        "isn't": "is not",
+        "aren't": "are not",
+        "haven't": "have not",
+        "hasn't": "has not",
+        "hadn't": "had not",
+        "doesn't": "does not",
+        "didn't": "did not",
+        "shouldn't": "should not",
+        "wouldn't": "would not",
+        "couldn't": "could not",
+        "that's": "that is",
+        "what's": "what is",
+        "there's": "there is",
+        "how's": "how is",
+        "where's": "where is",
+        "when's": "when is",
+        "who's": "who is",
+        "why's": "why is",
+        "you'll": "you will",
+        "i'll": "I will",
+        "they'll": "they will",
+        "it'll": "it will",
+        "i'm": "I am",
+        "you're": "you are",
+        "they're": "they are",
+        "he's": "he is",
+        "she's": "she is",
+        "i've": "I have",
+        "you've": "you have",
+        "we've": "we have",
+        "they've": "they have",
+        "you'd": "you would",
+        "he'd": "he would",
+        "she'd": "she would",
+        "it'd": "it would",
+        "we'd": "we would",
+        "they'd": "they would",
+        "y'all": "you all",
+        "here's": "here is"
+      };
+      expanded = new Map(Object.entries(contractions));
+      missing = new Map([
+        ...expanded.keys()
+      ].map((word) => [
+        word.replace("'", ""),
+        word
+      ]));
+      wordPattern = (words) => new RegExp("\\b(?:" + [
+        ...words.keys()
+      ].join("|") + ")\\b", "gi");
+      missingPattern = wordPattern(missing);
+      expandedPattern = wordPattern(expanded);
+      polishOptions = /* @__PURE__ */ new Set([
+        "apostrophes",
+        "expand",
+        "capitalize",
+        "punctuation"
+      ]);
+      messageTransforms = {
+        reverse: reverseText,
+        // NormalizeMessageLinks by bb010g.
+        normalizeDiscordLinks: (text) => text.replace(/https:\/\/(?:canary\.|ptb\.)discord(?:app)?\.com\/channels\//g, "https://discord.com/channels/"),
+        // Unindent by Vee.
+        unindentCode: (text) => text.replace(/(```[^\n`]*\n)([\s\S]*?)(```)/g, (_2, opening, code, closing) => {
+          var lines = code.split("\n");
+          var minimum = Infinity;
+          for (var line of lines) {
+            if (line.trim())
+              minimum = Math.min(minimum, /^[\t ]*/.exec(line)[0].length);
+          }
+          if (!Number.isFinite(minimum) || minimum === 0)
+            return opening + code + closing;
+          return opening + lines.map((line2) => line2.replace(/^[\t ]+/, (indent) => indent.slice(minimum))).join("\n") + closing;
+        }),
+        // WriteUpperCase by Samwich and KrystalSkull.
+        capitalizeSentences: (text, exclusions = "http, https, ok") => {
+          var prefixes = exclusions.split(",").map((prefix2) => prefix2.trim().toLowerCase()).filter(Boolean);
+          return text.split(/([.!?]+['")\]]*\s+)/).map((part, index) => index % 2 || prefixes.some((prefix2) => part.toLowerCase().startsWith(prefix2)) ? part : part.charAt(0).toUpperCase() + part.slice(1)).join("");
+        },
+        ingtonify,
+        polishWording,
+        clearTrackingLinks: (text) => text.replace(/https?:\/\/[^\s<>]+/gi, (match) => {
+          var url2 = match.replace(/[.,;!?]+$/, "");
+          var extraClosing = (url2.match(/\)/g)?.length ?? 0) - (url2.match(/\(/g)?.length ?? 0);
+          if (extraClosing > 0)
+            url2 = url2.replace(/\)+$/, (ending) => ending.slice(0, -extraClosing));
+          return cleanTrackingLink(url2) + match.slice(url2.length);
+        }),
+        // Signature by Vee, Rini, ImBanana and KrystalSkull.
+        signature: (text, signature = "a chronic discord user") => text.trim() ? text + "\n> " + signature : text,
+        // SilentMessageToggle by Nuckyz, CatNoir and Z1xus.
+        silentMessage: (text) => text.trim() && !/^@silent(?:\s|$)/.test(text) ? "@silent " + text : text,
+        // AutoVaporwave and ZeroWidthSanitizer by rootpoi, kraethis, and ewlle.
+        fullwidth: (text) => text.replace(/[ -~]/g, (char) => char === " " ? "\u3000" : String.fromCharCode(char.charCodeAt(0) + 65248)),
+        stripInvisible: (text) => text.replace(/[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u206a-\u206f\ufeff\u00ad]/g, ""),
+        sendTimestamps: (text) => {
+          var now = /* @__PURE__ */ new Date();
+          return text.replace(/\x60{3}[\s\S]*?\x60{3}|\x60{2}[\s\S]*?\x60{2}|\x60(\d{1,2}):(\d{2}) ?(am|pm)?\x60/gi, (match, hour, minute, meridiem) => hour === void 0 ? match : formatLocalTime(Number(hour), Number(minute), meridiem, now) ?? match);
+        }
+      };
+    }
+  });
+
+  // src/lib/api/cxProfileColors.ts
+  function decodeCxProfileColors(bio) {
+    if (typeof bio !== "string")
+      return;
+    var match = taggedPalette.exec(bio.slice(0, 4096));
+    if (!match)
+      return;
+    return match.slice(1).map((hex) => parseInt([
+      ...hex
+    ].map((char) => String.fromCodePoint(char.codePointAt(0) - tagOffset)).join(""), 16));
+  }
+  function formatCxProfileColors(primary, accent) {
+    var colors = [
+      primary,
+      accent
+    ].map((color) => color.trim().replace(/^#/, "").toLowerCase());
+    if (!colors.every((color) => /^[a-f0-9]{6}$/.test(color)))
+      return;
+    var encoded = [
+      ..."[#" + colors.join(",#") + "]"
+    ].map((char) => String.fromCodePoint(char.charCodeAt(0) + tagOffset)).join("");
+    return "Copy the code block into your Discord bio. The color code is invisible.\n```\n" + encoded + "\n```";
+  }
+  var tagOffset, taggedPalette;
+  var init_cxProfileColors = __esm({
+    "src/lib/api/cxProfileColors.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      tagOffset = 917504;
+      taggedPalette = RegExp("\\u{e005b}\\u{e0023}([\\u{e0061}-\\u{e0066}\\u{e0041}-\\u{e0046}\\u{e0030}-\\u{e0039}]{1,6})\\u{e002c}\\u{e0023}([\\u{e0061}-\\u{e0066}\\u{e0041}-\\u{e0046}\\u{e0030}-\\u{e0039}]{1,6})\\u{e005d}", "u");
+    }
+  });
+
+  // src/lib/api/cxIncoming.ts
+  function parseIncomingRule(name, input) {
+    if (!Object.prototype.hasOwnProperty.call(incomingPermissions, name))
+      throw new Error("Unknown incoming rule");
+    var kind = name;
+    if (kind === "ping-alerts") {
+      var values = [
+        ...new Set(input.split(",").map((value) => value.trim()))
+      ];
+      if (values.some((value) => ![
+        "mentions",
+        "friends",
+        "dms",
+        "active",
+        "include-muted"
+      ].includes(value)) || !values.some((value) => [
+        "mentions",
+        "friends",
+        "dms"
+      ].includes(value))) {
+        throw new Error("Choose mentions, friends, or dms, with optional active and include-muted");
+      }
+      return {
+        kind,
+        values
+      };
+    }
+    if (kind === "open-link") {
+      var [phrase, link, extra] = input.split("|").map((part) => part.trim());
+      if (!phrase || phrase.length > 80 || link === void 0 || extra !== void 0)
+        throw new Error("Use a short phrase followed by | and an HTTPS destination");
+      if (!link)
+        return {
+          kind,
+          values: [
+            phrase
+          ]
+        };
+      var match = /^(https:\/\/[^/?#]+)(?:[/?#][a-z0-9._~%!$&()*+,;=:@/?#-]*)?$/i.exec(link);
+      if (!match)
+        throw new Error("Use an HTTPS destination without credentials or a custom scheme");
+      try {
+        parseCxHttpsOrigin(match[1]);
+      } catch (e) {
+        throw new Error("Use an HTTPS destination without credentials or a custom scheme");
+      }
+      return {
+        kind,
+        values: [
+          phrase
+        ],
+        link
+      };
+    }
+    if (kind === "profile-bio-colors") {
+      if (input !== "prefer-native" && input !== "prefer-bio")
+        throw new Error("Choose prefer-native or prefer-bio");
+      return {
+        kind,
+        values: [
+          input
+        ]
+      };
+    }
+    var always = false;
+    if (kind === "reply-pings") {
+      var match1 = /^(always|never)(?::(.*))?$/.exec(input);
+      if (!match1)
+        throw new Error("Reply pings require always or never, followed by optional exception IDs");
+      always = match1[1] === "always";
+      input = match1[2] ?? "";
+    }
+    var textual = kind === "keywords" || kind === "hide-keywords";
+    var values1 = [
+      ...new Set(input.split(textual ? /,/ : /[\s,]+/).map((value) => value.trim()).filter(Boolean))
+    ];
+    if (values1.length > 24)
+      throw new Error("Too many incoming rule values");
+    if (kind === "follow-voice" && values1.length > 1)
+      throw new Error("Choose one friend ID to follow");
+    if (kind === "reply-ping-default" && input.trim())
+      throw new Error("Reply ping defaults take no options");
+    if (kind === "friend-removals" && values1.length)
+      throw new Error("Friend removal notices take no options");
+    if (kind === "hide-profile-themes" && values1.length)
+      throw new Error("Profile theme hiding takes no options");
+    if (kind === "hide-system") {
+      if (!values1.length || values1.some((value) => !Object.prototype.hasOwnProperty.call(systemMessageTypes, value)))
+        throw new Error("Choose pins, joins, or boosts");
+      return {
+        kind,
+        values: values1,
+        messageTypes: new Set(values1.flatMap((value) => systemMessageTypes[value]))
+      };
+    }
+    if (kind === "hide-blocked") {
+      if (!values1.some((value) => value === "blocked" || value === "ignored") || values1.some((value) => value !== "blocked" && value !== "ignored" && value !== "replies"))
+        throw new Error("Choose blocked, ignored, or both, with optional replies");
+    } else if (!textual && !(kind === "stickers" && input === "*") && values1.some((value) => !/^\d{17,20}$/.test(value))) {
+      throw new Error("Incoming rules need Discord IDs");
+    }
+    if (kind === "hide-keywords" && values1.length) {
+      var phrases = values1.map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      return {
+        kind,
+        values: values1,
+        matcher: new RegExp("\\b(?:" + phrases.join("|") + ")\\b", "i")
+      };
+    }
+    return {
+      kind,
+      values: values1,
+      always
+    };
+  }
+  function isCxNotificationMuted(id, channel, store) {
+    var guild = channel.guild_id;
+    if (channel.isMuted?.() || store?.isChannelMuted?.(guild ?? null, id))
+      return true;
+    if (!guild)
+      return store?.getMutedChannels?.()?.includes?.(id) === true;
+    return store?.isGuildOrCategoryOrChannelMuted?.(guild, id) === true || store?.isMuted?.(guild) === true || store?.isCategoryMuted?.(guild, id) === true || Boolean(channel.parent_id && store?.isChannelMuted?.(guild, channel.parent_id));
+  }
+  function stripStickers(message, rule) {
+    var stickers = message?.sticker_items ?? message?.stickerItems ?? message?.stickers;
+    if (!Array.isArray(stickers) || !stickers.length)
+      return message;
+    var kept = rule.values[0] === "*" ? [] : stickers.filter((sticker) => !rule.values.includes(String(sticker?.id)));
+    if (kept.length === stickers.length)
+      return message;
+    return {
+      ...message,
+      sticker_items: kept,
+      stickerItems: kept,
+      stickers: kept
+    };
+  }
+  function stripProfileTheme(profile) {
+    if (!profile || typeof profile !== "object" || !(Array.isArray(profile.theme_colors) || Array.isArray(profile.themeColors)))
+      return profile;
+    var next = {
+      ...profile
+    };
+    delete next.theme_colors;
+    delete next.themeColors;
+    return next;
+  }
+  function applyIncomingRule(rule, payload, context) {
+    var { type, message } = payload;
+    if (rule.kind === "reply-ping-default") {
+      if (type === "CREATE_PENDING_REPLY" && payload.shouldMention === true)
+        return {
+          shouldMention: false
+        };
+      return;
+    }
+    if (rule.kind === "friends-voice" || rule.kind === "follow-voice" || rule.kind === "friend-removals")
+      return;
+    if (rule.kind === "profile-bio-colors") {
+      if (type !== "USER_PROFILE_FETCH_SUCCESS")
+        return;
+      var envelope = payload.userProfile ?? payload;
+      var profile = envelope.user_profile ?? envelope;
+      if (rule.values[0] === "prefer-native" && [
+        profile.theme_colors,
+        profile.themeColors
+      ].some((colors2) => Array.isArray(colors2) && colors2.length))
+        return;
+      var colors = decodeCxProfileColors(profile.bio);
+      if (!colors)
+        return;
+      var change = {
+        theme_colors: colors,
+        themeColors: colors
+      };
+      var patch = profile === envelope ? change : {
+        user_profile: {
+          ...profile,
+          ...change
+        }
+      };
+      return envelope === payload ? patch : {
+        userProfile: {
+          ...envelope,
+          ...patch
+        }
+      };
+    }
+    if (rule.kind === "hide-profile-themes") {
+      if (type !== "USER_PROFILE_FETCH_SUCCESS")
+        return;
+      var envelope1 = payload.userProfile ?? payload;
+      var id = envelope1.user?.id ?? payload.userId;
+      var me = context.currentUser();
+      if (!me || typeof id !== "string" || id === me)
+        return;
+      var userProfile = envelope1.user_profile;
+      var guildProfile = envelope1.guild_member_profile;
+      var user = stripProfileTheme(userProfile);
+      var guild = stripProfileTheme(guildProfile);
+      var profile1 = !userProfile ? stripProfileTheme(envelope1) : envelope1;
+      if (user === userProfile && guild === guildProfile && profile1 === envelope1)
+        return;
+      var patch1 = {
+        ...user !== userProfile ? {
+          user_profile: user
+        } : {},
+        ...guild !== guildProfile ? {
+          guild_member_profile: guild
+        } : {}
+      };
+      if (envelope1 !== payload)
+        return {
+          userProfile: {
+            ...profile1,
+            ...patch1
+          }
+        };
+      return profile1 === envelope1 ? patch1 : {
+        ...patch1,
+        theme_colors: void 0,
+        themeColors: void 0
+      };
+    }
+    if (rule.kind === "hide-users" || rule.kind === "hide-keywords" || rule.kind === "hide-blocked" || rule.kind === "hide-system") {
+      if (!rule.values.length || payload.optimistic)
+        return;
+      if (type !== "MESSAGE_CREATE" && type !== "MESSAGE_UPDATE" && type !== "LOAD_MESSAGES_SUCCESS")
+        return;
+      var me1 = rule.kind === "hide-system" ? void 0 : context.currentUser();
+      if (!me1 && rule.kind !== "hide-system")
+        return;
+      var excludedAuthor = (user2) => typeof user2 === "string" && user2 !== me1 && (rule.values.includes("blocked") && context.blocked?.(user2) === true || rule.values.includes("ignored") && context.ignored?.(user2) === true);
+      var hide = (item) => {
+        if (!item)
+          return false;
+        if (rule.kind === "hide-system")
+          return rule.messageTypes?.has(item.type) === true;
+        var channel3 = item.channel_id ?? item.channelId ?? payload.channelId ?? payload.channel_id;
+        var user2 = item.author?.id ?? (type === "MESSAGE_UPDATE" && typeof channel3 === "string" && typeof item.id === "string" ? context.replyAuthor(channel3, item.id)?.id : void 0);
+        if (rule.kind === "hide-blocked") {
+          if (excludedAuthor(user2))
+            return true;
+          if (!rule.values.includes("replies"))
+            return false;
+          var reference = item.message_reference ?? item.messageReference;
+          var replyChannel = reference?.channel_id ?? reference?.channelId ?? channel3;
+          var replyId = reference?.message_id ?? reference?.messageId;
+          var repliedTo = (item.referenced_message ?? item.referencedMessage)?.author?.id ?? (typeof replyChannel === "string" && typeof replyId === "string" ? context.replyAuthor(replyChannel, replyId)?.id : void 0);
+          return excludedAuthor(repliedTo);
+        }
+        if (typeof user2 !== "string" || user2 === me1)
+          return false;
+        if (rule.kind === "hide-users")
+          return rule.values.includes(user2);
+        var fields = [
+          item.content
+        ];
+        if (Array.isArray(item.embeds))
+          for (var embed of item.embeds.slice(0, 10)) {
+            fields.push(embed?.title ?? embed?.rawTitle, embed?.description ?? embed?.rawDescription);
+          }
+        return fields.some((field) => typeof field === "string" && rule.matcher?.test(field.slice(0, 4e3)));
+      };
+      if (type === "LOAD_MESSAGES_SUCCESS") {
+        if (!Array.isArray(payload.messages))
+          return;
+        var messages = payload.messages.filter((item) => !hide(item));
+        if (messages.length !== payload.messages.length)
+          return {
+            messages
+          };
+      } else if (hide(message)) {
+        return false;
+      }
+      return;
+    }
+    if (rule.kind === "stickers") {
+      if (type === "MESSAGE_CREATE" || type === "MESSAGE_UPDATE") {
+        var next = stripStickers(message, rule);
+        return next !== message ? {
+          message: next
+        } : void 0;
+      }
+      if (type === "LOAD_MESSAGES_SUCCESS" && Array.isArray(payload.messages)) {
+        var messages1 = payload.messages.map((item) => stripStickers(item, rule));
+        if (messages1.some((item, index) => item !== payload.messages[index]))
+          return {
+            messages: messages1
+          };
+      }
+      return;
+    }
+    if (rule.kind === "calls") {
+      if (type !== "CALL_CREATE" && type !== "CALL_UPDATE" || !Array.isArray(payload.ringing) || !rule.values.length)
+        return;
+      var me2 = context.currentUser();
+      if (!me2 || !payload.ringing.includes(me2))
+        return;
+      var id1 = payload.channelId ?? payload.channel_id;
+      if (typeof id1 !== "string")
+        return;
+      var recipients = context.channel(id1)?.recipients;
+      var peer = recipients?.length === 1 ? recipients[0] : void 0;
+      if (rule.values.includes(id1) || rule.values.includes(typeof peer === "string" ? peer : peer?.id ?? ""))
+        return {
+          ringing: payload.ringing.filter((user2) => user2 !== me2)
+        };
+      return;
+    }
+    if (type !== "MESSAGE_CREATE" || payload.optimistic || typeof message?.author?.id !== "string")
+      return;
+    var me3 = context.currentUser();
+    var author = message.author.id;
+    if (rule.kind === "open-link") {
+      var channel = message.channel_id ?? message.channelId ?? payload.channelId;
+      if (!rule.link || !me3 || !context.openLink || typeof channel !== "string" || context.selectedChannel?.() !== channel || message.state === "SENDING" || context.blocked?.(author) || typeof message.content !== "string" || !message.content.slice(0, 4e3).toLowerCase().includes(rule.values[0].toLowerCase()))
+        return;
+      var now = Date.now();
+      var last = lastLinkOpen.get(context);
+      if (last !== void 0 && now - last < 1e4)
+        return;
+      lastLinkOpen.set(context, now);
+      context.openLink(rule.link, channel, me3);
+      return;
+    }
+    if (!me3 || author === me3)
+      return;
+    var mentions = Array.isArray(message.mentions) ? message.mentions : [];
+    var isMe = (mention) => (typeof mention === "string" ? mention : mention?.id) === me3;
+    if (rule.kind === "ping-alerts") {
+      var channelId = message.channel_id ?? message.channelId;
+      var alerts = context.pingAlerts;
+      if (!alerts || typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId) || typeof message.id !== "string" || !/^\d{17,20}$/.test(message.id) || message.state === "SENDING" || alerts.status(me3) === "dnd" || !rule.values.includes("active") && context.selectedChannel?.() === channelId)
+        return;
+      var channel1 = context.channel(channelId);
+      if (!channel1)
+        return;
+      var dm = channel1.type === 1 || channel1.type === 3;
+      if (!(rule.values.includes("mentions") && mentions.some(isMe) || rule.values.includes("friends") && !dm && alerts.isFriend(author) || rule.values.includes("dms") && dm))
+        return;
+      if (!rule.values.includes("include-muted") && (alerts.muted(channelId, channel1) || context.blocked?.(author) || dm && channel1.recipients?.some((recipient) => context.blocked?.(typeof recipient === "string" ? recipient : recipient.id))))
+        return;
+      var names = new Map(mentions.flatMap((mention) => typeof mention?.username === "string" && typeof mention?.id === "string" ? [
+        [
+          mention.id,
+          mention.username
+        ]
+      ] : []));
+      var content = typeof message.content === "string" ? message.content.slice(0, 4e3) : "";
+      var body = content.replace(/<@!?(\d{17,20})>/g, (token, id2) => names.has(id2) ? "@" + names.get(id2) : token);
+      var authorName = typeof message.author.username === "string" ? message.author.username : "Someone";
+      var channelName = channel1.name || (channel1.type === 3 ? "Group DM" : dm ? "DM" : "Server");
+      alerts.notify({
+        title: authorName.slice(0, 64) + " in " + channelName.slice(0, 64),
+        body: body.slice(0, 200) + (body.length > 200 ? "\u2026" : ""),
+        author,
+        channel: channelId,
+        message: message.id,
+        guild: channel1.guild_id
+      });
+      return;
+    }
+    if (rule.kind === "silence-users") {
+      if (rule.values.includes(author)) {
+        return {
+          message: {
+            ...message,
+            mention_everyone: false,
+            mention_roles: [],
+            mentions: mentions.filter((mention) => !isMe(mention))
+          }
+        };
+      }
+      return;
+    }
+    if (rule.kind === "reply-pings") {
+      var ref = message.message_reference ?? message.messageReference;
+      var channelId1 = ref?.channel_id ?? ref?.channelId ?? message.channel_id;
+      var messageId = ref?.message_id ?? ref?.messageId;
+      var replyAuthor = (message.referenced_message ?? message.referencedMessage)?.author ?? (typeof channelId1 === "string" && typeof messageId === "string" ? context.replyAuthor(channelId1, messageId) : void 0);
+      if (replyAuthor?.id !== me3)
+        return;
+      var shouldPing = rule.always !== rule.values.includes(author);
+      if (shouldPing === mentions.some(isMe))
+        return;
+      return {
+        message: {
+          ...message,
+          mentions: shouldPing ? [
+            ...mentions,
+            replyAuthor
+          ] : mentions.filter((mention) => !isMe(mention))
+        }
+      };
+    }
+    var content1 = typeof message.content === "string" ? message.content.slice(0, 4e3) : "";
+    var matches = rule.kind === "users" ? rule.values.includes(author) : !message.author.bot && rule.values.some((value) => content1.toLowerCase().includes(value.toLowerCase()));
+    if (matches) {
+      var channel2 = typeof message.channel_id === "string" ? context.channel(message.channel_id)?.name : void 0;
+      var name = message.author.global_name ?? message.author.globalName ?? message.author.username ?? "Someone";
+      context.notify(String(name).slice(0, 64) + (channel2 ? " in #" + channel2.slice(0, 64) : "") + ": " + (content1 || "sent an attachment").slice(0, 80));
+    }
+  }
+  var incomingPermissions, systemMessageTypes, lastLinkOpen;
+  var init_cxIncoming = __esm({
+    "src/lib/api/cxIncoming.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_cxMessageTransforms();
+      init_cxProfileColors();
+      incomingPermissions = {
+        stickers: "messages.filterstickers",
+        "silence-users": "messages.silencementions",
+        "reply-pings": "replies.controlping",
+        "reply-ping-default": "replies.suppressping",
+        calls: "calls.suppressring",
+        keywords: "messages.watchlocal",
+        users: "messages.watchlocal",
+        "ping-alerts": "messages.pingalerts",
+        "hide-users": "messages.filterlocal",
+        "hide-keywords": "messages.filterlocal",
+        "hide-blocked": "messages.filterlocal",
+        "hide-system": "messages.filterlocal",
+        "hide-profile-themes": "appearance.style",
+        "profile-bio-colors": "appearance.style",
+        "friends-voice": "voice.notifyfriends",
+        "follow-voice": "voice.followfriend",
+        "friend-removals": "friends.notifyremoval",
+        "open-link": "links.openonmessage"
+      };
+      systemMessageTypes = {
+        pins: [
+          6
+        ],
+        joins: [
+          7
+        ],
+        boosts: [
+          8,
+          9,
+          10,
+          11
+        ]
+      };
+      lastLinkOpen = /* @__PURE__ */ new WeakMap();
+    }
+  });
+
+  // src/lib/api/cxNumeric.ts
+  function convertUnits(input) {
+    if (input.length > 192)
+      return;
+    var match = /^(-?\d+(?:[.,]\d+)?)\s*(°?[cf]|km\/h|[a-z]+)$/.exec(input.trim().toLowerCase());
+    if (!match)
+      return;
+    var value = Number(match[1].replace(",", "."));
+    var unit = match[2].replace("\xB0", "");
+    if (unit === "c")
+      return `${value}\xB0C = ${+(value * 9 / 5 + 32).toFixed(2)}\xB0F`;
+    if (unit === "f")
+      return `${value}\xB0F = ${+((value - 32) * 5 / 9).toFixed(2)}\xB0C`;
+    if (!Object.prototype.hasOwnProperty.call(units, unit))
+      return;
+    var [target, multiplier] = units[unit];
+    return `${value} ${unit} = ${+(value * multiplier).toFixed(2)} ${target}`;
+  }
+  function calculate(input) {
+    if (input.length > 192 || !/^[\d\s+*/().%\-]+$/.test(input))
+      return;
+    var tokens2 = input.match(/\d+(?:\.\d*)?|\.\d+|\*\*|\+\+|--|[^\s]/g) ?? [];
+    var cursor = 0;
+    function operand() {
+      var token = tokens2[cursor++];
+      if (token === "(") {
+        var value2 = expression(1);
+        if (tokens2[cursor++] !== ")")
+          throw new Error("Unclosed expression");
+        return value2;
+      }
+      if (token === "+" || token === "-") {
+        var value1 = operand();
+        if (tokens2[cursor] === "**")
+          throw new Error("Use parentheses around a signed base");
+        return token === "-" ? -value1 : value1;
+      }
+      if (!token || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(token))
+        throw new Error("Expected a number");
+      return Number(token);
+    }
+    function expression(minimum) {
+      var value2 = operand();
+      while (cursor < tokens2.length) {
+        var symbol = tokens2[cursor];
+        var operator = operators[symbol];
+        if (!operator || operator.precedence < minimum)
+          break;
+        cursor++;
+        var right = expression(operator.precedence + (symbol === "**" ? 0 : 1));
+        value2 = operator.apply(value2, right);
+      }
+      return value2;
+    }
+    try {
+      var value = expression(1);
+      if (cursor === tokens2.length && Number.isFinite(value))
+        return `\`${input.trim()}\` = **${value}**`;
+    } catch (e) {
+    }
+  }
+  var units, operators;
+  var init_cxNumeric = __esm({
+    "src/lib/api/cxNumeric.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      units = {
+        km: [
+          "mi",
+          0.621371
+        ],
+        mi: [
+          "km",
+          1.609344
+        ],
+        m: [
+          "ft",
+          3.28084
+        ],
+        ft: [
+          "m",
+          0.3048
+        ],
+        cm: [
+          "in",
+          0.393701
+        ],
+        in: [
+          "cm",
+          2.54
+        ],
+        kg: [
+          "lb",
+          2.20462
+        ],
+        lb: [
+          "kg",
+          0.453592
+        ],
+        g: [
+          "oz",
+          0.035274
+        ],
+        oz: [
+          "g",
+          28.3495
+        ],
+        l: [
+          "gal",
+          0.264172
+        ],
+        gal: [
+          "l",
+          3.78541
+        ],
+        ml: [
+          "floz",
+          0.033814
+        ],
+        floz: [
+          "ml",
+          29.5735
+        ],
+        "km/h": [
+          "mph",
+          0.621371
+        ],
+        mph: [
+          "km/h",
+          1.609344
+        ]
+      };
+      operators = {
+        "+": {
+          precedence: 1,
+          apply: (left, right) => left + right
+        },
+        "-": {
+          precedence: 1,
+          apply: (left, right) => left - right
+        },
+        "*": {
+          precedence: 2,
+          apply: (left, right) => left * right
+        },
+        "/": {
+          precedence: 2,
+          apply: (left, right) => left / right
+        },
+        "%": {
+          precedence: 2,
+          apply: (left, right) => left % right
+        },
+        "**": {
+          precedence: 3,
+          apply: (left, right) => left ** right
+        }
+      };
+    }
+  });
+
+  // src/lib/api/cxProfileMenu.ts
+  function isCxProfileUserId(id) {
+    return typeof id === "string" && /^\d{17,20}$/.test(id);
+  }
+  function getCxProfileMedia(id, user, banner) {
+    if (!isCxProfileUserId(id))
+      return [];
+    var name = user.username?.replace(/[^\w.-]+/g, "_").slice(0, 64) || id;
+    var assets2 = [];
+    if (!user.avatar) {
+      var legacy = user.discriminator && /^[0-9]{4}$/.test(user.discriminator) && Number(user.discriminator);
+      var index = legacy ? legacy % 5 : Number((BigInt(id) >> 22n) % 6n);
+      assets2.push({
+        kind: "Avatar",
+        url: "https://cdn.discordapp.com/embed/avatars/" + index + ".png",
+        filename: "avatar_" + name + ".png",
+        animated: false
+      });
+    }
+    for (var [kind, path, hash] of [
+      [
+        "Avatar",
+        "avatars",
+        user.avatar
+      ],
+      [
+        "Banner",
+        "banners",
+        banner
+      ]
+    ]) {
+      if (typeof hash !== "string" || !/^(?:a_)?[0-9a-f]{32}$/.test(hash))
+        continue;
+      var animated = hash.startsWith("a_");
+      var extension = animated ? "gif" : "png";
+      assets2.push({
+        kind,
+        animated,
+        filename: kind.toLowerCase() + "_" + name + "." + extension,
+        url: "https://cdn.discordapp.com/" + path + "/" + id + "/" + hash + "." + extension + "?size=4096"
+      });
+    }
+    return assets2;
+  }
+  function nonBlankText(value) {
+    return typeof value === "string" && value.trim() ? value : void 0;
+  }
+  function getCxProfileMenuCopy(action, id, profiles, guildId, users, members) {
+    var entry = cxProfileMenuActions[action];
+    if (entry.scope === "none")
+      return entry.format(id);
+    if (entry.scope === "server" && !guildId)
+      return;
+    try {
+      if (entry.scope === "identity") {
+        var user = users?.getUser?.(id);
+        return nonBlankText(action === "username" ? user?.username : user?.globalName);
+      }
+      if (action === "server-nickname" && guildId) {
+        return nonBlankText(members?.getMember?.(guildId, id)?.nick);
+      }
+      var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
+      if (action === "profile-bio" || action === "server-profile-bio")
+        return nonBlankText(profile?.bio);
+      if (action === "profile-pronouns")
+        return nonBlankText(profile?.pronouns);
+      var colors = profile?.themeColors;
+      if (!Array.isArray(colors) || colors.length < 2)
+        return;
+      var hex = colors.slice(0, 2).map((color) => Number.isInteger(color) && color >= 0 && color <= 16777215 ? "#" + color.toString(16).padStart(6, "0") : void 0);
+      if (hex[0] && hex[1])
+        return "Primary-color " + hex[0] + ", Secondary-Color " + hex[1];
+    } catch (e) {
+    }
+  }
+  var cxProfileMenuActions;
+  var init_cxProfileMenu = __esm({
+    "src/lib/api/cxProfileMenu.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      cxProfileMenuActions = {
+        "user-url": {
+          label: "Copy User URL",
+          scope: "none",
+          format: (id) => "<https://discord.com/users/" + id + ">"
+        },
+        "user-mention": {
+          label: "Copy User Mention",
+          scope: "none",
+          format: (id) => "<@" + id + ">"
+        },
+        "username": {
+          label: "Copy Username",
+          scope: "identity"
+        },
+        "display-name": {
+          label: "Copy Display Name",
+          scope: "identity"
+        },
+        "profile-bio": {
+          label: "Copy Bio",
+          scope: "user",
+          unavailable: "No profile bio found."
+        },
+        "server-profile-bio": {
+          label: "Copy Server Bio",
+          scope: "server"
+        },
+        "profile-pronouns": {
+          label: "Copy Pronouns",
+          scope: "user",
+          unavailable: "No profile pronouns found."
+        },
+        "server-nickname": {
+          label: "Copy Server Nickname",
+          scope: "server"
+        },
+        "profile-colors": {
+          label: "Copy Profile Colors",
+          scope: "user",
+          unavailable: "No profile colors found."
+        },
+        "server-profile-colors": {
+          label: "Copy Server Profile Colors",
+          scope: "server"
+        }
+      };
+    }
+  });
+
+  // src/lib/api/cxNativeEffects.ts
+  function getCxSpotifySongName(activity) {
+    if (activity?.type === 2 && activity.name === "Spotify" && typeof activity.details === "string" && activity.details.trim()) {
+      return activity.details;
+    }
+  }
+  function sortCxReactions(reactions) {
+    return reactions.length < 2 ? reactions : [
+      ...reactions
+    ].sort((a, b3) => b3.count - a.count);
+  }
+  function getCxPinAction(message, channel, canPin) {
+    if (!canPin || !isCxProfileUserId(channel) || message.channel_id !== channel || !isCxProfileUserId(message.id) || typeof message.pinned !== "boolean")
+      return;
+    return {
+      id: message.id,
+      method: message.pinned ? "unpinMessage" : "pinMessage",
+      label: message.pinned ? "Unpin Without Confirmation" : "Pin Without Confirmation"
+    };
+  }
+  function getCxEmbedToggle(message, channelId, userId, permissions) {
+    var { id, flags } = message;
+    if (!isCxProfileUserId(id) || !isCxProfileUserId(channelId) || message.channel_id !== channelId || !isCxProfileUserId(userId) || typeof flags !== "number" || !Number.isSafeInteger(flags) || flags < 0 || (message.author?.id === userId ? !permissions.canEmbed : !permissions.canManage))
+      return;
+    var suppressed = (flags & 4) !== 0;
+    if (!suppressed && !message.embeds?.length && !(message.messageSnapshots ?? message.message_snapshots)?.some((snapshot2) => snapshot2.message?.embeds?.length))
+      return;
+    return {
+      id,
+      flags: flags + (suppressed ? -4 : 4),
+      label: suppressed ? "Unsuppress Embeds" : "Suppress Embeds"
+    };
+  }
+  function getCxMessageClipboard(effect, message, channel) {
+    if (effect === "copy-raw-text") {
+      var text = message?.content;
+      return typeof text === "string" && text.length ? [
+        {
+          key: "raw-text",
+          label: "Copy Raw Text",
+          text
+        }
+      ] : [];
+    }
+    if (!message || !isCxProfileUserId(message.id))
+      return [];
+    var snowflake3 = BigInt(message.id);
+    if (snowflake3 > 0xffffffffffffffffn || message.id[0] === "0")
+      return [];
+    var seconds = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
+    var items = [
+      {
+        key: "message-timestamp",
+        label: "Copy Message Timestamp",
+        text: "<t:" + seconds + ":F>"
+      }
+    ];
+    var author = message.author?.id;
+    if (isCxProfileUserId(author)) {
+      items.push({
+        key: "message-author",
+        label: "Copy Message Author Mention",
+        text: "<@" + author + ">"
+      });
+    }
+    if (channel && channel.id === message.channel_id && isCxProfileUserId(channel.id)) {
+      var guild = channel.guild_id == null ? "@me" : channel.guild_id;
+      if (guild === "@me" || isCxProfileUserId(guild)) {
+        items.unshift({
+          key: "markdown-message-link",
+          label: "Copy Markdown Message Link",
+          text: "[Discord message](https://discord.com/channels/" + guild + "/" + channel.id + "/" + message.id + ")"
+        });
+      }
+    }
+    return items;
+  }
+  function buildCxMessageQuote(message, guildId, nickname, includeLink) {
+    if (!message.author || !isCxProfileUserId(message.id) || !isCxProfileUserId(message.channel_id))
+      return;
+    var withoutPings = (text) => text.replace(/@(?=[!&]?\d{17,20}>|everyone\b|here\b)/gi, "@\u200B");
+    var attachments = (message.attachments ?? []).flatMap((file) => typeof file.filename === "string" && file.filename.trim() ? [
+      "\u{1F4CE} " + file.filename.replace(/[\r\n]+/g, " ")
+    ] : []);
+    var body = [
+      message.content ?? "",
+      ...attachments
+    ].filter(Boolean).join("\n").trim() || "\u2026";
+    var quote = withoutPings(body).split(/\r\n|\r|\n/).map((line) => "> " + line.replace(/^>{1,3} ?/, "")).join("\n");
+    var author = withoutPings((nickname || message.author.globalName || message.author.global_name || message.author.username || "Unknown user").replace(/[\r\n]+/g, " ").slice(0, 80).replace(/[\\*_`~|<>\[\]]/g, "\\$&"));
+    var link = includeLink ? ` \xB7 https://discord.com/channels/${isCxProfileUserId(guildId) ? guildId : "@me"}/${message.channel_id}/${message.id}` : "";
+    var attribution = `
+\u2014 **${author}**${link}
+`;
+    var maximum = 1500 - attribution.length;
+    var clipped = quote.length > maximum ? quote.slice(0, maximum - 1).replace(/[\uD800-\uDBFF]$/, "").trimEnd() + "\u2026" : quote;
+    return clipped + attribution;
+  }
+  function buildCxRepeatMessage(message, channelId, reply) {
+    if (!isCxProfileUserId(message.id) || !isCxProfileUserId(channelId))
+      return;
+    var attachments = [
+      ...message.attachments ?? [],
+      ...(message.messageSnapshots ?? message.message_snapshots ?? []).flatMap((snapshot2) => snapshot2.message?.attachments ?? [])
+    ].flatMap(({ filename, url: url2 }) => {
+      if (typeof filename !== "string" || typeof url2 !== "string" || !/^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/attachments\/[^\s<>]+$/i.test(url2))
+        return [];
+      return [
+        " - " + filename.replace(/[\r\n]+/g, " ") + " (" + url2 + ")"
+      ];
+    });
+    var text = typeof message.content === "string" ? message.content : "";
+    var content = attachments.length ? text + "\nAttachments:\n" + attachments.join("\n") : text;
+    var stickerIds = (message.stickerItems ?? message.sticker_items ?? []).map((sticker) => sticker.id).filter(isCxProfileUserId);
+    if (!content.trim() && !stickerIds.length)
+      return;
+    return {
+      content,
+      options: {
+        allowedMentions: {
+          parse: [],
+          replied_user: false
+        },
+        messageReference: reply ? {
+          channel_id: channelId,
+          message_id: message.id
+        } : void 0,
+        stickerIds
+      }
+    };
+  }
+  function getCxMessageGesture(message, currentUser, gestures) {
+    var author = message?.author?.id;
+    if (!message || !author || !currentUser || message.deleted || ((message.flags ?? 0) & 64) !== 0 || message.state && message.state !== "SENT" || message.type !== 0 && message.type !== 19)
+      return;
+    if (author === currentUser)
+      return gestures.edit && typeof message.content === "string" && message.content ? "edit" : void 0;
+    if (gestures.reply)
+      return "reply";
+  }
+  function fixCxFileExtensions(files) {
+    if (!Array.isArray(files))
+      return;
+    for (var file of files) {
+      try {
+        var filename = file?.filename;
+        if (typeof filename !== "string")
+          continue;
+        var parts = /^(.*[^/\\.])\.([a-z0-9]+)$/i.exec(filename);
+        if (!parts || /\.tar$/i.test(parts[1]))
+          continue;
+        var replacement = replacementExtensions.get(parts[2].toLowerCase());
+        if (replacement)
+          file.filename = parts[1] + "." + replacement;
+      } catch (e) {
+      }
+    }
+  }
+  function floorCxRelativeTime(target, enabled = () => true) {
+    if (typeof target?.relativeTimeRounding !== "function")
+      throw new Error("Discord relative timestamps are unavailable");
+    var state2 = roundingUsers.get(target);
+    if (!state2) {
+      var previous = target.relativeTimeRounding();
+      var round = (value) => enabled() ? Math.floor(value) : previous(value);
+      if (!target.relativeTimeRounding(round))
+        throw new Error("Could not change Discord relative timestamps");
+      state2 = {
+        previous,
+        applied: round,
+        count: 0
+      };
+      roundingUsers.set(target, state2);
+    }
+    state2.count++;
+    var active = true;
+    return () => {
+      if (!active)
+        return;
+      active = false;
+      if (--state2.count === 0) {
+        roundingUsers.delete(target);
+        if (target.relativeTimeRounding() === state2.applied)
+          target.relativeTimeRounding(state2.previous);
+      }
+    };
+  }
+  function overrideCxMethods(target, overrides, enabled = () => true) {
+    var cleanups = [];
+    var active = true;
+    function stop() {
+      active = false;
+      for (var cleanup of cleanups.splice(0).reverse())
+        cleanup();
+    }
+    if (!target)
+      throw new Error("Discord's module is unavailable");
+    var methods = target;
+    try {
+      var _loop2 = function(key2, override2) {
+        var original = methods[key2];
+        if (typeof original !== "function")
+          return "continue";
+        var previous = Object.getOwnPropertyDescriptor(target, key2);
+        function wrapped(...args) {
+          var invoke = (next) => Reflect.apply(original, this, next);
+          return active && enabled() ? override2(args, invoke) : invoke(args);
+        }
+        if (previous && !previous.configurable) {
+          if (!("value" in previous) || !previous.writable)
+            return "continue";
+          Object.defineProperty(target, key2, {
+            value: wrapped
+          });
+        } else {
+          Object.defineProperty(target, key2, {
+            value: wrapped,
+            writable: true,
+            configurable: true,
+            enumerable: previous?.enumerable ?? false
+          });
+        }
+        overrideLayers.set(wrapped, {
+          target,
+          key: key2,
+          previous,
+          active: () => active
+        });
+        cleanups.push(() => {
+          var current = Object.getOwnPropertyDescriptor(target, key2);
+          if (current?.value !== wrapped)
+            return;
+          var restore = previous;
+          while (typeof restore?.value === "function") {
+            var layer = overrideLayers.get(restore.value);
+            if (!layer || layer.target !== target || layer.key !== key2 || layer.active())
+              break;
+            restore = layer.previous;
+          }
+          if (restore)
+            Object.defineProperty(target, key2, restore);
+          else
+            Reflect.deleteProperty(target, key2);
+        });
+      };
+      for (var [key, override] of Object.entries(overrides))
+        _loop2(key, override);
+      if (!cleanups.length)
+        throw new Error("Discord's methods are unavailable or read-only");
+    } catch (error) {
+      stop();
+      throw error;
+    }
+    return stop;
+  }
+  function filterCxEmojiAutocomplete(store, mode, intentions, enabled) {
+    var methods = store;
+    if (typeof methods?.searchWithoutFetchingLatest !== "function" || typeof methods.getSearchResultsOrder !== "function")
+      throw new Error("Discord's emoji search is unavailable");
+    var shouldKeep;
+    return overrideCxMethods(store, {
+      searchWithoutFetchingLatest(args, invoke) {
+        var options = args[0];
+        if (options?.intention == null || !(options.intention === intentions?.AUTO_SUGGESTION || options.intention === (intentions?.CHAT ?? 3) && typeof options.count === "number" && options.count > 0))
+          return invoke(args);
+        var channel = options.channel;
+        var guild = channel?.getGuildId?.() ?? channel?.guild_id;
+        var previous = shouldKeep;
+        shouldKeep = (emoji) => emoji?.type !== 1 || mode === "local" && Boolean(guild) && emoji.guildId === guild;
+        try {
+          return invoke(args);
+        } finally {
+          shouldKeep = previous;
+        }
+      },
+      getSearchResultsOrder(args, invoke) {
+        var [emojis, ...rest] = args;
+        if (!shouldKeep || !Array.isArray(emojis))
+          return invoke(args);
+        var filtered = emojis.filter(shouldKeep);
+        return invoke(filtered.length === emojis.length ? args : [
+          filtered,
+          ...rest
+        ]);
+      }
+    }, enabled);
+  }
+  function animateCxAssets(target, bannerTakesOptions, enabled) {
+    var animateArgument = (args, invoke) => {
+      var next = [
+        ...args
+      ];
+      next[1] = true;
+      return invoke(next);
+    };
+    var animateOptions = ([options, ...args], invoke) => options && typeof options === "object" ? invoke([
+      {
+        ...options,
+        canAnimate: true
+      },
+      ...args
+    ]) : invoke([
+      options,
+      ...args
+    ]);
+    return overrideCxMethods(target, {
+      getUserAvatarURL: animateArgument,
+      getGuildMemberAvatarURL: animateArgument,
+      getUserBannerURL: bannerTakesOptions ? animateOptions : animateArgument,
+      getGuildIconURL: animateOptions
+    }, enabled);
+  }
+  function raiseCxAvatarResolution(target, size, enabled) {
+    var avatarUrl2 = /^(https:\/\/|\/\/)(?:cdn\.discordapp\.com|media\.discordapp\.net)\/(?:guilds\/\d+\/users\/\d+\/)?avatars\/\d+\/[\w-]+\.(?:png|webp|gif|jpe?g|avif)(\?[^#\s]*)?$/i;
+    return overrideCxMethods(target, {
+      getUserAvatarURL(args, invoke) {
+        var url2 = invoke(args);
+        if (typeof url2 !== "string")
+          return url2;
+        var match = avatarUrl2.exec(url2);
+        if (!match)
+          return url2;
+        var existingSize = /([?&])size=([^&]*)/i;
+        var existing = Number(existingSize.exec(url2)?.[2] ?? 0);
+        if (existing >= size)
+          return url2;
+        if (existingSize.test(url2))
+          return url2.replace(existingSize, "$1size=" + size);
+        return url2 + (/[?&]$/.test(url2) ? "" : match[2] ? "&" : "?") + "size=" + size;
+      }
+    }, enabled);
+  }
+  function decodeCxMessageBase64(content) {
+    if (typeof content !== "string" || content.length > 4e3)
+      return "";
+    var results = /* @__PURE__ */ new Set();
+    for (var match of content.matchAll(/[A-Za-z0-9+/]{4,}={0,2}/g)) {
+      var [token] = match;
+      var offset = match.index;
+      if (/[\w+/=]/.test(content.charAt(offset - 1)) || /[\w+/=]/.test(content.charAt(offset + token.length)))
+        continue;
+      var encoded = token.replace(/=+$/, "");
+      if (encoded.length % 4 === 1 || encoded !== token && token.length % 4 !== 0)
+        continue;
+      var bits = 0;
+      var buffer = 0;
+      var bytes = "";
+      for (var character of encoded) {
+        buffer = buffer << 6 | base64Alphabet2.indexOf(character);
+        bits += 6;
+        if (bits >= 8) {
+          bits -= 8;
+          bytes += "%" + (buffer >> bits & 255).toString(16).padStart(2, "0");
+        }
+      }
+      if (bits && buffer & (1 << bits) - 1)
+        continue;
+      try {
+        var decoded = decodeURIComponent(bytes);
+        if (decoded.trim() && !RegExp("[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]", "u").test(decoded))
+          results.add(decoded);
+      } catch (e) {
+      }
+      if (results.size === 10)
+        break;
+    }
+    return [
+      ...results
+    ].join("\n\n");
+  }
+  function hideCxProfileBannerImages(target, keepBanner, enabled) {
+    var officialBanner = /^(?:https:)?\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/(?:banners\/(\d{17,20})\/|guilds\/\d+\/users\/(\d{17,20})\/banners\/)/i;
+    return overrideCxMethods(target, {
+      getUserBannerURL(args, invoke) {
+        var url2 = invoke(args);
+        var match = typeof url2 === "string" ? officialBanner.exec(url2) : null;
+        var owner = match?.[1] ?? match?.[2];
+        return owner && !keepBanner(owner) ? void 0 : url2;
+      }
+    }, enabled);
+  }
+  function formatCxWordCount(content) {
+    if (typeof content !== "string")
+      return;
+    var words = content.match(/\S+/g)?.length ?? 0;
+    if (words > 5)
+      return `${words} words, ${content.length} characters`;
+  }
+  var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers, base64Alphabet2;
+  var init_cxNativeEffects = __esm({
+    "src/lib/api/cxNativeEffects.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_cxProfileMenu();
+      cxNativeEffects = {
+        "user-notes": {
+          permission: "profile.localnotes",
+          label: "Add a local user note editor to profile menus"
+        },
+        "channel-notes": {
+          permission: "channels.notes",
+          label: "Add a local note editor to channel menus"
+        },
+        "user-tags": {
+          permission: "profile.localtags",
+          label: "Tag users in profile menus and search those tags on this device"
+        },
+        "silent-typing": {
+          permission: "typing.suppress",
+          label: "Stop sending your typing indicator"
+        },
+        "static-typing-dots": {
+          permission: "appearance.style",
+          label: "Keep Discord's typing dots still"
+        },
+        "code-block-gap": {
+          permission: "appearance.style",
+          label: "Remove the extra blank line after fenced code blocks"
+        },
+        "force-owner-crown": {
+          permission: "appearance.style",
+          label: "Show the server owner\u2019s native crown in the member list"
+        },
+        "spotify-song-name": {
+          permission: "appearance.style",
+          label: "Show the song title in Spotify activity status"
+        },
+        "sort-reactions-by-count": {
+          permission: "appearance.style",
+          label: "Show the most-used reactions first under each message"
+        },
+        "plus-reactions": {
+          permission: "messages.reactshortcut",
+          label: "React to the matching previous message when you send a plus shortcut"
+        },
+        "fix-file-extensions": {
+          permission: "uploads.rename",
+          label: "Use supported filename extensions for listed attachment formats"
+        },
+        "pending-friend-count": {
+          permission: "appearance.hide",
+          label: "Hide the pending friend request count"
+        },
+        "hide-role-headers": {
+          permission: "appearance.hide",
+          label: "Hide role section headers in the server member list"
+        },
+        "animated-assets": {
+          permission: "appearance.style",
+          label: "Animate avatars, banners, and server icons"
+        },
+        "floor-relative-time": {
+          permission: "appearance.style",
+          label: "Round relative timestamps down"
+        },
+        "avatar-resolution": {
+          permission: "appearance.avatarresolution",
+          label: "Request higher-resolution Discord avatars"
+        },
+        "avatar-crop-zoom": {
+          permission: "appearance.avatarcrop",
+          label: "Increase the zoom limit in Discord's avatar crop tool",
+          desktopOnly: true
+        },
+        "jumbo-emoji-limit": {
+          permission: "appearance.style",
+          label: "Change how many emoji can appear at jumbo size in an emoji-only message",
+          desktopOnly: true
+        },
+        "stop-auto-unread": {
+          permission: "notifications.preventautoupgrade",
+          label: "Keep your chosen channel notification settings"
+        },
+        "notification-volume": {
+          permission: "notifications.volume",
+          label: "Adjust the volume of Discord notifications and in-app sounds",
+          desktopOnly: true
+        },
+        "flat-attachments": {
+          permission: "appearance.style",
+          label: "Show chat attachments individually without the media grid"
+        },
+        "split-long-messages": {
+          permission: "messages.split",
+          label: "Split long drafts into at most eight messages when slowmode is off"
+        },
+        "unicode-emoji-autocomplete": {
+          permission: "appearance.hide",
+          label: "Show only standard Unicode emoji in chat autocomplete"
+        },
+        "local-emoji-autocomplete": {
+          permission: "appearance.hide",
+          label: "Show Unicode emoji and emoji from the current server in chat autocomplete"
+        },
+        "hide-disabled-emojis": {
+          permission: "appearance.hide",
+          label: "Hide unavailable emoji in Discord\u2019s emoji picker"
+        },
+        "copy-emoji-markdown": {
+          permission: "emoji.clipboard",
+          label: "Add a Copy Emoji Markdown action to the emoji menu"
+        },
+        "reverse-image-search": {
+          permission: "media.search",
+          label: "Add a Search Image action with a choice of search engines"
+        },
+        "copy-media-link": {
+          permission: "media.clipboard",
+          label: "Add a clipboard action to media and link menus"
+        },
+        "open-steam-links": {
+          permission: "links.steam",
+          label: "Send clicked Steam links to the Steam app"
+        },
+        "profile-media": {
+          permission: "profilemenu.media",
+          label: "Add View and Download actions for Discord avatars and banners"
+        },
+        "copy-channel-name": {
+          permission: "channels.clipboard",
+          label: "Add Copy Channel Name and Copy Category Name actions"
+        },
+        "copy-role-color": {
+          permission: "guild.roleclipboard",
+          label: "Copy the selected server role's hex color",
+          desktopOnly: true
+        },
+        "copy-role-mention": {
+          permission: "guild.roleclipboard",
+          label: "Copy mention markup for the selected server role",
+          desktopOnly: true
+        },
+        "view-role-icon": {
+          permission: "guild.rolemedia",
+          label: "Open the selected server role's icon in Discord's image viewer",
+          desktopOnly: true
+        },
+        "view-server-media": {
+          permission: "servers.mediaview",
+          label: "View the selected server's icon and banner",
+          desktopOnly: true
+        },
+        "copy-server-media-links": {
+          permission: "servers.mediacopy",
+          label: "Copy links to the selected server's icon and banner",
+          desktopOnly: true
+        },
+        "copy-server-details": {
+          permission: "servers.detailscopy",
+          label: "Copy the selected server's name or description",
+          desktopOnly: true
+        },
+        "view-group-dm-icon": {
+          permission: "channels.iconview",
+          label: "View the selected group DM's icon",
+          desktopOnly: true
+        },
+        "hide-suggested-channels": {
+          permission: "appearance.hide",
+          label: "Hide the suggested channels section"
+        },
+        "copy-text-attachment": {
+          permission: "attachments.clipboard",
+          label: "Copy the contents of the selected text attachment"
+        },
+        "attachment-image-quality": {
+          permission: "media.imagequality",
+          label: "Improve attachment previews and load originals in the media viewer"
+        },
+        "original-attachment-images": {
+          permission: "media.imagequality",
+          label: "Load original attachment images in chat and the media viewer"
+        },
+        "image-filename": {
+          permission: "media.labels",
+          label: "Show image filenames and GIF links"
+        },
+        "image-full-url": {
+          permission: "media.labels",
+          label: "Show the full URL of images and GIFs"
+        },
+        "descriptive-gif-alt": {
+          permission: "media.labels",
+          label: "Use meaningful filenames for GIFs with generic alt text"
+        },
+        "preserve-image-links": {
+          permission: "media.labels",
+          label: "Show image links alongside their chat previews"
+        },
+        "double-click-edit": {
+          permission: "messages.openeditor",
+          label: "Open the editor for your own message on double-click or double-tap"
+        },
+        "double-click-reply": {
+          permission: "messages.openreply",
+          label: "Open a reply to another user's message on double-click or double-tap"
+        },
+        "quick-mention": {
+          permission: "messages.insertmention",
+          label: "Insert the selected message author's mention into the current draft"
+        },
+        "plain-url-paste": {
+          permission: "messages.paste",
+          label: "Paste URLs as plain text when replacing selected text in chat",
+          desktopOnly: true
+        },
+        "no-middle-click-paste": {
+          permission: "messages.paste",
+          label: "Disable Linux middle-click paste",
+          desktopOnly: true,
+          linuxOnly: true
+        },
+        "hide-profile-banner-images": {
+          permission: "appearance.hide",
+          label: "Hide Discord-hosted profile banner images except your own and those of friends"
+        },
+        "decode-base64": {
+          permission: "messages.decode",
+          label: "Decode Base64 in the selected message and copy the result on request"
+        },
+        "copy-raw-text": {
+          permission: "messages.copytext",
+          label: "Add Copy Raw Text to message menus"
+        },
+        "copy-message-reference": {
+          permission: "messages.copyreference",
+          label: "Copy the selected message\u2019s Markdown link, timestamp, or author mention"
+        },
+        "reveal-spoilers-shortcut": {
+          permission: "messages.revealspoilers",
+          label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added",
+          desktopOnly: true
+        },
+        "reply-timestamp": {
+          permission: "messages.replytimestamp",
+          label: "Show the original message's timestamp on loaded reply previews",
+          desktopOnly: true
+        },
+        "message-latency": {
+          permission: "messages.senddelay",
+          label: "Show an estimated send-delay indicator on messages",
+          desktopOnly: true
+        },
+        "message-word-count": {
+          permission: "messages.wordcount",
+          label: "Show word and character counts below messages longer than five words"
+        },
+        "quote-message": {
+          permission: "messages.quote",
+          label: "Add Quote and Copy as Quote actions to message menus"
+        },
+        "keep-long-drafts": {
+          permission: "drafts.long",
+          label: "Preserve long drafts in Discord\u2019s local draft store"
+        },
+        "bypass-pin-prompt": {
+          permission: "messages.pin",
+          label: "Use Discord\u2019s Pin and Unpin actions without a confirmation prompt"
+        },
+        "pin-message-shortcut": {
+          permission: "messages.pin",
+          label: "Pin or unpin the selected message with one menu action"
+        },
+        "toggle-message-embeds": {
+          permission: "messages.toggleembeds",
+          label: "Suppress or unsuppress embeds in the selected message"
+        },
+        "repeat-message": {
+          permission: "messages.repeat",
+          label: "Send the selected message again with its attachments and stickers"
+        },
+        "scroll-to-latest": {
+          permission: "channels.markonopen",
+          label: "Open channels at the latest message and mark them read"
+        },
+        "show-voice-ping": {
+          permission: "voice.latency",
+          label: "Show your live call latency in milliseconds"
+        },
+        "voice-channel-count": {
+          permission: "voice.channelcount",
+          label: "Show occupancy and capacity in the channel list"
+        },
+        "webcam-start-notifier": {
+          permission: "voice.cameratone",
+          label: "Play different tones when someone turns their camera on or off"
+        },
+        "notify-when-muted": {
+          permission: "voice.mutedtone",
+          label: "Play a sound when you try to speak while muted"
+        },
+        "wait-for-slot": {
+          permission: "voice.waitslot",
+          label: "Queue for a full voice channel and respond when a slot opens"
+        },
+        "all-call-time-counter": {
+          permission: "voice.membertime",
+          label: "Show elapsed call time next to members in server voice channels"
+        },
+        "call-time-counter": {
+          permission: "voice.calltime",
+          label: "Show the elapsed time in your current call"
+        },
+        "jump-without-unblocking": {
+          permission: "messages.jumpblocked",
+          label: "Skip the blocked, ignored, or spam author prompt when jumping to a message"
+        },
+        "jump-to-message-menu": {
+          permission: "channels.searchjump",
+          label: "Jump to the first or last message from channel and message menus"
+        },
+        "jump-to-first-message": {
+          permission: "channels.jump",
+          label: "Add a channel header button to jump to the first message"
+        },
+        "read-all-servers-button": {
+          permission: "servers.markread",
+          label: "Add a server list button to mark loaded server channels as read"
+        },
+        "sticker-links": {
+          permission: "stickers.links",
+          label: "Add Copy Sticker Link and Open Sticker Link actions"
+        },
+        "clean-channel-names": {
+          permission: "appearance.style",
+          label: "Remove decorations from displayed channel names"
+        },
+        "dashless-channel-names": {
+          permission: "appearance.style",
+          label: "Replace hyphens with spaces in text channel names"
+        },
+        "title-channel-names": {
+          permission: "appearance.style",
+          label: "Format displayed server channel names as titles"
+        }
+      };
+      cxAvatarResolutions = [
+        256,
+        512,
+        1024,
+        2048,
+        4096
+      ];
+      extensionGroups = {
+        ogg: [
+          "ogv",
+          "oga",
+          "ogx",
+          "ogm",
+          "spx",
+          "aac",
+          "wma"
+        ],
+        jpg: [
+          "jpe",
+          "jif",
+          "jfi",
+          "pjpeg",
+          "pjp",
+          "bmp",
+          "tiff",
+          "tif"
+        ],
+        svg: [
+          "svgz",
+          "ai",
+          "eps"
+        ],
+        mp4: [
+          "m4v",
+          "m4r",
+          "m4p",
+          "avi",
+          "mkv",
+          "wmv",
+          "flv",
+          "3gp"
+        ],
+        m4a: [
+          "m4b",
+          "aiff"
+        ],
+        mov: [
+          "movie",
+          "qt",
+          "asf",
+          "rm",
+          "rmvb"
+        ],
+        png: [
+          "ico",
+          "cur"
+        ]
+      };
+      replacementExtensions = new Map(Object.entries(extensionGroups).flatMap(([extension, aliases]) => aliases.map((alias) => [
+        alias,
+        extension
+      ])));
+      roundingUsers = /* @__PURE__ */ new WeakMap();
+      overrideLayers = /* @__PURE__ */ new WeakMap();
+      base64Alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    }
+  });
+
+  // src/lib/api/cxPreviousMessage.ts
+  function parseCxPreviousRule(line) {
+    if (line === "  before send correct-previous")
+      return {
+        kind: "correct"
+      };
+    var match = /^  before send merge-previous ([1-9]|[12][0-9]|30)( space)?$/.exec(line);
+    if (match)
+      return {
+        kind: "merge",
+        seconds: Number(match[1]),
+        space: Boolean(match[2])
+      };
+  }
+  function planCxPreviousEdit(rule, channel, currentUser, draft, previous, now) {
+    if (!currentUser || !draft.trim() || draft.length > 2e3)
+      return;
+    var sed = correction.exec(draft.trim());
+    if (rule.kind === "correct" && (!sed || sed[1].length > 240 || sed[3].length !== new Set(sed[3]).size))
+      return;
+    if (rule.kind === "merge" && sed)
+      return;
+    var message = previous();
+    if (!message?.id || message.author?.id !== currentUser || typeof message.content !== "string" || message.attachments?.length || (message.channel_id ?? message.channelId ?? channel) !== channel)
+      return;
+    var content;
+    if (rule.kind === "correct" && sed) {
+      var literal = unescapeSed(sed[1]).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      content = message.content.replace(new RegExp(literal, sed[3]), () => unescapeSed(sed[2]));
+    } else if (rule.kind === "merge") {
+      if (message.type !== void 0 && message.type !== 0)
+        return;
+      var time = Number(new Date(message.timestamp));
+      var age = now - time;
+      if (!(age >= 0 && age < rule.seconds * 1e3))
+        return;
+      content = message.content + (rule.space ? " " : "\n") + draft;
+    }
+    if (!content?.trim() || content.length > 2e3 || content === message.content)
+      return;
+    return {
+      id: message.id,
+      content
+    };
+  }
+  function createCxPreviousSendHandler(rule, host) {
+    var editing = /* @__PURE__ */ new Set();
+    return (channel, draft, hasExtraContent) => {
+      if (hasExtraContent || typeof draft !== "string" || editing.has(channel))
+        return;
+      var plan = planCxPreviousEdit(rule, channel, host.currentUser(), draft, () => host.previous(channel, rule.kind === "correct"), Date.now());
+      if (!plan)
+        return;
+      editing.add(channel);
+      return Promise.resolve().then(() => host.edit(channel, plan.id, plan.content)).catch(() => {
+        try {
+          host.error();
+        } catch (e) {
+        }
+      }).finally(() => editing.delete(channel));
+    };
+  }
+  var correction, unescapeSed;
+  var init_cxPreviousMessage = __esm({
+    "src/lib/api/cxPreviousMessage.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      correction = /^s\/((?:\\.|[^/])+)\/((?:\\.|[^/])*)\/([gi]*)$/;
+      unescapeSed = (text) => text.replace(/\\([/\\])/g, "$1");
+    }
+  });
+
+  // src/lib/api/cxTextRules.ts
+  function parseCxTextRule(line, quoted2) {
+    var replacement = replace.exec(line);
+    if (replacement) {
+      var [, alternatives, value, ignoreCase, wholeWord] = replacement;
+      var words;
+      try {
+        words = JSON.parse(alternatives);
+      } catch (e) {
+        throw new Error("Use a list of literal text alternatives");
+      }
+      if (!Array.isArray(words) || words.length < 1 || words.length > 16 || new Set(words).size !== words.length || words.some((word) => typeof word !== "string" || !word.trim() || word.length > 64 || RegExp("[\\x00-\\x1f\\x7f-\\x9f\\u202a-\\u202e\\u2066-\\u2069]", "u").test(word)))
+        throw new Error("Use up to 16 distinct, nonempty text alternatives");
+      if (wholeWord && words.some((word) => !RegExp("^\\w(?:.*\\w)?$", "u").test(word)))
+        throw new Error("Whole-word alternatives must begin and end with word characters");
+      var boundary = wholeWord ? "\\b" : "";
+      return {
+        kind: "replace",
+        pattern: new RegExp(boundary + "(?:" + words.map(escape).join("|") + ")" + boundary, ignoreCase ? "gi" : "g"),
+        replacement: quoted2(value, 64, true)
+      };
+    }
+    var prepend = prefix.exec(line);
+    if (prepend)
+      return {
+        kind: "prefix",
+        value: quoted2(prepend[1], 64)
+      };
+    if (line === "    alternate-case")
+      return {
+        kind: "alternate-case"
+      };
+    var shorten = shortenRun.exec(line);
+    if (shorten) {
+      var letter = quoted2(shorten[1], 1);
+      return {
+        kind: "shorten-run",
+        pattern: new RegExp(escape(letter) + "+", "g"),
+        fill: quoted2(shorten[2], 1)
+      };
+    }
+    throw new Error("Unknown text rewrite rule");
+  }
+  function applyCxTextRules(text, rules) {
+    var _loop2 = function(rule2) {
+      if (rule2.kind === "prefix") {
+        parts[0] = rule2.value + parts[0];
+        return "continue";
+      }
+      var upper = true;
+      var length = 0;
+      for (var i = 0; i < parts.length; i++) {
+        if (i % 2 === 0) {
+          if (rule2.kind === "replace")
+            parts[i] = parts[i].replace(rule2.pattern, () => rule2.replacement);
+          else if (rule2.kind === "shorten-run")
+            parts[i] = parts[i].replace(rule2.pattern, (run) => rule2.fill.repeat(Math.max(1, run.length - 1)) + run[0]);
+          else
+            parts[i] = parts[i].replace(/[a-z]/gi, (letter) => {
+              var value = upper ? letter.toUpperCase() : letter.toLowerCase();
+              upper = !upper;
+              return value;
+            });
+        }
+        length += parts[i].length;
+        if (length > 4e3)
+          return {
+            v: text
+          };
+      }
+    };
+    if (!text.trim())
+      return text;
+    var parts = text.split(links);
+    for (var rule of rules) {
+      var _ret = _loop2(rule);
+      if (_type_of(_ret) === "object")
+        return _ret.v;
+    }
+    return parts.join("");
+  }
+  var quotedText, replace, prefix, shortenRun, escape, links;
+  var init_cxTextRules = __esm({
+    "src/lib/api/cxTextRules.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_type_of();
+      quotedText = '"(?:[^"\\\\]|\\\\.)*"';
+      replace = new RegExp(`^    replace (\\[.{1,1800}\\]) with (${quotedText})( ignore-case)?( whole-word)?$`);
+      prefix = new RegExp(`^    prefix (${quotedText})$`);
+      shortenRun = new RegExp(`^    shorten-run (${quotedText}) with (${quotedText})$`);
+      escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      links = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+    }
+  });
+
   // src/lib/api/cxTimestamps.ts
   function formatCxTimestamp(input, surface, formats) {
     var template = formats?.[surface];
@@ -49142,6 +50297,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           avatarCropOptions = {
             maxAvatarCropZoom: Number(zoom)
           };
+        } else if (name3 === "jumbo-emoji-limit") {
+          var limit = effect2[2] ?? "50";
+          if (limit !== "unlimited" && (!/^(?:0|[1-9]\d{0,2})$/.test(limit) || Number(limit) > 200))
+            throw new Error("Choose a jumbo emoji limit from 0 to 200, or unlimited");
+          jumboEmojiOptions = {
+            jumboEmojiLimit: limit === "unlimited" ? Infinity : Number(limit)
+          };
         } else if (name3 === "notification-volume") {
           var volume = effect2[2] ?? "100";
           if (!/^(?:100|[1-9]?\d)$/.test(volume))
@@ -49587,6 +50749,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var hasTimestampSurface = false;
     var avatarResolution;
     var avatarCropOptions;
+    var jumboEmojiOptions;
     var notificationVolumeOptions;
     var messageLatencyOptions;
     var voiceMemberOptions;
@@ -49685,6 +50848,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ],
       avatarResolution,
       avatarCropOptions,
+      jumboEmojiOptions,
       notificationVolumeOptions,
       messageLatencyOptions,
       voiceMemberOptions,
@@ -49724,6 +50888,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         max: 16,
         unit: "\xD7"
       });
+    if (document.jumboEmojiOptions && Number.isFinite(document.jumboEmojiOptions.jumboEmojiLimit))
+      numberOptions.push({
+        effect: "jumbo-emoji-limit",
+        label: "Jumbo emoji limit",
+        value: document.jumboEmojiOptions.jumboEmojiLimit,
+        min: 0,
+        max: 200,
+        unit: ""
+      });
     if (document.notificationVolumeOptions)
       numberOptions.push({
         effect: "notification-volume",
@@ -49760,6 +50933,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           return label2 + " (" + document.avatarResolution + " px)";
         if (effect === "avatar-crop-zoom")
           return label2 + " (" + document.avatarCropOptions.maxAvatarCropZoom + "\xD7)";
+        if (effect === "jumbo-emoji-limit") {
+          var limit = document.jumboEmojiOptions.jumboEmojiLimit;
+          return label2 + " (" + (Number.isFinite(limit) ? limit : "unlimited") + ")";
+        }
         if (effect === "notification-volume")
           return label2 + " (" + document.notificationVolumeOptions.notificationVolume + "%)";
         if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
@@ -50201,6 +51378,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
       var nativeOptions = {
         "avatar-crop-zoom": document.avatarCropOptions,
+        "jumbo-emoji-limit": document.jumboEmojiOptions,
         "notification-volume": document.notificationVolumeOptions,
         "message-latency": document.messageLatencyOptions,
         "all-call-time-counter": document.voiceMemberOptions,
@@ -51973,6 +53151,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-server-banners.cx
+  var hide_server_banners_default;
+  var init_hide_server_banners = __esm({
+    "../examples/cx/catalog/plugins/hide-server-banners.cx"() {
+      hide_server_banners_default = 'plugin "HideServerBanners":\n  needs appearance.hide\n  hide server-banners\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-shop-tab.cx
   var hide_shop_tab_default;
   var init_hide_shop_tab = __esm({
@@ -52410,6 +53596,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_more_commands = __esm({
     "../examples/cx/catalog/plugins/more-commands.cx"() {
       more_commands_default = 'plugin "MoreCommands":\n  needs commands.register\n  needs messages.send\n  needs reply.local\n  on command "choose":\n    input "choices" text\n    send "${choose(choices)}" else "Give me some choices, separated by commas."\n  on command "flipcoin":\n    send one of ["Heads", "Tails"]\n  on command "rolldice":\n    input "sides" integer optional\n    send "${roll(sides)}" else "Enter a positive number of sides."\n  on command "randomnumber":\n    input "min" integer\n    input "max" integer\n    send "${randomNumber(min, max)}" else "Enter a smaller range."\n  on command "wordcount" with text:\n    reply "${wordCount(text)}"\n  on command "transform" with text:\n    input "style" choice "upper,lower,reverse,locale-upper,locale-lower,same"\n    input "repeat" integer optional\n    input "reverse" boolean optional\n    input "normalize" choice "NFC,NFD,NFKC,NFKD" optional\n    send "${transform(text, style, repeat, reverse, normalize)}" else "Use a positive repeat count and keep the result under 4,001 characters."\n  on command "ask" with text:\n    send "${ask(text)}"\n  on command "gettime":\n    send "${currentTime()}"\n  on command "echo":\n    input "message" text optional\n    reply "${message}"\n  on command "lenny":\n    input "message" text optional\n    send "${message} ( \u0361\xB0 \u035C\u0296 \u0361\xB0)"\n  on command "mock" with text:\n    send "${mock(text)}"\n  on command "morse" with text:\n    send "${morse(text)}"\n  on command "dissatisfaction":\n    input "message" text optional\n    send "${message}  \uFF1E\uFE4F\uFF1C"\n  on command "smug":\n    input "message" text optional\n    send "${message} \u0CA0_\u0CA0"\n  on command "happy":\n    input "message" text optional\n    send "${message} \u30FD(\xB4\u25BD`)/"\n  on command "crying":\n    input "message" text optional\n    send "${message} \u0CA5_\u0CA5"\n  on command "angry":\n    input "message" text optional\n    send "${message} \u30FD(\uFF40\u0414\xB4)\uFF89"\n  on command "anger":\n    input "message" text optional\n    send "${message} \u30FD(\uFF4F`\u76BF\u2032\uFF4F)\uFF89"\n  on command "joy":\n    input "message" text optional\n    send "${message} <(\uFFE3\uFE36\uFFE3)>"\n  on command "blush":\n    input "message" text optional\n    send "${message} \u0AEE \u02F6\u1D54 \u1D55 \u1D54\u02F6 \u10D0"\n  on command "confused":\n    input "message" text optional\n    send "${message} (\u2022\u0E34_\u2022\u0E34)?"\n  on command "sleeping":\n    input "message" text optional\n    send "${message} (\u1D17_\u1D17)"\n  on command "laughing":\n    input "message" text optional\n    send "${message} o(\u2267\u25BD\u2266)o"\n  on command "giving":\n    input "message" text optional\n    send "${message} (\uFF89\u25D5\u30EE\u25D5)\uFF89*:\uFF65\uFF9F\u2727"\n  on command "peace":\n    input "message" text optional\n    send "${message} \u270C(\u25D5\u203F-)\u270C"\n  on command "ending1":\n    input "message" text optional\n    send "${message} \u13EA \u08EA\u05B8 \u06F0 \u0359\u22B9"\n  on command "uwu":\n    input "message" text optional\n    send "${message} (>\u2A4A<)"\n  on command "comfy":\n    input "message" text optional\n    send "${message} (\u2500\u203F\u203F\u2500)\u2661"\n  on command "lovehappy":\n    input "message" text optional\n    send "${message} (*\u2267\u03C9\u2266*)"\n  on command "loveee":\n    input "message" text optional\n    send "${message} (\u2044 \u2044>\u2044 \u25BD \u2044<\u2044 \u2044)"\n  on command "give":\n    input "message" text optional\n    send "${message} (\u30CE= \u2A4A = )\u30CE"\n  on command "lovegive":\n    input "message" text optional\n    send "${message} \u10E6\u309D\u25E1\u2579)\u30CE\u2661"\n  on command "music":\n    input "message" text optional\n    send "${message} (\uFFE3\u25BD\uFFE3)/\u266B\u2022\xA8\u2022.\xB8\xB8\u266A"\n  on command "stars":\n    input "message" text optional\n    send "${message} .\u{16954} \u0741 \u02D6\u0E4B \u08ED \u2B51"\n  on command "lovegiving":\n    input "message" text optional\n    send "${message} \u2E1C(\uFF61\u02C3 \u1D55 \u02C2 )\u2E1D\u2661"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/more-jumbo-emoji.cx
+  var more_jumbo_emoji_default;
+  var init_more_jumbo_emoji = __esm({
+    "../examples/cx/catalog/plugins/more-jumbo-emoji.cx"() {
+      more_jumbo_emoji_default = 'plugin "MoreJumboEmoji":\n  needs appearance.style\n  use jumbo-emoji-limit\n';
     }
   });
 
@@ -54511,6 +55705,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_scrollbars();
       init_hide_send_button();
       init_hide_server_banner();
+      init_hide_server_banners();
       init_hide_shop_tab();
       init_hide_soundboard_nitro_banner();
       init_hide_spoiler_warnings();
@@ -54566,6 +55761,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_message_notifier();
       init_monospace_chat();
       init_more_commands();
+      init_more_jumbo_emoji();
       init_muted_channels_faded();
       init_narrow_channel_list();
       init_nepeta_s_typing_quirk();
@@ -56235,6 +57431,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "825488db0fc80c0d1087857297d001e600e4f5a1d5df8f6d3c3c683800448993"
           },
           {
+            name: "HideServerBanners",
+            source: hide_server_banners_default,
+            description: "Hide Hides banners at the top of server channel lists",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
             name: "HideShopTab",
             source: hide_shop_tab_default,
             description: "Hide the Shop entry",
@@ -56790,6 +57995,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat",
               "Commands"
+            ]
+          },
+          {
+            name: "MoreJumboEmoji",
+            source: more_jumbo_emoji_default,
+            description: "Change how many emoji can appear at jumbo size in an emoji-only message (50)",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
             ]
           },
           {
@@ -58796,7 +60010,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var CxExtensions_exports = {};
   __export(CxExtensions_exports, {
     default: () => CxExtensions,
-    restoreRememberedCxAppearance: () => restoreRememberedCxAppearance
+    disableCxAddon: () => disableCxAddon,
+    restoreRememberedCxAppearance: () => restoreRememberedCxAppearance,
+    useCxAddonRows: () => useCxAddonRows
   });
   function registerTimestampFormats(formats) {
     if (!stopTimestamps) {
@@ -58906,7 +60122,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     };
   }
   function NavigationButton({ label: label2, text, onPress }) {
-    return /* @__PURE__ */ jsx(import_react_native43.Pressable, {
+    return /* @__PURE__ */ jsx(import_react_native48.Pressable, {
       accessibilityRole: "button",
       accessibilityLabel: label2,
       onPress,
@@ -58916,7 +60132,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         alignItems: "center",
         justifyContent: "center"
       },
-      children: /* @__PURE__ */ jsx(import_react_native43.Text, {
+      children: /* @__PURE__ */ jsx(import_react_native48.Text, {
         style: {
           color: resolveSemanticColor(semanticColors.INTERACTIVE_TEXT_DEFAULT),
           fontSize: text === "\u2191" ? 20 : 10,
@@ -58930,7 +60146,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var latency = React2.useSyncExternalStore(voicePing.subscribe, () => voicePing.read(channelId));
     if (!latency || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsx(import_react_native43.Text, {
+    return /* @__PURE__ */ jsx(import_react_native48.Text, {
       accessibilityLabel: "Voice latency",
       style: {
         textAlign: "center",
@@ -58947,7 +60163,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var elapsed = React2.useSyncExternalStore(callClock.subscribe, () => callClock.read(channelId));
     if (!elapsed || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsxs(import_react_native43.Text, {
+    return /* @__PURE__ */ jsxs(import_react_native48.Text, {
       style: {
         textAlign: "center",
         fontSize: 12,
@@ -58967,7 +60183,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       userId
     ]);
     var elapsed = React2.useSyncExternalStore(subscribe, () => voiceMemberClock.read(userId, channelId));
-    return elapsed ? /* @__PURE__ */ jsx(import_react_native43.Text, {
+    return elapsed ? /* @__PURE__ */ jsx(import_react_native48.Text, {
       accessibilityLabel: "Call time " + elapsed,
       style: {
         marginStart: 6,
@@ -58984,20 +60200,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var count = React2.useSyncExternalStore(voiceCounts.subscribe, () => voiceCounts.read(channel));
     if (!count)
       return content;
-    return /* @__PURE__ */ jsxs(import_react_native43.View, {
+    return /* @__PURE__ */ jsxs(import_react_native48.View, {
       style: {
         flex: 1,
         flexDirection: "row",
         alignItems: "center"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native43.View, {
+        /* @__PURE__ */ jsx(import_react_native48.View, {
           style: {
             flex: 1
           },
           children: content
         }),
-        /* @__PURE__ */ jsx(import_react_native43.Text, {
+        /* @__PURE__ */ jsx(import_react_native48.Text, {
           accessibilityLabel: "Voice occupancy " + count,
           style: {
             marginStart: 4,
@@ -59316,7 +60532,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             pending2 = void 0;
         };
         try {
-          import_react_native43.Alert.alert("Confirm message", body, [
+          import_react_native48.Alert.alert("Confirm message", body, [
             {
               text: "Cancel",
               style: "cancel",
@@ -59472,7 +60688,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   label: "Open Sticker Link",
                   onPress: () => {
                     if (enabled())
-                      void import_react_native43.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
+                      void import_react_native48.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
                   }
                 })
               ]
@@ -59583,7 +60799,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             label: label2,
             onPress: () => {
               if (enabled())
-                void import_react_native43.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
+                void import_react_native48.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
             }
           }))
         });
@@ -59602,7 +60818,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var name = getCxImageTitle(link, full);
       return name ? () => {
         if (enabled())
-          import_react_native43.Alert.alert(label2, name);
+          import_react_native48.Alert.alert(label2, name);
       } : void 0;
     });
     return () => {
@@ -60006,20 +61222,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           borderRadius: 3,
           backgroundColor
         };
-        return /* @__PURE__ */ jsxs(import_react_native43.View, {
+        return /* @__PURE__ */ jsxs(import_react_native48.View, {
           style: {
             flexDirection: "row",
             gap: 4
           },
           accessible: false,
           children: [
-            /* @__PURE__ */ jsx(import_react_native43.View, {
+            /* @__PURE__ */ jsx(import_react_native48.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native43.View, {
+            /* @__PURE__ */ jsx(import_react_native48.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native43.View, {
+            /* @__PURE__ */ jsx(import_react_native48.View, {
               style: dot
             })
           ]
@@ -60123,7 +61339,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     ], (element) => {
       if (element.key !== "guild-channel-user-list" || element.props.getItemSize != null)
         return element;
-      if (import_react_native43.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
+      if (import_react_native48.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
         return element;
       return React2.cloneElement(element, {
         getItemSize: 44
@@ -60412,7 +61628,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         return getCxVoiceQueueRoom(channel, voice.getVoiceStatesForChannel(id));
       },
       join: (id) => actions.selectVoiceChannel(id),
-      prompt: (title, body, label2, confirm, cancel) => import_react_native43.Alert.alert(title, body, [
+      prompt: (title, body, label2, confirm, cancel) => import_react_native48.Alert.alert(title, body, [
         {
           text: "Cancel",
           style: "cancel",
@@ -61215,9 +62431,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var pageSize = 8;
     var search = query.trim().toLowerCase();
     var matches = items.filter((item) => item.name.toLowerCase().includes(search));
-    return /* @__PURE__ */ jsxs(import_react_native43.View, {
+    return /* @__PURE__ */ jsxs(import_react_native48.View, {
       children: [
-        /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+        /* @__PURE__ */ jsx(import_react_native48.TextInput, {
           accessibilityLabel: "Search saved channels",
           placeholder: "Search saved channels",
           value: query,
@@ -61230,7 +62446,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
           }
         }),
-        /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
+        /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
           style: {
             maxHeight: 270
           },
@@ -61281,7 +62497,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var draft = initial;
       openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
         title: label2,
-        extraContent: /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+        extraContent: /* @__PURE__ */ jsx(import_react_native48.TextInput, {
           accessibilityLabel: tags ? "Private tags" : "Private note",
           defaultValue: initial,
           multiline: true,
@@ -61364,7 +62580,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       findLocalUserTags = notes.search;
     else
       clearLocalNotes[kind] = () => {
-        void notes.clear(() => new Promise((resolve) => import_react_native43.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
+        void notes.clear(() => new Promise((resolve) => import_react_native48.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
           {
             text: "Cancel",
             style: "cancel",
@@ -61436,7 +62652,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               if (asset.kind === "Avatar")
                 open(512, 512);
               else
-                import_react_native43.Image.getSize(asset.url, open, () => open(1024, 384));
+                import_react_native48.Image.getSize(asset.url, open, () => open(1024, 384));
             }
           },
           {
@@ -61515,7 +62731,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           },
           openLink: (link, channel, user) => setTimeout(() => {
             if (active && !settings.safeMode?.enabled && context.currentUser() === user && context.selectedChannel() === channel)
-              void import_react_native43.Linking.openURL(link).catch(() => {
+              void import_react_native48.Linking.openURL(link).catch(() => {
               });
           }, 0),
           notify: (body) => setTimeout(() => {
@@ -61717,7 +62933,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var link = getCxSteamLink(options.href);
                 if (!link?.mobile || blockedDomains.isBlockedDomain(link.https) !== null)
                   return invoke(args);
-                void import_react_native43.Linking.openURL(link.https).catch(() => {
+                void import_react_native48.Linking.openURL(link.https).catch(() => {
                   if (enabled())
                     showToast("Couldn't open the Steam link.");
                 });
@@ -61832,7 +63048,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   label: "Decode Base64",
                   run() {
                     close();
-                    import_react_native43.Alert.alert("Decoded Base64", decoded, [
+                    import_react_native48.Alert.alert("Decoded Base64", decoded, [
                       {
                         text: "Close",
                         style: "cancel"
@@ -62257,7 +63473,40 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       refreshRememberedAppearance();
     };
   }
-  function CxExtensions() {
+  function useCxAddonRows(kind) {
+    var revision = React2.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
+    return React2.useMemo(() => {
+      var entries2 = kind === "plugin" ? mobileCatalogPlugins : cxCatalog.themes;
+      var catalog = entries2.map((entry) => {
+        var id = kind === "theme" ? "theme" : "plugin:" + entry.name;
+        var current = session.source(id);
+        return {
+          ...entry,
+          id,
+          active: current !== void 0 && (kind === "plugin" || current === entry.source)
+        };
+      });
+      var imported = session.list().filter(({ id, name }) => id === "theme" === (kind === "theme") && !catalog.some((entry) => entry.name === name)).map(({ id, name }) => ({
+        id,
+        name,
+        source: session.source(id),
+        active: true
+      }));
+      return [
+        ...catalog,
+        ...imported
+      ];
+    }, [
+      kind,
+      revision
+    ]);
+  }
+  function disableCxAddon(id, name) {
+    forgetRememberedAppearance(name);
+    session.disable(id);
+    refreshRememberedAppearance();
+  }
+  function CxExtensions({ kind, entry } = {}) {
     var [source, setSource] = React2.useState("");
     var [showCatalog, setShowCatalog] = React2.useState(false);
     var [search, setSearch] = React2.useState("");
@@ -62276,6 +63525,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       setCandidate(void 0);
       try {
         var preview2 = reviewCx(next);
+        if (kind && preview2.kind !== kind)
+          throw new Error(`Open this file from ${preview2.kind === "theme" ? "Themes" : "Plugins"}.`);
         setCandidate({
           source: next,
           review: preview2,
@@ -62286,6 +63537,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         setStatus(String(error instanceof Error ? error.message : error));
       }
     }
+    React2.useEffect(() => {
+      if (!entry || entry.active)
+        return;
+      setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");
+      review(entry.source);
+    }, [
+      entry
+    ]);
     function openFile() {
       return _async_to_generator(function* () {
         var id = ++selection.current;
@@ -62340,9 +63599,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         }
       } catch (error) {
         setStatus(String(error instanceof Error ? error.message : error));
+      } finally {
+        refreshRememberedAppearance();
       }
     }
-    return /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16
@@ -62350,7 +63611,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 16,
         children: [
-          /* @__PURE__ */ jsx(TableRowGroup, {
+          !kind && /* @__PURE__ */ jsx(TableRowGroup, {
             title: "CX catalog",
             children: /* @__PURE__ */ jsx(TableRow, {
               label: showCatalog ? "Hide catalog" : "Browse catalog",
@@ -62358,9 +63619,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               onPress: () => setShowCatalog(!showCatalog)
             })
           }),
-          showCatalog && /* @__PURE__ */ jsxs(Fragment, {
+          !kind && showCatalog && /* @__PURE__ */ jsxs(Fragment, {
             children: [
-              /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+              /* @__PURE__ */ jsx(import_react_native48.TextInput, {
                 accessibilityLabel: "Search CX catalog",
                 placeholder: "Search name, feature or /command",
                 placeholderTextColor: "#b5bac1",
@@ -62379,13 +63640,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   padding: 12
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native43.View, {
+              /* @__PURE__ */ jsx(import_react_native48.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 6
                 },
-                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native43.Pressable, {
+                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native48.Pressable, {
                   accessibilityRole: "button",
                   accessibilityLabel: `Filter by ${value}`,
                   accessibilityState: {
@@ -62407,7 +63668,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     borderColor: resolveSemanticColor(category === value ? semanticColors.INTERACTIVE_TEXT_DEFAULT : semanticColors.BORDER_SUBTLE),
                     backgroundColor: resolveSemanticColor(semanticColors.CARD_BACKGROUND_DEFAULT)
                   },
-                  children: /* @__PURE__ */ jsx(import_react_native43.Text, {
+                  children: /* @__PURE__ */ jsx(import_react_native48.Text, {
                     style: {
                       color: resolveSemanticColor(semanticColors.TEXT_DEFAULT),
                       fontWeight: category === value ? "700" : "400"
@@ -62436,57 +63697,57 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   "Themes",
                   cxCatalog.themes
                 ]
-              ].map(([kind, entries2]) => {
-                if (category !== "All" && kind === "Themes" !== (category === "Themes"))
+              ].map(([kind2, entries2]) => {
+                if (category !== "All" && kind2 === "Themes" !== (category === "Themes"))
                   return null;
-                var isActive = (entry) => session.source(kind === "Themes" ? "theme" : "plugin:" + entry.name) === entry.source;
+                var isActive = (entry2) => session.source(kind2 === "Themes" ? "theme" : "plugin:" + entry2.name) === entry2.source;
                 var matches = searchCxCatalog(activeOnly ? entries2.filter(isActive) : entries2, search, category);
-                var page = Math.min(pages[kind], Math.max(0, Math.ceil(matches.length / 12) - 1));
+                var page = Math.min(pages[kind2], Math.max(0, Math.ceil(matches.length / 12) - 1));
                 var start = page * 12;
                 return /* @__PURE__ */ jsxs(TableRowGroup, {
-                  title: `${kind} (${matches.length})`,
+                  title: `${kind2} (${matches.length})`,
                   children: [
-                    matches.slice(start, start + 12).map((entry) => /* @__PURE__ */ jsx(TableRow, {
-                      label: entry.name,
-                      subLabel: isActive(entry) ? [
+                    matches.slice(start, start + 12).map((entry2) => /* @__PURE__ */ jsx(TableRow, {
+                      label: entry2.name,
+                      subLabel: isActive(entry2) ? [
                         "Active",
-                        entry.description
-                      ].filter(Boolean).join(" \xB7 ") : entry.description,
+                        entry2.description
+                      ].filter(Boolean).join(" \xB7 ") : entry2.description,
                       onPress: () => {
                         setShowCatalog(false);
-                        setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");
-                        review(entry.source);
+                        setSource(entry2.source.length <= CX_INLINE_EDITOR_LIMIT ? entry2.source : "");
+                        review(entry2.source);
                       }
-                    }, entry.name)),
+                    }, entry2.name)),
                     page > 0 && /* @__PURE__ */ jsx(TableRow, {
-                      label: `Previous ${kind.toLowerCase()} page`,
+                      label: `Previous ${kind2.toLowerCase()} page`,
                       onPress: () => setPages({
                         ...pages,
-                        [kind]: page - 1
+                        [kind2]: page - 1
                       })
                     }),
                     start + 12 < matches.length && /* @__PURE__ */ jsx(TableRow, {
-                      label: `Next ${kind.toLowerCase()} page`,
+                      label: `Next ${kind2.toLowerCase()} page`,
                       onPress: () => setPages({
                         ...pages,
-                        [kind]: page + 1
+                        [kind2]: page + 1
                       })
                     }),
                     !matches.length && /* @__PURE__ */ jsx(TableRow, {
                       label: "No matches"
                     })
                   ]
-                }, kind);
+                }, kind2);
               })
             ]
           }),
-          /* @__PURE__ */ jsx(import_react_native43.Text, {
+          !entry && /* @__PURE__ */ jsx(import_react_native48.Text, {
             style: {
               color: "#b5bac1"
             },
             children: "Paste the contents of a .cx file to review it."
           }),
-          /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+          !entry && /* @__PURE__ */ jsx(import_react_native48.TextInput, {
             accessibilityLabel: "CX source",
             placeholder: 'theme "Midnight":',
             placeholderTextColor: "#b5bac1",
@@ -62508,14 +63769,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             }
           }),
           /* @__PURE__ */ jsxs(TableRowGroup, {
-            title: "CX Extensions",
+            title: kind ? entry?.name ?? `Import ${kind}` : "CX Extensions",
             children: [
-              /* @__PURE__ */ jsx(TableRow, {
+              !entry && /* @__PURE__ */ jsx(TableRow, {
                 label: "Open a .cx file",
                 onPress: openFile
               }),
-              /* @__PURE__ */ jsx(TableRow, {
-                label: "Review CX",
+              !entry && /* @__PURE__ */ jsx(TableRow, {
+                label: kind ? "Review" : "Review CX",
                 onPress: () => review(source)
               }),
               candidate && /* @__PURE__ */ jsx(TableRow, {
@@ -62543,13 +63804,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 label: "Allow and remember on this device",
                 onPress: () => enable(true)
               }),
-              candidate && !source && /* @__PURE__ */ jsx(TableRow, {
-                label: "Edit CX source",
+              candidate && !entry && !source && /* @__PURE__ */ jsx(TableRow, {
+                label: "Edit source",
                 onPress: () => setSource(candidate.source)
               }),
-              session.list().flatMap(({ id, name }) => {
-                var entry = rememberedCatalog.get(name);
-                var saved = entry?.source === session.source(id) ? remembered.find((item) => item.name === name && item.revision === entry?.appearanceRevision) : void 0;
+              session.list().filter(({ id, name }) => !kind || entry?.id === id && entry.name === name).flatMap(({ id, name }) => {
+                var _$entry = rememberedCatalog.get(name);
+                var saved = _$entry?.source === session.source(id) ? remembered.find((item) => item.name === name && item.revision === _$entry?.appearanceRevision) : void 0;
                 return [
                   ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label: label2, enabled }) => /* @__PURE__ */ jsx(TableSwitchRow, {
                     label: `${name} \xB7 ${label2}`,
@@ -62574,9 +63835,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     subLabel: saved ? "Remembered on this device" : void 0,
                     onPress: () => {
                       try {
-                        if (saved)
-                          forgetRememberedAppearance(name);
-                        session.disable(id);
+                        disableCxAddon(id, name);
                         setStatus(`${name} disabled.`);
                       } catch (error) {
                         setStatus(String(error instanceof Error ? error.message : error));
@@ -62586,8 +63845,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 ];
               }),
               remembered.filter((saved) => {
-                var entry = rememberedCatalog.get(saved.name);
-                return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
+                var _$entry = rememberedCatalog.get(saved.name);
+                if (kind && _$entry?.id === "theme" !== (kind === "theme"))
+                  return false;
+                return !_$entry || _$entry.appearanceRevision !== saved.revision || session.source(_$entry.id) !== _$entry.source;
               }).map((saved) => /* @__PURE__ */ jsx(TableRow, {
                 label: `Forget ${saved.name}`,
                 subLabel: settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered extension is inactive",
@@ -62600,21 +63861,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   }
                 }
               }, saved.name)),
-              clearLocalNotes.notes && /* @__PURE__ */ jsx(TableRow, {
+              kind !== "theme" && !entry && clearLocalNotes.notes && /* @__PURE__ */ jsx(TableRow, {
                 label: "Clear local user notes",
                 onPress: clearLocalNotes.notes
               }),
-              browseLocalChannelNotes && /* @__PURE__ */ jsx(TableRow, {
+              kind !== "theme" && !entry && browseLocalChannelNotes && /* @__PURE__ */ jsx(TableRow, {
                 label: "Browse channel notes",
                 onPress: browseLocalChannelNotes
               }),
-              clearLocalNotes.channels && /* @__PURE__ */ jsx(TableRow, {
+              kind !== "theme" && !entry && clearLocalNotes.channels && /* @__PURE__ */ jsx(TableRow, {
                 label: "Clear local channel notes",
                 onPress: clearLocalNotes.channels
               })
             ]
           }),
-          /* @__PURE__ */ jsx(import_react_native43.Text, {
+          /* @__PURE__ */ jsx(import_react_native48.Text, {
             accessibilityLiveRegion: "polite",
             style: {
               color: "#b5bac1"
@@ -62625,7 +63886,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, rememberedAppearanceListeners, rememberedAppearanceUpdates;
+  var import_react_native48, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, rememberedAppearanceListeners, rememberedAppearanceUpdates;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -62669,7 +63930,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cx();
       init_common();
       init_components();
-      import_react_native43 = __toESM(require_react_native());
+      import_react_native48 = __toESM(require_react_native());
       session = createCxSession();
       callClock = createCxCallClock();
       voiceMemberClock = createCxVoiceMemberClock();
@@ -62770,12 +64031,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerHiddenAppearancePaths(mobile.hideComponentPaths);
           if ("scrollIndicators" in mobile) {
             var scrollViews = /* @__PURE__ */ new Set([
-              import_react_native43.ScrollView,
-              import_react_native43.FlatList,
-              import_react_native43.SectionList,
-              import_react_native43.Animated?.ScrollView,
-              import_react_native43.Animated?.FlatList,
-              import_react_native43.Animated?.SectionList
+              import_react_native48.ScrollView,
+              import_react_native48.FlatList,
+              import_react_native48.SectionList,
+              import_react_native48.Animated?.ScrollView,
+              import_react_native48.Animated?.FlatList,
+              import_react_native48.Animated?.SectionList
             ]);
             var components = [
               ...scrollViews
@@ -62910,7 +64171,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerReducedMotion();
           if ("mentionHighlight" in style) {
             var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-            var highlightColor = (0, import_react_native43.processColor)(style.mentionHighlight);
+            var highlightColor = (0, import_react_native48.processColor)(style.mentionHighlight);
             if (typeof highlightColor !== "number")
               throw new Error("Discord's message highlight color is unavailable");
             return overrideCxMethods(renderer, {
@@ -62951,7 +64212,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var input = args[0];
                 if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number")
                   return presentation;
-                var width = style.width * import_react_native43.PixelRatio.getFontScale();
+                var width = style.width * import_react_native48.PixelRatio.getFontScale();
                 return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width ? {
                   ...presentation,
                   constrainedWidth: width
@@ -62992,7 +64253,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               }
               if (typeof icon3.value === "string" && "size" in icon3 && typeof icon3.animate === "boolean") {
                 return React2.cloneElement(element, {
-                  children: /* @__PURE__ */ jsx(import_react_native43.View, {
+                  children: /* @__PURE__ */ jsx(import_react_native48.View, {
                     style: iconStyle,
                     children
                   })
@@ -63139,1154 +64400,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
-  // src/core/ui/settings/pages/Addons/index.tsx
-  var Addons_exports = {};
-  __export(Addons_exports, {
-    default: () => Addons
-  });
-  function icon2(...names) {
-    for (var name of names) {
-      try {
-        var id = findAssetId(name);
-        if (id)
-          return /* @__PURE__ */ jsx(TableRow.Icon, {
-            source: id
-          });
-      } catch (e) {
-      }
-    }
-    return void 0;
-  }
-  function Addons() {
-    var navigation2 = NavigationNative.useNavigation();
-    var open = React2.useMemo(() => {
-      var actions = /* @__PURE__ */ new Map();
-      return (title, load) => {
-        if (!actions.has(title))
-          actions.set(title, wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
-            return load();
-          })(), title, void 0, "push"));
-        return actions.get(title)();
-      };
-    }, [
-      navigation2
-    ]);
-    return /* @__PURE__ */ jsx(import_react_native44.ScrollView, {
-      contentContainerStyle: {
-        paddingBottom: 38
-      },
-      children: /* @__PURE__ */ jsx(Stack, {
-        style: {
-          paddingVertical: 24,
-          paddingHorizontal: 12
-        },
-        spacing: 24,
-        children: /* @__PURE__ */ jsxs(TableRowGroup, {
-          title: "Add-ons",
-          children: [
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Installed plugins",
-              subLabel: "Manage and configure your plugins",
-              icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
-              onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Discover plugins",
-              subLabel: "Browse and install new plugins",
-              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "SettingsIcon"),
-              onPress: () => open("Discover plugins", () => (init_PluginBrowser(), __toCommonJS(PluginBrowser_exports)))
-            }),
-            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Themes",
-              subLabel: "Manage your Discord themes",
-              icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
-              onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
-            }),
-            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Discover themes",
-              subLabel: "Browse community themes and use one in a tap",
-              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "PaintPaletteIcon"),
-              onPress: () => open("Discover themes", () => (init_ThemeStore(), __toCommonJS(ThemeStore_exports)))
-            }),
-            isFontSupported() ? /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Fonts",
-              subLabel: "Choose and manage fonts",
-              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon"),
-              onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
-            }) : /* @__PURE__ */ jsx(TableRow, {
-              label: "Fonts",
-              subLabel: "Custom fonts are unavailable on this loader",
-              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon")
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "CX Extensions",
-              subLabel: "Review and activate .cx plugins and themes",
-              icon: icon2("AppsIcon", "SettingsIcon"),
-              onPress: () => open("CX Extensions", () => (init_CxExtensions(), __toCommonJS(CxExtensions_exports)))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Extras",
-              subLabel: "Fake Nitro, gift links, boosts, friend requests and account tools",
-              icon: icon2("GiftIcon", "NitroWheelIcon", "StarIcon", "SettingsIcon"),
-              onPress: () => open("Extras", () => ({
-                default: (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).ExtrasPage
-              }))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Cloudsync",
-              subLabel: "Back up and sync your settings",
-              icon: icon2("CloudIcon", "SyncIcon", "SettingsIcon"),
-              onPress: () => open("Cloudsync", () => (init_StoreCloud(), __toCommonJS(StoreCloud_exports)))
-            })
-          ]
-        })
-      })
-    });
-  }
-  var import_react_native44;
-  var init_Addons = __esm({
-    "src/core/ui/settings/pages/Addons/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      import_react_native44 = __toESM(require_react_native());
-      init_common();
-      init_components();
-      init_loader();
-      init_assets();
-      init_shared();
-    }
-  });
-
-  // src/core/ui/settings/pages/TestingPlugins/index.tsx
-  var TestingPlugins_exports = {};
-  __export(TestingPlugins_exports, {
-    default: () => TestingPlugins
-  });
-  function TestingReview({ assignment }) {
-    var backend = React2.useMemo(() => createFileBackend(testingStorageKey(assignment) + ".json"), [
-      assignment.userId,
-      assignment.platform
-    ]);
-    var storage = {
-      read: backend.get,
-      write: backend.set
-    };
-    var authorized = () => currentTestingAssignment()?.userId === assignment.userId;
-    var discord = "";
-    try {
-      var info = NativeClientInfoModule.getConstants();
-      if (info.Version && info.Build)
-        discord = String(info.Version) + " (" + String(info.Build) + ")";
-      else if (info.Version || info.Build)
-        discord = String(info.Version ?? info.Build);
-    } catch (e) {
-    }
-    var revision = globalThis.__CLOUDCORD_RUNTIME_REVISION__;
-    var cloudcord = typeof revision === "string" && revision ? "v1.4.3 " + revision : "v1.4.3";
-    var review = useTestingReview(React2, assignment, storage, {
-      cloudcord,
-      discord
-    }, authorized);
-    var [exportMessage, setExportMessage] = React2.useState("");
-    function saveResults() {
-      return _async_to_generator(function* () {
-        var text = review.export();
-        if (!text)
-          return;
-        var filename = "cx-testing-" + assignment.platform + "-" + assignment.userId + ".csv";
-        try {
-          yield writeFile(filename, text, {
-            prefix: ""
-          });
-          setExportMessage("Saved " + filename + " in the app folder.");
-        } catch (e) {
-          setExportMessage("Could not save the CSV.");
-        }
-      })();
-    }
-    var disabled = !review.ready || review.saving;
-    var field = (label2, value, onChange, maxLength) => /* @__PURE__ */ jsxs(Stack, {
-      spacing: 5,
-      children: [
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-sm/medium",
-          children: label2
-        }),
-        /* @__PURE__ */ jsx(TextInput, {
-          size: "lg",
-          value,
-          maxLength,
-          onChange: (input) => onChange(typeof input === "string" ? input : input?.nativeEvent?.text ?? "")
-        })
-      ]
-    });
-    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
-      keyboardShouldPersistTaps: "handled",
-      contentContainerStyle: {
-        padding: 16,
-        paddingBottom: 40
-      },
-      children: /* @__PURE__ */ jsxs(Stack, {
-        spacing: 14,
-        children: [
-          /* @__PURE__ */ jsxs(Text, {
-            variant: "text-md/medium",
-            children: [
-              assignment.label,
-              " \xB7 ",
-              review.completed,
-              " of ",
-              assignment.entries.length,
-              " reviewed"
-            ]
-          }),
-          field("Search assigned plugins", review.search, review.searchFor, 120),
-          field("CloudCord build", review.build.cloudcord, (value) => review.setBuild("cloudcord", value), 100),
-          field("Discord build", review.build.discord, (value) => review.setBuild("discord", value), 100),
-          review.entry ? /* @__PURE__ */ jsxs(Stack, {
-            spacing: 10,
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "heading-lg/semibold",
-                children: review.entry.name
-              }),
-              /* @__PURE__ */ jsxs(Text, {
-                variant: "text-sm/normal",
-                children: [
-                  review.entry.id,
-                  " \xB7 ",
-                  review.entry.group
-                ]
-              }),
-              /* @__PURE__ */ jsxs(Text, {
-                variant: "text-sm/medium",
-                children: [
-                  review.review?.status ?? "Pending",
-                  " \xB7 ",
-                  review.index + 1,
-                  " of ",
-                  review.count
-                ]
-              }),
-              field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native45.View, {
-                style: {
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 8
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "primary",
-                    text: "Approve",
-                    disabled,
-                    onPress: () => void review.save("Pass")
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "destructive",
-                    text: "Disapprove",
-                    disabled,
-                    onPress: () => void review.save("Fail")
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "secondary",
-                    text: "Blocked",
-                    disabled,
-                    onPress: () => void review.save("Blocked")
-                  })
-                ]
-              }),
-              /* @__PURE__ */ jsxs(import_react_native45.View, {
-                style: {
-                  flexDirection: "row",
-                  gap: 8
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "secondary",
-                    text: "Previous",
-                    disabled: review.saving || review.index === 0,
-                    onPress: () => review.move(-1)
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "secondary",
-                    text: "Next",
-                    disabled: review.saving || review.index + 1 >= review.count,
-                    onPress: () => review.move(1)
-                  })
-                ]
-              })
-            ]
-          }) : /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/normal",
-            children: "No assigned plugins match your search."
-          }),
-          /* @__PURE__ */ jsx(Button, {
-            size: "md",
-            variant: "secondary",
-            text: "Save results as CSV",
-            disabled: !review.completed || review.saving,
-            onPress: () => void saveResults()
-          }),
-          !!(review.message || !review.ready) && /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/medium",
-            children: review.message || "Loading results\u2026"
-          }),
-          !!exportMessage && /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/medium",
-            children: exportMessage
-          })
-        ]
-      })
-    });
-  }
-  function TestingPlugins() {
-    var assignment = useMobileTestingAssignment();
-    return assignment ? /* @__PURE__ */ jsx(TestingReview, {
-      assignment
-    }, assignment.userId) : null;
-  }
-  var import_react_native45;
-  var init_TestingPlugins = __esm({
-    "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_storage();
-      init_cxTesting();
-      init_fs();
-      init_modules();
-      init_pluginTesting();
-      init_common();
-      init_components();
-      import_react_native45 = __toESM(require_react_native());
-    }
-  });
-
-  // src/core/ui/settings/index.ts
-  var settings_exports3 = {};
-  __export(settings_exports3, {
-    PupuIcon: () => cloudcord_default,
-    default: () => initSettings
-  });
-  function safeAsset(...names) {
-    for (var name of names) {
-      try {
-        var asset = findAssetId(name);
-        if (asset)
-          return asset;
-      } catch (e) {
-      }
-    }
-    return cloudcord_default;
-  }
-  function initSettings() {
-    if (settings.cloudcordDiagnosticsEnabled === true)
-      void Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)).then((module) => module.initializeDiagnosticsCapture()).catch(() => {
-      });
-    var coreItem = {
-      key: "CLOUDCORD",
-      title: () => "Overview",
-      icon: safeAsset("CircleInformationIcon-primary", "CircleInformationIcon", "InfoIcon"),
-      render: () => Promise.resolve().then(() => (init_General(), General_exports)),
-      useTrailing: () => `(${"v1.4.3"})`
-    };
-    var hiddenControlsItem = {
-      key: "CLOUDCORD_HIDDEN_CONTROLS",
-      title: () => "Developer options",
-      icon: safeAsset("WrenchIcon", "SettingsIcon"),
-      render: () => Promise.resolve().then(() => (init_Customization(), Customization_exports)),
-      usePredicate: () => useProxy(settings).cloudcordSectionHidden ?? false,
-      useTrailing: () => "\xB7",
-      nativeSection: "developer"
-    };
-    var baseItems = [
-      coreItem,
-      {
-        key: "BOTCORD",
-        title: () => "Botcord",
-        icon: safeAsset("RobotIcon", "AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_BotCord(), BotCord_exports))
-      },
-      {
-        key: "FAKE_PROFILE",
-        title: () => "Profile",
-        icon: safeAsset("UserIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))
-      },
-      {
-        key: "STORE_CLOUD",
-        title: () => "Cloudsync",
-        icon: {
-          uri: "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png"
-        },
-        render: () => Promise.resolve().then(() => (init_StoreCloud(), StoreCloud_exports))
-      },
-      {
-        key: "BUNNY_PLUGINS",
-        title: () => "Add-ons",
-        icon: safeAsset("AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_Addons(), Addons_exports))
-      },
-      {
-        key: "CLOUDCORD_TESTING_PLUGINS",
-        title: () => "Testing Plugins",
-        icon: safeAsset("AppsIcon", "WrenchIcon"),
-        render: () => Promise.resolve().then(() => (init_TestingPlugins(), TestingPlugins_exports)),
-        usePredicate: () => Boolean(useMobileTestingAssignment())
-      },
-      {
-        key: "CLOUDCORD_PLUGIN_BROWSER",
-        title: () => "Discover plugins",
-        icon: safeAsset("ChannelListMagnifyingGlassIcon", "SearchIcon", "AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports))
-      },
-      {
-        key: "CLOUDCORD_DIAGNOSTICS",
-        title: () => "Diagnostics",
-        icon: safeAsset("WrenchIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)),
-        usePredicate: () => useProxy(settings).cloudcordDiagnosticsEnabled === true
-      }
-    ];
-    var defaultOrder = [
-      "CLOUDCORD",
-      "BOTCORD",
-      "FAKE_PROFILE",
-      "BUNNY_PLUGINS",
-      "CLOUDCORD_TESTING_PLUGINS",
-      "CLOUDCORD_DIAGNOSTICS"
-    ];
-    var configurableKeys = new Set(defaultOrder.filter((key) => key !== "CLOUDCORD"));
-    var configuredOrder = settings.cloudcordTabOrder ?? [];
-    var orderIndex = new Map(configuredOrder.map((key, index) => [
-      key,
-      index
-    ]));
-    var items = [
-      ...baseItems,
-      hiddenControlsItem
-    ].filter((row) => ![
-      "STORE_CLOUD",
-      "CLOUDCORD_PLUGIN_BROWSER",
-      "CLOUDCORD_RECOVERY"
-    ].includes(row.key)).map((row) => {
-      if (row.nativeSection)
-        return row;
-      var originalPredicate = row.usePredicate;
-      return {
-        ...row,
-        usePredicate: () => {
-          var state2 = useProxy(settings);
-          var originalVisible = originalPredicate?.() ?? true;
-          if (state2.cloudcordSectionHidden ?? false)
-            return false;
-          if (configurableKeys.has(row.key) && (state2.cloudcordHiddenTabs ?? []).includes(row.key))
-            return false;
-          return originalVisible;
-        }
-      };
-    }).sort((a, b3) => {
-      var rank = (key) => key === "CLOUDCORD" ? -1 : key === "BUNNY_DEVELOPER" ? Number.MAX_SAFE_INTEGER : orderIndex.get(key) ?? (defaultOrder.includes(key) ? defaultOrder.indexOf(key) : defaultOrder.length);
-      return rank(a.key) - rank(b3.key);
-    });
-    registerSection({
-      name: "CloudCord",
-      items
-    });
-    globalThis.__CLOUDCORD_SETTINGS_CORE_REGISTERED__ = true;
-    registerSection({
-      name: "Bunny",
-      items: []
-    });
-    registerSection({
-      name: "Revenge",
-      items: []
-    });
-    registerSection({
-      name: "Vendetta",
-      items: []
-    });
-  }
-  var init_settings3 = __esm({
-    "src/core/ui/settings/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_cloudcord();
-      init_storage();
-      init_assets();
-      init_settings();
-      init_pluginTesting();
-      init_settings2();
-    }
-  });
-
-  // src/core/ui/settings/pages/CloudCordVerification/index.tsx
-  function initializeCloudCordVerification() {
-  }
-  var init_CloudCordVerification = __esm({
-    "src/core/ui/settings/pages/CloudCordVerification/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/core/ui/botcord/FloatingSwitcher.tsx
-  function initBotCordSwitcher() {
-    return () => {
-    };
-  }
-  var init_FloatingSwitcher = __esm({
-    "src/core/ui/botcord/FloatingSwitcher.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/core/ui/reporter/components/ErrorBoundaryScreen.tsx
-  function ErrorBoundaryScreen(props) {
-    var styles2 = useStyles4();
-    var debugInfo = getDebugInfo();
-    return /* @__PURE__ */ jsx(ErrorBoundary, {
-      children: /* @__PURE__ */ jsx(SafeAreaProvider, {
-        children: /* @__PURE__ */ jsxs(SafeAreaView, {
-          style: styles2.container,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native46.View, {
-              style: {
-                gap: 4
-              },
-              children: [
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "display-lg",
-                  children: "Uh oh."
-                }),
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "text-md/normal",
-                  children: "A crash occurred while rendering a component. This could be caused by a plugin, CloudCord, or Discord itself."
-                }),
-                /* @__PURE__ */ jsxs(Text, {
-                  variant: "text-sm/normal",
-                  color: "text-muted",
-                  children: [
-                    debugInfo.os.name,
-                    "; ",
-                    debugInfo.discord.build,
-                    " (",
-                    debugInfo.discord.version,
-                    "); ",
-                    debugInfo.bunny.version
-                  ]
-                })
-              ]
-            }),
-            /* @__PURE__ */ jsxs(import_react_native46.ScrollView, {
-              fadingEdgeLength: 64,
-              contentContainerStyle: {
-                gap: 12
-              },
-              children: [
-                /* @__PURE__ */ jsx(Codeblock, {
-                  selectable: true,
-                  children: props.error.message
-                }),
-                hasStack(props.error) && /* @__PURE__ */ jsx(ErrorStackCard, {
-                  error: props.error
-                }),
-                isComponentStack(props.error) ? /* @__PURE__ */ jsx(ErrorComponentStackCard, {
-                  componentStack: props.error.componentStack
-                }) : null
-              ]
-            }),
-            /* @__PURE__ */ jsxs(Card, {
-              style: {
-                gap: 6
-              },
-              children: [
-                /* @__PURE__ */ jsx(Button, {
-                  text: "Reload Discord",
-                  onPress: () => BundleUpdaterManager.reload()
-                }),
-                !settings.safeMode?.enabled && /* @__PURE__ */ jsx(Button, {
-                  text: "Reload in Safe Mode",
-                  onPress: () => toggleSafeMode()
-                }),
-                /* @__PURE__ */ jsx(Button, {
-                  variant: "destructive",
-                  text: "Retry Render",
-                  onPress: () => props.rerender()
-                })
-              ]
-            })
-          ]
-        })
-      })
-    });
-  }
-  var import_react_native46, useStyles4;
-  var init_ErrorBoundaryScreen = __esm({
-    "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_isStack();
-      init_debug();
-      init_modules();
-      init_settings();
-      init_components2();
-      init_styles();
-      init_common();
-      init_components();
-      import_react_native46 = __toESM(require_react_native());
-      init_ErrorComponentStackCard();
-      init_ErrorStackCard();
-      useStyles4 = createStyles({
-        container: {
-          flex: 1,
-          backgroundColor: tokens.colors.BG_BASE_SECONDARY,
-          paddingHorizontal: 16,
-          height: "100%",
-          gap: 12
-        }
-      });
-    }
-  });
-
-  // src/core/debug/patches/patchErrorBoundary.tsx
-  function getErrorBoundaryContext() {
-    var ctxt = findByNameLazy("ErrorBoundary")[_lazyContextSymbol];
-    return new Promise((resolve) => ctxt.getExports((exp) => resolve(exp.prototype)));
-  }
-  function patchErrorBoundary() {
-    return after.await("render", getErrorBoundaryContext(), function() {
-      if (!this.state.error)
-        return;
-      return /* @__PURE__ */ jsx(ErrorBoundaryScreen, {
-        error: this.state.error,
-        rerender: () => this.setState({
-          info: null,
-          error: null
-        })
-      });
-    });
-  }
-  var init_patchErrorBoundary = __esm({
-    "src/core/debug/patches/patchErrorBoundary.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_ErrorBoundaryScreen();
-      init_patcher();
-      init_lazy2();
-      init_wrappers();
-    }
-  });
-
-  // src/core/fixes.ts
-  function onDispatch({ locale }) {
-    try {
-      findByProps("isMoment", "locale")?.locale(locale.toLowerCase());
-    } catch (e) {
-      logger.error("Failed to fix timestamps...", e);
-    }
-    FluxDispatcher.unsubscribe("I18N_LOAD_SUCCESS", onDispatch);
-  }
-  var fixes_default;
-  var init_fixes = __esm({
-    "src/core/fixes.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_logger();
-      init_common();
-      init_wrappers();
-      fixes_default = () => {
-        FluxDispatcher.subscribe("I18N_LOAD_SUCCESS", onDispatch);
-      };
-    }
-  });
-
-  // globals:lodash
-  var require_lodash = __commonJS({
-    "globals:lodash"(exports, module) {
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      module.exports = require_depsModule()["lodash"];
-    }
-  });
-
-  // globals:util
-  var require_util = __commonJS({
-    "globals:util"(exports, module) {
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      module.exports = require_depsModule()["util"];
-    }
-  });
-
-  // src/core/vendetta/api.tsx
-  var import_react16, import_react_native47, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
-  var init_api3 = __esm({
-    "src/core/vendetta/api.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_alerts2();
-      init_storage();
-      init_storage();
-      init_themes();
-      init_assets();
-      init_commands();
-      init_debug();
-      init_loader();
-      init_patcher();
-      init_settings();
-      init_utils();
-      init_cyrb64();
-      init_logger();
-      init_metro();
-      init_modules2();
-      init_common();
-      init_components();
-      init_components();
-      init_color();
-      init_components2();
-      init_styles();
-      init_toasts();
-      init_dist();
-      import_react16 = __toESM(require_react());
-      import_react_native47 = __toESM(require_react_native());
-      init_plugins();
-      makeIcon = (leading) => leading;
-      CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
-      CompatSwitchRow = TableSwitchRow ?? Forms.FormSwitchRow ?? CompatRow;
-      CompatSection = TableRowGroup ?? Forms.FormSection ?? ReactNative.View;
-      PatchedFormRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatRow, {
-        label: props.label,
-        subLabel: props.subLabel,
-        icon: makeIcon(props.leading),
-        trailing: props.trailing,
-        onPress: props.onPress,
-        disabled: props.disabled,
-        arrow: props.arrow
-      });
-      PatchedFormRow.Icon = Forms.FormRow?.Icon ?? TableRow?.Icon ?? (() => null);
-      PatchedFormRow.Arrow = Forms.FormRow?.Arrow ?? TableRow?.Arrow ?? (() => null);
-      PatchedFormSwitchRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSwitchRow, {
-        label: props.label,
-        subLabel: props.subLabel,
-        icon: makeIcon(props.leading),
-        value: !!props.value,
-        onValueChange: props.onValueChange,
-        disabled: props.disabled
-      });
-      PatchedFormSection = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSection, {
-        title: props.title,
-        ...props
-      }, props.children);
-      PatchedForms = {
-        ...Forms,
-        FormRow: PatchedFormRow,
-        FormSwitchRow: PatchedFormSwitchRow,
-        FormSection: PatchedFormSection,
-        FormDivider: () => null
-      };
-      initVendettaObject = () => {
-        var createStackBasedFilter = (fn) => {
-          return (filter) => {
-            return fn(factories_exports.createSimpleFilter(filter, cyrb64Hash(new Error().stack)));
-          };
-        };
-        var api = globalThis.vendetta = {
-          patcher: {
-            before: patcher_default.before,
-            after: patcher_default.after,
-            instead: patcher_default.instead
-          },
-          metro: {
-            modules: metroModules,
-            find: createStackBasedFilter(findExports),
-            findAll: createStackBasedFilter(findAllExports),
-            findByProps: (...props) => {
-              if (props.length === 1 && props[0] === "KeyboardAwareScrollView") {
-                props.push("listenToKeyboardEvents");
-              }
-              var ret = findByProps(...props);
-              if (ret == null) {
-                if (props.includes("ActionSheetTitleHeader")) {
-                  var module = findByProps("ActionSheetRow");
-                  return {
-                    ...module,
-                    ActionSheetTitleHeader: module.BottomSheetTitleHeader,
-                    ActionSheetContentContainer: ({ children }) => {
-                      (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
-                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native47.View, null, children);
-                    }
-                  };
-                }
-              }
-              return ret;
-            },
-            findByPropsAll: (...props) => findByPropsAll(...props),
-            findByName: (name, defaultExp) => {
-              if (name === "create" && typeof defaultExp === "undefined") {
-                return findByName("create", false).default;
-              }
-              return findByName(name, defaultExp ?? true);
-            },
-            findByNameAll: (name, defaultExp = true) => findByNameAll(name, defaultExp),
-            findByDisplayName: (displayName2, defaultExp = true) => findByDisplayName(displayName2, defaultExp),
-            findByDisplayNameAll: (displayName2, defaultExp = true) => findByDisplayNameAll(displayName2, defaultExp),
-            findByTypeName: (typeName, defaultExp = true) => findByTypeName(typeName, defaultExp),
-            findByTypeNameAll: (typeName, defaultExp = true) => findByTypeNameAll(typeName, defaultExp),
-            findByStoreName: (name) => findByStoreName(name),
-            common: {
-              constants,
-              channels,
-              i18n,
-              url,
-              toasts,
-              stylesheet: {
-                createThemedStyleSheet
-              },
-              clipboard,
-              assets,
-              invites,
-              commands,
-              navigation,
-              navigationStack,
-              NavigationNative,
-              Flux,
-              FluxDispatcher,
-              React: React2,
-              ReactNative,
-              moment: require_moment(),
-              chroma: require_chroma(),
-              lodash: require_lodash(),
-              util: require_util()
-            }
-          },
-          constants: {
-            DISCORD_SERVER: "https://discord.gg/n9QQ4XhhJP",
-            GITHUB: "https://github.com/vendetta-mod",
-            PROXY_PREFIX: "https://vd-plugins.github.io/proxy",
-            HTTP_REGEX: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
-            HTTP_REGEX_MULTI: /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&//=]*)/g,
-            DISCORD_SERVER_ID: "1015931589865246730",
-            PLUGINS_CHANNEL_ID: "1091880384561684561",
-            THEMES_CHANNEL_ID: "1091880434939482202"
-          },
-          utils: {
-            findInReactTree: (tree, filter) => findInReactTree(tree, filter),
-            findInTree: (tree, filter, options) => findInTree(tree, filter, options),
-            safeFetch: (input, options, timeout) => safeFetch(input, options, timeout),
-            unfreeze: (obj) => Object.isFrozen(obj) ? {
-              ...obj
-            } : obj,
-            without: (object, ...keys) => omit(object, keys)
-          },
-          debug: {
-            connectToDebugger: (url2) => connectToDebugger2(url2),
-            getDebugInfo: () => getDebugInfo()
-          },
-          ui: {
-            components: {
-              Forms: PatchedForms,
-              General: ReactNative,
-              Alert: LegacyAlert,
-              Button: CompatButton,
-              HelpMessage: (...props) => /* @__PURE__ */ jsx(HelpMessage, {
-                ...props
-              }),
-              SafeAreaView: (...props) => /* @__PURE__ */ jsx(SafeAreaView, {
-                ...props
-              }),
-              Summary,
-              ErrorBoundary,
-              Codeblock,
-              Search: Search_default
-            },
-            toasts: {
-              showToast: (content, asset) => showToast(content, asset)
-            },
-            alerts: {
-              showConfirmationAlert: (options) => showConfirmationAlert(options),
-              showCustomAlert: (component, props) => showCustomAlert(component, props),
-              showInputAlert: (options) => showInputAlert(options)
-            },
-            assets: {
-              all: new Proxy({}, {
-                get(cache, p) {
-                  if (typeof p !== "string")
-                    return void 0;
-                  if (cache[p])
-                    return cache[p];
-                  for (var asset of iterateAssets()) {
-                    if (asset.name)
-                      return cache[p] = asset;
-                  }
-                },
-                ownKeys(cache) {
-                  var keys = /* @__PURE__ */ new Set();
-                  for (var asset of iterateAssets()) {
-                    cache[asset.name] = asset;
-                    keys.add(asset.name);
-                  }
-                  return [
-                    ...keys
-                  ];
-                }
-              }),
-              find: (filter) => findAsset(filter),
-              getAssetByName: (name) => findAsset(name),
-              getAssetByID: (id) => findAsset(id),
-              getAssetIDByName: (name) => findAssetId(name)
-            },
-            semanticColors,
-            rawColors
-          },
-          plugins: {
-            plugins: VdPluginManager.plugins,
-            fetchPlugin: (source) => VdPluginManager.fetchPlugin(source),
-            installPlugin: (source, enabled = true) => VdPluginManager.installPlugin(source, enabled),
-            startPlugin: (id) => VdPluginManager.startPlugin(id),
-            stopPlugin: (id, disable = true) => VdPluginManager.stopPlugin(id, disable),
-            removePlugin: (id) => VdPluginManager.removePlugin(id),
-            getSettings: (id) => VdPluginManager.getSettings(id)
-          },
-          themes: {
-            themes,
-            fetchTheme: (id, selected) => fetchTheme(id, selected),
-            installTheme: (id) => installTheme(id),
-            selectTheme: (id) => selectTheme(id === "default" ? null : themes[id]),
-            removeTheme: (id) => removeTheme(id),
-            getCurrentTheme: () => getThemeFromLoader(),
-            updateThemes: () => updateThemes()
-          },
-          commands: {
-            registerCommand
-          },
-          storage: {
-            createProxy: (target) => createProxy(target),
-            useProxy: (_storage) => useProxy(_storage),
-            createStorage: (backend) => createStorage(backend),
-            wrapSync: (store) => wrapSync(store),
-            awaitSyncWrapper: (store) => awaitStorage(store),
-            createMMKVBackend: (store) => createMMKVBackend(store),
-            createFileBackend: (file) => {
-              if (isPyonLoader() && file === "vendetta_theme.json") {
-                file = "pyon/current-theme.json";
-              }
-              return createFileBackend(file);
-            }
-          },
-          settings,
-          loader: {
-            identity: getVendettaLoaderIdentity() ?? void 0,
-            config: loaderConfig
-          },
-          logger: {
-            log: (...message) => console.log(...message),
-            info: (...message) => console.info(...message),
-            warn: (...message) => console.warn(...message),
-            error: (...message) => console.error(...message),
-            time: (...message) => console.time(...message),
-            trace: (...message) => console.trace(...message),
-            verbose: (...message) => console.log(...message)
-          },
-          version: versionHash,
-          unload: () => {
-            delete globalThis.vendetta;
-          }
-        };
-        return () => api.unload();
-      };
-    }
-  });
-
-  // src/lib/api/native/legacyRuntimeRefresh.ts
-  function invokeLegacyReload() {
-    return _async_to_generator(function* () {
-      var reader = import_react_native48.NativeModules.FileReaderModule ?? import_react_native48.NativeModules.RCTFileReaderModule;
-      if (typeof reader?.readAsDataURL !== "function")
-        return false;
-      yield reader.readAsDataURL({
-        rain: {
-          method: "updater.reload",
-          args: []
-        }
-      });
-      return true;
-    })();
-  }
-  function isCurrentCloudCordLoader() {
-    var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
-    return Boolean(nativeLoader && Number(nativeLoader.cloudcordAutoUpdateVersion ?? 0) >= 2);
-  }
-  function initLegacyRuntimeRefresh() {
-    return _async_to_generator(function* () {
-      var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
-      if (!nativeLoader || isCurrentCloudCordLoader())
-        return;
-      yield awaitStorage(loaderConfig);
-      var config = loaderConfig;
-      config.customLoadUrl ??= {
-        enabled: false,
-        url: ""
-      };
-      if (config.customLoadUrl.enabled && config.customLoadUrl.url && !config.customLoadUrl.url.startsWith("https://cloudcord.xohus.lol/"))
-        return;
-      config.customLoadUrl.url = CURRENT_RUNTIME_URL;
-      config.customLoadUrl.enabled = true;
-      try {
-        yield invokeLegacyReload();
-      } catch (e) {
-      }
-    })();
-  }
-  var import_react_native48, CURRENT_RUNTIME_URL;
-  var init_legacyRuntimeRefresh = __esm({
-    "src/lib/api/native/legacyRuntimeRefresh.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_storage();
-      init_settings();
-      import_react_native48 = __toESM(require_react_native());
-      CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
-    }
-  });
-
-  // src/global.d.ts
-  var init_global_d = __esm({
-    "src/global.d.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/modules.d.ts
-  var init_modules_d = __esm({
-    "src/modules.d.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/lib/ui/index.ts
-  var ui_exports = {};
-  __export(ui_exports, {
-    alerts: () => alerts_exports,
-    components: () => components_exports2,
-    settings: () => settings_exports2,
-    sheets: () => sheets_exports,
-    styles: () => styles_exports,
-    toasts: () => toasts_exports
-  });
-  var init_ui = __esm({
-    "src/lib/ui/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_alerts();
-      init_components2();
-      init_settings2();
-      init_sheets();
-      init_styles();
-      init_toasts();
-    }
-  });
-
-  // src/lib/index.ts
-  var lib_exports = {};
-  __export(lib_exports, {
-    _jsx: () => jsxRuntime_exports,
-    api: () => api_exports,
-    fonts: () => fonts_exports,
-    managers: () => managers,
-    metro: () => metro_exports,
-    plugins: () => plugins_exports2,
-    themes: () => themes_exports,
-    ui: () => ui_exports,
-    unload: () => unload,
-    utils: () => utils_exports
-  });
-  function unload() {
-    for (var d of _disposer)
-      if (typeof d === "function")
-        d();
-    delete globalThis.bunny;
-  }
-  var managers, _disposer;
-  var init_lib = __esm({
-    "src/lib/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_global_d();
-      init_modules_d();
-      init_fonts();
-      init_plugins4();
-      init_themes();
-      init_api();
-      init_ui();
-      init_utils();
-      init_metro();
-      init_fonts();
-      init_plugins4();
-      init_themes();
-      init_jsxRuntime();
-      init_lazy();
-      managers = proxyLazy(() => {
-        console.warn("bunny.managers.* is deprecated, and moved the top level (bunny.*). bunny.managers will be eventually removed soon");
-        return {
-          get fonts() {
-            return fonts_exports;
-          },
-          get plugins() {
-            return plugins_exports2;
-          },
-          get themes() {
-            return themes_exports;
-          }
-        };
-      }, {
-        hint: "object"
-      });
-      _disposer = [];
-      unload.push = (fn) => {
-        _disposer.push(fn);
-      };
-    }
-  });
-
   // src/index.ts
   var src_exports = {};
   __export(src_exports, {
@@ -64417,7 +64530,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "03221f107534e4612966cf22c2e256233dc61f04";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d704c11b50725519c7df32531632a9f50f347202";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
