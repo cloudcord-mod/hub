@@ -6560,7 +6560,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           limits
         };
         var Color$3 = Color_1;
-        var contrast = function contrast2(a, b3) {
+        var contrast2 = function contrast3(a, b3) {
           a = new Color$3(a);
           b3 = new Color$3(b3);
           var l1 = a.luminance();
@@ -7113,7 +7113,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         chroma5.random = random_1;
         chroma5.scale = scale$2;
         chroma5.analyze = analyze_1.analyze;
-        chroma5.contrast = contrast;
+        chroma5.contrast = contrast2;
         chroma5.deltaE = deltaE;
         chroma5.distance = distance;
         chroma5.limits = analyze_1.limits;
@@ -37862,6 +37862,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (/^[\da-f]{6}$/i.test(hex))
       return hex.match(/../g).map((value) => Number.parseInt(value, 16));
   }
+  function hexColor(channels2) {
+    return "#" + channels2.map((channel) => Math.round(channel).toString(16).padStart(2, "0")).join("");
+  }
+  function mixChannels(from, to, weight) {
+    return from.map((channel, index) => channel + (to[index] - channel) * weight);
+  }
+  function relativeLuminance(channels2) {
+    var [red, green, blue] = channels2.map((channel) => {
+      var value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+  }
+  function contrast(a, b3) {
+    return (Math.max(a, b3) + 0.05) / (Math.min(a, b3) + 0.05);
+  }
   function utcMidnight(input) {
     var date = input.trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
@@ -37929,6 +37945,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       label2,
       base ** exponent
     ]));
+  }
+  function fileSizeBytes(text) {
+    var match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
+    if (!match)
+      return;
+    var unit = match[2] === "KB" ? "kB" : match[2];
+    var bytes = Number(match[1]) * (decimalFileUnits.get(unit) ?? binaryFileUnits.get(unit));
+    if (Number.isFinite(bytes) && bytes <= Number.MAX_SAFE_INTEGER)
+      return bytes;
   }
   function planningRows(text) {
     return text.split(/\r\n|\r|\n/).map((row) => row.trim()).filter(Boolean);
@@ -38309,12 +38334,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ].join(" \xB7 ");
         },
         convertFileSize(text) {
-          var match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
-          if (!match)
-            return;
-          var inputUnit = match[2] === "KB" ? "kB" : match[2];
-          var bytes = Number(match[1]) * (decimalFileUnits.get(inputUnit) ?? binaryFileUnits.get(inputUnit));
-          if (!Number.isFinite(bytes) || bytes > Number.MAX_SAFE_INTEGER)
+          var bytes = fileSizeBytes(text);
+          if (bytes === void 0)
             return;
           var format = (units2) => {
             var [unit, divisor] = [
@@ -38412,23 +38433,65 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return `\`rgb(${channels2.join(", ")})\``;
         },
         colorContrast(foreground, background) {
-          var colors = [
-            hexChannels(foreground),
-            hexChannels(background)
-          ];
-          var luminances = colors.map((channels2) => channels2?.map((channel) => {
-            var rgb = channel / 255;
-            return rgb <= 0.04045 ? rgb / 12.92 : ((rgb + 0.055) / 1.055) ** 2.4;
-          }));
-          var [text, surface] = luminances;
+          var text = hexChannels(foreground), surface = hexChannels(background);
           if (!text || !surface)
             return;
-          var relativeLuminance = ([red, green, blue]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-          var a = relativeLuminance(text), b3 = relativeLuminance(surface);
-          var ratio = (Math.max(a, b3) + 0.05) / (Math.min(a, b3) + 0.05);
+          var ratio = contrast(relativeLuminance(text), relativeLuminance(surface));
           return `Contrast \u2248 ${ratio.toFixed(2)}:1
 WCAG AA normal text ${ratio >= 4.5 ? "passes" : "fails"}
 WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
+        },
+        colorMix(first, second, percent) {
+          var from = hexChannels(first), to = hexChannels(second);
+          var weight = integerText(percent);
+          if (!from || !to || weight === void 0 || weight < 0 || weight > 100)
+            return;
+          return `\`${hexColor(mixChannels(from, to, weight / 100))}\``;
+        },
+        readableInk(background) {
+          var surface = hexChannels(background);
+          if (!surface)
+            return;
+          var luminance = relativeLuminance(surface);
+          return [
+            [
+              0,
+              "#000000"
+            ],
+            [
+              1,
+              "#ffffff"
+            ]
+          ].map(([ink, hex]) => [
+            contrast(luminance, ink),
+            hex
+          ]).sort(([a], [b3]) => b3 - a).map(([ratio, hex]) => `\`${hex}\` \xB7 ${ratio.toFixed(2)}:1`).join("\n");
+        },
+        themeStarter(name, background, accent) {
+          var title = name.trim();
+          var surface = hexChannels(background), brand = hexChannels(accent);
+          if (!title || title.length > 64 || /[\u0000-\u001f\u007f]/.test(title) || !surface || !brand)
+            return;
+          var luminance = relativeLuminance(surface);
+          var dark = contrast(luminance, 1) >= contrast(luminance, 0);
+          var ink = dark ? [
+            255,
+            255,
+            255
+          ] : [
+            0,
+            0,
+            0
+          ];
+          return planningBlock([
+            `theme ${JSON.stringify(title).replaceAll("`", "\\u0060")}:`,
+            "  mode: " + (dark ? "dark" : "light"),
+            "  background: " + hexColor(surface),
+            "  surface: " + hexColor(mixChannels(surface, ink, 0.08)),
+            "  sidebar: " + hexColor(mixChannels(surface, ink, 0.04)),
+            "  text: " + hexColor(ink),
+            "  accent: " + hexColor(brand)
+          ].join("\n"));
         },
         rgbToHex(input) {
           var text = input.trim();
@@ -38691,6 +38754,37 @@ Copy \`<t:${timestamp}:F>\``;
             ];
           return `\`${w / a}:${h / a}\` \xB7 ${w} \xD7 ${h} px`;
         },
+        resizeDimensions(width, height, target, axis) {
+          var w = integerText(width), h = integerText(height), size = integerText(target);
+          if (w === void 0 || h === void 0 || size === void 0 || [
+            w,
+            h,
+            size
+          ].some((value) => value < 1 || value > 1e5) || axis !== "width" && axis !== "height")
+            return;
+          var other = Math.max(1, Math.round(size * (axis === "width" ? h / w : w / h)));
+          if (other > 1e5)
+            return;
+          return (axis === "width" ? [
+            size,
+            other
+          ] : [
+            other,
+            size
+          ]).join(" \xD7 ") + " px";
+        },
+        transferEta(size, megabits) {
+          var bytes = fileSizeBytes(size);
+          var value = megabits.trim();
+          if (bytes === void 0 || !/^\d+(?:\.\d+)?$/.test(value))
+            return;
+          var speed = Number(value);
+          if (!Number.isFinite(speed) || speed < 1e-3 || speed > 1e6)
+            return;
+          var seconds = Math.ceil(bytes * 8 / (speed * 1e6));
+          var hours = Math.floor(seconds / 3600);
+          return `About ${hours}h ${Math.floor(seconds % 3600 / 60)}m ${seconds % 60}s at ${displayNumber(speed)} Mbps`;
+        },
         utf8Size(text) {
           var bytes = 0;
           for (var character of text) {
@@ -38756,6 +38850,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         csvToMarkdown(input) {
           return markdownTable(csvRows(input));
+        },
+        csvColumn(input, column) {
+          var position = integerText(column);
+          if (position === void 0 || position < 1 || position > 64 || input.length > 12e3)
+            return;
+          var rows = csvRows(input);
+          if (!rows.length || rows.length > 150 || rows.some((row) => row[position - 1] === void 0))
+            return;
+          return planningBlock(rows.map((row) => '"' + row[position - 1].replaceAll('"', '""') + '"').join("\n"));
         },
         markdownChecklist(input) {
           var lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
@@ -48238,6 +48341,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/color-mixer.cx
+  var color_mixer_default;
+  var init_color_mixer = __esm({
+    "../examples/cx/catalog/plugins/color-mixer.cx"() {
+      color_mixer_default = 'plugin "Color Mixer":\n  needs commands.register\n  needs reply.local\n  on command "mixcolors":\n    input "first" text\n    input "second" text\n    input "percent" text\n    reply "${colorMix(first, second, percent)}" else "Enter two hex colors and a whole number from 0 to 100 for the second color\u2019s share."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/color-text.cx
   var color_text_default;
   var init_color_text = __esm({
@@ -48451,6 +48562,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_count_lines = __esm({
     "../examples/cx/catalog/plugins/count-lines.cx"() {
       count_lines_default = 'plugin "Count Lines":\n  needs commands.register\n  needs reply.local\n  on command "countlines" with text:\n    reply "${countLines(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/csv-column.cx
+  var csv_column_default;
+  var init_csv_column = __esm({
+    "../examples/cx/catalog/plugins/csv-column.cx"() {
+      csv_column_default = 'plugin "CSV Column":\n  needs commands.register\n  needs reply.local\n  on command "csvcolumn":\n    input "document" text\n    input "column" text\n    reply "${csvColumn(document, column)}" else "Paste up to 150 CSV rows and choose a column number starting at 1."\n';
     }
   });
 
@@ -48834,6 +48953,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_file_size_converter = __esm({
     "../examples/cx/catalog/plugins/file-size-converter.cx"() {
       file_size_converter_default = 'plugin "File Size Converter":\n  needs commands.register\n  needs reply.local\n  on command "convertfilesize" with text:\n    reply "${convertFileSize(text)}" else "Enter bytes or a size such as 1.5 MiB or 250 MB."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/file-transfer-estimate.cx
+  var file_transfer_estimate_default;
+  var init_file_transfer_estimate = __esm({
+    "../examples/cx/catalog/plugins/file-transfer-estimate.cx"() {
+      file_transfer_estimate_default = 'plugin "File Transfer Estimate":\n  needs commands.register\n  needs reply.local\n  on command "transferestimate":\n    input "size" text\n    input "megabits" text\n    reply "${transferEta(size, megabits)}" else "Enter a file size such as 300 MB and a connection speed in Mbps."\n';
     }
   });
 
@@ -50337,6 +50464,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/readable-ink.cx
+  var readable_ink_default;
+  var init_readable_ink = __esm({
+    "../examples/cx/catalog/plugins/readable-ink.cx"() {
+      readable_ink_default = 'plugin "Readable Ink":\n  needs commands.register\n  needs reply.local\n  on command "readableink" with text:\n    reply "${readableInk(text)}" else "Enter a hex background color to compare black and white text."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/readable-line-length.cx
   var readable_line_length_default;
   var init_readable_line_length = __esm({
@@ -50398,6 +50533,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_reply_timestamp = __esm({
     "../examples/cx/catalog/plugins/reply-timestamp.cx"() {
       reply_timestamp_default = 'plugin "ReplyTimestamp":\n  needs messages.replytimestamp\n  use reply-timestamp\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/resize-dimensions.cx
+  var resize_dimensions_default;
+  var init_resize_dimensions = __esm({
+    "../examples/cx/catalog/plugins/resize-dimensions.cx"() {
+      resize_dimensions_default = 'plugin "Resize Dimensions":\n  needs commands.register\n  needs reply.local\n  on command "resizedimensions":\n    input "width" text\n    input "height" text\n    input "target" text\n    input "axis" choice "width,height"\n    reply "${resizeDimensions(width, height, target, axis)}" else "Enter positive pixel dimensions, the new size, and the side you want to set."\n';
     }
   });
 
@@ -50734,6 +50877,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_text_replace = __esm({
     "../examples/cx/catalog/plugins/text-replace.cx"() {
       text_replace_default = 'plugin "TextReplace":\n  needs messages.transform\n  before send replace ":shrug:" with "\xAF\\\\_(\u30C4)_/\xAF"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/theme-starter.cx
+  var theme_starter_default;
+  var init_theme_starter = __esm({
+    "../examples/cx/catalog/plugins/theme-starter.cx"() {
+      theme_starter_default = 'plugin "Theme Starter":\n  needs commands.register\n  needs reply.local\n  on command "themestarter":\n    input "name" text\n    input "background" text\n    input "accent" text\n    reply "${themeStarter(name, background, accent)}" else "Enter a one-line theme name and two hex colors. Paste the result into Themes to try it."\n';
     }
   });
 
@@ -51902,6 +52053,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cloud_cord_accent();
       init_color_contrast();
       init_color_converter();
+      init_color_mixer();
       init_color_text();
       init_colorful_mentions();
       init_common_lines();
@@ -51929,6 +52081,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_user_mention();
       init_copy_user_urls();
       init_count_lines();
+      init_csv_column();
       init_csv_to_markdown();
       init_custom_timestamps();
       init_dashless();
@@ -51954,6 +52107,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_feferi_typing_quirk();
       init_file_name_randomization();
       init_file_size_converter();
+      init_file_transfer_estimate();
       init_fix_codeblock_gap();
       init_fix_file_extensions();
       init_fix_images_quality();
@@ -52120,6 +52274,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_quote_message();
       init_read_all_notifications_button();
       init_read_all_notifications();
+      init_readable_ink();
       init_readable_line_length();
       init_readable_spoilers();
       init_realtime_timestamps();
@@ -52128,6 +52283,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_repeat_messages();
       init_reply_ping_control();
       init_reply_timestamp();
+      init_resize_dimensions();
       init_reveal_all_spoilers();
       init_reverse_image_search();
       init_reverse_text();
@@ -52170,6 +52326,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_terezi_typing_quirk();
       init_test_result_summary();
       init_text_replace();
+      init_theme_starter();
       init_thin_scrollbars();
       init_timestamp_styles();
       init_total_time();
@@ -52677,6 +52834,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "717db9fa96c52602500f4a297fe5566d4a6005fd1ba67d4e00c2e58803b0ba88"
           },
           {
+            name: "Color Mixer",
+            source: color_mixer_default,
+            description: "/mixcolors",
+            commands: [
+              "mixcolors"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "ab7bdeba3beda590ca752dfde44208e7d1091b70e7c79db1dc3df3e43207fa32"
+          },
+          {
             name: "ColorText",
             source: color_text_default,
             description: "/color",
@@ -52919,6 +53088,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18"
+          },
+          {
+            name: "CSV Column",
+            source: csv_column_default,
+            description: "/csvcolumn",
+            commands: [
+              "csvcolumn"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5"
           },
           {
             name: "CSV to Markdown",
@@ -53177,6 +53358,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7"
+          },
+          {
+            name: "File Transfer Estimate",
+            source: file_transfer_estimate_default,
+            description: "/transferestimate",
+            commands: [
+              "transferestimate"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736"
           },
           {
             name: "FixCodeblockGap",
@@ -54752,6 +54945,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Readable Ink",
+            source: readable_ink_default,
+            description: "/readableink",
+            commands: [
+              "readableink"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "7d9315a5485ec4dbace842a66d573b3c8412747a45aaa180050928cd234ee725"
+          },
+          {
             name: "ReadableLineLength",
             source: readable_line_length_default,
             description: "limit the width of long message lines",
@@ -54823,6 +55028,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Resize Dimensions",
+            source: resize_dimensions_default,
+            description: "/resizedimensions",
+            commands: [
+              "resizedimensions"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "3120fff9dc0b3d5c7b10d5a36790889834e63855d918591628d837ac14c94ec6"
           },
           {
             name: "RevealAllSpoilers",
@@ -55226,6 +55443,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Theme Starter",
+            source: theme_starter_default,
+            description: "/themestarter",
+            commands: [
+              "themestarter"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "6554f9b1b18d14eac32a85e66a21fddbfac3b452d339fb0c0d498c19f945e023"
           },
           {
             name: "ThinScrollbars",
@@ -65412,7 +65641,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d706ae97cf6ad83e67a67e35b34c5582280d85eb";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b30b6878cb7a9e520f63811b54a4434abe90261";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
