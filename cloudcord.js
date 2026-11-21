@@ -47895,6 +47895,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       throw new Error("Invalid text or length");
     return decoded;
   }
+  function matchesCxCatalogEntry(entry, search) {
+    var query = search.trim().toLowerCase();
+    if (!query)
+      return true;
+    var normalize = (value) => value.normalize("NFKD").toLowerCase().replace(RegExp("[^\\p{L}\\p{N}]", "gu"), "");
+    var compactQuery = normalize(query);
+    if (query.startsWith("/")) {
+      return Boolean((compactQuery || query === "/") && entry.commands?.some((command) => normalize(command).includes(compactQuery)));
+    }
+    return entry.name.toLowerCase().includes(query) || Boolean(compactQuery && normalize(entry.name).includes(compactQuery));
+  }
   function parseCx(source) {
     var _loop2 = function(line12) {
       if (!line12.trim())
@@ -52992,7 +53003,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         plugins: [
           {
             name: "CX Character Counter",
-            source: character_counter_default2
+            source: character_counter_default2,
+            commands: [
+              "ccp-count",
+              "ccp-inspect"
+            ]
           },
           {
             name: "AllCallTimeCounter",
@@ -53008,11 +53023,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "AnonymiseFileNames",
-            source: anonymise_file_names_default
+            source: anonymise_file_names_default,
+            commands: [
+              "spoiler"
+            ]
           },
           {
             name: "AtSomeone",
-            source: at_someone_default
+            source: at_someone_default,
+            commands: [
+              "someone"
+            ]
           },
           {
             name: "AutoVaporwave",
@@ -53020,7 +53041,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "AvatarGrabber",
-            source: avatar_grabber_default
+            source: avatar_grabber_default,
+            commands: [
+              "avatar"
+            ]
           },
           {
             name: "BetterChatNames",
@@ -53071,7 +53095,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "BoldText",
-            source: bold_text_default
+            source: bold_text_default,
+            commands: [
+              "bold"
+            ]
           },
           {
             name: "BoldUsernames",
@@ -53084,7 +53111,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Calculator",
-            source: calculator_default
+            source: calculator_default,
+            commands: [
+              "calc"
+            ]
           },
           {
             name: "CallTimeCounter",
@@ -53100,7 +53130,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "ClapText",
-            source: clap_text_default
+            source: clap_text_default,
+            commands: [
+              "clap"
+            ]
           },
           {
             name: "CleanChannelName",
@@ -53120,11 +53153,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Color Converter",
-            source: color_converter_default
+            source: color_converter_default,
+            commands: [
+              "hextorgb",
+              "rgbtohex"
+            ]
           },
           {
             name: "ColorText",
-            source: color_text_default
+            source: color_text_default,
+            commands: [
+              "color"
+            ]
           },
           {
             name: "ColorfulMentions",
@@ -53187,7 +53227,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Count Lines",
-            source: count_lines_default
+            source: count_lines_default,
+            commands: [
+              "countlines"
+            ]
           },
           {
             name: "CustomTimestamps",
@@ -53199,7 +53242,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Days Between",
-            source: days_between_default
+            source: days_between_default,
+            commands: [
+              "daysbetween"
+            ]
           },
           {
             name: "Declutter",
@@ -53215,7 +53261,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Discord Timestamp",
-            source: discord_timestamp_default
+            source: discord_timestamp_default,
+            commands: [
+              "discordtimestamp",
+              "discordlocaltimestamp"
+            ]
           },
           {
             name: "DontRoundMyTimestamps",
@@ -53243,7 +53293,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "FakeProfileThemes",
-            source: fake_profile_themes_default
+            source: fake_profile_themes_default,
+            commands: [
+              "cx-profile-colors"
+            ]
           },
           {
             name: "FeferiTypingQuirk",
@@ -53288,7 +53341,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "FriendInvites",
-            source: friend_invites_default
+            source: friend_invites_default,
+            commands: [
+              "create-friend-invite",
+              "view-friend-invites",
+              "revoke-friend-invites"
+            ]
           },
           {
             name: "Gamzee'sTypingQuirk",
@@ -53296,7 +53354,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "GoogleThat",
-            source: google_that_default
+            source: google_that_default,
+            commands: [
+              "googlethat"
+            ]
           },
           {
             name: "GrayscaleImages",
@@ -53608,7 +53669,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "InRole",
-            source: in_role_default
+            source: in_role_default,
+            commands: [
+              "inrole"
+            ]
           },
           {
             name: "Ingtoninator",
@@ -53616,7 +53680,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "JSON Check",
-            source: json_check_default
+            source: json_check_default,
+            commands: [
+              "jsoncheck"
+            ]
           },
           {
             name: "JumpToTop",
@@ -53637,11 +53704,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "LeetText",
-            source: leet_text_default
+            source: leet_text_default,
+            commands: [
+              "leet"
+            ]
           },
           {
             name: "Lines to CSV",
-            source: lines_to_csv_default
+            source: lines_to_csv_default,
+            commands: [
+              "linestocsv"
+            ]
           },
           {
             name: "LinkConverter",
@@ -53649,7 +53722,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Markdown Escape",
-            source: markdown_escape_default
+            source: markdown_escape_default,
+            commands: [
+              "escapemarkdown"
+            ]
           },
           {
             name: "MessageBurst",
@@ -53666,7 +53742,44 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "MoreCommands",
-            source: more_commands_default
+            source: more_commands_default,
+            commands: [
+              "choose",
+              "flipcoin",
+              "rolldice",
+              "randomnumber",
+              "wordcount",
+              "transform",
+              "ask",
+              "gettime",
+              "echo",
+              "lenny",
+              "mock",
+              "morse",
+              "dissatisfaction",
+              "smug",
+              "happy",
+              "crying",
+              "angry",
+              "anger",
+              "joy",
+              "blush",
+              "confused",
+              "sleeping",
+              "laughing",
+              "giving",
+              "peace",
+              "ending1",
+              "uwu",
+              "comfy",
+              "lovehappy",
+              "loveee",
+              "give",
+              "lovegive",
+              "music",
+              "stars",
+              "lovegiving"
+            ]
           },
           {
             name: "MutedChannelsFaded",
@@ -53756,7 +53869,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Number Lines",
-            source: number_lines_default
+            source: number_lines_default,
+            commands: [
+              "numberlines"
+            ]
           },
           {
             name: "OpenSteamLinksInApp",
@@ -53788,7 +53904,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "ReadAllNotifications",
-            source: read_all_notifications_default
+            source: read_all_notifications_default,
+            commands: [
+              "readall"
+            ]
           },
           {
             name: "ReadableLineLength",
@@ -53820,11 +53939,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "ReverseText",
-            source: reverse_text_default
+            source: reverse_text_default,
+            commands: [
+              "reverse"
+            ]
           },
           {
             name: "ROT13 Text",
-            source: rot13_text_default
+            source: rot13_text_default,
+            commands: [
+              "rot13text"
+            ]
           },
           {
             name: "RoundServerIcons",
@@ -53846,7 +53971,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "ScheduledMessages",
-            source: scheduled_messages_default
+            source: scheduled_messages_default,
+            commands: [
+              "schedule"
+            ]
           },
           {
             name: "ScrollToLatest",
@@ -53862,7 +53990,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "ShipCalc",
-            source: ship_calc_default
+            source: ship_calc_default,
+            commands: [
+              "ship"
+            ]
           },
           {
             name: "ShowPing",
@@ -53890,7 +54021,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Slugify Text",
-            source: slugify_text_default
+            source: slugify_text_default,
+            commands: [
+              "slugifytext"
+            ]
           },
           {
             name: "SmallerAvatarsInChat",
@@ -53909,7 +54043,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Snowflake Created At",
-            source: snowflake_created_at_default
+            source: snowflake_created_at_default,
+            commands: [
+              "snowflakecreated"
+            ]
           },
           {
             name: "SoftCorners",
@@ -53922,7 +54059,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Sort Lines",
-            source: sort_lines_default
+            source: sort_lines_default,
+            commands: [
+              "sortlines"
+            ]
           },
           {
             name: "SortReactions",
@@ -53930,7 +54070,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "SpaceOut",
-            source: space_out_default
+            source: space_out_default,
+            commands: [
+              "spaceout"
+            ]
           },
           {
             name: "SpaciousMessages",
@@ -53943,7 +54086,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "SpotifyShareCommands",
-            source: spotify_share_commands_default
+            source: spotify_share_commands_default,
+            commands: [
+              "track",
+              "album",
+              "artist"
+            ]
           },
           {
             name: "SquareAvatars",
@@ -53952,7 +54100,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Starify",
-            source: starify_default
+            source: starify_default,
+            commands: [
+              "starify"
+            ]
           },
           {
             name: "StickerBlocker",
@@ -53986,7 +54137,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Translate",
-            source: translate_default
+            source: translate_default,
+            commands: [
+              "translate"
+            ]
           },
           {
             name: "TransparentChatBar",
@@ -53994,11 +54148,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Trim Lines",
-            source: trim_lines_default
+            source: trim_lines_default,
+            commands: [
+              "trimlines"
+            ]
           },
           {
             name: "Unicode Inspector",
-            source: unicode_inspector_default
+            source: unicode_inspector_default,
+            commands: [
+              "unicodeinfo"
+            ]
           },
           {
             name: "Unindent",
@@ -54006,11 +54166,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Unique Lines",
-            source: unique_lines_default
+            source: unique_lines_default,
+            commands: [
+              "uniquelines"
+            ]
           },
           {
             name: "UnitConverter",
-            source: unit_converter_default
+            source: unit_converter_default,
+            commands: [
+              "convert"
+            ]
           },
           {
             name: "UnsuppressEmbeds",
@@ -54018,7 +54184,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "URL Component Codec",
-            source: url_component_codec_default
+            source: url_component_codec_default,
+            commands: [
+              "urlencode",
+              "urldecode"
+            ]
           },
           {
             name: "UserNotes",
@@ -54026,11 +54196,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "UserTags",
-            source: user_tags_default
+            source: user_tags_default,
+            commands: [
+              "find-user-tags"
+            ]
           },
           {
             name: "VibeCheck",
-            source: vibe_check_default
+            source: vibe_check_default,
+            commands: [
+              "vibe"
+            ]
           },
           {
             name: "VoiceCount",
@@ -54063,7 +54239,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "WikiLookup",
-            source: wiki_lookup_default
+            source: wiki_lookup_default,
+            commands: [
+              "wiki"
+            ]
           },
           {
             name: "WordCount",
@@ -54071,7 +54250,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "Word Frequency",
-            source: word_frequency_default
+            source: word_frequency_default,
+            commands: [
+              "wordfrequency"
+            ]
           },
           {
             name: "WriteUpperCase",
@@ -57038,7 +57220,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [status, setStatus] = React2.useState("");
     var [candidate, setCandidate] = React2.useState();
     var [, refreshOptions] = React2.useState(0);
-    var searchText = search.trim().toLowerCase();
     function review(next) {
       setCandidate(void 0);
       try {
@@ -58217,7 +58398,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             children: [
               /* @__PURE__ */ jsx(import_react_native43.TextInput, {
                 accessibilityLabel: "Search CX catalog",
-                placeholder: "Search CX catalog",
+                placeholder: "Search name or /command",
                 placeholderTextColor: "#b5bac1",
                 value: search,
                 onChangeText: (value) => {
@@ -58244,7 +58425,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   cxCatalog.themes
                 ]
               ].map(([kind, entries2]) => {
-                var matches = entries2.filter((entry) => entry.name.toLowerCase().includes(searchText));
+                var matches = entries2.filter((entry) => matchesCxCatalogEntry(entry, search));
                 var page = pages[kind];
                 var start = page * 12;
                 return /* @__PURE__ */ jsxs(TableRowGroup, {
@@ -59757,7 +59938,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "23e57607b63d89c633d0a26f0fa7fc046ca84a45";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "37238c59c5e060a2b1d88b7288836487c54e3816";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
