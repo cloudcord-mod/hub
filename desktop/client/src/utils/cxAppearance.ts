@@ -187,6 +187,21 @@ export const cxAppearanceTargets = {
         css: '[class*="badgeList"] { display: none !important; }',
         mobile: ["ProfileBadgeRows"],
     },
+    "profile-notes": {
+        plugin: "HideProfileNotes", label: "local notes in profile cards",
+        css: '[class*="noteText_"], [class*="notePreview_"] { display: none !important; }',
+        mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileNote.tsx"] },
+    },
+    "profile-connections": {
+        plugin: "HideProfileConnections", label: "connections in profile cards",
+        css: '[class*="connectedAccounts_"] { display: none !important; }',
+        mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileConnections.tsx", "modules/user_profile/native/LegacyUserProfileConnections.tsx"] },
+    },
+    "profile-mutuals": {
+        plugin: "HideProfileMutuals", label: "mutual friends and servers in profile cards",
+        css: '[class*="mutuals_"], [class*="mutualGuilds_"] { display: none !important; }',
+        mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileMutuals.tsx", "modules/user_profile/native/UserProfileMutualGuilds.tsx"] },
+    },
     "custom-status-emojis": {
         plugin: "HideStatusEmojis", label: "emojis in custom status bubbles",
         css: '[class*="customStatus"] img[class*="emoji"] { display: none !important; }',

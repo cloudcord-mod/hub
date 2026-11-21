@@ -1,0 +1,3 @@
+plugin "HideProfileNotes":
+  needs appearance.hide
+  hide profile-notes

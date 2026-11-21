@@ -116,7 +116,10 @@ import plugin_catalog_hide_nitro_tab from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_hide_notification_bell from "../../../../examples/cx/catalog/plugins/hide-notification-bell.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
 import plugin_catalog_hide_profile_banner_images from "../../../../examples/cx/catalog/plugins/hide-profile-banner-images.cx";
+import plugin_catalog_hide_profile_connections from "../../../../examples/cx/catalog/plugins/hide-profile-connections.cx";
 import plugin_catalog_hide_profile_effects from "../../../../examples/cx/catalog/plugins/hide-profile-effects.cx";
+import plugin_catalog_hide_profile_mutuals from "../../../../examples/cx/catalog/plugins/hide-profile-mutuals.cx";
+import plugin_catalog_hide_profile_notes from "../../../../examples/cx/catalog/plugins/hide-profile-notes.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
 import plugin_catalog_hide_reactions from "../../../../examples/cx/catalog/plugins/hide-reactions.cx";
 import plugin_catalog_hide_reply_previews from "../../../../examples/cx/catalog/plugins/hide-reply-previews.cx";
@@ -486,7 +489,10 @@ export const cxCatalog = {
         { name: "HideNotificationBell", source: plugin_catalog_hide_notification_bell },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button },
         { name: "Hide Profile Banner Images", source: plugin_catalog_hide_profile_banner_images },
+        { name: "HideProfileConnections", source: plugin_catalog_hide_profile_connections },
         { name: "HideProfileEffects", source: plugin_catalog_hide_profile_effects },
+        { name: "HideProfileMutuals", source: plugin_catalog_hide_profile_mutuals },
+        { name: "HideProfileNotes", source: plugin_catalog_hide_profile_notes },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab },
         { name: "HideReactions", source: plugin_catalog_hide_reactions },
         { name: "HideReplyPreviews", source: plugin_catalog_hide_reply_previews },

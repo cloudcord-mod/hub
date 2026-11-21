@@ -522,7 +522,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const appContainer = { getBaseAppContainerDimensions: () => ({ width: viewportWidth }) };
         const renderHeader = tree => tree;
         const nativeHeaders = new Map(["PrivateChannelButtons", "MessagesHeader", "VoiceUserItem", "MediaModalSpoilerOverlay",
-            "GuildBoostingMarketingProgressBar", "GuildPowerupsBoostGem", "PresenceActivityStatus", "ChatInputExpressionButton"].map(name => [
+            "GuildBoostingMarketingProgressBar", "GuildPowerupsBoostGem", "PresenceActivityStatus", "ChatInputExpressionButton",
+            "UserProfileNote", "UserProfileConnections", "LegacyUserProfileConnections", "UserProfileMutuals", "UserProfileMutualGuilds"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const forwardedRefs = [];
