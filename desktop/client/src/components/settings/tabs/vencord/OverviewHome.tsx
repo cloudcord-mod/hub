@@ -10,7 +10,7 @@ import "./OverviewHome.css";
 
 import { openNotificationLogModal } from "@api/Notifications/notificationLog";
 import { isPluginEnabled, plugins, startPlugin, stopPlugin } from "@api/PluginManager";
-import { Settings, useSettings } from "@api/Settings";
+import { Settings } from "@api/Settings";
 import { CloudIcon, FolderIcon, PluginsIcon, LogIcon, OpenExternalIcon, PaintbrushIcon, RestartIcon, RobotIcon, UserIcon } from "@components/Icons";
 import { Switch } from "@components/Switch";
 import { SettingsTab } from "@components/settings/tabs/BaseTab";
@@ -24,7 +24,7 @@ import { SettingsRouter, useEffect, useState } from "@webpack/common";
 import type { ComponentType } from "react";
 
 import { setNextAddonsTab } from "../addons";
-import { listablePlugins } from "../addons/AddonPage";
+import { useAddonCounts } from "../addons/AddonPage";
 import { tweakPlugins } from "../addons/TweaksPage";
 
 const cl = classNameFactory("cc-home-");
@@ -112,10 +112,8 @@ function setPlugin(name: string, on: boolean) {
 }
 
 export function OverviewHome() {
-    const { enabledThemes, themeLinks } = useSettings(["enabledThemes", "themeLinks", "plugins.*"] as any) as any;
-    const all = listablePlugins();
+    const counts = useAddonCounts();
     const tweaks = tweakPlugins();
-    const pluginsOn = all.filter(p => isPluginEnabled(p.name)).length;
     const tweaksOn = tweaks.filter(p => isPluginEnabled(p.name)).length;
     const profileOn = isPluginEnabled("ProfileSpoofer");
 
@@ -132,13 +130,13 @@ export function OverviewHome() {
 
             <div className={cl("stats")}>
                 <button className={cl("stat")} onClick={() => open("cloudcord_cloud_sync", "Plugins")}>
-                    <b>{pluginsOn}</b><span>of {all.length} plugins on</span>
+                    <b>{counts.activePlugins}</b><span>of {counts.plugins} plugins on</span>
                 </button>
                 <button className={cl("stat")} onClick={() => open("cloudcord_cloud_sync", "Tweaks")}>
                     <b>{tweaksOn}</b><span>of {tweaks.length} tweaks on</span>
                 </button>
                 <button className={cl("stat")} onClick={() => open("cloudcord_cloud_sync", "Themes")}>
-                    <b>{(enabledThemes?.length ?? 0) + (themeLinks?.length ?? 0)}</b><span>themes in use</span>
+                    <b>{counts.activeThemes}</b><span>themes in use</span>
                 </button>
                 <button className={cl("stat")} onClick={() => open("cloudcord_fake_profile")}>
                     <b className={profileOn ? cl("on") : cl("off")}>{profileOn ? "On" : "Off"}</b><span>Fake Profile</span>

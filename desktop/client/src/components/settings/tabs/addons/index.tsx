@@ -15,8 +15,8 @@ import { React } from "@webpack/common";
 import type { ComponentType } from "react";
 
 import { wrapTab } from "../BaseTab";
-import { listablePlugins, PluginsPage, ThemesPage } from "./AddonPage";
-import { tweakPlugins, TweaksPage } from "./TweaksPage";
+import { PluginsPage, ThemesPage } from "./AddonPage";
+import { TweaksPage } from "./TweaksPage";
 import { useTestingPluginsAssignment } from "./testingAccess";
 
 const cl = classNameFactory("cc-addons-");
@@ -30,11 +30,11 @@ const TweakIcon = ({ width = 16, height = 16, className }: IconProps) => (
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className}><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2" /><circle cx="10" cy="17" r="2" /></svg>
 );
 
-interface Page { name: string; Icon: ComponentType<IconProps>; Tab: ComponentType; count?(): number; show?(v: any): boolean; }
+interface Page { name: string; Icon: ComponentType<IconProps>; Tab: ComponentType; show?(v: any): boolean; }
 
 const PAGES: Page[] = [
-    { name: "Plugins", Icon: PluginsIcon, Tab: PluginsPage, count: () => listablePlugins().length, show: v => v.showPluginsTab !== false },
-    { name: "Tweaks", Icon: TweakIcon, Tab: TweaksPage, count: () => tweakPlugins().length },
+    { name: "Plugins", Icon: PluginsIcon, Tab: PluginsPage, show: v => v.showPluginsTab !== false },
+    { name: "Tweaks", Icon: TweakIcon, Tab: TweaksPage },
     { name: "Themes", Icon: PaintbrushIcon, Tab: ThemesPage, show: v => v.showThemesTab !== false },
     { name: "Testing Plugins", Icon: PluginIcon, Tab: TestingPage },
     { name: "Sync", Icon: CloudIcon, Tab: CloudPage, show: v => v.showCloudSyncTab !== false },
@@ -61,7 +61,7 @@ function Addons() {
     return (
         <>
             <nav className={cl("seg")} role="tablist">
-                {pages.map(({ name, Icon, count }) => (
+                {pages.map(({ name, Icon }) => (
                     <button
                         key={name}
                         role="tab"
@@ -71,7 +71,6 @@ function Addons() {
                     >
                         <Icon width={16} height={16} className={cl("seg-icon")} />
                         <span>{name}</span>
-                        {count && <span className={cl("seg-count")}>{count()}</span>}
                     </button>
                 ))}
             </nav>

@@ -67,4 +67,52 @@ assert.throws(() => testingPage.props.children[0].type(), /broken optional page/
 assert.equal(imported.at(-1), "./TestingPlugins");
 tester = undefined;
 assert(!labels(Addons()).includes("Testing Plugins"));
+
+const countModule = { exports: {} };
+let cursor = 0;
+const states = [];
+const commonHooks = {
+    useEffect() {}, useMemo: fn => fn(),
+    useState(initial) {
+        const index = cursor++;
+        if (!(index in states)) states[index] = initial;
+        return [states[index], value => { states[index] = value; }];
+    },
+};
+const nativePlugins = {
+    same: { name: "Shared", description: "Native version" },
+    disabled: { name: "Disabled", description: "Off" },
+    hidden: { name: "Hidden", description: "Internal", required: true },
+};
+const catalog = {
+    plugin: [
+        { id: "plugin:Shared", name: "Shared", description: "Catalog version", active: true },
+        { id: "plugin:Local", name: "Local", description: "Off", active: false },
+    ],
+    theme: [{ id: "theme", name: "Palette", active: true }],
+};
+const countMocks = {
+    "@api/PluginManager": { plugins: nativePlugins, isPluginEnabled: name => name === "Shared" },
+    "@api/Settings": { useSettings: () => ({ enabledThemes: ["a.css"], enabledThemeLinks: ["file"] }) },
+    "@sincordplugins/cxExtensions": { useCxAddonRows: kind => catalog[kind] },
+    "@utils/css": mocks["@utils/css"],
+    "@webpack/common": commonHooks,
+    "@components/settings/AddonCard": { AddonCard: "CatalogCard" },
+    "../plugins/PluginCard": { PluginCard: "NativeCard" },
+};
+const addonSource = fs.readFileSync("src/components/settings/tabs/addons/AddonPage.tsx", "utf8");
+vm.runInNewContext(esbuild.transformSync(addonSource, { loader: "tsx", format: "cjs" }).code, {
+    module: countModule, React, IS_WEB: true, VencordNative: { pluginHelpers: {} },
+    require: name => countMocks[name] ?? {},
+});
+const { useAddonCounts, PluginsPage } = countModule.exports;
+assert.deepEqual({ ...useAddonCounts() }, { plugins: 3, activePlugins: 1, activeThemes: 3 });
+const walk = tree => Array.isArray(tree) ? tree.flatMap(walk) : tree?.props ? [tree, ...walk(tree.props.children)] : [];
+const renderList = () => { cursor = 0; return walk(PluginsPage()); };
+const beforeFiltering = renderList();
+assert.ok(beforeFiltering.some(node => node.type === "CatalogCard" && node.props.name === "Local"));
+const toggle = beforeFiltering.find(node => node.type?.name === "EnabledOnly");
+toggle.props.onChange(true);
+assert.ok(!renderList().some(node => node.props.name === "Local" || node.props.plugin?.name === "Disabled"));
+assert.ok(renderList().some(node => node.props.name === "Shared" || node.props.plugin?.name === "Shared"));
 console.log("PASS Add-ons tabs, tester visibility and optional page isolation");

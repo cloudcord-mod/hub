@@ -42,6 +42,7 @@ export default function Themes() {
   return (
     <AddonPage<VdThemeInfo | CxAddonRow>
       title={Strings.THEMES}
+      isEnabled={theme => "source" in theme ? theme.active : !activeCxTheme && theme.selected}
       searchKeywords={[
         themeName,
         (p) => ("source" in p ? p.description : p.data.description) ?? "",

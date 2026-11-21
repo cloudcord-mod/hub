@@ -71,6 +71,27 @@ export function AddonHeader({ title, count, query, setQuery }: { title: string; 
 export const listablePlugins = () =>
     Object.values(plugins).filter(p => !p.hidden && !p.required && !(p.name.endsWith("API") && !p.settings?.def));
 
+export function useAddonCounts() {
+    const settings = useSettings(["enabledThemes", "enabledThemeLinks", "plugins.*"]);
+    const pluginRows = cxAddons().useCxAddonRows("plugin", "");
+    const themeRows = cxAddons().useCxAddonRows("theme", "");
+    const catalogNames = new Map(pluginRows.map(row => [row.name.toLowerCase(), row.active]));
+    for (const plugin of listablePlugins()) {
+        const name = plugin.name.toLowerCase();
+        catalogNames.set(name, Boolean(catalogNames.get(name) || isPluginEnabled(plugin.name)));
+    }
+    return {
+        plugins: catalogNames.size,
+        activePlugins: [...catalogNames.values()].filter(Boolean).length,
+        activeThemes: (settings.enabledThemes?.length ?? 0) + (settings.enabledThemeLinks?.length ?? 0) + themeRows.filter(row => row.active).length,
+    };
+}
+
+function EnabledOnly({ value, onChange }: { value: boolean; onChange(enabled: boolean): void; }) {
+    return <button type="button" className={cl("mode", { "mode-on": value })} aria-pressed={value}
+        onClick={() => onChange(!value)}>Enabled only</button>;
+}
+
 // Render cards in pages as you scroll, so opening Plugins stays fast.
 const PAGE = 48;
 
@@ -89,9 +110,10 @@ export function PluginsPage() {
     const [query, setQuery] = useState("");
     const [sort, setSort] = useState<Sort>("name");
     const [grid, setGrid] = useState(false);
+    const [enabledOnly, setEnabledOnly] = useState(false);
     const [, force] = useState(0);
     const [limit, setLimit] = useState(PAGE);
-    useEffect(() => setLimit(PAGE), [query, sort]);
+    useEffect(() => setLimit(PAGE), [query, sort, enabledOnly]);
 
     const visible = useMemo(listablePlugins, []);
     const cxRows = cxAddons().useCxAddonRows("plugin", query);
@@ -110,7 +132,8 @@ export function PluginsPage() {
             const native = nativeByName.get(name);
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
         }).map(extension => ({ name: extension.name, active: extension.active, plugin: undefined, extension })),
-    ].sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0) || a.name.localeCompare(b.name));
+    ].filter(row => !enabledOnly || row.active)
+        .sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0) || a.name.localeCompare(b.name));
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
 
@@ -134,6 +157,7 @@ export function PluginsPage() {
                     <button className={cl("mode")} onClick={() => reviewAddon("plugin")}>Import plugin</button>
                 </div>
                 <div className={cl("advanced")}>
+                    <EnabledOnly value={enabledOnly} onChange={setEnabledOnly} />
                     <label className={cl("select")}>
                         Sort by:
                         <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
@@ -149,7 +173,7 @@ export function PluginsPage() {
             </div>
 
             {shown.length === 0
-                ? <div className={cl("empty")}>No plugins match “{query}”.</div>
+                ? <div className={cl("empty")}>{enabledOnly && !q ? "No plugins are enabled." : `No plugins match “${query}”.`}</div>
                 : (
                     <div className={cl("list", { grid })}>
                         {shown.slice(0, limit).map(({ plugin, extension }) => {
@@ -249,9 +273,10 @@ export function ThemesPage() {
     const [query, setQuery] = useState("");
     const [sort, setSort] = useState<Sort>("name");
     const [grid, setGrid] = useState(false);
+    const [enabledOnly, setEnabledOnly] = useState(false);
     const [limit, setLimit] = useState(PAGE);
     const cxRows = cxAddons().useCxAddonRows("theme", query);
-    useEffect(() => setLimit(PAGE), [query, sort]);
+    useEffect(() => setLimit(PAGE), [query, sort, enabledOnly]);
 
     const refresh = () => VencordNative.themes.getThemesList().then(list => setThemes(list.map(t => getThemeInfo(stripBOM(t.content), t.fileName))));
     useEffect(() => { refresh(); fetchStore().then(setStore, () => { }); }, []);
@@ -309,14 +334,15 @@ export function ThemesPage() {
         key: "cx:" + entry.name, name: entry.name, description: entry.description, on: entry.active,
         set: on => toggleCxAddon("theme", entry, on), options: entry.active ? () => reviewAddon("theme", entry) : undefined,
     })));
-    installed
+    const visibleInstalled = enabledOnly ? installed.filter(row => row.on) : installed;
+    visibleInstalled
         .sort((a, b) => sort === "enabled" ? Number(b.on) - Number(a.on) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name));
 
     const browse = (store ?? [])
         .filter(t => match(t.name, t.author.display_name, t.description, ...t.tags))
         .sort((a, b) => sort === "enabled" ? b.downloads - a.downloads : a.name.localeCompare(b.name));
 
-    const count = mode === "installed" ? installed.length : browse.length;
+    const count = mode === "installed" ? visibleInstalled.length : browse.length;
 
     return (
         <SettingsTab>
@@ -335,6 +361,7 @@ export function ThemesPage() {
                     <button className={cl("mode")} onClick={() => reviewAddon("theme")}>Import theme</button>
                 </div>
                 <div className={cl("advanced")}>
+                    {mode === "installed" && <EnabledOnly value={enabledOnly} onChange={setEnabledOnly} />}
                     <label className={cl("select")}>
                         Sort by:
                         <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
@@ -349,17 +376,17 @@ export function ThemesPage() {
                 </div>
             </div>
 
-            {mode === "installed" && (installed.length === 0
+            {mode === "installed" && (visibleInstalled.length === 0
                 ? (
                     <div className={cl("empty")}>
                         {q
                             ? <>No themes match “{query}”.</>
-                            : <>No themes yet. Open <b>Browse</b> to install one, or put <code>.theme.css</code> files in your themes folder.</>}
+                            : enabledOnly ? "No themes are enabled." : <>No themes yet. Open <b>Browse</b> to install one, or put <code>.theme.css</code> files in your themes folder.</>}
                     </div>
                 )
                 : (
                     <div className={cl("list", { grid })}>
-                        {installed.slice(0, limit).map(r => (
+                        {visibleInstalled.slice(0, limit).map(r => (
                             <AddonCard
                                 key={r.key}
                                 name={r.name}
@@ -378,7 +405,7 @@ export function ThemesPage() {
                         ))}
                     </div>
                 ))}
-            {mode === "installed" && installed.length > limit && <LoadMore onVisible={() => setLimit(l => l + PAGE)} />}
+            {mode === "installed" && visibleInstalled.length > limit && <LoadMore onVisible={() => setLimit(l => l + PAGE)} />}
 
             {mode === "browse" && (storeError
                 ? <div className={cl("empty")}>Couldn't load the theme store: {storeError}</div>

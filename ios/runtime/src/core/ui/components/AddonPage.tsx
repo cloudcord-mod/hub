@@ -7,7 +7,7 @@ import isValidHttpUrl from "@lib/utils/isValidHttpUrl";
 import { lazyDestructure, proxyLazy } from "@lib/utils/lazy";
 import { findByProps } from "@metro";
 import { clipboard, NavigationNative } from "@metro/common";
-import { AlertActionButton, AlertModal, Button, FlashList, FloatingActionButton, HelpMessage, IconButton, Stack, Text, TextInput, useSafeAreaInsets } from "@metro/common/components";
+import { AlertActionButton, AlertModal, Button, FlashList, FloatingActionButton, HelpMessage, IconButton, Stack, TableSwitchRow, Text, TextInput, useSafeAreaInsets } from "@metro/common/components";
 import { ErrorBoundary, Search } from "@ui/components";
 import { isNotNil } from "es-toolkit";
 import fuzzysort from "fuzzysort";
@@ -24,6 +24,7 @@ interface AddonPageProps<T extends object, I = any> {
     searchKeywords: SearchKeywords<T>;
     sortOptions?: Record<string, (a: T, b: T) => number>;
     resolveItem?: (value: I) => T | undefined;
+    isEnabled?: (item: T) => boolean;
     safeModeHint?: {
         message?: string;
         footer?: ReactNode;
@@ -111,6 +112,7 @@ function InputAlert(props: { label: string, fetchFn: (url: string) => Promise<vo
 
 export default function AddonPage<T extends object>({ CardComponent, ...props }: AddonPageProps<T>) {
     const [search, setSearch] = useState("");
+    const [enabledOnly, setEnabledOnly] = useState(false);
     const [sortFn, setSortFn] = useState<((a: T, b: T) => number) | null>(() => null);
     const { bottom: bottomInset } = useSafeAreaInsets();
     const navigation = NavigationNative.useNavigation();
@@ -131,11 +133,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     const results = useMemo(() => {
         let values = props.items;
         if (props.resolveItem) values = values.map(props.resolveItem).filter(isNotNil);
-        const items = values.filter(i => isNotNil(i) && typeof i === "object");
+        const items = values.filter(item => isNotNil(item) && typeof item === "object"
+            && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
         if (!search && sortFn) items.sort(sortFn);
 
         return fuzzysort.go(search, items, { keys: props.searchKeywords, all: true });
-    }, [props.items, sortFn, search]);
+    }, [props.items, props.isEnabled, sortFn, search, enabledOnly]);
 
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };
@@ -147,7 +150,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         }
     }, []);
 
-    if (results.length === 0 && !search) {
+    if (results.length === 0 && !search && !enabledOnly) {
         return <View style={{ gap: 32, flexGrow: 1, justifyContent: "center", alignItems: "center" }}>
             <View style={{ gap: 8, alignItems: "center" }}>
                 <Image source={findAssetId("empty_quick_switcher")!} />
@@ -191,6 +194,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                     })}
                 />}
             </View>
+            {props.isEnabled && <TableSwitchRow label="Enabled only" value={enabledOnly} onValueChange={setEnabledOnly} />}
             {props.ListHeaderComponent && <props.ListHeaderComponent />}
         </View>
     );
@@ -205,7 +209,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>
                     <Image source={findAssetId("devices_not_found")!} />
                     <Text variant="text-lg/semibold" color="text-default">
-                        Hmmm... could not find that!
+                        {enabledOnly && !search ? "No add-ons are enabled." : "Hmmm... could not find that!"}
                     </Text>
                 </View>}
                 contentContainerStyle={{ padding: 8, paddingHorizontal: 12, paddingBottom: 90 }}

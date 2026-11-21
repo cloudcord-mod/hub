@@ -39,6 +39,7 @@ const { AlertModal, AlertActions, AlertActionButton } = lazyDestructure(() =>
 
 type PluginRow = UnifiedPluginModel | CxAddonRow;
 type PluginPageProps = Partial<ComponentProps<typeof AddonPage<PluginRow>>> & { useItems: () => PluginRow[]; };
+const isPluginRowEnabled = (item: PluginRow) => "source" in item ? item.active : item.isEnabled();
 
 function PluginListCard({ item, result }: CardWrapper<PluginRow>) {
   return "source" in item
@@ -52,6 +53,7 @@ function PluginPage(props: PluginPageProps) {
   return (
     <AddonPage<PluginRow>
       CardComponent={PluginListCard}
+      isEnabled={isPluginRowEnabled}
       title={Strings.PLUGINS}
       searchKeywords={[
         "name",

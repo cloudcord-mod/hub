@@ -50,5 +50,41 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
     vm.runInNewContext(compile('ios/runtime/src/core/ui/settings/pages/PluginBrowser/index.tsx'), browser);
     assert.equal(typeof browser.module.exports.default, 'function');
     assert.equal(lookups, 0, 'loading the marketplace must not eagerly resolve an unavailable action-sheet module');
+
+    let cursor = 0;
+    const state = [];
+    const addonList = { module: { exports: {} }, React, require(name) {
+        if (name === 'react') return {
+            useCallback: fn => fn, useEffect() {}, useMemo: fn => fn(),
+            useState(initial) {
+                const index = cursor++;
+                if (!(index in state)) state[index] = typeof initial === 'function' ? initial() : initial;
+                return [state[index], value => { state[index] = value; }];
+            },
+        };
+        if (name === '@metro/common') return common;
+        if (name === '@lib/api/settings') return { settings: {} };
+        if (name === '@lib/api/assets') return { findAssetId: () => 1 };
+        if (name === '@lib/utils/lazy') return { lazyDestructure: () => ({}) };
+        if (name === '@metro/common/components') return { FlashList: 'FlashList', TableSwitchRow: 'TableSwitchRow', useSafeAreaInsets: () => ({ bottom: 0 }) };
+        if (name === 'es-toolkit') return { isNotNil: value => value != null };
+        if (name === 'fuzzysort') return { go: (query, items) => items.filter(item => item.name.includes(query)).map(obj => ({ obj })) };
+        return {};
+    } };
+    vm.runInNewContext(compile('ios/runtime/src/core/ui/components/AddonPage.tsx'), addonList);
+    const items = [{ name: 'first', enabled: true }, { name: 'second', enabled: false }];
+    const renderList = () => {
+        cursor = 0;
+        return walk(addonList.module.exports.default({ title: 'Plugins', items, isEnabled: item => item.enabled, searchKeywords: ['name'] }))
+            .find(node => node.type === 'FlashList');
+    };
+    const filter = list => walk(list.props.ListHeaderComponent).find(node => node.type === 'TableSwitchRow');
+    assert.equal(renderList().props.data.length, 2);
+    filter(renderList()).props.onValueChange(true);
+    assert.deepEqual(renderList().props.data.map(item => item.obj.name), ['first']);
+    items[0].enabled = false;
+    assert.equal(renderList().props.data.length, 0, 'the list stays open when the last enabled plugin is turned off');
+    filter(renderList()).props.onValueChange(false);
+    assert.equal(renderList().props.data.length, 2);
     console.log('PASS add-on failed-import recovery, duplicate-tap isolation, valid routing and lazy marketplace native lookup');
 })().catch(error => { console.error(error); process.exitCode = 1; });
