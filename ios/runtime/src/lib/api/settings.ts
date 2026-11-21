@@ -13,6 +13,7 @@ export interface Settings {
     cloudcordHiddenTabs?: string[];
     cloudcordTabOrder?: string[];
     cloudcordSectionHidden?: boolean;
+    cxRememberedAppearance?: { name: string; revision: string; selected: string[]; }[];
     safeMode?: {
         enabled: boolean;
         currentThemeId?: string;

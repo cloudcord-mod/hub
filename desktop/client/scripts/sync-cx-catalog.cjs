@@ -1,4 +1,5 @@
 const fs = require("node:fs");
+const { createHash } = require("node:crypto");
 const path = require("node:path");
 const vm = require("node:vm");
 const { buildSync } = require("esbuild");
@@ -27,7 +28,7 @@ function pluginBody(source) {
 }
 
 function buildCatalog(additions = new Map()) {
-    const { parseCx, reviewCx, cxAppearanceTargets, getCxCatalogCategories } = loadCxRuntime();
+    const { parseCx, reviewCx, cxAppearanceTargets, getCxCatalogCategories, canRememberCxAppearance } = loadCxRuntime();
     const names = new Set();
     const commands = new Set();
     const groups = {};
@@ -81,7 +82,9 @@ function buildCatalog(additions = new Map()) {
                 ? [parsed.mode && (parsed.mode[0].toUpperCase() + parsed.mode.slice(1) + " theme"), parsed.wallpaper && "Wallpaper"].filter(Boolean).join(" · ")
                 : (specific[0] ?? (commandNames.length ? commandNames.slice(0, 3).map(command => "/" + command).join(" · ") : review?.effects[0] ?? "")).slice(0, 160);
             const keywords = [...new Set([...specific.slice(1), ...(review?.appearanceOptions ?? []).map(option => option.label)])].join(" ").slice(0, 520);
-            return { name, binding, description, keywords, desktopOnly, commandNames, categories: getCxCatalogCategories(parsed) };
+            const appearanceRevision = !desktopOnly && canRememberCxAppearance(parsed)
+                ? createHash("sha256").update(document.replaceAll("\r\n", "\n")).digest("hex") : undefined;
+            return { name, binding, description, keywords, desktopOnly, commandNames, categories: getCxCatalogCategories(parsed), appearanceRevision };
         });
     }
     const source = [
@@ -90,14 +93,14 @@ function buildCatalog(additions = new Map()) {
         "",
         'import type { CxCatalogCategory } from "./cx";',
         "",
-        "type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; };",
+        "type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; };",
         "",
         "export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {",
         ...Object.entries(groups).flatMap(([kind, entries]) => [
             `    ${kind}: [`,
-            ...entries.map(({ name, binding, description, keywords, desktopOnly, commandNames, categories }) => {
+            ...entries.map(({ name, binding, description, keywords, desktopOnly, commandNames, categories, appearanceRevision }) => {
                 const data = { description: description || undefined, keywords: keywords || undefined,
-                    desktopOnly: desktopOnly || undefined, commands: commandNames.length ? commandNames : undefined, categories };
+                    desktopOnly: desktopOnly || undefined, commands: commandNames.length ? commandNames : undefined, categories, appearanceRevision };
                 const fields = Object.entries(data).filter(([, value]) => value !== undefined)
                     .map(([key, value]) => `${key}: ${JSON.stringify(value)}`);
                 return `        { name: ${JSON.stringify(name)}, source: ${[binding, ...fields].join(", ")} },`;

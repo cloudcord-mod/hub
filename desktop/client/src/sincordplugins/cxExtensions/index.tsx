@@ -26,7 +26,7 @@ import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
-import { type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
+import { canRememberCxAppearance, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -800,7 +800,7 @@ function refreshRememberedAppearance() {
 }
 
 function bundledAppearanceId(source: string, review: ReturnType<typeof reviewCx>) {
-    if (review.kind === "plugin" && !review.permissions.every(permission => permission === "appearance.hide" || permission === "appearance.style")) return;
+    if (!canRememberCxAppearance(review)) return;
     const entries = review.kind === "theme" ? cxCatalog.themes : cxCatalog.plugins;
     if (!entries.some(entry => entry.source === source)) return;
     return review.kind === "theme" ? "theme" : "plugin:" + review.name;

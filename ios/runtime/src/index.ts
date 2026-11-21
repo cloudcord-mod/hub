@@ -75,6 +75,18 @@ export default async () => {
         u => u.forEach(f => f && lib.unload.push(f))
     );
 
+    // Keep the catalog and native appearance adapters off the startup path
+    // until storage confirms the user chose to remember an appearance.
+    void Promise.resolve().then(async () => {
+        const { settings } = require("@lib/api/settings") as typeof import("@lib/api/settings");
+        const { awaitStorage } = require("@core/vendetta/storage") as typeof import("@core/vendetta/storage");
+        await awaitStorage(settings);
+        if (settings.safeMode?.enabled || !settings.cxRememberedAppearance?.length) return;
+        const cleanup = await runStartupTask("CX appearance", () =>
+            require("@core/ui/settings/pages/CxExtensions").restoreRememberedCxAppearance());
+        if (cleanup) lib.unload.push(cleanup);
+    }).catch(error => console.warn("CloudCord could not restore CX appearance", error));
+
     initDebugger()
 
     // Assign window object

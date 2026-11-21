@@ -256,6 +256,11 @@ function quoted(value: string, limit: number, allowEmpty = false) {
 export const CX_CATALOG_CATEGORIES = ["All", "Appearance", "Chat", "Commands", "Media", "Profiles", "Servers & channels", "Voice & calls", "Themes"] as const;
 export type CxCatalogCategory = typeof CX_CATALOG_CATEGORIES[number];
 
+export function canRememberCxAppearance(document: { kind: "plugin" | "theme"; permissions?: readonly CxPermission[]; }) {
+    return document.kind === "theme" || Boolean(document.permissions?.length && document.permissions.every(permission =>
+        permission === "appearance.hide" || permission === "appearance.style"));
+}
+
 export function getCxCatalogCategories(document: CxDocument): CxCatalogCategory[] {
     if (document.kind === "theme") return ["Themes"];
     const permissions = document.permissions;

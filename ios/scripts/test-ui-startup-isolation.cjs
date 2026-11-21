@@ -12,4 +12,7 @@ assert.match(page, /function ActionButton/);
 const native = fs.readFileSync(path.join(root, 'ios/native-ios/Sources/Bridgeless.xm'), 'utf8');
 assert.doesNotMatch(native, /initializeThemeColors|current-theme\.json/);
 assert.doesNotMatch(native, /patchFonts|fonts\.json|RCTJavaScriptDidLoadNotification/);
-console.log('FakeProfile redesign stays lazy; no appearance work in the retired adapter');
+const startup = fs.readFileSync(path.join(root, 'ios/runtime/src/index.ts'), 'utf8');
+assert.doesNotMatch(startup, /import[^\n]*CxExtensions/);
+assert.match(startup, /void Promise\.resolve\(\)\.then\(async \(\) => \{[\s\S]*?await awaitStorage\(settings\);\s*if \(settings\.safeMode\?\.enabled \|\| !settings\.cxRememberedAppearance\?\.length\) return;\s*const cleanup = await runStartupTask\("CX appearance"/);
+console.log('PASS mobile Profile Studio and remembered CX appearance stay off the required startup path');

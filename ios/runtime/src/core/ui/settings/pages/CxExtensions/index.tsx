@@ -4,7 +4,7 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
-import { CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
+import { canRememberCxAppearance, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
@@ -2002,6 +2002,281 @@ function supportsMobileHide({ target }: { target: keyof typeof cxAppearanceTarge
     return !("desktopOnly" in cxAppearanceTargets[target]);
 }
 
+const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearanceTarget" | "styleAppearanceTarget" | "applyTheme"> = {
+    hideAppearanceTarget(target) {
+        if (!supportsMobileHide({ target })) return () => {};
+        const mobile = cxAppearanceTargets[target].mobile;
+        if ("renderTree" in mobile || "renderComponent" in mobile) return registerTreeAppearance(mobile);
+        if ("tableRow" in mobile) {
+            const tableRow = findByFilePath("design/components/TableRow/native/TableRow.native.tsx")?.TableRow;
+            if (!tableRow) throw new Error("Discord's table row is unavailable");
+            const rule = mobile.tableRow;
+            if ("key" in rule) return registerJsxAppearance([tableRow], element => element.key === rule.key ? null : element);
+            const translations = findByProps("intl", "t");
+            const message = translations?.t?.[rule.subLabelFor];
+            const label = message && translations?.intl?.string?.(message);
+            if (typeof label !== "string" || !label) throw new Error("Discord's table row label is unavailable");
+            return registerJsxAppearance([tableRow], element => element.props.label === label && typeof element.props.subLabel === "string"
+                ? React.cloneElement(element, { subLabel: undefined }) : element);
+        }
+        if ("expressionPickerTab" in mobile) return registerExpressionPickerTab(mobile.expressionPickerTab);
+        if ("settingsEntry" in mobile) return hideSettingsEntry(mobile.settingsEntry);
+        if ("hideComponentPaths" in mobile) return registerHiddenAppearancePaths(mobile.hideComponentPaths);
+        if ("scrollIndicators" in mobile) {
+            const scrollViews = new Set([ScrollView, FlatList, SectionList, Animated?.ScrollView, Animated?.FlatList, Animated?.SectionList]);
+            const components = [...scrollViews].filter((component): component is NonNullable<typeof component> => component != null);
+            return registerJsxAppearance(components, element => React.cloneElement(element, {
+                showsHorizontalScrollIndicator: false,
+                showsVerticalScrollIndicator: false,
+            }));
+        }
+        if ("customStatusEmojis" in mobile) {
+            const hideBubbleEmoji = registerJsxAppearance(mobile.customStatusEmojis, element => {
+                const { customStatusActivity } = element.props;
+                if (!customStatusActivity?.emoji) return element;
+                return React.cloneElement(element, { customStatusActivity: { ...customStatusActivity, emoji: undefined } });
+            });
+            const hideActivityEmoji = registerJsxAppearance(["ActivityStatus"], element => React.cloneElement(element, { hideEmoji: true }), true);
+            return () => { hideActivityEmoji(); hideBubbleEmoji(); };
+        }
+        if ("memberActivityText" in mobile) {
+            const status = findByFilePath("modules/activity_status/native/PresenceActivityStatus.tsx")?.default;
+            if (!status) throw new Error("Discord's member activity renderer is unavailable");
+            return registerMemberRowAppearance(status, element => {
+                const type = element.props.activity?.type;
+                // Discord activity types 0 and 2 are Playing and Listening.
+                return type === 0 || type === 2 ? React.cloneElement(element, { hideText: true }) : element;
+            });
+        }
+        if ("memberCustomStatus" in mobile) {
+            const status = findByFilePath("modules/activity_status/native/ActivityStatus.tsx")?.default;
+            if (typeof status !== "function" || status.prototype?.isReactComponent) {
+                throw new Error("Discord's custom status renderer is unavailable");
+            }
+            function WithoutCustomStatus({ originalProps }: { originalProps: object; }) {
+                const output: ReactNode = status(originalProps);
+                if (settings.safeMode?.enabled || !React.isValidElement<{ children?: ReactNode; }>(output)) return output;
+                const { children } = output.props;
+                if (!Array.isArray(children) || children.length !== 3) return output;
+                const [activity, separator, custom] = children;
+                if (!React.isValidElement(custom) || custom.type !== React.Fragment
+                    || separator != null && (!React.isValidElement<{ accessibilityElementsHidden?: boolean; }>(separator)
+                        || separator.props.accessibilityElementsHidden !== true)) return output;
+                // Discord renders the activity, its separator, and the custom status as three siblings.
+                return React.cloneElement(output, { children: [activity, null, null] });
+            }
+            return registerMemberRowAppearance("ActivityStatus", element => element.type === status
+                ? <WithoutCustomStatus originalProps={element.props} /> : element);
+        }
+        if ("emptyServerFolders" in mobile) {
+            return registerJsxAppearance(["GuildsBarGuildFolder"], element => {
+                const { expanded, childNodes, isDragPreview, hideExpandedChildren } = element.props;
+                return expanded === true && !isDragPreview && !hideExpandedChildren
+                    && Array.isArray(childNodes) && childNodes.length === 0 ? null : element;
+            });
+        }
+        if ("mentionBadges" in mobile) {
+            const stopLegacy = registerJsxAppearance(["MentionsBadge"], () => null);
+            const stopCount = registerJsxAppearance(["Badge"], element =>
+                typeof element.props.value === "number" && element.props.value > 0
+                    && "isMentionLowImportance" in element.props ? null : element);
+            return () => { stopCount(); stopLegacy(); };
+        }
+        if (!("messagePresentation" in mobile)) return registerJsxAppearance(mobile, () => null);
+        const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+        return overrideCxMethods(renderer, {
+            default(args, invoke) {
+                const presentation = invoke(args);
+                if (!presentation || typeof presentation !== "object") return presentation;
+                if (mobile.messagePresentation === "edited") {
+                    if ("edited" in presentation && presentation.edited === true) return { ...presentation, edited: false };
+                } else if (mobile.messagePresentation === "timestamps") {
+                    if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
+                        return { ...presentation, timestamp: undefined, timestampTooltip: undefined, timestampAccessibilityLabel: undefined };
+                    }
+                } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
+                    return { ...presentation, stickers: [] };
+                }
+                return presentation;
+            },
+        }, () => !settings.safeMode?.enabled);
+    },
+    styleAppearanceTarget(target) {
+        const style = cxAppearanceTargets[target].style;
+        if ("blurredMedia" in style) return registerBlurredMedia(style.blurredMedia);
+        if ("reducedMotion" in style) return registerReducedMotion();
+        if ("mentionHighlight" in style) {
+            const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+            const highlightColor = processColor(style.mentionHighlight);
+            if (typeof highlightColor !== "number") throw new Error("Discord's message highlight color is unavailable");
+            return overrideCxMethods(renderer, {
+                default(args, invoke) {
+                    const message = invoke(args);
+                    if (!message || typeof message !== "object" || !("mentioned" in message) || message.mentioned !== true
+                        || !("highlightColor" in message) || typeof message.highlightColor !== "number" || message.highlightColor === 0) return message;
+                    return { ...message, highlightColor };
+                },
+            }, () => !settings.safeMode?.enabled);
+        }
+        if ("centeredMessageList" in style) {
+            const messages = findByFilePath(style.centeredMessageList)?.default;
+            if (!messages) throw new Error("Discord's message list is unavailable");
+            const centered = { alignSelf: "center", width: "100%", maxWidth: style.width };
+            // The wallpaper hook may already have wrapped the original message list.
+            return registerJsxAppearance([messages], tree => mapAppearanceElements(tree, element => element.type === messages
+                ? React.cloneElement(element, { style: [element.props.style, centered] })
+                : element));
+        }
+        if ("messageWidthRenderer" in style) {
+            const renderer = findByFilePath(style.messageWidthRenderer);
+            return overrideCxMethods(renderer, {
+                default(args, invoke) {
+                    const presentation = invoke(args);
+                    const input = args[0] as { isInlineReplyPreview?: boolean; message?: { content?: string; }; } | undefined;
+                    if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview
+                        || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number") return presentation;
+                    // Use the native logical width for message text and keep the system font scale.
+                    const width = style.width * PixelRatio.getFontScale();
+                    return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width
+                        ? { ...presentation, constrainedWidth: width } : presentation;
+                },
+            }, () => !settings.safeMode?.enabled);
+        }
+        if ("drawerWidthDelta" in style) return registerChannelDrawerWidth(style.drawerWidthDelta);
+        if ("compactMemberList" in style) return registerCompactMemberList();
+        if ("renderedComponents" in style) return registerRenderedChannelStyle(style);
+        if ("serverIconScale" in style) {
+            const iconStyle = { transform: [{ scale: style.serverIconScale }] };
+            return registerJsxAppearance(["GuildsBarAnimatedItemWrapper"], element => {
+                const { children, preventClipping, isDragPreview } = element.props;
+                if (preventClipping || isDragPreview || !React.isValidElement<{
+                    source?: unknown; style?: unknown; value?: string; size?: unknown; animate?: boolean;
+                }>(children)) return element;
+
+                const icon = children.props;
+                // Discord renders either a server image or a label with the server initials here.
+                if ("source" in icon && "style" in icon) {
+                    return React.cloneElement(element, { children: React.cloneElement(children, { style: [icon.style, iconStyle] }) });
+                }
+                if (typeof icon.value === "string" && "size" in icon && typeof icon.animate === "boolean") {
+                    return React.cloneElement(element, { children: <View style={iconStyle}>{children}</View> });
+                }
+                return element;
+            });
+        }
+        if ("spoilerOutline" in style) {
+            const spoiler = findByFilePath("modules/markup/native/Spoiler.tsx")?.default?.prototype;
+            if (typeof spoiler?.render !== "function") throw new Error("Discord's text spoiler is unavailable");
+            const outline = style.spoilerOutline;
+            const stopText = instead("render", spoiler, function (this: { state?: { revealed?: boolean; }; }, args, original) {
+                const rendered = original.apply(this, args);
+                if (settings.safeMode?.enabled || this.state?.revealed !== false || !React.isValidElement<{ style?: unknown; }>(rendered)) return rendered;
+                return React.cloneElement(rendered, { style: [rendered.props.style, outline] });
+            });
+            try {
+                const stopMedia = registerJsxAppearance(["MediaModalSpoilerOverlay"], element => element.props.source?.obscure
+                    ? element : React.cloneElement(element, { style: [element.props.style, outline] }));
+                return () => { stopMedia(); stopText(); };
+            } catch (error) {
+                stopText();
+                throw error;
+            }
+        }
+        if ("component" in style) {
+            return registerJsxAppearance([style.component], element => {
+                if ("props" in style) {
+                    return element.props[style.skipWhenTrue] === true ? element : React.cloneElement(element, style.props);
+                }
+                if (!("key" in style)) return React.cloneElement(element, { style: [element.props.style, style.values] });
+                const styles = element.props.styles;
+                return React.cloneElement(element, { styles: { ...styles, [style.key]: [styles?.[style.key], style.values] } });
+            });
+        }
+        if (!isThemeSupported()) throw new Error("This loader does not support color overrides");
+        return registerColorOverlay(style);
+    },
+    applyTheme(theme) {
+        if (!isThemeSupported()) throw new Error("This loader does not support themes");
+        const palette = (value: string) => [value, value];
+        const surface = theme.surface ?? theme.background;
+        const sidebar = theme.sidebar ?? surface;
+        return applyTemporaryTheme({
+            name: theme.name,
+            spec: 2,
+            semanticColors: {
+                BACKGROUND_PRIMARY: palette(theme.background),
+                BACKGROUND_SECONDARY: palette(surface),
+                BACKGROUND_TERTIARY: palette(sidebar),
+                BACKGROUND_BASE_LOW: palette(theme.background),
+                BACKGROUND_BASE_LOWER: palette(surface),
+                BACKGROUND_BASE_LOWEST: palette(sidebar),
+                ...(theme.text ? { TEXT_NORMAL: palette(theme.text), TEXT_PRIMARY: palette(theme.text), TEXT_DEFAULT: palette(theme.text), TEXT_STRONG: palette(theme.text) } : {}),
+                ...(theme.muted ? { TEXT_MUTED: palette(theme.muted), TEXT_SECONDARY: palette(theme.muted), TEXT_SUBTLE: palette(theme.muted) } : {}),
+                ...(theme.accent ? { TEXT_LINK: palette(theme.accent) } : {}),
+                ...Object.fromEntries(Object.entries(theme.semanticColors ?? {}).map(([token, color]) => [token, palette(color)])),
+            },
+            ...(theme.rawColors ? { rawColors: { ...theme.rawColors } } : {}),
+            ...(theme.wallpaper ? { background: { url: theme.wallpaper, alpha: theme.wallpaperOpacity ?? 1, blur: theme.wallpaperBlur } } : {}),
+        }, theme.mode);
+    },
+};
+
+const rememberedCatalog = new Map([
+    ...mobileCatalogPlugins.filter(entry => entry.appearanceRevision).map(entry => [entry.name, { ...entry, id: "plugin:" + entry.name }] as const),
+    ...cxCatalog.themes.filter(entry => entry.appearanceRevision).map(entry => [entry.name, { ...entry, id: "theme" }] as const),
+]);
+type RememberedAppearance = NonNullable<typeof settings.cxRememberedAppearance>[number];
+
+function readRememberedAppearance(): RememberedAppearance[] {
+    const records = settings.cxRememberedAppearance;
+    if (!Array.isArray(records)) return [];
+    return records.slice(0, 16).filter(entry => typeof entry?.name === "string" && typeof entry.revision === "string"
+        && Array.isArray(entry.selected) && entry.selected.every(target => typeof target === "string"));
+}
+
+function forgetRememberedAppearance(name: string) {
+    settings.cxRememberedAppearance = readRememberedAppearance().filter(entry => entry.name !== name);
+}
+
+function rememberAppearance(entry: RememberedAppearance, replaceTheme = false) {
+    const remaining = readRememberedAppearance().filter(saved => saved.name !== entry.name
+        && (!replaceTheme || rememberedCatalog.get(saved.name)?.id !== "theme"));
+    settings.cxRememberedAppearance = [entry, ...remaining].slice(0, 16);
+}
+
+const rememberedAppearanceListeners = new Set<() => void>();
+let rememberedAppearanceUpdates = 0;
+function subscribeRememberedAppearance(listener: () => void) {
+    rememberedAppearanceListeners.add(listener);
+    return () => { rememberedAppearanceListeners.delete(listener); };
+}
+function refreshRememberedAppearance() {
+    rememberedAppearanceUpdates++;
+    rememberedAppearanceListeners.forEach(listener => listener());
+}
+
+export function restoreRememberedCxAppearance() {
+    if (settings.safeMode?.enabled) return;
+    for (const saved of readRememberedAppearance()) {
+        const entry = rememberedCatalog.get(saved.name);
+        if (!entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== undefined) continue;
+        try {
+            const review = reviewCx(entry.source);
+            if (!canRememberCxAppearance(review)) continue;
+            session.enable(entry.source, {
+                ...appearanceHost,
+                toast() {},
+                registerCommand() { throw new Error("Saved appearance cannot register commands"); },
+            }, review.permissions, saved.selected);
+        } catch { /* The appearance remains available to review or forget. */ }
+    }
+    refreshRememberedAppearance();
+    return () => {
+        session.clear();
+        refreshRememberedAppearance();
+    };
+}
+
 export default function CxExtensions() {
     const [source, setSource] = React.useState("");
     const [showCatalog, setShowCatalog] = React.useState(false);
@@ -2047,11 +2322,17 @@ export default function CxExtensions() {
         }
     }
 
-    function enable() {
+    React.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
+    const remembered = readRememberedAppearance();
+    const catalogEntry = candidate && rememberedCatalog.get(candidate.review.name);
+    const rememberRevision = catalogEntry?.source === candidate?.source ? catalogEntry?.appearanceRevision : undefined;
+
+    function enable(remember = false) {
         if (!candidate) return;
         try {
             if (settings.safeMode?.enabled) throw new Error("CX is unavailable in Safe Mode");
             session.enable(candidate.source, {
+                ...appearanceHost,
                 registerIncomingRules(rules) {
                     let active = true;
                     const context = {
@@ -2109,198 +2390,6 @@ export default function CxExtensions() {
                 registerProfileMenuAction,
                 registerSendConfirmation,
                 registerTimestampFormats,
-                hideAppearanceTarget(target) {
-                    if (!supportsMobileHide({ target })) return () => {};
-                    const mobile = cxAppearanceTargets[target].mobile;
-                    if ("renderTree" in mobile || "renderComponent" in mobile) return registerTreeAppearance(mobile);
-                    if ("tableRow" in mobile) {
-                        const tableRow = findByFilePath("design/components/TableRow/native/TableRow.native.tsx")?.TableRow;
-                        if (!tableRow) throw new Error("Discord's table row is unavailable");
-                        const rule = mobile.tableRow;
-                        if ("key" in rule) return registerJsxAppearance([tableRow], element => element.key === rule.key ? null : element);
-                        const translations = findByProps("intl", "t");
-                        const message = translations?.t?.[rule.subLabelFor];
-                        const label = message && translations?.intl?.string?.(message);
-                        if (typeof label !== "string" || !label) throw new Error("Discord's table row label is unavailable");
-                        return registerJsxAppearance([tableRow], element => element.props.label === label && typeof element.props.subLabel === "string"
-                            ? React.cloneElement(element, { subLabel: undefined }) : element);
-                    }
-                    if ("expressionPickerTab" in mobile) return registerExpressionPickerTab(mobile.expressionPickerTab);
-                    if ("settingsEntry" in mobile) return hideSettingsEntry(mobile.settingsEntry);
-                    if ("hideComponentPaths" in mobile) return registerHiddenAppearancePaths(mobile.hideComponentPaths);
-                    if ("scrollIndicators" in mobile) {
-                        const scrollViews = new Set([ScrollView, FlatList, SectionList, Animated?.ScrollView, Animated?.FlatList, Animated?.SectionList]);
-                        const components = [...scrollViews].filter((component): component is NonNullable<typeof component> => component != null);
-                        return registerJsxAppearance(components, element => React.cloneElement(element, {
-                            showsHorizontalScrollIndicator: false,
-                            showsVerticalScrollIndicator: false,
-                        }));
-                    }
-                    if ("customStatusEmojis" in mobile) {
-                        const hideBubbleEmoji = registerJsxAppearance(mobile.customStatusEmojis, element => {
-                            const { customStatusActivity } = element.props;
-                            if (!customStatusActivity?.emoji) return element;
-                            return React.cloneElement(element, { customStatusActivity: { ...customStatusActivity, emoji: undefined } });
-                        });
-                        const hideActivityEmoji = registerJsxAppearance(["ActivityStatus"], element => React.cloneElement(element, { hideEmoji: true }), true);
-                        return () => { hideActivityEmoji(); hideBubbleEmoji(); };
-                    }
-                    if ("memberActivityText" in mobile) {
-                        const status = findByFilePath("modules/activity_status/native/PresenceActivityStatus.tsx")?.default;
-                        if (!status) throw new Error("Discord's member activity renderer is unavailable");
-                        return registerMemberRowAppearance(status, element => {
-                            const type = element.props.activity?.type;
-                            // Discord activity types 0 and 2 are Playing and Listening.
-                            return type === 0 || type === 2 ? React.cloneElement(element, { hideText: true }) : element;
-                        });
-                    }
-                    if ("memberCustomStatus" in mobile) {
-                        const status = findByFilePath("modules/activity_status/native/ActivityStatus.tsx")?.default;
-                        if (typeof status !== "function" || status.prototype?.isReactComponent) {
-                            throw new Error("Discord's custom status renderer is unavailable");
-                        }
-                        function WithoutCustomStatus({ originalProps }: { originalProps: object; }) {
-                            const output: ReactNode = status(originalProps);
-                            if (settings.safeMode?.enabled || !React.isValidElement<{ children?: ReactNode; }>(output)) return output;
-                            const { children } = output.props;
-                            if (!Array.isArray(children) || children.length !== 3) return output;
-                            const [activity, separator, custom] = children;
-                            if (!React.isValidElement(custom) || custom.type !== React.Fragment
-                                || separator != null && (!React.isValidElement<{ accessibilityElementsHidden?: boolean; }>(separator)
-                                    || separator.props.accessibilityElementsHidden !== true)) return output;
-                            // Discord renders the activity, its separator, and the custom status as three siblings.
-                            return React.cloneElement(output, { children: [activity, null, null] });
-                        }
-                        return registerMemberRowAppearance("ActivityStatus", element => element.type === status
-                            ? <WithoutCustomStatus originalProps={element.props} /> : element);
-                    }
-                    if ("emptyServerFolders" in mobile) {
-                        return registerJsxAppearance(["GuildsBarGuildFolder"], element => {
-                            const { expanded, childNodes, isDragPreview, hideExpandedChildren } = element.props;
-                            return expanded === true && !isDragPreview && !hideExpandedChildren
-                                && Array.isArray(childNodes) && childNodes.length === 0 ? null : element;
-                        });
-                    }
-                    if ("mentionBadges" in mobile) {
-                        const stopLegacy = registerJsxAppearance(["MentionsBadge"], () => null);
-                        const stopCount = registerJsxAppearance(["Badge"], element =>
-                            typeof element.props.value === "number" && element.props.value > 0
-                                && "isMentionLowImportance" in element.props ? null : element);
-                        return () => { stopCount(); stopLegacy(); };
-                    }
-                    if (!("messagePresentation" in mobile)) return registerJsxAppearance(mobile, () => null);
-                    const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-                    return overrideCxMethods(renderer, {
-                        default(args, invoke) {
-                            const presentation = invoke(args);
-                            if (!presentation || typeof presentation !== "object") return presentation;
-                            if (mobile.messagePresentation === "edited") {
-                                if ("edited" in presentation && presentation.edited === true) return { ...presentation, edited: false };
-                            } else if (mobile.messagePresentation === "timestamps") {
-                                if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
-                                    return { ...presentation, timestamp: undefined, timestampTooltip: undefined, timestampAccessibilityLabel: undefined };
-                                }
-                            } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
-                                return { ...presentation, stickers: [] };
-                            }
-                            return presentation;
-                        },
-                    }, () => !settings.safeMode?.enabled);
-                },
-                styleAppearanceTarget(target) {
-                    const style = cxAppearanceTargets[target].style;
-                    if ("blurredMedia" in style) return registerBlurredMedia(style.blurredMedia);
-                    if ("reducedMotion" in style) return registerReducedMotion();
-                    if ("mentionHighlight" in style) {
-                        const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-                        const highlightColor = processColor(style.mentionHighlight);
-                        if (typeof highlightColor !== "number") throw new Error("Discord's message highlight color is unavailable");
-                        return overrideCxMethods(renderer, {
-                            default(args, invoke) {
-                                const message = invoke(args);
-                                if (!message || typeof message !== "object" || !("mentioned" in message) || message.mentioned !== true
-                                    || !("highlightColor" in message) || typeof message.highlightColor !== "number" || message.highlightColor === 0) return message;
-                                return { ...message, highlightColor };
-                            },
-                        }, () => !settings.safeMode?.enabled);
-                    }
-                    if ("centeredMessageList" in style) {
-                        const messages = findByFilePath(style.centeredMessageList)?.default;
-                        if (!messages) throw new Error("Discord's message list is unavailable");
-                        const centered = { alignSelf: "center", width: "100%", maxWidth: style.width };
-                        // The wallpaper hook may already have wrapped the original message list.
-                        return registerJsxAppearance([messages], tree => mapAppearanceElements(tree, element => element.type === messages
-                            ? React.cloneElement(element, { style: [element.props.style, centered] })
-                            : element));
-                    }
-                    if ("messageWidthRenderer" in style) {
-                        const renderer = findByFilePath(style.messageWidthRenderer);
-                        return overrideCxMethods(renderer, {
-                            default(args, invoke) {
-                                const presentation = invoke(args);
-                                const input = args[0] as { isInlineReplyPreview?: boolean; message?: { content?: string; }; } | undefined;
-                                if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview
-                                    || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number") return presentation;
-                                // Use the native logical width for message text and keep the system font scale.
-                                const width = style.width * PixelRatio.getFontScale();
-                                return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width
-                                    ? { ...presentation, constrainedWidth: width } : presentation;
-                            },
-                        }, () => !settings.safeMode?.enabled);
-                    }
-                    if ("drawerWidthDelta" in style) return registerChannelDrawerWidth(style.drawerWidthDelta);
-                    if ("compactMemberList" in style) return registerCompactMemberList();
-                    if ("renderedComponents" in style) return registerRenderedChannelStyle(style);
-                    if ("serverIconScale" in style) {
-                        const iconStyle = { transform: [{ scale: style.serverIconScale }] };
-                        return registerJsxAppearance(["GuildsBarAnimatedItemWrapper"], element => {
-                            const { children, preventClipping, isDragPreview } = element.props;
-                            if (preventClipping || isDragPreview || !React.isValidElement<{
-                                source?: unknown; style?: unknown; value?: string; size?: unknown; animate?: boolean;
-                            }>(children)) return element;
-
-                            const icon = children.props;
-                            // Discord renders either a server image or a label with the server initials here.
-                            if ("source" in icon && "style" in icon) {
-                                return React.cloneElement(element, { children: React.cloneElement(children, { style: [icon.style, iconStyle] }) });
-                            }
-                            if (typeof icon.value === "string" && "size" in icon && typeof icon.animate === "boolean") {
-                                return React.cloneElement(element, { children: <View style={iconStyle}>{children}</View> });
-                            }
-                            return element;
-                        });
-                    }
-                    if ("spoilerOutline" in style) {
-                        const spoiler = findByFilePath("modules/markup/native/Spoiler.tsx")?.default?.prototype;
-                        if (typeof spoiler?.render !== "function") throw new Error("Discord's text spoiler is unavailable");
-                        const outline = style.spoilerOutline;
-                        const stopText = instead("render", spoiler, function (this: { state?: { revealed?: boolean; }; }, args, original) {
-                            const rendered = original.apply(this, args);
-                            if (settings.safeMode?.enabled || this.state?.revealed !== false || !React.isValidElement<{ style?: unknown; }>(rendered)) return rendered;
-                            return React.cloneElement(rendered, { style: [rendered.props.style, outline] });
-                        });
-                        try {
-                            const stopMedia = registerJsxAppearance(["MediaModalSpoilerOverlay"], element => element.props.source?.obscure
-                                ? element : React.cloneElement(element, { style: [element.props.style, outline] }));
-                            return () => { stopMedia(); stopText(); };
-                        } catch (error) {
-                            stopText();
-                            throw error;
-                        }
-                    }
-                    if ("component" in style) {
-                        return registerJsxAppearance([style.component], element => {
-                            if ("props" in style) {
-                                return element.props[style.skipWhenTrue] === true ? element : React.cloneElement(element, style.props);
-                            }
-                            if (!("key" in style)) return React.cloneElement(element, { style: [element.props.style, style.values] });
-                            const styles = element.props.styles;
-                            return React.cloneElement(element, { styles: { ...styles, [style.key]: [styles?.[style.key], style.values] } });
-                        });
-                    }
-                    if (!isThemeSupported()) throw new Error("This loader does not support color overrides");
-                    return registerColorOverlay(style);
-                },
                 registerUploadAnonymiser,
                 registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
                     const enabled = () => !settings.safeMode?.enabled;
@@ -2769,33 +2858,13 @@ export default function CxExtensions() {
                     });
                 },
                 toast: message => { showToast(message); },
-                applyTheme(theme) {
-                    if (!isThemeSupported()) throw new Error("This loader does not support themes");
-                    const palette = (value: string) => [value, value];
-                    const surface = theme.surface ?? theme.background;
-                    const sidebar = theme.sidebar ?? surface;
-                    return applyTemporaryTheme({
-                        name: theme.name,
-                        spec: 2,
-                        semanticColors: {
-                            BACKGROUND_PRIMARY: palette(theme.background),
-                            BACKGROUND_SECONDARY: palette(surface),
-                            BACKGROUND_TERTIARY: palette(sidebar),
-                            BACKGROUND_BASE_LOW: palette(theme.background),
-                            BACKGROUND_BASE_LOWER: palette(surface),
-                            BACKGROUND_BASE_LOWEST: palette(sidebar),
-                            ...(theme.text ? { TEXT_NORMAL: palette(theme.text), TEXT_PRIMARY: palette(theme.text), TEXT_DEFAULT: palette(theme.text), TEXT_STRONG: palette(theme.text) } : {}),
-                            ...(theme.muted ? { TEXT_MUTED: palette(theme.muted), TEXT_SECONDARY: palette(theme.muted), TEXT_SUBTLE: palette(theme.muted) } : {}),
-                            ...(theme.accent ? { TEXT_LINK: palette(theme.accent) } : {}),
-                            ...Object.fromEntries(Object.entries(theme.semanticColors ?? {}).map(([token, color]) => [token, palette(color)])),
-                        },
-                        ...(theme.rawColors ? { rawColors: { ...theme.rawColors } } : {}),
-                        ...(theme.wallpaper ? { background: { url: theme.wallpaper, alpha: theme.wallpaperOpacity ?? 1, blur: theme.wallpaperBlur } } : {}),
-                    }, theme.mode);
-                },
             }, candidate.review.permissions, candidate.selected);
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
+            if (remember && rememberRevision) {
+                rememberAppearance({ name: candidate.review.name, revision: rememberRevision, selected: candidate.selected }, candidate.review.kind === "theme");
+                setStatus(`${candidate.review.name} is active and will reopen with CloudCord.`);
+            }
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));
         }
@@ -2862,22 +2931,38 @@ export default function CxExtensions() {
                     label={label} value={candidate.selected.includes(target)} onValueChange={(checked: boolean) => {
                         setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, checked) });
                     }} />)}
-                {candidate && <TableRow label="Allow for this session" onPress={enable} />}
+                {candidate && <TableRow label="Allow for this session" onPress={() => enable()} />}
+                {candidate && rememberRevision && <TableRow label="Allow and remember on this device" onPress={() => enable(true)} />}
                 {candidate && !source && <TableRow label="Edit CX source" onPress={() => setSource(candidate.source)} />}
-                {session.list().flatMap(({ id, name }) => [
-                    ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label, enabled }) => <TableSwitchRow key={`${id}:${target}`}
-                        label={`${name} · ${label}`} value={enabled} onValueChange={(checked: boolean) => {
+                {session.list().flatMap(({ id, name }) => {
+                    const entry = rememberedCatalog.get(name);
+                    const saved = entry?.source === session.source(id) ? remembered.find(item => item.name === name && item.revision === entry?.appearanceRevision) : undefined;
+                    return [
+                        ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label, enabled }) => <TableSwitchRow key={`${id}:${target}`}
+                            label={`${name} · ${label}`} value={enabled} onValueChange={(checked: boolean) => {
+                                try {
+                                    session.setAppearanceOption(id, target, checked);
+                                    if (saved) rememberAppearance({ ...saved, selected: session.appearanceOptions(id).filter(option => option.enabled && supportsMobileHide(option)).map(option => option.target) });
+                                    setStatus("");
+                                    refreshOptions(value => value + 1);
+                                } catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
+                            }} />),
+                        <TableRow key={id} label={`Disable ${name}`} subLabel={saved ? "Remembered on this device" : undefined} onPress={() => {
                             try {
-                                session.setAppearanceOption(id, target, checked);
-                                setStatus("");
-                                refreshOptions(value => value + 1);
+                                if (saved) forgetRememberedAppearance(name);
+                                session.disable(id);
+                                setStatus(`${name} disabled.`);
                             } catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
-                        }} />),
-                    <TableRow key={id} label={`Disable ${name}`} onPress={() => {
-                        session.disable(id);
-                        setStatus(`${name} disabled.`);
-                    }} />,
-                ])}
+                        }} />,
+                    ];
+                })}
+                {remembered.filter(saved => {
+                    const entry = rememberedCatalog.get(saved.name);
+                    return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
+                }).map(saved => <TableRow key={saved.name} label={`Forget ${saved.name}`} subLabel={settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered appearance needs review"} onPress={() => {
+                    try { forgetRememberedAppearance(saved.name); refreshRememberedAppearance(); }
+                    catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
+                }} />)}
                 {clearLocalNotes.notes && <TableRow label="Clear local user notes" onPress={clearLocalNotes.notes} />}
                 {browseLocalChannelNotes && <TableRow label="Browse channel notes" onPress={browseLocalChannelNotes} />}
                 {clearLocalNotes.channels && <TableRow label="Clear local channel notes" onPress={clearLocalNotes.channels} />}

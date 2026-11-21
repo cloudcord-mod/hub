@@ -5173,6 +5173,41 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             await click(render(), "Forget theme");
             assert.equal(localNotes[storageKey].length, 0);
             plugin.stop();
+        } else {
+            const restore = module.exports.restoreRememberedCxAppearance;
+            selectCatalog("QuickMention");
+            assert.ok(!button(render(), "Allow and remember on this device"));
+            selectCatalog("ChatButtonsBegone");
+            click(render(), "Allow and remember on this device");
+            const label = "ChatButtonsBegone · Hide the chat gift button";
+            button(render(), label).props.onValueChange(true);
+            selectCatalog("Blue Hour");
+            click(render(), "Allow and remember on this device");
+            const saved = settings.cxRememberedAppearance.find(entry => entry.name === "Blue Hour");
+            const source = cxCatalog.themes.find(entry => entry.name === "Blue Hour").source;
+            assert.equal(saved.revision, createHash("sha256").update(source.replaceAll("\r\n", "\n")).digest("hex"));
+            assert.ok(!("source" in saved), "mobile stores only approval metadata and options");
+            restore()();
+            assert.equal(nativeTheme, selectedTheme);
+            assert.equal(appearanceHooks.size, 0);
+            settings.safeMode = { enabled: true };
+            assert.equal(restore(), undefined);
+            assert.equal(nativeTheme, selectedTheme);
+            assert.equal(appearanceHooks.size, 0);
+            settings.safeMode.enabled = false;
+            const unload = restore();
+            assert.equal(nativeTheme.name, "Blue Hour");
+            assert.equal(button(render(), label).props.value, true);
+            assert.ok(appearanceHooks.has("PremiumAnimatedGiftButton"));
+            click(render(), "Disable ChatButtonsBegone");
+            assert.equal(settings.cxRememberedAppearance.length, 1);
+            unload();
+            saved.revision = "changed";
+            const unloadStale = restore();
+            assert.equal(nativeTheme, selectedTheme);
+            click(render(), "Forget Blue Hour");
+            assert.equal(settings.cxRememberedAppearance.length, 0);
+            unloadStale();
         }
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
