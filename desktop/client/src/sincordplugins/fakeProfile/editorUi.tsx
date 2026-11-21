@@ -176,10 +176,12 @@ const STATUS_COLORS: Record<string, string> = { online: "#23a55a", idle: "#f0b23
 
 export type ProfilePreviewSurface = ReturnType<typeof nativeProfilePreviewSurface>;
 
-function previewSurface(data: { nitro?: boolean; banner?: string; accentColor?: number; accentColor2?: number; }, fallback?: ProfilePreviewSurface) {
+function previewSurface(data: { nitro?: boolean; banner?: string; accentColor?: number; accentColor2?: number; bio?: string; pronouns?: string; }, fallback?: ProfilePreviewSurface) {
     const primary = data.nitro ? profilePreviewColor(data.accentColor) : undefined;
     return {
         banner: data.banner || fallback?.banner,
+        bio: data.bio || fallback?.bio,
+        pronouns: data.pronouns || fallback?.pronouns,
         primary: primary ?? fallback?.primary,
         accent: primary ? profilePreviewColor(data.accentColor2) ?? primary : fallback?.accent ?? fallback?.primary,
         bannerColor: profilePreviewColor(data.accentColor) ?? fallback?.bannerColor ?? primary ?? fallback?.primary,
@@ -197,7 +199,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     const name = data.globalName || fallbackName;
     const username = data.username || fallbackUsername;
     const avatar = data.avatar || fallbackAvatar;
-    const { banner, primary, accent, bannerColor } = previewSurface(data, fallbackSurface);
+    const { banner, primary, accent, bannerColor, bio, pronouns } = previewSurface(data, fallbackSurface);
     const tag = data.serverTag;
     const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
     const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
@@ -229,11 +231,11 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                     <span className="cpx-card-display">{name}</span>
                     {tag?.tag && <span className="cpx-card-tag">{tagIcon && <img src={tagIcon} alt="" />}{tag.tag}</span>}
                 </div>
-                <div className="cpx-card-username">@{username}{data.pronouns ? ` · ${data.pronouns}` : ""}</div>
+                <div className="cpx-card-username">@{username}{pronouns ? ` · ${pronouns}` : ""}</div>
                 {!!badges.length && <div className="cpx-live-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} />)}</div>}
                 {data.customStatus && <div className="cpx-card-custom">{data.customStatus.emoji} {data.customStatus.text}</div>}
                 {activity?.name && <div className="cpx-card-activity"><span>{activityVerb}</span><strong>{activity.name}</strong>{activity.details && <span>{activity.details}</span>}</div>}
-                {data.bio && <p className="cpx-card-bio">{data.bio}</p>}
+                {bio && <p className="cpx-card-bio">{bio}</p>}
                 {(effectName || frameName) && <div className="cpx-card-chips">
                     {frameName && <span className="cpx-chip">Frame: {frameName}</span>}
                     {effectName && <span className="cpx-chip">Effect: {effectName}</span>}
@@ -252,7 +254,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
     fallbackSurface?: ProfilePreviewSurface;
 }) {
-    const { banner, primary, accent, bannerColor } = previewSurface(data, fallbackSurface);
+    const { banner, primary, accent, bannerColor, bio, pronouns } = previewSurface(data, fallbackSurface);
     const themed = !!primary;
     const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
     const tag = data.serverTag;
@@ -273,13 +275,12 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
                     <div className="cpx-dc-username">
                         <span>{data.username || fallbackUsername}</span>
                         {tag?.tag && <span className="cpx-dc-tag">{tagIcon && <img src={tagIcon} alt="" />}{tag.tag}</span>}
-                        {data.pronouns && <span className="cpx-dc-dot">•</span>}
-                        {data.pronouns && <span>{data.pronouns}</span>}
+                        {pronouns && <><span className="cpx-dc-dot">•</span><span>{pronouns}</span></>}
                     </div>
                 </div>
                 {data.customStatus?.text || data.customStatus?.emoji ? <div className="cpx-dc-bubble">{data.customStatus.emoji} {data.customStatus.text}</div> : null}
-                {(data.bio || activity?.name) && <div className="cpx-dc-section">
-                    {data.bio && <div className="cpx-dc-bio">{data.bio}</div>}
+                {(bio || activity?.name) && <div className="cpx-dc-section">
+                    {bio && <div className="cpx-dc-bio">{bio}</div>}
                     {activity?.name && <div className="cpx-dc-activity"><span className="cpx-dc-activity-verb">{ACTIVITY_TYPES.find(type => type.value === activity.type)?.label || "Playing"}</span><strong>{activity.name}</strong>{activity.details && <span>{activity.details}</span>}</div>}
                 </div>}
             </div>

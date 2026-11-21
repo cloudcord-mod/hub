@@ -114,6 +114,8 @@ export function customDiscordMediaURL(kind: "avatars" | "banners", userId: strin
 
 type DiscordProfileSurface = {
     banner?: unknown;
+    bio?: unknown;
+    pronouns?: unknown;
     themeColors?: unknown;
     theme_colors?: unknown;
     accentColor?: unknown;
@@ -130,6 +132,8 @@ export function nativeProfilePreviewSurface(userId: string, profile?: DiscordPro
     const colors = profile?.themeColors ?? profile?.theme_colors;
     return {
         banner: customDiscordMediaURL("banners", userId, profile?.banner) || customDiscordMediaURL("banners", userId, userBanner) || undefined,
+        bio: typeof profile?.bio === "string" ? profile.bio : undefined,
+        pronouns: typeof profile?.pronouns === "string" ? profile.pronouns : undefined,
         primary: Array.isArray(colors) ? profilePreviewColor(colors[0]) : undefined,
         accent: Array.isArray(colors) ? profilePreviewColor(colors[1]) : undefined,
         bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color),

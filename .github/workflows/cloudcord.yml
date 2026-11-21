@@ -4562,9 +4562,11 @@ jobs:
                   username: data.username || realUser?.username || "username",
                   avatar: data.avatarMedia?.uri || realAvatar,
                   banner: data.bannerMedia?.uri || fallback.banner,
+                  bio: data.bio ?? fallback.bio,
+                  pronouns: data.pronouns ?? fallback.pronouns,
                   primary: primary ?? accent ?? fallback.primary,
                   accent: accent ?? primary ?? fallback.accent,
-                  bannerColor: primary ?? accent ?? fallback.bannerColor ?? fallback.primary,
+                  bannerColor: accent ?? fallback.bannerColor ?? primary ?? fallback.primary,
                   nameplate: data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined,
                   tagText: data.serverTag?.tag,
                   tagIcon: data.serverTag ? serverTagIconURL(data.serverTag) || undefined : undefined,
@@ -4642,9 +4644,9 @@ jobs:
                       if (gift) rows.push({ id: "gifting", iconSrc: gift.icon });
                       const badges = [...new Set(applyBadgeLayout(rows, data).map(row => row.iconSrc).filter(Boolean))];
                       return <View key={item.id} style={{ gap: 10 }}>
-                          <S.DiscordProfileCard {...appearance} secondary={appearance.accent} pronouns={data.pronouns}
+                          <S.DiscordProfileCard {...appearance} secondary={appearance.accent}
                               decoration={data.avatarDecoration || undefined} badges={badges}
-                              customStatus={data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : undefined} bio={data.bio}
+                              customStatus={data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : undefined}
                               activity={data.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === data.customActivity?.type)?.label || "", name: data.customActivity.name, details: data.customActivity.details } : null} />
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 }}>
                               <View style={{ flex: 1, gap: 2 }}>
@@ -5100,12 +5102,12 @@ jobs:
                               <K.Button label="Saved looks" grow onPress={() => setActiveTab("saved")} />
                           </View>
                           {showPreview ? <Card><View style={{ padding: 16 }}>
-                              <K.PreviewCard {...appearance} pronouns={preview.pronouns} decoration={preview.avatarDecoration || undefined}
+                              <K.PreviewCard {...appearance} decoration={preview.avatarDecoration || undefined}
                                   customStatus={preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : undefined}
                                   activity={preview.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === preview.customActivity?.type)?.label || "", name: preview.customActivity.name, details: preview.customActivity.details } : null}
                                   badges={[...new Set(editableBadgeRows().filter(row => !preview.hiddenBadgeIds.includes(row.id)).map(row => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : undefined)).filter(Boolean))] as string[]}
                                   onBadges={() => setActiveTab("badges")} onSaved={() => setActiveTab("saved")}
-                                  bio={preview.bio} frame={preview.profileFrame ? catalog?.frames.find(item => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : undefined}
+                                  frame={preview.profileFrame ? catalog?.frames.find(item => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : undefined}
                                   effect={preview.profileEffect ? catalog?.effects.find(item => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : undefined} />
                           </View></Card> : null}
                           <K.StudioNav selected={activeTab} onSelect={setActiveTab} />
