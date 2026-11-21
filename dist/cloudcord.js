@@ -43077,6 +43077,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "messages.copyreference",
           label: "Copy the selected message\u2019s Markdown link, timestamp, or author mention"
         },
+        "reveal-spoilers-shortcut": {
+          permission: "messages.revealspoilers",
+          label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added",
+          desktopOnly: true
+        },
         "message-word-count": {
           permission: "messages.wordcount",
           label: "Show word and character counts below messages longer than five words"
@@ -50236,6 +50241,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
         "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
         "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
+        "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
         "messages.wordcount": "Count words and characters in displayed messages on this device",
         "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
         "drafts.long": "Keep the full text of your local drafts",
@@ -52656,6 +52662,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/reveal-all-spoilers.cx
+  var reveal_all_spoilers_default;
+  var init_reveal_all_spoilers = __esm({
+    "../examples/cx/catalog/plugins/reveal-all-spoilers.cx"() {
+      reveal_all_spoilers_default = 'plugin "RevealAllSpoilers":\n  needs messages.revealspoilers\n  use reveal-spoilers-shortcut\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/reverse-image-search.cx
   var reverse_image_search_default;
   var init_reverse_image_search = __esm({
@@ -54296,6 +54310,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_relationship_notifier();
       init_repeat_messages();
       init_reply_ping_control();
+      init_reveal_all_spoilers();
       init_reverse_image_search();
       init_reverse_text();
       init_rot13_text();
@@ -56705,6 +56720,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "ReplyPingControl",
             source: reply_ping_control_default,
             description: "Choose whether incoming replies ping you on this device",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "RevealAllSpoilers",
+            source: reveal_all_spoilers_default,
+            description: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added",
+            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -61553,6 +61577,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 throw new Error("Avatar crop zoom is available on desktop and browser.");
               case "notification-volume":
                 throw new Error("Notification volume control is available on desktop and browser.");
+              case "reveal-spoilers-shortcut":
+                throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
               case "animated-assets":
                 return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
               case "floor-relative-time":
@@ -63874,7 +63900,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0edb90860df195c432f4df5e15a4a1aeee521423";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c1ea8e775e2a8023ab67dc4178e61e9b80f032ae";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
