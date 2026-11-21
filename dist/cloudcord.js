@@ -17071,6 +17071,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var colors = profile?.themeColors ?? profile?.theme_colors;
     return {
       banner: customDiscordMediaURL("banners", userId, profile?.banner) || customDiscordMediaURL("banners", userId, userBanner) || void 0,
+      bio: typeof profile?.bio === "string" ? profile.bio : void 0,
+      pronouns: typeof profile?.pronouns === "string" ? profile.pronouns : void 0,
       primary: Array.isArray(colors) ? profilePreviewColor(colors[0]) : void 0,
       accent: Array.isArray(colors) ? profilePreviewColor(colors[1]) : void 0,
       bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color)
@@ -22244,6 +22246,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             backgroundColor: edge
           },
           children: [
+            primary && accent && accent !== primary ? /* @__PURE__ */ jsx(import_react_native24.View, {
+              pointerEvents: "none",
+              style: {
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: "55%",
+                borderBottomLeftRadius: R2.lg,
+                borderBottomRightRadius: R2.lg,
+                backgroundColor: accent
+              }
+            }) : null,
             /* @__PURE__ */ jsx(import_react_native24.View, {
               style: {
                 height: 88,
@@ -31043,9 +31058,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       username: data.username || realUser?.username || "username",
       avatar: data.avatarMedia?.uri || realAvatar,
       banner: data.bannerMedia?.uri || fallback.banner,
+      bio: data.bio ?? fallback.bio,
+      pronouns: data.pronouns ?? fallback.pronouns,
       primary: primary ?? accent ?? fallback.primary,
       accent: accent ?? primary ?? fallback.accent,
-      bannerColor: primary ?? accent ?? fallback.bannerColor ?? fallback.primary,
+      bannerColor: accent ?? fallback.bannerColor ?? primary ?? fallback.primary,
       nameplate: data.nameplate ? nameplateAssetURL(data.nameplate.asset) : void 0,
       tagText: data.serverTag?.tag,
       tagIcon: data.serverTag ? serverTagIconURL(data.serverTag) || void 0 : void 0,
@@ -31239,11 +31256,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(S2.DiscordProfileCard, {
                 ...appearance,
                 secondary: appearance.accent,
-                pronouns: data.pronouns,
                 decoration: data.avatarDecoration || void 0,
                 badges,
                 customStatus: data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : void 0,
-                bio: data.bio,
                 activity: data.customActivity ? {
                   verb: ACTIVITY_TYPES.find((type) => type.value === data.customActivity?.type)?.label || "",
                   name: data.customActivity.name,
@@ -32145,7 +32160,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               children: /* @__PURE__ */ jsx(K2.PreviewCard, {
                 ...appearance,
-                pronouns: preview.pronouns,
                 decoration: preview.avatarDecoration || void 0,
                 customStatus: preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : void 0,
                 activity: preview.customActivity ? {
@@ -32158,7 +32172,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 ],
                 onBadges: () => setActiveTab("badges"),
                 onSaved: () => setActiveTab("saved"),
-                bio: preview.bio,
                 frame: preview.profileFrame ? catalog?.frames.find((item) => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : void 0,
                 effect: preview.profileEffect ? catalog?.effects.find((item) => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : void 0
               })
@@ -63286,7 +63299,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f03ce3af2eed355f752d8d0cc7bb3f4c5a25a177";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2be2a2c3b4a33ccbbbdb2f09944851f2855cabab";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
