@@ -61017,6 +61017,738 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     rememberedAppearanceUpdates++;
     rememberedAppearanceListeners.forEach((listener) => listener());
   }
+  function createMobileCxHost() {
+    return {
+      ...appearanceHost,
+      registerIncomingRules(rules) {
+        var active = true;
+        var context = {
+          currentUser: () => UserStore3?.getCurrentUser?.()?.id,
+          channel: (id) => ChannelStore?.getChannel?.(id),
+          replyAuthor: (channel, id) => MessageStore?.getMessage?.(channel, id)?.author,
+          blocked: (id) => RelationshipStore?.isBlocked?.(id) === true,
+          ignored: (id) => RelationshipStore?.isIgnored?.(id) === true,
+          selectedChannel: () => SelectedChannelStore?.getChannelId?.(),
+          pingAlerts: {
+            status: (id) => PresenceStore?.getStatus?.(id),
+            isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
+            muted: (id, channel) => isCxNotificationMuted(id, channel, UserGuildSettingsStore),
+            notify: ({ title, body }) => {
+              var account = UserStore3?.getCurrentUser?.()?.id;
+              setTimeout(() => {
+                if (active && !settings.safeMode?.enabled && account === UserStore3?.getCurrentUser?.()?.id)
+                  showToast(body ? title + ": " + body : title);
+              }, 0);
+            }
+          },
+          openLink: (link, channel, user) => setTimeout(() => {
+            if (active && !settings.safeMode?.enabled && context.currentUser() === user && context.selectedChannel() === channel)
+              void import_react_native43.Linking.openURL(link).catch(() => {
+              });
+          }, 0),
+          notify: (body) => setTimeout(() => {
+            if (active && !settings.safeMode?.enabled)
+              showToast(body);
+          }, 0)
+        };
+        var social = bindCxSocialEvents(rules, {
+          currentUser: context.currentUser,
+          notify: context.notify,
+          isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
+          userName: (id) => {
+            var user = UserStore3?.getUser?.(id);
+            return user?.globalName || user?.username;
+          },
+          channelName: (id) => ChannelStore?.getChannel?.(id)?.name,
+          voiceChannel: () => SelectedChannelStore?.getVoiceChannelId?.(),
+          joinVoice: (id) => findByProps("selectVoiceChannel")?.selectVoiceChannel?.(id),
+          removalActions: () => findByProps("removeRelationship"),
+          enabled: () => active && !settings.safeMode?.enabled
+        });
+        var onIncoming = (payload) => {
+          try {
+            if (active && !settings.safeMode?.enabled) {
+              var patch = runCxIncomingRules(rules, payload, context);
+              if (patch !== false)
+                social?.observe(payload);
+              return patch;
+            }
+          } catch (e) {
+          }
+        };
+        var stop;
+        try {
+          stop = intercept(onIncoming);
+        } catch (error) {
+          social?.stop();
+          throw error;
+        }
+        return () => {
+          active = false;
+          stop();
+          social?.stop();
+        };
+      },
+      registerProfileMenuAction,
+      registerSendConfirmation,
+      registerTimestampFormats,
+      registerUploadAnonymiser,
+      registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
+        var enabled = () => !settings.safeMode?.enabled;
+        switch (effect) {
+          case "hide-role-headers":
+            return registerNoRoleHeaders();
+          case "show-voice-ping":
+            return registerVoicePing(enabled);
+          case "notify-when-muted": {
+            var sound = findByFilePath("modules/sound_playback/native/SoundUtils.tsx");
+            if (typeof sound?.playSound !== "function" || !effectOptions || !("serverMute" in effectOptions))
+              throw new Error("Discord's mute alert controls are unavailable");
+            return bindCxMutedVoice(findByStoreName("MediaEngineStore"), () => Boolean(SelectedChannelStore.getVoiceChannelId()), () => {
+              void Promise.resolve(sound.playSound("user_leave")).catch(() => {
+              });
+            }, effectOptions, enabled);
+          }
+          case "voice-channel-count":
+            if (!effectOptions || !("showEmpty" in effectOptions))
+              throw new Error("Missing voice count options");
+            return registerVoiceChannelCount(effectOptions, enabled);
+          case "webcam-start-notifier": {
+            if (!effectOptions || !("scope" in effectOptions))
+              throw new Error("Missing camera tone options");
+            var voice = findByStoreName("VoiceStateStore");
+            return bindCxCameraTone({
+              account: () => UserStore3.getCurrentUser()?.id,
+              selected() {
+                var id = SelectedChannelStore.getVoiceChannelId();
+                var channel = id && ChannelStore.getChannel(id);
+                if (id && channel)
+                  return {
+                    id,
+                    private: channel.type === 1 || channel.type === 3
+                  };
+              },
+              states: (id) => voice?.getVoiceStatesForChannel?.(id),
+              play: (on) => playCxVoiceTone(on ? "user_join" : "user_leave"),
+              enabled,
+              dispatcher: FluxDispatcher
+            }, effectOptions);
+          }
+          case "wait-for-slot":
+            if (!effectOptions || !("autoJoin" in effectOptions))
+              throw new Error("Missing voice queue options");
+            return registerWaitForSlot(effectOptions, enabled);
+          case "all-call-time-counter":
+            if (!effectOptions || !("human" in effectOptions))
+              throw new Error("Missing voice member timer options");
+            return registerVoiceMemberClock(effectOptions);
+          case "call-time-counter":
+            return registerCallTimeCounter();
+          case "jump-to-message-menu":
+            return registerJumpToMessageMenu(enabled);
+          case "jump-without-unblocking":
+            return navigationControls.register(effect, () => overrideCxMethods(findByFilePath("modules/messages/validateJumpWithAlert.tsx"), {
+              default: () => true
+            }, enabled));
+          case "jump-to-first-message":
+            return navigationControls.register(effect, () => registerJumpToFirst(enabled));
+          case "read-all-servers-button":
+            return navigationControls.register(effect, () => registerReadAllButton(enabled));
+          case "clean-channel-names":
+          case "title-channel-names":
+            return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles", enabled);
+          case "dashless-channel-names":
+            return registerChannelNames("dashless", enabled);
+          case "static-typing-dots":
+            return registerStaticTypingDots();
+          case "hide-disabled-emojis":
+            return hideDisabledEmojiInPicker(enabled);
+          case "copy-emoji-markdown":
+          case "sticker-links":
+            return registerExpressionLinks(effect);
+          case "reverse-image-search":
+            return registerReverseImageSearch();
+          case "copy-media-link":
+            return registerMediaLinkCopy();
+          case "profile-media":
+            return registerProfileMedia();
+          case "user-notes":
+            return registerLocalText("notes");
+          case "user-tags":
+            return registerLocalText("tags");
+          case "channel-notes":
+            return registerLocalText("channels");
+          case "copy-channel-name":
+            return registerCopyChannelName(enabled);
+          case "hide-suggested-channels": {
+            var suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
+            if (!suggested)
+              throw new Error("Discord's suggested channels section is unavailable");
+            return registerJsxAppearance([
+              suggested
+            ], () => null);
+          }
+          case "copy-text-attachment":
+            return registerTextAttachmentCopy(enabled);
+          case "image-filename":
+          case "image-full-url":
+            return registerImageFilename(effect === "image-full-url");
+          case "descriptive-gif-alt":
+            return registerGifAltText();
+          case "preserve-image-links": {
+            var parser = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
+            var visibleMessages = /* @__PURE__ */ new WeakMap();
+            return overrideCxMethods(parser, {
+              parseMessageMarkup(args, invoke) {
+                var [message, contentMessage, hideSimpleEmbedContent, ...rest] = args;
+                if (hideSimpleEmbedContent !== true || !message || typeof message !== "object")
+                  return invoke(args);
+                var { content } = contentMessage ?? message;
+                if (typeof content !== "string" || !/https?:\/\//i.test(content))
+                  return invoke(args);
+                var visible = visibleMessages.get(message);
+                if (!visible) {
+                  visible = Object.create(Object.getPrototypeOf(message), Object.getOwnPropertyDescriptors(message));
+                  visibleMessages.set(message, visible);
+                }
+                return invoke([
+                  visible,
+                  contentMessage,
+                  false,
+                  ...rest
+                ]);
+              }
+            }, enabled);
+          }
+          case "double-click-edit":
+          case "double-click-reply":
+            return registerMessageGesture(effect === "double-click-edit" ? "edit" : "reply");
+          case "open-steam-links": {
+            var links2 = findByFilePath("utils/MaskedLinkUtils.tsx");
+            var blockedDomains = findByFilePath("modules/blocked_domains/BlockedDomainStore.tsx")?.default;
+            if (typeof blockedDomains?.isBlockedDomain !== "function")
+              throw new Error("Discord's blocked domain check is unavailable");
+            return overrideCxMethods(links2, {
+              handleClick(args, invoke) {
+                var options = args[0];
+                if (options?.trusted !== true || !isCxProfileUserId(options.messageId) || !isCxProfileUserId(options.channelId) || options.onClick != null || options.onConfirm != null || options.onCancel != null || options.shouldConfirm != null || args.length !== 1)
+                  return invoke(args);
+                var link = getCxSteamLink(options.href);
+                if (!link?.mobile || blockedDomains.isBlockedDomain(link.https) !== null)
+                  return invoke(args);
+                void import_react_native43.Linking.openURL(link.https).catch(() => {
+                  if (enabled())
+                    showToast("Couldn't open the Steam link.");
+                });
+              }
+            }, enabled);
+          }
+          case "code-block-gap": {
+            var compactCodeBlocks2 = function(nodes, depth = 0) {
+              var changed = false;
+              var content = nodes.flatMap((node, index) => {
+                if (depth < 8 && (node?.type === "blockQuote" || node?.type === "paragraph") && Array.isArray(node.content)) {
+                  var nested = compactCodeBlocks2(node.content, depth + 1);
+                  if (nested !== node.content) {
+                    changed = true;
+                    return [
+                      {
+                        ...node,
+                        content: nested
+                      }
+                    ];
+                  }
+                }
+                if (nodes[index - 1]?.type !== "codeBlock")
+                  return [
+                    node
+                  ];
+                if (node?.type === "newline" && (node.content == null || node.content === "\n")) {
+                  changed = true;
+                  return [];
+                }
+                if (node?.type !== "text" && node?.type !== "newline" || typeof node.content !== "string" || !node.content.startsWith("\n"))
+                  return [
+                    node
+                  ];
+                changed = true;
+                return node.content.length > 1 ? [
+                  {
+                    ...node,
+                    content: node.content.slice(1)
+                  }
+                ] : [];
+              });
+              return changed ? content : nodes;
+            };
+            var compactCodeBlocks = compactCodeBlocks2;
+            var parser1 = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
+            var cache = /* @__PURE__ */ new WeakMap();
+            return overrideCxMethods(parser1, {
+              parseMessageMarkup(args, invoke) {
+                var row2 = invoke(args);
+                if (!Array.isArray(row2?.content) || row2.isInlineReplyPreview || row2.hasBailedAst)
+                  return row2;
+                if (cache.has(row2))
+                  return cache.get(row2);
+                var content = compactCodeBlocks2(row2.content);
+                var result = content === row2.content ? row2 : {
+                  ...row2,
+                  content
+                };
+                cache.set(row2, result);
+                return result;
+              }
+            }, enabled);
+          }
+          case "quick-mention":
+            return registerQuickMention(enabled);
+          case "copy-raw-text":
+          case "copy-message-reference":
+            return registerMessageMenuActions(enabled, ({ message, channel }, close) => getCxMessageClipboard(effect, message, channel).map(({ label: label2, text }) => ({
+              label: label2,
+              run() {
+                try {
+                  clipboard.setString(text);
+                  showToast.showCopyToClipboard?.();
+                  close();
+                } catch (e) {
+                  showToast("Couldn't copy to clipboard.");
+                }
+              }
+            })), false);
+          case "message-word-count": {
+            var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+            return overrideCxMethods(renderer, {
+              default(args, invoke) {
+                var row2 = invoke(args);
+                if (!row2 || typeof row2 !== "object" || !("content" in row2) || !Array.isArray(row2.content) || !row2.content.length)
+                  return row2;
+                var input = args[0];
+                if (input?.isInlineReplyPreview)
+                  return row2;
+                var label2 = formatCxWordCount(input?.message?.content);
+                return label2 ? {
+                  ...row2,
+                  content: [
+                    ...row2.content,
+                    {
+                      type: "text",
+                      content: "\n" + label2
+                    }
+                  ]
+                } : row2;
+              }
+            }, enabled);
+          }
+          case "decode-base64":
+            return registerMessageMenuActions(enabled, ({ message }, close, stillActive) => {
+              var decoded = decodeCxMessageBase64(message?.content);
+              if (!decoded)
+                return [];
+              return [
+                {
+                  label: "Decode Base64",
+                  run() {
+                    close();
+                    import_react_native43.Alert.alert("Decoded Base64", decoded, [
+                      {
+                        text: "Close",
+                        style: "cancel"
+                      },
+                      {
+                        text: "Copy",
+                        onPress: () => {
+                          if (stillActive(false))
+                            clipboard.setString(decoded);
+                        }
+                      }
+                    ]);
+                  }
+                }
+              ];
+            }, false);
+          case "hide-profile-banner-images":
+            return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore3?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
+          case "quote-message":
+            if (!effectOptions || !("includeLink" in effectOptions))
+              throw new Error("Missing quote options");
+            return registerQuoteMessage(enabled, effectOptions.includeLink);
+          case "force-owner-crown": {
+            var row = findByFilePath("modules/main_tabs_v2/native/shared_components/user_list/UserRow.tsx")?.default;
+            if (!row)
+              throw new Error("Discord\u2019s member row is unavailable");
+            return registerJsxAppearance([
+              row
+            ], (element) => {
+              var { guildId, user, isOwner } = element.props;
+              if (isOwner || !isCxProfileUserId(guildId) || !isCxProfileUserId(user?.id) || GuildStore?.getGuild?.(guildId)?.ownerId !== user.id)
+                return element;
+              return React2.cloneElement(element, {
+                isOwner: true
+              });
+            });
+          }
+          case "spotify-song-name":
+            return overrideCxMethods(findByFilePath("modules/activity_status/getActivityStatusText.tsx"), {
+              default(args, invoke) {
+                var result = invoke(args);
+                var activity = args[0];
+                var title = args[1] === true && getCxSpotifySongName(activity);
+                var artist = typeof activity?.state === "string" && activity.state.split("; ").join(", ");
+                return title && artist && result && typeof result === "object" && "text" in result && result.text === artist ? {
+                  ...result,
+                  text: title
+                } : result;
+              }
+            }, enabled);
+          case "sort-reactions-by-count":
+            return overrideCxMethods(findByFilePath("modules/messages/native/renderer/transformReactions.tsx"), {
+              default(args, invoke) {
+                var options = args[0];
+                if (!Array.isArray(options?.reactions) || options.reactions.length < 2)
+                  return invoke(args);
+                return invoke([
+                  {
+                    ...options,
+                    reactions: sortCxReactions(options.reactions)
+                  },
+                  ...args.slice(1)
+                ]);
+              }
+            }, enabled);
+          case "keep-long-drafts":
+            return registerLongDrafts(enabled);
+          case "bypass-pin-prompt":
+            return registerBypassPinPrompt(enabled);
+          case "pin-message-shortcut":
+            return registerPinShortcut(enabled);
+          case "toggle-message-embeds":
+            return registerEmbedToggle(enabled);
+          case "repeat-message":
+            return registerRepeatMessages(enabled);
+          case "attachment-image-quality":
+          case "original-attachment-images":
+            return registerAttachmentImageQuality(effect === "original-attachment-images");
+          case "scroll-to-latest": {
+            var actions = findByProps("jumpToMessage", "fetchMessages");
+            if (typeof actions?.jumpToMessage !== "function")
+              throw new Error("Discord message navigation is unavailable");
+            return bindCxChannelOpenRead({
+              dispatcher: FluxDispatcher,
+              read: ReadStateStore,
+              enabled,
+              selected: () => SelectedChannelStore?.getChannelId?.(),
+              user: () => UserStore3?.getCurrentUser?.()?.id,
+              jump: (target) => actions.jumpToMessage(target)
+            });
+          }
+          case "unicode-emoji-autocomplete":
+          case "local-emoji-autocomplete":
+            return filterCxEmojiAutocomplete(EmojiStore, effect === "local-emoji-autocomplete" ? "local" : "unicode", findByProps("EmojiIntention")?.EmojiIntention, enabled);
+          case "split-long-messages":
+            return registerSplitSender();
+          case "flat-attachments": {
+            var renderer1 = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+            return overrideCxMethods(renderer1, {
+              default(args, invoke) {
+                var presentation = invoke(args);
+                if (!presentation || typeof presentation !== "object" || !("useAttachmentGridLayout" in presentation) || presentation.useAttachmentGridLayout !== true)
+                  return presentation;
+                return {
+                  ...presentation,
+                  useAttachmentGridLayout: false
+                };
+              }
+            }, enabled);
+          }
+          case "fix-file-extensions": {
+            var uploader = findByFilePath("lib/uploader/native/CloudUploader.tsx")?.default?.prototype;
+            return overrideCxMethods(uploader, {
+              uploadFiles: (args, original) => {
+                fixCxFileExtensions(args[0]);
+                return original(args);
+              }
+            }, enabled);
+          }
+          case "plus-reactions": {
+            var reactions = findByProps("addReaction", "removeReaction") ?? findByProps("addReaction");
+            if (typeof reactions?.addReaction !== "function")
+              throw new Error("Discord reactions are unavailable");
+            var handle = createCxPlusReactionHandler({
+              messages: (channel) => MessageStore?.getMessages?.(channel),
+              guild: (channel) => ChannelStore?.getChannel?.(channel)?.guild_id,
+              emojis: () => EmojiStore,
+              unicode: (name) => findByProps("convertNameToSurrogate")?.convertNameToSurrogate(name),
+              react: (channel, message, emoji) => reactions.addReaction(channel, message, emoji),
+              error: () => {
+                showToast("Couldn\u2019t react to the previous message.");
+              }
+            });
+            return instead("sendMessage", messageUtil, function(args, original) {
+              if (enabled()) {
+                var result = handle(args[0], args[1], args[3]);
+                if (result)
+                  return result;
+              }
+              return original.apply(this, args);
+            });
+          }
+          case "silent-typing":
+            return overrideCxMethods(findByProps("startTyping", "stopTyping"), {
+              startTyping: () => void 0
+            }, enabled);
+          case "pending-friend-count":
+            return overrideCxMethods(RelationshipStore, {
+              getPendingCount: () => 0,
+              getPendingIncomingCount: () => 0
+            }, enabled);
+          case "plain-url-paste":
+            throw new Error("Plain URL paste is available on desktop and browser.");
+          case "no-middle-click-paste":
+            throw new Error("Middle-click paste control is available on Linux.");
+          case "avatar-crop-zoom":
+            throw new Error("Avatar crop zoom is available on desktop and browser.");
+          case "notification-volume":
+            throw new Error("Notification volume control is available on desktop and browser.");
+          case "reveal-spoilers-shortcut":
+            throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
+          case "reply-timestamp":
+            throw new Error("Reply timestamps are available on desktop and browser.");
+          case "animated-assets":
+            return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
+          case "floor-relative-time":
+            return floorCxRelativeTime(findByProps("relativeTimeRounding", "locale"), enabled);
+          case "avatar-resolution":
+            return raiseCxAvatarResolution(findByProps("getUserAvatarURL", "getGuildIconURL"), avatarResolution, enabled);
+          case "stop-auto-unread":
+            return overrideCxMethods(findByStoreName("UnreadSettingNoticeStore2"), {
+              maybeAutoUpgradeChannel: () => false
+            }, enabled);
+        }
+      },
+      registerReplyPingSuppression() {
+        return onSendMessage((_message, options) => {
+          if (settings.safeMode?.enabled || !options?.messageReference)
+            return;
+          options.allowedMentions = {
+            parse: [
+              "users",
+              "roles",
+              "everyone"
+            ],
+            ...options.allowedMentions,
+            replied_user: false
+          };
+        });
+      },
+      registerPreviousMessageRule(rule) {
+        var active = true;
+        var editor = findByProps("editMessage", "startEditMessage");
+        if (typeof editor?.editMessage !== "function")
+          throw new Error("Discord message edits are unavailable");
+        var currentUser = () => UserStore3?.getCurrentUser?.()?.id;
+        var handle = createCxPreviousSendHandler(rule, {
+          currentUser,
+          previous(channel, own) {
+            var existing = own ? MessageStore?.getLastEditableMessage?.(channel) : MessageStore?.getLastMessage?.(channel);
+            if (existing)
+              return existing;
+            var cache = MessageStore?.getMessages?.(channel);
+            var list = cache?.toArray?.() ?? cache?._array;
+            if (!Array.isArray(list))
+              return;
+            if (!own)
+              return list[list.length - 1];
+            var me = currentUser();
+            for (var i = list.length - 1; i >= 0; i--)
+              if (list[i]?.author?.id === me)
+                return list[i];
+          },
+          edit: (channel, id, content) => editor.editMessage(channel, id, {
+            content
+          }),
+          error: () => {
+            showToast("Couldn\u2019t edit the previous message.");
+          }
+        });
+        var unpatch = instead("sendMessage", messageUtil, function(args, original) {
+          var [channel, message, , options] = args;
+          if (active && !settings.safeMode?.enabled && typeof channel === "string") {
+            var edit = handle(channel, message?.content, Boolean(message?.tts || message?.attachments?.length || message?.stickers?.length || message?.stickerIds?.length || options?.uploads?.length || options?.stickers?.length || options?.messageReference || options?.replyOptions?.messageReference));
+            if (edit)
+              return edit;
+          }
+          return original.apply(this, args);
+        });
+        return () => {
+          active = false;
+          unpatch();
+        };
+      },
+      registerMessageTransform(transform) {
+        return onSendMessage((message) => {
+          if (!settings.safeMode?.enabled && typeof message.content === "string")
+            message.content = transform(message.content);
+        });
+      },
+      registerMessageEditTransform(transform) {
+        return onEditMessage((message) => {
+          if (!settings.safeMode?.enabled && typeof message.content === "string")
+            message.content = transform(message.content);
+        });
+      },
+      registerProfileBioTransform(transform) {
+        var target = findByFilePath("modules/user_profile/native/UserProfileAboutMeCard.tsx")?.default;
+        if (!target)
+          throw new Error("Discord's profile bio is unavailable");
+        return registerJsxAppearance([
+          target
+        ], (element) => {
+          if (element.type !== target)
+            return element;
+          var { displayProfile, pendingBio } = element.props;
+          var bio = displayProfile?.getPreviewBio?.(pendingBio);
+          if (typeof bio !== "string")
+            return element;
+          var rewritten = transform(bio);
+          return rewritten === bio ? element : React2.cloneElement(element, {
+            pendingBio: rewritten
+          });
+        });
+      },
+      getUserAvatarUrl(id) {
+        var user = id ? UserStore3?.getUser?.(id) : UserStore3?.getCurrentUser?.();
+        if (user)
+          return findByProps("getUserAvatarURL", "getGuildIconURL")?.getUserAvatarURL(user, true, 1024);
+      },
+      registerCommand(name, execute, acceptsText, _sendsMessage, optionalSend, inputs) {
+        var builtIns;
+        try {
+          builtIns = commands.getBuiltInCommands(ApplicationCommandType.CHAT, true, false);
+        } catch (e) {
+          builtIns = commands.getBuiltInCommands(Object.values(ApplicationCommandType), true, false);
+        }
+        if (builtIns.some((command) => command.name === name))
+          throw new Error(`Command /${name} already exists`);
+        return registerCommand({
+          name,
+          description: "Local CX command",
+          shouldHide: () => !settings.safeMode?.enabled,
+          options: [
+            ...acceptsText ? [
+              {
+                name: "text",
+                description: "Text to use",
+                type: ApplicationCommandOptionType.STRING,
+                required: true
+              }
+            ] : [],
+            ...inputs.map((input) => ({
+              name: input.name,
+              description: input.name.replace(/[_-]/g, " "),
+              required: input.required,
+              type: input.type === "integer" ? ApplicationCommandOptionType.INTEGER : input.type === "boolean" ? ApplicationCommandOptionType.BOOLEAN : input.type === "user" ? ApplicationCommandOptionType.USER : input.type === "role" ? ApplicationCommandOptionType.ROLE : ApplicationCommandOptionType.STRING,
+              choices: input.choices?.map((value) => ({
+                name: value,
+                displayName: value,
+                label: value,
+                value
+              }))
+            })),
+            ...optionalSend ? [
+              {
+                name: "send",
+                description: "Send the result to this chat",
+                type: ApplicationCommandOptionType.BOOLEAN
+              }
+            ] : []
+          ],
+          execute(args, context) {
+            if (settings.safeMode?.enabled)
+              return;
+            var text = acceptsText ? args.find((arg) => arg?.name === "text")?.value : void 0;
+            var outgoing = execute({
+              text: typeof text === "string" ? text : void 0,
+              inputs: Object.fromEntries(inputs.map((input) => [
+                input.name,
+                args.find((arg) => arg?.name === input.name)?.value
+              ])),
+              sendRequested: optionalSend && args.find((arg) => arg?.name === "send")?.value === true,
+              reply: (message) => {
+                if (!settings.safeMode?.enabled && context.channel?.id)
+                  messageUtil.sendBotMessage(context.channel.id, message);
+              },
+              prepareChannel() {
+                var channelId = context.channel?.id;
+                var accountId = UserStore3?.getCurrentUser?.()?.id;
+                if (!channelId || !accountId)
+                  return;
+                var isCurrent = () => !settings.safeMode?.enabled && UserStore3?.getCurrentUser?.()?.id === accountId;
+                return {
+                  reply(content) {
+                    if (isCurrent())
+                      messageUtil.sendBotMessage(channelId, content);
+                  },
+                  send(content) {
+                    return _async_to_generator(function* () {
+                      if (!isCurrent())
+                        return;
+                      if (!ChannelStore?.getChannel(channelId))
+                        throw new Error("The original channel is unavailable");
+                      yield messageUtil.sendMessage(channelId, {
+                        content
+                      });
+                    })();
+                  }
+                };
+              },
+              lookup(name2, input) {
+                if (name2 === "roleMembers" || name2 === "randomMember") {
+                  var guild = context.guild?.id ?? ChannelStore?.getChannel?.(context.channel?.id)?.guild_id;
+                  if (name2 === "randomMember") {
+                    var ids = guild ? GuildMemberStore?.getMemberIds?.(guild) ?? [] : [];
+                    return formatCxRandomMember(input, ids.map((userId) => ({
+                      userId
+                    })), UserStore3?.getCurrentUser?.()?.id);
+                  }
+                  return formatCxRoleMembers(input, guild, guild ? GuildMemberStore?.getMembers?.(guild) ?? [] : [], (id) => UserStore3?.getUser?.(id));
+                }
+                var track = SpotifyStore?.getTrack?.();
+                if (track)
+                  return formatCxSpotify(name2, input, track);
+                var activity = SpotifyStore?.getActivity?.();
+                return formatCxSpotify(name2, input, {
+                  id: activity?.sync_id,
+                  album: {
+                    id: activity?.metadata?.album_id
+                  },
+                  artists: [
+                    {
+                      id: activity?.metadata?.artist_ids?.[0]
+                    }
+                  ]
+                });
+              },
+              markServersRead: () => markCxServersRead(getReadStores(), acknowledgeServers),
+              friendInvites: (operation) => runCxFriendInvites(operation, findByProps("createFriendInvite")),
+              findUserTags: findLocalUserTags,
+              copyDiagnostics: () => _async_to_generator(function* () {
+                return describeCcpReport(yield copyCcpReport());
+              })()
+            });
+            if (outgoing !== void 0)
+              return {
+                content: outgoing
+              };
+          }
+        });
+      },
+      toast: (message) => {
+        showToast(message);
+      }
+    };
+  }
   function restoreRememberedCxAppearance() {
     if (settings.safeMode?.enabled)
       return;
@@ -61029,7 +61761,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         if (!canRememberCxAppearance(review))
           continue;
         session.enable(entry.source, {
-          ...appearanceHost,
+          ...createMobileCxHost(),
           toast() {
           },
           registerCommand() {
@@ -61108,736 +61840,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       try {
         if (settings.safeMode?.enabled)
           throw new Error("CX is unavailable in Safe Mode");
-        session.enable(candidate.source, {
-          ...appearanceHost,
-          registerIncomingRules(rules) {
-            var active = true;
-            var context = {
-              currentUser: () => UserStore3?.getCurrentUser?.()?.id,
-              channel: (id) => ChannelStore?.getChannel?.(id),
-              replyAuthor: (channel, id) => MessageStore?.getMessage?.(channel, id)?.author,
-              blocked: (id) => RelationshipStore?.isBlocked?.(id) === true,
-              ignored: (id) => RelationshipStore?.isIgnored?.(id) === true,
-              selectedChannel: () => SelectedChannelStore?.getChannelId?.(),
-              pingAlerts: {
-                status: (id) => PresenceStore?.getStatus?.(id),
-                isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
-                muted: (id, channel) => isCxNotificationMuted(id, channel, UserGuildSettingsStore),
-                notify: ({ title, body }) => {
-                  var account = UserStore3?.getCurrentUser?.()?.id;
-                  setTimeout(() => {
-                    if (active && !settings.safeMode?.enabled && account === UserStore3?.getCurrentUser?.()?.id)
-                      showToast(body ? title + ": " + body : title);
-                  }, 0);
-                }
-              },
-              openLink: (link, channel, user) => setTimeout(() => {
-                if (active && !settings.safeMode?.enabled && context.currentUser() === user && context.selectedChannel() === channel)
-                  void import_react_native43.Linking.openURL(link).catch(() => {
-                  });
-              }, 0),
-              notify: (body) => setTimeout(() => {
-                if (active && !settings.safeMode?.enabled)
-                  showToast(body);
-              }, 0)
-            };
-            var social = bindCxSocialEvents(rules, {
-              currentUser: context.currentUser,
-              notify: context.notify,
-              isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
-              userName: (id) => {
-                var user = UserStore3?.getUser?.(id);
-                return user?.globalName || user?.username;
-              },
-              channelName: (id) => ChannelStore?.getChannel?.(id)?.name,
-              voiceChannel: () => SelectedChannelStore?.getVoiceChannelId?.(),
-              joinVoice: (id) => findByProps("selectVoiceChannel")?.selectVoiceChannel?.(id),
-              removalActions: () => findByProps("removeRelationship"),
-              enabled: () => active && !settings.safeMode?.enabled
-            });
-            var onIncoming = (payload) => {
-              try {
-                if (active && !settings.safeMode?.enabled) {
-                  var patch = runCxIncomingRules(rules, payload, context);
-                  if (patch !== false)
-                    social?.observe(payload);
-                  return patch;
-                }
-              } catch (e) {
-              }
-            };
-            var stop;
-            try {
-              stop = intercept(onIncoming);
-            } catch (error) {
-              social?.stop();
-              throw error;
-            }
-            return () => {
-              active = false;
-              stop();
-              social?.stop();
-            };
-          },
-          registerProfileMenuAction,
-          registerSendConfirmation,
-          registerTimestampFormats,
-          registerUploadAnonymiser,
-          registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
-            var enabled = () => !settings.safeMode?.enabled;
-            switch (effect) {
-              case "hide-role-headers":
-                return registerNoRoleHeaders();
-              case "show-voice-ping":
-                return registerVoicePing(enabled);
-              case "notify-when-muted": {
-                var sound = findByFilePath("modules/sound_playback/native/SoundUtils.tsx");
-                if (typeof sound?.playSound !== "function" || !effectOptions || !("serverMute" in effectOptions))
-                  throw new Error("Discord's mute alert controls are unavailable");
-                return bindCxMutedVoice(findByStoreName("MediaEngineStore"), () => Boolean(SelectedChannelStore.getVoiceChannelId()), () => {
-                  void Promise.resolve(sound.playSound("user_leave")).catch(() => {
-                  });
-                }, effectOptions, enabled);
-              }
-              case "voice-channel-count":
-                if (!effectOptions || !("showEmpty" in effectOptions))
-                  throw new Error("Missing voice count options");
-                return registerVoiceChannelCount(effectOptions, enabled);
-              case "webcam-start-notifier": {
-                if (!effectOptions || !("scope" in effectOptions))
-                  throw new Error("Missing camera tone options");
-                var voice = findByStoreName("VoiceStateStore");
-                return bindCxCameraTone({
-                  account: () => UserStore3.getCurrentUser()?.id,
-                  selected() {
-                    var id = SelectedChannelStore.getVoiceChannelId();
-                    var channel = id && ChannelStore.getChannel(id);
-                    if (id && channel)
-                      return {
-                        id,
-                        private: channel.type === 1 || channel.type === 3
-                      };
-                  },
-                  states: (id) => voice?.getVoiceStatesForChannel?.(id),
-                  play: (on) => playCxVoiceTone(on ? "user_join" : "user_leave"),
-                  enabled,
-                  dispatcher: FluxDispatcher
-                }, effectOptions);
-              }
-              case "wait-for-slot":
-                if (!effectOptions || !("autoJoin" in effectOptions))
-                  throw new Error("Missing voice queue options");
-                return registerWaitForSlot(effectOptions, enabled);
-              case "all-call-time-counter":
-                if (!effectOptions || !("human" in effectOptions))
-                  throw new Error("Missing voice member timer options");
-                return registerVoiceMemberClock(effectOptions);
-              case "call-time-counter":
-                return registerCallTimeCounter();
-              case "jump-to-message-menu":
-                return registerJumpToMessageMenu(enabled);
-              case "jump-without-unblocking":
-                return navigationControls.register(effect, () => overrideCxMethods(findByFilePath("modules/messages/validateJumpWithAlert.tsx"), {
-                  default: () => true
-                }, enabled));
-              case "jump-to-first-message":
-                return navigationControls.register(effect, () => registerJumpToFirst(enabled));
-              case "read-all-servers-button":
-                return navigationControls.register(effect, () => registerReadAllButton(enabled));
-              case "clean-channel-names":
-              case "title-channel-names":
-                return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles", enabled);
-              case "dashless-channel-names":
-                return registerChannelNames("dashless", enabled);
-              case "static-typing-dots":
-                return registerStaticTypingDots();
-              case "hide-disabled-emojis":
-                return hideDisabledEmojiInPicker(enabled);
-              case "copy-emoji-markdown":
-              case "sticker-links":
-                return registerExpressionLinks(effect);
-              case "reverse-image-search":
-                return registerReverseImageSearch();
-              case "copy-media-link":
-                return registerMediaLinkCopy();
-              case "profile-media":
-                return registerProfileMedia();
-              case "user-notes":
-                return registerLocalText("notes");
-              case "user-tags":
-                return registerLocalText("tags");
-              case "channel-notes":
-                return registerLocalText("channels");
-              case "copy-channel-name":
-                return registerCopyChannelName(enabled);
-              case "hide-suggested-channels": {
-                var suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
-                if (!suggested)
-                  throw new Error("Discord's suggested channels section is unavailable");
-                return registerJsxAppearance([
-                  suggested
-                ], () => null);
-              }
-              case "copy-text-attachment":
-                return registerTextAttachmentCopy(enabled);
-              case "image-filename":
-              case "image-full-url":
-                return registerImageFilename(effect === "image-full-url");
-              case "descriptive-gif-alt":
-                return registerGifAltText();
-              case "preserve-image-links": {
-                var parser = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
-                var visibleMessages = /* @__PURE__ */ new WeakMap();
-                return overrideCxMethods(parser, {
-                  parseMessageMarkup(args, invoke) {
-                    var [message, contentMessage, hideSimpleEmbedContent, ...rest] = args;
-                    if (hideSimpleEmbedContent !== true || !message || typeof message !== "object")
-                      return invoke(args);
-                    var { content } = contentMessage ?? message;
-                    if (typeof content !== "string" || !/https?:\/\//i.test(content))
-                      return invoke(args);
-                    var visible = visibleMessages.get(message);
-                    if (!visible) {
-                      visible = Object.create(Object.getPrototypeOf(message), Object.getOwnPropertyDescriptors(message));
-                      visibleMessages.set(message, visible);
-                    }
-                    return invoke([
-                      visible,
-                      contentMessage,
-                      false,
-                      ...rest
-                    ]);
-                  }
-                }, enabled);
-              }
-              case "double-click-edit":
-              case "double-click-reply":
-                return registerMessageGesture(effect === "double-click-edit" ? "edit" : "reply");
-              case "open-steam-links": {
-                var links2 = findByFilePath("utils/MaskedLinkUtils.tsx");
-                var blockedDomains = findByFilePath("modules/blocked_domains/BlockedDomainStore.tsx")?.default;
-                if (typeof blockedDomains?.isBlockedDomain !== "function")
-                  throw new Error("Discord's blocked domain check is unavailable");
-                return overrideCxMethods(links2, {
-                  handleClick(args, invoke) {
-                    var options = args[0];
-                    if (options?.trusted !== true || !isCxProfileUserId(options.messageId) || !isCxProfileUserId(options.channelId) || options.onClick != null || options.onConfirm != null || options.onCancel != null || options.shouldConfirm != null || args.length !== 1)
-                      return invoke(args);
-                    var link = getCxSteamLink(options.href);
-                    if (!link?.mobile || blockedDomains.isBlockedDomain(link.https) !== null)
-                      return invoke(args);
-                    void import_react_native43.Linking.openURL(link.https).catch(() => {
-                      if (enabled())
-                        showToast("Couldn't open the Steam link.");
-                    });
-                  }
-                }, enabled);
-              }
-              case "code-block-gap": {
-                var compactCodeBlocks2 = function(nodes, depth = 0) {
-                  var changed = false;
-                  var content = nodes.flatMap((node, index) => {
-                    if (depth < 8 && (node?.type === "blockQuote" || node?.type === "paragraph") && Array.isArray(node.content)) {
-                      var nested = compactCodeBlocks2(node.content, depth + 1);
-                      if (nested !== node.content) {
-                        changed = true;
-                        return [
-                          {
-                            ...node,
-                            content: nested
-                          }
-                        ];
-                      }
-                    }
-                    if (nodes[index - 1]?.type !== "codeBlock")
-                      return [
-                        node
-                      ];
-                    if (node?.type === "newline" && (node.content == null || node.content === "\n")) {
-                      changed = true;
-                      return [];
-                    }
-                    if (node?.type !== "text" && node?.type !== "newline" || typeof node.content !== "string" || !node.content.startsWith("\n"))
-                      return [
-                        node
-                      ];
-                    changed = true;
-                    return node.content.length > 1 ? [
-                      {
-                        ...node,
-                        content: node.content.slice(1)
-                      }
-                    ] : [];
-                  });
-                  return changed ? content : nodes;
-                };
-                var compactCodeBlocks = compactCodeBlocks2;
-                var parser1 = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
-                var cache = /* @__PURE__ */ new WeakMap();
-                return overrideCxMethods(parser1, {
-                  parseMessageMarkup(args, invoke) {
-                    var row2 = invoke(args);
-                    if (!Array.isArray(row2?.content) || row2.isInlineReplyPreview || row2.hasBailedAst)
-                      return row2;
-                    if (cache.has(row2))
-                      return cache.get(row2);
-                    var content = compactCodeBlocks2(row2.content);
-                    var result = content === row2.content ? row2 : {
-                      ...row2,
-                      content
-                    };
-                    cache.set(row2, result);
-                    return result;
-                  }
-                }, enabled);
-              }
-              case "quick-mention":
-                return registerQuickMention(enabled);
-              case "copy-raw-text":
-              case "copy-message-reference":
-                return registerMessageMenuActions(enabled, ({ message, channel }, close) => getCxMessageClipboard(effect, message, channel).map(({ label: label2, text }) => ({
-                  label: label2,
-                  run() {
-                    try {
-                      clipboard.setString(text);
-                      showToast.showCopyToClipboard?.();
-                      close();
-                    } catch (e) {
-                      showToast("Couldn't copy to clipboard.");
-                    }
-                  }
-                })), false);
-              case "message-word-count": {
-                var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-                return overrideCxMethods(renderer, {
-                  default(args, invoke) {
-                    var row2 = invoke(args);
-                    if (!row2 || typeof row2 !== "object" || !("content" in row2) || !Array.isArray(row2.content) || !row2.content.length)
-                      return row2;
-                    var input = args[0];
-                    if (input?.isInlineReplyPreview)
-                      return row2;
-                    var label2 = formatCxWordCount(input?.message?.content);
-                    return label2 ? {
-                      ...row2,
-                      content: [
-                        ...row2.content,
-                        {
-                          type: "text",
-                          content: "\n" + label2
-                        }
-                      ]
-                    } : row2;
-                  }
-                }, enabled);
-              }
-              case "decode-base64":
-                return registerMessageMenuActions(enabled, ({ message }, close, stillActive) => {
-                  var decoded = decodeCxMessageBase64(message?.content);
-                  if (!decoded)
-                    return [];
-                  return [
-                    {
-                      label: "Decode Base64",
-                      run() {
-                        close();
-                        import_react_native43.Alert.alert("Decoded Base64", decoded, [
-                          {
-                            text: "Close",
-                            style: "cancel"
-                          },
-                          {
-                            text: "Copy",
-                            onPress: () => {
-                              if (stillActive(false))
-                                clipboard.setString(decoded);
-                            }
-                          }
-                        ]);
-                      }
-                    }
-                  ];
-                }, false);
-              case "hide-profile-banner-images":
-                return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore3?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
-              case "quote-message":
-                if (!effectOptions || !("includeLink" in effectOptions))
-                  throw new Error("Missing quote options");
-                return registerQuoteMessage(enabled, effectOptions.includeLink);
-              case "force-owner-crown": {
-                var row = findByFilePath("modules/main_tabs_v2/native/shared_components/user_list/UserRow.tsx")?.default;
-                if (!row)
-                  throw new Error("Discord\u2019s member row is unavailable");
-                return registerJsxAppearance([
-                  row
-                ], (element) => {
-                  var { guildId, user, isOwner } = element.props;
-                  if (isOwner || !isCxProfileUserId(guildId) || !isCxProfileUserId(user?.id) || GuildStore?.getGuild?.(guildId)?.ownerId !== user.id)
-                    return element;
-                  return React2.cloneElement(element, {
-                    isOwner: true
-                  });
-                });
-              }
-              case "spotify-song-name":
-                return overrideCxMethods(findByFilePath("modules/activity_status/getActivityStatusText.tsx"), {
-                  default(args, invoke) {
-                    var result = invoke(args);
-                    var activity = args[0];
-                    var title = args[1] === true && getCxSpotifySongName(activity);
-                    var artist = typeof activity?.state === "string" && activity.state.split("; ").join(", ");
-                    return title && artist && result && typeof result === "object" && "text" in result && result.text === artist ? {
-                      ...result,
-                      text: title
-                    } : result;
-                  }
-                }, enabled);
-              case "sort-reactions-by-count":
-                return overrideCxMethods(findByFilePath("modules/messages/native/renderer/transformReactions.tsx"), {
-                  default(args, invoke) {
-                    var options = args[0];
-                    if (!Array.isArray(options?.reactions) || options.reactions.length < 2)
-                      return invoke(args);
-                    return invoke([
-                      {
-                        ...options,
-                        reactions: sortCxReactions(options.reactions)
-                      },
-                      ...args.slice(1)
-                    ]);
-                  }
-                }, enabled);
-              case "keep-long-drafts":
-                return registerLongDrafts(enabled);
-              case "bypass-pin-prompt":
-                return registerBypassPinPrompt(enabled);
-              case "pin-message-shortcut":
-                return registerPinShortcut(enabled);
-              case "toggle-message-embeds":
-                return registerEmbedToggle(enabled);
-              case "repeat-message":
-                return registerRepeatMessages(enabled);
-              case "attachment-image-quality":
-              case "original-attachment-images":
-                return registerAttachmentImageQuality(effect === "original-attachment-images");
-              case "scroll-to-latest": {
-                var actions = findByProps("jumpToMessage", "fetchMessages");
-                if (typeof actions?.jumpToMessage !== "function")
-                  throw new Error("Discord message navigation is unavailable");
-                return bindCxChannelOpenRead({
-                  dispatcher: FluxDispatcher,
-                  read: ReadStateStore,
-                  enabled,
-                  selected: () => SelectedChannelStore?.getChannelId?.(),
-                  user: () => UserStore3?.getCurrentUser?.()?.id,
-                  jump: (target) => actions.jumpToMessage(target)
-                });
-              }
-              case "unicode-emoji-autocomplete":
-              case "local-emoji-autocomplete":
-                return filterCxEmojiAutocomplete(EmojiStore, effect === "local-emoji-autocomplete" ? "local" : "unicode", findByProps("EmojiIntention")?.EmojiIntention, enabled);
-              case "split-long-messages":
-                return registerSplitSender();
-              case "flat-attachments": {
-                var renderer1 = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-                return overrideCxMethods(renderer1, {
-                  default(args, invoke) {
-                    var presentation = invoke(args);
-                    if (!presentation || typeof presentation !== "object" || !("useAttachmentGridLayout" in presentation) || presentation.useAttachmentGridLayout !== true)
-                      return presentation;
-                    return {
-                      ...presentation,
-                      useAttachmentGridLayout: false
-                    };
-                  }
-                }, enabled);
-              }
-              case "fix-file-extensions": {
-                var uploader = findByFilePath("lib/uploader/native/CloudUploader.tsx")?.default?.prototype;
-                return overrideCxMethods(uploader, {
-                  uploadFiles: (args, original) => {
-                    fixCxFileExtensions(args[0]);
-                    return original(args);
-                  }
-                }, enabled);
-              }
-              case "plus-reactions": {
-                var reactions = findByProps("addReaction", "removeReaction") ?? findByProps("addReaction");
-                if (typeof reactions?.addReaction !== "function")
-                  throw new Error("Discord reactions are unavailable");
-                var handle = createCxPlusReactionHandler({
-                  messages: (channel) => MessageStore?.getMessages?.(channel),
-                  guild: (channel) => ChannelStore?.getChannel?.(channel)?.guild_id,
-                  emojis: () => EmojiStore,
-                  unicode: (name) => findByProps("convertNameToSurrogate")?.convertNameToSurrogate(name),
-                  react: (channel, message, emoji) => reactions.addReaction(channel, message, emoji),
-                  error: () => {
-                    showToast("Couldn\u2019t react to the previous message.");
-                  }
-                });
-                return instead("sendMessage", messageUtil, function(args, original) {
-                  if (enabled()) {
-                    var result = handle(args[0], args[1], args[3]);
-                    if (result)
-                      return result;
-                  }
-                  return original.apply(this, args);
-                });
-              }
-              case "silent-typing":
-                return overrideCxMethods(findByProps("startTyping", "stopTyping"), {
-                  startTyping: () => void 0
-                }, enabled);
-              case "pending-friend-count":
-                return overrideCxMethods(RelationshipStore, {
-                  getPendingCount: () => 0,
-                  getPendingIncomingCount: () => 0
-                }, enabled);
-              case "plain-url-paste":
-                throw new Error("Plain URL paste is available on desktop and browser.");
-              case "no-middle-click-paste":
-                throw new Error("Middle-click paste control is available on Linux.");
-              case "avatar-crop-zoom":
-                throw new Error("Avatar crop zoom is available on desktop and browser.");
-              case "notification-volume":
-                throw new Error("Notification volume control is available on desktop and browser.");
-              case "reveal-spoilers-shortcut":
-                throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
-              case "reply-timestamp":
-                throw new Error("Reply timestamps are available on desktop and browser.");
-              case "animated-assets":
-                return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
-              case "floor-relative-time":
-                return floorCxRelativeTime(findByProps("relativeTimeRounding", "locale"), enabled);
-              case "avatar-resolution":
-                return raiseCxAvatarResolution(findByProps("getUserAvatarURL", "getGuildIconURL"), avatarResolution, enabled);
-              case "stop-auto-unread":
-                return overrideCxMethods(findByStoreName("UnreadSettingNoticeStore2"), {
-                  maybeAutoUpgradeChannel: () => false
-                }, enabled);
-            }
-          },
-          registerReplyPingSuppression() {
-            return onSendMessage((_message, options) => {
-              if (settings.safeMode?.enabled || !options?.messageReference)
-                return;
-              options.allowedMentions = {
-                parse: [
-                  "users",
-                  "roles",
-                  "everyone"
-                ],
-                ...options.allowedMentions,
-                replied_user: false
-              };
-            });
-          },
-          registerPreviousMessageRule(rule) {
-            var active = true;
-            var editor = findByProps("editMessage", "startEditMessage");
-            if (typeof editor?.editMessage !== "function")
-              throw new Error("Discord message edits are unavailable");
-            var currentUser = () => UserStore3?.getCurrentUser?.()?.id;
-            var handle = createCxPreviousSendHandler(rule, {
-              currentUser,
-              previous(channel, own) {
-                var existing = own ? MessageStore?.getLastEditableMessage?.(channel) : MessageStore?.getLastMessage?.(channel);
-                if (existing)
-                  return existing;
-                var cache = MessageStore?.getMessages?.(channel);
-                var list = cache?.toArray?.() ?? cache?._array;
-                if (!Array.isArray(list))
-                  return;
-                if (!own)
-                  return list[list.length - 1];
-                var me = currentUser();
-                for (var i = list.length - 1; i >= 0; i--)
-                  if (list[i]?.author?.id === me)
-                    return list[i];
-              },
-              edit: (channel, id, content) => editor.editMessage(channel, id, {
-                content
-              }),
-              error: () => {
-                showToast("Couldn\u2019t edit the previous message.");
-              }
-            });
-            var unpatch = instead("sendMessage", messageUtil, function(args, original) {
-              var [channel, message, , options] = args;
-              if (active && !settings.safeMode?.enabled && typeof channel === "string") {
-                var edit = handle(channel, message?.content, Boolean(message?.tts || message?.attachments?.length || message?.stickers?.length || message?.stickerIds?.length || options?.uploads?.length || options?.stickers?.length || options?.messageReference || options?.replyOptions?.messageReference));
-                if (edit)
-                  return edit;
-              }
-              return original.apply(this, args);
-            });
-            return () => {
-              active = false;
-              unpatch();
-            };
-          },
-          registerMessageTransform(transform) {
-            return onSendMessage((message) => {
-              if (!settings.safeMode?.enabled && typeof message.content === "string")
-                message.content = transform(message.content);
-            });
-          },
-          registerMessageEditTransform(transform) {
-            return onEditMessage((message) => {
-              if (!settings.safeMode?.enabled && typeof message.content === "string")
-                message.content = transform(message.content);
-            });
-          },
-          registerProfileBioTransform(transform) {
-            var target = findByFilePath("modules/user_profile/native/UserProfileAboutMeCard.tsx")?.default;
-            if (!target)
-              throw new Error("Discord's profile bio is unavailable");
-            return registerJsxAppearance([
-              target
-            ], (element) => {
-              if (element.type !== target)
-                return element;
-              var { displayProfile, pendingBio } = element.props;
-              var bio = displayProfile?.getPreviewBio?.(pendingBio);
-              if (typeof bio !== "string")
-                return element;
-              var rewritten = transform(bio);
-              return rewritten === bio ? element : React2.cloneElement(element, {
-                pendingBio: rewritten
-              });
-            });
-          },
-          getUserAvatarUrl(id) {
-            var user = id ? UserStore3?.getUser?.(id) : UserStore3?.getCurrentUser?.();
-            if (user)
-              return findByProps("getUserAvatarURL", "getGuildIconURL")?.getUserAvatarURL(user, true, 1024);
-          },
-          registerCommand(name, execute, acceptsText, _sendsMessage, optionalSend, inputs) {
-            var builtIns;
-            try {
-              builtIns = commands.getBuiltInCommands(ApplicationCommandType.CHAT, true, false);
-            } catch (e) {
-              builtIns = commands.getBuiltInCommands(Object.values(ApplicationCommandType), true, false);
-            }
-            if (builtIns.some((command) => command.name === name))
-              throw new Error(`Command /${name} already exists`);
-            return registerCommand({
-              name,
-              description: "Local CX command",
-              shouldHide: () => !settings.safeMode?.enabled,
-              options: [
-                ...acceptsText ? [
-                  {
-                    name: "text",
-                    description: "Text to use",
-                    type: ApplicationCommandOptionType.STRING,
-                    required: true
-                  }
-                ] : [],
-                ...inputs.map((input) => ({
-                  name: input.name,
-                  description: input.name.replace(/[_-]/g, " "),
-                  required: input.required,
-                  type: input.type === "integer" ? ApplicationCommandOptionType.INTEGER : input.type === "boolean" ? ApplicationCommandOptionType.BOOLEAN : input.type === "user" ? ApplicationCommandOptionType.USER : input.type === "role" ? ApplicationCommandOptionType.ROLE : ApplicationCommandOptionType.STRING,
-                  choices: input.choices?.map((value) => ({
-                    name: value,
-                    displayName: value,
-                    label: value,
-                    value
-                  }))
-                })),
-                ...optionalSend ? [
-                  {
-                    name: "send",
-                    description: "Send the result to this chat",
-                    type: ApplicationCommandOptionType.BOOLEAN
-                  }
-                ] : []
-              ],
-              execute(args, context) {
-                if (settings.safeMode?.enabled)
-                  return;
-                var text = acceptsText ? args.find((arg) => arg?.name === "text")?.value : void 0;
-                var outgoing = execute({
-                  text: typeof text === "string" ? text : void 0,
-                  inputs: Object.fromEntries(inputs.map((input) => [
-                    input.name,
-                    args.find((arg) => arg?.name === input.name)?.value
-                  ])),
-                  sendRequested: optionalSend && args.find((arg) => arg?.name === "send")?.value === true,
-                  reply: (message) => {
-                    if (!settings.safeMode?.enabled && context.channel?.id)
-                      messageUtil.sendBotMessage(context.channel.id, message);
-                  },
-                  prepareChannel() {
-                    var channelId = context.channel?.id;
-                    var accountId = UserStore3?.getCurrentUser?.()?.id;
-                    if (!channelId || !accountId)
-                      return;
-                    var isCurrent = () => !settings.safeMode?.enabled && UserStore3?.getCurrentUser?.()?.id === accountId;
-                    return {
-                      reply(content) {
-                        if (isCurrent())
-                          messageUtil.sendBotMessage(channelId, content);
-                      },
-                      send(content) {
-                        return _async_to_generator(function* () {
-                          if (!isCurrent())
-                            return;
-                          if (!ChannelStore?.getChannel(channelId))
-                            throw new Error("The original channel is unavailable");
-                          yield messageUtil.sendMessage(channelId, {
-                            content
-                          });
-                        })();
-                      }
-                    };
-                  },
-                  lookup(name2, input) {
-                    if (name2 === "roleMembers" || name2 === "randomMember") {
-                      var guild = context.guild?.id ?? ChannelStore?.getChannel?.(context.channel?.id)?.guild_id;
-                      if (name2 === "randomMember") {
-                        var ids = guild ? GuildMemberStore?.getMemberIds?.(guild) ?? [] : [];
-                        return formatCxRandomMember(input, ids.map((userId) => ({
-                          userId
-                        })), UserStore3?.getCurrentUser?.()?.id);
-                      }
-                      return formatCxRoleMembers(input, guild, guild ? GuildMemberStore?.getMembers?.(guild) ?? [] : [], (id) => UserStore3?.getUser?.(id));
-                    }
-                    var track = SpotifyStore?.getTrack?.();
-                    if (track)
-                      return formatCxSpotify(name2, input, track);
-                    var activity = SpotifyStore?.getActivity?.();
-                    return formatCxSpotify(name2, input, {
-                      id: activity?.sync_id,
-                      album: {
-                        id: activity?.metadata?.album_id
-                      },
-                      artists: [
-                        {
-                          id: activity?.metadata?.artist_ids?.[0]
-                        }
-                      ]
-                    });
-                  },
-                  markServersRead: () => markCxServersRead(getReadStores(), acknowledgeServers),
-                  friendInvites: (operation) => runCxFriendInvites(operation, findByProps("createFriendInvite")),
-                  findUserTags: findLocalUserTags,
-                  copyDiagnostics: () => _async_to_generator(function* () {
-                    return describeCcpReport(yield copyCcpReport());
-                  })()
-                });
-                if (outgoing !== void 0)
-                  return {
-                    content: outgoing
-                  };
-              }
-            });
-          },
-          toast: (message) => {
-            showToast(message);
-          }
-        }, candidate.review.permissions, candidate.selected);
+        session.enable(candidate.source, createMobileCxHost(), candidate.review.permissions, candidate.selected);
         setStatus(`${candidate.review.name} is active for this session.`);
         setCandidate(void 0);
         if (remember && rememberRevision) {
@@ -63926,7 +63929,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0725155baaaf593a5d3b2cd1560dc188a0fee206";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ae62976d3043ec21fa152c60ad1a400cdb441ffe";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
