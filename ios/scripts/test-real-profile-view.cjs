@@ -31,10 +31,12 @@ const helpers = source.slice(source.indexOf('function isRealProfileView('), sour
 const profile = Object.freeze({ username: 'custom-name', bio: 'custom bio' });
 const root = { fakeProfile: profile };
 const hooks = new Map();
+const badgeRefreshes = [];
 let intercept;
 let lastSheet;
 const mobile = vm.createContext({ rootSettings: root, settings: {}, sharedProfiles: new Map([[id, profile]]),
     isCurrentUser: uid => uid === other, clearCache() {}, identityRefreshers: new Set(),
+    reapplyBadgeDirectory: uid => badgeRefreshes.push(uid),
     safeStore: () => ({ emitChange() {} }), simpleSheets: { showSimpleActionSheet() {}, hideActionSheet() {} },
     findByName: () => () => {}, setTimeout: fn => fn(),
     instead: (_method, _parent, fn) => { intercept = fn; },
@@ -55,6 +57,7 @@ intercept([original], sheet => { lastSheet = sheet; });
 assert.equal(lastSheet.options.at(-1).label, 'Show CloudCord profile');
 lastSheet.options.at(-1).onPress();
 assert.equal(mobile.getProfileOverride(id), profile, 'switching back restores the retained shared snapshot');
+assert.deepEqual(badgeRefreshes, [id, id], 'changing the profile view also refreshes the native directory');
 const unrelated = { key: 'ChannelMenu', userId: id, options: [] };
 intercept([unrelated], sheet => { lastSheet = sheet; });
 assert.equal(lastSheet, unrelated, 'unrelated menus stay untouched');
@@ -74,6 +77,51 @@ assert.equal(mobile.getProfileOverride(id), profile, 'private profiles still sho
 assert.equal(mobile.getProfileOverride(id, true), profile, 'public CloudCord badges do not depend on Discord friendship/privacy');
 root.cloudcordRealProfileUsers = [id];
 assert.equal(mobile.getProfileOverride(id, true), undefined, 'real-profile viewer choice also hides public cosmetic badges');
+
+const scheduled = [];
+const catalogs = new Map();
+const learned = [];
+let cosmetic = true;
+const directory = vm.createContext({
+    setTimeout: work => scheduled.push(work),
+    badgeSourceFor: uid => cosmetic && uid === id ? { replace: false } : undefined,
+    nativeBadgesFor: () => [{ id: 'early_supporter' }],
+    directoryBadgeId: () => 11,
+    fakeDirectoryEntry: (entry, _src, owned) => owned.has(entry.badge_id) ? { ...entry, owned: true } : entry,
+    isCurrentUser: uid => uid === other,
+    currentUserId: other,
+    learnBadgeInfo: entries => learned.push(...entries.map(entry => entry.badge_id)),
+    findByStoreName: () => ({
+        hasCatalogFor: uid => catalogs.has(uid),
+        getBadges: uid => catalogs.get(uid),
+        getBadgeById: badgeId => ({ badge_id: badgeId, owned: false }),
+    }),
+    FluxDispatcher: { dispatch: action => dispatchDirectory(action) },
+});
+vm.runInContext(compile(source.slice(source.indexOf('const nativeBadgeDirectories'), source.indexOf('let nativeBadgeHooksInstalled'))), directory);
+function dispatchDirectory(action) {
+    directory.rewriteBadgeDirectory(action);
+    catalogs.set(action.userId, action.badges);
+}
+const directoryAction = uid => ({ type: 'BADGE_DIRECTORY_FETCH_SUCCESS', userId: uid, badges: [] });
+dispatchDirectory(directoryAction(id));
+assert.equal(catalogs.get(id)[0]?.owned, true, 'CloudCord badges can populate Discord’s native directory');
+cosmetic = false;
+directory.reapplyBadgeDirectory(id);
+directory.reapplyBadgeDirectory(id);
+assert.equal(scheduled.length, 1, 'several refreshes of the same profile coalesce');
+scheduled.shift()();
+assert.equal(catalogs.get(id).length, 0, 'real profile restores an originally empty native directory');
+cosmetic = true;
+directory.reapplyBadgeDirectory(id);
+scheduled.shift()();
+assert.equal(catalogs.get(id)[0]?.owned, true, 'switching back reapplies the cosmetic from the original snapshot');
+assert.deepEqual(learned, [], 'local replays do not teach the directory synthetic badge labels');
+directory.reapplyBadgeDirectory(id);
+dispatchDirectory({ ...directoryAction(id), badges: [{ badge_id: 12, owned: true }] });
+cosmetic = false;
+scheduled.shift()();
+assert.equal(JSON.stringify(catalogs.get(id)), '[{"badge_id":12,"owned":true}]', 'a replay after a new fetch uses the newest native data');
 
 const desktopSource = fs.readFileSync('desktop/client/src/sincordplugins/fakeProfile/index.tsx', 'utf8');
 const badgeViewer = vm.createContext({ realGetUserProfile: () => ({ private: true }), storedData: {},

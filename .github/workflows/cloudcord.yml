@@ -1492,6 +1492,7 @@ jobs:
               if (users.has(id)) users.delete(id); else users.add(id);
               rootSettings.cloudcordRealProfileUsers = [...users];
               clearCache();
+              reapplyBadgeDirectory(id);
               for (const refresh of identityRefreshers) refresh();
               for (const store of ["UserStore", "UserProfileStore", "MessageStore"]) {
                   try { safeStore(store)?.emitChange?.(); } catch {}
@@ -2384,12 +2385,25 @@ jobs:
               if (entry.badge_id === 17) return tieredEntry(entry, src.giftLevel, monthsAgo(1), fake.description, hidden);
               return { ...entry, owned: true, hidden, info_label: entry.info_label ?? rootSettings.cloudcordBadgeInfo?.[entry.badge_id] ?? KNOWN_BADGE_INFO[entry.badge_id] };
           }
+          // Save Discord's unmodified directory for local refreshes. The store
+          // can already contain CloudCord's badges from a previous interception.
+          const nativeBadgeDirectories = new Map<string, any[]>();
+          const badgeDirectoryReplays = new WeakSet<object>();
+          const queuedBadgeDirectoryReplays = new Set<string>();
+          function rememberNativeBadgeDirectory(id: string, badges: any[]) {
+              nativeBadgeDirectories.delete(id);
+              nativeBadgeDirectories.set(id, badges.map(entry => entry && { ...entry }));
+              if (nativeBadgeDirectories.size > 100) nativeBadgeDirectories.delete(nativeBadgeDirectories.keys().next().value!);
+          }
           // Discord's badge directory (owned badges, tiers, "since" labels) loads separately.
           function rewriteBadgeDirectory(action: any) {
               const type = action?.type;
               if (type !== "BADGE_DIRECTORY_FETCH_SUCCESS" && type !== "BADGE_FETCH_SUCCESS" && type !== "BADGE_SUMMARY_FETCH_SUCCESS") return false;
-              try { learnBadgeInfo(Array.isArray(action.badges) ? action.badges : action.badge ? [action.badge] : []); } catch {}
               const id = String(action.userId || "");
+              if (!badgeDirectoryReplays.has(action)) {
+                  if (/^\d{15,22}$/.test(id) && type === "BADGE_DIRECTORY_FETCH_SUCCESS" && Array.isArray(action.badges)) rememberNativeBadgeDirectory(id, action.badges);
+                  try { learnBadgeInfo(Array.isArray(action.badges) ? action.badges : action.badge ? [action.badge] : []); } catch {}
+              }
               const src = id ? badgeSourceFor(id) : undefined;
               if (!src) return false;
               try {
@@ -2420,15 +2434,26 @@ jobs:
               if (Array.isArray(action.pendingBadgeHiddenBadges)) rootSettings.fakeProfileNativeHidden = action.pendingBadgeHiddenBadges.map(Number);
               if (Array.isArray(action.pendingBadgeDisplayOrder) || Array.isArray(action.pendingBadgeHiddenBadges)) queueSharedPublish();
           }
-          // Re-run the badge rewrite on badge info Discord already has (no network): a fetch can
-          // be skipped while Discord's copy is fresh, which left badges without fake data.
+          // Reapply the current view to cached native data without a network request.
           function reapplyBadgeDirectory(id: string) {
-              try {
-                  const store = findByStoreName("BadgeDirectoryStore") as any;
-                  if (!store?.hasCatalogFor?.(id)) return;
-                  const badges = (store.getBadges(id) || []).map((entry: any) => ({ ...entry }));
-                  if (badges.length) setTimeout(() => { try { FluxDispatcher.dispatch({ type: "BADGE_DIRECTORY_FETCH_SUCCESS", userId: id, badges }); } catch {} }, 0);
-              } catch {}
+              if (queuedBadgeDirectoryReplays.has(id)) return;
+              queuedBadgeDirectoryReplays.add(id);
+              setTimeout(() => {
+                  queuedBadgeDirectoryReplays.delete(id);
+                  try {
+                      if (!nativeBadgeDirectories.has(id)) {
+                          const store = findByStoreName("BadgeDirectoryStore") as any;
+                          if (!store?.hasCatalogFor?.(id)) return;
+                          const badges = store.getBadges(id);
+                          if (!Array.isArray(badges)) return;
+                          rememberNativeBadgeDirectory(id, badges);
+                      }
+                      const badges = nativeBadgeDirectories.get(id)!.map(entry => entry && { ...entry });
+                      const action = { type: "BADGE_DIRECTORY_FETCH_SUCCESS", userId: id, badges };
+                      badgeDirectoryReplays.add(action);
+                      FluxDispatcher.dispatch(action);
+                  } catch {}
+              }, 0);
           }
           let nativeBadgeHooksInstalled = false;
           function installNativeBadgeHooks() {
