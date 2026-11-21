@@ -285,6 +285,7 @@ import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/uni
 import plugin_catalog_unique_lines from "../../../../examples/cx/catalog/plugins/unique-lines.cx";
 import plugin_catalog_unit_converter from "../../../../examples/cx/catalog/plugins/unit-converter.cx";
 import plugin_catalog_unix_date_converter from "../../../../examples/cx/catalog/plugins/unix-date-converter.cx";
+import plugin_catalog_unlocked_avatar_zoom from "../../../../examples/cx/catalog/plugins/unlocked-avatar-zoom.cx";
 import plugin_catalog_unsuppress_embeds from "../../../../examples/cx/catalog/plugins/unsuppress-embeds.cx";
 import plugin_catalog_url_component_codec from "../../../../examples/cx/catalog/plugins/url-component-codec.cx";
 import plugin_catalog_url_inspector from "../../../../examples/cx/catalog/plugins/url-inspector.cx";
@@ -697,6 +698,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Unique Lines", source: plugin_catalog_unique_lines, description: "/uniquelines", commands: ["uniquelines"], categories: ["Commands"] },
         { name: "UnitConverter", source: plugin_catalog_unit_converter, description: "/convert", commands: ["convert"], categories: ["Chat","Commands"] },
         { name: "Unix Date Converter", source: plugin_catalog_unix_date_converter, description: "/unixtoiso · /isotounix", commands: ["unixtoiso","isotounix"], categories: ["Commands"] },
+        { name: "UnlockedAvatarZoom", source: plugin_catalog_unlocked_avatar_zoom, description: "Increase the zoom limit in Discord's avatar crop tool (4×)", desktopOnly: true, categories: ["Appearance"] },
         { name: "UnsuppressEmbeds", source: plugin_catalog_unsuppress_embeds, description: "Suppress or unsuppress embeds in the selected message", categories: ["Chat"] },
         { name: "URL Component Codec", source: plugin_catalog_url_component_codec, description: "/urlencode · /urldecode", commands: ["urlencode","urldecode"], categories: ["Commands"] },
         { name: "URL Inspector", source: plugin_catalog_url_inspector, description: "/inspecturl", commands: ["inspecturl"], categories: ["Commands"] },

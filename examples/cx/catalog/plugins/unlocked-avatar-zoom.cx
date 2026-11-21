@@ -1,0 +1,3 @@
+plugin "UnlockedAvatarZoom":
+  needs appearance.avatarcrop
+  use avatar-crop-zoom

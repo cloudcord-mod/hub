@@ -106,6 +106,7 @@ const permissionLabels = {
     "appearance.hide": "Hide the listed interface elements on this device",
     "appearance.style": "Apply the listed visual changes on this device",
     "appearance.avatarresolution": "Change image size requests for avatars hosted on Discord’s CDN",
+    "appearance.avatarcrop": "Change the maximum zoom while cropping an avatar",
     "messages.filterstickers": "Filter stickers from incoming messages on this device",
     "messages.silencementions": "Mute mentions from the listed senders on this device",
     "replies.controlping": "Choose whether incoming replies ping you on this device",
@@ -207,7 +208,8 @@ export type CxTheme = {
     rawColors?: Record<string, string>;
 };
 type CxQuoteOptions = { includeLink: boolean; };
-type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions;
+type CxAvatarCropOptions = { maxAvatarCropZoom: number; };
+type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions;
 
 type CxPlugin = {
     kind: "plugin";
@@ -223,6 +225,7 @@ type CxPlugin = {
     timestamps: CxTimestampFormats;
     nativeEffects: CxNativeEffect[];
     avatarResolution?: CxAvatarResolution;
+    avatarCropOptions?: CxAvatarCropOptions;
     voiceMemberOptions?: CxVoiceMemberOptions;
     voiceQueueOptions?: CxVoiceQueueOptions;
     cameraToneOptions?: CxCameraToneOptions;
@@ -363,6 +366,7 @@ export function parseCx(source: string): CxDocument {
     const timestamps: CxTimestampFormats = {};
     let hasTimestampSurface = false;
     let avatarResolution: CxAvatarResolution | undefined;
+    let avatarCropOptions: CxAvatarCropOptions | undefined;
     let voiceMemberOptions: CxVoiceMemberOptions | undefined;
     let voiceQueueOptions: CxVoiceQueueOptions | undefined;
     let mutedVoiceOptions: CxMutedVoiceOptions | undefined;
@@ -464,6 +468,10 @@ export function parseCx(source: string): CxDocument {
                 const size = Number(effect[2]) as CxAvatarResolution;
                 if (!/^\d+$/.test(effect[2] ?? "") || !cxAvatarResolutions.includes(size)) throw new Error("Choose an avatar size of 256, 512, 1024, 2048, or 4096");
                 avatarResolution = size;
+            } else if (name === "avatar-crop-zoom") {
+                const zoom = effect[2] ?? "4";
+                if (!/^(?:[2-9]|1[0-6])$/.test(zoom)) throw new Error("Choose an avatar crop zoom from 2 to 16");
+                avatarCropOptions = { maxAvatarCropZoom: Number(zoom) };
             } else if (name === "all-call-time-counter") {
                 const flags = effect[2]?.split(" ") ?? [];
                 if (flags.some(flag => !["human", "minutes-only", "exclude-self"].includes(flag)) || new Set(flags).size !== flags.length)
@@ -742,7 +750,7 @@ export function parseCx(source: string): CxDocument {
         throw new Error("Remove unused CX permissions");
     return {
         kind: "plugin", name, commands, permissions: [...permissions], messageTransforms: transforms, sendConfirmation, suppressReplyPing,
-        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
+        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
     };
 }
 
@@ -762,6 +770,7 @@ export function reviewCx(source: string) {
             .concat(document.nativeEffects.map(effect => {
                 const label = cxNativeEffects[effect].label;
                 if (effect === "avatar-resolution") return label + " (" + document.avatarResolution + " px)";
+                if (effect === "avatar-crop-zoom") return label + " (" + document.avatarCropOptions!.maxAvatarCropZoom + "×)";
                 if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
                     return "Automatically join the selected voice channel when its slot opens";
                 return label;
@@ -929,6 +938,7 @@ function bindCx(source: string, host: CxHost, approved: readonly CxPermission[],
             cleanups.push(host.registerTimestampFormats(document.timestamps));
         }
         const nativeOptions: Partial<Record<CxNativeEffect, CxNativeOptions>> = {
+            "avatar-crop-zoom": document.avatarCropOptions,
             "all-call-time-counter": document.voiceMemberOptions,
             "wait-for-slot": document.voiceQueueOptions,
             "webcam-start-notifier": document.cameraToneOptions,

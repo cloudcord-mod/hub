@@ -1088,6 +1088,10 @@ const desktopEffectRecipes = {
         effect: "plain-url-paste",
         sha256: "2ea39358d6f186594dfd5c51032546c030967217e1712ca8f859624b66025966",
     },
+    UnlockedAvatarZoom: {
+        effect: "avatar-crop-zoom",
+        sha256: "79d758d98fdafd27b0ba1178f14c5c7a4773ae74dbcaa735ad31d242bbc1d413",
+    },
 };
 
 function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {

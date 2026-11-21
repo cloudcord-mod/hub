@@ -2707,6 +2707,8 @@ export default function CxExtensions() {
                             return overrideCxMethods(RelationshipStore, { getPendingCount: () => 0, getPendingIncomingCount: () => 0 }, enabled);
                         case "plain-url-paste":
                             throw new Error("Plain URL paste is available on desktop and browser.");
+                        case "avatar-crop-zoom":
+                            throw new Error("Avatar crop zoom is available on desktop and browser.");
                         case "animated-assets":
                             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                         case "floor-relative-time":

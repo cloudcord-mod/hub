@@ -965,6 +965,26 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(pasteWithSelection(false), "plain");
             click(render(), "Disable NoMaskedUrlPaste");
             assert.equal(pasteWithSelection(true), "masked");
+
+            const zoomPatch = runtime.patches.find(patch => patch.find === "#{intl::AVATAR_UPLOAD_EDIT_MEDIA}").replacement;
+            const avatarCrop = Function("$self", "return ({maxValue:1.5, minValue:1});".replace(zoomPatch.match, zoomPatch.replace));
+            assert.equal(avatarCrop(runtime).maxValue, 1.5);
+            selectCatalog("UnlockedAvatarZoom");
+            assert.ok(button(render(), "Allow for this session"));
+            assert.match(reviewCx(read("examples/cx/catalog/plugins/unlocked-avatar-zoom.cx")).effects.join(" "), /4×/);
+            assert.throws(() => parseCx('plugin "Too Far":\n  needs appearance.avatarcrop\n  use avatar-crop-zoom 17'), /2 to 16/);
+            click(render(), "Allow for this session");
+            assert.equal(avatarCrop(runtime).maxValue, 4);
+            const editor = find(render(), item => item.props["aria-label"] === "CX source");
+            editor.props.onChange({ currentTarget: { value: 'plugin "Crop Twelve":\n  needs appearance.avatarcrop\n  use avatar-crop-zoom 12' } });
+            click(render(), "Review CX");
+            click(render(), "Allow for this session");
+            assert.equal(avatarCrop(runtime).maxValue, 12);
+            assert.equal(runtime.avatarCropZoom(13), 13);
+            click(render(), "Disable Crop Twelve");
+            assert.equal(avatarCrop(runtime).maxValue, 4);
+            click(render(), "Disable UnlockedAvatarZoom");
+            assert.equal(avatarCrop(runtime).maxValue, 1.5);
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));

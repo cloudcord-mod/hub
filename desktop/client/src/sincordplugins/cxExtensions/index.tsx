@@ -468,6 +468,7 @@ let imageLinkUsers = 0;
 let roleHeaderUsers = 0;
 let reactionSortUsers = 0;
 let plainUrlPasteUsers = 0;
+const avatarCropZoomLimits = new Map<symbol, number>();
 let bypassPinPromptUsers = 0;
 let longDraftUsers = 0;
 let ownerCrownUsers = 0;
@@ -1232,6 +1233,12 @@ export function CxSettings() {
                             return floorCxRelativeTime(findByProps("relativeTimeRounding", "locale"));
                         case "avatar-resolution":
                             return raiseCxAvatarResolution(findByProps("getUserAvatarURL", "getGuildIconURL"), avatarResolution);
+                        case "avatar-crop-zoom": {
+                            if (!effectOptions || !("maxAvatarCropZoom" in effectOptions)) throw new Error("Missing avatar crop zoom");
+                            const grant = Symbol();
+                            avatarCropZoomLimits.set(grant, effectOptions.maxAvatarCropZoom);
+                            return () => { avatarCropZoomLimits.delete(grant); };
+                        }
                         case "stop-auto-unread":
                             return overrideCxMethods(findStore("UnreadSettingNoticeStore2"), { maybeAutoUpgradeChannel: () => false });
                     }
@@ -1553,6 +1560,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // UnlockedAvatarZoom by nakoyasha, GPL-3.0-or-later.
+        find: "#{intl::AVATAR_UPLOAD_EDIT_MEDIA}",
+        replacement: {
+            match: /maxValue:(\d+(?:\.\d+)?)(?=[,}])/,
+            replace: "maxValue:$self.avatarCropZoom($1)",
+        },
+    }, {
         // NoMaskedUrlPaste by CatNoir, GPL-3.0-or-later.
         find: ".selection,preventEmojiSurrogates:",
         replacement: {
@@ -1817,6 +1831,7 @@ export default definePlugin({
     keepLongDrafts() { return longDraftUsers > 0; },
     shouldSkipPinPrompt() { return bypassPinPromptUsers > 0; },
     usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
+    avatarCropZoom(original: number) { return Math.max(original, ...avatarCropZoomLimits.values()); },
     sortMessageReactions<T extends { count: number; }>(reactions: readonly T[]) {
         return reactionSortUsers > 0 ? sortCxReactions(reactions) : reactions;
     },

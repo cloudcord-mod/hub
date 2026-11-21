@@ -17,6 +17,7 @@ export const cxNativeEffects = {
     "animated-assets": { permission: "appearance.style", label: "Animate avatars, banners, and server icons" },
     "floor-relative-time": { permission: "appearance.style", label: "Round relative timestamps down" },
     "avatar-resolution": { permission: "appearance.avatarresolution", label: "Request higher-resolution Discord avatars" },
+    "avatar-crop-zoom": { permission: "appearance.avatarcrop", label: "Increase the zoom limit in Discord's avatar crop tool", desktopOnly: true },
     "stop-auto-unread": { permission: "notifications.preventautoupgrade", label: "Keep your chosen channel notification settings" },
     "flat-attachments": { permission: "appearance.style", label: "Show chat attachments individually without the media grid" },
     "split-long-messages": { permission: "messages.split", label: "Split long drafts into at most eight messages when slowmode is off" },
