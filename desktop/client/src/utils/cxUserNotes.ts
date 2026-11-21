@@ -41,27 +41,27 @@ export function createCxUserNotes(
     read: (id: string) => Promise<Notes | undefined>,
     update: (id: string, mutate: (notes: Notes | undefined) => Notes) => Promise<void>,
     enabled = () => true,
-    kind: "notes" | "tags" = "notes",
+    kind: "notes" | "tags" | "channels" = "notes",
 ) {
     let active = true;
     const current = (id: string) => active && enabled() && account() === id;
     return {
-        async open(user: string, edit: EditNote) {
+        async open(subject: string, edit: EditNote) {
             const owner = account();
-            if (!isCxProfileUserId(owner) || !isCxProfileUserId(user) || !current(owner)) return;
-            const saved = (await read(owner))?.[user];
+            if (!isCxProfileUserId(owner) || !isCxProfileUserId(subject) || !current(owner)) return;
+            const saved = (await read(owner))?.[subject];
             if (!current(owner)) return;
             edit(typeof saved === "string" ? saved.slice(0, CX_USER_NOTE_LIMIT) : "", async value => {
                 if (!current(owner)) return;
-                if (value.length > CX_USER_NOTE_LIMIT) throw new Error("User notes can have up to 2,000 characters.");
+                if (value.length > CX_USER_NOTE_LIMIT) throw new Error("Notes can have up to 2,000 characters.");
                 const text = kind === "tags" ? normalizeTags(value) : value;
                 await update(owner, notes => {
                     if (!current(owner)) return notes ?? {};
                     const next = { ...notes };
                     if (text.trim()) {
-                        if (!Object.hasOwn(next, user) && Object.keys(next).length >= 500) throw new Error("Clear an entry before adding another.");
-                        next[user] = text;
-                    } else delete next[user];
+                        if (!Object.hasOwn(next, subject) && Object.keys(next).length >= 500) throw new Error("Clear an entry before adding another.");
+                        next[subject] = text;
+                    } else delete next[subject];
                     return next;
                 });
             });

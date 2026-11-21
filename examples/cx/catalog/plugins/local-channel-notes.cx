@@ -1,0 +1,3 @@
+plugin "LocalChannelNotes":
+  needs channels.notes
+  use channel-notes

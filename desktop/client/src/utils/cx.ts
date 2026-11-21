@@ -98,6 +98,7 @@ const permissionLabels = {
     "messages.jumpblocked": "Jump to messages without changing your block or ignore list",
     "channels.jump": "Jump within the current channel when you choose the navigation control",
     "channels.clipboard": "Copy the selected channel or category name when you choose its menu action",
+    "channels.notes": "Read and edit your private channel notes stored on this device",
     "profilemenu.copy": "Add the listed copy actions to user menus, including profile colors when specified. Writes to the clipboard only when selected.",
     "profilemenu.media": "Open or download the selected user's Discord avatar or banner when you choose a profile menu action.",
     "appearance.hide": "Hide the listed interface elements on this device",

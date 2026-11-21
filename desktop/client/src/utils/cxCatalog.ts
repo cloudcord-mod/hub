@@ -164,6 +164,7 @@ import plugin_catalog_larger_chat_text from "../../../../examples/cx/catalog/plu
 import plugin_catalog_leet_text from "../../../../examples/cx/catalog/plugins/leet-text.cx";
 import plugin_catalog_lines_to_csv from "../../../../examples/cx/catalog/plugins/lines-to-csv.cx";
 import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugins/link-converter.cx";
+import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/plugins/local-channel-notes.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
@@ -537,6 +538,7 @@ export const cxCatalog = {
         { name: "LeetText", source: plugin_catalog_leet_text, commands: ["leet"] },
         { name: "Lines to CSV", source: plugin_catalog_lines_to_csv, commands: ["linestocsv"] },
         { name: "LinkConverter", source: plugin_catalog_link_converter },
+        { name: "LocalChannelNotes", source: plugin_catalog_local_channel_notes },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, commands: ["escapemarkdown"] },
         { name: "MessageBurst", source: plugin_catalog_message_burst },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier },

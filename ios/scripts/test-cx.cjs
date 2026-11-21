@@ -717,7 +717,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                         : key === "convertNameToSurrogate" ? emojiConverters : undefined },
             "@webpack/common": {
                 Alerts: { confirm: () => new Promise(resolve => { confirmNotes = resolve; }), show(props) {
-                    if (props.title === "Local User Note" || props.title === "Local User Tags") { noteAlert = props; return; }
+                    if (["Local User Note", "Local User Tags", "Local Channel Note"].includes(props.title)) { noteAlert = props; return; }
                     const target = props.title === "Confirm message" ? nativeConfirmations : queuePrompts;
                     target.push({ props, resolve: value => value ? props.onConfirm() : props.onCancel() });
                 } },
@@ -862,7 +862,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "@metro/common/components": { Stack: "Stack", TableRow: "TableRow", TableRowGroup: "TableRowGroup", TableSwitchRow: "TableSwitchRow" },
             "react-native": {
                 Alert: { alert: (title, body, buttons, options) => {
-                    if (title === "Clear local user notes?") confirmNotes = value => buttons[value ? 1 : 0].onPress();
+                    if (title === "Clear local user notes?" || title === "Clear local channel notes?") confirmNotes = value => buttons[value ? 1 : 0].onPress();
                     else if (title === "Confirm message") nativeConfirmations.push({ props: { title, body }, buttons, options });
                     else if (title === "Voice channel is full" || title === "A voice slot is open") {
                         queuePrompts.push({ props: { title, body, confirmText: buttons[1].text },
@@ -2029,19 +2029,20 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         selectCatalog("foreignCopyHandler");
         click(render(), "Allow for this session");
         const category = { id: guildId, name: "Team channels", type: 4 };
-        const getCopy = channel => {
+        const getChannelAction = (channel, matches) => {
             if (desktop) {
                 const items = [];
                 for (const patch of menuPatches) patch(items, { channel });
-                return items[0]?.props;
+                return items.find(item => matches(item.props.label))?.props;
             }
             const hook = appearanceHooks.get("ChannelLongPressActionSheetConnected");
             const wrapped = hook(null, jsx(ChannelLongPressActionSheetConnected, { channel }));
             const item = wrapped.type(wrapped.props);
             const tree = item.type(item.props);
             assert.ok(find(tree, entry => entry.type === "OriginalAction"));
-            return find(tree, entry => entry.props.label?.startsWith("Copy "))?.props;
+            return find(tree, entry => typeof entry.props.label === "string" && matches(entry.props.label))?.props;
         };
+        const getCopy = channel => getChannelAction(channel, label => label.startsWith("Copy "));
         const beforeChannelCopies = clipboardWrites.length;
         assert.equal(getCopy({ id: "invalid", name: "Invalid" }), undefined);
         const categoryCopy = getCopy(category);
@@ -2051,6 +2052,46 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const invokeCopy = action => action[desktop ? "action" : "onPress"]();
         invokeCopy(categoryCopy);
         invokeCopy(dmCopy);
+        const channelNotes = cxCatalog.plugins.find(entry => entry.name === "LocalChannelNotes").source;
+        assert.throws(() => activateCx(channelNotes, host, ["profile.localnotes"]), /approval/);
+        selectCatalog("LocalChannelNotes");
+        click(render(), "Allow for this session");
+        assert.ok(getCopy(category), "copy and channel notes can coexist in the same menu");
+        const channelNote = channel => getChannelAction(channel, label => label === "Local Channel Note");
+        assert.equal(channelNote({ id: "invalid" }), undefined);
+        const openChannelNote = async (channel, initial) => {
+            noteAlert = undefined;
+            invokeCopy(channelNote(channel));
+            await new Promise(setImmediate);
+            assert.equal(noteAlert.title, "Local Channel Note");
+            const input = desktop ? noteAlert.body.props : noteAlert.extraContent.props;
+            assert.equal(input.defaultValue, initial);
+            return input;
+        };
+        const originalNote = await openChannelNote(category, "");
+        if (desktop) {
+            originalNote.onChange({ currentTarget: { value: "Read the welcome guides" } });
+            noteAlert.onConfirm();
+        } else {
+            originalNote.onChangeText("Read the welcome guides");
+            find(noteAlert.actions, element => element.props.text === "Save").props.onPress();
+        }
+        await new Promise(setImmediate);
+        await openChannelNote(category, "Read the welcome guides");
+        await openChannelNote({ id: other, name: "Another channel" }, "");
+        activeAccount = other;
+        await openChannelNote(category, "");
+        activeAccount = me;
+        click(render(), "Clear local channel notes");
+        confirmNotes(true);
+        await new Promise(setImmediate);
+        await openChannelNote(category, "");
+        const heldNoteAction = channelNote(category);
+        click(render(), "Disable LocalChannelNotes");
+        noteAlert = undefined;
+        invokeCopy(heldNoteAction);
+        await new Promise(setImmediate);
+        assert.equal(noteAlert, undefined, "disabled channel notes ignore retained menu actions");
         click(render(), "Disable foreignCopyHandler");
         invokeCopy(categoryCopy);
         assert.deepEqual(clipboardWrites.slice(beforeChannelCopies), ["Team channels", "Group DM"]);

@@ -2,6 +2,7 @@ import { isCxProfileUserId } from "./cxProfileMenu";
 
 export const cxNativeEffects = {
     "user-notes": { permission: "profile.localnotes", label: "Add a local user note editor to profile menus" },
+    "channel-notes": { permission: "channels.notes", label: "Add a local note editor to channel menus" },
     "user-tags": { permission: "profile.localtags", label: "Tag users in profile menus and search those tags on this device" },
     "silent-typing": { permission: "typing.suppress", label: "Stop sending your typing indicator" },
     "static-typing-dots": { permission: "appearance.style", label: "Keep Discord's typing dots still" },
