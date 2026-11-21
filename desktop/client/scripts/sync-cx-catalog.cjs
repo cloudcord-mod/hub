@@ -74,7 +74,7 @@ function buildCatalog(additions = new Map()) {
             imports.push(`import ${binding} from "${"../../../../" + file}";`);
             const desktopOnly = parsed.kind === "plugin" && [...parsed.hiddenTargets, ...parsed.styledTargets]
                 .some(target => cxAppearanceTargets[target]?.desktopOnly);
-            return { name, binding, desktopOnly };
+            return { name, binding, desktopOnly, commandNames: declaredCommands?.map(command => command.name) ?? [] };
         });
     }
     const source = [
@@ -84,7 +84,7 @@ function buildCatalog(additions = new Map()) {
         "export const cxCatalog = {",
         ...Object.entries(groups).flatMap(([kind, entries]) => [
             `    ${kind}: [`,
-            ...entries.map(({ name, binding, desktopOnly }) => `        { name: ${JSON.stringify(name)}, source: ${binding}${desktopOnly ? ", desktopOnly: true" : ""} },`),
+            ...entries.map(({ name, binding, desktopOnly, commandNames }) => `        { name: ${JSON.stringify(name)}, source: ${binding}${desktopOnly ? ", desktopOnly: true" : ""}${commandNames.length ? `, commands: ${JSON.stringify(commandNames)}` : ""} },`),
             "    ],",
         ]),
         "};",

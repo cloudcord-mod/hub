@@ -4,7 +4,7 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@lib/api/cx";
-import { formatCxWordCount } from "@lib/api/cx";
+import { formatCxWordCount, matchesCxCatalogEntry } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
@@ -1937,7 +1937,6 @@ export default function CxExtensions() {
     const [status, setStatus] = React.useState("");
     const [candidate, setCandidate] = React.useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
     const [, refreshOptions] = React.useState(0);
-    const searchText = search.trim().toLowerCase();
 
     function review(next: string) {
         setCandidate(undefined);
@@ -2739,11 +2738,11 @@ export default function CxExtensions() {
                     onPress={() => setShowCatalog(!showCatalog)} />
             </TableRowGroup>
             {showCatalog && <>
-                <TextInput accessibilityLabel="Search CX catalog" placeholder="Search CX catalog" placeholderTextColor="#b5bac1"
+                <TextInput accessibilityLabel="Search CX catalog" placeholder="Search name or /command" placeholderTextColor="#b5bac1"
                     value={search} onChangeText={value => { setSearch(value); setPages({ Plugins: 0, Themes: 0 }); }}
                     autoCorrect={false} style={{ color: "#fff", backgroundColor: "#27282d", padding: 12 }} />
                 {([["Plugins", mobileCatalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
-                    const matches = entries.filter(entry => entry.name.toLowerCase().includes(searchText));
+                    const matches = entries.filter(entry => matchesCxCatalogEntry(entry, search));
                     const page = pages[kind];
                     const start = page * 12;
                     return <TableRowGroup key={kind} title={kind}>

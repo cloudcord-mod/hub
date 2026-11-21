@@ -906,7 +906,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             && [].concat(item.props.children).join("") === label);
         const click = (tree, label) => button(tree, label).props[desktop ? "onClick" : "onPress"]();
         const searchFor = value => {
-            const search = find(render(), element => element.props.placeholder === "Search CX catalog");
+            const search = find(render(), element => (desktop ? element.props["aria-label"] : element.props.accessibilityLabel) === "Search CX catalog");
             if (desktop) search.props.onChange({ currentTarget: { value } });
             else search.props.onChangeText(value);
         };
@@ -4676,6 +4676,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         click(render(), "Next plugins page");
         searchFor(visiblePlugins[0].name);
         assert.ok(button(render(), visiblePlugins[0].name));
+        searchFor("avatar grabber");
+        assert.ok(button(render(), "AvatarGrabber"));
+        searchFor("/HEX-to-RGB");
+        assert.ok(button(render(), "Color Converter"));
+        searchFor("/!!!");
+        assert.ok(!button(render(), "Color Converter"));
         if (!desktop) {
             const desktopPlugin = cxCatalog.plugins.find(entry => entry.desktopOnly);
             assert.ok(desktopPlugin, "desktop-only catalog fixture");

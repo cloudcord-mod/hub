@@ -17,7 +17,7 @@ import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearc
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
 import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@utils/cx";
-import { formatCxWordCount } from "@utils/cx";
+import { formatCxWordCount, matchesCxCatalogEntry } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT } from "@utils/cx";
@@ -709,7 +709,6 @@ export function CxSettings() {
     const [, refreshOptions] = useState(0);
     const [status, setStatus] = useState("");
     const selection = useRef(0);
-    const searchText = search.trim().toLowerCase();
 
     function review(next: string) {
         selection.current++;
@@ -1271,12 +1270,12 @@ export function CxSettings() {
         <h2>CX Extensions</h2>
         <details>
             <summary>CX catalog · {cxCatalog.plugins.length} plugins · {cxCatalog.themes.length} themes</summary>
-            <input aria-label="Search CX catalog" placeholder="Search CX catalog" value={search} onChange={event => {
+            <input aria-label="Search CX catalog" placeholder="Search name or /command" value={search} onChange={event => {
                 setSearch(event.currentTarget.value);
                 setPages({ Plugins: 0, Themes: 0 });
             }} />
             {([["Plugins", cxCatalog.plugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
-                const matches = entries.filter(entry => entry.name.toLowerCase().includes(searchText));
+                const matches = entries.filter(entry => matchesCxCatalogEntry(entry, search));
                 const page = pages[kind];
                 const start = page * 12;
                 return <div key={kind}>

@@ -251,6 +251,17 @@ function quoted(value: string, limit: number, allowEmpty = false) {
     return decoded;
 }
 
+export function matchesCxCatalogEntry(entry: { name: string; commands?: readonly string[]; }, search: string): boolean {
+    const query = search.trim().toLowerCase();
+    if (!query) return true;
+    const normalize = (value: string) => value.normalize("NFKD").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+    const compactQuery = normalize(query);
+    if (query.startsWith("/")) {
+        return Boolean((compactQuery || query === "/") && entry.commands?.some(command => normalize(command).includes(compactQuery)));
+    }
+    return entry.name.toLowerCase().includes(query) || Boolean(compactQuery && normalize(entry.name).includes(compactQuery));
+}
+
 export function parseCx(source: string): CxDocument {
     if (source.length > MAX_CX_SOURCE) throw new Error("CX file is too large");
     const lines = source.replace(/^\uFEFF/, "").split(/\r?\n/);
