@@ -17076,6 +17076,36 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color)
     };
   }
+  function setProfilePresentationFields(target, fields) {
+    for (var [key, value] of Object.entries(fields)) {
+      Object.defineProperty(target, key, {
+        value,
+        configurable: true,
+        enumerable: true,
+        writable: true
+      });
+    }
+  }
+  function copyProfilePresentation(source, fields = {}) {
+    var descriptors = Object.getOwnPropertyDescriptors(source);
+    for (var key of Reflect.ownKeys(descriptors)) {
+      descriptors[key].configurable = true;
+    }
+    var clone = Object.create(Object.getPrototypeOf(source), descriptors);
+    setProfilePresentationFields(clone, fields);
+    return clone;
+  }
+  function profileAvatarPresentation(avatar) {
+    return typeof avatar === "string" && /^(https:\/\/|data:image\/(?:png|jpe?g|gif|webp);base64,)/i.test(avatar) ? {
+      avatarURL: avatar,
+      avatarUrl: avatar,
+      avatarSrc: avatar,
+      getAvatarURL: () => avatar,
+      getAvatarSource: () => ({
+        uri: avatar
+      })
+    } : {};
+  }
   function customConnectionServiceName(service) {
     var names = {
       steam: "Steam",
@@ -25369,17 +25399,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function cloneSharedUser(original, data) {
     if (!original || typeof original !== "object" || !data)
       return original;
-    var cloned = Object.create(Object.getPrototypeOf(original) || Object.prototype);
-    for (var key of Reflect.ownKeys(original)) {
-      var descriptor = Object.getOwnPropertyDescriptor(original, key);
-      if (descriptor)
-        Object.defineProperty(cloned, key, {
-          ...descriptor,
-          configurable: true
-        });
-    }
-    for (var [key1, value] of Object.entries(nativeProfileAppearance(data)))
-      setOwnValue(cloned, key1, value);
+    var catalog = data.profileEffect ? collectiblesCatalog : void 0;
+    var hit = sharedUserPresentation.get(original);
+    if (hit?.data === data && hit.catalog === catalog)
+      return hit.value;
+    var cloned = copyProfilePresentation(original, profileAvatarPresentation(data.avatar));
+    for (var [key, value] of Object.entries(nativeProfileAppearance(data)))
+      setOwnValue(cloned, key, value);
     if (data.username) {
       var username = String(data.username);
       setOwnValue(cloned, "username", username);
@@ -25394,14 +25420,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       setOwnValue(cloned, "displayName", displayName2);
       setOwnValue(cloned, "name", displayName2);
       setOwnValue(cloned, "getGlobalName", () => displayName2);
-    }
-    if (data.avatar) {
-      setOwnValue(cloned, "avatarURL", data.avatar);
-      setOwnValue(cloned, "avatarUrl", data.avatar);
-      setOwnValue(cloned, "getAvatarURL", () => data.avatar);
-      setOwnValue(cloned, "getAvatarSource", () => ({
-        uri: data.avatar
-      }));
     }
     applyAvatarDecoration(cloned, data);
     applyCollectibles(cloned, data);
@@ -25437,28 +25455,32 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       setOwnValue(cloned, "premiumSince", since);
       setOwnValue(cloned, "premium_since", since.toISOString());
     }
+    sharedUserPresentation.set(original, {
+      data,
+      catalog,
+      value: cloned
+    });
     return cloned;
   }
   function decorateSharedProfile(original, userId, data, depth = 0) {
     if (!original || typeof original !== "object" || !data)
       return original;
+    var catalog = data.profileEffect ? collectiblesCatalog : void 0;
     var hit = sharedDecorations.get(original);
-    if (hit && hit.data === data && hit.userId === userId && hit.depth === depth)
+    if (hit && hit.data === data && hit.userId === userId && hit.depth === depth && hit.catalog === catalog)
       return hit.value;
     var value = decorateSharedProfileFresh(original, userId, data, depth);
-    try {
-      sharedDecorations.set(original, {
-        data,
-        userId,
-        depth,
-        value
-      });
-    } catch (e) {
-    }
+    sharedDecorations.set(original, {
+      data,
+      userId,
+      depth,
+      catalog,
+      value
+    });
     return value;
   }
   function decorateSharedProfileFresh(original, userId, data, depth) {
-    var cloned = Object.assign(Object.create(Object.getPrototypeOf(original) || Object.prototype), original);
+    var cloned = copyProfilePresentation(original, profileAvatarPresentation(data.avatar));
     for (var [key, value] of Object.entries(nativeSocialProfile(original, data)))
       setOwnValue(cloned, key, value);
     for (var [key1, value1] of Object.entries(nativeProfileAppearance(data)))
@@ -25492,15 +25514,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       setOwnValue(cloned, "userName", username);
       setOwnValue(cloned, "tag", `@${username}`);
       setOwnValue(cloned, "getTag", () => `${username}#0000`);
-    }
-    if (data.avatar) {
-      setOwnValue(cloned, "avatarURL", data.avatar);
-      setOwnValue(cloned, "avatarUrl", data.avatar);
-      setOwnValue(cloned, "avatarSrc", data.avatar);
-      setOwnValue(cloned, "getAvatarURL", () => data.avatar);
-      setOwnValue(cloned, "getAvatarSource", () => ({
-        uri: data.avatar
-      }));
     }
     if (data.banner) {
       setOwnValue(cloned, "banner", data.banner);
@@ -27261,24 +27274,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var id = String(user?.id || (result.username ? result.id : "") || args.find((value) => value?.author?.id)?.author?.id || args.find((value) => value?.id && value?.username)?.id || "");
     if (!id)
       return result;
-    if (!isCurrentUser(id))
+    var own = isCurrentUser(id);
+    if (!own)
       requestSharedProfile(id);
-    var data = isCurrentUser(id) ? preview.enabled ? {
-      ...preview,
-      globalName: preview.displayName
-    } : null : getProfileOverride(id);
+    var data = own ? preview.enabled ? preview : null : getProfileOverride(id);
     if (!data)
       return result;
+    var present2 = (value) => own ? cloneObject(value, "user") : cloneSharedUser(value, data);
     if (result.id === id && result.username)
-      return cloneSharedUser(result, data);
-    var cloned = {
-      ...result,
-      ...nativeProfileAppearance(data)
-    };
-    if (result.user)
-      cloned.user = cloneSharedUser(result.user, data);
-    if (result.author)
-      cloned.author = cloneSharedUser(result.author, data);
+      return present2(result);
+    var fields = nativeProfileAppearance(data);
+    if (String(result.user?.id || "") === id)
+      fields.user = present2(result.user);
+    if (String(result.author?.id || "") === id)
+      fields.author = present2(result.author);
     var name = data.globalName || data.displayName || data.username;
     if (name)
       for (var key of [
@@ -27288,9 +27297,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "displayName"
       ]) {
         if (key in result)
-          cloned[key] = name;
+          fields[key] = name;
       }
-    return cloned;
+    return copyProfilePresentation(result, fields);
   }
   function ensurePatches() {
     if (initialized)
@@ -33480,7 +33489,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -34191,6 +34200,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       realProfileMenuConnected = false;
       checkingPrivacy = false;
       mergedOverrides = /* @__PURE__ */ new Map();
+      sharedUserPresentation = /* @__PURE__ */ new WeakMap();
       sharedDecorations = /* @__PURE__ */ new WeakMap();
       collectiblesCatalog = null;
       collectiblesRequest = null;
@@ -63186,7 +63196,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5ca9df770b6636fba3d73e26248b8a5c88aa27fc";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e8b59cf624242589d61a21728fb0c05594f1d00e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
