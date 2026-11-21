@@ -40821,6 +40821,31 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var value = Number(text);
     return Number.isSafeInteger(value) ? value : void 0;
   }
+  function durationSeconds(input) {
+    var text = input.trim();
+    if (!/^(?:\d{1,10}[dhms] *){1,4}$/i.test(text))
+      return;
+    var seen = /* @__PURE__ */ new Set();
+    var seconds = 0;
+    for (var [, digits, unit] of text.toLowerCase().matchAll(/(\d+)([dhms])/g)) {
+      if (seen.has(unit))
+        return;
+      seen.add(unit);
+      seconds += Number(digits) * durationUnits.get(unit);
+    }
+    return seconds;
+  }
+  function isoUnixMilliseconds(input) {
+    var parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
+    if (!parsed)
+      return;
+    var [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
+    var midnight = utcMidnight(date);
+    if (midnight === void 0 || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59)
+      return;
+    var offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
+    return midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1e3 + Number(fraction.padEnd(3, "0"));
+  }
   function jsonTokens(text) {
     try {
       JSON.parse(text);
@@ -40862,7 +40887,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return rows;
   }
-  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, dayMilliseconds, cxCommandFunctions;
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, dayMilliseconds, durationUnits, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
       "use strict";
@@ -40983,6 +41008,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ];
       codeFence = "```";
       dayMilliseconds = 864e5;
+      durationUnits = /* @__PURE__ */ new Map([
+        [
+          "d",
+          86400
+        ],
+        [
+          "h",
+          3600
+        ],
+        [
+          "m",
+          60
+        ],
+        [
+          "s",
+          1
+        ]
+      ]);
       cxCommandFunctions = {
         snowflakeTimestamp(input) {
           var text = input.trim();
@@ -41185,17 +41228,57 @@ WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
             return `\`${instant.toISOString()}\``;
         },
         isoToUnix(input) {
-          var parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
-          if (!parsed)
-            return;
-          var [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
-          var midnight = utcMidnight(date);
-          if (midnight === void 0 || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59)
-            return;
-          var offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
-          var ms = midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1e3 + Number(fraction.padEnd(3, "0"));
-          return `Seconds \`${ms / 1e3}\`
+          var ms = isoUnixMilliseconds(input);
+          if (ms !== void 0)
+            return `Seconds \`${ms / 1e3}\`
 Milliseconds \`${ms}\``;
+        },
+        convertDuration(input) {
+          var seconds = durationSeconds(input);
+          if (seconds === void 0)
+            return;
+          var days = Math.floor(seconds / 86400);
+          var hours = Math.floor(seconds % 86400 / 3600);
+          var minutes = Math.floor(seconds % 3600 / 60);
+          return `${days}d ${hours}h ${minutes}m ${seconds % 60}s \xB7 ${seconds} seconds`;
+        },
+        countdownTimestamp(input) {
+          var duration = durationSeconds(input);
+          if (!duration)
+            return;
+          var timestamp = Math.ceil(Date.now() / 1e3) + duration;
+          if (timestamp <= 864e10)
+            return `<t:${timestamp}:R> \xB7 \`<t:${timestamp}:R>\``;
+        },
+        meetingTimestamp(input) {
+          var ms = isoUnixMilliseconds(input);
+          if (ms === void 0)
+            return;
+          var timestamp = Math.floor(ms / 1e3);
+          return `<t:${timestamp}:F> (<t:${timestamp}:R>)
+Copy \`<t:${timestamp}:F>\``;
+        },
+        discordLinkDetails(input) {
+          var text = input.trim().replace(/^<([^<>]+)>$/, "$1");
+          var match = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/channels\/(@me|\d{17,20})\/(\d{17,20})(?:\/(\d{17,20}))?\/?$/i.exec(text);
+          if (!match)
+            return;
+          var [, guild, channel, message] = match;
+          var direct = guild.toLowerCase() === "@me";
+          var ids = [
+            direct ? void 0 : guild,
+            channel,
+            message
+          ];
+          if (ids.some((id) => id && (id.startsWith("0") || BigInt(id) > 0xffffffffffffffffn)))
+            return;
+          return [
+            direct ? "Direct message" : `Server \`${guild}\``,
+            `Channel \`${channel}\``,
+            ...message ? [
+              `Message \`${message}\``
+            ] : []
+          ].join("\n");
         },
         convertNumberBase(input, from, to) {
           var match = /^([+-]?)([0-9a-z]{1,256})$/i.exec(input.trim());
@@ -50733,6 +50816,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/discord-countdown.cx
+  var discord_countdown_default;
+  var init_discord_countdown = __esm({
+    "../examples/cx/catalog/plugins/discord-countdown.cx"() {
+      discord_countdown_default = 'plugin "Discord Countdown":\n  needs commands.register\n  needs reply.local\n  on command "countdowntimestamp" with text:\n    reply "${countdownTimestamp(text)}" else "Enter a positive duration such as 2h 30m."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/discord-link-details.cx
+  var discord_link_details_default;
+  var init_discord_link_details = __esm({
+    "../examples/cx/catalog/plugins/discord-link-details.cx"() {
+      discord_link_details_default = 'plugin "Discord Link Details":\n  needs commands.register\n  needs reply.local\n  on command "discordlinkdetails" with text:\n    reply "${discordLinkDetails(text)}" else "Paste a Discord channel or message link."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/discord-timestamp.cx
   var discord_timestamp_default;
   var init_discord_timestamp = __esm({
@@ -50762,6 +50861,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_double_click_to_reply = __esm({
     "../examples/cx/catalog/plugins/double-click-to-reply.cx"() {
       double_click_to_reply_default = 'plugin "DoubleClickToReply":\n  needs messages.openreply\n  use double-click-reply\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/duration-converter.cx
+  var duration_converter_default;
+  var init_duration_converter = __esm({
+    "../examples/cx/catalog/plugins/duration-converter.cx"() {
+      duration_converter_default = 'plugin "Duration Converter":\n  needs commands.register\n  needs reply.local\n  on command "convertduration" with text:\n    reply "${convertDuration(text)}" else "Enter a duration such as 1d 2h 30m 5s. Use each unit once."\n';
     }
   });
 
@@ -51933,6 +52040,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_markdown_escape = __esm({
     "../examples/cx/catalog/plugins/markdown-escape.cx"() {
       markdown_escape_default = 'plugin "Markdown Escape":\n  needs commands.register\n  needs reply.local\n  on command "escapemarkdown" with text:\n    reply "${escapeMarkdown(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/meeting-timestamp.cx
+  var meeting_timestamp_default;
+  var init_meeting_timestamp = __esm({
+    "../examples/cx/catalog/plugins/meeting-timestamp.cx"() {
+      meeting_timestamp_default = 'plugin "Meeting Timestamp":\n  needs commands.register\n  needs reply.local\n  on command "meetingtimestamp" with text:\n    reply "${meetingTimestamp(text)}" else "Enter an ISO date with a time zone, like 2026-11-21T18:00:00+03:00."\n';
     }
   });
 
@@ -53888,10 +54003,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_declutter();
       init_decode_base64();
       init_dim_inactive_channels();
+      init_discord_countdown();
+      init_discord_link_details();
       init_discord_timestamp();
       init_dont_round_my_timestamps();
       init_double_click_edit();
       init_double_click_to_reply();
+      init_duration_converter();
       init_embedded_urls();
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
@@ -54015,6 +54133,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_local_channel_notes();
       init_markdown_checklist();
       init_markdown_escape();
+      init_meeting_timestamp();
       init_message_burst();
       init_message_notifier();
       init_monospace_chat();
@@ -54830,6 +54949,28 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "160f84b67cdbe906ff267e13c45e81408f856278e15e24e2286e5b66e88c0663"
           },
           {
+            name: "Discord Countdown",
+            source: discord_countdown_default,
+            description: "/countdowntimestamp",
+            commands: [
+              "countdowntimestamp"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
+            name: "Discord Link Details",
+            source: discord_link_details_default,
+            description: "/discordlinkdetails",
+            commands: [
+              "discordlinkdetails"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
             name: "Discord Timestamp",
             source: discord_timestamp_default,
             description: "/discordtimestamp \xB7 /discordlocaltimestamp",
@@ -54864,6 +55005,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Open a reply to another user's message on double-click or double-tap",
             categories: [
               "Chat"
+            ]
+          },
+          {
+            name: "Duration Converter",
+            source: duration_converter_default,
+            description: "/convertduration",
+            commands: [
+              "convertduration"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -55988,6 +56140,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "/escapemarkdown",
             commands: [
               "escapemarkdown"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
+            name: "Meeting Timestamp",
+            source: meeting_timestamp_default,
+            description: "/meetingtimestamp",
+            commands: [
+              "meetingtimestamp"
             ],
             categories: [
               "Commands"
@@ -63532,7 +63695,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "726541f8aa7a2801ee80abddf56a81fab330b517";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7738c08889998600032d52b12e8dda6eb5feee6b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
