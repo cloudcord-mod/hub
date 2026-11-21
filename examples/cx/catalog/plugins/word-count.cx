@@ -1,0 +1,3 @@
+plugin "WordCount":
+  needs messages.wordcount
+  use message-word-count

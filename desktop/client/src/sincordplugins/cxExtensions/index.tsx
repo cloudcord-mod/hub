@@ -15,6 +15,8 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel } from "@utils/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
+import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
+import { formatCxWordCount } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT } from "@utils/cx";
@@ -256,6 +258,21 @@ function registerQuickMention() {
         };
     }, MentionIcon);
     return () => { active = false; removeMessagePopoverButton(id); };
+}
+
+let wordCountSequence = 0;
+
+function registerCopyRawText() {
+    let active = true;
+    const patch: NavContextMenuPatchCallback = (children, { message }: { message?: Message; }) => {
+        const text = message?.content;
+        if (!active || typeof text !== "string" || !text.length) return;
+        children.push(<Menu.MenuItem id="cx-copy-raw-text" label="Copy Raw Text" action={() => {
+            if (active) void copyToClipboard(text).then(() => showToast("Message text copied"), () => showToast("Couldn't copy message text."));
+        }} />);
+    };
+    addContextMenuPatch("message", patch);
+    return () => { active = false; removeContextMenuPatch("message", patch); };
 }
 
 function registerQuoteMessage(includeLink: boolean) {
@@ -927,6 +944,16 @@ export function CxSettings() {
                             return registerMessageGesture(effect === "double-click-edit" ? "edit" : "reply");
                         case "quick-mention":
                             return registerQuickMention();
+                        case "copy-raw-text":
+                            return registerCopyRawText();
+                        case "message-word-count": {
+                            const id = "cx-word-count-" + ++wordCountSequence;
+                            addMessageAccessory(id, ({ message }) => {
+                                const label = formatCxWordCount(message?.content);
+                                return label ? <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{label}</div> : null;
+                            }, 2);
+                            return () => removeMessageAccessory(id);
+                        }
                         case "quote-message":
                             if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
                             return registerQuoteMessage(effectOptions.includeLink);
@@ -1305,7 +1332,7 @@ export default definePlugin({
     description: "Review and run permission-scoped CX plugins and themes.",
     authors: [{ name: "CloudCord", id: 0n }],
     required: true,
-    dependencies: ["CommandsAPI", "MessageEventsAPI", "ContextMenuAPI", "ServerListAPI", "MessagePopoverAPI", "DynamicImageModalAPI"],
+    dependencies: ["CommandsAPI", "MessageEventsAPI", "ContextMenuAPI", "ServerListAPI", "MessagePopoverAPI", "MessageAccessoriesAPI", "DynamicImageModalAPI"],
     flux: {
         CHANNEL_SETTINGS_INIT({ channelId }: { channelId: string; }) {
             editingChannelId = channelId;

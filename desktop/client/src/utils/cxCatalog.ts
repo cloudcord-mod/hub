@@ -42,6 +42,7 @@ import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
 import plugin_catalog_copy_media_link from "../../../../examples/cx/catalog/plugins/copy-media-link.cx";
 import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/plugins/copy-profile-colors.cx";
+import plugin_catalog_copy_raw_text from "../../../../examples/cx/catalog/plugins/copy-raw-text.cx";
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
@@ -256,6 +257,7 @@ import plugin_catalog_webcam_start_notifier from "../../../../examples/cx/catalo
 import plugin_catalog_wider_channel_list from "../../../../examples/cx/catalog/plugins/wider-channel-list.cx";
 import plugin_catalog_wider_chat from "../../../../examples/cx/catalog/plugins/wider-chat.cx";
 import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/wiki-lookup.cx";
+import plugin_catalog_word_count from "../../../../examples/cx/catalog/plugins/word-count.cx";
 import plugin_catalog_word_frequency from "../../../../examples/cx/catalog/plugins/word-frequency.cx";
 import plugin_catalog_write_upper_case from "../../../../examples/cx/catalog/plugins/write-upper-case.cx";
 import plugin_catalog_zero_width_sanitizer from "../../../../examples/cx/catalog/plugins/zero-width-sanitizer.cx";
@@ -405,6 +407,7 @@ export const cxCatalog = {
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents },
         { name: "CopyMediaLink", source: plugin_catalog_copy_media_link },
         { name: "CopyProfileColors", source: plugin_catalog_copy_profile_colors },
+        { name: "Copy Raw Text", source: plugin_catalog_copy_raw_text },
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links },
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention },
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls },
@@ -619,6 +622,7 @@ export const cxCatalog = {
         { name: "WiderChannelList", source: plugin_catalog_wider_channel_list },
         { name: "WiderChat", source: plugin_catalog_wider_chat, desktopOnly: true },
         { name: "WikiLookup", source: plugin_catalog_wiki_lookup },
+        { name: "WordCount", source: plugin_catalog_word_count },
         { name: "Word Frequency", source: plugin_catalog_word_frequency },
         { name: "WriteUpperCase", source: plugin_catalog_write_upper_case },
         { name: "ZeroWidthSanitizer", source: plugin_catalog_zero_width_sanitizer },

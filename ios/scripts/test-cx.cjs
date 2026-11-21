@@ -233,6 +233,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         let embedMessage;
         const repeatChannel = "100000000000000011";
         const messagePopover = new Map();
+        const messageAccessories = new Map();
         function NativeActionSheet() {}
         function LongPressMessageActionSheet() {
             return jsx("Analytics", { children: jsx(NativeActionSheet, { children: jsx("OriginalAction", {}) }) });
@@ -677,6 +678,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 addMessagePopoverButton: (id, render) => messagePopover.set(id, render),
                 removeMessagePopoverButton: id => messagePopover.delete(id),
             },
+            "@api/MessageAccessories": {
+                addMessageAccessory: (id, render) => messageAccessories.set(id, render),
+                removeMessageAccessory: id => messageAccessories.delete(id),
+            },
             "@api/ServerList": { ServerListRenderPosition: { Above: 0 },
                 addServerListElement: (_, component) => serverListButtons.add(component),
                 removeServerListElement: (_, component) => serverListButtons.delete(component),
@@ -1005,6 +1010,32 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const source = cxCatalog.plugins.find(entry => entry.name === "QuoteMessage").source;
             assert.equal(parseCx(source.replace("use quote-message", "use quote-message without-link")).quoteOptions.includeLink, false);
             assert.throws(() => activateCx(source, host, []), /approval/);
+            selectCatalog("Copy Raw Text");
+            click(render(), "Allow for this session");
+            const copyRaw = button(menu(), "Copy Raw Text").props[desktop ? "action" : "onPress"];
+            copyRaw();
+            assert.equal(clipboardWrites.pop(), message.content);
+            click(render(), "Disable Copy Raw Text");
+            const afterDisable = clipboardWrites.length;
+            copyRaw();
+            assert.equal(clipboardWrites.length, afterDisable, "stale copy action is disabled");
+
+            selectCatalog("WordCount");
+            click(render(), "Allow for this session");
+            const longMessage = { content: "one two three four five six" };
+            if (desktop) {
+                const accessory = Array.from(messageAccessories.values()).at(-1);
+                assert.equal(accessory({ message: longMessage }).props.children, "6 words, 27 characters");
+                assert.equal(accessory({ message: { content: "one two" } }), null);
+            } else {
+                const original = { content: [{ type: "text", content: longMessage.content }] };
+                const input = { cxTestPresentation: original, message: longMessage };
+                assert.equal(messageRenderer.default(input).content.at(-1).content, "\n6 words, 27 characters");
+                assert.equal(messageRenderer.default({ ...input, isInlineReplyPreview: true }), original);
+            }
+            click(render(), "Disable WordCount");
+            assert.equal(messageAccessories.size, 0);
+            assert.equal(messageRenderer.default, createMessageContent);
             selectedChannel = "test-channel";
         }
         {
@@ -4813,6 +4844,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             incoming: incomingHooks.length,
             menus: menuPatches.size,
             popover: messagePopover.size,
+            accessories: messageAccessories.size,
             appearance: appearanceHooks.size,
             colors: colorOverlays.size,
             pendingEmojiPicker: emojiPickerWaiters.size,

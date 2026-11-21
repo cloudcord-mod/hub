@@ -23,7 +23,7 @@ export { cxProfileMenuActions, getCxProfileMedia, getCxProfileMenuCopy, isCxProf
 export { formatCxChannelName, getCxChannelNameCopy, type CxChannelLabel } from "./cxChannelNames";
 export { isCxNotificationMuted, type CxMessageAlert } from "./cxIncoming";
 export { bindCxChannelOpenRead, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, markCxServersRead, markCxServersReadAndWait, runCxFriendInvites } from "./cxClientCommands";
-export { animateCxAssets, buildCxMessageQuote, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
+export { animateCxAssets, buildCxMessageQuote, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxWordCount, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
 export { createCxPreviousSendHandler, planCxPreviousEdit } from "./cxPreviousMessage";
 export { bindCxSocialEvents } from "./cxSocialEvents";
 export { createCxPlusReactionHandler } from "./cxPlusReactions";
@@ -73,6 +73,8 @@ const permissionLabels = {
     "messages.openeditor": "Open Discord’s editor for your own message when you double-click or double-tap it",
     "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user’s message",
     "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+    "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
+    "messages.wordcount": "Count words and characters in displayed messages on this device",
     "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
     "drafts.long": "Keep the full text of your local drafts",
     "messages.pin": "Pin or unpin a message immediately when you choose a pin action.",

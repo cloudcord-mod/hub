@@ -39,6 +39,8 @@ export const cxNativeEffects = {
     "double-click-edit": { permission: "messages.openeditor", label: "Open the editor for your own message on double-click or double-tap" },
     "double-click-reply": { permission: "messages.openreply", label: "Open a reply to another user's message on double-click or double-tap" },
     "quick-mention": { permission: "messages.insertmention", label: "Insert the selected message author's mention into the current draft" },
+    "copy-raw-text": { permission: "messages.copytext", label: "Add Copy Raw Text to message menus" },
+    "message-word-count": { permission: "messages.wordcount", label: "Show word and character counts below messages longer than five words" },
     "quote-message": { permission: "messages.quote", label: "Add Quote and Copy as Quote actions to message menus" },
     "keep-long-drafts": { permission: "drafts.long", label: "Preserve long drafts in Discord’s local draft store" },
     "bypass-pin-prompt": { permission: "messages.pin", label: "Use Discord’s Pin and Unpin actions without a confirmation prompt" },
@@ -349,4 +351,10 @@ export function raiseCxAvatarResolution(target: object | undefined, size: CxAvat
             return url + (/[?&]$/.test(url) ? "" : match[2] ? "&" : "?") + "size=" + size;
         },
     }, enabled);
+}
+
+export function formatCxWordCount(content: unknown) {
+    if (typeof content !== "string") return;
+    const words = content.match(/\S+/g)?.length ?? 0;
+    if (words > 5) return `${words} words, ${content.length} characters`;
 }

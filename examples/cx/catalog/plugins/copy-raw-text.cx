@@ -1,0 +1,3 @@
+plugin "Copy Raw Text":
+  needs messages.copytext
+  use copy-raw-text
