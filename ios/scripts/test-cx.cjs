@@ -5993,6 +5993,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         else sourceEditor.props.onChangeText(theme.source);
         click(render(importPlugin), "Review");
         assert.equal(button(render(importPlugin), "Allow for this session"), undefined, "theme files are reviewed from Themes");
+
+        const localSource = 'plugin "Local Private Command":\n  needs commands.register\n  needs reply.local\n  on command "local-filter-test":\n    reply "Local only"';
+        if (desktop) sourceEditor.props.onChange({ currentTarget: { value: localSource } });
+        else sourceEditor.props.onChangeText(localSource);
+        click(render(importPlugin), "Review");
+        click(render(importPlugin), "Allow for this session");
+        const local = useCxAddonRows("plugin", "").find(row => row.name === "Local Private Command");
+        assert.equal(local?.privateCommands, true, platform + " classifies imported private commands by their approved permissions");
+        assert.ok(local.active);
+        await disableCxAddon(local.id, local.name);
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
     assert.equal(parseCx(migrateCxPalette(":root { --background-primary: #123; --brand-500: #8765ab; }", "Test")).background, "#112233");

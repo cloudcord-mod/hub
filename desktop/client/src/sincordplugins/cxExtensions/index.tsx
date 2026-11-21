@@ -1524,10 +1524,12 @@ export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
                 || (typeof source === "string" ? current === source : activeCatalogLoaders.get(id) === source));
             const saved = approvals.get(id);
             const needsReview = kind === "plugin" && !active && saved !== undefined && typeof source === "string" && saved !== source;
-            return { ...entry, id, active, needsReview };
+            return { ...entry, id, active, needsReview, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
-            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({ id, name, source: session.source(id)!, active: true }));
+            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
+                id, name, source: session.source(id)!, active: true, privateCommands: session.isPrivateCommand(id),
+            }));
         return [...catalog, ...imported];
     }, [kind, revision]);
     return React.useMemo(() => [...searchCxCatalog(rows, query)], [rows, query]);

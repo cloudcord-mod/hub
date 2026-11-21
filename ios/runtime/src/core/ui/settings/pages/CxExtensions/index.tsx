@@ -2847,10 +2847,12 @@ export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
             const active = current !== undefined && (kind === "plugin" || current === entry.source);
             const saved = approvals.get(entry.name);
             const needsReview = kind === "plugin" && !active && saved !== undefined && saved !== entry.appearanceRevision;
-            return { ...entry, id, active, needsReview };
+            return { ...entry, id, active, needsReview, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
-            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({ id, name, source: session.source(id)!, active: true }));
+            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
+                id, name, source: session.source(id)!, active: true, privateCommands: session.isPrivateCommand(id),
+            }));
         return [...catalog, ...imported];
     }, [kind, revision]);
 }

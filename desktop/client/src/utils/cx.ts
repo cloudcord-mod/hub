@@ -1273,6 +1273,7 @@ export function createCxSession() {
     return {
         list: () => [...active].map(([id, { name }]) => ({ id, name })),
         source: (id: string) => active.get(id)?.source,
+        isPrivateCommand: (id: string) => active.get(id)?.privateCommand ?? false,
         appearanceOptions(id: string) {
             const entry = active.get(id);
             return entry?.options.map(option => ({ ...option, enabled: Boolean(entry.binding.isAppearanceOptionEnabled?.(option.target)) })) ?? [];
