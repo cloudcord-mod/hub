@@ -74,6 +74,7 @@ const permissionLabels = {
     "messages.openeditor": "Open Discord’s editor for your own message when you double-click or double-tap it",
     "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user’s message",
     "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+    "messages.paste": "Change how links you paste into the message composer are inserted",
     "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
     "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
     "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",

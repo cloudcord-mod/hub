@@ -1,0 +1,3 @@
+plugin "NoMaskedUrlPaste":
+  needs messages.paste
+  use plain-url-paste

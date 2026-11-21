@@ -2705,6 +2705,8 @@ export default function CxExtensions() {
                             }, enabled);
                         case "pending-friend-count":
                             return overrideCxMethods(RelationshipStore, { getPendingCount: () => 0, getPendingIncomingCount: () => 0 }, enabled);
+                        case "plain-url-paste":
+                            throw new Error("Plain URL paste is available on desktop and browser.");
                         case "animated-assets":
                             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                         case "floor-relative-time":

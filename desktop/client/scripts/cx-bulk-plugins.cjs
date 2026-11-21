@@ -1084,6 +1084,10 @@ const desktopEffectRecipes = {
         match: String.raw`/maybeAutoUpgradeChannel\(\i\){/`,
         replace: "$&return !1;",
     },
+    NoMaskedUrlPaste: {
+        effect: "plain-url-paste",
+        sha256: "2ea39358d6f186594dfd5c51032546c030967217e1712ca8f859624b66025966",
+    },
 };
 
 function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {

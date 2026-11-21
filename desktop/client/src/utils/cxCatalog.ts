@@ -206,6 +206,7 @@ import plugin_catalog_no_blocked_messages from "../../../../examples/cx/catalog/
 import plugin_catalog_no_chat_bar_border from "../../../../examples/cx/catalog/plugins/no-chat-bar-border.cx";
 import plugin_catalog_no_confirm_pin from "../../../../examples/cx/catalog/plugins/no-confirm-pin.cx";
 import plugin_catalog_no_draft_length_limit from "../../../../examples/cx/catalog/plugins/no-draft-length-limit.cx";
+import plugin_catalog_no_masked_url_paste from "../../../../examples/cx/catalog/plugins/no-masked-url-paste.cx";
 import plugin_catalog_no_message_hover_bar from "../../../../examples/cx/catalog/plugins/no-message-hover-bar.cx";
 import plugin_catalog_no_mosaic from "../../../../examples/cx/catalog/plugins/no-mosaic.cx";
 import plugin_catalog_no_pending_count from "../../../../examples/cx/catalog/plugins/no-pending-count.cx";
@@ -617,6 +618,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "NoChatBarBorder", source: plugin_catalog_no_chat_bar_border, description: "remove the chat bar border and shadow", categories: ["Appearance"], appearanceRevision: "89679b574b204ad7982449213caaa672c6d2f25239384b7cec57a77c31cc1e41" },
         { name: "NoConfirmPin", source: plugin_catalog_no_confirm_pin, description: "Pin or unpin the selected message with one menu action", categories: ["Chat"] },
         { name: "NoDraftLengthLimit", source: plugin_catalog_no_draft_length_limit, description: "Preserve long drafts in Discord’s local draft store", categories: ["Chat"] },
+        { name: "NoMaskedUrlPaste", source: plugin_catalog_no_masked_url_paste, description: "Paste URLs as plain text when replacing selected text in chat", desktopOnly: true, categories: ["Chat"] },
         { name: "NoMessageHoverBar", source: plugin_catalog_no_message_hover_bar, description: "Hides the buttons that appear when hovering a message", desktopOnly: true, categories: ["Appearance"] },
         { name: "NoMosaic", source: plugin_catalog_no_mosaic, description: "Show chat attachments individually without the media grid", categories: ["Appearance"], appearanceRevision: "8307a41cf1c546ccf7519ef83129026d7b49680012112e359bf30b2f3fbb4d74" },
         { name: "NoPendingCount", source: plugin_catalog_no_pending_count, description: "Hide the pending friend request count", categories: ["Appearance"], appearanceRevision: "e96b70311d701d8abd7cb2852a61de587e08d74d7ffe3590a2d589219c38f8b0" },

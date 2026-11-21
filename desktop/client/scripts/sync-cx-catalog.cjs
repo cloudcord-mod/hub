@@ -28,7 +28,7 @@ function pluginBody(source) {
 }
 
 function buildCatalog(additions = new Map()) {
-    const { parseCx, reviewCx, cxAppearanceTargets, getCxCatalogCategories, canRememberCxAppearance } = loadCxRuntime();
+    const { parseCx, reviewCx, cxAppearanceTargets, cxNativeEffects, getCxCatalogCategories, canRememberCxAppearance } = loadCxRuntime();
     const names = new Set();
     const commands = new Set();
     const groups = {};
@@ -73,8 +73,10 @@ function buildCatalog(additions = new Map()) {
             if (!/^[a-z0-9][a-z0-9-]*$/.test(stem)) throw new Error("Invalid CX filename: " + file);
             const binding = kind + (file === original ? "_base_" : "_catalog_") + stem.replaceAll("-", "_");
             imports.push(`import ${binding} from "${"../../../../" + file}";`);
-            const desktopOnly = parsed.kind === "plugin" && [...parsed.hiddenTargets, ...parsed.styledTargets]
-                .some(target => cxAppearanceTargets[target]?.desktopOnly);
+            const desktopOnly = parsed.kind === "plugin" && (
+                [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.desktopOnly)
+                || parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.desktopOnly)
+            );
             const review = parsed.kind === "plugin" ? reviewCx(document) : undefined;
             const specific = review?.effects.slice(parsed.permissions?.length ?? 0) ?? [];
             const commandNames = declaredCommands?.map(command => command.name) ?? [];

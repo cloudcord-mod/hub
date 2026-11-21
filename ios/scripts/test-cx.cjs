@@ -950,6 +950,29 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             searchFor(name);
             click(render(), name);
         };
+        if (desktop) {
+            const runtime = module.exports.default;
+            const { replacement } = runtime.patches.find(patch => patch.find === ".selection,preventEmojiSurrogates:");
+            const match = new RegExp(replacement.match.source.replaceAll("\\i", "[a-z]+"));
+            const native = "if(null!=a.selection&&b.c.isExpanded(a.selection))return 'masked';return 'plain';";
+            assert.match(native, match);
+            const paste = Function("$self", "a", "b", native.replace(match, replacement.replace));
+            const pasteWithSelection = selection => paste(runtime, { selection }, { c: { isExpanded: value => Boolean(value) } });
+            assert.equal(pasteWithSelection(true), "masked");
+            selectCatalog("NoMaskedUrlPaste");
+            click(render(), "Allow for this session");
+            assert.equal(pasteWithSelection(true), "plain");
+            assert.equal(pasteWithSelection(false), "plain");
+            click(render(), "Disable NoMaskedUrlPaste");
+            assert.equal(pasteWithSelection(true), "masked");
+        } else {
+            const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
+            editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));
+            click(render(), "Review CX");
+            click(render(), "Allow for this session");
+            assert.ok(button(render(), "Plain URL paste is available on desktop and browser."));
+            assert.ok(!button(render(), "Disable NoMaskedUrlPaste"));
+        }
         selectCatalog("QuickMention");
         click(render(), "Allow for this session");
         selectedChannel = "guild-channel";

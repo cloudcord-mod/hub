@@ -467,6 +467,7 @@ let descriptiveGifAltUsers = 0;
 let imageLinkUsers = 0;
 let roleHeaderUsers = 0;
 let reactionSortUsers = 0;
+let plainUrlPasteUsers = 0;
 let bypassPinPromptUsers = 0;
 let longDraftUsers = 0;
 let ownerCrownUsers = 0;
@@ -1219,6 +1220,9 @@ export function CxSettings() {
                         case "sort-reactions-by-count":
                             reactionSortUsers++;
                             return () => { reactionSortUsers--; };
+                        case "plain-url-paste":
+                            plainUrlPasteUsers++;
+                            return () => { plainUrlPasteUsers--; };
                         case "hide-role-headers":
                             roleHeaderUsers++;
                             return () => { roleHeaderUsers--; };
@@ -1549,6 +1553,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // NoMaskedUrlPaste by CatNoir, GPL-3.0-or-later.
+        find: ".selection,preventEmojiSurrogates:",
+        replacement: {
+            match: /if\((null!=\i\.selection&&\i\.\i\.isExpanded\(\i\.selection\))\)/,
+            replace: "if(!$self.usePlainUrlPaste()&&$1)",
+        },
+    }, {
         find: "#{intl::PREVIEW_BYTES_LEFT}",
         replacement: [
             {
@@ -1805,6 +1816,7 @@ export default definePlugin({
     },
     keepLongDrafts() { return longDraftUsers > 0; },
     shouldSkipPinPrompt() { return bypassPinPromptUsers > 0; },
+    usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
     sortMessageReactions<T extends { count: number; }>(reactions: readonly T[]) {
         return reactionSortUsers > 0 ? sortCxReactions(reactions) : reactions;
     },
