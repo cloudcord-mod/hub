@@ -41857,18 +41857,23 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return assets2;
   }
-  function getCxProfileMenuCopy(action, id, profiles, guildId) {
+  function nonBlankText(value) {
+    return typeof value === "string" && value.trim() ? value : void 0;
+  }
+  function getCxProfileMenuCopy(action, id, profiles, guildId, users) {
     var entry = cxProfileMenuActions[action];
     if (entry.scope === "none")
       return entry.format(id);
     if (entry.scope === "server" && !guildId)
       return;
     try {
-      if (action === "profile-bio") {
-        var bio = profiles?.getUserProfile?.(id)?.bio;
-        return typeof bio === "string" && bio.trim() ? bio : void 0;
+      if (entry.scope === "identity") {
+        var user = users?.getUser?.(id);
+        return nonBlankText(action === "username" ? user?.username : user?.globalName);
       }
       var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
+      if (action === "profile-bio" || action === "server-profile-bio")
+        return nonBlankText(profile?.bio);
       var colors = profile?.themeColors;
       if (!Array.isArray(colors) || colors.length < 2)
         return;
@@ -41895,13 +41900,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           scope: "none",
           format: (id) => "<@" + id + ">"
         },
+        "username": {
+          label: "Copy Username",
+          scope: "identity"
+        },
+        "display-name": {
+          label: "Copy Display Name",
+          scope: "identity"
+        },
         "profile-bio": {
           label: "Copy Bio",
-          scope: "user"
+          scope: "user",
+          unavailable: "No profile bio found."
+        },
+        "server-profile-bio": {
+          label: "Copy Server Bio",
+          scope: "server"
         },
         "profile-colors": {
           label: "Copy Profile Colors",
-          scope: "user"
+          scope: "user",
+          unavailable: "No profile colors found."
         },
         "server-profile-colors": {
           label: "Copy Server Profile Colors",
@@ -50077,11 +50096,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-profile-names.cx
+  var copy_profile_names_default;
+  var init_copy_profile_names = __esm({
+    "../examples/cx/catalog/plugins/copy-profile-names.cx"() {
+      copy_profile_names_default = 'plugin "CopyProfileNames":\n  needs profilemenu.copy\n  on profile menu copy username\n  on profile menu copy display-name\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-raw-text.cx
   var copy_raw_text_default;
   var init_copy_raw_text = __esm({
     "../examples/cx/catalog/plugins/copy-raw-text.cx"() {
       copy_raw_text_default = 'plugin "Copy Raw Text":\n  needs messages.copytext\n  use copy-raw-text\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-server-bio.cx
+  var copy_server_bio_default;
+  var init_copy_server_bio = __esm({
+    "../examples/cx/catalog/plugins/copy-server-bio.cx"() {
+      copy_server_bio_default = 'plugin "CopyServerBio":\n  needs profilemenu.copy\n  on profile menu copy server-profile-bio\n';
     }
   });
 
@@ -53181,7 +53216,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_copy_media_link();
       init_copy_message_reference();
       init_copy_profile_colors();
+      init_copy_profile_names();
       init_copy_raw_text();
+      init_copy_server_bio();
       init_copy_sticker_links();
       init_copy_user_mention();
       init_copy_user_urls();
@@ -53782,9 +53819,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             keywords: "Copy Server Profile Colors"
           },
           {
+            name: "CopyProfileNames",
+            source: copy_profile_names_default,
+            description: "Copy Username",
+            keywords: "Copy Display Name"
+          },
+          {
             name: "Copy Raw Text",
             source: copy_raw_text_default,
             description: "Add Copy Raw Text to message menus"
+          },
+          {
+            name: "CopyServerBio",
+            source: copy_server_bio_default,
+            description: "Copy Server Bio"
           },
           {
             name: "CopyStickerLinks",
@@ -58019,22 +58067,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     };
   }
   function registerProfileMenuAction(action) {
-    var { label: label2, scope } = cxProfileMenuActions[action];
+    var entry = cxProfileMenuActions[action];
+    var { label: label2, scope } = entry;
     return registerProfileMenuEntry({
       key: action,
       getItems(id, guildId) {
-        if (scope === "server" && !getCxProfileMenuCopy(action, id, UserProfileStore, guildId))
+        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore3);
+        if ((scope === "server" || scope === "identity") && !getCopy())
           return [];
         return [
           {
             label: label2,
             action: () => {
-              var text = getCxProfileMenuCopy(action, id, UserProfileStore, guildId);
+              var text = getCopy();
               if (text) {
                 clipboard.setString(text);
                 showToast.showCopyToClipboard?.();
               } else
-                showToast(action === "profile-bio" ? "No profile bio found." : "No profile colors found.");
+                showToast("unavailable" in entry ? entry.unavailable : "This profile field is unavailable.");
             }
           }
         ];
@@ -61025,7 +61075,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b6e7629525ba91fdceacd7a91949a989e37382f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e77189ed2cc239bf6ed0dde4dc7d172475d8224a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
