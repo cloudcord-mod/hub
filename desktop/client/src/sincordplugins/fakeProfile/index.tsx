@@ -597,7 +597,10 @@ function fromSharedProfile(data: any): CustomProfileData {
         nativeBadgeOrder: Array.isArray(data?.nativeBadgeOrder) ? data.nativeBadgeOrder.map(Number) : [],
         nativeHiddenBadges: Array.isArray(data?.nativeHiddenBadges) ? data.nativeHiddenBadges.map(Number) : [],
         activityAmounts: data?.activityAmounts && typeof data.activityAmounts === "object" && !Array.isArray(data.activityAmounts)
-            ? Object.fromEntries(Object.entries(data.activityAmounts).filter(([, amount]) => Number.isSafeInteger(amount) && Number(amount) >= 0 && Number(amount) <= 1_000_000))
+            ? Object.fromEntries(Object.entries(data.activityAmounts).filter((entry): entry is [string, number] => {
+                const amount = entry[1];
+                return typeof amount === "number" && Number.isSafeInteger(amount) && amount >= 0 && amount <= 1_000_000;
+            }))
             : {},
         badgeOrder: Array.isArray(data?.badgeOrder) ? data.badgeOrder : []
     };
