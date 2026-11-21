@@ -49597,6 +49597,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         id,
         name
       })),
+      source: (id) => active.get(id)?.source,
       appearanceOptions(id) {
         var entry = active.get(id);
         return entry?.options.map((option) => ({
@@ -49619,6 +49620,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           throw new Error("Disable an extension before adding another");
         active.set(id, {
           name: review.name,
+          source,
           options: review.appearanceOptions,
           binding: bindCx(source, host, approved, selected)
         });
@@ -62415,7 +62417,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5b1934f29353a3bb6ec710fd77f0c984415b27ba";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c24f5d072540117b9f126f9d6393f6a39fba3466";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
