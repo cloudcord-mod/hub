@@ -60192,7 +60192,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f1a6e8c3afd7c90adb8d0f3ee5a9113bec05b15f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "70a8f502d75eb692910691e46f25a1364bce3a07";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
