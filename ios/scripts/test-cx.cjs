@@ -4607,14 +4607,21 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.throws(() => parseCx(replacements + '\n  before send replace "a" with "again"'), /Duplicate/);
         if (!desktop) click(render(), "Browse catalog");
         searchFor("");
-        assert.ok(!button(render(), cxCatalog.plugins[12].name));
+        const visiblePlugins = desktop ? cxCatalog.plugins : cxCatalog.plugins.filter(entry => !entry.desktopOnly);
+        assert.ok(!button(render(), visiblePlugins[12].name));
         click(render(), "Next plugins page");
-        assert.ok(button(render(), cxCatalog.plugins[12].name));
+        assert.ok(button(render(), visiblePlugins[12].name));
         click(render(), "Previous plugins page");
-        assert.ok(button(render(), cxCatalog.plugins[0].name));
+        assert.ok(button(render(), visiblePlugins[0].name));
         click(render(), "Next plugins page");
-        searchFor(cxCatalog.plugins[0].name);
-        assert.ok(button(render(), cxCatalog.plugins[0].name));
+        searchFor(visiblePlugins[0].name);
+        assert.ok(button(render(), visiblePlugins[0].name));
+        if (!desktop) {
+            const desktopPlugin = cxCatalog.plugins.find(entry => entry.desktopOnly);
+            assert.ok(desktopPlugin, "desktop-only catalog fixture");
+            searchFor(desktopPlugin.name);
+            assert.ok(!button(render(), desktopPlugin.name));
+        }
         if (desktop) {
             selectCatalog("Lazy Wallpaper");
             assert.equal(button(render(), "Allow for this session"), undefined);
@@ -4813,6 +4820,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             stylesheet,
         });
         for (const entry of cxCatalog.plugins) {
+            if (!desktop && entry.desktopOnly) {
+                if (resultsPath) adapterResults.push({
+                    platform, name: entry.name, status: "Blocked", errors: ["Requires desktop CloudCord"],
+                    sourceHash: createHash("sha256").update(entry.source.replace(/\r\n/g, "\n").trim()).digest("hex"),
+                });
+                continue;
+            }
             const baseline = installedHooks();
             const deactivate = "Disable " + entry.name;
             const errors = [];

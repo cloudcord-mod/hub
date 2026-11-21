@@ -1921,6 +1921,8 @@ function registerProfileMedia() {
     return () => { active = false; stop(); };
 }
 
+const mobileCatalogPlugins = cxCatalog.plugins.filter(entry => !("desktopOnly" in entry && entry.desktopOnly));
+
 function supportsMobileHide({ target }: { target: keyof typeof cxAppearanceTargets; }) {
     return !("desktopOnly" in cxAppearanceTargets[target]);
 }
@@ -2691,14 +2693,14 @@ export default function CxExtensions() {
     return <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16 }}>
         <Stack spacing={16}>
             <TableRowGroup title="CX catalog">
-                <TableRow label={showCatalog ? "Hide catalog" : "Browse catalog"} subLabel={`${cxCatalog.plugins.length} plugins · ${cxCatalog.themes.length} themes`}
+                <TableRow label={showCatalog ? "Hide catalog" : "Browse catalog"} subLabel={`${mobileCatalogPlugins.length} plugins · ${cxCatalog.themes.length} themes`}
                     onPress={() => setShowCatalog(!showCatalog)} />
             </TableRowGroup>
             {showCatalog && <>
                 <TextInput accessibilityLabel="Search CX catalog" placeholder="Search CX catalog" placeholderTextColor="#b5bac1"
                     value={search} onChangeText={value => { setSearch(value); setPages({ Plugins: 0, Themes: 0 }); }}
                     autoCorrect={false} style={{ color: "#fff", backgroundColor: "#27282d", padding: 12 }} />
-                {([["Plugins", cxCatalog.plugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
+                {([["Plugins", mobileCatalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
                     const matches = entries.filter(entry => entry.name.toLowerCase().includes(searchText));
                     const page = pages[kind];
                     const start = page * 12;

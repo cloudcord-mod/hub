@@ -27,7 +27,7 @@ function pluginBody(source) {
 }
 
 function buildCatalog(additions = new Map()) {
-    const parseCx = loadCxParser();
+    const { parseCx, cxAppearanceTargets } = loadCxRuntime();
     const names = new Set();
     const commands = new Set();
     const groups = {};
@@ -51,7 +51,8 @@ function buildCatalog(additions = new Map()) {
         groups[kind + "s"] = files.map(file => {
             const extra = kind === "plugin" && file !== original ? additions.get(path.basename(file)) : undefined;
             const document = extra ?? fs.readFileSync(path.join(root, file), "utf8");
-            const { kind: actualKind, name, commands: declaredCommands } = parseCx(document);
+            const parsed = parseCx(document);
+            const { kind: actualKind, name, commands: declaredCommands } = parsed;
             if (actualKind !== kind) throw new Error(`Unexpected CX kind in ${file}`);
             const normalized = name.trim().toLowerCase();
             if (names.has(normalized)) throw new Error(`Duplicate CX name in ${file}: ${name}`);
@@ -71,7 +72,9 @@ function buildCatalog(additions = new Map()) {
             if (!/^[a-z0-9][a-z0-9-]*$/.test(stem)) throw new Error("Invalid CX filename: " + file);
             const binding = kind + (file === original ? "_base_" : "_catalog_") + stem.replaceAll("-", "_");
             imports.push(`import ${binding} from "${"../../../../" + file}";`);
-            return { name, binding };
+            const desktopOnly = parsed.kind === "plugin" && [...parsed.hiddenTargets, ...parsed.styledTargets]
+                .some(target => cxAppearanceTargets[target]?.desktopOnly);
+            return { name, binding, desktopOnly };
         });
     }
     const source = [
@@ -81,7 +84,7 @@ function buildCatalog(additions = new Map()) {
         "export const cxCatalog = {",
         ...Object.entries(groups).flatMap(([kind, entries]) => [
             `    ${kind}: [`,
-            ...entries.map(({ name, binding }) => `        { name: ${JSON.stringify(name)}, source: ${binding} },`),
+            ...entries.map(({ name, binding, desktopOnly }) => `        { name: ${JSON.stringify(name)}, source: ${binding}${desktopOnly ? ", desktopOnly: true" : ""} },`),
             "    ],",
         ]),
         "};",
