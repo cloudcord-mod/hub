@@ -1,0 +1,5 @@
+plugin "Encode Base64":
+  needs commands.register
+  needs reply.local
+  on command "encodebase64" with text:
+    reply "${encodeBase64(text)}"

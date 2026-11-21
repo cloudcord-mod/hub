@@ -26,6 +26,7 @@ import plugin_catalog_calculator from "../../../../examples/cx/catalog/plugins/c
 import plugin_catalog_call_time_counter from "../../../../examples/cx/catalog/plugins/call-time-counter.cx";
 import plugin_catalog_centered_chat from "../../../../examples/cx/catalog/plugins/centered-chat.cx";
 import plugin_catalog_chat_buttons_begone from "../../../../examples/cx/catalog/plugins/chat-buttons-begone.cx";
+import plugin_catalog_checklist_progress from "../../../../examples/cx/catalog/plugins/checklist-progress.cx";
 import plugin_catalog_clap_text from "../../../../examples/cx/catalog/plugins/clap-text.cx";
 import plugin_catalog_clean_channel_name from "../../../../examples/cx/catalog/plugins/clean-channel-name.cx";
 import plugin_catalog_clear_urls from "../../../../examples/cx/catalog/plugins/clear-urls.cx";
@@ -35,6 +36,7 @@ import plugin_catalog_color_contrast from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_color_converter from "../../../../examples/cx/catalog/plugins/color-converter.cx";
 import plugin_catalog_color_text from "../../../../examples/cx/catalog/plugins/color-text.cx";
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
+import plugin_catalog_common_lines from "../../../../examples/cx/catalog/plugins/common-lines.cx";
 import plugin_catalog_compact_compose from "../../../../examples/cx/catalog/plugins/compact-compose.cx";
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
 import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
@@ -75,6 +77,7 @@ import plugin_catalog_double_click_edit from "../../../../examples/cx/catalog/pl
 import plugin_catalog_double_click_to_reply from "../../../../examples/cx/catalog/plugins/double-click-to-reply.cx";
 import plugin_catalog_duration_converter from "../../../../examples/cx/catalog/plugins/duration-converter.cx";
 import plugin_catalog_embedded_urls from "../../../../examples/cx/catalog/plugins/embedded-urls.cx";
+import plugin_catalog_encode_base64 from "../../../../examples/cx/catalog/plugins/encode-base64.cx";
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
 import plugin_catalog_fake_profile_themes from "../../../../examples/cx/catalog/plugins/fake-profile-themes.cx";
@@ -178,6 +181,7 @@ import plugin_catalog_highlight_mentions from "../../../../examples/cx/catalog/p
 import plugin_catalog_hold_your_tongue from "../../../../examples/cx/catalog/plugins/hold-your-tongue.cx";
 import plugin_catalog_hop_on from "../../../../examples/cx/catalog/plugins/hop-on.cx";
 import plugin_catalog_hover_highlight_messages from "../../../../examples/cx/catalog/plugins/hover-highlight-messages.cx";
+import plugin_catalog_hsl_color_converter from "../../../../examples/cx/catalog/plugins/hsl-color-converter.cx";
 import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins/ignore-calls.cx";
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
@@ -187,6 +191,7 @@ import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso
 import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
 import plugin_catalog_json_compact from "../../../../examples/cx/catalog/plugins/json-compact.cx";
 import plugin_catalog_json_format from "../../../../examples/cx/catalog/plugins/json-format.cx";
+import plugin_catalog_json_keys from "../../../../examples/cx/catalog/plugins/json-keys.cx";
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
 import plugin_catalog_keyword_notify from "../../../../examples/cx/catalog/plugins/keyword-notify.cx";
@@ -282,6 +287,7 @@ import plugin_catalog_starify from "../../../../examples/cx/catalog/plugins/star
 import plugin_catalog_sticker_blocker from "../../../../examples/cx/catalog/plugins/sticker-blocker.cx";
 import plugin_catalog_sticky_date_dividers from "../../../../examples/cx/catalog/plugins/sticky-date-dividers.cx";
 import plugin_catalog_stop_auto_unread from "../../../../examples/cx/catalog/plugins/stop-auto-unread.cx";
+import plugin_catalog_strip_url_tracking from "../../../../examples/cx/catalog/plugins/strip-url-tracking.cx";
 import plugin_catalog_talk_in_reverse from "../../../../examples/cx/catalog/plugins/talk-in-reverse.cx";
 import plugin_catalog_terezi_typing_quirk from "../../../../examples/cx/catalog/plugins/terezi-typing-quirk.cx";
 import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins/text-replace.cx";
@@ -452,6 +458,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CallTimeCounter", source: plugin_catalog_call_time_counter, description: "Show the elapsed time in your current call", categories: ["Voice & calls"] },
         { name: "CenteredChat", source: plugin_catalog_centered_chat, description: "center the message list on wide screens", categories: ["Appearance"], appearanceRevision: "b83a7ec1531049c64d41b5b2401a77ad421f81966abb0957703cbb3757b96d71" },
         { name: "ChatButtonsBegone", source: plugin_catalog_chat_buttons_begone, description: "Hide the listed interface elements on this device", keywords: "Hide the chat attachment button Hide the chat gift button Hide the GIF picker shortcut Hide the sticker picker shortcut Hide the composer expression picker shortcut Hide the chat apps button Hide the Shop entry Hide the threads shortcut in the channel header Hide avatar decorations Hide profile badge rows Hide profile effects", categories: ["Appearance","Profiles"], appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433" },
+        { name: "Checklist Progress", source: plugin_catalog_checklist_progress, description: "/checklistprogress", commands: ["checklistprogress"], categories: ["Commands"], appearanceRevision: "edaaa6c353ed5ae0b1226b53fa0768367fd5e83c8f293c765142041ef542216d" },
         { name: "ClapText", source: plugin_catalog_clap_text, description: "/clap", commands: ["clap"], categories: ["Chat","Commands"] },
         { name: "CleanChannelName", source: plugin_catalog_clean_channel_name, description: "Remove decorations from displayed channel names", categories: ["Appearance"], appearanceRevision: "c8c232817b30c0a5dd3cd694d9a1da0fbb7156039cdf59dbb1b932a124c004cc" },
         { name: "ClearURLs", source: plugin_catalog_clear_urls, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
@@ -461,6 +468,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Color Converter", source: plugin_catalog_color_converter, description: "/hextorgb · /rgbtohex", commands: ["hextorgb","rgbtohex"], categories: ["Commands"], appearanceRevision: "717db9fa96c52602500f4a297fe5566d4a6005fd1ba67d4e00c2e58803b0ba88" },
         { name: "ColorText", source: plugin_catalog_color_text, description: "/color", commands: ["color"], categories: ["Chat","Commands"] },
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions, description: "tint inline mentions purple", categories: ["Appearance"], appearanceRevision: "84ed334d7bbfa85c7c10f1ce59c128908e80a62f7442539ba51f0dfb0c24fa16" },
+        { name: "Common Lines", source: plugin_catalog_common_lines, description: "/commonlines", commands: ["commonlines"], categories: ["Commands"], appearanceRevision: "8a6571a5f25c6dd9a6ce6dc6fb05b9bd0028e003f3dd9eb48ff4227fdc593d40" },
         { name: "CompactCompose", source: plugin_catalog_compact_compose, description: "Slims the composer and fades its action buttons until hover or focus", desktopOnly: true, categories: ["Appearance"] },
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list, description: "reduce the spacing in the server member list", categories: ["Appearance"], appearanceRevision: "21cb8ff0a28cec1a5d7a550d3ac698ae54d2cdcea9824ab27c8767945fea0eba" },
         { name: "CompactMessages", source: plugin_catalog_compact_messages, description: "Tighter spacing between messages", desktopOnly: true, categories: ["Appearance"] },
@@ -501,6 +509,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "DoubleClickToReply", source: plugin_catalog_double_click_to_reply, description: "Open a reply to another user's message on double-click or double-tap", categories: ["Chat"] },
         { name: "Duration Converter", source: plugin_catalog_duration_converter, description: "/convertduration", commands: ["convertduration"], categories: ["Commands"], appearanceRevision: "62d8be3950f686cb41cb3570da9b245ecc1a1344e759dda3904deaae623de90b" },
         { name: "EmbeddedURLs", source: plugin_catalog_embedded_urls, description: "https://www.tiktok.com → https://www.tnktok.com", keywords: "https://vt.tiktok.com → https://www.tnktok.com https://x.com → https://www.fxtwitter.com https://www.twitter.com → https://www.fxtwitter.com https://www.instagram.com → https://www.kkinstagram.com", categories: ["Chat"] },
+        { name: "Encode Base64", source: plugin_catalog_encode_base64, description: "/encodebase64", commands: ["encodebase64"], categories: ["Commands"], appearanceRevision: "d695cbf61031f6f60e1492fcc9e387c435f14933328eab0416384d9fa7d3ab7c" },
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "FakeProfileThemes", source: plugin_catalog_fake_profile_themes, description: "Show colors encoded in bios when the profile has no native theme", commands: ["cx-profile-colors"], categories: ["Appearance","Commands"] },
@@ -604,6 +613,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HoldYourTongue", source: plugin_catalog_hold_your_tongue, description: "Confirm before sending text containing lipton green tea citrus", categories: ["Chat"] },
         { name: "HopOn", source: plugin_catalog_hop_on, description: "Edit the source to set the HTTPS destination", categories: ["Chat"] },
         { name: "HoverHighlightMessages", source: plugin_catalog_hover_highlight_messages, description: "Highlights the message under your cursor", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HSL Color Converter", source: plugin_catalog_hsl_color_converter, description: "/hsltohex", commands: ["hsltohex"], categories: ["Commands"], appearanceRevision: "824ea2d52eb31cc78fa7f8c0adf6709f71e12f0c529f7fbd60c9545fb18dc7de" },
         { name: "IgnoreCalls", source: plugin_catalog_ignore_calls, description: "Edit the source to enter Discord IDs", categories: ["Voice & calls"] },
         { name: "ImageFilename", source: plugin_catalog_image_filename, description: "Show image filenames and GIF links", categories: ["Media"] },
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
@@ -613,6 +623,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "JSON Check", source: plugin_catalog_json_check, description: "/jsoncheck", commands: ["jsoncheck"], categories: ["Commands"], appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f" },
         { name: "JSON Compact", source: plugin_catalog_json_compact, description: "/compactjson", commands: ["compactjson"], categories: ["Commands"], appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb" },
         { name: "JSON Format", source: plugin_catalog_json_format, description: "/formatjson", commands: ["formatjson"], categories: ["Commands"], appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c" },
+        { name: "JSON Keys", source: plugin_catalog_json_keys, description: "/jsonkeys", commands: ["jsonkeys"], categories: ["Commands"], appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d" },
         { name: "JumpToTop", source: plugin_catalog_jump_to_top, description: "Add a channel header button to jump to the first message", categories: ["Servers & channels"] },
         { name: "JumpTo", source: plugin_catalog_jump_to, description: "Jump to the first or last message from channel and message menus", categories: ["Servers & channels"] },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify, description: "Edit the source to enter keywords", categories: ["Chat"] },
@@ -708,6 +719,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "StickerBlocker", source: plugin_catalog_sticker_blocker, description: "Hide all stickers", categories: ["Chat"] },
         { name: "StickyDateDividers", source: plugin_catalog_sticky_date_dividers, description: "Keeps the current day label at the top while scrolling", desktopOnly: true, categories: ["Appearance"] },
         { name: "StopAutoUnread", source: plugin_catalog_stop_auto_unread, description: "Keep your chosen channel notification settings", categories: ["Chat"] },
+        { name: "Strip URL Tracking", source: plugin_catalog_strip_url_tracking, description: "/striptracking", commands: ["striptracking"], categories: ["Commands"], appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40" },
         { name: "TalkInReverse", source: plugin_catalog_talk_in_reverse, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "TereziTypingQuirk", source: plugin_catalog_terezi_typing_quirk, description: "Apply 3 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "TextReplace", source: plugin_catalog_text_replace, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },

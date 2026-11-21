@@ -1,0 +1,7 @@
+plugin "Common Lines":
+  needs commands.register
+  needs reply.local
+  on command "commonlines":
+    input "first" text
+    input "second" text
+    reply "${commonLines(first, second)}"

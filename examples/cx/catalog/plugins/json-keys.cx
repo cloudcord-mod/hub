@@ -1,0 +1,5 @@
+plugin "JSON Keys":
+  needs commands.register
+  needs reply.local
+  on command "jsonkeys" with text:
+    reply "${jsonKeys(text)}"

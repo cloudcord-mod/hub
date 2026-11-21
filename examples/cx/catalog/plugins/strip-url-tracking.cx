@@ -1,0 +1,5 @@
+plugin "Strip URL Tracking":
+  needs commands.register
+  needs reply.local
+  on command "striptracking" with text:
+    reply "${stripTracking(text)}" else "Enter an HTTP or HTTPS URL without embedded credentials."

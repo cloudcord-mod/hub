@@ -30,6 +30,7 @@ const normalizations = ["NFC", "NFD", "NFKC", "NFKD"];
 const ansiForegrounds = ["gray", "red", "green", "yellow", "blue", "pink", "cyan", "white"];
 const ansiBackgrounds = ["navy", "orange", "slate", "teal", "gray", "indigo", "silver", "white"];
 const codeFence = "```";
+const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 function randomInteger(low: number, high: number) {
     const range = high - low + 1;
@@ -114,6 +115,14 @@ function csvRows(input: string) {
     return rows;
 }
 
+function parsePublicHttpUrl(text: string) {
+    if (!/^https?:\/\//i.test(text) || text.length > 3000 || /[\s\\]/.test(text)) return;
+    try {
+        const url = new URL(text);
+        if (!url.username && !url.password) return url;
+    } catch { /* Invalid URL. */ }
+}
+
 export const cxCommandFunctions = {
     snowflakeTimestamp(input: string) {
         const text = input.trim();
@@ -193,6 +202,21 @@ export const cxCommandFunctions = {
         const result = tokens.join("").replaceAll("`", "\\u0060");
         return result.length <= 3900 ? codeFence + "json\n" + result + "\n" + codeFence : "Compacted JSON is too long for one reply.";
     },
+    jsonKeys(text: string) {
+        try {
+            const value = JSON.parse(text);
+            if (!value || Array.isArray(value) || typeof value !== "object") return "Enter a JSON object.";
+            const keys = JSON.stringify(Object.keys(value), null, 2).replaceAll("`", "\\u0060");
+            return keys.length <= 3900 ? codeFence + "json\n" + keys + "\n" + codeFence : "The key list is too long for one reply.";
+        } catch { return "Invalid JSON."; }
+    },
+    commonLines(first: string, second: string) {
+        const otherLines = new Set(second.split(/\r\n|\r|\n/));
+        const common = [...new Set(first.split(/\r\n|\r|\n/).filter(line => line && otherLines.has(line)))];
+        if (!common.length) return "No matching nonempty lines.";
+        const result = common.join("\n").replace(/`(?=``)/g, "`\u200b");
+        return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Matching lines are too long for one reply.";
+    },
     compareLines(before: string, after: string) {
         const lines = (value: string) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
         const previous = lines(before);
@@ -247,6 +271,23 @@ export const cxCommandFunctions = {
         const values = channels.slice(1).map(Number);
         if (values.some(value => value > 255)) return;
         return "`#" + values.map(value => value.toString(16).padStart(2, "0")).join("") + "`";
+    },
+    hslToHex(input: string) {
+        const text = input.trim().replace(/^hsl\((.*)\)$/i, "$1").trim();
+        const parts = text.includes(",") ? text.split(",").map(part => part.trim()) : text.split(/\s+/);
+        const match = /^([+-]?\d+(?:\.\d+)?)(?:deg)? (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)%$/i.exec(parts.join(" "));
+        if (!match) return;
+        const [angle, saturation, lightness] = match.slice(1).map(Number);
+        if (!Number.isFinite(angle) || saturation > 100 || lightness > 100) return;
+        const hue = (angle % 360 + 360) % 360;
+        const light = lightness / 100;
+        const amplitude = saturation / 100 * Math.min(light, 1 - light);
+        const component = (offset: number) => {
+            const sector = (offset + hue / 30) % 12;
+            const value = light - amplitude * Math.max(-1, Math.min(sector - 3, 9 - sector, 1));
+            return Math.round(255 * value).toString(16).padStart(2, "0");
+        };
+        return "`#" + [0, 8, 4].map(component).join("") + "`";
     },
     daysBetween(start: string, end: string) {
         const first = utcMidnight(start), last = utcMidnight(end);
@@ -345,13 +386,44 @@ export const cxCommandFunctions = {
     },
     inspectUrl(input: string) {
         const text = input.trim();
-        if (!/^https?:\/\//i.test(text) || text.length > 3000 || /[\s\\]/.test(text)) return;
-        try {
-            const url = new URL(text);
-            if (url.username || url.password) return;
-            const count = url.search.slice(1).split("&").filter(Boolean).length;
-            return `Scheme \`${url.protocol.slice(0, -1)}\`\nHost \`${url.host.replaceAll("`", "%60")}\`\nQuery parameters ${count}\nFragment ${url.hash ? "present" : "absent"}`;
-        } catch { /* Invalid URL. */ }
+        const url = parsePublicHttpUrl(text);
+        if (!url) return;
+        const count = url.search.slice(1).split("&").filter(Boolean).length;
+        return `Scheme \`${url.protocol.slice(0, -1)}\`\nHost \`${url.host.replaceAll("`", "%60")}\`\nQuery parameters ${count}\nFragment ${url.hash ? "present" : "absent"}`;
+    },
+    stripTracking(input: string) {
+        const text = input.trim();
+        if (!parsePublicHttpUrl(text)) return;
+        const match = /^([^?#]+)\?([^#]*)(#.*)?$/.exec(text);
+        if (!match) return "No known tracking parameters found.";
+        const fields = match[2].split("&");
+        const kept = fields.filter(field => {
+            try {
+                const name = decodeURIComponent(field.split("=", 1)[0]).toLowerCase();
+                return !/^(?:utm_(?:source|medium|campaign|term|content|id|source_platform|creative_format|marketing_tactic)|fbclid|gclid|dclid|msclkid)$/.test(name);
+            } catch { return true; }
+        });
+        if (fields.length === kept.length) return "No known tracking parameters found.";
+        const query = kept.some(Boolean) ? "?" + kept.join("&") : "";
+        const result = match[1] + query + (match[3] ?? "");
+        return codeFence + "\n" + result.replace(/`(?=``)/g, "`\u200b") + "\n" + codeFence;
+    },
+    encodeBase64(text: string) {
+        let encoded: string;
+        try { encoded = encodeURIComponent(text); }
+        catch { return "This text contains invalid Unicode."; }
+        const bytes = encoded.replace(/%([a-f0-9]{2})/gi, (_, hex) => String.fromCharCode(Number.parseInt(hex, 16)));
+        if (Math.ceil(bytes.length / 3) * 4 > 3900) return "Encoded text is too long for one reply.";
+        let output = "";
+        for (let index = 0; index < bytes.length; index += 3) {
+            const a = bytes.charCodeAt(index);
+            const b = bytes.charCodeAt(index + 1) || 0;
+            const c = bytes.charCodeAt(index + 2) || 0;
+            output += base64Alphabet[a >> 2] + base64Alphabet[(a & 3) << 4 | b >> 4]
+                + (index + 1 < bytes.length ? base64Alphabet[(b & 15) << 2 | c >> 6] : "=")
+                + (index + 2 < bytes.length ? base64Alphabet[c & 63] : "=");
+        }
+        return codeFence + "\n" + output + "\n" + codeFence;
     },
     tsvToMarkdown(input: string) {
         return markdownTable(input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(row => row.split("\t")));
@@ -365,6 +437,12 @@ export const cxCommandFunctions = {
         const checklist = lines.map(line => /^- \[[ xX]\]\s/.test(line)
             ? line : "- [ ] " + line.replace(/^[-*+]\s+/, "")).join("\n").replace(/`(?=``)/g, "`\u200b");
         return checklist.length <= 3900 ? codeFence + "markdown\n" + checklist + "\n" + codeFence : "The checklist is too long for one reply.";
+    },
+    checklistProgress(input: string) {
+        const items = [...input.matchAll(/^[ \t]*(?:[-*+]|\d+\.)[ \t]+\[([ xX])\](?:[ \t]+|$)/gm)];
+        if (!items.length) return "No Markdown checklist items found.";
+        const completed = items.filter(([, state]) => state !== " ").length;
+        return `${completed} of ${items.length} complete · ${Math.round(100 * completed / items.length)}% · ${items.length - completed} remaining`;
     },
     discordTimestamp(seconds: string, format: string) {
         const input = seconds.trim();

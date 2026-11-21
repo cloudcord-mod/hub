@@ -1,0 +1,5 @@
+plugin "HSL Color Converter":
+  needs commands.register
+  needs reply.local
+  on command "hsltohex" with text:
+    reply "${hslToHex(text)}" else "Enter an HSL color like hsl(120, 100%, 50%)."

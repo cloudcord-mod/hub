@@ -2630,6 +2630,32 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["discordlinkdetails", { text: "https://discord.com/channels/@me/234567890123456789" }, /^Direct message\nChannel \x60234567890123456789\x60$/],
                 ["discordlinkdetails", { text: "https://discord.com.example.com/channels/@me/234567890123456789" }, /^Paste a Discord/],
             ]],
+            ["JSON Keys", [
+                ["jsonkeys", { text: '{"id":9007199254740993,"x":{"private":true},"__proto__":1}' }, /"id",\n  "x",\n  "__proto__"/],
+                ["jsonkeys", { text: '[{"id":1}]' }, /^Enter a JSON object/],
+            ]],
+            ["Common Lines", [
+                ["commonlines", { first: "alpha\r\nbeta\r\nalpha", second: "beta\nother\nalpha" }, /^\x60\x60\x60\nalpha\nbeta\n\x60\x60\x60$/],
+                ["commonlines", { first: "Alpha\n", second: "alpha\n" }, /^No matching nonempty lines/],
+            ]],
+            ["HSL Color Converter", [
+                ["hsltohex", { text: "hsl(120, 100%, 50%)" }, /^\x60#00ff00\x60$/],
+                ["hsltohex", { text: "hsl(-120deg 100% 50%)" }, /^\x60#0000ff\x60$/],
+                ["hsltohex", { text: "0 101% 50%" }, /^Enter an HSL color/],
+            ]],
+            ["Strip URL Tracking", [
+                ["striptracking", { text: "https://example.com/path?utm_source=x&a=b%20c&%66bclid=y&a=q#section" }, /https:\/\/example\.com\/path\?a=b%20c&a=q#section/],
+                ["striptracking", { text: "https://example.com/?ref=section" }, /^No known tracking parameters/],
+                ["striptracking", { text: "https://name:secret@example.com/" }, /^Enter an HTTP/],
+            ]],
+            ["Encode Base64", [
+                ["encodebase64", { text: "Aé猫🔔" }, new RegExp(Buffer.from("Aé猫🔔", "utf8").toString("base64").replace(/[+]/g, "\\+"))],
+                ["encodebase64", { text: "\ud800" }, /^This text contains invalid Unicode/],
+            ]],
+            ["Checklist Progress", [
+                ["checklistprogress", { text: "- [x] Build\r\n  * [ ] Deploy\r\n2. [X] Test\nPlain [ ] ignored" }, /^2 of 3 complete · 67% · 1 remaining$/],
+                ["checklistprogress", { text: "normal list" }, /^No Markdown checklist items/],
+            ]],
         ]) {
             selectCatalog(plugin);
             click(render(), "Allow for this session");

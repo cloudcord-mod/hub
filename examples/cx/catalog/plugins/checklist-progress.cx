@@ -1,0 +1,5 @@
+plugin "Checklist Progress":
+  needs commands.register
+  needs reply.local
+  on command "checklistprogress" with text:
+    reply "${checklistProgress(text)}"
