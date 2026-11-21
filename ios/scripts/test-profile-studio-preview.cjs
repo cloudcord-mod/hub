@@ -117,6 +117,33 @@ assert.equal(twoToneDraft.bannerColor, "#765432");
 const fullPreview = mobileRender(twoToneDraft);
 assert.ok(fullPreview.some(node => node.props.style?.backgroundColor === "#234567" && node.props.style?.padding === 3));
 assert.ok(fullPreview.some(node => node.props.style?.backgroundColor === "#765432" && node.props.style?.height === "55%"));
+const staffIcon = "https://cdn.example/staff.png";
+const nativeIcon = "a".repeat(32);
+const savedBadgeCode = page.slice(page.indexOf("const nativeBadgeRows ="), page.indexOf("function appendPublishedBadges("));
+const previewBadges = vm.runInNewContext(transformSync(savedBadgeCode + "\nstudioBadgeIcons;", { loader: "ts" }).code, {
+    currentUserId: id, CLOUDCORD_BADGE_ICON: staffIcon,
+    safeStore: () => ({ getUserProfile: accountId => accountId === id ? { badges: [{ id: "native", icon: nativeIcon }] } : undefined }),
+    cloudCordStaffBadge: accountId => accountId === id ? { id: "cloudcord-official-owner", label: "CloudCord Owner" } : null,
+    publishedBadges: [{ id: "custom", name: "Custom", userId: id, icon: "custom-icon" }, { id: "other", userId: "other", icon: "other-icon" }],
+    draftBadgeRows: data => data.nitroEnabled ? [{ id: "nitro", iconSrc: "nitro-icon" }] : [],
+    shouldReplaceLocalBadges: data => Boolean(data.replaceBadges),
+    badgeLayoutKey: badge => badge.id,
+    applyBadgeLayout: (rows, { badgeOrder }) => [...rows].sort((a, b) => badgeOrder.indexOf(a.id) - badgeOrder.indexOf(b.id)),
+    defaultBadgeOrder: () => [],
+});
+assert.deepEqual(Array.from(previewBadges({ nitroEnabled: true, hiddenBadgeIds: ["cloudcord-custom-custom"] }, id)),
+    [staffIcon, "nitro-icon", "https://cdn.discordapp.com/badge-icons/" + nativeIcon + ".png"]);
+assert.deepEqual(Array.from(previewBadges({ nitroEnabled: true, replaceBadges: true, badgeOrder: ["nitro", "cloudcord-official-owner", "cloudcord-custom-custom"] }, id)),
+    ["nitro-icon", staffIcon, "custom-icon"]);
+assert.deepEqual(Array.from(previewBadges({}, "other")), ["other-icon"]);
+const staffPreview = { ...mobileProfile, badges: [staffIcon], officialBadgeIcon: staffIcon };
+theme = "dark";
+assert.equal(mobileRender(staffPreview).find(node => node.props.source?.uri === staffIcon).props.style.tintColor, "#ffffff");
+theme = "light";
+layout = "Popout";
+assert.equal(mobileRender(staffPreview).find(node => node.props.source?.uri === staffIcon).props.style.tintColor, "#000000");
+assert.match(page, /studioBadgeIcons\(data, ownerId \?\? ""\)/);
+assert.match(page, /badges=\{studioBadgeIcons\(preview\)\}/);
 async function testMobilePreviewOpening() {
     const handoff = page.slice(page.indexOf("const openPreview = async"), page.indexOf("const K = require", page.indexOf("const openPreview = async")));
     const toasts = [];

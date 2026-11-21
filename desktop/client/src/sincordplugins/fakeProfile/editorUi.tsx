@@ -232,7 +232,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                     {tag?.tag && <span className="cpx-card-tag">{tagIcon && <img src={tagIcon} alt="" />}{tag.tag}</span>}
                 </div>
                 <div className="cpx-card-username">@{username}{pronouns ? ` · ${pronouns}` : ""}</div>
-                {!!badges.length && <div className="cpx-live-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} />)}</div>}
+                {!!badges.length && <div className="cpx-live-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}
                 {data.customStatus && <div className="cpx-card-custom">{data.customStatus.emoji} {data.customStatus.text}</div>}
                 {activity?.name && <div className="cpx-card-activity"><span>{activityVerb}</span><strong>{activity.name}</strong>{activity.details && <span>{activity.details}</span>}</div>}
                 {bio && <p className="cpx-card-bio">{bio}</p>}
@@ -268,7 +268,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
                 {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}
                 <span className={`cpx-dc-status cpx-dc-status-${status}`} />
             </div>
-            {badges.length > 0 && <div className="cpx-dc-badges">{badges.slice(0, 8).map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} />)}</div>}
+            {badges.length > 0 && <div className="cpx-dc-badges">{badges.slice(0, 8).map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}
             <div className="cpx-dc-body">
                 <div className="cpx-dc-names" style={nameplateUrl ? { backgroundImage: `url("${nameplateUrl}")`, backgroundSize: "cover", backgroundPosition: "center", borderRadius: 8 } : undefined}>
                     <div className="cpx-dc-display">{data.globalName || fallbackName}</div>

@@ -321,6 +321,16 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
     margin-top: 6px;
 }
 
+.cpx-live-badges img[data-cloudcord-official],
+.cpx-dc-badges img[data-cloudcord-official] {
+    filter: brightness(0) invert(1);
+}
+
+.theme-light .cpx-live-badges img[data-cloudcord-official],
+.theme-light .cpx-dc-badges img[data-cloudcord-official] {
+    filter: brightness(0);
+}
+
 .cpx-live-badges img {
     width: 19px;
     height: 19px;

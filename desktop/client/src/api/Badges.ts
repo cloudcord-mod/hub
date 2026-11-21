@@ -114,7 +114,7 @@ export const CLOUDCORD_STAFF_ROLES: Record<string, string> = {
     "257020965756731403": "Senior Support",
     "1253436423923699796": "Support",
 };
-const CLOUDCORD_BADGE_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
+export const CLOUDCORD_BADGE_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
 
 function createOfficialCloudBadgeIcon(badge: ProfileBadge & BadgeUserArgs) {
     // Choose the higher contrast of true black/white for every RGB hue.

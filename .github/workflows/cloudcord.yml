@@ -1181,12 +1181,12 @@ jobs:
               return rootSettings.fakeProfileLocalOnly && preview.hideBadgesWhenSyncOff === true;
           }
 
-          function localHasFakeBadges() {
-              return preview.nitroEnabled || preview.boostMonths > 0 || preview.giftLevel >= 0 || Object.values(preview.selectedBadges || {}).some(Boolean);
+          function localHasFakeBadges(data: Partial<PreviewSettings> = preview) {
+              return data.nitroEnabled || (data.boostMonths ?? 0) > 0 || (data.giftLevel ?? -1) >= 0 || Object.values(data.selectedBadges || {}).some(Boolean);
           }
 
-          function shouldReplaceLocalBadges() {
-              return !localBadgesHidden() && preview.replaceBadges && localHasFakeBadges();
+          function shouldReplaceLocalBadges(data: Partial<PreviewSettings> = preview) {
+              return !localBadgesHidden() && data.replaceBadges && localHasFakeBadges(data);
           }
 
           function remoteReplaceBadges(data: any) {
@@ -2098,27 +2098,9 @@ jobs:
           }
 
           function selectedBadgeObjects(existing: any, forEditor = false) {
-              const result: any[] = [];
               // Optional: no CloudCord badges while this profile stays on this device only.
-              if (!forEditor && rootSettings.fakeProfileLocalOnly && preview.hideBadgesWhenSyncOff) return Array.isArray(existing) ? existing : result;
-              if (preview.nitroEnabled) {
-                  const icon = milestoneIcon(preview.nitroMonths, NITRO_ICONS);
-                  result.push({ id: nitroBadgeId(preview.nitroMonths), description: nitroSubscriberLabel(preview.nitroMonths, preview.nitroSince), icon: " _", iconSrc: icon, source: { uri: icon } });
-              }
-              const gift = GIFT_LEVELS[preview.giftLevel];
-              if (gift) result.push({ id: "fakeprofile-gifting", description: gift.name, icon: gift.icon, iconSrc: gift.icon, source: { uri: gift.icon } });
-              if (preview.boostMonths > 0) {
-                  const icon = boosterIcon(preview.boostMonths);
-                  result.push({ id: "fakeprofile-boost", description: serverBoostingLabel(preview.boostMonths), icon: " _", iconSrc: icon, source: { uri: icon } });
-              }
-              for (const [id, description, , icon] of BADGES) {
-                  if (!preview.selectedBadges?.[id]) continue;
-                  const badgeId = `fakeprofile-${id}`;
-                  if (!result.some(item => item?.id === badgeId)) {
-                      const label = id === "oldname" && preview.oldName ? `Originally Known As: ${preview.oldName}` : description;
-                      result.push({ id: badgeId, description: label, icon: " _", iconSrc: icon, source: { uri: icon } });
-                  }
-              }
+              if (!forEditor && rootSettings.fakeProfileLocalOnly && preview.hideBadgesWhenSyncOff) return Array.isArray(existing) ? existing : [];
+              const result = draftBadgeRows(preview);
               if (!shouldReplaceLocalBadges() && Array.isArray(existing)) {
                   for (const badge of existing) {
                       if (!badge || result.some(item => badgeLayoutKey(item) === badgeLayoutKey(badge))) continue;
@@ -2132,6 +2114,31 @@ jobs:
                   }
               }
               return forEditor ? result : applyBadgeLayout(result, { ...preview, badgeOrder: preview.badgeOrder?.length ? preview.badgeOrder : defaultBadgeOrder(Array.isArray(existing) ? existing : []) });
+          }
+
+          function draftBadgeRows(data: Partial<PreviewSettings>) {
+              const result: any[] = [];
+              if (data.nitroEnabled) {
+                  const months = data.nitroMonths ?? 0;
+                  const icon = milestoneIcon(months, NITRO_ICONS);
+                  result.push({ id: nitroBadgeId(months), description: nitroSubscriberLabel(months, data.nitroSince), icon: " _", iconSrc: icon, source: { uri: icon } });
+              }
+              const gift = GIFT_LEVELS[data.giftLevel ?? -1];
+              if (gift) result.push({ id: "fakeprofile-gifting", description: gift.name, icon: gift.icon, iconSrc: gift.icon, source: { uri: gift.icon } });
+              if ((data.boostMonths ?? 0) > 0) {
+                  const months = data.boostMonths ?? 0;
+                  const icon = boosterIcon(months);
+                  result.push({ id: "fakeprofile-boost", description: serverBoostingLabel(months), icon: " _", iconSrc: icon, source: { uri: icon } });
+              }
+              for (const [id, description, , icon] of BADGES) {
+                  if (!data.selectedBadges?.[id]) continue;
+                  const badgeId = `fakeprofile-${id}`;
+                  if (!result.some(item => item?.id === badgeId)) {
+                      const label = id === "oldname" && data.oldName ? `Originally Known As: ${data.oldName}` : description;
+                      result.push({ id: badgeId, description: label, icon: " _", iconSrc: icon, source: { uri: icon } });
+                  }
+              }
+              return result;
           }
 
           function userIdFromProfile(profile: any): string {
@@ -2310,19 +2317,25 @@ jobs:
               } catch {} finally { publishedBadgeRequest = false; }
           }
           const nativeBadgeRows = new Map<string, any[]>();
-          function editableBadgeRows() {
-              const existing = nativeBadgeRows.get(currentUserId) || safeStore("UserProfileStore")?.getUserProfile?.(currentUserId)?.badges || [];
+          function editableBadgeRows(data: Partial<PreviewSettings> = preview, userId = currentUserId) {
+              const existing = nativeBadgeRows.get(userId) || safeStore("UserProfileStore")?.getUserProfile?.(userId)?.badges || [];
               const native = Array.isArray(existing) ? existing.filter(badge => !/^(?:fakeprofile-|cloudcord-shared-)/.test(String(badge?.id))) : [];
-              const rows = selectedBadgeObjects(native, true);
-              const gift = GIFT_LEVELS[preview.giftLevel];
-              if (gift) rows.push({ id: "gifting", description: gift.name, iconSrc: gift.icon });
-              const staff = cloudCordStaffBadge(currentUserId);
+              const rows = draftBadgeRows(data);
+              if (!shouldReplaceLocalBadges(data)) rows.push(...native);
+              const staff = cloudCordStaffBadge(userId);
               if (staff) rows.unshift({ id: staff.id, description: staff.label, iconSrc: CLOUDCORD_BADGE_ICON });
-              for (const badge of publishedBadges) if (badge.userId === currentUserId) rows.push({ id: `cloudcord-custom-${badge.id}`, description: badge.name, iconSrc: badge.icon });
+              for (const badge of publishedBadges) if (badge.userId === userId) rows.push({ id: `cloudcord-custom-${badge.id}`, description: badge.name, iconSrc: badge.icon });
               const unique = new Map<string, any>();
               for (const row of rows) { const id = badgeLayoutKey(row); if (id && !unique.has(id)) unique.set(id, { ...row, id }); }
-              for (const id of preview.hiddenBadgeIds) if (!unique.has(id)) unique.set(id, { id, description: id });
-              return applyBadgeLayout([...unique.values()], { badgeOrder: preview.badgeOrder.length ? preview.badgeOrder : defaultBadgeOrder(native) });
+              for (const id of data.hiddenBadgeIds ?? []) if (!unique.has(id)) unique.set(id, { id, description: id });
+              return applyBadgeLayout([...unique.values()], { badgeOrder: data.badgeOrder?.length ? data.badgeOrder : defaultBadgeOrder(native) });
+          }
+
+          function studioBadgeIcons(data: Partial<PreviewSettings>, userId = currentUserId): string[] {
+              const hidden = new Set(data.hiddenBadgeIds);
+              const icons = editableBadgeRows(data, userId).filter(row => !hidden.has(row.id))
+                  .map(row => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : undefined));
+              return [...new Set<string>(icons.filter(icon => typeof icon === "string" && icon))];
           }
 
           function appendPublishedBadges(result: any[], userId: string) {
@@ -4652,15 +4665,10 @@ jobs:
                       const data = item.data || {};
                       const active = JSON.stringify(savedSnapshot(data)) === currentJson;
                       const appearance = studioPreviewAppearance(data, realUser);
-                      const rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({ id, iconSrc }));
-                      if (data.nitroEnabled) rows.push({ id: nitroBadgeId(data.nitroMonths), iconSrc: milestoneIcon(data.nitroMonths, NITRO_ICONS) });
-                      if (data.boostMonths > 0) rows.push({ id: "boost", iconSrc: boosterIcon(data.boostMonths) });
-                      const gift = GIFT_LEVELS[data.giftLevel];
-                      if (gift) rows.push({ id: "gifting", iconSrc: gift.icon });
-                      const badges = [...new Set(applyBadgeLayout(rows, data).map(row => row.iconSrc).filter(Boolean))];
+                      const badges = studioBadgeIcons(data, ownerId ?? "");
                       return <View key={item.id} style={{ gap: 10 }}>
                           <S.DiscordProfileCard {...appearance} secondary={appearance.accent}
-                              decoration={data.avatarDecoration || undefined} badges={badges}
+                              decoration={data.avatarDecoration || undefined} badges={badges} officialBadgeIcon={CLOUDCORD_BADGE_ICON}
                               customStatus={data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : undefined}
                               activity={data.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === data.customActivity?.type)?.label || "", name: data.customActivity.name, details: data.customActivity.details } : null} />
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 }}>
@@ -5127,7 +5135,7 @@ jobs:
                               <K.PreviewCard {...appearance} decoration={preview.avatarDecoration || undefined}
                                   customStatus={preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : undefined}
                                   activity={preview.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === preview.customActivity?.type)?.label || "", name: preview.customActivity.name, details: preview.customActivity.details } : null}
-                                  badges={[...new Set(editableBadgeRows().filter(row => !preview.hiddenBadgeIds.includes(row.id)).map(row => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : undefined)).filter(Boolean))] as string[]}
+                                  badges={studioBadgeIcons(preview)} officialBadgeIcon={CLOUDCORD_BADGE_ICON}
                                   onBadges={() => setActiveTab("badges")} onSaved={() => setActiveTab("saved")}
                                   frame={preview.profileFrame ? catalog?.frames.find(item => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : undefined}
                                   effect={preview.profileEffect ? catalog?.effects.find(item => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : undefined} />

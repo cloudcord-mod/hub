@@ -393,10 +393,10 @@ function PreviewNameplate({ uri }: { uri: string }) {
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }: {
+export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
     name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
-    badges?: string[]; onBadges?: () => void; onSaved?: () => void;
+    badges?: string[]; officialBadgeIcon?: string; onBadges?: () => void; onSaved?: () => void;
 }) {
     const [layout, setLayout] = useState<"Profile" | "Popout" | "Chat">("Profile");
     const edge = primary || C.page();
@@ -416,7 +416,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
         </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent} bannerColor={bannerColor}
-            decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
+            decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             {primary && accent && accent !== primary ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "55%", borderBottomLeftRadius: R.lg, borderBottomRightRadius: R.lg, backgroundColor: accent }} /> : null}
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: bannerColor || primary || C.raised() }}>
                 {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
@@ -436,7 +436,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                 </View>
                 <Text variant="text-sm/medium" numberOfLines={1} style={{ color: C.muted() }}>@{username}{pronouns ? ` · ${pronouns}` : ""}</Text>
                 {badges.length ? <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                    {badges.map(uri => <Image key={uri} source={{ uri }} resizeMode="contain" style={{ width: 20, height: 20 }} />)}
+                    {badges.map(uri => <Image key={uri} source={{ uri }} resizeMode="contain" style={{ width: 20, height: 20, tintColor: uri === officialBadgeIcon ? (isLightTheme() ? "#000000" : "#ffffff") : undefined }} />)}
                 </View> : null}
                 {customStatus ? <Text variant="text-sm/medium" numberOfLines={2} style={{ color: C.text() }}>{customStatus}</Text> : null}
                 {activity?.name ? <View style={{ padding: GAP.sm, borderRadius: R.sm, backgroundColor: C.panel(), gap: 2 }}>
@@ -472,9 +472,9 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }: {
+export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [], officialBadgeIcon }: {
     name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
-    customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[];
+    customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[]; officialBadgeIcon?: string;
 }) {
     const themed = !!primary;
     const colors = palette();
@@ -492,7 +492,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
             <View style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 5, borderColor: ring, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
         </View>
         {badges.length ? <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "58%", marginTop: 8, marginRight: 10, paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.panel }}>
-            {badges.slice(0, 8).map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20 }} resizeMode="contain" />)}
+            {badges.slice(0, 8).map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20, tintColor: icon === officialBadgeIcon ? (colors === LIGHT ? "#000000" : "#ffffff") : undefined }} resizeMode="contain" />)}
         </View> : null}
         <View style={{ paddingHorizontal: 14, paddingBottom: 14, paddingTop: badges.length ? 22 : 46, gap: 10 }}>
             <View style={{ gap: 2, borderRadius: 8, overflow: "hidden" }}>
