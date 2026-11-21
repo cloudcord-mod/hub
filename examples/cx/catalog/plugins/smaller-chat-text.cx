@@ -1,0 +1,3 @@
+plugin "SmallerChatText":
+  needs appearance.style
+  style smaller-chat-text

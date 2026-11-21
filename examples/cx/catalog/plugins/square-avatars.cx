@@ -1,0 +1,3 @@
+plugin "SquareAvatars":
+  needs appearance.style
+  style square-avatars

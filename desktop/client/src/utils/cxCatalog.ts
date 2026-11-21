@@ -11,6 +11,7 @@ import plugin_catalog_better_chat_names from "../../../../examples/cx/catalog/pl
 import plugin_catalog_better_gif_alt_text from "../../../../examples/cx/catalog/plugins/better-gif-alt-text.cx";
 import plugin_catalog_better_plus_reacts from "../../../../examples/cx/catalog/plugins/better-plus-reacts.cx";
 import plugin_catalog_bigger_avatars_in_chat from "../../../../examples/cx/catalog/plugins/bigger-avatars-in-chat.cx";
+import plugin_catalog_bigger_chat_text from "../../../../examples/cx/catalog/plugins/bigger-chat-text.cx";
 import plugin_catalog_bigger_code_blocks from "../../../../examples/cx/catalog/plugins/bigger-code-blocks.cx";
 import plugin_catalog_bigger_jumbo_emojis from "../../../../examples/cx/catalog/plugins/bigger-jumbo-emojis.cx";
 import plugin_catalog_bigger_server_icons from "../../../../examples/cx/catalog/plugins/bigger-server-icons.cx";
@@ -34,6 +35,7 @@ import plugin_catalog_color_text from "../../../../examples/cx/catalog/plugins/c
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
 import plugin_catalog_compact_compose from "../../../../examples/cx/catalog/plugins/compact-compose.cx";
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
+import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
@@ -98,6 +100,7 @@ import plugin_catalog_hide_guild_boost_tag from "../../../../examples/cx/catalog
 import plugin_catalog_hide_help_button from "../../../../examples/cx/catalog/plugins/hide-help-button.cx";
 import plugin_catalog_hide_image_alt_text from "../../../../examples/cx/catalog/plugins/hide-image-alt-text.cx";
 import plugin_catalog_hide_inbox_button from "../../../../examples/cx/catalog/plugins/hide-inbox-button.cx";
+import plugin_catalog_hide_join_messages from "../../../../examples/cx/catalog/plugins/hide-join-messages.cx";
 import plugin_catalog_hide_jump_to_present from "../../../../examples/cx/catalog/plugins/hide-jump-to-present.cx";
 import plugin_catalog_hide_keyboard_tips from "../../../../examples/cx/catalog/plugins/hide-keyboard-tips.cx";
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
@@ -148,12 +151,14 @@ import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/j
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
 import plugin_catalog_keyword_notify from "../../../../examples/cx/catalog/plugins/keyword-notify.cx";
+import plugin_catalog_larger_chat_text from "../../../../examples/cx/catalog/plugins/larger-chat-text.cx";
 import plugin_catalog_leet_text from "../../../../examples/cx/catalog/plugins/leet-text.cx";
 import plugin_catalog_lines_to_csv from "../../../../examples/cx/catalog/plugins/lines-to-csv.cx";
 import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugins/link-converter.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
+import plugin_catalog_monospace_chat from "../../../../examples/cx/catalog/plugins/monospace-chat.cx";
 import plugin_catalog_more_commands from "../../../../examples/cx/catalog/plugins/more-commands.cx";
 import plugin_catalog_muted_channels_faded from "../../../../examples/cx/catalog/plugins/muted-channels-faded.cx";
 import plugin_catalog_narrow_channel_list from "../../../../examples/cx/catalog/plugins/narrow-channel-list.cx";
@@ -195,6 +200,7 @@ import plugin_catalog_reverse_image_search from "../../../../examples/cx/catalog
 import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins/reverse-text.cx";
 import plugin_catalog_rot13_text from "../../../../examples/cx/catalog/plugins/rot13-text.cx";
 import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/plugins/round-server-icons.cx";
+import plugin_catalog_rounded_avatars_square from "../../../../examples/cx/catalog/plugins/rounded-avatars-square.cx";
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
 import plugin_catalog_rounded_images from "../../../../examples/cx/catalog/plugins/rounded-images.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
@@ -210,6 +216,7 @@ import plugin_catalog_silent_message_toggle from "../../../../examples/cx/catalo
 import plugin_catalog_silent_typing from "../../../../examples/cx/catalog/plugins/silent-typing.cx";
 import plugin_catalog_slugify_text from "../../../../examples/cx/catalog/plugins/slugify-text.cx";
 import plugin_catalog_smaller_avatars_in_chat from "../../../../examples/cx/catalog/plugins/smaller-avatars-in-chat.cx";
+import plugin_catalog_smaller_chat_text from "../../../../examples/cx/catalog/plugins/smaller-chat-text.cx";
 import plugin_catalog_smooth_scrolling from "../../../../examples/cx/catalog/plugins/smooth-scrolling.cx";
 import plugin_catalog_snowflake_created_at from "../../../../examples/cx/catalog/plugins/snowflake-created-at.cx";
 import plugin_catalog_soft_corners from "../../../../examples/cx/catalog/plugins/soft-corners.cx";
@@ -217,8 +224,10 @@ import plugin_catalog_sollux_typing_quirk from "../../../../examples/cx/catalog/
 import plugin_catalog_sort_lines from "../../../../examples/cx/catalog/plugins/sort-lines.cx";
 import plugin_catalog_sort_reactions from "../../../../examples/cx/catalog/plugins/sort-reactions.cx";
 import plugin_catalog_space_out from "../../../../examples/cx/catalog/plugins/space-out.cx";
+import plugin_catalog_spacious_messages from "../../../../examples/cx/catalog/plugins/spacious-messages.cx";
 import plugin_catalog_split_large_messages from "../../../../examples/cx/catalog/plugins/split-large-messages.cx";
 import plugin_catalog_spotify_share_commands from "../../../../examples/cx/catalog/plugins/spotify-share-commands.cx";
+import plugin_catalog_square_avatars from "../../../../examples/cx/catalog/plugins/square-avatars.cx";
 import plugin_catalog_starify from "../../../../examples/cx/catalog/plugins/starify.cx";
 import plugin_catalog_sticker_blocker from "../../../../examples/cx/catalog/plugins/sticker-blocker.cx";
 import plugin_catalog_sticky_date_dividers from "../../../../examples/cx/catalog/plugins/sticky-date-dividers.cx";
@@ -365,6 +374,7 @@ export const cxCatalog = {
         { name: "BetterGifAltText", source: plugin_catalog_better_gif_alt_text },
         { name: "BetterPlusReacts", source: plugin_catalog_better_plus_reacts },
         { name: "BiggerAvatarsInChat", source: plugin_catalog_bigger_avatars_in_chat, desktopOnly: true },
+        { name: "BiggerChatText", source: plugin_catalog_bigger_chat_text, desktopOnly: true },
         { name: "BiggerCodeBlocks", source: plugin_catalog_bigger_code_blocks },
         { name: "BiggerJumboEmojis", source: plugin_catalog_bigger_jumbo_emojis, desktopOnly: true },
         { name: "BiggerServerIcons", source: plugin_catalog_bigger_server_icons },
@@ -388,6 +398,7 @@ export const cxCatalog = {
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions },
         { name: "CompactCompose", source: plugin_catalog_compact_compose, desktopOnly: true },
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list },
+        { name: "CompactMessages", source: plugin_catalog_compact_messages, desktopOnly: true },
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, desktopOnly: true },
         { name: "CopyBios", source: plugin_catalog_copy_bios },
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown },
@@ -452,6 +463,7 @@ export const cxCatalog = {
         { name: "HideHelpButton", source: plugin_catalog_hide_help_button },
         { name: "HideImageAltText", source: plugin_catalog_hide_image_alt_text },
         { name: "HideInboxButton", source: plugin_catalog_hide_inbox_button },
+        { name: "HideJoinMessages", source: plugin_catalog_hide_join_messages },
         { name: "HideJumpToPresent", source: plugin_catalog_hide_jump_to_present },
         { name: "HideKeyboardTips", source: plugin_catalog_hide_keyboard_tips, desktopOnly: true },
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities },
@@ -502,12 +514,14 @@ export const cxCatalog = {
         { name: "JumpToTop", source: plugin_catalog_jump_to_top },
         { name: "JumpTo", source: plugin_catalog_jump_to },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify },
+        { name: "LargerChatText", source: plugin_catalog_larger_chat_text, desktopOnly: true },
         { name: "LeetText", source: plugin_catalog_leet_text },
         { name: "Lines to CSV", source: plugin_catalog_lines_to_csv },
         { name: "LinkConverter", source: plugin_catalog_link_converter },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape },
         { name: "MessageBurst", source: plugin_catalog_message_burst },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier },
+        { name: "MonospaceChat", source: plugin_catalog_monospace_chat, desktopOnly: true },
         { name: "MoreCommands", source: plugin_catalog_more_commands },
         { name: "MutedChannelsFaded", source: plugin_catalog_muted_channels_faded },
         { name: "NarrowChannelList", source: plugin_catalog_narrow_channel_list },
@@ -549,6 +563,7 @@ export const cxCatalog = {
         { name: "ReverseText", source: plugin_catalog_reverse_text },
         { name: "ROT13 Text", source: plugin_catalog_rot13_text },
         { name: "RoundServerIcons", source: plugin_catalog_round_server_icons },
+        { name: "RoundedAvatarsSquare", source: plugin_catalog_rounded_avatars_square, desktopOnly: true },
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar },
         { name: "RoundedImages", source: plugin_catalog_rounded_images, desktopOnly: true },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages },
@@ -564,6 +579,7 @@ export const cxCatalog = {
         { name: "SilentTyping", source: plugin_catalog_silent_typing },
         { name: "Slugify Text", source: plugin_catalog_slugify_text },
         { name: "SmallerAvatarsInChat", source: plugin_catalog_smaller_avatars_in_chat, desktopOnly: true },
+        { name: "SmallerChatText", source: plugin_catalog_smaller_chat_text, desktopOnly: true },
         { name: "SmoothScrolling", source: plugin_catalog_smooth_scrolling, desktopOnly: true },
         { name: "Snowflake Created At", source: plugin_catalog_snowflake_created_at },
         { name: "SoftCorners", source: plugin_catalog_soft_corners, desktopOnly: true },
@@ -571,8 +587,10 @@ export const cxCatalog = {
         { name: "Sort Lines", source: plugin_catalog_sort_lines },
         { name: "SortReactions", source: plugin_catalog_sort_reactions },
         { name: "SpaceOut", source: plugin_catalog_space_out },
+        { name: "SpaciousMessages", source: plugin_catalog_spacious_messages, desktopOnly: true },
         { name: "SplitLargeMessages", source: plugin_catalog_split_large_messages },
         { name: "SpotifyShareCommands", source: plugin_catalog_spotify_share_commands },
+        { name: "SquareAvatars", source: plugin_catalog_square_avatars, desktopOnly: true },
         { name: "Starify", source: plugin_catalog_starify },
         { name: "StickerBlocker", source: plugin_catalog_sticker_blocker },
         { name: "StickyDateDividers", source: plugin_catalog_sticky_date_dividers, desktopOnly: true },

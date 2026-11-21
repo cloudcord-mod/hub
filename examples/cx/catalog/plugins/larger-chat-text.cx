@@ -1,0 +1,3 @@
+plugin "LargerChatText":
+  needs appearance.style
+  style larger-chat-text

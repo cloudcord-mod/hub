@@ -1,6 +1,55 @@
 // CloudCord appearance tweaks. CX sources select a target and never supply
 // a CSS selector or a Discord component name.
 export const cxAppearanceTargets = {
+    // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
+    "larger-chat-text": {
+        plugin: "LargerChatText",
+        label: "Makes chat text larger",
+        css: "[class*=\"messageContent\"] { font-size: 17px !important; line-height: 1.45 !important; }",
+        desktopOnly: true, style: {},
+    },
+    "bigger-chat-text": {
+        plugin: "BiggerChatText",
+        label: "Slightly larger message text",
+        css: "[class*=\"markup\"][class*=\"messageContent\"] { font-size: 1.08rem !important; line-height: 1.45 !important; }",
+        desktopOnly: true, style: {},
+    },
+    "smaller-chat-text": {
+        plugin: "SmallerChatText",
+        label: "Makes chat text smaller",
+        css: "[class*=\"messageContent\"] { font-size: 14px !important; }",
+        desktopOnly: true, style: {},
+    },
+    "compact-messages": {
+        plugin: "CompactMessages",
+        label: "Tighter spacing between messages",
+        css: "[class*=\"messageListItem\"] [class*=\"cozy\"] { padding-top: 1px !important; padding-bottom: 1px !important; } [class*=\"groupStart\"] { margin-top: 8px !important; }",
+        desktopOnly: true, style: {},
+    },
+    "monospace-chat": {
+        plugin: "MonospaceChat",
+        label: "Shows chat text in a monospace font",
+        css: "[class*=\"messageContent\"] { font-family: var(--font-code) !important; }",
+        desktopOnly: true, style: {},
+    },
+    "square-avatars": {
+        plugin: "SquareAvatars",
+        label: "give avatars round-square corners",
+        css: 'img[class*="avatar"], [class*="avatar"] foreignObject { border-radius: 22% !important; mask: none !important; }',
+        desktopOnly: true, style: {},
+    },
+    "rounded-square-avatars": {
+        plugin: "RoundedAvatarsSquare",
+        label: "give avatars softer square corners",
+        css: '[class*="avatar"] img, img[class*="avatar"] { border-radius: 28% !important; } [class*="avatar"] svg mask rect, mask[id*="avatar"] circle { rx: 28%; }',
+        desktopOnly: true, style: {},
+    },
+    "spacious-message-groups": {
+        plugin: "SpaciousMessages",
+        label: "increase spacing between message groups",
+        css: '[class*="groupStart"] { margin-top: 22px !important; }',
+        desktopOnly: true, style: {},
+    },
     "bigger-avatars-in-chat": { plugin: "BiggerAvatarsInChat", label: "Makes avatars in chat larger", css: "[class*=\"messageListItem\"] img[class*=\"avatar\"] { width: 48px !important; height: 48px !important; }", desktopOnly: true, style: {} },
     "bigger-jumbo-emojis": { plugin: "BiggerJumboEmojis", label: "Makes emoji-only messages bigger", css: "img[class*=\"emoji\"][class*=\"jumboable\"] { width: 64px !important; height: 64px !important; }", desktopOnly: true, style: {} },
     "bold-usernames": { plugin: "BoldUsernames", label: "Makes usernames in chat bolder", css: "[class*=\"username_\"] { font-weight: 700 !important; }", desktopOnly: true, style: {} },

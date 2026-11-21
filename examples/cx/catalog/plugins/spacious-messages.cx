@@ -1,0 +1,3 @@
+plugin "SpaciousMessages":
+  needs appearance.style
+  style spacious-message-groups
