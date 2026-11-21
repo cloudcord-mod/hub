@@ -41872,6 +41872,55 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }, enabled);
   }
+  function decodeCxMessageBase64(content) {
+    if (typeof content !== "string" || content.length > 4e3)
+      return "";
+    var results = /* @__PURE__ */ new Set();
+    for (var match of content.matchAll(/[A-Za-z0-9+/]{4,}={0,2}/g)) {
+      var [token] = match;
+      var offset = match.index;
+      if (/[\w+/=]/.test(content.charAt(offset - 1)) || /[\w+/=]/.test(content.charAt(offset + token.length)))
+        continue;
+      var encoded = token.replace(/=+$/, "");
+      if (encoded.length % 4 === 1 || encoded !== token && token.length % 4 !== 0)
+        continue;
+      var bits = 0;
+      var buffer = 0;
+      var bytes = "";
+      for (var character of encoded) {
+        buffer = buffer << 6 | base64Alphabet.indexOf(character);
+        bits += 6;
+        if (bits >= 8) {
+          bits -= 8;
+          bytes += "%" + (buffer >> bits & 255).toString(16).padStart(2, "0");
+        }
+      }
+      if (bits && buffer & (1 << bits) - 1)
+        continue;
+      try {
+        var decoded = decodeURIComponent(bytes);
+        if (decoded.trim() && !RegExp("[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f-\\u009f\\u202a-\\u202e\\u2066-\\u2069]", "u").test(decoded))
+          results.add(decoded);
+      } catch (e) {
+      }
+      if (results.size === 10)
+        break;
+    }
+    return [
+      ...results
+    ].join("\n\n");
+  }
+  function hideCxProfileBannerImages(target, keepBanner, enabled) {
+    var officialBanner = /^(?:https:)?\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/(?:banners\/(\d{17,20})\/|guilds\/\d+\/users\/(\d{17,20})\/banners\/)/i;
+    return overrideCxMethods(target, {
+      getUserBannerURL(args, invoke) {
+        var url2 = invoke(args);
+        var match = typeof url2 === "string" ? officialBanner.exec(url2) : null;
+        var owner = match?.[1] ?? match?.[2];
+        return owner && !keepBanner(owner) ? void 0 : url2;
+      }
+    }, enabled);
+  }
   function formatCxWordCount(content) {
     if (typeof content !== "string")
       return;
@@ -41879,7 +41928,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (words > 5)
       return `${words} words, ${content.length} characters`;
   }
-  var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers;
+  var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers, base64Alphabet;
   var init_cxNativeEffects = __esm({
     "src/lib/api/cxNativeEffects.ts"() {
       "use strict";
@@ -42038,6 +42087,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "quick-mention": {
           permission: "messages.insertmention",
           label: "Insert the selected message author's mention into the current draft"
+        },
+        "hide-profile-banner-images": {
+          permission: "appearance.hide",
+          label: "Hide Discord-hosted profile banner images except your own and those of friends"
+        },
+        "decode-base64": {
+          permission: "messages.decode",
+          label: "Decode Base64 in the selected message and copy the result on request"
         },
         "copy-raw-text": {
           permission: "messages.copytext",
@@ -42200,6 +42257,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ])));
       roundingUsers = /* @__PURE__ */ new WeakMap();
       overrideLayers = /* @__PURE__ */ new WeakMap();
+      base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     }
   });
 
@@ -47892,7 +47950,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         current = void 0;
         return "continue";
       }
-      var effect2 = /^  use ([a-z-]+)(?: ([a-z0-9 -]+))?$/.exec(line12);
+      var effect2 = /^  use ([a-z][a-z0-9-]*)(?: ([a-z0-9 -]+))?$/.exec(line12);
       if (effect2) {
         var name3 = effect2[1];
         if (!Object.prototype.hasOwnProperty.call(cxNativeEffects, name3) || nativeEffects.has(name3))
@@ -49033,6 +49091,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_cxIncoming();
       init_cxClientCommands();
       init_cxNativeEffects();
+      init_cxNativeEffects();
       init_cxPreviousMessage();
       init_cxSocialEvents();
       init_cxPlusReactions();
@@ -49078,6 +49137,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "messages.openeditor": "Open Discord\u2019s editor for your own message when you double-click or double-tap it",
         "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user\u2019s message",
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+        "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
         "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
         "messages.wordcount": "Count words and characters in displayed messages on this device",
         "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
@@ -49623,6 +49683,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_declutter = __esm({
     "../examples/cx/catalog/plugins/declutter.cx"() {
       declutter_default = 'plugin "Declutter":\n  needs appearance.hide\n  option hide avatar-decorations\n  option hide nameplates default-on\n  option hide profile-effects default-on\n  option hide server-tags default-on\n  option hide shop-entry\n  option hide nitro-entry\n  option hide quests-entry\n  option hide server-boost-progress default-on\n  option hide chat-gift-button default-on\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/decode-base64.cx
+  var decode_base64_default;
+  var init_decode_base64 = __esm({
+    "../examples/cx/catalog/plugins/decode-base64.cx"() {
+      decode_base64_default = 'plugin "DecodeBase64":\n  needs messages.decode\n  use decode-base64\n';
     }
   });
 
@@ -50298,6 +50366,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_hide_pins_button = __esm({
     "../examples/cx/catalog/plugins/hide-pins-button.cx"() {
       hide_pins_button_default = 'plugin "HidePinsButton":\n  needs appearance.hide\n  hide pinned-messages-button\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-banner-images.cx
+  var hide_profile_banner_images_default;
+  var init_hide_profile_banner_images = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-banner-images.cx"() {
+      hide_profile_banner_images_default = 'plugin "Hide Profile Banner Images":\n  needs appearance.hide\n  use hide-profile-banner-images\n';
     }
   });
 
@@ -52561,6 +52637,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_dashless();
       init_days_between();
       init_declutter();
+      init_decode_base64();
       init_dim_inactive_channels();
       init_discord_timestamp();
       init_dont_round_my_timestamps();
@@ -52622,6 +52699,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_nitro_tab();
       init_hide_notification_bell();
       init_hide_pins_button();
+      init_hide_profile_banner_images();
       init_hide_profile_effects();
       init_hide_quests_tab();
       init_hide_reactions();
@@ -53089,6 +53167,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: declutter_default
           },
           {
+            name: "DecodeBase64",
+            source: decode_base64_default
+          },
+          {
             name: "DimInactiveChannels",
             source: dim_inactive_channels_default
           },
@@ -53337,6 +53419,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "HidePinsButton",
             source: hide_pins_button_default
+          },
+          {
+            name: "Hide Profile Banner Images",
+            source: hide_profile_banner_images_default
           },
           {
             name: "HideProfileEffects",
@@ -57615,6 +57701,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }
                 }, enabled);
               }
+              case "decode-base64":
+                return registerMessageMenuActions(enabled, ({ message }, close, stillActive) => {
+                  var decoded = decodeCxMessageBase64(message?.content);
+                  if (!decoded)
+                    return [];
+                  return [
+                    {
+                      label: "Decode Base64",
+                      run() {
+                        close();
+                        import_react_native43.Alert.alert("Decoded Base64", decoded, [
+                          {
+                            text: "Close",
+                            style: "cancel"
+                          },
+                          {
+                            text: "Copy",
+                            onPress: () => {
+                              if (stillActive(false))
+                                clipboard.setString(decoded);
+                            }
+                          }
+                        ]);
+                      }
+                    }
+                  ];
+                }, false);
+              case "hide-profile-banner-images":
+                return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore3?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
               case "quote-message":
                 if (!effectOptions || !("includeLink" in effectOptions))
                   throw new Error("Missing quote options");
@@ -58233,6 +58348,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_jsxRuntime();
       init_sendMessage();
       init_patcher();
+      init_cx();
       init_cx();
       init_cx();
       init_cx();
@@ -59598,7 +59714,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "370e8b7c36065375951ffde770536f9051e3706b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0cfc879d31db7f181ded0960c7a2d56c76b9598b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
