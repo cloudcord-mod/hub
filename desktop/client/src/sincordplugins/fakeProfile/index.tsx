@@ -1737,7 +1737,7 @@ function badgeLayoutRows(data: CustomProfileData, userId: string): ProfileBadge[
         native = profile?.cloudcordUnorderedBadges?.() || profile?.getBadges?.() || profile?.badges || [];
     } catch { /* silent: runs during render; missing native badges just means none */ }
     // Regenerate fake badges from the editor draft rather than the last save.
-    const rows: ProfileBadge[] = !shouldReplaceBadges(data) && Array.isArray(native) ? native.filter(badge => !/^sp_|^fakeprofile-|^cloudcord-shared-/.test(String(badge.id))) : [];
+    const rows: ProfileBadge[] = [];
     const flagKeys: Record<number, string> = {
         [FLAG.STAFF]: "staff", [FLAG.PARTNER]: "partner", [FLAG.HYPESQUAD]: "hypesquad",
         [FLAG.BUG_HUNTER_1]: "bug1", [FLAG.BUG_HUNTER_2]: "bug2",
@@ -1746,9 +1746,12 @@ function badgeLayoutRows(data: CustomProfileData, userId: string): ProfileBadge[
         [FLAG.MOD_ALUMNI]: "mod", [FLAG.ACTIVE_DEVELOPER]: "active"
     };
     for (const badge of BADGES) if ((data.badgeFlags || 0) & badge.flag) rows.push({ id: flagKeys[badge.flag], description: badge.label, iconSrc: badge.icon });
-    if (data.nitro && Number(data.nitroLevel ?? -1) >= 0) rows.push({ id: "nitro", description: "Nitro", iconSrc: NITRO_LEVELS[data.nitroLevel!]?.icon });
-    if (Number(data.boostMonths ?? -1) >= 0) rows.push({ id: "boost", description: "Server Booster", iconSrc: BOOST_ICONS[data.boostMonths!] });
-    if (Number(data.giftLevel ?? -1) >= 0) rows.push({ id: "gifting", description: GIFT_LEVELS[data.giftLevel!]?.name || "Gifting", iconSrc: GIFT_LEVELS[data.giftLevel!]?.icon });
+    const nitro = data.nitro ? NITRO_LEVELS[data.nitroLevel ?? -1] : undefined;
+    const boost = BOOST_ICONS[data.boostMonths ?? -1];
+    const gift = GIFT_LEVELS[data.giftLevel ?? -1];
+    if (nitro) rows.push({ id: "nitro", description: nitro.label === "Nitro" ? nitro.label : `Nitro ${nitro.label}`, iconSrc: nitro.icon });
+    if (boost) rows.push({ id: "boost", description: "Server Booster", iconSrc: boost });
+    if (gift) rows.push({ id: "gifting", description: gift.name, iconSrc: gift.icon });
     const special = [
         ...EXTRA_BADGES,
         { id: "oldname", label: "Originally Known As", icon: OLD_NAME_BADGE_ICON },
@@ -1759,6 +1762,13 @@ function badgeLayoutRows(data: CustomProfileData, userId: string): ProfileBadge[
     rows.push(...uploadedUserBadges(userId));
     const role = CLOUDCORD_STAFF_ROLES[userId];
     if (role) rows.unshift({ id: `cloudcord-official-${role.toLowerCase()}`, description: `CloudCord ${role}` });
+    if (!shouldReplaceBadges(data) && Array.isArray(native)) {
+        for (const badge of native) {
+            if (!badge?.id || /^(?:sp_|fakeprofile-|cloudcord-shared-)/.test(badge.id)) continue;
+            const icon = (badge as ProfileBadge & { icon?: string }).icon;
+            rows.push(badge.iconSrc || !icon || !/^[a-f0-9]{32}$/i.test(icon) ? badge : { ...badge, iconSrc: badgeIcon(icon) });
+        }
+    }
     const unique = new Map<string, ProfileBadge>();
     for (const badge of rows) { const key = badgeLayoutKey(badge); if (key && !unique.has(key)) unique.set(key, { ...badge, id: key }); }
     for (const id of data.hiddenBadgeIds || []) if (!unique.has(id)) unique.set(id, { id, description: id });

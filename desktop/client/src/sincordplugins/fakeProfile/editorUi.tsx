@@ -184,7 +184,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     const name = data.globalName || fallbackName;
     const username = data.username || fallbackUsername;
     const avatar = data.avatar || fallbackAvatar;
-    const banner = data.nitro && data.banner ? data.banner : "";
+    const banner = data.banner || "";
     const color = data.accentColor != null ? `#${Number(data.accentColor).toString(16).padStart(6, "0")}` : "#5865f2";
     const color2 = data.accentColor2 != null ? `#${Number(data.accentColor2).toString(16).padStart(6, "0")}` : color;
     const tag = data.serverTag;
