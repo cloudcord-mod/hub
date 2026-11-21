@@ -43050,6 +43050,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Paste URLs as plain text when replacing selected text in chat",
           desktopOnly: true
         },
+        "no-middle-click-paste": {
+          permission: "messages.paste",
+          label: "Disable Linux middle-click paste",
+          desktopOnly: true,
+          linuxOnly: true
+        },
         "hide-profile-banner-images": {
           permission: "appearance.hide",
           label: "Hide Discord-hosted profile banner images except your own and those of friends"
@@ -50188,7 +50194,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.openeditor": "Open Discord\u2019s editor for your own message when you double-click or double-tap it",
         "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user\u2019s message",
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
-        "messages.paste": "Change how links you paste into the message composer are inserted",
+        "messages.paste": "Change how pasted text enters the message composer",
         "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
         "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
         "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
@@ -52363,6 +52369,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/no-middle-click-paste.cx
+  var no_middle_click_paste_default;
+  var init_no_middle_click_paste = __esm({
+    "../examples/cx/catalog/plugins/no-middle-click-paste.cx"() {
+      no_middle_click_paste_default = 'plugin "NoMiddleClickPaste":\n  needs messages.paste\n  use no-middle-click-paste\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/no-mosaic.cx
   var no_mosaic_default;
   var init_no_mosaic = __esm({
@@ -54204,6 +54218,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_no_draft_length_limit();
       init_no_masked_url_paste();
       init_no_message_hover_bar();
+      init_no_middle_click_paste();
       init_no_mosaic();
       init_no_pending_count();
       init_no_profile_themes();
@@ -56370,6 +56385,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             desktopOnly: true,
             categories: [
               "Appearance"
+            ]
+          },
+          {
+            name: "NoMiddleClickPaste",
+            source: no_middle_click_paste_default,
+            description: "Disable Linux middle-click paste",
+            desktopOnly: true,
+            linuxOnly: true,
+            categories: [
+              "Chat"
             ]
           },
           {
@@ -61465,6 +61490,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 }, enabled);
               case "plain-url-paste":
                 throw new Error("Plain URL paste is available on desktop and browser.");
+              case "no-middle-click-paste":
+                throw new Error("Middle-click paste control is available on Linux.");
               case "avatar-crop-zoom":
                 throw new Error("Avatar crop zoom is available on desktop and browser.");
               case "animated-assets":
@@ -63788,7 +63815,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "96692f0ac8465d583e666756493a02f54efdd8ec";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5970bf9a40952ce8ad69df25d8d4c256fd6a5c43";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
