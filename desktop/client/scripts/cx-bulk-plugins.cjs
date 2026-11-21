@@ -1177,6 +1177,14 @@ const sharedSourceRecipes = [
     {
         capability: "appearance",
         sources: {
+            "desktop/client/src/plugins/plainFolderIcon/index.ts": "d052b3a09acfe05e3408f1ca51d3dfef6291962e130cdd901ff05e8b232b957a",
+        },
+        companions: { "style.css": "00e43c948251b83234f6db19137b80883c6e16e932908e3eb87a3870f987475b" },
+        lines: ["  needs appearance.style", "  style plain-folder-icon"],
+    },
+    {
+        capability: "appearance",
+        sources: {
             "desktop/client/src/plugins/blurNsfw/index.ts": "292e1074f5153a353f41f4b350505e00a879c81f8268f49e218324f6697e0c26",
         },
         lines: ["  needs appearance.style", "  style blur-nsfw-attachments"],
@@ -1220,9 +1228,12 @@ const sharedSourceRecipes = [
     },
 ];
 
-function compileSharedSource(file, code) {
+function compileSharedSource(file, code, readCompanion) {
     const recipe = sharedSourceRecipes.find(recipe => Object.hasOwn(recipe.sources, file));
-    if (!recipe || createHash("sha256").update(code.replaceAll("\r\n", "\n")).digest("hex") !== recipe.sources[file]) return;
+    if (!recipe) return;
+    const hash = text => typeof text === "string" ? createHash("sha256").update(text.replaceAll("\r\n", "\n")).digest("hex") : undefined;
+    if (hash(code) !== recipe.sources[file] || Object.entries(recipe.companions ?? {})
+        .some(([name, expected]) => hash(readCompanion?.(name)) !== expected)) return;
     return { capability: recipe.capability, lines: recipe.lines };
 }
 
@@ -1408,7 +1419,7 @@ function inspectPlugin(file, code, platform, appearance = {}, nativeEffects = {}
     const externalLookup = platform === "desktop" && compileExternalLookup(name, code);
     const timestamps = platform === "desktop" && compileTimestampFormats(name, source, readStylesheet);
     const declutter = platform === "desktop" && name === "Declutter" && compileDeclutter(source, appearance);
-    const compiled = compileSharedSource(file, code) || (platform === "mobile" && factory === "defineCorePlugin" && !source.parseDiagnostics.length
+    const compiled = compileSharedSource(file, code, readStylesheet) || (platform === "mobile" && factory === "defineCorePlugin" && !source.parseDiagnostics.length
         ? compileMobileFilter(name, file, plugin, source) || compileMobileClientCommands(file, plugin, source)
             || compileMobileNativeEffect(file, plugin, source, nativeEffects) || compileMobilePreviousEdit(file, plugin, source)
             || compileMobileSocialEvents(file, plugin, source)

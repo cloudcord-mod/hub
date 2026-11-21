@@ -985,6 +985,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(avatarCrop(runtime).maxValue, 4);
             click(render(), "Disable UnlockedAvatarZoom");
             assert.equal(avatarCrop(runtime).maxValue, 1.5);
+
+            const folderPatch = runtime.patches.find(patch => patch.find === "#{intl::GUILD_FOLDER_TOOLTIP_A11Y_LABEL}").replacement;
+            const folderMatch = new RegExp(folderPatch.match.source.replaceAll("\\i", "[a-z]+"));
+            const folder = "a.slice(0,4),{[b.c]:d,[b.e]:!d}";
+            const applyFolderClass = Function("a", "b", "d", "return (" + folder.replace(folderMatch, folderPatch.replace) + ");");
+            assert.equal(applyFolderClass([], { c: "expanded", e: "collapsed" }, false)["cc-cx-plain-folder-icon"], true);
+            assert.equal(applyFolderClass([], { c: "expanded", e: "collapsed" }, true)["cc-cx-plain-folder-icon"], false);
+            selectCatalog("PlainFolderIcon");
+            click(render(), "Allow for this session");
+            assert.match(stylesheet.textContent, /\.cc-cx-plain-folder-icon.*translateZ\(0\)/);
+            click(render(), "Disable PlainFolderIcon");
+            assert.equal(stylesheet, undefined);
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));

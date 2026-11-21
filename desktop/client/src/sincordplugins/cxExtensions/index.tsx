@@ -1560,6 +1560,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // PlainFolderIcon by botato (GPL-3.0-or-later). The class is inert until CX applies its stylesheet.
+        find: "#{intl::GUILD_FOLDER_TOOLTIP_A11Y_LABEL}",
+        replacement: {
+            match: /\.slice\(0,4\).+?\]:(\i),\[\i\.\i\]:!\1/,
+            replace: '$&,"cc-cx-plain-folder-icon":!$1',
+        },
+    }, {
         // UnlockedAvatarZoom by nakoyasha, GPL-3.0-or-later.
         find: "#{intl::AVATAR_UPLOAD_EDIT_MEDIA}",
         replacement: {

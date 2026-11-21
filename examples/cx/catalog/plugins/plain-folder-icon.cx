@@ -1,0 +1,3 @@
+plugin "PlainFolderIcon":
+  needs appearance.style
+  style plain-folder-icon

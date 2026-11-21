@@ -13,6 +13,12 @@ function hideDesktopClass(plugin: string, label: string, className: string) {
 }
 
 export const cxAppearanceTargets = {
+    // PlainFolderIcon by botato (GPL-3.0-or-later).
+    "plain-folder-icon": {
+        plugin: "PlainFolderIcon", label: "Replace the mini server icons in collapsed folders with a plain folder icon",
+        css: '.cc-cx-plain-folder-icon { transition: none !important; transform: translateZ(0); background-color: color-mix(in oklab, var(--custom-folder-color, var(--badge-background-default)) 40%, transparent); }',
+        desktopOnly: true, style: {},
+    },
     // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
     "larger-chat-text": {
         plugin: "LargerChatText",

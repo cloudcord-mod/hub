@@ -2102,7 +2102,9 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
         }, () => !settings.safeMode?.enabled);
     },
     styleAppearanceTarget(target) {
-        const style = cxAppearanceTargets[target].style;
+        const definition = cxAppearanceTargets[target];
+        if ("desktopOnly" in definition && definition.desktopOnly) throw new Error("This appearance style is available on desktop and browser.");
+        const { style } = definition;
         if ("blurredMedia" in style) return registerBlurredMedia(style.blurredMedia);
         if ("reducedMotion" in style) return registerReducedMotion();
         if ("mentionHighlight" in style) {

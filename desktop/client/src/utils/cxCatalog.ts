@@ -224,6 +224,7 @@ import plugin_catalog_number_base_converter from "../../../../examples/cx/catalo
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
+import plugin_catalog_plain_folder_icon from "../../../../examples/cx/catalog/plugins/plain-folder-icon.cx";
 import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugins/polish-wording.cx";
 import plugin_catalog_profile_media from "../../../../examples/cx/catalog/plugins/profile-media.cx";
 import plugin_catalog_quick_mention from "../../../../examples/cx/catalog/plugins/quick-mention.cx";
@@ -637,6 +638,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"] },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },
+        { name: "PlainFolderIcon", source: plugin_catalog_plain_folder_icon, description: "Replace the mini server icons in collapsed folders with a plain folder icon", desktopOnly: true, categories: ["Appearance"] },
         { name: "PolishWording", source: plugin_catalog_polish_wording, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ProfileMedia", source: plugin_catalog_profile_media, description: "Add View and Download actions for Discord avatars and banners", categories: ["Media","Profiles"] },
         { name: "QuickMention", source: plugin_catalog_quick_mention, description: "Insert the selected message author's mention into the current draft", categories: ["Chat"] },
