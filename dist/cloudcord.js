@@ -43082,6 +43082,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added",
           desktopOnly: true
         },
+        "reply-timestamp": {
+          permission: "messages.replytimestamp",
+          label: "Show the original message's timestamp on loaded reply previews",
+          desktopOnly: true
+        },
         "message-word-count": {
           permission: "messages.wordcount",
           label: "Show word and character counts below messages longer than five words"
@@ -50242,6 +50247,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
         "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
         "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
+        "messages.replytimestamp": "Read the timestamp of a loaded message to show it in a reply preview",
         "messages.wordcount": "Count words and characters in displayed messages on this device",
         "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
         "drafts.long": "Keep the full text of your local drafts",
@@ -52662,6 +52668,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/reply-timestamp.cx
+  var reply_timestamp_default;
+  var init_reply_timestamp = __esm({
+    "../examples/cx/catalog/plugins/reply-timestamp.cx"() {
+      reply_timestamp_default = 'plugin "ReplyTimestamp":\n  needs messages.replytimestamp\n  use reply-timestamp\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/reveal-all-spoilers.cx
   var reveal_all_spoilers_default;
   var init_reveal_all_spoilers = __esm({
@@ -54310,6 +54324,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_relationship_notifier();
       init_repeat_messages();
       init_reply_ping_control();
+      init_reply_timestamp();
       init_reveal_all_spoilers();
       init_reverse_image_search();
       init_reverse_text();
@@ -56720,6 +56735,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "ReplyPingControl",
             source: reply_ping_control_default,
             description: "Choose whether incoming replies ping you on this device",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "ReplyTimestamp",
+            source: reply_timestamp_default,
+            description: "Show the original message's timestamp on loaded reply previews",
+            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -61579,6 +61603,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 throw new Error("Notification volume control is available on desktop and browser.");
               case "reveal-spoilers-shortcut":
                 throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
+              case "reply-timestamp":
+                throw new Error("Reply timestamps are available on desktop and browser.");
               case "animated-assets":
                 return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
               case "floor-relative-time":
@@ -63900,7 +63926,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c1ea8e775e2a8023ab67dc4178e61e9b80f032ae";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0725155baaaf593a5d3b2cd1560dc188a0fee206";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
