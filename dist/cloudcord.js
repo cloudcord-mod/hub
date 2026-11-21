@@ -42940,6 +42940,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "appearance.avatarresolution",
           label: "Request higher-resolution Discord avatars"
         },
+        "avatar-crop-zoom": {
+          permission: "appearance.avatarcrop",
+          label: "Increase the zoom limit in Discord's avatar crop tool",
+          desktopOnly: true
+        },
         "stop-auto-unread": {
           permission: "notifications.preventautoupgrade",
           label: "Keep your chosen channel notification settings"
@@ -48984,6 +48989,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           if (!/^\d+$/.test(effect2[2] ?? "") || !cxAvatarResolutions.includes(size))
             throw new Error("Choose an avatar size of 256, 512, 1024, 2048, or 4096");
           avatarResolution = size;
+        } else if (name3 === "avatar-crop-zoom") {
+          var zoom = effect2[2] ?? "4";
+          if (!/^(?:[2-9]|1[0-6])$/.test(zoom))
+            throw new Error("Choose an avatar crop zoom from 2 to 16");
+          avatarCropOptions = {
+            maxAvatarCropZoom: Number(zoom)
+          };
         } else if (name3 === "all-call-time-counter") {
           var flags = effect2[2]?.split(" ") ?? [];
           if (flags.some((flag) => ![
@@ -49406,6 +49418,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var timestamps2 = {};
     var hasTimestampSurface = false;
     var avatarResolution;
+    var avatarCropOptions;
     var voiceMemberOptions;
     var voiceQueueOptions;
     var mutedVoiceOptions;
@@ -49501,6 +49514,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         ...nativeEffects
       ],
       avatarResolution,
+      avatarCropOptions,
       voiceMemberOptions,
       voiceQueueOptions,
       cameraToneOptions,
@@ -49542,6 +49556,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         var label2 = cxNativeEffects[effect].label;
         if (effect === "avatar-resolution")
           return label2 + " (" + document.avatarResolution + " px)";
+        if (effect === "avatar-crop-zoom")
+          return label2 + " (" + document.avatarCropOptions.maxAvatarCropZoom + "\xD7)";
         if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
           return "Automatically join the selected voice channel when its slot opens";
         return label2;
@@ -49980,6 +49996,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         cleanups.push(host.registerTimestampFormats(document.timestamps));
       }
       var nativeOptions = {
+        "avatar-crop-zoom": document.avatarCropOptions,
         "all-call-time-counter": document.voiceMemberOptions,
         "wait-for-slot": document.voiceQueueOptions,
         "webcam-start-notifier": document.cameraToneOptions,
@@ -50195,6 +50212,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "appearance.hide": "Hide the listed interface elements on this device",
         "appearance.style": "Apply the listed visual changes on this device",
         "appearance.avatarresolution": "Change image size requests for avatars hosted on Discord\u2019s CDN",
+        "appearance.avatarcrop": "Change the maximum zoom while cropping an avatar",
         "messages.filterstickers": "Filter stickers from incoming messages on this device",
         "messages.silencementions": "Mute mentions from the listed senders on this device",
         "replies.controlping": "Choose whether incoming replies ping you on this device",
@@ -52953,6 +52971,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/unlocked-avatar-zoom.cx
+  var unlocked_avatar_zoom_default;
+  var init_unlocked_avatar_zoom = __esm({
+    "../examples/cx/catalog/plugins/unlocked-avatar-zoom.cx"() {
+      unlocked_avatar_zoom_default = 'plugin "UnlockedAvatarZoom":\n  needs appearance.avatarcrop\n  use avatar-crop-zoom\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/unsuppress-embeds.cx
   var unsuppress_embeds_default;
   var init_unsuppress_embeds = __esm({
@@ -54239,6 +54265,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_unique_lines();
       init_unit_converter();
       init_unix_date_converter();
+      init_unlocked_avatar_zoom();
       init_unsuppress_embeds();
       init_url_component_codec();
       init_url_inspector();
@@ -57044,6 +57071,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
+            ]
+          },
+          {
+            name: "UnlockedAvatarZoom",
+            source: unlocked_avatar_zoom_default,
+            description: "Increase the zoom limit in Discord's avatar crop tool (4\xD7)",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
             ]
           },
           {
@@ -61403,6 +61439,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 }, enabled);
               case "plain-url-paste":
                 throw new Error("Plain URL paste is available on desktop and browser.");
+              case "avatar-crop-zoom":
+                throw new Error("Avatar crop zoom is available on desktop and browser.");
               case "animated-assets":
                 return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
               case "floor-relative-time":
@@ -63721,7 +63759,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "280010c58c07eec1cc74edb462bc1671be07b308";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1efc0f12ef39d55a7ff19ec5c0998c199e381fe0";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
