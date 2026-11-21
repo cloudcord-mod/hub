@@ -199,7 +199,13 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
             </div></>}
         {mode === "chat" ? <div className="cpx-chat-preview">
             <img src={avatar} alt="" />
-            <div><strong>{name}</strong>{tag?.tag && <span className="cpx-card-tag">{tagIcon && <img src={tagIcon} alt="" />}{tag.tag}</span>}<p>Hey! This is how your profile looks in chat.</p></div>
+            <div className="cpx-chat-preview-content">
+                <div className="cpx-chat-preview-heading">
+                    <strong>{name}</strong>
+                    {tag?.tag && <span className="cpx-card-tag">{tagIcon && <img src={tagIcon} alt="" />}{tag.tag}</span>}
+                </div>
+                <p>Hey! This is how your profile looks in chat.</p>
+            </div>
         </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={{ "--cpx-accent": color, "--cpx-accent2": color2 } as any}>
             <div className="cpx-card-banner" style={banner ? { backgroundImage: `url("${banner.replace(/"/g, "%22")}")` } : undefined} />
             <div className="cpx-card-avatar">

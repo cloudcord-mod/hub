@@ -12,6 +12,7 @@ on:
       - "desktop/**"
       - "ios/scripts/test-cx-testing.cjs"
       - "ios/scripts/test-custom-social-render.cjs"
+      - "ios/scripts/test-profile-studio-preview.cjs"
       - ".github/workflows/desktop.yml"
 
 jobs:
@@ -121,6 +122,7 @@ jobs:
         run: |
           node ios/scripts/test-extra-badges.cjs
           node ios/scripts/test-badge-layout.cjs
+          CLOUDCORD_ESBUILD="$PWD/desktop/client/node_modules/esbuild" node ios/scripts/test-profile-studio-preview.cjs
           node ios/scripts/test-staff-roster.cjs
           node ios/scripts/test-real-profile-view.cjs
           node ios/scripts/test-profile-sync-regressions.cjs

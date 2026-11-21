@@ -338,11 +338,17 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 }
 
 .cpx-chat-preview > img {
+    flex: none;
     width: 34px;
     height: 34px;
     border-radius: 50%;
     object-fit: cover;
 }
+
+.cpx-chat-preview-content { min-width: 0; }
+.cpx-chat-preview-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.cpx-chat-preview-heading strong { min-width: 0; }
+.cpx-chat-preview-heading .cpx-card-tag { flex: none; }
 
 .cpx-chat-preview p {
     margin-top: 4px;

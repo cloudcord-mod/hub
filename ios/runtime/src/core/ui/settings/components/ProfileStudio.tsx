@@ -110,9 +110,9 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
     </View>;
 }
 
-function Action({ label, onPress, primary, danger, disabled, grow }: { label: string; onPress: () => void; primary?: boolean; danger?: boolean; disabled?: boolean; grow?: boolean }) {
-    return <Pressable accessibilityRole="button" accessibilityState={{ disabled: !!disabled }} disabled={disabled} onPress={onPress}
-        style={({ pressed }) => ({ flex: grow ? 1 : undefined, alignItems: "center", justifyContent: "center", minHeight: 40, paddingHorizontal: GAP.lg, borderRadius: R.sm, backgroundColor: danger ? C.red : primary ? C.brand : C.raised(), opacity: disabled ? 0.45 : pressed ? 0.8 : 1 })}>
+function Action({ label, onPress, primary, danger, disabled, grow, selected }: { label: string; onPress: () => void; primary?: boolean; danger?: boolean; disabled?: boolean; grow?: boolean; selected?: boolean }) {
+    return <Pressable accessibilityRole={selected === undefined ? "button" : "tab"} accessibilityState={{ disabled: !!disabled, selected }} disabled={disabled} onPress={onPress}
+        style={({ pressed }) => ({ flex: grow ? 1 : undefined, alignItems: "center", justifyContent: "center", minHeight: 40, paddingHorizontal: selected === undefined ? GAP.lg : GAP.xs, borderRadius: R.sm, backgroundColor: danger ? C.red : primary ? C.brand : C.raised(), opacity: disabled ? 0.45 : pressed ? 0.8 : 1 })}>
         <Text variant="text-sm/bold" style={{ color: primary || danger ? "#FFFFFF" : C.text() }}>{label}</Text>
     </Pressable>;
 }
@@ -381,6 +381,17 @@ export function BadgeGrid({ items }: { items: BadgeChoice[] }) {
     </View>;
 }
 
+function PreviewTag({ label, icon }: { label: string; icon?: string }) {
+    return <View style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4, backgroundColor: C.line() }}>
+        {icon ? <Image source={{ uri: icon }} style={{ width: 12, height: 12 }} resizeMode="contain" /> : null}
+        <Text variant="text-xs/bold" numberOfLines={1} style={{ color: C.text() }}>{label}</Text>
+    </View>;
+}
+
+function PreviewNameplate({ uri }: { uri: string }) {
+    return <Image source={{ uri }} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", borderRadius: 8 }} resizeMode="cover" />;
+}
+
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
 export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }: {
     name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; decoration?: string; nameplate?: string;
@@ -393,32 +404,34 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
     return <View style={{ gap: GAP.sm }}>
         <Text variant="heading-md/bold" style={{ color: C.text() }}>Live preview</Text>
         <View style={{ flexDirection: "row", gap: GAP.sm }}>
-            {(["Profile", "Popout", "Chat"] as const).map(mode => <Action key={mode} label={mode} grow primary={layout === mode} onPress={() => setLayout(mode)} />)}
+            {(["Profile", "Popout", "Chat"] as const).map(mode => <Action key={mode} label={mode} grow primary={layout === mode} selected={layout === mode} onPress={() => setLayout(mode)} />)}
         </View>
         {layout === "Chat" ? <View style={{ flexDirection: "row", gap: GAP.md, padding: GAP.md, borderRadius: R.md, backgroundColor: card }}>
             {avatar ? <Image source={{ uri: avatar }} style={{ width: 38, height: 38, borderRadius: 19 }} /> : null}
             <View style={{ flex: 1, gap: 4 }}>
-                <Text variant="text-md/bold" style={{ color: C.text() }}>{name}{tagText ? ` · ${tagText}` : ""}</Text>
+                <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
+                    <Text variant="text-md/bold" numberOfLines={1} style={{ flexShrink: 1, color: C.text() }}>{name}</Text>
+                    {tagText ? <PreviewTag label={tagText} icon={tagIcon} /> : null}
+                </View>
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
         </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent}
-            decoration={decoration} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} badges={badges} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
+            decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: accent || edge }}>
                 {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
             </View>
             <View style={{ backgroundColor: card, borderBottomLeftRadius: R.lg - 3, borderBottomRightRadius: R.lg - 3, padding: GAP.md, paddingTop: 50, gap: 6 }}>
                 <View style={{ position: "absolute", top: -42, left: 14, width: 84, height: 84 }}>
-                    <Image source={{ uri: avatar }} style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: card }} />
+                    <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: card, backgroundColor: C.raised(), overflow: "hidden" }}>
+                        {avatar ? <Image source={{ uri: avatar }} style={{ width: "100%", height: "100%" }} /> : null}
+                    </View>
                     {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -10, left: -10, width: 104, height: 104 }} resizeMode="contain" /> : null}
                     <View style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: card, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
                 </View>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 6, borderRadius: 8, overflow: "hidden", paddingVertical: 2 }}>
-                    {nameplate ? <Image source={{ uri: nameplate }} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} resizeMode="cover" /> : null}
-                    <Text variant="heading-lg/bold" numberOfLines={1} style={{ color: C.text() }}>{name}</Text>
-                    {tagText ? <View style={{ flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 4, backgroundColor: "rgba(0,0,0,0.35)" }}>
-                        {tagIcon ? <Image source={{ uri: tagIcon }} style={{ width: 12, height: 12 }} resizeMode="contain" /> : null}
-                        <Text variant="text-xs/bold" style={{ color: C.text() }}>{tagText}</Text>
-                    </View> : null}
+                <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, borderRadius: 8, overflow: "hidden", paddingVertical: 2 }}>
+                    {nameplate ? <PreviewNameplate uri={nameplate} /> : null}
+                    <Text variant="heading-lg/bold" numberOfLines={1} style={{ flexShrink: 1, color: C.text() }}>{name}</Text>
+                    {tagText ? <PreviewTag label={tagText} icon={tagIcon} /> : null}
                 </View>
                 <Text variant="text-sm/medium" numberOfLines={1} style={{ color: C.muted() }}>@{username}{pronouns ? ` · ${pronouns}` : ""}</Text>
                 {badges.length ? <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
@@ -458,14 +471,15 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, decoration, status, customStatus, bio, activity, tagText, badges = [] }: {
-    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; decoration?: string; status?: string;
-    customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; badges?: string[];
+export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }: {
+    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; decoration?: string; nameplate?: string; status?: string;
+    customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[];
 }) {
     const themed = !!primary;
-    const base = "#111214";
-    const ring = themed ? "#1A1B1E" : base;
-    const inner = <View style={{ borderRadius: themed ? 6 : 10, overflow: "hidden", backgroundColor: themed ? "rgba(0,0,0,0.5)" : base }}>
+    const colors = palette();
+    const ring = themed ? colors.panel : colors.page;
+    const themedSurface = colors === LIGHT ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.55)";
+    const inner = <View style={{ borderRadius: themed ? 6 : 10, overflow: "hidden", backgroundColor: themed ? themedSurface : colors.page }}>
         <View style={{ height: 96, backgroundColor: primary || C.brand }}>
             {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
         </View>
@@ -476,27 +490,28 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
             {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
             <View style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 5, borderColor: ring, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
         </View>
-        {badges.length ? <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "58%", marginTop: 8, marginRight: 10, paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: "rgba(0,0,0,0.35)" }}>
+        {badges.length ? <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "58%", marginTop: 8, marginRight: 10, paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.panel }}>
             {badges.slice(0, 8).map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20 }} resizeMode="contain" />)}
         </View> : null}
         <View style={{ paddingHorizontal: 14, paddingBottom: 14, paddingTop: badges.length ? 22 : 46, gap: 10 }}>
-            <View style={{ gap: 2 }}>
-                <Text variant="heading-lg/extrabold" numberOfLines={1} style={{ color: "#FFFFFF" }}>{name}</Text>
+            <View style={{ gap: 2, borderRadius: 8, overflow: "hidden" }}>
+                {nameplate ? <PreviewNameplate uri={nameplate} /> : null}
+                <Text variant="heading-lg/extrabold" numberOfLines={1} style={{ color: colors.text }}>{name}</Text>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 4 }}>
-                    <Text variant="text-sm/medium" numberOfLines={1} style={{ color: "#DBDEE1" }}>{username}</Text>
-                    {tagText ? <View style={{ paddingHorizontal: 5, borderRadius: 4, backgroundColor: "rgba(0,0,0,0.35)" }}><Text variant="text-xs/bold" style={{ color: "#DBDEE1" }}>{tagText}</Text></View> : null}
-                    {pronouns ? <Text variant="text-sm/medium" numberOfLines={1} style={{ color: "#DBDEE1", opacity: 0.8 }}>• {pronouns}</Text> : null}
+                    <Text variant="text-sm/medium" numberOfLines={1} style={{ flexShrink: 1, color: colors.text }}>{username}</Text>
+                    {tagText ? <PreviewTag label={tagText} icon={tagIcon} /> : null}
+                    {pronouns ? <Text variant="text-sm/medium" numberOfLines={1} style={{ flexShrink: 1, color: colors.muted }}>• {pronouns}</Text> : null}
                 </View>
             </View>
-            {customStatus ? <View style={{ alignSelf: "flex-start", maxWidth: "100%", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, backgroundColor: "rgba(255,255,255,0.08)" }}>
-                <Text variant="text-sm/medium" numberOfLines={1} style={{ color: "#DBDEE1" }}>{customStatus}</Text>
+            {customStatus ? <View style={{ alignSelf: "flex-start", maxWidth: "100%", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.line }}>
+                <Text variant="text-sm/medium" numberOfLines={1} style={{ color: colors.text }}>{customStatus}</Text>
             </View> : null}
-            {bio || activity?.name ? <View style={{ gap: 8, padding: 10, borderRadius: 8, backgroundColor: "rgba(255,255,255,0.05)" }}>
-                {bio ? <Text variant="text-sm/medium" numberOfLines={3} style={{ color: "#DBDEE1" }}>{bio}</Text> : null}
+            {bio || activity?.name ? <View style={{ gap: 8, padding: 10, borderRadius: 8, backgroundColor: colors.line }}>
+                {bio ? <Text variant="text-sm/medium" numberOfLines={3} style={{ color: colors.text }}>{bio}</Text> : null}
                 {activity?.name ? <View style={{ gap: 1 }}>
-                    <Text variant="text-xs/bold" style={{ color: "#B5BAC1" }}>{(activity.verb || "Playing").toUpperCase()}</Text>
-                    <Text variant="text-sm/bold" numberOfLines={1} style={{ color: "#F2F3F5" }}>{activity.name}</Text>
-                    {activity.details ? <Text variant="text-xs/medium" numberOfLines={1} style={{ color: "#B5BAC1" }}>{activity.details}</Text> : null}
+                    <Text variant="text-xs/bold" style={{ color: colors.muted }}>{(activity.verb || "Playing").toUpperCase()}</Text>
+                    <Text variant="text-sm/bold" numberOfLines={1} style={{ color: colors.text }}>{activity.name}</Text>
+                    {activity.details ? <Text variant="text-xs/medium" numberOfLines={1} style={{ color: colors.muted }}>{activity.details}</Text> : null}
                 </View> : null}
             </View> : null}
         </View>
