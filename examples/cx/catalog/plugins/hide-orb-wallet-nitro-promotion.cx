@@ -1,0 +1,3 @@
+plugin "HideOrbWalletNitroPromotion":
+  needs appearance.hide
+  hide orb-wallet-nitro-promotion

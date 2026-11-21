@@ -1,0 +1,3 @@
+plugin "HidePremiumGroupPromotion":
+  needs appearance.hide
+  hide premium-group-promotion

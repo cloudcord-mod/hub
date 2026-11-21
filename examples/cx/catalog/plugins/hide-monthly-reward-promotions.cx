@@ -1,0 +1,3 @@
+plugin "HideMonthlyRewardPromotions":
+  needs appearance.hide
+  hide monthly-reward-promotions

@@ -114,11 +114,16 @@ import plugin_catalog_hide_keyboard_tips from "../../../../examples/cx/catalog/p
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
 import plugin_catalog_hide_member_list_button from "../../../../examples/cx/catalog/plugins/hide-member-list-button.cx";
 import plugin_catalog_hide_mention_badges from "../../../../examples/cx/catalog/plugins/hide-mention-badges.cx";
+import plugin_catalog_hide_message_length_promotion from "../../../../examples/cx/catalog/plugins/hide-message-length-promotion.cx";
+import plugin_catalog_hide_monthly_reward_promotions from "../../../../examples/cx/catalog/plugins/hide-monthly-reward-promotions.cx";
 import plugin_catalog_hide_nameplates from "../../../../examples/cx/catalog/plugins/hide-nameplates.cx";
 import plugin_catalog_hide_new_messages_bar from "../../../../examples/cx/catalog/plugins/hide-new-messages-bar.cx";
 import plugin_catalog_hide_nitro_tab from "../../../../examples/cx/catalog/plugins/hide-nitro-tab.cx";
 import plugin_catalog_hide_notification_bell from "../../../../examples/cx/catalog/plugins/hide-notification-bell.cx";
+import plugin_catalog_hide_orb_wallet_nitro_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-nitro-promotion.cx";
+import plugin_catalog_hide_orb_wallet_seasonal_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-seasonal-promotion.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
+import plugin_catalog_hide_premium_group_promotion from "../../../../examples/cx/catalog/plugins/hide-premium-group-promotion.cx";
 import plugin_catalog_hide_profile_banner_images from "../../../../examples/cx/catalog/plugins/hide-profile-banner-images.cx";
 import plugin_catalog_hide_profile_connections from "../../../../examples/cx/catalog/plugins/hide-profile-connections.cx";
 import plugin_catalog_hide_profile_effects from "../../../../examples/cx/catalog/plugins/hide-profile-effects.cx";
@@ -133,8 +138,10 @@ import plugin_catalog_hide_scrollbars from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_send_button from "../../../../examples/cx/catalog/plugins/hide-send-button.cx";
 import plugin_catalog_hide_server_banner from "../../../../examples/cx/catalog/plugins/hide-server-banner.cx";
 import plugin_catalog_hide_shop_tab from "../../../../examples/cx/catalog/plugins/hide-shop-tab.cx";
+import plugin_catalog_hide_soundboard_nitro_banner from "../../../../examples/cx/catalog/plugins/hide-soundboard-nitro-banner.cx";
 import plugin_catalog_hide_spoiler_warnings from "../../../../examples/cx/catalog/plugins/hide-spoiler-warnings.cx";
 import plugin_catalog_hide_status_emojis from "../../../../examples/cx/catalog/plugins/hide-status-emojis.cx";
+import plugin_catalog_hide_sticker_autocomplete from "../../../../examples/cx/catalog/plugins/hide-sticker-autocomplete.cx";
 import plugin_catalog_hide_sticker_button from "../../../../examples/cx/catalog/plugins/hide-sticker-button.cx";
 import plugin_catalog_hide_sticker_picker_promotions from "../../../../examples/cx/catalog/plugins/hide-sticker-picker-promotions.cx";
 import plugin_catalog_hide_sticker_search_suggestions from "../../../../examples/cx/catalog/plugins/hide-sticker-search-suggestions.cx";
@@ -500,11 +507,16 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities, description: "Hide game and music activity text in the member list", categories: ["Appearance"], appearanceRevision: "efcbd78248bb6f5d22c117a37c14dbf80295b01a55761aee8866dbba3a7f0dda" },
         { name: "HideMemberListButton", source: plugin_catalog_hide_member_list_button, description: "Hides the member list toggle in the channel header", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideMentionBadges", source: plugin_catalog_hide_mention_badges, description: "Hide mention count badges", categories: ["Appearance"], appearanceRevision: "71ff42f973686ad65b32085da67363ea82e0ddace83c2b3f3091f855bce2eaef" },
+        { name: "HideMessageLengthPromotion", source: plugin_catalog_hide_message_length_promotion, description: "Hide the Nitro promotion shown with long messages", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideMonthlyRewardPromotions", source: plugin_catalog_hide_monthly_reward_promotions, description: "Hide promotional cards in the monthly rewards panel", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideNameplates", source: plugin_catalog_hide_nameplates, description: "Hide nameplates", categories: ["Appearance"], appearanceRevision: "a1a4921ec50253e74f70cee18c4210151654b56ab3af47085be01cb56028aa58" },
         { name: "HideNewMessagesBar", source: plugin_catalog_hide_new_messages_bar, description: "Hide the new messages bar", categories: ["Appearance"], appearanceRevision: "ef764695aecc37b3f4bb92bddd58eb030ea64d1afe8dc32b1c4c00281bec0b70" },
         { name: "HideNitroTab", source: plugin_catalog_hide_nitro_tab, description: "Hide the Nitro entry", categories: ["Appearance"], appearanceRevision: "77819d3881314900b8285f3145480dda07dbb4dd98a136765979e14f1e2d2706" },
         { name: "HideNotificationBell", source: plugin_catalog_hide_notification_bell, description: "Hide the channel notification settings shortcut", categories: ["Appearance"], appearanceRevision: "7ba7ebf67f69bf87b478780c25dc22ee79e44f0f381e0339fbc78c50ace61320" },
+        { name: "HideOrbWalletNitroPromotion", source: plugin_catalog_hide_orb_wallet_nitro_promotion, description: "Hide the Nitro promotion in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideOrbWalletSeasonalPromotion", source: plugin_catalog_hide_orb_wallet_seasonal_promotion, description: "Hide the Black Friday card in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button, description: "Hide the pinned messages shortcut", categories: ["Appearance"], appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67" },
+        { name: "HidePremiumGroupPromotion", source: plugin_catalog_hide_premium_group_promotion, description: "Hide the premium group promotion in the offer dialog", desktopOnly: true, categories: ["Appearance"] },
         { name: "Hide Profile Banner Images", source: plugin_catalog_hide_profile_banner_images, description: "Hide Discord-hosted profile banner images except your own and those of friends", categories: ["Appearance"], appearanceRevision: "c2654ca55ea9bf9aa21d8bb1cef13879d1c933a0c6c9ed27d5917ef051ec10db" },
         { name: "HideProfileConnections", source: plugin_catalog_hide_profile_connections, description: "Hide connections in profile cards", categories: ["Appearance","Profiles"], appearanceRevision: "67db92b87e8fbbb17a52ec3362fdc70a6e0954b7d12788a893e4c5ceb0f70770" },
         { name: "HideProfileEffects", source: plugin_catalog_hide_profile_effects, description: "Hide profile effects", categories: ["Appearance","Profiles"], appearanceRevision: "8110c30799aff6431793b0a0c777fdda3acf3eea1ece8723bf08b4d08124acd3" },
@@ -519,8 +531,10 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideSendButton", source: plugin_catalog_hide_send_button, description: "Hide the chat send button", categories: ["Appearance"], appearanceRevision: "2c963173d276b2197c7e2228e8e884b0561a6b26b52b219408a2369030346419" },
         { name: "HideServerBanner", source: plugin_catalog_hide_server_banner, description: "Hide the channel list server banner", categories: ["Appearance"], appearanceRevision: "825488db0fc80c0d1087857297d001e600e4f5a1d5df8f6d3c3c683800448993" },
         { name: "HideShopTab", source: plugin_catalog_hide_shop_tab, description: "Hide the Shop entry", categories: ["Appearance"], appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d" },
+        { name: "HideSoundboardNitroBanner", source: plugin_catalog_hide_soundboard_nitro_banner, description: "Hide the Nitro promotion banner in the soundboard", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideSpoilerWarnings", source: plugin_catalog_hide_spoiler_warnings, description: "Hide the spoiler label on images", categories: ["Appearance"], appearanceRevision: "5319d784ea12ca01dd954473ebb2feee7755dea7b5714f7dfaa4c7026e9e46f6" },
         { name: "HideStatusEmojis", source: plugin_catalog_hide_status_emojis, description: "Hide emojis in custom status bubbles", categories: ["Appearance"], appearanceRevision: "863bbb51f3b1d5c1c32cd6c8bbf52e32b16f9a6bd64f94a36d06f32eea77fea3" },
+        { name: "HideStickerAutocomplete", source: plugin_catalog_hide_sticker_autocomplete, description: "Hide sticker suggestions while typing in chat", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideStickerButton", source: plugin_catalog_hide_sticker_button, description: "Hide the sticker picker shortcut", categories: ["Appearance"], appearanceRevision: "7aa0a5bdf382195bf48b3579640eb8a1ab819a0b8e480fe8b34f6a571e2542db" },
         { name: "HideStickerPickerPromotions", source: plugin_catalog_hide_sticker_picker_promotions, description: "Hide shop and promotional cards in the sticker picker", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideStickerSearchSuggestions", source: plugin_catalog_hide_sticker_search_suggestions, description: "Hide suggested searches in the sticker picker", desktopOnly: true, categories: ["Appearance"] },

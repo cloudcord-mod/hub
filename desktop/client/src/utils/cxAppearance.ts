@@ -1,5 +1,17 @@
 // CloudCord appearance tweaks. CX sources select a target and never supply
 // a CSS selector or a Discord component name.
+function hideDesktopClass(plugin: string, label: string, className: string) {
+    const prefix = className + "_";
+    return {
+        plugin,
+        label,
+        css: `[class^="${prefix}"], [class*=" ${prefix}"] { display: none !important; }`,
+        desktopOnly: true,
+        mobile: [],
+        catalogOriginal: true,
+    } as const;
+}
+
 export const cxAppearanceTargets = {
     // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
     "larger-chat-text": {
@@ -98,6 +110,13 @@ export const cxAppearanceTargets = {
         css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
         desktopOnly: true, mobile: [], catalogOriginal: true,
     },
+    "message-length-promotion": hideDesktopClass("HideMessageLengthPromotion", "the Nitro promotion shown with long messages", "messageLengthUpsellContainer"),
+    "orb-wallet-nitro-promotion": hideDesktopClass("HideOrbWalletNitroPromotion", "the Nitro promotion in the Orbs Wallet", "orbWalletNitroUpsellCard"),
+    "orb-wallet-seasonal-promotion": hideDesktopClass("HideOrbWalletSeasonalPromotion", "the Black Friday card in the Orbs Wallet", "orbWalletBlackFridayCardWrapper"),
+    "monthly-reward-promotions": hideDesktopClass("HideMonthlyRewardPromotions", "promotional cards in the monthly rewards panel", "promoCardContainer"),
+    "soundboard-nitro-banner": hideDesktopClass("HideSoundboardNitroBanner", "the Nitro promotion banner in the soundboard", "upsellBanner"),
+    "sticker-autocomplete": hideDesktopClass("HideStickerAutocomplete", "sticker suggestions while typing in chat", "stickerAutoComplete"),
+    "premium-group-promotion": hideDesktopClass("HidePremiumGroupPromotion", "the premium group promotion in the offer dialog", "premiumGroupUpsellWrapper"),
     "voice-krisp-button": {
         plugin: "ShowPing", label: "the desktop Krisp button beside the voice connection controls",
         css: '[class*="voiceButtonsContainer_"] > button[aria-label$="Krisp" i] { display: none !important; }',

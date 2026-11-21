@@ -1,0 +1,3 @@
+plugin "HideMessageLengthPromotion":
+  needs appearance.hide
+  hide message-length-promotion

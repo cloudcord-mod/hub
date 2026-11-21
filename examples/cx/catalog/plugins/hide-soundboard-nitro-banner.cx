@@ -1,0 +1,3 @@
+plugin "HideSoundboardNitroBanner":
+  needs appearance.hide
+  hide soundboard-nitro-banner
