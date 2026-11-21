@@ -1247,23 +1247,70 @@ jobs:
               };
           }
 
-          async function publishSharedProfile() {
-              if (rootSettings.fakeProfileLocalOnly || !preview.enabled || !currentUserId || Reflect.get(rootSettings, "fakeProfilePreviewBackup")) return;
-              const queue = publishSharedProfile as typeof publishSharedProfile & { pending?: Promise<void>; queued?: boolean };
+          async function publishSharedProfile(): Promise<boolean> {
+              if (rootSettings.fakeProfileLocalOnly || !preview.enabled || !currentUserId || Reflect.get(rootSettings, "fakeProfilePreviewBackup")) return false;
+              if (profileSyncDelay(currentUserId)) return false;
+              const queue = publishSharedProfile as typeof publishSharedProfile & { pending?: Promise<boolean>; queued?: boolean };
               if (queue.pending) { queue.queued = true; return queue.pending; }
               queue.pending = (async () => {
+                  let confirmed = false;
                   try {
                       do {
                           queue.queued = false;
-                          try { await publishSharedProfileSnapshot(); }
-                          catch (error) { if (!queue.queued) throw error; }
-                      } while (queue.queued && !rootSettings.fakeProfileLocalOnly && preview.enabled && currentUserId);
+                          const ownerId = currentUserId;
+                          confirmed = false;
+                          setProfileSyncFeedback(ownerId, "uploading");
+                          try { confirmed = await publishSharedProfileSnapshot() === true; }
+                          catch (error) {
+                              if (!queue.queued) {
+                                  if (ownerId && canPublishProfile(ownerId) && profileSyncFeedback?.phase !== "pending") setProfileSyncFeedback(ownerId, "failed");
+                                  throw error;
+                              }
+                          }
+                      } while (queue.queued && currentUserId && canPublishProfile(currentUserId) && !profileSyncDelay(currentUserId));
+                      return confirmed;
                   } finally { queue.pending = undefined; }
               })();
               return queue.pending;
           }
 
-          async function publishSharedProfileSnapshot(allowRetry = true) {
+          type ProfileSyncPhase = "pending" | "uploading" | "retry" | "confirmed" | "failed";
+          let profileSyncFeedback: { ownerId: string; phase: ProfileSyncPhase; snapshot: PreviewSettings } | undefined;
+          let profileSyncRetry: { ownerId: string; until: number } | undefined;
+          const profileSyncListeners = new Set<() => void>();
+          function canPublishProfile(ownerId: string) {
+              return currentUserId === ownerId && !rootSettings.fakeProfileLocalOnly && preview.enabled
+                  && !Reflect.get(rootSettings, "fakeProfilePreviewBackup");
+          }
+
+          function profileSyncDelay(ownerId: string) {
+              return profileSyncRetry?.ownerId === ownerId ? Math.max(0, profileSyncRetry.until - Date.now()) : 0;
+          }
+
+          function setProfileSyncFeedback(ownerId: string | null, phase: ProfileSyncPhase) {
+              if (!ownerId || ownerId !== currentUserId) return;
+              if (profileSyncFeedback?.ownerId === ownerId && profileSyncFeedback.phase === phase && profileSyncFeedback.snapshot === preview) return;
+              profileSyncFeedback = { ownerId, phase, snapshot: preview };
+              for (const listener of profileSyncListeners) listener();
+          }
+
+          function profileSyncLabel() {
+              if (!preview.enabled) return "Off";
+              if (Reflect.get(rootSettings, "fakeProfilePreviewBackup")) return "Template preview";
+              if (rootSettings.fakeProfileLocalOnly) return "This device";
+              if (currentUserId && profileSyncDelay(currentUserId)) return "Retry scheduled";
+              if (profileSyncFeedback?.ownerId === currentUserId && profileSyncFeedback.snapshot === preview) {
+                  switch (profileSyncFeedback.phase) {
+                      case "confirmed": return "Synced";
+                      case "uploading": return "Syncing…";
+                      case "retry": return "Retry scheduled";
+                      case "failed": return "Sync failed";
+                  }
+              }
+              return "Waiting to sync";
+          }
+
+          async function publishSharedProfileSnapshot(allowRetry = true): Promise<boolean | undefined> {
               if (rootSettings.fakeProfileLocalOnly) return;
               if (!preview.enabled || !currentUserId) return;
               const ownerId = currentUserId;
@@ -1278,16 +1325,20 @@ jobs:
               const path = saved.id ? `/v1/profiles/${encodeURIComponent(saved.id)}` : "/v1/profiles";
               const localFingerprint = JSON.stringify(preview);
               const profileSnapshot = await ownSharedProfile();
-              if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly) return;
+              if (!canPublishProfile(ownerId)) return;
               const latestResponse = await fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(ownerId)}`, { cache: "no-store" });
-              if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly) return;
+              if (!canPublishProfile(ownerId)) return;
               if (JSON.stringify(preview) !== localFingerprint) {
                   (publishSharedProfile as any).queued = true;
                   return;
               }
               if (latestResponse.ok) {
                   const latest = await latestResponse.json() as any;
-                  if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly) return;
+                  if (!canPublishProfile(ownerId)) return;
+                  if (JSON.stringify(preview) !== localFingerprint) {
+                      (publishSharedProfile as any).queued = true;
+                      return;
+                  }
                   // Save everything: keep fields only desktop knows about, and don't wipe a
                   // picture or banner just because this phone couldn't read its own copy.
                   const remote = latest?.profile && typeof latest.profile === "object" ? latest.profile : {};
@@ -1305,7 +1356,8 @@ jobs:
               }
               else if (latestResponse.status !== 404) throw new Error(`Couldn't load your latest shared profile (${latestResponse.status}). Your local changes are saved; try syncing again shortly.`);
               const clearSnapshot = { ...(rootSettings.fakeProfileMediaCleared || {}) };
-              if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly) return;
+              if (!canPublishProfile(ownerId)) return;
+              const uploadingPreview = preview;
               const response = await fetchProfileResponse(`${SHARED_PROFILE_API}${path}`, {
                   method: saved.id ? "PUT" : "POST",
                   headers: {
@@ -1316,13 +1368,20 @@ jobs:
               });
               if (currentUserId !== ownerId) return;
               if (!response.ok) {
+                  if (!canPublishProfile(ownerId)) return;
                   if (response.status === 429) {
-                      const retrySeconds = Math.max(2, Number(response.headers.get("retry-after") || 10));
+                      const retryAfter = response.headers.get("retry-after")?.trim();
+                      const wait = retryAfter && /^\d+$/.test(retryAfter)
+                          ? Number(retryAfter) * 1000 : Date.parse(retryAfter || "") - Date.now();
+                      const retryDelay = Number.isFinite(wait) ? Math.max(2_000, Math.min(wait, 2_147_483_647)) : 10_000;
+                      profileSyncRetry = { ownerId, until: Date.now() + retryDelay };
                       if (publishTimer) clearTimeout(publishTimer);
-                      publishTimer = setTimeout(() => void publishSharedProfile().catch(error => {
-                          diagnostics.last = error?.message || "Sharing will retry later";
-                      }), retrySeconds * 1000);
-                      diagnostics.last = `CloudCord sharing paused; retrying in ${retrySeconds}s`;
+                      publishTimer = setTimeout(() => {
+                          publishTimer = null;
+                          void publishSharedProfile().catch(error => { diagnostics.last = error?.message || "Could not sync this profile"; });
+                      }, retryDelay);
+                      setProfileSyncFeedback(ownerId, "retry");
+                      diagnostics.last = `CloudCord sharing paused; retrying in ${Math.ceil(retryDelay / 1000)}s`;
                       return;
                   }
                   if (response.status === 409) {
@@ -1354,15 +1413,23 @@ jobs:
                   }
               }
               diagnostics.last = "Fake Profile shared automatically";
+              if (uploadingPreview !== preview || !canPublishProfile(ownerId) || profileSyncFeedback?.phase === "pending") return false;
+              setProfileSyncFeedback(ownerId, "confirmed");
+              return true;
           }
 
           function queueSharedPublish() {
-              if (rootSettings.fakeProfileLocalOnly || Reflect.get(rootSettings, "fakeProfilePreviewBackup")) { if (publishTimer) clearTimeout(publishTimer); return; }
-              if (!preview.enabled) return;
+              if (rootSettings.fakeProfileLocalOnly || Reflect.get(rootSettings, "fakeProfilePreviewBackup")) {
+                  if (publishTimer) { clearTimeout(publishTimer); publishTimer = null; }
+                  return;
+              }
+              if (!currentUserId || !preview.enabled) return;
               if (publishTimer) clearTimeout(publishTimer);
-              publishTimer = setTimeout(() => void publishSharedProfile().catch(error => {
-                  diagnostics.last = error?.message || "Sharing will retry later";
-              }), 1200);
+              setProfileSyncFeedback(currentUserId, "pending");
+              publishTimer = setTimeout(() => {
+                  publishTimer = null;
+                  void publishSharedProfile().catch(error => { diagnostics.last = error?.message || "Could not sync this profile"; });
+              }, Math.max(1200, profileSyncDelay(currentUserId)));
           }
 
           async function pullOwnSharedProfile(force = false) {
@@ -1429,9 +1496,11 @@ jobs:
                   } satisfies PreviewSettings;
                   // Polls commonly return the same snapshot. Replacing the
                   // observed settings and clearing stores still rerenders Discord.
-                  if (JSON.stringify(nextPreview) === JSON.stringify(preview)) return;
-                  rootSettings.fakeProfile = preview = nextPreview;
-                  clearCache();
+                  if (JSON.stringify(nextPreview) !== JSON.stringify(preview)) {
+                      rootSettings.fakeProfile = preview = nextPreview;
+                      clearCache();
+                  }
+                  setProfileSyncFeedback(requestedUserId, "confirmed");
                   diagnostics.last = "Fake Profile synced across devices";
               } catch {} finally {
                   (pullOwnSharedProfile as any).pending = false;
@@ -4254,8 +4323,8 @@ jobs:
               </ScrollView>;
           }
 
-          function ActionButton({ label, onPress, muted = false }: { label: string; onPress: () => void; muted?: boolean }) {
-              return <GlassButton label={label} onPress={onPress} muted={muted} />;
+          function ActionButton({ label, onPress, muted = false, disabled }: { label: string; onPress: () => void; muted?: boolean; disabled?: boolean }) {
+              return <GlassButton label={label} onPress={onPress} muted={muted} disabled={disabled} />;
           }
 
           // Accepts 2016-05-21, 2016/05/21, 21/05/2016 or 21.05.2016; returns YYYY-MM-DD or null.
@@ -4785,9 +4854,10 @@ jobs:
 
               useEffect(() => {
                   fakeProfileEditorOpen = true;
+                  profileSyncListeners.add(redraw);
                   let active = true;
                   void initializeFakeProfile().then(() => { if (active) { if (editorOwner.current == null) editorOwner.current = currentUserId; redraw(); } });
-                  return () => { active = false; fakeProfileEditorOpen = false; };
+                  return () => { active = false; fakeProfileEditorOpen = false; profileSyncListeners.delete(redraw); };
               }, []);
 
               const update = (key: keyof PreviewSettings, value: any, refresh = false) => {
@@ -4974,11 +5044,14 @@ jobs:
 
               if (editorOwner.current !== currentUserId) return <Text style={{ padding: 24 }}>Your Discord account changed. Go back and reopen the profile editor before making changes.</Text>;
               const appearance = studioPreviewAppearance(preview, realCurrentUser);
+              const syncLabel = profileSyncLabel();
+              const canSync = Boolean(currentUserId && preview.enabled && !Reflect.get(rootSettings, "fakeProfilePreviewBackup")
+                  && syncLabel !== "Syncing…" && syncLabel !== "Retry scheduled");
               return (
                   <ScrollView style={{ flex: 1, width: "100%" }} contentContainerStyle={{ width: "100%", maxWidth: 640, alignSelf: "center", paddingHorizontal: 12, paddingTop: 24, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
                       <View style={{ width: "100%", gap: 24 }}>
                           <K.StudioHero {...appearance} accent={appearance.bannerColor}
-                              enabled={preview.enabled} onToggle={() => update("enabled", !preview.enabled, true)} syncLabel={rootSettings.fakeProfileLocalOnly ? "This device" : "Synced"}
+                              enabled={preview.enabled} onToggle={() => update("enabled", !preview.enabled, true)} syncLabel={syncLabel}
                               onPreview={openPreview} quickLook={showPreview} onQuickLook={() => setShowPreview(!showPreview)} />
                           <View style={{ flexDirection: "row", gap: 8 }}>
                               <K.Button label="Badges" grow onPress={() => setActiveTab("badges")} />
@@ -5000,12 +5073,12 @@ jobs:
                               const badgeCount = Object.values(preview.selectedBadges || {}).filter(Boolean).length + (preview.nitroEnabled ? 1 : 0) + (preview.boostMonths > 0 ? 1 : 0) + (preview.giftLevel >= 0 ? 1 : 0);
                               const connections = (preview.customConnections || []).length;
                               const name = preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "there";
-                              return <OverviewPanel name={name} subtitle={preview.enabled ? (rootSettings.fakeProfileLocalOnly ? "Your custom profile is on, on this device only" : "Your custom profile is on and synced everywhere") : "Your custom profile is off"}
+                              return <OverviewPanel name={name} subtitle={preview.enabled ? "Your custom profile is on" : "Your custom profile is off"}
                                   stats={[
                                       { label: "Username", value: preview.username || realCurrentUser?.username || "-", hint: "Your public name" },
                                       { label: "Badges", value: String(badgeCount), hint: preview.replaceBadges ? "Real badges hidden" : "Shown with your real ones" },
                                       { label: "Connections", value: String(connections), hint: "Accounts and domains" },
-                                      { label: "Sync", value: rootSettings.fakeProfileLocalOnly ? "Device" : "Everywhere", hint: rootSettings.fakeProfileLocalOnly ? "Only you see it" : "Other CloudCord users see it" }
+                                      { label: "Sync", value: syncLabel, hint: rootSettings.fakeProfileLocalOnly ? "Edits stay on this device" : "CloudCord profile sharing" }
                                   ]}
                                   tasks={[
                                       { label: "Upload a profile picture", done: !!preview.avatarMedia, tab: "profile" },
@@ -5265,17 +5338,21 @@ jobs:
                                       redraw();
                                   }} />
                                   <Text variant="text-sm/normal" color="text-muted">Device only stops profile uploads and downloads here. A previously shared profile remains shared until replaced.</Text>
-                                  <ActionButton label="Use this profile on all devices" onPress={() => void (async () => {
+                                  <ActionButton label="Use this profile on all devices" disabled={!canSync} onPress={() => void (async () => {
+                                      const ownerId = currentUserId;
+                                      if (!ownerId || !canSync) return;
+                                      if (publishTimer) { clearTimeout(publishTimer); publishTimer = null; }
                                       rootSettings.fakeProfileLocalOnly = false;
-                                      preview.syncRevision = Date.now();
+                                      preview.syncRevision = Math.max(Date.now(), Number(preview.syncRevision || 0) + 1);
                                       rootSettings.fakeProfile = { ...preview, selectedBadges: { ...(preview.selectedBadges || {}) } };
+                                      preview = rootSettings.fakeProfile as PreviewSettings;
                                       suppressOwnPullUntil = Date.now() + 60_000;
                                       refreshPreview();
                                       try {
-                                          await publishSharedProfile();
-                                          diagnostics.last = "This profile is now active on all devices";
-                                          Alert.alert("FakeProfile", "This profile is now active on all of your CloudCord devices.");
+                                          const confirmed = await publishSharedProfile();
+                                          if (confirmed && currentUserId === ownerId && profileSyncLabel() === "Synced") Alert.alert("Profile synced", "CloudCord accepted the current profile for sharing.");
                                       } catch (error: any) {
+                                          if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly) return;
                                           diagnostics.last = error?.message || "Could not sync this profile";
                                           Alert.alert("FakeProfile", diagnostics.last);
                                       }

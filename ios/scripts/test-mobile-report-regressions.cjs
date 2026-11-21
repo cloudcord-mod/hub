@@ -87,6 +87,7 @@ vm.runInContext(compile(publishedSource), refreshContext);
     await refreshContext.refreshPublishedBadges(true);
     assert.equal(emits, 2, 'unchanged badges must not trigger store refreshes');
     let clears = 0;
+    const confirmations = [];
     let profile = { bio: 'saved', nitro: false };
     const own = vm.createContext({
         rootSettings: {}, preview: { primaryColor: '#000000', accentColor: '#ffffff' },
@@ -97,15 +98,18 @@ vm.runInContext(compile(publishedSource), refreshContext);
         normalizeProfileAppearance: () => ({}), mediaClearPending: () => false,
         remoteNitroEnabled: data => data.nitro === true, remoteReplaceBadges: () => false,
         colorHex: (value, fallback) => value ?? fallback, diagnostics: {},
-        clearCache: () => clears++
+        clearCache: () => clears++,
+        setProfileSyncFeedback: (owner, phase) => confirmations.push([owner, phase]),
     });
     own.fetchProfileResponse = (...args) => own.fetch(...args);
     vm.runInContext(compile(source.slice(source.indexOf('async function pullOwnSharedProfile('), source.indexOf('const sharedProfileSeenAt'))), own);
     await own.pullOwnSharedProfile();
     assert.equal(clears, 1);
+    assert.deepEqual(confirmations.at(-1), [own.currentUserId, 'confirmed']);
     own.pullOwnSharedProfile.lastAttempt = 0;
     await own.pullOwnSharedProfile();
     assert.equal(clears, 1, 'identical own profile must not replace observed settings or clear caches');
+    assert.equal(confirmations.length, 2, 'a matching server copy can confirm sync without refreshing the profile');
     profile = { bio: 'updated', nitro: false };
     own.pullOwnSharedProfile.lastAttempt = 0;
     await own.pullOwnSharedProfile();
@@ -119,5 +123,6 @@ vm.runInContext(compile(publishedSource), refreshContext);
     finish(); await pending;
     assert.equal(own.preview.bio, 'new local edit', 'mobile in-flight polls cannot overwrite edits made after the request');
     assert.equal(clears, 2);
+    assert.equal(confirmations.length, 3, 'an outdated response cannot confirm a newer local edit');
     console.log('PASS real Nitro replaced locally/remotely, real badges preserved when disabled, background refresh suppressed and unchanged badge snapshots do not rerender');
 })().catch(error => { console.error(error); process.exitCode = 1; });

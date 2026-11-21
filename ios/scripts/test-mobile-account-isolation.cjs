@@ -34,8 +34,11 @@ assert.equal(account.rootSettings.fakeProfileLocalOnly, false);
 assert(source.includes('editorOwner.current !== currentUserId'), 'stale editors cannot edit another account');
 (async () => {
     let finishFirst, writes = [];
+    let now = Date.now(), retryCallback, retryDelay;
+    class TestDate extends Date { static now() { return now; } }
     const shared = vm.createContext({ rootSettings: { fakeProfileShare: { id: 'old-a', editToken: 'test-a', ownerId: 'a' } },
-        preview: { enabled: true, bio: 'first' }, currentUserId: 'a', Date, JSON,
+        preview: { enabled: true, bio: 'first' }, currentUserId: 'a', Date: TestDate, JSON, publishTimer: null,
+        setTimeout: (callback, delay) => { retryCallback = callback; retryDelay = delay; return 1; }, clearTimeout() {},
         customSocialValidationErrors: () => [], ownSharedProfile: async () => ({ bio: shared.preview.bio }),
         SHARED_PROFILE_API: 'https://example.test', diagnostics: {},
         fetch: async (url, options) => {
@@ -46,18 +49,22 @@ assert(source.includes('editorOwner.current !== currentUserId'), 'stale editors 
         } });
     shared.fetchProfileResponse = (...args) => shared.fetch(...args);
     vm.runInContext(compile(block('async function publishSharedProfile(', 'function queueSharedPublish(')), shared);
+    assert.equal(shared.profileSyncLabel(), 'Waiting to sync');
     const first = shared.publishSharedProfile();
     for (let i = 0; i < 20 && !finishFirst; i++) await Promise.resolve();
     assert(finishFirst);
+    assert.equal(shared.profileSyncLabel(), 'Syncing…');
     shared.preview = { enabled: true, bio: 'latest' };
     const second = shared.publishSharedProfile();
     assert.equal(writes.length, 1, 'overlapping saves are serialized');
     finishFirst(); await Promise.all([first, second]);
+    assert.equal(shared.profileSyncLabel(), 'Synced');
     assert.equal(writes.length, 2);
     assert.equal(JSON.parse(writes[1].body).profile.bio, 'latest', 'the queued save uses the newest edit');
     assert.equal(shared.rootSettings.fakeProfileShare, undefined, 'legacy credentials migrate once');
     assert.equal(shared.rootSettings.fakeProfileShares.a.id, 'old-a');
     shared.currentUserId = 'b'; shared.preview = { enabled: true, bio: 'B' };
+    assert.equal(shared.profileSyncLabel(), 'Waiting to sync', 'one account does not inherit another account’s confirmation');
     await shared.publishSharedProfile();
     assert.equal(writes[2].method, 'POST');
     assert.equal(writes[2].headers.Authorization, undefined, 'account B cannot use account A edit token');
@@ -82,9 +89,27 @@ assert(source.includes('editorOwner.current !== currentUserId'), 'stale editors 
     assert.equal(attempts, 2, 'conflict retries are bounded');
     shared.fetchProfileResponse = async () => { throw Error('request timed out'); };
     await assert.rejects(shared.publishSharedProfile(), /timed out/);
+    assert.equal(shared.profileSyncLabel(), 'Sync failed');
     shared.fetchProfileResponse = (...args) => shared.fetch(...args);
+    attempts = 0;
+    shared.fetch = async (_url, options) => {
+        if (!options?.method) return { ok: false, status: 404 };
+        attempts++;
+        return { ok: false, status: 429, headers: new Map([['retry-after', 'invalid']]) };
+    };
+    assert.equal(await shared.publishSharedProfile(), false, 'a rate-limited save is not confirmed');
+    assert.equal(shared.profileSyncLabel(), 'Retry scheduled');
+    assert.equal(retryDelay, 10_000);
+    assert.equal(await shared.publishSharedProfile(), false);
+    assert.equal(attempts, 1, 'manual sync respects the server cooldown');
     shared.fetch = async (_url, options) => options?.method
         ? { ok: true, json: async () => ({}) } : { ok: false, status: 404 };
-    await shared.publishSharedProfile();
+    now += retryDelay;
+    retryCallback();
+    while (shared.publishSharedProfile.pending) await shared.publishSharedProfile.pending;
+    assert.equal(shared.profileSyncLabel(), 'Synced');
+    shared.rootSettings.fakeProfileLocalOnly = true;
+    assert.equal(shared.profileSyncLabel(), 'This device');
+    assert.equal(await shared.publishSharedProfile(), false);
     console.log('PASS mobile account/profile/privacy isolation, logout, legacy migration, serialized saves and bounded credential/conflict recovery');
 })().catch(error => { console.error(error); process.exitCode = 1; });
