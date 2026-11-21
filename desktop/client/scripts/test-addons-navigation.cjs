@@ -1,6 +1,6 @@
 const fs = require("node:fs"), vm = require("node:vm"), assert = require("node:assert/strict");
 const esbuild = require("esbuild");
-let active, visibility = {}, tester;
+let active, visibility = {};
 const imported = [];
 const React = {
     createElement: (type, props, ...children) => ({ type, props: { ...props, children } }),
@@ -19,8 +19,6 @@ const mocks = {
     "@components/Icons": Object.fromEntries(["CloudIcon", "PaintbrushIcon", "PluginIcon", "PluginsIcon"].map(name => [name, name])),
     "@components/ErrorBoundary": { __esModule: true, default: "Boundary" },
     "./AddonPage": { listablePlugins: () => [], PluginsPage: "Plugins", ThemesPage: "Themes" },
-    "./TweaksPage": { tweakPlugins: () => [], TweaksPage: "Tweaks" },
-    "./testingAccess": { useTestingPluginsAssignment: () => tester },
 };
 const realm = { module: moduleObject, exports: moduleObject.exports, require(name) {
     if (name in mocks) return mocks[name];
@@ -30,43 +28,40 @@ const realm = { module: moduleObject, exports: moduleObject.exports, require(nam
 vm.runInNewContext(esbuild.transformSync(fs.readFileSync("src/components/settings/tabs/addons/index.tsx", "utf8"), { loader: "tsx", format: "cjs" }).code, realm);
 const { default: Addons, setNextAddonsTab } = moduleObject.exports;
 
-const labels = tree => Array.from(tree.props.children[0].props.children[0], button => button.props.children[1].props.children[0]);
-const tabs = ["Plugins", "Tweaks", "Themes", "Sync", "Extras"];
-assert.deepEqual(labels(Addons()), tabs);
+const tabs = tree => tree?.props.children[0].props.children[0] ?? [];
+const labels = tree => Array.from(tabs(tree), button => button.props.children[1].props.children[0]);
+assert.deepEqual(labels(Addons()), ["Plugins", "Themes"]);
 assert.equal(imported.length, 0);
+assert.equal(Addons().props.children[1].props.children[0].type, "Boundary");
 
-for (const [name, path] of [
-    ["Sync", "../sync/CloudTab"],
-    ["Extras", "../extras"],
-]) {
-    const importsBefore = imported.length;
-    const buttons = Addons().props.children[0].props.children[0];
-    buttons[tabs.indexOf(name)].props.onClick();
-    const tree = Addons();
-    assert.equal(imported.length, importsBefore, "Selecting a tab does not eagerly import its page");
-    assert.deepEqual(labels(tree), tabs, "Navigation stays outside the page boundary");
-    const boundary = tree.props.children[1].props.children[0];
-    assert.equal(boundary.type, "Boundary");
-    assert.throws(() => boundary.props.children[0].type(), /broken optional page/);
-    assert.equal(imported.at(-1), path);
-}
+const tabButtons = tabs(Addons());
+const focused = [];
+const controls = Array.from(tabButtons, ({ props }, index) => ({
+    focus: () => focused.push(index),
+    click: props.onClick,
+}));
+const tablist = { querySelectorAll: () => controls };
+for (const button of controls) button.parentElement = tablist;
+let prevented = false;
+tabButtons[0].props.onKeyDown({
+    key: "ArrowRight",
+    currentTarget: controls[0],
+    preventDefault: () => { prevented = true; },
+});
+assert.equal(prevented, true);
+assert.deepEqual(focused, [1]);
+assert.equal(tabs(Addons())[1].props["aria-selected"], true);
+assert.equal(Addons().props.children[1].props["aria-labelledby"], "cloudcord-addons-themes");
+
 setNextAddonsTab("Themes");
 active = undefined;
-assert.equal(Addons().props.children[0].props.children[0][2].props["aria-selected"], true);
-
-visibility = { showPluginsTab: false, showThemesTab: false, showCloudSyncTab: false };
-assert.deepEqual(labels(Addons()), ["Tweaks", "Extras"]);
-tester = { label: "Desktop 2" };
-const importsBeforeTesting = imported.length;
-const testingTabs = Addons();
-assert.deepEqual(labels(testingTabs), ["Tweaks", "Testing Plugins", "Extras"]);
-testingTabs.props.children[0].props.children[0][1].props.onClick();
-const testingPage = Addons().props.children[1].props.children[0];
-assert.equal(imported.length, importsBeforeTesting);
-assert.throws(() => testingPage.props.children[0].type(), /broken optional page/);
-assert.equal(imported.at(-1), "./TestingPlugins");
-tester = undefined;
-assert(!labels(Addons()).includes("Testing Plugins"));
+assert.equal(tabs(Addons())[1].props["aria-selected"], true);
+visibility = { showThemesTab: false };
+assert.deepEqual(labels(Addons()), ["Plugins"]);
+assert.equal(tabs(Addons())[0].props["aria-selected"], true);
+visibility = { showPluginsTab: false, showThemesTab: false };
+assert.equal(Addons(), null);
+assert.equal(imported.length, 0);
 
 const countModule = { exports: {} };
 let cursor = 0;
@@ -115,4 +110,4 @@ const toggle = beforeFiltering.find(node => node.type?.name === "EnabledOnly");
 toggle.props.onChange(true);
 assert.ok(!renderList().some(node => node.props.name === "Local" || node.props.plugin?.name === "Disabled"));
 assert.ok(renderList().some(node => node.props.name === "Shared" || node.props.plugin?.name === "Shared"));
-console.log("PASS Add-ons tabs, tester visibility and optional page isolation");
+console.log("PASS Add-ons tabs, keyboard navigation, visibility and CX list filtering");
