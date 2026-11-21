@@ -60643,6 +60643,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       Themes: 0
     });
     var [category, setCategory] = React2.useState("All");
+    var [activeOnly, setActiveOnly] = React2.useState(false);
     var [status, setStatus] = React2.useState("");
     var [candidate, setCandidate] = React2.useState();
     var [, refreshOptions] = React2.useState(0);
@@ -61502,6 +61503,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   })
                 }, value))
               }),
+              /* @__PURE__ */ jsx(TableSwitchRow, {
+                label: "Active only",
+                value: activeOnly,
+                onValueChange: (value) => {
+                  setActiveOnly(value);
+                  setPages({
+                    Plugins: 0,
+                    Themes: 0
+                  });
+                }
+              }),
               [
                 [
                   "Plugins",
@@ -61514,15 +61526,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               ].map(([kind, entries2]) => {
                 if (category !== "All" && kind === "Themes" !== (category === "Themes"))
                   return null;
-                var matches = searchCxCatalog(entries2, search, category);
-                var page = pages[kind];
+                var isActive = (entry) => session.source(kind === "Themes" ? "theme" : "plugin:" + entry.name) === entry.source;
+                var matches = searchCxCatalog(activeOnly ? entries2.filter(isActive) : entries2, search, category);
+                var page = Math.min(pages[kind], Math.max(0, Math.ceil(matches.length / 12) - 1));
                 var start = page * 12;
                 return /* @__PURE__ */ jsxs(TableRowGroup, {
                   title: `${kind} (${matches.length})`,
                   children: [
                     matches.slice(start, start + 12).map((entry) => /* @__PURE__ */ jsx(TableRow, {
                       label: entry.name,
-                      subLabel: entry.description,
+                      subLabel: isActive(entry) ? [
+                        "Active",
+                        entry.description
+                      ].filter(Boolean).join(" \xB7 ") : entry.description,
                       onPress: () => {
                         setShowCatalog(false);
                         setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");
@@ -63484,7 +63500,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7164a453da8457c2e5b6db06cf60d2cad9dd7696";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a08c32e2bb333ff7b3326a7a247436e76fafade2";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
