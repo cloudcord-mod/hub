@@ -1597,7 +1597,15 @@ function scan(sourceDir, { includeCompanions = false, reviewedSources = [] } = {
         if (!record?.cx || record.review?.sha256 !== sha256) throw new Error("No CX recipe matched reviewed source " + file);
         records.push(record);
     }
-    return classifyPorts(records, existing, hasLegacyCounter);
+    const classified = classifyPorts(records, existing, hasLegacyCounter);
+    if (!classified.some(record => record.status === "ready")) return classified;
+    const { buildCatalog, pluginBody } = require("./sync-cx-catalog.cjs");
+    const { pluginBodies } = buildCatalog();
+    return classified.map(record => {
+        if (record.status !== "ready") return record;
+        const catalogAlias = pluginBodies.get(pluginBody(record.cx));
+        return catalogAlias ? { ...record, status: "in-catalog", catalogAlias } : record;
+    });
 }
 
 function buildPlan(records) {

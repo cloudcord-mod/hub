@@ -80,6 +80,7 @@ import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catal
 import plugin_catalog_hide_apps_button from "../../../../examples/cx/catalog/plugins/hide-apps-button.cx";
 import plugin_catalog_hide_avatar_decorations from "../../../../examples/cx/catalog/plugins/hide-avatar-decorations.cx";
 import plugin_catalog_hide_badges from "../../../../examples/cx/catalog/plugins/hide-badges.cx";
+import plugin_catalog_hide_blocked_and_ignored_messages from "../../../../examples/cx/catalog/plugins/hide-blocked-and-ignored-messages.cx";
 import plugin_catalog_hide_boost_goal from "../../../../examples/cx/catalog/plugins/hide-boost-goal.cx";
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
@@ -447,6 +448,7 @@ export const cxCatalog = {
         { name: "HideAppsButton", source: plugin_catalog_hide_apps_button },
         { name: "HideAvatarDecorations", source: plugin_catalog_hide_avatar_decorations },
         { name: "HideBadges", source: plugin_catalog_hide_badges },
+        { name: "HideBlockedAndIgnoredMessages", source: plugin_catalog_hide_blocked_and_ignored_messages },
         { name: "HideBoostGoal", source: plugin_catalog_hide_boost_goal },
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons },

@@ -2323,6 +2323,21 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(incomingHooks.length, 0);
         }
 
+        const blockedRepliesPort = cxCatalog.plugins.find(entry => entry.name === "HideBlockedAndIgnoredMessages").source;
+        assert.throws(() => parseCx(blockedRepliesPort.replace("blocked,ignored,replies", "replies")), /optional replies/);
+        selectCatalog("HideBlockedAndIgnoredMessages");
+        click(render(), "Allow for this session");
+        const [filterBlockedReplies] = incomingHooks;
+        const replyTo = id => ({ author: { id: guildId }, referenced_message: { author: { id } } });
+        assert.equal(filterBlockedReplies({ type: "MESSAGE_CREATE", message: replyTo(sender) }), desktop ? true : false);
+        assert.equal(filterBlockedReplies({ type: "MESSAGE_UPDATE", message: replyTo(other) }), desktop ? true : false);
+        assert.equal(filterBlockedReplies({ type: "MESSAGE_CREATE", optimistic: true, message: replyTo(sender) }), undefined);
+        const visibleReply = replyTo(me);
+        const replyHistory = { type: "LOAD_MESSAGES_SUCCESS", messages: [replyTo(sender), replyTo(other), visibleReply] };
+        assert.deepEqual(Array.from((filterBlockedReplies(replyHistory) ?? replyHistory).messages), [visibleReply]);
+        click(render(), "Disable HideBlockedAndIgnoredMessages");
+        assert.equal(filterBlockedReplies({ type: "MESSAGE_CREATE", message: replyTo(sender) }), undefined);
+
         const systemPort = cxCatalog.plugins.find(entry => entry.name === "HideSystemMessages").source;
         assert.throws(() => parseCx(systemPort.replace("pins,joins,boosts", "pins,moderation")), /Choose pins, joins, or boosts/);
         selectCatalog("HideSystemMessages");

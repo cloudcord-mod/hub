@@ -96,6 +96,9 @@ assert.throws(() => buildCatalog(new Map([["auto-silent-message.cx", silentMessa
     /Duplicate CX plugin behavior.*(?:AutoSilentMessage|SilentMessageToggle)/);
 
 const records = scan(undefined, { includeCompanions: true });
+const reactionAlias = records.find(record => record.name === "HideReactionsBar" && record.cx);
+assert.equal(reactionAlias?.status, "in-catalog");
+assert.equal(reactionAlias.catalogAlias, "HideReactions");
 assert.equal(records.find(record => record.name === "CCPCharacterCounter")?.status, "in-catalog");
 const folders = records.find(record => record.name === "BetterFolders");
 assert.equal(folders.status, "needs-adapter");

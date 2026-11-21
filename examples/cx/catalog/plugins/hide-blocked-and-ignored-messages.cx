@@ -1,0 +1,3 @@
+plugin "HideBlockedAndIgnoredMessages":
+  needs messages.filterlocal
+  on incoming hide-blocked "blocked,ignored,replies"
