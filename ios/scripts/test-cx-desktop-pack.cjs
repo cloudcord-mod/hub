@@ -47,7 +47,14 @@ globalThis.document = {
     documentElement: {}, head, addEventListener() {}, removeEventListener() {},
     getElementById(id) { return [...styles].find(element => element.id === id) ?? null; },
     createElement(tag) {
-        const element = { style: { transform: "", transition: "" }, remove() { head.removeChild(element); } };
+        const attributes = new Map();
+        const element = {
+            style: { transform: "", transition: "" },
+            get isConnected() { return styles.has(element); },
+            setAttribute(name, value) { attributes.set(name, String(value)); },
+            getAttribute(name) { return attributes.get(name) ?? null; },
+            remove() { head.removeChild(element); },
+        };
         if (tag === "canvas") element.getContext = kind => kind === "2d" ? { canvas: element } : null;
         return element;
     },
@@ -76,8 +83,9 @@ const webpack = ${loadModule("webpack.js")}(() => logger);
 const cloudcord = window.CloudCord = {
     webpack, discord: { React: react, Dispatcher: dispatcher, store() {} },
     settings: { getData: (_key, fallback) => fallback, setData() {} },
+    settingsPage: { registerSettingsPage: subscribe },
     menus: { Menu: { types: () => ({}) }, addMenuHook: subscribe },
-    messages: { onBeforeSend: subscribe },
+    messages: { onBeforeSend: subscribe, onBeforeEdit: subscribe, onMessageClick: subscribe },
 };
 const scripts = ${loadModule("scripts.js")}(name => name === "./webpack.js" ? webpack : logger);
 const fixture = (operation, ...args) => JSON.parse(cxFixture(operation, JSON.stringify(args)));
@@ -206,7 +214,7 @@ async function main() {
         const runtime = engine.newRuntime();
         runtime.setMemoryLimit(64 * 1024 * 1024);
         runtime.setMaxStackSize(768 * 1024);
-        let deadline = Date.now() + 250;
+        let deadline = Date.now() + 1_000;
         runtime.setInterruptHandler(() => Date.now() > deadline);
         const context = runtime.newContext();
         try {
@@ -214,8 +222,18 @@ async function main() {
                 context.newString(JSON.stringify(runFixture(context.getString(operation), context.getString(data))) ?? "null"));
             context.setProp(context.global, "cxFixture", hook);
             hook.dispose();
-            const checked = context.evalCode(`${bootstrap}
-const rec = scripts.loadScript(${JSON.stringify(entry.id)}, ${JSON.stringify(code)}, { patches: false });
+            const setup = context.evalCode(bootstrap, "cx-pack-setup.js");
+            if (setup.error) {
+                try {
+                    const error = context.dump(setup.error);
+                    throw new Error("Desktop test host setup failed: " + (error.stack || error.message || String(error)));
+                } finally {
+                    setup.error.dispose();
+                }
+            }
+            setup.value.dispose();
+            deadline = Date.now() + 250;
+            const checked = context.evalCode(`const rec = scripts.loadScript(${JSON.stringify(entry.id)}, ${JSON.stringify(code)}, { patches: false });
 const patches = rec.plugin?.patches ?? [];
 const textTargets = patches.map(patch => patch.find).filter(target => typeof target === "string" && target.length <= 4096);
 const settingsFields = [...new Set([...Object.keys(rec.def?.settings?.def ?? {}), ...Object.keys(rec.def?.options ?? {})])];
