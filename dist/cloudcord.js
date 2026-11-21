@@ -25061,18 +25061,38 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }, 250);
   }
+  function recordSharedProfileFetch(id, now) {
+    sharedProfileFetchedAt.delete(id);
+    sharedProfileFetchedAt.set(id, now);
+    for (var candidate of sharedProfileFetchedAt.keys()) {
+      if (sharedProfileFetchedAt.size <= SHARED_PROFILE_CACHE_LIMIT)
+        break;
+      if (sharedRequests.has(candidate))
+        continue;
+      sharedProfileFetchedAt.delete(candidate);
+      sharedProfiles.delete(candidate);
+    }
+  }
   function requestSharedProfile(userId, force = false) {
     var id = String(userId || "");
-    if (!force)
-      sharedProfileSeenAt.set(id, Date.now());
+    if (import_react_native28.AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId)
+      return false;
+    var now = Date.now();
+    var seenAt = sharedProfileSeenAt.get(id);
+    if (!force && (seenAt === void 0 || now - seenAt >= 5e3)) {
+      sharedProfileSeenAt.delete(id);
+      sharedProfileSeenAt.set(id, now);
+      if (sharedProfileSeenAt.size > SHARED_RECENT_PROFILE_LIMIT)
+        sharedProfileSeenAt.delete(sharedProfileSeenAt.keys().next().value);
+    }
     var fetchedAt = sharedProfileFetchedAt.get(id) || 0;
     var cached = sharedProfiles.get(id);
     var ttl = cached && !Object.keys(cached).length ? force ? 6e4 : 15 * 6e4 : force ? 3e4 : 2 * 6e4;
-    if (import_react_native28.AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId || sharedRequests.has(id) || Date.now() - fetchedAt < ttl || sharedRequests.size >= 4)
-      return;
+    if (sharedRequests.has(id) || now - fetchedAt < ttl || sharedRequests.size >= 4)
+      return false;
     sharedRequests.add(id);
-    sharedProfileFetchedAt.set(id, Date.now());
-    void fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(id)}?v=${Date.now()}`, {
+    recordSharedProfileFetch(id, now);
+    void fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(id)}?v=${now}`, {
       cache: "no-store"
     }).then((response) => {
       if (response.ok)
@@ -25086,7 +25106,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       var previous = sharedProfiles.get(id);
       var changed = JSON.stringify(previous ?? {}) !== JSON.stringify(next);
       sharedProfiles.set(id, next);
-      sharedProfileFetchedAt.set(id, Date.now());
+      recordSharedProfileFetch(id, Date.now());
       if (!changed)
         return;
       try {
@@ -25096,6 +25116,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       queueSharedRenderRefresh();
     }).catch(() => {
     }).finally(() => sharedRequests.delete(id));
+    return true;
   }
   function isRealProfileView(id) {
     return Array.isArray(rootSettings.cloudcordRealProfileUsers) && rootSettings.cloudcordRealProfileUsers.includes(id);
@@ -25245,10 +25266,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         sharedProfileSeenAt.delete(id);
         continue;
       }
-      if (now - (sharedProfileFetchedAt.get(id) || 0) < 3e4)
-        continue;
-      requestSharedProfile(id, true);
-      if (--budget === 0)
+      if (requestSharedProfile(id, true) && --budget === 0)
         break;
     }
   }
@@ -33357,7 +33375,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -34061,6 +34079,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       mediaSelections = /* @__PURE__ */ new Map();
       REPLACE_BADGES_SYNC_ID = "__cc_replace_real_badges";
       sharedProfileSeenAt = /* @__PURE__ */ new Map();
+      SHARED_RECENT_PROFILE_LIMIT = 256;
+      SHARED_PROFILE_CACHE_LIMIT = 512;
       sharedRenderTimer = null;
       realProfileMenuConnected = false;
       checkingPrivacy = false;
@@ -60172,7 +60192,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fff7a93bdc4b2c4e789ea0787928a634e1051a1d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f1a6e8c3afd7c90adb8d0f3ee5a9113bec05b15f";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
