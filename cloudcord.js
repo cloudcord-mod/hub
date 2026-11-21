@@ -45605,6 +45605,26 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
   }
+  function endOfJsonValue(tokens2, start) {
+    if (tokens2[start] !== "{" && tokens2[start] !== "[")
+      return start + 1;
+    var depth = 1;
+    var end = start + 1;
+    for (; depth > 0; end++) {
+      var token = tokens2[end];
+      if (token === "{" || token === "[")
+        depth++;
+      if (token === "}" || token === "]")
+        depth--;
+    }
+    return end;
+  }
+  function fileSizeUnits(base, labels) {
+    return new Map(labels.map((label2, exponent) => [
+      label2,
+      base ** exponent
+    ]));
+  }
   function markdownTable(rows) {
     var columns = rows[0]?.length ?? 0;
     if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
@@ -45648,7 +45668,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     } catch (e) {
     }
   }
-  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, base64Alphabet, dayMilliseconds, durationUnits, cxCommandFunctions;
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, base64Alphabet, dayMilliseconds, durationUnits, decimalFileUnits, binaryFileUnits, displayNumber, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
       "use strict";
@@ -45788,6 +45808,23 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           1
         ]
       ]);
+      decimalFileUnits = fileSizeUnits(1e3, [
+        "B",
+        "kB",
+        "MB",
+        "GB",
+        "TB",
+        "PB"
+      ]);
+      binaryFileUnits = fileSizeUnits(1024, [
+        "B",
+        "KiB",
+        "MiB",
+        "GiB",
+        "TiB",
+        "PiB"
+      ]);
+      displayNumber = (value) => String(Number(value.toPrecision(12)));
       cxCommandFunctions = {
         snowflakeTimestamp(input) {
           var text = input.trim();
@@ -45893,6 +45930,121 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           } catch (e) {
             return "Invalid JSON.";
           }
+        },
+        jsonPointer(text, path) {
+          var tokens2 = jsonTokens(text);
+          if (!tokens2)
+            return "Invalid JSON.";
+          if (path && (!path.startsWith("/") || /~(?![01])/.test(path)))
+            return "Use a JSON pointer such as /items/0. Escape / as ~1 and ~ as ~0.";
+          var start = 0;
+          for (var part of path ? path.slice(1).split("/") : []) {
+            var key = part.replaceAll("~1", "/").replaceAll("~0", "~");
+            var container = tokens2[start];
+            var match = void 0;
+            if (container === "{" || container === "[") {
+              var end = endOfJsonValue(tokens2, start) - 1;
+              var position = start + 1;
+              for (var index = 0; position < end; index++) {
+                var name = container === "{" ? JSON.parse(tokens2[position]) : String(index);
+                var valuePosition = container === "{" ? position + 2 : position;
+                if (name === key)
+                  match = valuePosition;
+                position = endOfJsonValue(tokens2, valuePosition) + 1;
+              }
+            }
+            if (match === void 0)
+              return "That JSON pointer does not exist.";
+            start = match;
+          }
+          var value = tokens2.slice(start, endOfJsonValue(tokens2, start)).join("").replaceAll("`", "\\u0060");
+          return value.length <= 3900 ? codeFence + "json\n" + value + "\n" + codeFence : "The selected value is too long for one reply.";
+        },
+        duplicateLines(text) {
+          var counts = /* @__PURE__ */ new Map();
+          for (var line of text.split(/\r\n|\r|\n/)) {
+            if (line.trim())
+              counts.set(line, (counts.get(line) ?? 0) + 1);
+          }
+          var results = [
+            ...counts
+          ].filter(([, count]) => count > 1).map(([line2, count]) => count + " \xD7 " + line2).join("\n").replace(/`(?=``)/g, "`\u200B");
+          if (!results)
+            return "No duplicate nonempty lines.";
+          return results.length <= 3900 ? codeFence + "\n" + results + "\n" + codeFence : "The duplicate list is too long for one reply.";
+        },
+        summarizeNumbers(text) {
+          var tokens2 = text.trim().split(/\s*,\s*|\s+/);
+          if (tokens2.length > 128 || tokens2.some((token) => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(token)))
+            return;
+          var values = tokens2.map(Number).sort((left, right) => left - right);
+          if (values.some((value) => Math.abs(value) > Number.MAX_SAFE_INTEGER))
+            return;
+          var count = values.length;
+          var middle = Math.floor(count / 2);
+          var sum = values.reduce((total, value) => total + value, 0);
+          var median = count % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
+          return [
+            "Count " + count,
+            "Sum " + displayNumber(sum),
+            "Mean " + displayNumber(sum / count),
+            "Median " + displayNumber(median),
+            "Min " + displayNumber(values[0]),
+            "Max " + displayNumber(values[count - 1])
+          ].join(" \xB7 ");
+        },
+        convertFileSize(text) {
+          var match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
+          if (!match)
+            return;
+          var inputUnit = match[2] === "KB" ? "kB" : match[2];
+          var bytes = Number(match[1]) * (decimalFileUnits.get(inputUnit) ?? binaryFileUnits.get(inputUnit));
+          if (!Number.isFinite(bytes) || bytes > Number.MAX_SAFE_INTEGER)
+            return;
+          var format = (units2) => {
+            var [unit, divisor] = [
+              ...units2
+            ].reverse().find(([, scale]) => scale <= bytes) ?? [
+              "B",
+              1
+            ];
+            return displayNumber(bytes / divisor) + " " + unit;
+          };
+          return [
+            String(bytes) + " B",
+            format(decimalFileUnits),
+            format(binaryFileUnits)
+          ].filter((entry, index, values) => values.indexOf(entry) === index).join(" \xB7 ");
+        },
+        extractDiscordMentions(text) {
+          var mentions = /* @__PURE__ */ new Map();
+          for (var [, prefix2, id] of text.matchAll(/<(@!|@&|@|#)([1-9]\d{14,21})>/g)) {
+            var kind = prefix2 === "@&" ? "Role" : prefix2 === "#" ? "Channel" : "User";
+            mentions.set(kind + id, kind + " `" + id + "`");
+          }
+          if (!mentions.size)
+            return "No Discord user, role, or channel mentions found.";
+          var output = [
+            ...mentions.values()
+          ].join("\n");
+          return output.length <= 3900 ? output : "The mention list is too long for one reply.";
+        },
+        percentChange(before3, after2) {
+          var values = [
+            before3.trim(),
+            after2.trim()
+          ];
+          if (values.some((value) => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)))
+            return;
+          var [original, updated] = values.map(Number);
+          if (!Number.isFinite(original) || !Number.isFinite(updated))
+            return;
+          if (!original)
+            return "Percentage change from zero is undefined.";
+          var change = (updated - original) / Math.abs(original) * 100;
+          if (!Number.isFinite(change))
+            return;
+          return (change > 0 ? "+" : "") + displayNumber(change) + "%";
         },
         commonLines(first, second) {
           var otherLines = new Set(second.split(/\r\n|\r|\n/));
@@ -52364,6 +52516,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/duplicate-lines.cx
+  var duplicate_lines_default;
+  var init_duplicate_lines = __esm({
+    "../examples/cx/catalog/plugins/duplicate-lines.cx"() {
+      duplicate_lines_default = 'plugin "Duplicate Lines":\n  needs commands.register\n  needs reply.local\n  on command "duplicatelines" with text:\n    reply "${duplicateLines(text)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/duration-converter.cx
   var duration_converter_default;
   var init_duration_converter = __esm({
@@ -52413,6 +52573,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_eridan_typing_quirk = __esm({
     "../examples/cx/catalog/plugins/eridan-typing-quirk.cx"() {
       eridan_typing_quirk_default = 'plugin "EridanTypingQuirk":\n  needs messages.transform\n  before send rewrite-text:\n    replace ["v"] with "vv"\n    replace ["w"] with "ww"\n    replace ["V"] with "VV"\n    replace ["W"] with "WW"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/extract-mentions.cx
+  var extract_mentions_default;
+  var init_extract_mentions = __esm({
+    "../examples/cx/catalog/plugins/extract-mentions.cx"() {
+      extract_mentions_default = 'plugin "Extract Mentions":\n  needs commands.register\n  needs reply.local\n  on command "extractmentions" with text:\n    reply "${extractDiscordMentions(text)}"\n';
     }
   });
 
@@ -52608,6 +52776,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_file_name_randomization = __esm({
     "../examples/cx/catalog/plugins/file-name-randomization.cx"() {
       file_name_randomization_default = 'plugin "FileNameRandomization":\n  needs uploads.rename\n  before upload anonymise format "{random}" random 10 manual\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/file-size-converter.cx
+  var file_size_converter_default;
+  var init_file_size_converter = __esm({
+    "../examples/cx/catalog/plugins/file-size-converter.cx"() {
+      file_size_converter_default = 'plugin "File Size Converter":\n  needs commands.register\n  needs reply.local\n  on command "convertfilesize" with text:\n    reply "${convertFileSize(text)}" else "Enter bytes or a size such as 1.5 MiB or 250 MB."\n';
     }
   });
 
@@ -53495,6 +53671,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/json-pointer.cx
+  var json_pointer_default;
+  var init_json_pointer = __esm({
+    "../examples/cx/catalog/plugins/json-pointer.cx"() {
+      json_pointer_default = 'plugin "JSON Pointer":\n  needs commands.register\n  needs reply.local\n  on command "jsonpointer":\n    input "document" text\n    input "path" text optional\n    reply "${jsonPointer(document, path)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/jump-to-top.cx
   var jump_to_top_default;
   var init_jump_to_top = __esm({
@@ -54007,11 +54191,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/number-summary.cx
+  var number_summary_default;
+  var init_number_summary = __esm({
+    "../examples/cx/catalog/plugins/number-summary.cx"() {
+      number_summary_default = 'plugin "Number Summary":\n  needs commands.register\n  needs reply.local\n  on command "numberstats" with text:\n    reply "${summarizeNumbers(text)}" else "Enter up to 128 decimal numbers separated by commas or spaces."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/open-steam-links-in-app.cx
   var open_steam_links_in_app_default;
   var init_open_steam_links_in_app = __esm({
     "../examples/cx/catalog/plugins/open-steam-links-in-app.cx"() {
       open_steam_links_in_app_default = 'plugin "OpenSteamLinksInApp":\n  needs links.steam\n  use open-steam-links\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/percentage-change.cx
+  var percentage_change_default;
+  var init_percentage_change = __esm({
+    "../examples/cx/catalog/plugins/percentage-change.cx"() {
+      percentage_change_default = 'plugin "Percentage Change":\n  needs commands.register\n  needs reply.local\n  on command "percentchange":\n    input "before" text\n    input "after" text\n    reply "${percentChange(before, after)}" else "Enter two decimal numbers."\n';
     }
   });
 
@@ -55651,14 +55851,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_dont_round_my_timestamps();
       init_double_click_edit();
       init_double_click_to_reply();
+      init_duplicate_lines();
       init_duration_converter();
       init_embedded_urls();
       init_encode_base64();
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
+      init_extract_mentions();
       init_fake_profile_themes();
       init_feferi_typing_quirk();
       init_file_name_randomization();
+      init_file_size_converter();
       init_fix_codeblock_gap();
       init_fix_file_extensions();
       init_fix_images_quality();
@@ -55769,6 +55972,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_json_compact();
       init_json_format();
       init_json_keys();
+      init_json_pointer();
       init_jump_to_top();
       init_jump_to();
       init_keyword_notify();
@@ -55812,7 +56016,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_notify_when_muted();
       init_number_base_converter();
       init_number_lines();
+      init_number_summary();
       init_open_steam_links_in_app();
+      init_percentage_change();
       init_ping_notifications();
       init_plain_folder_icon();
       init_polish_wording();
@@ -56739,6 +56945,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Duplicate Lines",
+            source: duplicate_lines_default,
+            description: "/duplicatelines",
+            commands: [
+              "duplicatelines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "10cad05d5a25d1c1c69f4f7df88993efd796f408992bdcef7b2140223400501e"
+          },
+          {
             name: "Duration Converter",
             source: duration_converter_default,
             description: "/convertduration",
@@ -56788,6 +57006,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Extract Mentions",
+            source: extract_mentions_default,
+            description: "/extractmentions",
+            commands: [
+              "extractmentions"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "3ec2a4e37763a849937c21c6d3e06749f3edf63ef132424ff41d0a51f1ebec14"
+          },
+          {
             name: "FakeProfileThemes",
             source: fake_profile_themes_default,
             description: "Show colors encoded in bios when the profile has no native theme",
@@ -56814,6 +57044,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Media"
             ]
+          },
+          {
+            name: "File Size Converter",
+            source: file_size_converter_default,
+            description: "/convertfilesize",
+            commands: [
+              "convertfilesize"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7"
           },
           {
             name: "FixCodeblockGap",
@@ -57831,6 +58073,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d"
           },
           {
+            name: "JSON Pointer",
+            source: json_pointer_default,
+            description: "/jsonpointer",
+            commands: [
+              "jsonpointer"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "cce9a34c37c39761ba736fcf2101312f25ca0cf5cdbf8a20a16f8db085f6d900"
+          },
+          {
             name: "JumpToTop",
             source: jump_to_top_default,
             description: "Add a channel header button to jump to the first message",
@@ -58263,12 +58517,36 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da"
           },
           {
+            name: "Number Summary",
+            source: number_summary_default,
+            description: "/numberstats",
+            commands: [
+              "numberstats"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb"
+          },
+          {
             name: "OpenSteamLinksInApp",
             source: open_steam_links_in_app_default,
             description: "Send clicked Steam links to the Steam app",
             categories: [
               "Media"
             ]
+          },
+          {
+            name: "Percentage Change",
+            source: percentage_change_default,
+            description: "/percentchange",
+            commands: [
+              "percentchange"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e"
           },
           {
             name: "PingNotifications",
@@ -64554,7 +64832,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8a335c29f6f5e547e539ad70ac4c63c0c4c9fa20";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "543b9159f4388d2190db62561c3524f7e7c5ad99";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
