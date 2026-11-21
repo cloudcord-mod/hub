@@ -1,0 +1,49 @@
+name: Announce CloudCord update
+
+on:
+  workflow_run:
+    workflows: ["CloudCord Desktop", "Build CloudCord Runtime"]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Publication to preview
+        type: choice
+        options: [desktop, mobile]
+        default: desktop
+
+permissions:
+  contents: read
+
+jobs:
+  announce:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.head_repository.full_name == github.repository &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.run_attempt == 1)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify the publication and prepare the Discord update
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_PLATFORM: ${{ inputs.platform || (github.event.workflow_run.name == 'CloudCord Desktop' && 'desktop' || 'mobile') }}
+          RELEASE_SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_UPDATE_CHANNEL_ID: ${{ vars.DISCORD_UPDATE_CHANNEL_ID }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            node .github/scripts/announce-update.mjs --dry-run
+          else
+            node .github/scripts/announce-update.mjs
+          fi
