@@ -36422,7880 +36422,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
-  // src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts
-  var usePluginCardStyles;
-  var init_usePluginCardStyles = __esm({
-    "src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_common();
-      init_styles();
-      usePluginCardStyles = createStyles({
-        smallIcon: {
-          tintColor: tokens.colors.LOGO_PRIMARY,
-          height: 18,
-          width: 18
-        },
-        badgeIcon: {
-          tintColor: tokens.colors.LOGO_PRIMARY,
-          height: 12,
-          width: 12
-        },
-        badgesContainer: {
-          flexWrap: "wrap",
-          flexDirection: "row",
-          gap: 6,
-          borderRadius: 6,
-          padding: 4
-        }
-      });
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/components/PluginCard.tsx
-  function getHighlightColor() {
-    return (0, import_chroma_js4.default)(tokens.unsafe_rawColors.YELLOW_300).alpha(0.3).hex();
-  }
-  function Title() {
-    var styles2 = usePluginCardStyles();
-    var { plugin: plugin2, result } = useCardContext();
-    var highlightedNode = result[0].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
-      style: {
-        backgroundColor: getHighlightColor()
-      },
-      children: m2
-    }, i));
-    var icon3 = plugin2.icon && findAssetId(plugin2.icon);
-    var textNode = /* @__PURE__ */ jsx(Text, {
-      numberOfLines: 1,
-      variant: "heading-lg/semibold",
-      children: highlightedNode.length ? highlightedNode : plugin2.name
-    });
-    return /* @__PURE__ */ jsxs(import_react_native32.View, {
-      style: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6
-      },
-      children: [
-        icon3 && /* @__PURE__ */ jsx(import_react_native32.Image, {
-          style: styles2.smallIcon,
-          source: icon3
-        }),
-        textNode
-      ]
-    });
-  }
-  function Authors() {
-    var { plugin: plugin2, result } = useCardContext();
-    var styles2 = usePluginCardStyles();
-    if (!plugin2.authors)
-      return null;
-    var highlightedNode = result[2].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
-      style: {
-        backgroundColor: getHighlightColor()
-      },
-      children: m2
-    }, i));
-    var badges = plugin2.getBadges();
-    var authorText = highlightedNode.length > 0 ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
-    return /* @__PURE__ */ jsxs(import_react_native32.View, {
-      style: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        flexShrink: 1,
-        gap: 4
-      },
-      children: [
-        /* @__PURE__ */ jsxs(Text, {
-          variant: "text-sm/semibold",
-          color: "text-muted",
-          children: [
-            "by ",
-            authorText
-          ]
-        }),
-        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native32.View, {
-          style: styles2.badgesContainer,
-          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native32.Image, {
-            source: b3.source,
-            style: styles2.badgeIcon
-          }, i))
-        })
-      ]
-    });
-  }
-  function Description() {
-    var { plugin: plugin2, result } = useCardContext();
-    var highlightedNode = result[1].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
-      style: {
-        backgroundColor: getHighlightColor()
-      },
-      children: m2
-    }, i));
-    return /* @__PURE__ */ jsx(Text, {
-      variant: "text-md/medium",
-      children: highlightedNode.length ? highlightedNode : plugin2.description
-    });
-  }
-  function PluginCard({ result, item: plugin2 }) {
-    plugin2.usePluginState();
-    var [toggling, setToggling] = (0, import_react12.useState)(false);
-    var cardContextValue = (0, import_react12.useMemo)(() => ({
-      plugin: plugin2,
-      result
-    }), [
-      plugin2,
-      result
-    ]);
-    var core = isCorePlugin(plugin2.id);
-    return /* @__PURE__ */ jsx(CardContext.Provider, {
-      value: cardContextValue,
-      children: /* @__PURE__ */ jsx(Card, {
-        children: /* @__PURE__ */ jsxs(Stack, {
-          spacing: 16,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native32.View, {
-              style: {
-                flexDirection: "row",
-                justifyContent: "space-between"
-              },
-              children: [
-                /* @__PURE__ */ jsxs(import_react_native32.View, {
-                  style: {
-                    flexShrink: 1
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx(Title, {}),
-                    /* @__PURE__ */ jsx(Authors, {})
-                  ]
-                }),
-                /* @__PURE__ */ jsx(import_react_native32.View, {
-                  children: /* @__PURE__ */ jsxs(Stack, {
-                    spacing: 12,
-                    direction: "horizontal",
-                    children: [
-                      /* @__PURE__ */ jsx(Actions, {}),
-                      /* @__PURE__ */ jsx(import_react_native32.View, {
-                        style: core ? {
-                          opacity: 0.5
-                        } : void 0,
-                        children: /* @__PURE__ */ jsx(TableSwitch, {
-                          value: core ? true : plugin2.isEnabled(),
-                          disabled: core || toggling,
-                          onValueChange: (v2) => _async_to_generator(function* () {
-                            if (!core) {
-                              setToggling(true);
-                              try {
-                                yield plugin2.toggle(v2);
-                              } catch (error) {
-                                showToast(error instanceof Error ? error.message : String(error), findAssetId("CircleXIcon-primary"));
-                              } finally {
-                                setToggling(false);
-                              }
-                            }
-                          })()
-                        })
-                      })
-                    ]
-                  })
-                })
-              ]
-            }),
-            /* @__PURE__ */ jsx(Description, {})
-          ]
-        })
-      })
-    });
-  }
-  var import_chroma_js4, import_react12, import_react_native32, CardContext, useCardContext, Actions;
-  var init_PluginCard = __esm({
-    "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_usePluginCardStyles();
-      init_assets();
-      init_toasts();
-      init_common();
-      init_components();
-      init_sheets();
-      import_chroma_js4 = __toESM(require_chroma());
-      import_react12 = __toESM(require_react());
-      import_react_native32 = __toESM(require_react_native());
-      init_plugins4();
-      CardContext = /* @__PURE__ */ (0, import_react12.createContext)(null);
-      useCardContext = () => (0, import_react12.useContext)(CardContext);
-      Actions = () => {
-        var { plugin: plugin2 } = useCardContext();
-        var navigation2 = NavigationNative.useNavigation();
-        return /* @__PURE__ */ jsxs(import_react_native32.View, {
-          style: {
-            flexDirection: "row",
-            gap: 6
-          },
-          children: [
-            /* @__PURE__ */ jsx(IconButton, {
-              size: "sm",
-              variant: "secondary",
-              icon: findAssetId("WrenchIcon"),
-              disabled: !plugin2.getPluginSettingsComponent(),
-              onPress: () => navigation2.push("PUPU_CUSTOM_PAGE", {
-                title: plugin2.name,
-                render: plugin2.getPluginSettingsComponent()
-              })
-            }),
-            /* @__PURE__ */ jsx(IconButton, {
-              size: "sm",
-              variant: "secondary",
-              icon: findAssetId("CircleInformationIcon-primary"),
-              onPress: () => void showSheet("PluginInfoActionSheet", plugin2.resolveSheetComponent(), {
-                plugin: plugin2,
-                navigation: navigation2
-              })
-            })
-          ]
-        });
-      };
-    }
-  });
-
-  // src/metro/common/stores.ts
-  var UserStore2;
-  var init_stores = __esm({
-    "src/metro/common/stores.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_wrappers();
-      UserStore2 = findByStoreNameLazy("UserStore");
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx
-  function TitleComponent({ plugin: plugin2 }) {
-    var users = FluxUtils.useStateFromStoresArray([
-      UserStore2
-    ], () => {
-      plugin2.authors?.forEach((a) => a.id && maybeFetchUser(a.id));
-      return plugin2.authors?.map((a) => UserStore2.getUser(a.id));
-    });
-    var { authors } = plugin2;
-    var authorTextNode = [];
-    if (authors) {
-      var _loop2 = function(author2) {
-        authorTextNode.push(/* @__PURE__ */ jsx(Text, {
-          onPress: () => showUserProfileActionSheet({
-            userId: author2.id
-          }),
-          variant: "text-md/medium",
-          children: author2.name
-        }));
-        authorTextNode.push(", ");
-      };
-      for (var author of authors)
-        _loop2(author);
-      authorTextNode.pop();
-    }
-    return /* @__PURE__ */ jsxs(import_react_native33.View, {
-      style: {
-        gap: 4
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native33.View, {
-          children: /* @__PURE__ */ jsx(Text, {
-            variant: "heading-xl/semibold",
-            children: plugin2.name
-          })
-        }),
-        /* @__PURE__ */ jsx(import_react_native33.View, {
-          style: {
-            flexDirection: "row",
-            flexShrink: 1
-          },
-          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native33.View, {
-            style: {
-              flexDirection: "row",
-              gap: 8,
-              alignItems: "center",
-              paddingVertical: 4,
-              paddingHorizontal: 8,
-              backgroundColor: "#00000016",
-              borderRadius: 32
-            },
-            children: [
-              users.length && /* @__PURE__ */ jsx(AvatarPile, {
-                size: "xxsmall",
-                names: plugin2.authors?.map((a) => a.name),
-                totalCount: plugin2.authors?.length,
-                children: users.map((a) => /* @__PURE__ */ jsx(Avatar, {
-                  size: "xxsmall",
-                  user: a
-                }))
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/medium",
-                children: authorTextNode
-              })
-            ]
-          })
-        })
-      ]
-    });
-  }
-  var import_react_native33, showUserProfileActionSheet, maybeFetchUser;
-  var init_TitleComponent = __esm({
-    "src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_lazy();
-      init_metro();
-      init_common();
-      init_components();
-      init_stores();
-      import_react_native33 = __toESM(require_react_native());
-      showUserProfileActionSheet = findByNameLazy("showUserProfileActionSheet");
-      ({ getUser: maybeFetchUser } = lazyDestructure(() => findByProps("getUser", "fetchProfile")));
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx
-  var PluginInfoActionSheet_exports = {};
-  __export(PluginInfoActionSheet_exports, {
-    default: () => PluginInfoActionSheet
-  });
-  function PluginInfoIconButton(props) {
-    var { onPress } = props;
-    props.onPress &&= () => {
-      hideSheet("PluginInfoActionSheet");
-      onPress?.();
-    };
-    return /* @__PURE__ */ jsx(IconButton, {
-      ...props
-    });
-  }
-  function PluginInfoActionSheet({ plugin: plugin2, navigation: navigation2 }) {
-    plugin2.usePluginState();
-    var [loading, setLoading] = (0, import_react13.useState)(false);
-    var isVendettaPlugin = plugin2.id.includes("/");
-    var isCorePlugin2 = plugin2.id.startsWith("bunny.") || plugin2.id.startsWith("vendetta.");
-    var copyPluginUrl = () => {
-      var url2 = plugin2.id;
-      if (isVendettaPlugin) {
-        url2 = plugin2.id;
-      } else {
-        try {
-          var pluginAny = plugin2;
-          var repoUrl = (
-            //@ts-expect-error
-            pluginAny._manifest?.parentRepository || //@ts-expect-error
-            pluginAny.manifest?.parentRepository
-          );
-          url2 = repoUrl ? `${repoUrl}/builds/${plugin2.id}` : plugin2.id;
-        } catch (e) {
-          url2 = plugin2.id;
-        }
-      }
-      clipboard.setString(url2);
-      showToast("Copied to clipboard!", findAssetId("toast_copy_link"));
-    };
-    var refetchPlugin = () => _async_to_generator(function* () {
-      setLoading(true);
-      try {
-        if (isVendettaPlugin) {
-          var vdPlugin = VdPluginManager.plugins[plugin2.id];
-          if (vdPlugin.enabled)
-            VdPluginManager.stopPlugin(plugin2.id, false);
-          yield VdPluginManager.fetchPlugin(plugin2.id);
-          if (vdPlugin.enabled)
-            yield VdPluginManager.startPlugin(plugin2.id);
-          showToast("Plugin refreshed successfully");
-        } else {
-          showToast("Plugin refreshed successfully");
-        }
-      } catch (e) {
-        showToast("Failed to refresh plugin");
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var clearPluginData = () => {
-      showConfirmationAlert({
-        title: "Clear Data",
-        content: "Are you sure you want to clear all data for this plugin? This action cannot be undone.",
-        confirmText: "Clear",
-        confirmColor: "red",
-        cancelText: "Cancel",
-        onConfirm: () => _async_to_generator(function* () {
-          hideSheet("PluginInfoActionSheet");
-          try {
-            if (isVendettaPlugin) {
-              var vdPlugin = VdPluginManager.plugins[plugin2.id];
-              if (vdPlugin.enabled)
-                VdPluginManager.stopPlugin(plugin2.id, false);
-              yield purgeStorage(plugin2.id);
-              if (vdPlugin.enabled)
-                yield VdPluginManager.startPlugin(plugin2.id);
-            } else {
-              yield purgeStorage2(`plugins/storage/${plugin2.id}.json`);
-            }
-            showToast("Plugin data cleared successfully");
-          } catch (e) {
-            showToast("Failed to clear plugin data");
-          }
-        })()
-      });
-    };
-    var uninstallPluginHandler = () => {
-      if (isCorePlugin2) {
-        showToast("Core plugins cannot be uninstalled");
-        return;
-      }
-      showConfirmationAlert({
-        title: "Uninstall Plugin",
-        content: "Are you sure you want to uninstall this plugin? This action cannot be undone.",
-        confirmText: "Uninstall",
-        confirmColor: "red",
-        cancelText: "Cancel",
-        onConfirm: () => _async_to_generator(function* () {
-          hideSheet("PluginInfoActionSheet");
-          try {
-            if (isVendettaPlugin) {
-              yield VdPluginManager.removePlugin(plugin2.id);
-            } else {
-            }
-            showToast("Plugin uninstalled successfully");
-          } catch (e) {
-            showToast(`Failed to uninstall plugin: ${e instanceof Error ? e.message : String(e)}`);
-          }
-        })()
-      });
-    };
-    return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native34.ScrollView, {
-        contentContainerStyle: {
-          gap: 12,
-          marginBottom: 12
-        },
-        children: [
-          /* @__PURE__ */ jsx(import_react_native34.View, {
-            style: {
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              paddingVertical: 24,
-              justifyContent: "space-between",
-              width: "100%"
-            },
-            children: /* @__PURE__ */ jsx(TitleComponent, {
-              plugin: plugin2
-            })
-          }),
-          /* @__PURE__ */ jsxs(import_react_native34.View, {
-            style: {
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 22,
-              paddingHorizontal: 4
-            },
-            children: [
-              /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Configure",
-                variant: "secondary",
-                disabled: !plugin2.getPluginSettingsComponent(),
-                icon: findAssetId("WrenchIcon"),
-                onPress: () => {
-                  navigation2.push("PUPU_CUSTOM_PAGE", {
-                    title: plugin2.name,
-                    render: () => /* @__PURE__ */ jsx(ScaledPluginSettings, {
-                      component: plugin2.getPluginSettingsComponent()
-                    })
-                  });
-                }
-              }),
-              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Refetch",
-                variant: "secondary",
-                icon: findAssetId("RetryIcon"),
-                onPress: refetchPlugin,
-                disabled: loading
-              }),
-              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Copy URL",
-                variant: "secondary",
-                icon: findAssetId("LinkIcon"),
-                onPress: copyPluginUrl
-              }),
-              /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Clear Data",
-                variant: "secondary",
-                icon: findAssetId("FileIcon"),
-                onPress: clearPluginData
-              }),
-              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Uninstall",
-                variant: "secondary",
-                icon: findAssetId("TrashIcon"),
-                onPress: uninstallPluginHandler
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsxs(Card, {
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/semibold",
-                color: "text-primary",
-                style: {
-                  marginBottom: 4,
-                  color: "text-strong"
-                },
-                children: "Description"
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/medium",
-                children: plugin2.description
-              })
-            ]
-          })
-        ]
-      })
-    });
-  }
-  var import_react13, import_react_native34;
-  var init_PluginInfoActionSheet = __esm({
-    "src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_sheets();
-      init_components();
-      init_common();
-      init_toasts();
-      init_alerts2();
-      init_plugins();
-      init_storage();
-      init_storage2();
-      init_assets();
-      import_react13 = __toESM(require_react());
-      import_react_native34 = __toESM(require_react_native());
-      init_TitleComponent();
-      init_ScaledPluginSettings();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/models/bunny.ts
-  function unifyBunnyPlugin(manifest) {
-    return {
-      id: manifest.id,
-      name: manifest.display.name,
-      description: manifest.display.description,
-      authors: manifest.display.authors,
-      getBadges() {
-        return [
-          {
-            source: {
-              uri: cloudcord_default
-            }
-          }
-        ];
-      },
-      isEnabled: () => isPluginEnabled(manifest.id),
-      isInstalled: () => manifest.id in pluginSettings,
-      usePluginState() {
-        useObservable([
-          pluginSettings
-        ]);
-      },
-      toggle(start) {
-        try {
-          start ? enablePlugin(manifest.id, true) : disablePlugin(manifest.id);
-        } catch (e) {
-          console.error(e);
-        }
-      },
-      resolveSheetComponent() {
-        return Promise.resolve({
-          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
-        });
-      },
-      getPluginSettingsComponent() {
-        return getPluginSettingsComponent(manifest.id);
-      }
-    };
-  }
-  var init_bunny = __esm({
-    "src/core/ui/settings/pages/Plugins/models/bunny.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_settings3();
-      init_plugins4();
-      init_storage2();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/models/vendetta.ts
-  function unifyVdPlugin(vdPlugin) {
-    return {
-      id: vdPlugin.id,
-      name: vdPlugin.manifest.name,
-      description: vdPlugin.manifest.description,
-      authors: vdPlugin.manifest.authors,
-      icon: vdPlugin.manifest.vendetta?.icon,
-      getBadges() {
-        return [];
-      },
-      isEnabled: () => vdPlugin.enabled,
-      isInstalled: () => Boolean(vdPlugin && VdPluginManager.plugins[vdPlugin.id]),
-      usePluginState() {
-        useProxy(VdPluginManager.plugins[vdPlugin.id]);
-      },
-      toggle(start) {
-        return _async_to_generator(function* () {
-          if (start)
-            yield VdPluginManager.startPlugin(vdPlugin.id);
-          else
-            VdPluginManager.stopPlugin(vdPlugin.id);
-        })();
-      },
-      resolveSheetComponent() {
-        return Promise.resolve({
-          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
-        });
-      },
-      getPluginSettingsComponent() {
-        return VdPluginManager.getSettings(vdPlugin.id);
-      }
-    };
-  }
-  var init_vendetta = __esm({
-    "src/core/ui/settings/pages/Plugins/models/vendetta.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_plugins();
-      init_storage();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/index.tsx
-  var Plugins_exports = {};
-  __export(Plugins_exports, {
-    default: () => Plugins
-  });
-  function PluginPage(props) {
-    var items = props.useItems();
-    return /* @__PURE__ */ jsx(AddonPage, {
-      CardComponent: PluginCard,
-      title: Strings.PLUGINS,
-      searchKeywords: [
-        "name",
-        "description",
-        (p) => p.authors?.map((a) => typeof a === "string" ? a : a.name).join() || ""
-      ],
-      sortOptions: {
-        "Name (A-Z)": (a, b3) => a.name.localeCompare(b3.name),
-        "Name (Z-A)": (a, b3) => b3.name.localeCompare(a.name)
-      },
-      safeModeHint: {
-        message: Strings.SAFE_MODE_NOTICE_PLUGINS
-      },
-      items,
-      ...props
-    });
-  }
-  function Plugins() {
-    useProxy(settings);
-    var navigation2 = NavigationNative.useNavigation();
-    return /* @__PURE__ */ jsx(PluginPage, {
-      useItems: () => {
-        useProxy(VdPluginManager.plugins);
-        useObservable([
-          pluginSettings
-        ]);
-        var corePlugins = [
-          ...registeredPlugins.values()
-        ].filter((p) => isPluginInstalled(p.id) && isCorePlugin(p.id)).map(unifyBunnyPlugin);
-        var vdPlugins = Object.values(VdPluginManager.plugins).map(unifyVdPlugin);
-        var bnPlugins = [
-          ...registeredPlugins.values()
-        ].filter((p) => isPluginInstalled(p.id) && !isCorePlugin(p.id)).map(unifyBunnyPlugin);
-        return [
-          ...corePlugins,
-          ...vdPlugins,
-          ...bnPlugins
-        ];
-      },
-      ListHeaderComponent: () => {
-        var unproxiedPlugins = Object.values(VdPluginManager.plugins).filter((p) => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));
-        if (!unproxiedPlugins.length)
-          return null;
-        return /* @__PURE__ */ jsx(import_react_native35.View, {
-          style: {
-            marginVertical: 12,
-            marginHorizontal: 10
-          },
-          children: /* @__PURE__ */ jsx(Card, {
-            border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native35.View, {
-              style: {
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "row"
-              },
-              children: [
-                /* @__PURE__ */ jsxs(import_react_native35.View, {
-                  style: {
-                    gap: 6,
-                    flexShrink: 1
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx(Text, {
-                      variant: "heading-md/bold",
-                      children: "Unproxied Plugins Found"
-                    }),
-                    /* @__PURE__ */ jsx(Text, {
-                      variant: "text-sm/medium",
-                      color: "text-muted",
-                      children: "Plugins installed from unproxied sources may run unverified code in this app without your awareness."
-                    })
-                  ]
-                }),
-                /* @__PURE__ */ jsx(import_react_native35.View, {
-                  style: {
-                    marginLeft: "auto"
-                  },
-                  children: /* @__PURE__ */ jsx(IconButton, {
-                    size: "sm",
-                    variant: "secondary",
-                    icon: findAssetId("CircleInformationIcon-primary"),
-                    style: {
-                      marginLeft: 8
-                    },
-                    onPress: () => {
-                      navigation2.push("PUPU_CUSTOM_PAGE", {
-                        title: "Unproxied Plugins",
-                        render: () => {
-                          return /* @__PURE__ */ jsx(FlashList, {
-                            data: unproxiedPlugins,
-                            contentContainerStyle: {
-                              padding: 8
-                            },
-                            ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native35.View, {
-                              style: {
-                                height: 8
-                              }
-                            }),
-                            renderItem: ({ item: p }) => /* @__PURE__ */ jsx(Card, {
-                              children: /* @__PURE__ */ jsx(Text, {
-                                variant: "heading-md/semibold",
-                                children: p.id
-                              })
-                            })
-                          });
-                        }
-                      });
-                    }
-                  })
-                })
-              ]
-            })
-          })
-        });
-      },
-      installAction: {
-        label: "Install a plugin",
-        fetchFn: (url2) => _async_to_generator(function* () {
-          if (!url2.startsWith(VD_PROXY_PREFIX) && !url2.startsWith(BUNNY_PROXY_PREFIX) && !settings.developerSettings) {
-            openAlert2("bunny-plugin-unproxied-confirmation", /* @__PURE__ */ jsx(AlertModal3, {
-              title: "Hold On!",
-              content: "You're trying to install a plugin from an unproxied external source. This means you're trusting the creator to run their code in this app without your knowledge. Are you sure you want to continue?",
-              extraContent: /* @__PURE__ */ jsx(Card, {
-                children: /* @__PURE__ */ jsx(Text, {
-                  variant: "text-md/bold",
-                  children: url2
-                })
-              }),
-              actions: /* @__PURE__ */ jsxs(AlertActions2, {
-                children: [
-                  /* @__PURE__ */ jsx(AlertActionButton3, {
-                    text: "Continue",
-                    variant: "primary",
-                    onPress: () => {
-                      VdPluginManager.installPlugin(url2).then(() => showToast(Strings.TOASTS_INSTALLED_PLUGIN, findAssetId("Check"))).catch((e) => openAlert2("bunny-plugin-install-failed", /* @__PURE__ */ jsx(AlertModal3, {
-                        title: "Install Failed",
-                        content: `Unable to install plugin from '${url2}':`,
-                        extraContent: /* @__PURE__ */ jsx(Card, {
-                          children: /* @__PURE__ */ jsx(Text, {
-                            variant: "text-md/normal",
-                            children: e instanceof Error ? e.message : String(e)
-                          })
-                        }),
-                        actions: /* @__PURE__ */ jsx(AlertActionButton3, {
-                          text: "Okay",
-                          variant: "primary"
-                        })
-                      })));
-                    }
-                  }),
-                  /* @__PURE__ */ jsx(AlertActionButton3, {
-                    text: "Cancel",
-                    variant: "secondary"
-                  })
-                ]
-              })
-            }));
-          } else {
-            return yield VdPluginManager.installPlugin(url2);
-          }
-        })()
-      }
-    });
-  }
-  var import_react_native35, openAlert2, AlertModal3, AlertActions2, AlertActionButton3;
-  var init_Plugins = __esm({
-    "src/core/ui/settings/pages/Plugins/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_i18n();
-      init_AddonPage();
-      init_PluginCard();
-      init_plugins();
-      init_storage();
-      init_plugins4();
-      init_assets();
-      init_settings();
-      init_storage2();
-      init_toasts();
-      init_constants();
-      init_lazy();
-      init_metro();
-      init_common();
-      init_components();
-      import_react_native35 = __toESM(require_react_native());
-      init_bunny();
-      init_vendetta();
-      ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
-      ({ AlertModal: AlertModal3, AlertActions: AlertActions2, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
-    }
-  });
-
-  // src/core/ui/settings/pages/PluginBrowser/index.tsx
-  var PluginBrowser_exports = {};
-  __export(PluginBrowser_exports, {
-    default: () => BrowserPage
-  });
-  function normalizeIdFromInstallUrl(url2) {
-    return url2.endsWith("/") ? url2 : url2 + "/";
-  }
-  function InstallButton({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
-    var normId = normalizeIdFromInstallUrl(addon.installUrl);
-    var [installed, setInstalled] = React2.useState(() => isPluginMode ? Boolean(VdPluginManager.plugins[normId]) : Boolean(themes[addon.installUrl]));
-    React2.useEffect(() => {
-      setInstalled(isPluginMode ? Boolean(VdPluginManager.plugins[normId]) : Boolean(themes[addon.installUrl]));
-    }, [
-      addon.installUrl,
-      setRefreshTick,
-      isPluginMode
-    ]);
-    var installAddon = () => _async_to_generator(function* () {
-      if (installing.has(normId))
-        return;
-      setInstalling((prev) => new Set(prev).add(normId));
-      try {
-        if (isPluginMode) {
-          yield VdPluginManager.installPlugin(normId, true);
-        } else {
-          yield installTheme(addon.installUrl);
-        }
-        showToast(`Installed ${addon.name}`, findAssetId("CheckIcon"));
-        setInstalled(true);
-      } catch (e) {
-        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-      } finally {
-        setInstalling((prev) => {
-          var s = new Set(prev);
-          s.delete(normId);
-          return s;
-        });
-        setRefreshTick((t) => t + 1);
-      }
-    })();
-    var uninstallAddon = () => _async_to_generator(function* () {
-      try {
-        if (isPluginMode) {
-          yield VdPluginManager.removePlugin(normId);
-        } else {
-          yield removeTheme(addon.installUrl);
-        }
-        showToast(`Uninstalled ${addon.name}`, findAssetId("TrashIcon"));
-        setInstalled(false);
-      } catch (e) {
-        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-      } finally {
-        setRefreshTick((t) => t + 1);
-      }
-    })();
-    var promptInstall = () => {
-      if (!isPluginMode)
-        return installAddon();
-      var plugin2 = addon;
-      var needsWarn = plugin2.status && plugin2.status !== "working" || plugin2.warningMessage && plugin2.warningMessage.trim().length > 0;
-      if (!needsWarn)
-        return installAddon();
-      var lines = [];
-      if (plugin2.status && plugin2.status !== "working") {
-        if (plugin2.status === "broken")
-          lines.push("This plugin is marked as broken, please be aware you may encounter issues");
-        else if (plugin2.status === "warning")
-          lines.push("This plugin may have issues");
-        else
-          lines.push(`Status: ${plugin2.status}`);
-      }
-      if (plugin2.warningMessage)
-        lines.push(plugin2.warningMessage);
-      openAlert("plugins-list-install-warning", /* @__PURE__ */ jsx(AlertModal, {
-        title: "Warning!",
-        content: "This plugin may not work as expected.",
-        extraContent: /* @__PURE__ */ jsx(Text, {
-          variant: "text-sm/normal",
-          color: "text-muted",
-          children: lines.join("\n\n")
-        }),
-        actions: /* @__PURE__ */ jsxs(AlertActions, {
-          children: [
-            /* @__PURE__ */ jsx(AlertActionButton2, {
-              text: "Install Anyway",
-              variant: "primary",
-              onPress: () => {
-                dismissAlert("plugins-list-install-warning");
-                installAddon();
-              }
-            }),
-            /* @__PURE__ */ jsx(AlertActionButton2, {
-              text: "Cancel",
-              variant: "secondary",
-              onPress: () => dismissAlert("plugins-list-install-warning")
-            })
-          ]
-        })
-      }));
-    };
-    return /* @__PURE__ */ jsx(Button, {
-      size: "sm",
-      loading: installing.has(normId),
-      text: !installed ? installing.has(normId) ? "Installing..." : "Install" : "Uninstall",
-      disabled: installing.has(normId),
-      onPress: !installed ? promptInstall : uninstallAddon,
-      variant: !installed ? "primary" : "destructive",
-      icon: findAssetId(!installed ? "DownloadIcon" : "TrashIcon")
-    });
-  }
-  function TrailingButtons({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
-    var copyAddonLink = () => {
-      clipboard.setString(addon.installUrl);
-      showToast.showCopyToClipboard?.();
-    };
-    var copySourceUrl = () => {
-      var plugin2 = addon;
-      clipboard.setString(plugin2.sourceUrl);
-      showToast.showCopyToClipboard?.();
-    };
-    var openAddonMenu = () => {
-      var actions = [
-        {
-          label: `Copy ${isPluginMode ? "Plugin" : "Theme"} Link`,
-          icon: findAssetId("CopyIcon"),
-          onPress: copyAddonLink
-        }
-      ];
-      if (isPluginMode && addon.sourceUrl) {
-        actions.push({
-          label: "Copy Source URL",
-          icon: findAssetId("CopyIcon"),
-          onPress: copySourceUrl
-        });
-      }
-      var sheetKey = `${isPluginMode ? "plugin" : "theme"}-menu`;
-      showSheet(sheetKey, () => /* @__PURE__ */ jsx(ActionSheet, {
-        children: /* @__PURE__ */ jsx(TableRowGroup, {
-          title: `${isPluginMode ? "Plugin" : "Theme"} Info`,
-          children: actions.map((action, index) => /* @__PURE__ */ jsx(TableRow, {
-            label: action.label,
-            icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-              source: action.icon
-            }),
-            onPress: () => {
-              action.onPress();
-              hideSheet(sheetKey);
-            }
-          }, index))
-        })
-      }));
-    };
-    return /* @__PURE__ */ jsxs(Stack, {
-      spacing: 8,
-      direction: "horizontal",
-      children: [
-        /* @__PURE__ */ jsx(IconButton, {
-          size: "sm",
-          onPress: openAddonMenu,
-          variant: "secondary",
-          icon: findAssetId("MoreHorizontalIcon")
-        }),
-        /* @__PURE__ */ jsx(InstallButton, {
-          addon,
-          isPluginMode,
-          installing,
-          setInstalling,
-          setRefreshTick
-        })
-      ]
-    });
-  }
-  function AddonCard({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
-    var { name, description, authors } = addon;
-    var plugin2 = addon;
-    var statusColor = "text-normal";
-    if (isPluginMode) {
-      if (plugin2.status === "working")
-        statusColor = "#4ADE80";
-      if (plugin2.status === "broken")
-        statusColor = "#EF4444";
-      if (plugin2.status === "warning")
-        statusColor = "#F59E0B";
-    }
-    return /* @__PURE__ */ jsx(Card, {
-      children: /* @__PURE__ */ jsxs(Stack, {
-        spacing: 16,
-        children: [
-          /* @__PURE__ */ jsxs(import_react_native36.View, {
-            style: {
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center"
-            },
-            children: [
-              /* @__PURE__ */ jsxs(import_react_native36.View, {
-                style: {
-                  flexShrink: 1
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Text, {
-                    numberOfLines: 1,
-                    variant: "heading-lg/semibold",
-                    children: name
-                  }),
-                  /* @__PURE__ */ jsxs(Text, {
-                    variant: "text-md/semibold",
-                    color: "text-muted",
-                    children: [
-                      "by ",
-                      authors?.join(", ") || "Unknown"
-                    ]
-                  }),
-                  isPluginMode && /* @__PURE__ */ jsxs(Text, {
-                    variant: "text-md/semibold",
-                    style: {
-                      color: statusColor
-                    },
-                    children: [
-                      "Status: ",
-                      plugin2.status
-                    ]
-                  })
-                ]
-              }),
-              /* @__PURE__ */ jsx(import_react_native36.View, {
-                children: /* @__PURE__ */ jsx(TrailingButtons, {
-                  addon,
-                  isPluginMode,
-                  installing,
-                  setInstalling,
-                  setRefreshTick
-                })
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsx(Text, {
-            variant: "text-md/medium",
-            children: description
-          }),
-          isPluginMode && plugin2.warningMessage && /* @__PURE__ */ jsxs(Text, {
-            variant: "text-sm/medium",
-            color: "text-muted",
-            children: [
-              "Warning: ",
-              plugin2.warningMessage
-            ]
-          })
-        ]
-      })
-    });
-  }
-  function BrowserPage() {
-    var navigation2 = NavigationNative.useNavigation();
-    var [mode, setMode] = React2.useState("plugins");
-    var [plugins2, setPlugins] = React2.useState([]);
-    var [themesList, setThemesList] = React2.useState([]);
-    var [loading, setLoading] = React2.useState(true);
-    var [error, setError] = React2.useState(null);
-    var [searchQuery, setSearchQuery] = React2.useState("");
-    var [installing, setInstalling] = React2.useState(/* @__PURE__ */ new Set());
-    var [refreshTick, setRefreshTick] = React2.useState(0);
-    var [sort, setSort] = React2.useState("Newest");
-    React2.useEffect(() => {
-      navigation2.setOptions({
-        title: "Browser"
-      });
-    }, [
-      navigation2
-    ]);
-    var fetchData = React2.useCallback((isPluginMode) => _async_to_generator(function* () {
-      setLoading(true);
-      setError(null);
-      try {
-        var url2 = isPluginMode ? PLUGIN_URL2 : THEME_URL;
-        var response = yield safeFetch(url2);
-        if (!response.ok)
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        var data = yield response.json();
-        var addonList = [];
-        if (Array.isArray(data)) {
-          addonList = data;
-        } else if (isPluginMode && data.OFFICIAL_PLUGINS) {
-          addonList = data.OFFICIAL_PLUGINS;
-        } else if (!isPluginMode) {
-          addonList = data.OFFICIAL_THEMES || data.themes || data.THEMES || data.items || [];
-        }
-        if (isPluginMode) {
-          setPlugins(addonList);
-        } else {
-          setThemesList(addonList);
-        }
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-        if (isPluginMode) {
-          setPlugins([]);
-        } else {
-          setThemesList([]);
-        }
-      } finally {
-        setLoading(false);
-      }
-    })(), []);
-    var fetchPlugins = React2.useCallback(() => fetchData(true), [
-      fetchData
-    ]);
-    var fetchThemes = React2.useCallback(() => fetchData(false), [
-      fetchData
-    ]);
-    React2.useEffect(() => {
-      fetchPlugins();
-      fetchThemes();
-    }, [
-      fetchPlugins,
-      fetchThemes
-    ]);
-    var filterList = (list) => {
-      if (!list)
-        return [];
-      var q3 = searchQuery.toLowerCase();
-      if (!q3)
-        return list;
-      return list.filter((p) => p.name.toLowerCase().includes(q3) || p.description.toLowerCase().includes(q3) || (p.authors || []).some((a) => a.toLowerCase().includes(q3)));
-    };
-    var sortedAndFiltered = React2.useMemo(() => {
-      var list = filterList(mode === "plugins" ? plugins2 : themesList);
-      var getStatusPriority = (status, sortBy) => {
-        if (sortBy === "Working First") {
-          return status === "working" || status === "warning" ? 0 : 1;
-        }
-        if (sortBy === "Broken First") {
-          return status === "broken" ? 0 : 1;
-        }
-        return 0;
-      };
-      switch (sort) {
-        case "Newest":
-          return [
-            ...list
-          ].reverse();
-        case "Oldest":
-          return [
-            ...list
-          ];
-        case "Name (A\u2013Z)":
-          return [
-            ...list
-          ].sort((a, b3) => a.name.localeCompare(b3.name));
-        case "Name (Z\u2013A)":
-          return [
-            ...list
-          ].sort((a, b3) => b3.name.localeCompare(a.name));
-        case "Working First":
-          if (mode === "plugins") {
-            return [
-              ...list
-            ].sort((a, b3) => {
-              var pa = getStatusPriority(a.status, "Working First");
-              var pb = getStatusPriority(b3.status, "Working First");
-              return pa !== pb ? pa - pb : a.name.localeCompare(b3.name);
-            });
-          }
-          return list;
-        case "Broken First":
-          if (mode === "plugins") {
-            return [
-              ...list
-            ].sort((a, b3) => {
-              var pa = getStatusPriority(a.status, "Broken First");
-              var pb = getStatusPriority(b3.status, "Broken First");
-              return pa !== pb ? pa - pb : a.name.localeCompare(b3.name);
-            });
-          }
-          return list;
-        default:
-          return list;
-      }
-    }, [
-      plugins2,
-      themesList,
-      mode,
-      searchQuery,
-      sort
-    ]);
-    if (error) {
-      return /* @__PURE__ */ jsx(import_react_native36.View, {
-        style: {
-          flex: 1,
-          paddingHorizontal: 8,
-          justifyContent: "center",
-          alignItems: "center"
-        },
-        children: /* @__PURE__ */ jsxs(Card, {
-          style: {
-            gap: 8
-          },
-          children: [
-            /* @__PURE__ */ jsx(Text, {
-              style: {
-                textAlign: "center"
-              },
-              variant: "heading-lg/bold",
-              children: "An error occurred while fetching the repository"
-            }),
-            /* @__PURE__ */ jsx(Text, {
-              style: {
-                textAlign: "center"
-              },
-              variant: "text-sm/medium",
-              color: "text-muted",
-              children: error
-            }),
-            /* @__PURE__ */ jsx(Button, {
-              size: "lg",
-              text: "Refetch",
-              onPress: () => fetchData(mode === "plugins"),
-              icon: findAssetId("RetryIcon")
-            })
-          ]
-        })
-      });
-    }
-    return /* @__PURE__ */ jsxs(import_react_native36.View, {
-      style: {
-        flex: 1
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native36.View, {
-          style: {
-            paddingHorizontal: 10
-          },
-          children: /* @__PURE__ */ jsxs(Stack, {
-            spacing: 12,
-            children: [
-              /* @__PURE__ */ jsx(import_react_native36.View, {
-                style: {
-                  flexDirection: "row",
-                  paddingTop: 10
-                },
-                children: /* @__PURE__ */ jsxs(import_react_native36.View, {
-                  style: {
-                    flex: 1,
-                    flexDirection: "row",
-                    alignItems: "center"
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx(Button, {
-                      size: "md",
-                      text: "Plugins",
-                      variant: mode === "plugins" ? "primary" : "secondary",
-                      onPress: () => setMode("plugins"),
-                      style: {
-                        flex: 1
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(import_react_native36.View, {
-                      style: {
-                        width: 8
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(Button, {
-                      size: "md",
-                      text: "Themes",
-                      variant: mode === "themes" ? "primary" : "secondary",
-                      onPress: () => setMode("themes"),
-                      style: {
-                        flex: 1
-                      }
-                    })
-                  ]
-                })
-              }),
-              /* @__PURE__ */ jsxs(import_react_native36.View, {
-                style: {
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 8,
-                  paddingBottom: 6
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Search_default, {
-                    placeholder: `Search ${mode}...`,
-                    isRound: true,
-                    onChangeText: setSearchQuery,
-                    style: {
-                      flex: 1
-                    }
-                  }),
-                  /* @__PURE__ */ jsx(import_react_native36.View, {
-                    style: {
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 8
-                    },
-                    children: /* @__PURE__ */ jsx(IconButton, {
-                      size: "md",
-                      variant: "tertiary",
-                      icon: findAssetId("MoreVerticalIcon"),
-                      disabled: !!searchQuery,
-                      onPress: () => showSimpleActionSheet3({
-                        key: "AddonListSortOptions",
-                        header: {
-                          title: "Sort Options",
-                          onClose: () => hideActionSheet2("AddonListSortOptions")
-                        },
-                        options: Object.entries(Sort).map(([key, value]) => ({
-                          label: value,
-                          onPress: () => {
-                            setSort(value);
-                          }
-                        }))
-                      })
-                    })
-                  })
-                ]
-              })
-            ]
-          })
-        }),
-        /* @__PURE__ */ jsx(FlashList, {
-          data: sortedAndFiltered,
-          refreshing: loading,
-          onRefresh: mode === "plugins" ? fetchPlugins : fetchThemes,
-          estimatedItemSize: 200,
-          contentContainerStyle: {
-            paddingBottom: 90,
-            paddingHorizontal: 5
-          },
-          ListHeaderComponent: mode === "plugins" ? /* @__PURE__ */ jsx(import_react_native36.View, {
-            style: {
-              paddingVertical: 6,
-              paddingHorizontal: 8
-            },
-            children: /* @__PURE__ */ jsx(Card, {
-              border: "strong",
-              children: /* @__PURE__ */ jsx(import_react_native36.View, {
-                style: {
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "row"
-                },
-                children: /* @__PURE__ */ jsxs(import_react_native36.View, {
-                  style: {
-                    gap: 6,
-                    flexShrink: 1
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx(Text, {
-                      variant: "heading-md/bold",
-                      children: "Unproxied Plugins"
-                    }),
-                    /* @__PURE__ */ jsx(Text, {
-                      variant: "text-sm/medium",
-                      color: "text-muted",
-                      children: "Plugins installed from this source have not been checked for safety, install at your own risk"
-                    })
-                  ]
-                })
-              })
-            })
-          }) : null,
-          //@ts-ignore
-          renderItem: ({ item: addon }) => /* @__PURE__ */ jsx(import_react_native36.View, {
-            style: {
-              paddingVertical: 6,
-              paddingHorizontal: 8
-            },
-            children: /* @__PURE__ */ jsx(AddonCard, {
-              addon,
-              isPluginMode: mode === "plugins",
-              installing,
-              setInstalling,
-              setRefreshTick
-            })
-          })
-        })
-      ]
-    });
-  }
-  var import_react_native36, showSimpleActionSheet3, hideActionSheet2, PLUGIN_URL2, THEME_URL, Sort;
-  var init_PluginBrowser = __esm({
-    "src/core/ui/settings/pages/PluginBrowser/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_common();
-      import_react_native36 = __toESM(require_react_native());
-      init_components();
-      init_assets();
-      init_safeFetch();
-      init_toasts();
-      init_Search();
-      init_plugins();
-      init_themes();
-      init_common();
-      init_sheets();
-      init_wrappers2();
-      init_alerts();
-      init_components();
-      init_lazy();
-      init_metro();
-      ({ showSimpleActionSheet: showSimpleActionSheet3 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
-      ({ hideActionSheet: hideActionSheet2 } = lazyDestructure(() => findByProps("hideActionSheet")));
-      PLUGIN_URL2 = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
-      THEME_URL = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
-      Sort = /* @__PURE__ */ function(Sort2) {
-        Sort2["DateNewest"] = "Newest";
-        Sort2["DateOldest"] = "Oldest";
-        Sort2["NameAZ"] = "Name (A\u2013Z)";
-        Sort2["NameZA"] = "Name (Z\u2013A)";
-        Sort2["WorkingFirst"] = "Working First";
-        Sort2["BrokenFirst"] = "Broken First";
-        return Sort2;
-      }(Sort || {});
-    }
-  });
-
-  // src/core/ui/components/AddonCard.tsx
-  function AddonCard2(props) {
-    var styles2 = useStyles3();
-    return /* @__PURE__ */ jsx(Card, {
-      children: /* @__PURE__ */ jsxs(Stack, {
-        spacing: 16,
-        children: [
-          /* @__PURE__ */ jsxs(import_react_native37.View, {
-            style: {
-              flexDirection: "row",
-              alignItems: "center"
-            },
-            children: [
-              /* @__PURE__ */ jsxs(import_react_native37.View, {
-                style: styles2.headerLeading,
-                children: [
-                  /* @__PURE__ */ jsx(Text, {
-                    style: styles2.headerLabel,
-                    children: props.headerLabel
-                  }),
-                  props.headerSublabel && /* @__PURE__ */ jsx(Text, {
-                    style: styles2.headerSubtitle,
-                    children: props.headerSublabel
-                  })
-                ]
-              }),
-              /* @__PURE__ */ jsxs(import_react_native37.View, {
-                style: [
-                  styles2.headerTrailing,
-                  {
-                    marginLeft: "auto"
-                  }
-                ],
-                children: [
-                  /* @__PURE__ */ jsxs(import_react_native37.View, {
-                    style: styles2.actions,
-                    children: [
-                      props.overflowActions && /* @__PURE__ */ jsx(IconButton, {
-                        onPress: () => showSimpleActionSheet4({
-                          key: "CardOverflow",
-                          header: {
-                            title: props.overflowTitle,
-                            icon: props.headerIcon && /* @__PURE__ */ jsx(LegacyFormRow.Icon, {
-                              style: {
-                                marginRight: 8
-                              },
-                              source: findAssetId(props.headerIcon)
-                            }),
-                            onClose: () => hideActionSheet3()
-                          },
-                          options: props.overflowActions?.map((i) => ({
-                            ...i,
-                            icon: findAssetId(i.icon)
-                          }))
-                        }),
-                        size: "sm",
-                        variant: "secondary",
-                        icon: findAssetId("CircleInformationIcon-primary")
-                      }),
-                      props.actions?.map(({ icon: icon3, onPress, disabled }) => /* @__PURE__ */ jsx(IconButton, {
-                        onPress,
-                        disabled,
-                        size: "sm",
-                        variant: "secondary",
-                        icon: findAssetId(icon3)
-                      }))
-                    ]
-                  }),
-                  props.toggleType && (props.toggleType === "switch" ? /* @__PURE__ */ jsx(FormSwitch, {
-                    value: props.toggleValue(),
-                    onValueChange: props.onToggleChange
-                  }) : /* @__PURE__ */ jsx(import_react_native37.TouchableOpacity, {
-                    onPress: () => {
-                      props.onToggleChange?.(!props.toggleValue());
-                    },
-                    children: /* @__PURE__ */ jsx(FormRadio, {
-                      selected: props.toggleValue()
-                    })
-                  }))
-                ]
-              })
-            ]
-          }),
-          props.descriptionLabel && /* @__PURE__ */ jsx(Text, {
-            variant: "text-md/medium",
-            children: props.descriptionLabel
-          })
-        ]
-      })
-    });
-  }
-  var import_react_native37, hideActionSheet3, showSimpleActionSheet4, useStyles3;
-  var init_AddonCard = __esm({
-    "src/core/ui/components/AddonCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_assets();
-      init_lazy();
-      init_components();
-      init_wrappers();
-      init_color();
-      init_styles();
-      import_react_native37 = __toESM(require_react_native());
-      ({ hideActionSheet: hideActionSheet3 } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet")));
-      ({ showSimpleActionSheet: showSimpleActionSheet4 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
-      useStyles3 = createStyles({
-        card: {
-          backgroundColor: semanticColors?.CARD_SECONDARY_BG,
-          borderRadius: 12,
-          overflow: "hidden"
-        },
-        header: {
-          padding: 0
-        },
-        headerLeading: {
-          flex: 1,
-          flexDirection: "column",
-          justifyContent: "center",
-          scale: 1.2
-        },
-        headerTrailing: {
-          display: "flex",
-          flexDirection: "row",
-          gap: 15,
-          alignItems: "center"
-        },
-        headerLabel: {
-          ...TextStyleSheet["heading-lg/semibold"]
-        },
-        headerLabelCompact: {
-          ...TextStyleSheet["text-md/semibold"]
-        },
-        headerSubtitle: {
-          ...TextStyleSheet["text-sm/semibold"],
-          color: semanticColors.TEXT_MUTED
-        },
-        descriptionLabel: {
-          ...TextStyleSheet["text-md/semibold"],
-          color: "text-strong"
-        },
-        actions: {
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          gap: 5
-        },
-        iconStyle: {
-          tintColor: semanticColors.LOGO_PRIMARY,
-          opacity: 0.2,
-          height: 64,
-          width: 64,
-          left: void 0,
-          right: "30%",
-          top: "-10%"
-        }
-      });
-    }
-  });
-
-  // src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx
-  var ThemeInfoActionSheet_exports = {};
-  __export(ThemeInfoActionSheet_exports, {
-    default: () => ThemeInfoActionSheet
-  });
-  function ThemeInfoIconButton(props) {
-    var { onPress } = props;
-    props.onPress &&= () => {
-      hideSheet("ThemeInfoActionSheet");
-      onPress?.();
-    };
-    return /* @__PURE__ */ jsx(IconButton, {
-      ...props,
-      label: props.label
-    });
-  }
-  function TitleComponent2({ theme }) {
-    var { authors } = theme.data;
-    return /* @__PURE__ */ jsxs(import_react_native38.View, {
-      style: {
-        gap: 4
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native38.View, {
-          children: /* @__PURE__ */ jsx(Text, {
-            variant: "heading-xl/semibold",
-            children: theme.data.name
-          })
-        }),
-        /* @__PURE__ */ jsx(import_react_native38.View, {
-          style: {
-            flexDirection: "row",
-            flexShrink: 1
-          },
-          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native38.TouchableOpacity, {
-            style: {
-              flexDirection: "row",
-              gap: 8,
-              alignItems: "center",
-              paddingVertical: 4,
-              paddingHorizontal: 8,
-              backgroundColor: "#00000016",
-              borderRadius: 32
-            },
-            disabled: !authors.some((a) => a.id),
-            children: /* @__PURE__ */ jsxs(Text, {
-              variant: "text-md/medium",
-              children: [
-                "by ",
-                authors.map((a) => a.name).join(", ")
-              ]
-            })
-          })
-        })
-      ]
-    });
-  }
-  function ThemeInfoActionSheet({ theme, navigation: navigation2 }) {
-    var [themeState, setThemeState] = (0, import_react14.useState)({
-      ...theme
-    });
-    var [loading, setLoading] = (0, import_react14.useState)(false);
-    (0, import_react14.useEffect)(() => {
-      var interval = setInterval(() => {
-        setThemeState({
-          ...theme
-        });
-      }, 500);
-      return () => clearInterval(interval);
-    }, [
-      theme
-    ]);
-    var copyThemeUrl = () => {
-      clipboard.setString(themeState.id);
-      if (typeof showToast?.showCopyToClipboard === "function") {
-        showToast.showCopyToClipboard();
-      } else {
-        showToast("Copied to clipboard");
-      }
-    };
-    var refetchTheme = () => _async_to_generator(function* () {
-      setLoading(true);
-      try {
-        yield fetchTheme(themeState.id, themeState.selected);
-        showToast("Theme refreshed successfully");
-      } catch (e) {
-        console.error("Failed to refresh theme:", e);
-        showToast("Failed to refresh theme");
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var removeThemeHandler = () => {
-      showConfirmationAlert({
-        title: Strings.HOLD_UP,
-        content: formatString("ARE_YOU_SURE_TO_DELETE_THEME", {
-          name: themeState.data.name
-        }),
-        confirmText: Strings.DELETE,
-        cancelText: Strings.CANCEL,
-        confirmColor: "red",
-        onConfirm: () => _async_to_generator(function* () {
-          hideSheet("ThemeInfoActionSheet");
-          try {
-            var wasSelected = yield removeTheme(themeState.id);
-            if (wasSelected)
-              selectTheme(null);
-            showToast("Theme removed successfully");
-          } catch (e) {
-            console.error("Failed to remove theme:", e);
-            showToast("Failed to remove theme");
-          }
-        })()
-      });
-    };
-    var applyTheme = () => {
-      try {
-        selectTheme(themeState);
-        hideSheet("ThemeInfoActionSheet");
-        showToast(`Applied theme: ${themeState.data.name}`);
-      } catch (e) {
-        console.error("Failed to apply theme:", e);
-        showToast("Failed to apply theme");
-      }
-    };
-    return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native38.ScrollView, {
-        contentContainerStyle: {
-          gap: 12,
-          marginBottom: 12
-        },
-        children: [
-          /* @__PURE__ */ jsx(import_react_native38.View, {
-            style: {
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              paddingVertical: 24,
-              justifyContent: "space-between",
-              width: "100%"
-            },
-            children: /* @__PURE__ */ jsx(TitleComponent2, {
-              theme: themeState
-            })
-          }),
-          /* @__PURE__ */ jsxs(import_react_native38.View, {
-            style: {
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 65,
-              paddingHorizontal: 8
-            },
-            children: [
-              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
-                label: Strings.REFETCH,
-                variant: "secondary",
-                icon: findAssetId("RetryIcon"),
-                onPress: refetchTheme,
-                disabled: loading
-              }),
-              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
-                label: Strings.COPY_URL,
-                variant: "secondary",
-                icon: findAssetId("LinkIcon"),
-                onPress: copyThemeUrl
-              }),
-              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
-                label: Strings.UNINSTALL,
-                variant: "secondary",
-                icon: findAssetId("TrashIcon"),
-                onPress: removeThemeHandler
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsxs(Card, {
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/semibold",
-                style: {
-                  marginBottom: 4,
-                  color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY
-                },
-                children: "Description"
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/medium",
-                children: themeState.data.description || "No description provided."
-              })
-            ]
-          })
-        ]
-      })
-    });
-  }
-  var import_react14, import_react_native38;
-  var init_ThemeInfoActionSheet = __esm({
-    "src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_assets();
-      init_sheets();
-      init_components();
-      init_common();
-      import_react14 = __toESM(require_react());
-      import_react_native38 = __toESM(require_react_native());
-      init_toasts();
-      init_alerts2();
-      init_themes();
-      init_i18n();
-      init_color();
-    }
-  });
-
-  // src/core/ui/settings/pages/Themes/ThemeCard.tsx
-  function ThemeCard({ item: theme, overridden, beforeSelect }) {
-    var navigation2 = NavigationNative.useNavigation();
-    var [removed, setRemoved] = React2.useState(false);
-    if (removed)
-      return null;
-    var { authors } = theme.data;
-    return /* @__PURE__ */ jsx(AddonCard2, {
-      headerLabel: theme.data.name,
-      headerSublabel: authors ? `by ${authors.map((i) => i.name).join(", ")}` : "",
-      descriptionLabel: theme.data.description ?? "No description.",
-      toggleType: !settings.safeMode?.enabled ? "radio" : void 0,
-      toggleValue: () => !overridden && themes[theme.id].selected,
-      onToggleChange: (v2) => _async_to_generator(function* () {
-        try {
-          if (v2)
-            beforeSelect?.();
-          yield selectTheme(v2 ? theme : null);
-          showToast(v2 ? `Applied ${theme.data.name}` : "Theme disabled", findAssetId("Check"));
-        } catch (e) {
-          console.error("Error while selecting theme:", e);
-          showToast(e?.message ?? "Could not apply theme", findAssetId("CircleXIcon-primary"));
-        }
-      })(),
-      overflowTitle: theme.data.name,
-      actions: [
-        {
-          icon: "CircleInformationIcon-primary",
-          onPress: () => {
-            var importPromise = Promise.resolve().then(() => (init_ThemeInfoActionSheet(), ThemeInfoActionSheet_exports));
-            showSheet("ThemeInfoActionSheet", importPromise, {
-              theme,
-              navigation: navigation2
-            });
-          }
-        }
-      ]
-    });
-  }
-  var init_ThemeCard = __esm({
-    "src/core/ui/settings/pages/Themes/ThemeCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_AddonCard();
-      init_themes();
-      init_assets();
-      init_settings();
-      init_toasts();
-      init_sheets();
-      init_common();
-    }
-  });
-
-  // src/core/ui/settings/pages/Themes/index.tsx
-  var Themes_exports = {};
-  __export(Themes_exports, {
-    default: () => Themes
-  });
-  function Themes() {
-    useProxy(settings);
-    useProxy(themes);
-    return /* @__PURE__ */ jsx(AddonPage, {
-      title: Strings.THEMES,
-      searchKeywords: [
-        "data.name",
-        "data.description",
-        (p) => p.data.authors?.map((a) => a.name).join(", ") ?? ""
-      ],
-      sortOptions: {
-        "Name (A-Z)": (a, b3) => a.data.name.localeCompare(b3.data.name),
-        "Name (Z-A)": (a, b3) => b3.data.name.localeCompare(a.data.name)
-      },
-      installAction: {
-        label: "Install a theme",
-        fetchFn: installTheme
-      },
-      items: Object.values(themes),
-      safeModeHint: {
-        message: formatString("SAFE_MODE_NOTICE_THEMES", {
-          enabled: Boolean(settings.safeMode?.currentThemeId)
-        }),
-        footer: settings.safeMode?.currentThemeId && /* @__PURE__ */ jsx(Button, {
-          size: "small",
-          text: Strings.DISABLE_THEME,
-          onPress: () => delete settings.safeMode?.currentThemeId,
-          style: {
-            marginTop: 8
-          }
-        })
-      },
-      CardComponent: ThemeCard,
-      OptionsActionSheetComponent: () => {
-        useObservable([
-          colorsPref
-        ]);
-        return /* @__PURE__ */ jsxs(ActionSheet, {
-          children: [
-            /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
-              title: "Options"
-            }),
-            /* @__PURE__ */ jsxs(import_react_native39.View, {
-              style: {
-                paddingVertical: 20,
-                gap: 12
-              },
-              children: [
-                /* @__PURE__ */ jsxs(TableRowGroup, {
-                  title: "Override Theme Type",
-                  children: [
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Auto",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("RobotIcon")
-                      }),
-                      value: !colorsPref.type,
-                      onValueChange: (enabled) => {
-                        if (enabled) {
-                          colorsPref.type = void 0;
-                        } else {
-                          colorsPref.type = "dark";
-                        }
-                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
-                          update: true
-                        });
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Dark",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("ThemeDarkIcon")
-                      }),
-                      value: colorsPref.type === "dark",
-                      onValueChange: (enabled) => {
-                        colorsPref.type = enabled ? "dark" : void 0;
-                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
-                          update: true
-                        });
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Light",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("ThemeLightIcon")
-                      }),
-                      value: colorsPref.type === "light",
-                      onValueChange: (enabled) => {
-                        colorsPref.type = enabled ? "light" : void 0;
-                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
-                          update: true
-                        });
-                      }
-                    })
-                  ]
-                }),
-                /* @__PURE__ */ jsxs(TableRowGroup, {
-                  title: "Chat Background",
-                  children: [
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Show Background",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("ImageIcon")
-                      }),
-                      value: !colorsPref.customBackground,
-                      onValueChange: (enabled) => {
-                        colorsPref.customBackground = enabled ? null : "hidden";
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Hide Background",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("DenyIcon")
-                      }),
-                      value: colorsPref.customBackground === "hidden",
-                      onValueChange: (enabled) => {
-                        colorsPref.customBackground = enabled ? "hidden" : null;
-                      }
-                    })
-                  ]
-                })
-              ]
-            })
-          ]
-        });
-      }
-    });
-  }
-  var import_react_native39;
-  var init_Themes = __esm({
-    "src/core/ui/settings/pages/Themes/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_i18n();
-      init_AddonPage();
-      init_ThemeCard();
-      init_storage();
-      init_themes();
-      init_preferences();
-      init_updater();
-      init_assets();
-      init_settings();
-      init_storage2();
-      init_components();
-      import_react_native39 = __toESM(require_react_native());
-    }
-  });
-
-  // src/core/ui/settings/pages/ThemeStore/index.tsx
-  var ThemeStore_exports = {};
-  __export(ThemeStore_exports, {
-    default: () => ThemeStore3
-  });
-  function loadThemes() {
-    return _async_to_generator(function* () {
-      var [index, market] = yield allSettled([
-        safeFetch(CLOUDCORD_INDEX, {
-          cache: "no-store"
-        }).then((r) => r.json()),
-        safeFetch(MARKETPLACE, {
-          cache: "no-store"
-        }).then((r) => r.json())
-      ]);
-      var list = [];
-      if (index.status === "fulfilled" && Array.isArray(index.value?.themes)) {
-        for (var t of index.value.themes) {
-          list.push({
-            url: t.id,
-            name: t.name,
-            description: t.description ?? "",
-            authors: t.authors ?? [],
-            source: t.source ?? "CloudCord",
-            hasBackground: t.hasBackground,
-            preview: t.preview
-          });
-        }
-      }
-      if (market.status === "fulfilled" && Array.isArray(market.value)) {
-        for (var t1 of market.value) {
-          if (typeof t1?.installUrl !== "string" || typeof t1?.name !== "string")
-            continue;
-          list.push({
-            url: t1.installUrl,
-            name: t1.name,
-            description: t1.description ?? "",
-            authors: Array.isArray(t1.authors) ? t1.authors : [],
-            source: "Marketplace"
-          });
-        }
-      }
-      if (!list.length)
-        throw new Error("Couldn't load the theme store. Check your connection and try again.");
-      var seen = /* @__PURE__ */ new Set();
-      return list.filter((t2) => !seen.has(t2.url) && seen.add(t2.url));
-    })();
-  }
-  function Swatches({ preview: preview2 }) {
-    if (!preview2)
-      return null;
-    var colors = [
-      preview2.background,
-      preview2.surface,
-      preview2.accent,
-      preview2.text
-    ];
-    return /* @__PURE__ */ jsx(import_react_native40.View, {
-      style: {
-        flexDirection: "row",
-        gap: 6
-      },
-      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native40.View, {
-        style: {
-          width: 22,
-          height: 22,
-          borderRadius: 11,
-          backgroundColor: c2,
-          borderWidth: 1,
-          borderColor: "rgba(255,255,255,0.15)"
-        }
-      }, i))
-    });
-  }
-  function ThemeRow({ theme, refresh }) {
-    var [busy, setBusy] = React2.useState(false);
-    var installed = Boolean(themes[theme.url]);
-    var active = getCurrentTheme()?.id === theme.url;
-    var use = () => _async_to_generator(function* () {
-      setBusy(true);
-      try {
-        if (!themes[theme.url])
-          yield installTheme(theme.url);
-        yield selectTheme(themes[theme.url]);
-        showToast(`Now using ${theme.name}`, findAssetId("CheckIcon"));
-      } catch (e) {
-        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-      } finally {
-        setBusy(false);
-        refresh();
-      }
-    })();
-    var remove = () => _async_to_generator(function* () {
-      setBusy(true);
-      try {
-        yield removeTheme(theme.url);
-        showToast(`Removed ${theme.name}`, findAssetId("TrashIcon"));
-      } catch (e) {
-        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-      } finally {
-        setBusy(false);
-        refresh();
-      }
-    })();
-    return /* @__PURE__ */ jsx(Card, {
-      style: {
-        borderRadius: 22
-      },
-      children: /* @__PURE__ */ jsxs(Stack, {
-        spacing: 8,
-        children: [
-          /* @__PURE__ */ jsxs(import_react_native40.View, {
-            style: {
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 12
-            },
-            children: [
-              /* @__PURE__ */ jsxs(import_react_native40.View, {
-                style: {
-                  flex: 1
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Text, {
-                    variant: "heading-md/semibold",
-                    numberOfLines: 1,
-                    children: theme.name
-                  }),
-                  /* @__PURE__ */ jsxs(Text, {
-                    variant: "text-sm/medium",
-                    color: "text-muted",
-                    numberOfLines: 1,
-                    children: [
-                      theme.authors.length ? `by ${theme.authors.join(", ")}` : theme.source,
-                      theme.hasBackground ? " \xB7 background" : ""
-                    ]
-                  })
-                ]
-              }),
-              /* @__PURE__ */ jsx(Swatches, {
-                preview: theme.preview
-              })
-            ]
-          }),
-          !!theme.description && /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/normal",
-            numberOfLines: 2,
-            children: theme.description
-          }),
-          /* @__PURE__ */ jsxs(import_react_native40.View, {
-            style: {
-              flexDirection: "row",
-              gap: 8
-            },
-            children: [
-              /* @__PURE__ */ jsx(import_react_native40.View, {
-                style: {
-                  flex: 1
-                },
-                children: /* @__PURE__ */ jsx(Button, {
-                  size: "md",
-                  variant: active ? "secondary" : "primary",
-                  text: active ? "In use" : busy ? "Working\u2026" : "Use",
-                  disabled: busy || active,
-                  onPress: use
-                })
-              }),
-              installed && /* @__PURE__ */ jsx(import_react_native40.View, {
-                style: {
-                  flex: 1
-                },
-                children: /* @__PURE__ */ jsx(Button, {
-                  size: "md",
-                  variant: "destructive",
-                  text: "Remove",
-                  disabled: busy,
-                  onPress: remove
-                })
-              })
-            ]
-          })
-        ]
-      })
-    });
-  }
-  function ThemeStore3() {
-    var [list, setList] = React2.useState(null);
-    var [error, setError] = React2.useState("");
-    var [query, setQuery] = React2.useState("");
-    var [, setTick] = React2.useState(0);
-    var refresh = () => setTick((t) => t + 1);
-    React2.useEffect(() => {
-      loadThemes().then(setList, (e) => setError(e instanceof Error ? e.message : String(e)));
-    }, []);
-    var q3 = query.trim().toLowerCase();
-    var shown = (list ?? []).filter((t) => !q3 || [
-      t.name,
-      t.description,
-      t.source,
-      ...t.authors
-    ].some((v2) => v2?.toLowerCase().includes(q3)));
-    return /* @__PURE__ */ jsxs(import_react_native40.View, {
-      style: {
-        flex: 1
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native40.View, {
-          style: {
-            paddingHorizontal: 12,
-            paddingTop: 12,
-            paddingBottom: 4
-          },
-          children: /* @__PURE__ */ jsx(Search_default, {
-            placeholder: list ? `Search ${list.length} themes` : "Search themes",
-            onChangeText: setQuery
-          })
-        }),
-        error ? /* @__PURE__ */ jsx(Text, {
-          variant: "text-md/medium",
-          color: "text-muted",
-          style: {
-            textAlign: "center",
-            padding: 24
-          },
-          children: error
-        }) : !list ? /* @__PURE__ */ jsx(Text, {
-          variant: "text-md/medium",
-          color: "text-muted",
-          style: {
-            textAlign: "center",
-            padding: 24
-          },
-          children: "Loading themes\u2026"
-        }) : /* @__PURE__ */ jsx(FlashList, {
-          data: shown,
-          estimatedItemSize: 150,
-          keyExtractor: (t) => t.url,
-          contentContainerStyle: {
-            padding: 12,
-            paddingBottom: 48
-          },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native40.View, {
-            style: {
-              height: 10
-            }
-          }),
-          ListEmptyComponent: /* @__PURE__ */ jsxs(Text, {
-            variant: "text-md/medium",
-            color: "text-muted",
-            style: {
-              textAlign: "center",
-              padding: 24
-            },
-            children: [
-              "No themes match \u201C",
-              query,
-              "\u201D."
-            ]
-          }),
-          renderItem: ({ item }) => /* @__PURE__ */ jsx(ThemeRow, {
-            theme: item,
-            refresh
-          })
-        })
-      ]
-    });
-  }
-  var import_react_native40, CLOUDCORD_INDEX, MARKETPLACE;
-  var init_ThemeStore = __esm({
-    "src/core/ui/settings/pages/ThemeStore/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_themes();
-      init_assets();
-      init_safeFetch();
-      init_common();
-      init_components();
-      init_Search();
-      init_toasts();
-      import_react_native40 = __toESM(require_react_native());
-      CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/themes/mobile/index.json";
-      MARKETPLACE = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
-    }
-  });
-
-  // src/lib/addons/fonts/index.ts
-  var fonts_exports = {};
-  __export(fonts_exports, {
-    fonts: () => fonts,
-    installFont: () => installFont,
-    removeFont: () => removeFont,
-    saveFont: () => saveFont,
-    selectFont: () => selectFont,
-    updateFont: () => updateFont,
-    updateFonts: () => updateFonts,
-    validateFont: () => validateFont
-  });
-  function writeFont(font) {
-    return _async_to_generator(function* () {
-      if (!font && font !== null)
-        throw new Error("Arg font must be a valid object or null");
-      if (font) {
-        yield writeFile("fonts.json", JSON.stringify(font));
-      } else {
-        yield removeFile("fonts.json");
-      }
-    })();
-  }
-  function validateFont(font) {
-    if (!font || typeof font !== "object")
-      throw new Error("URL returned a null/non-object JSON");
-    if (typeof font.spec !== "number")
-      throw new Error("Invalid font 'spec' number");
-    if (font.spec !== 1)
-      throw new Error("Only fonts which follows spec:1 are supported");
-    var requiredFields = [
-      "name",
-      "main"
-    ];
-    if (requiredFields.some((f) => !font[f]))
-      throw new Error(`Font is missing one of the fields: ${requiredFields}`);
-    if (font.name.startsWith("__"))
-      throw new Error("Font names cannot start with __");
-    if (font.name in fonts)
-      throw new Error(`There is already a font named '${font.name}' installed`);
-  }
-  function saveFont(data, selected = false) {
-    return _async_to_generator(function* () {
-      var fontDefJson;
-      if (typeof data === "string") {
-        try {
-          fontDefJson = yield (yield safeFetch(data)).json();
-        } catch (e) {
-          throw new Error(`Failed to fetch fonts at ${data}`, {
-            cause: e
-          });
-        }
-      } else {
-        fontDefJson = data;
-      }
-      validateFont(fontDefJson);
-      var errors = yield allSettled(Object.entries(fontDefJson.main).map(([font, url2]) => _async_to_generator(function* () {
-        var ext = url2.split(".").pop();
-        if (ext !== "ttf" && ext !== "otf")
-          ext = "ttf";
-        var path = `downloads/fonts/${fontDefJson.name}/${font}.${ext}`;
-        if (!(yield fileExists(path)))
-          yield downloadFile(url2, path);
-      })())).then((it) => it.map((it2) => it2.status === "fulfilled" ? void 0 : it2.reason));
-      if (errors.some((it) => it))
-        throw errors;
-      fonts[fontDefJson.name] = fontDefJson;
-      if (selected)
-        writeFont(fonts[fontDefJson.name]);
-      return fontDefJson;
-    })();
-  }
-  function updateFont(fontDef) {
-    return _async_to_generator(function* () {
-      var fontDefCopy = {
-        ...fontDef
-      };
-      if (fontDefCopy.source)
-        fontDefCopy = {
-          ...yield fetch(fontDefCopy.source).then((it) => it.json()),
-          // Can't change these properties
-          name: fontDef.name,
-          source: fontDef.source
-        };
-      var selected = fonts.__selected === fontDef.name;
-      yield removeFont(fontDef.name);
-      yield saveFont(fontDefCopy, selected);
-    })();
-  }
-  function installFont(url2, selected = false) {
-    return _async_to_generator(function* () {
-      var font = yield saveFont(url2);
-      if (selected)
-        yield selectFont(font.name);
-    })();
-  }
-  function selectFont(name) {
-    return _async_to_generator(function* () {
-      if (name && !(name in fonts))
-        throw new Error("Selected font does not exist!");
-      if (name) {
-        fonts.__selected = name;
-      } else {
-        delete fonts.__selected;
-      }
-      yield writeFont(name == null ? null : fonts[name]);
-    })();
-  }
-  function removeFont(name) {
-    return _async_to_generator(function* () {
-      var selected = fonts.__selected === name;
-      if (selected)
-        yield selectFont(null);
-      delete fonts[name];
-      try {
-        yield clearFolder(`downloads/fonts/${name}`);
-      } catch (e) {
-      }
-    })();
-  }
-  function updateFonts() {
-    return _async_to_generator(function* () {
-      yield awaitStorage(fonts);
-      allSettled(Object.keys(fonts).map((name) => saveFont(fonts[name], fonts.__selected === name)));
-    })();
-  }
-  var fonts;
-  var init_fonts = __esm({
-    "src/lib/addons/fonts/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_storage();
-      init_fs();
-      init_utils();
-      fonts = wrapSync(createStorage(createMMKVBackend("BUNNY_FONTS")));
-    }
-  });
-
-  // src/core/ui/settings/pages/Fonts/FontEditor.tsx
-  function promptDetachConfirmationForThen(fontName, cb) {
-    if (fontName && fonts[fontName].source)
-      openAlert3("revenge-fonts-detach-source-confirmation", /* @__PURE__ */ jsx(AlertModal4, {
-        title: "Detach font pack URL?",
-        content: "You need to detach the font pack URL from this font pack before you can manually edit its font entries. Do you want to detach the font pack URL?",
-        actions: /* @__PURE__ */ jsxs(Stack, {
-          children: [
-            /* @__PURE__ */ jsx(AlertActionButton4, {
-              text: "Detach",
-              variant: "destructive",
-              onPress: () => {
-                delete fonts[fontName].source;
-                cb();
-              }
-            }),
-            /* @__PURE__ */ jsx(AlertActionButton4, {
-              text: Strings.CANCEL,
-              variant: "secondary"
-            })
-          ]
-        })
-      }));
-    else
-      cb();
-  }
-  function guessFontName(urls) {
-    var fileNames = urls.map((url2) => {
-      var { pathname } = new URL(url2);
-      var fileName = pathname.replace(/\.[^/.]+$/, "");
-      return fileName.split("/").pop();
-    }).filter(Boolean);
-    var shortest = fileNames.reduce((shortest2, name) => {
-      return name.length < shortest2.length ? name : shortest2;
-    }, fileNames[0] || "");
-    return shortest?.replace(/-[A-Za-z]*$/, "") || null;
-  }
-  function RevengeFontsExtractor({ fonts: fonts2, setName }) {
-    var currentTheme = getCurrentTheme().data;
-    var themeFonts = currentTheme.fonts;
-    var [fontName, setFontName] = (0, import_react15.useState)(guessFontName(Object.values(themeFonts)));
-    var [error, setError] = (0, import_react15.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native41.View, {
-      style: {
-        padding: 8,
-        paddingBottom: 16,
-        gap: 12
-      },
-      children: [
-        /* @__PURE__ */ jsx(TextInput, {
-          autoFocus: true,
-          size: "md",
-          label: Strings.FONT_NAME,
-          value: fontName,
-          placeholder: fontName || "Whitney",
-          onChange: setFontName,
-          errorMessage: error,
-          state: error ? "error" : void 0
-        }),
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-xs/normal",
-          color: "text-muted",
-          children: formatString("THEME_EXTRACTOR_DESC", {
-            fonts: Object.keys(themeFonts).join(Strings.SEPARATOR)
-          })
-        }),
-        /* @__PURE__ */ jsx(Button, {
-          size: "md",
-          variant: "primary",
-          text: Strings.EXTRACT,
-          disabled: !fontName,
-          onPress: () => {
-            if (!fontName)
-              return;
-            try {
-              validateFont({
-                spec: 1,
-                name: fontName,
-                main: themeFonts
-              });
-              setName(fontName);
-              Object.assign(fonts2, themeFonts);
-              actionSheet2.hideActionSheet();
-            } catch (e) {
-              setError(String(e));
-            }
-          }
-        })
-      ]
-    });
-  }
-  function JsonFontImporter({ fonts: fonts2, setName, setSource }) {
-    var [fontLink, setFontLink] = (0, import_react15.useState)("");
-    var [saving, setSaving] = (0, import_react15.useState)(false);
-    var [error, setError] = (0, import_react15.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native41.View, {
-      style: {
-        padding: 8,
-        paddingBottom: 16,
-        gap: 12
-      },
-      children: [
-        /* @__PURE__ */ jsx(TextInput, {
-          autoFocus: true,
-          size: "md",
-          label: "Font Link",
-          value: fontLink,
-          placeholder: "https://link.to/font/pack.json",
-          onChange: setFontLink,
-          errorMessage: error,
-          state: error ? "error" : void 0
-        }),
-        /* @__PURE__ */ jsx(Button, {
-          size: "md",
-          variant: "primary",
-          text: "Import",
-          disabled: !fontLink || saving,
-          loading: saving,
-          onPress: () => {
-            setSaving(true);
-            (() => _async_to_generator(function* () {
-              var res = yield safeFetch(fontLink, {
-                cache: "no-store"
-              });
-              var json = yield res.json();
-              validateFont(json);
-              setName(json.name);
-              setSource(fontLink);
-              Object.assign(fonts2, json.main);
-            })())().then(() => actionSheet2.hideActionSheet()).catch((e) => setError(String(e))).finally(() => setSaving(false));
-          }
-        })
-      ]
-    });
-  }
-  function EntryEditorActionSheet(props) {
-    var [familyName, setFamilyName] = (0, import_react15.useState)(props.name);
-    var [fontUrl, setFontUrl] = (0, import_react15.useState)(props.fontEntries[props.name]);
-    return /* @__PURE__ */ jsxs(import_react_native41.View, {
-      style: {
-        padding: 8,
-        paddingBottom: 16,
-        gap: 12
-      },
-      children: [
-        /* @__PURE__ */ jsx(TextInput, {
-          autoFocus: true,
-          size: "md",
-          label: "Family Name (to override)",
-          value: familyName,
-          placeholder: "ggsans-Bold",
-          onChange: setFamilyName
-        }),
-        /* @__PURE__ */ jsx(TextInput, {
-          size: "md",
-          label: "Font URL",
-          value: fontUrl,
-          placeholder: "https://link.to/the/font.ttf",
-          onChange: setFontUrl
-        }),
-        /* @__PURE__ */ jsx(Button, {
-          size: "md",
-          variant: "primary",
-          text: "Apply",
-          onPress: () => {
-            delete props.fontEntries[props.name];
-            props.fontEntries[familyName] = fontUrl;
-            props.onChange();
-            actionSheet2.hideActionSheet();
-          }
-        })
-      ]
-    });
-  }
-  function promptActionSheet(Component2, fontEntries, props) {
-    actionSheet2.openLazy(Promise.resolve({
-      default: () => /* @__PURE__ */ jsx(ErrorBoundary, {
-        children: /* @__PURE__ */ jsxs(ActionSheet, {
-          children: [
-            /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
-              title: "Import Font"
-            }),
-            /* @__PURE__ */ jsx(Component2, {
-              fonts: fontEntries,
-              ...props
-            })
-          ]
-        })
-      })
-    }), "FontEditorActionSheet");
-  }
-  function NewEntryRow({ fontName, fontEntry }) {
-    var nameRef = (0, import_react15.useRef)();
-    var urlRef = (0, import_react15.useRef)();
-    var [nameSet, setNameSet] = (0, import_react15.useState)(false);
-    var [error, setError] = (0, import_react15.useState)();
-    return /* @__PURE__ */ jsxs(import_react_native41.View, {
-      style: {
-        flexDirection: "row",
-        gap: 8,
-        justifyContent: "flex-start"
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native41.View, {
-          style: {
-            flex: 1
-          },
-          children: /* @__PURE__ */ jsx(TextInput, {
-            isRound: true,
-            size: "md",
-            label: nameSet ? nameRef.current : void 0,
-            placeholder: nameSet ? "https://path.to/the/file.ttf" : "PostScript name (e.g. ggsans-Bold)",
-            leadingIcon: () => nameSet ? null : /* @__PURE__ */ jsx(TableRow.Icon, {
-              source: findAssetId("PlusSmallIcon")
-            }),
-            leadingText: nameSet ? nameRef.current : "",
-            onChange: (text) => (nameSet ? urlRef : nameRef).current = text,
-            errorMessage: error,
-            state: error ? "error" : void 0
-          })
-        }),
-        nameSet && /* @__PURE__ */ jsx(IconButton, {
-          size: "md",
-          variant: "secondary",
-          onPress: () => {
-            nameRef.current = "";
-            setNameSet(false);
-          },
-          icon: findAssetId("TrashIcon")
-        }),
-        /* @__PURE__ */ jsx(IconButton, {
-          size: "md",
-          variant: "primary",
-          onPress: () => promptDetachConfirmationForThen(fontName, () => {
-            if (!nameSet && nameRef.current) {
-              setNameSet(true);
-            } else if (nameSet && nameRef.current && urlRef.current) {
-              try {
-                var parsedUrl = new URL(urlRef.current);
-                if (!parsedUrl.protocol || !parsedUrl.host) {
-                  throw "Invalid URL";
-                }
-                fontEntry[nameRef.current] = urlRef.current;
-                nameRef.current = void 0;
-                urlRef.current = void 0;
-                setNameSet(false);
-              } catch (e) {
-                setError(String(e));
-              }
-            }
-          }),
-          icon: findAssetId(nameSet ? "PlusSmallIcon" : "ArrowLargeRightIcon")
-        })
-      ]
-    });
-  }
-  function FontEditor(props) {
-    var [name, setName] = (0, import_react15.useState)(props.name);
-    var [source, setSource] = (0, import_react15.useState)(props.name && fonts[props.name].source);
-    var [importing, setIsImporting] = (0, import_react15.useState)(false);
-    var [errors, setErrors] = (0, import_react15.useState)();
-    var memoEntry = (0, import_react15.useMemo)(() => {
-      return createProxy(props.name ? {
-        ...fonts[props.name].main
-      } : {}).proxy;
-    }, [
-      props.name
-    ]);
-    var fontEntries = useProxy(memoEntry);
-    var navigation2 = NavigationNative.useNavigation();
-    var [, forceUpdate] = React.useReducer(() => ({}), 0);
-    return /* @__PURE__ */ jsx(import_react_native41.ScrollView, {
-      style: {
-        flex: 1
-      },
-      contentContainerStyle: {
-        paddingBottom: 38
-      },
-      children: /* @__PURE__ */ jsxs(Stack, {
-        style: {
-          paddingVertical: 24,
-          paddingHorizontal: 12
-        },
-        spacing: 12,
-        children: [
-          !props.name ? /* @__PURE__ */ jsxs(TableRowGroup, {
-            title: "Import",
-            children: [
-              getCurrentTheme()?.data?.fonts && /* @__PURE__ */ jsx(TableRow, {
-                label: Strings.LABEL_EXTRACT_FONTS_FROM_THEME,
-                subLabel: Strings.DESC_EXTRACT_FONTS_FROM_THEME,
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: findAssetId("HammerIcon")
-                }),
-                onPress: () => promptActionSheet(RevengeFontsExtractor, fontEntries, {
-                  setName
-                })
-              }),
-              /* @__PURE__ */ jsx(TableRow, {
-                label: "Import font entries from a link",
-                subLabel: "Directly import from a link with a pre-configured JSON file",
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: findAssetId("LinkIcon")
-                }),
-                onPress: () => promptActionSheet(JsonFontImporter, fontEntries, {
-                  setName,
-                  setSource
-                })
-              })
-            ]
-          }) : /* @__PURE__ */ jsxs(TableRowGroup, {
-            title: "Actions",
-            children: [
-              /* @__PURE__ */ jsx(TableRow, {
-                label: "Refetch fonts from source",
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: findAssetId("RetryIcon")
-                }),
-                onPress: () => _async_to_generator(function* () {
-                  yield updateFont(fonts[props.name]);
-                  navigation2.goBack();
-                })()
-              }),
-              /* @__PURE__ */ jsx(TableRow, {
-                variant: "danger",
-                label: "Delete font pack",
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  variant: "danger",
-                  source: findAssetId("TrashIcon")
-                }),
-                onPress: () => removeFont(props.name).then(() => navigation2.goBack())
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsx(TextInput, {
-            size: "lg",
-            value: name,
-            label: Strings.FONT_NAME,
-            placeholder: "Whitney",
-            onChange: setName
-          }),
-          props.name && fonts[props.name].source && /* @__PURE__ */ jsx(TextInput, {
-            size: "lg",
-            value: source,
-            label: "Font Pack URL",
-            onChange: setSource
-          }),
-          /* @__PURE__ */ jsxs(TableRowGroup, {
-            title: "Font Entries",
-            children: [
-              Object.entries(fontEntries).map(([name2, url2], index) => {
-                var error = errors?.[index];
-                return /* @__PURE__ */ jsx(TableRow, {
-                  label: name2,
-                  subLabel: error ? /* @__PURE__ */ jsx(Text, {
-                    variant: "text-xs/medium",
-                    color: "text-feedback-critical",
-                    children: error.message
-                  }) : url2,
-                  trailing: /* @__PURE__ */ jsxs(Stack, {
-                    spacing: 8,
-                    direction: "horizontal",
-                    children: [
-                      /* @__PURE__ */ jsx(IconButton, {
-                        size: "sm",
-                        variant: "secondary",
-                        icon: findAssetId("PencilIcon"),
-                        onPress: () => promptDetachConfirmationForThen(props.name, () => promptActionSheet(EntryEditorActionSheet, fontEntries, {
-                          name: name2,
-                          fontEntries,
-                          onChange: () => {
-                            setErrors(void 0);
-                            forceUpdate();
-                          }
-                        }))
-                      }),
-                      /* @__PURE__ */ jsx(IconButton, {
-                        size: "sm",
-                        variant: "secondary",
-                        icon: findAssetId("TrashIcon"),
-                        onPress: () => promptDetachConfirmationForThen(props.name, () => {
-                          delete fontEntries[name2];
-                          setErrors(void 0);
-                        })
-                      })
-                    ]
-                  })
-                });
-              }),
-              /* @__PURE__ */ jsx(TableRow, {
-                label: /* @__PURE__ */ jsx(NewEntryRow, {
-                  fontName: props.name,
-                  fontEntry: fontEntries
-                })
-              })
-            ]
-          }),
-          errors && /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/medium",
-            color: "text-feedback-critical",
-            children: "Some font entries cannot be imported. Please modify the entries and try again."
-          }),
-          /* @__PURE__ */ jsx(import_react_native41.View, {
-            style: {
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              bottom: 0,
-              left: 0
-            },
-            children: /* @__PURE__ */ jsx(Button, {
-              size: "lg",
-              loading: importing,
-              disabled: importing || !name || Object.keys(fontEntries).length === 0,
-              variant: "primary",
-              text: props.name ? "Save" : "Import",
-              onPress: () => _async_to_generator(function* () {
-                if (!name)
-                  return;
-                setErrors(void 0);
-                setIsImporting(true);
-                if (!props.name) {
-                  saveFont({
-                    spec: 1,
-                    name,
-                    main: fontEntries,
-                    source
-                  }).then(() => navigation2.goBack()).catch((e) => setErrors(e)).finally(() => setIsImporting(false));
-                } else {
-                  Object.assign(fonts[props.name], {
-                    name,
-                    main: fontEntries
-                  });
-                  updateFont(fonts[props.name]).then(() => navigation2.goBack()).catch((e) => setErrors(e)).finally(() => setIsImporting(false));
-                }
-              })(),
-              icon: findAssetId(props.name ? "toast_image_saved" : "DownloadIcon"),
-              style: {
-                marginLeft: 8
-              }
-            })
-          })
-        ]
-      })
-    });
-  }
-  var import_react15, import_react_native41, actionSheet2, openAlert3, AlertModal4, AlertActionButton4;
-  var init_FontEditor = __esm({
-    "src/core/ui/settings/pages/Fonts/FontEditor.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_i18n();
-      init_storage();
-      init_fonts();
-      init_themes();
-      init_assets();
-      init_utils();
-      init_lazy();
-      init_common();
-      init_components();
-      init_wrappers();
-      init_components2();
-      import_react15 = __toESM(require_react());
-      import_react_native41 = __toESM(require_react_native());
-      actionSheet2 = findByPropsLazy("hideActionSheet");
-      ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
-      ({ AlertModal: AlertModal4, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
-    }
-  });
-
-  // src/core/ui/settings/pages/Fonts/FontCard.tsx
-  function FontCard({ item: font }) {
-    useProxy(fonts);
-    var navigation2 = NavigationNative.useNavigation();
-    var selected = fonts.__selected === font.name;
-    return /* @__PURE__ */ jsx(Card, {
-      children: /* @__PURE__ */ jsx(Stack, {
-        spacing: 16,
-        children: /* @__PURE__ */ jsxs(import_react_native42.View, {
-          style: {
-            flexDirection: "row",
-            alignItems: "center"
-          },
-          children: [
-            /* @__PURE__ */ jsx(import_react_native42.View, {
-              children: /* @__PURE__ */ jsx(Text, {
-                variant: "heading-lg/semibold",
-                children: font.name
-              })
-            }),
-            /* @__PURE__ */ jsx(import_react_native42.View, {
-              style: {
-                marginLeft: "auto"
-              },
-              children: /* @__PURE__ */ jsxs(Stack, {
-                spacing: 12,
-                direction: "horizontal",
-                children: [
-                  /* @__PURE__ */ jsx(IconButton, {
-                    onPress: () => {
-                      navigation2.push("BUNNY_CUSTOM_PAGE", {
-                        title: "Edit Font",
-                        render: () => /* @__PURE__ */ jsx(FontEditor, {
-                          name: font.name
-                        })
-                      });
-                    },
-                    size: "sm",
-                    variant: "secondary",
-                    disabled: selected,
-                    icon: findAssetId("WrenchIcon")
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "sm",
-                    variant: selected ? "secondary" : "primary",
-                    text: selected ? "Unapply" : "Apply",
-                    onPress: () => _async_to_generator(function* () {
-                      yield selectFont(selected ? null : font.name);
-                      showConfirmationAlert({
-                        title: Strings.HOLD_UP,
-                        content: "Reload Discord to apply changes?",
-                        confirmText: Strings.RELOAD,
-                        cancelText: Strings.CANCEL,
-                        confirmColor: "red",
-                        onConfirm: BundleUpdaterManager.reload
-                      });
-                    })()
-                  })
-                ]
-              })
-            })
-          ]
-        })
-      })
-    });
-  }
-  var import_react_native42, useToken2;
-  var init_FontCard = __esm({
-    "src/core/ui/settings/pages/Fonts/FontCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_i18n();
-      init_alerts2();
-      init_storage();
-      init_fonts();
-      init_assets();
-      init_modules();
-      init_lazy();
-      init_metro();
-      init_common();
-      init_components();
-      import_react_native42 = __toESM(require_react_native());
-      init_FontEditor();
-      ({ useToken: useToken2 } = lazyDestructure(() => findByProps("useToken")));
-    }
-  });
-
-  // src/core/ui/settings/pages/Fonts/index.tsx
-  var Fonts_exports = {};
-  __export(Fonts_exports, {
-    default: () => Fonts
-  });
-  function Fonts() {
-    useProxy(settings);
-    useProxy(fonts);
-    var navigation2 = NavigationNative.useNavigation();
-    return /* @__PURE__ */ jsx(AddonPage, {
-      title: Strings.FONTS,
-      searchKeywords: [
-        "name",
-        "description"
-      ],
-      sortOptions: {
-        "Name (A-Z)": (a, b3) => a.name.localeCompare(b3.name),
-        "Name (Z-A)": (a, b3) => b3.name.localeCompare(a.name)
-      },
-      items: Object.values(fonts),
-      safeModeHint: {
-        message: Strings.SAFE_MODE_NOTICE_FONTS
-      },
-      CardComponent: FontCard,
-      installAction: {
-        label: "Install a font",
-        onPress: () => {
-          navigation2.push("BUNNY_CUSTOM_PAGE", {
-            title: "Import Font",
-            render: () => /* @__PURE__ */ jsx(FontEditor, {})
-          });
-        }
-      }
-    });
-  }
-  var init_Fonts = __esm({
-    "src/core/ui/settings/pages/Fonts/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_i18n();
-      init_AddonPage();
-      init_FontEditor();
-      init_storage();
-      init_fonts();
-      init_settings();
-      init_common();
-      init_FontCard();
-    }
-  });
-
-  // src/core/ui/settings/pages/Addons/index.tsx
-  var Addons_exports = {};
-  __export(Addons_exports, {
-    default: () => Addons
-  });
-  function icon2(...names) {
-    for (var name of names) {
-      try {
-        var id = findAssetId(name);
-        if (id)
-          return /* @__PURE__ */ jsx(TableRow.Icon, {
-            source: id
-          });
-      } catch (e) {
-      }
-    }
-    return void 0;
-  }
-  function Addons() {
-    var navigation2 = NavigationNative.useNavigation();
-    var open = React2.useMemo(() => {
-      var actions = /* @__PURE__ */ new Map();
-      return (title, load) => {
-        if (!actions.has(title))
-          actions.set(title, wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
-            return load();
-          })(), title, void 0, "push"));
-        return actions.get(title)();
-      };
-    }, [
-      navigation2
-    ]);
-    return /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
-      contentContainerStyle: {
-        paddingBottom: 38
-      },
-      children: /* @__PURE__ */ jsx(Stack, {
-        style: {
-          paddingVertical: 24,
-          paddingHorizontal: 12
-        },
-        spacing: 24,
-        children: /* @__PURE__ */ jsxs(TableRowGroup, {
-          title: "Add-ons",
-          children: [
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Plugins",
-              subLabel: "Manage and configure your plugins",
-              icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
-              onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Discover plugins",
-              subLabel: "Browse and install new plugins",
-              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "SettingsIcon"),
-              onPress: () => open("Discover plugins", () => (init_PluginBrowser(), __toCommonJS(PluginBrowser_exports)))
-            }),
-            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Themes",
-              subLabel: "Manage your Discord themes",
-              icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
-              onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
-            }),
-            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Discover themes",
-              subLabel: "Browse community themes and use one in a tap",
-              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "PaintPaletteIcon"),
-              onPress: () => open("Discover themes", () => (init_ThemeStore(), __toCommonJS(ThemeStore_exports)))
-            }),
-            isFontSupported() ? /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Fonts",
-              subLabel: "Choose and manage fonts",
-              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon"),
-              onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
-            }) : /* @__PURE__ */ jsx(TableRow, {
-              label: "Fonts",
-              subLabel: "Custom fonts are unavailable on this loader",
-              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon")
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Extras",
-              subLabel: "Fake Nitro, gift links, boosts, friend requests and account tools",
-              icon: icon2("GiftIcon", "NitroWheelIcon", "StarIcon", "SettingsIcon"),
-              onPress: () => open("Extras", () => ({
-                default: (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).ExtrasPage
-              }))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Cloudsync",
-              subLabel: "Back up and sync your settings",
-              icon: icon2("CloudIcon", "SyncIcon", "SettingsIcon"),
-              onPress: () => open("Cloudsync", () => (init_StoreCloud(), __toCommonJS(StoreCloud_exports)))
-            })
-          ]
-        })
-      })
-    });
-  }
-  var import_react_native43;
-  var init_Addons = __esm({
-    "src/core/ui/settings/pages/Addons/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      import_react_native43 = __toESM(require_react_native());
-      init_common();
-      init_components();
-      init_loader();
-      init_assets();
-      init_shared();
-    }
-  });
-
-  // src/core/ui/settings/pages/TestingPlugins/index.tsx
-  var TestingPlugins_exports = {};
-  __export(TestingPlugins_exports, {
-    default: () => TestingPlugins
-  });
-  function TestingReview({ assignment }) {
-    var backend = React2.useMemo(() => createFileBackend(testingStorageKey(assignment) + ".json"), [
-      assignment.userId,
-      assignment.platform
-    ]);
-    var storage = {
-      read: backend.get,
-      write: backend.set
-    };
-    var authorized = () => currentTestingAssignment()?.userId === assignment.userId;
-    var discord = "";
-    try {
-      var info = NativeClientInfoModule.getConstants();
-      if (info.Version && info.Build)
-        discord = String(info.Version) + " (" + String(info.Build) + ")";
-      else if (info.Version || info.Build)
-        discord = String(info.Version ?? info.Build);
-    } catch (e) {
-    }
-    var revision = globalThis.__CLOUDCORD_RUNTIME_REVISION__;
-    var cloudcord = typeof revision === "string" && revision ? "v1.4.3 " + revision : "v1.4.3";
-    var review = useTestingReview(React2, assignment, storage, {
-      cloudcord,
-      discord
-    }, authorized);
-    var [exportMessage, setExportMessage] = React2.useState("");
-    function saveResults() {
-      return _async_to_generator(function* () {
-        var text = review.export();
-        if (!text)
-          return;
-        var filename = "cx-testing-" + assignment.platform + "-" + assignment.userId + ".csv";
-        try {
-          yield writeFile(filename, text, {
-            prefix: ""
-          });
-          setExportMessage("Saved " + filename + " in the app folder.");
-        } catch (e) {
-          setExportMessage("Could not save the CSV.");
-        }
-      })();
-    }
-    var disabled = !review.ready || review.saving;
-    var field = (label2, value, onChange, maxLength) => /* @__PURE__ */ jsxs(Stack, {
-      spacing: 5,
-      children: [
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-sm/medium",
-          children: label2
-        }),
-        /* @__PURE__ */ jsx(TextInput, {
-          size: "lg",
-          value,
-          maxLength,
-          onChange: (input) => onChange(typeof input === "string" ? input : input?.nativeEvent?.text ?? "")
-        })
-      ]
-    });
-    return /* @__PURE__ */ jsx(import_react_native44.ScrollView, {
-      keyboardShouldPersistTaps: "handled",
-      contentContainerStyle: {
-        padding: 16,
-        paddingBottom: 40
-      },
-      children: /* @__PURE__ */ jsxs(Stack, {
-        spacing: 14,
-        children: [
-          /* @__PURE__ */ jsxs(Text, {
-            variant: "text-md/medium",
-            children: [
-              assignment.label,
-              " \xB7 ",
-              review.completed,
-              " of ",
-              assignment.entries.length,
-              " reviewed"
-            ]
-          }),
-          field("Search assigned plugins", review.search, review.searchFor, 120),
-          field("CloudCord build", review.build.cloudcord, (value) => review.setBuild("cloudcord", value), 100),
-          field("Discord build", review.build.discord, (value) => review.setBuild("discord", value), 100),
-          review.entry ? /* @__PURE__ */ jsxs(Stack, {
-            spacing: 10,
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "heading-lg/semibold",
-                children: review.entry.name
-              }),
-              /* @__PURE__ */ jsxs(Text, {
-                variant: "text-sm/normal",
-                children: [
-                  review.entry.id,
-                  " \xB7 ",
-                  review.entry.group
-                ]
-              }),
-              /* @__PURE__ */ jsxs(Text, {
-                variant: "text-sm/medium",
-                children: [
-                  review.review?.status ?? "Pending",
-                  " \xB7 ",
-                  review.index + 1,
-                  " of ",
-                  review.count
-                ]
-              }),
-              field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native44.View, {
-                style: {
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 8
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "primary",
-                    text: "Approve",
-                    disabled,
-                    onPress: () => void review.save("Pass")
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "destructive",
-                    text: "Disapprove",
-                    disabled,
-                    onPress: () => void review.save("Fail")
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "secondary",
-                    text: "Blocked",
-                    disabled,
-                    onPress: () => void review.save("Blocked")
-                  })
-                ]
-              }),
-              /* @__PURE__ */ jsxs(import_react_native44.View, {
-                style: {
-                  flexDirection: "row",
-                  gap: 8
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "secondary",
-                    text: "Previous",
-                    disabled: review.saving || review.index === 0,
-                    onPress: () => review.move(-1)
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "secondary",
-                    text: "Next",
-                    disabled: review.saving || review.index + 1 >= review.count,
-                    onPress: () => review.move(1)
-                  })
-                ]
-              })
-            ]
-          }) : /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/normal",
-            children: "No assigned plugins match your search."
-          }),
-          /* @__PURE__ */ jsx(Button, {
-            size: "md",
-            variant: "secondary",
-            text: "Save results as CSV",
-            disabled: !review.completed || review.saving,
-            onPress: () => void saveResults()
-          }),
-          !!(review.message || !review.ready) && /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/medium",
-            children: review.message || "Loading results\u2026"
-          }),
-          !!exportMessage && /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/medium",
-            children: exportMessage
-          })
-        ]
-      })
-    });
-  }
-  function TestingPlugins() {
-    var assignment = useMobileTestingAssignment();
-    return assignment ? /* @__PURE__ */ jsx(TestingReview, {
-      assignment
-    }, assignment.userId) : null;
-  }
-  var import_react_native44;
-  var init_TestingPlugins = __esm({
-    "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_storage();
-      init_cxTesting();
-      init_fs();
-      init_modules();
-      init_pluginTesting();
-      init_common();
-      init_components();
-      import_react_native44 = __toESM(require_react_native());
-    }
-  });
-
-  // src/core/ui/settings/index.ts
-  var settings_exports3 = {};
-  __export(settings_exports3, {
-    PupuIcon: () => cloudcord_default,
-    default: () => initSettings
-  });
-  function safeAsset(...names) {
-    for (var name of names) {
-      try {
-        var asset = findAssetId(name);
-        if (asset)
-          return asset;
-      } catch (e) {
-      }
-    }
-    return cloudcord_default;
-  }
-  function initSettings() {
-    if (settings.cloudcordDiagnosticsEnabled === true)
-      void Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)).then((module) => module.initializeDiagnosticsCapture()).catch(() => {
-      });
-    var coreItem = {
-      key: "CLOUDCORD",
-      title: () => "Overview",
-      icon: safeAsset("CircleInformationIcon-primary", "CircleInformationIcon", "InfoIcon"),
-      render: () => Promise.resolve().then(() => (init_General(), General_exports)),
-      useTrailing: () => `(${"v1.4.3"})`
-    };
-    var hiddenControlsItem = {
-      key: "CLOUDCORD_HIDDEN_CONTROLS",
-      title: () => "Developer options",
-      icon: safeAsset("WrenchIcon", "SettingsIcon"),
-      render: () => Promise.resolve().then(() => (init_Customization(), Customization_exports)),
-      usePredicate: () => useProxy(settings).cloudcordSectionHidden ?? false,
-      useTrailing: () => "\xB7",
-      nativeSection: "developer"
-    };
-    var baseItems = [
-      coreItem,
-      {
-        key: "BOTCORD",
-        title: () => "Botcord",
-        icon: safeAsset("RobotIcon", "AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_BotCord(), BotCord_exports))
-      },
-      {
-        key: "FAKE_PROFILE",
-        title: () => "Profile",
-        icon: safeAsset("UserIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))
-      },
-      {
-        key: "STORE_CLOUD",
-        title: () => "Cloudsync",
-        icon: {
-          uri: "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png"
-        },
-        render: () => Promise.resolve().then(() => (init_StoreCloud(), StoreCloud_exports))
-      },
-      {
-        key: "BUNNY_PLUGINS",
-        title: () => "Add-ons",
-        icon: safeAsset("AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_Addons(), Addons_exports))
-      },
-      {
-        key: "CLOUDCORD_TESTING_PLUGINS",
-        title: () => "Testing Plugins",
-        icon: safeAsset("AppsIcon", "WrenchIcon"),
-        render: () => Promise.resolve().then(() => (init_TestingPlugins(), TestingPlugins_exports)),
-        usePredicate: () => Boolean(useMobileTestingAssignment())
-      },
-      {
-        key: "CLOUDCORD_PLUGIN_BROWSER",
-        title: () => "Discover plugins",
-        icon: safeAsset("ChannelListMagnifyingGlassIcon", "SearchIcon", "AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports))
-      },
-      {
-        key: "CLOUDCORD_DIAGNOSTICS",
-        title: () => "Diagnostics",
-        icon: safeAsset("WrenchIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)),
-        usePredicate: () => useProxy(settings).cloudcordDiagnosticsEnabled === true
-      }
-    ];
-    var defaultOrder = [
-      "CLOUDCORD",
-      "BOTCORD",
-      "FAKE_PROFILE",
-      "BUNNY_PLUGINS",
-      "CLOUDCORD_TESTING_PLUGINS",
-      "CLOUDCORD_DIAGNOSTICS"
-    ];
-    var configurableKeys = new Set(defaultOrder.filter((key) => key !== "CLOUDCORD"));
-    var configuredOrder = settings.cloudcordTabOrder ?? [];
-    var orderIndex = new Map(configuredOrder.map((key, index) => [
-      key,
-      index
-    ]));
-    var items = [
-      ...baseItems,
-      hiddenControlsItem
-    ].filter((row) => ![
-      "STORE_CLOUD",
-      "CLOUDCORD_PLUGIN_BROWSER",
-      "CLOUDCORD_RECOVERY"
-    ].includes(row.key)).map((row) => {
-      if (row.nativeSection)
-        return row;
-      var originalPredicate = row.usePredicate;
-      return {
-        ...row,
-        usePredicate: () => {
-          var state2 = useProxy(settings);
-          var originalVisible = originalPredicate?.() ?? true;
-          if (state2.cloudcordSectionHidden ?? false)
-            return false;
-          if (configurableKeys.has(row.key) && (state2.cloudcordHiddenTabs ?? []).includes(row.key))
-            return false;
-          return originalVisible;
-        }
-      };
-    }).sort((a, b3) => {
-      var rank = (key) => key === "CLOUDCORD" ? -1 : key === "BUNNY_DEVELOPER" ? Number.MAX_SAFE_INTEGER : orderIndex.get(key) ?? (defaultOrder.includes(key) ? defaultOrder.indexOf(key) : defaultOrder.length);
-      return rank(a.key) - rank(b3.key);
-    });
-    registerSection({
-      name: "CloudCord",
-      items
-    });
-    globalThis.__CLOUDCORD_SETTINGS_CORE_REGISTERED__ = true;
-    registerSection({
-      name: "Bunny",
-      items: []
-    });
-    registerSection({
-      name: "Revenge",
-      items: []
-    });
-    registerSection({
-      name: "Vendetta",
-      items: []
-    });
-  }
-  var init_settings3 = __esm({
-    "src/core/ui/settings/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_cloudcord();
-      init_storage();
-      init_assets();
-      init_settings();
-      init_pluginTesting();
-      init_settings2();
-    }
-  });
-
-  // src/core/ui/settings/pages/CloudCordVerification/index.tsx
-  function initializeCloudCordVerification() {
-  }
-  var init_CloudCordVerification = __esm({
-    "src/core/ui/settings/pages/CloudCordVerification/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/core/ui/botcord/FloatingSwitcher.tsx
-  function initBotCordSwitcher() {
-    return () => {
-    };
-  }
-  var init_FloatingSwitcher = __esm({
-    "src/core/ui/botcord/FloatingSwitcher.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/core/ui/reporter/components/ErrorBoundaryScreen.tsx
-  function ErrorBoundaryScreen(props) {
-    var styles2 = useStyles4();
-    var debugInfo = getDebugInfo();
-    return /* @__PURE__ */ jsx(ErrorBoundary, {
-      children: /* @__PURE__ */ jsx(SafeAreaProvider, {
-        children: /* @__PURE__ */ jsxs(SafeAreaView, {
-          style: styles2.container,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native45.View, {
-              style: {
-                gap: 4
-              },
-              children: [
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "display-lg",
-                  children: "Uh oh."
-                }),
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "text-md/normal",
-                  children: "A crash occurred while rendering a component. This could be caused by a plugin, CloudCord, or Discord itself."
-                }),
-                /* @__PURE__ */ jsxs(Text, {
-                  variant: "text-sm/normal",
-                  color: "text-muted",
-                  children: [
-                    debugInfo.os.name,
-                    "; ",
-                    debugInfo.discord.build,
-                    " (",
-                    debugInfo.discord.version,
-                    "); ",
-                    debugInfo.bunny.version
-                  ]
-                })
-              ]
-            }),
-            /* @__PURE__ */ jsxs(import_react_native45.ScrollView, {
-              fadingEdgeLength: 64,
-              contentContainerStyle: {
-                gap: 12
-              },
-              children: [
-                /* @__PURE__ */ jsx(Codeblock, {
-                  selectable: true,
-                  children: props.error.message
-                }),
-                hasStack(props.error) && /* @__PURE__ */ jsx(ErrorStackCard, {
-                  error: props.error
-                }),
-                isComponentStack(props.error) ? /* @__PURE__ */ jsx(ErrorComponentStackCard, {
-                  componentStack: props.error.componentStack
-                }) : null
-              ]
-            }),
-            /* @__PURE__ */ jsxs(Card, {
-              style: {
-                gap: 6
-              },
-              children: [
-                /* @__PURE__ */ jsx(Button, {
-                  text: "Reload Discord",
-                  onPress: () => BundleUpdaterManager.reload()
-                }),
-                !settings.safeMode?.enabled && /* @__PURE__ */ jsx(Button, {
-                  text: "Reload in Safe Mode",
-                  onPress: () => toggleSafeMode()
-                }),
-                /* @__PURE__ */ jsx(Button, {
-                  variant: "destructive",
-                  text: "Retry Render",
-                  onPress: () => props.rerender()
-                })
-              ]
-            })
-          ]
-        })
-      })
-    });
-  }
-  var import_react_native45, useStyles4;
-  var init_ErrorBoundaryScreen = __esm({
-    "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_isStack();
-      init_debug();
-      init_modules();
-      init_settings();
-      init_components2();
-      init_styles();
-      init_common();
-      init_components();
-      import_react_native45 = __toESM(require_react_native());
-      init_ErrorComponentStackCard();
-      init_ErrorStackCard();
-      useStyles4 = createStyles({
-        container: {
-          flex: 1,
-          backgroundColor: tokens.colors.BG_BASE_SECONDARY,
-          paddingHorizontal: 16,
-          height: "100%",
-          gap: 12
-        }
-      });
-    }
-  });
-
-  // src/core/debug/patches/patchErrorBoundary.tsx
-  function getErrorBoundaryContext() {
-    var ctxt = findByNameLazy("ErrorBoundary")[_lazyContextSymbol];
-    return new Promise((resolve) => ctxt.getExports((exp) => resolve(exp.prototype)));
-  }
-  function patchErrorBoundary() {
-    return after.await("render", getErrorBoundaryContext(), function() {
-      if (!this.state.error)
-        return;
-      return /* @__PURE__ */ jsx(ErrorBoundaryScreen, {
-        error: this.state.error,
-        rerender: () => this.setState({
-          info: null,
-          error: null
-        })
-      });
-    });
-  }
-  var init_patchErrorBoundary = __esm({
-    "src/core/debug/patches/patchErrorBoundary.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_ErrorBoundaryScreen();
-      init_patcher();
-      init_lazy2();
-      init_wrappers();
-    }
-  });
-
-  // src/core/fixes.ts
-  function onDispatch({ locale }) {
-    try {
-      findByProps("isMoment", "locale")?.locale(locale.toLowerCase());
-    } catch (e) {
-      logger.error("Failed to fix timestamps...", e);
-    }
-    FluxDispatcher.unsubscribe("I18N_LOAD_SUCCESS", onDispatch);
-  }
-  var fixes_default;
-  var init_fixes = __esm({
-    "src/core/fixes.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_logger();
-      init_common();
-      init_wrappers();
-      fixes_default = () => {
-        FluxDispatcher.subscribe("I18N_LOAD_SUCCESS", onDispatch);
-      };
-    }
-  });
-
-  // node_modules/moment/moment.js
-  var require_moment = __commonJS({
-    "node_modules/moment/moment.js"(exports, module) {
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      (function(global, factory) {
-        typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : global.moment = factory();
-      })(exports, function() {
-        "use strict";
-        var hookCallback;
-        function hooks() {
-          return hookCallback.apply(null, arguments);
-        }
-        function setHookCallback(callback) {
-          hookCallback = callback;
-        }
-        function isArray(input) {
-          return input instanceof Array || Object.prototype.toString.call(input) === "[object Array]";
-        }
-        function isObject2(input) {
-          return input != null && Object.prototype.toString.call(input) === "[object Object]";
-        }
-        function isObjectEmpty(obj) {
-          if (Object.getOwnPropertyNames) {
-            return Object.getOwnPropertyNames(obj).length === 0;
-          } else {
-            var k;
-            for (k in obj) {
-              if (obj.hasOwnProperty(k)) {
-                return false;
-              }
-            }
-            return true;
-          }
-        }
-        function isUndefined(input) {
-          return input === void 0;
-        }
-        function isNumber(input) {
-          return typeof input === "number" || Object.prototype.toString.call(input) === "[object Number]";
-        }
-        function isDate(input) {
-          return input instanceof Date || Object.prototype.toString.call(input) === "[object Date]";
-        }
-        function map(arr, fn) {
-          var res = [], i;
-          for (i = 0; i < arr.length; ++i) {
-            res.push(fn(arr[i], i));
-          }
-          return res;
-        }
-        function hasOwnProp(a, b3) {
-          return Object.prototype.hasOwnProperty.call(a, b3);
-        }
-        function extend(a, b3) {
-          for (var i in b3) {
-            if (hasOwnProp(b3, i)) {
-              a[i] = b3[i];
-            }
-          }
-          if (hasOwnProp(b3, "toString")) {
-            a.toString = b3.toString;
-          }
-          if (hasOwnProp(b3, "valueOf")) {
-            a.valueOf = b3.valueOf;
-          }
-          return a;
-        }
-        function createUTC(input, format2, locale2, strict) {
-          return createLocalOrUTC(input, format2, locale2, strict, true).utc();
-        }
-        function defaultParsingFlags() {
-          return {
-            empty: false,
-            unusedTokens: [],
-            unusedInput: [],
-            overflow: -2,
-            charsLeftOver: 0,
-            nullInput: false,
-            invalidMonth: null,
-            invalidFormat: false,
-            userInvalidated: false,
-            iso: false,
-            parsedDateParts: [],
-            meridiem: null,
-            rfc2822: false,
-            weekdayMismatch: false
-          };
-        }
-        function getParsingFlags(m2) {
-          if (m2._pf == null) {
-            m2._pf = defaultParsingFlags();
-          }
-          return m2._pf;
-        }
-        var some;
-        if (Array.prototype.some) {
-          some = Array.prototype.some;
-        } else {
-          some = function some2(fun) {
-            var t = Object(this);
-            var len = t.length >>> 0;
-            for (var i = 0; i < len; i++) {
-              if (i in t && fun.call(this, t[i], i, t)) {
-                return true;
-              }
-            }
-            return false;
-          };
-        }
-        function isValid(m2) {
-          if (m2._isValid == null) {
-            var flags = getParsingFlags(m2);
-            var parsedParts = some.call(flags.parsedDateParts, function(i) {
-              return i != null;
-            });
-            var isNowValid = !isNaN(m2._d.getTime()) && flags.overflow < 0 && !flags.empty && !flags.invalidMonth && !flags.invalidWeekday && !flags.weekdayMismatch && !flags.nullInput && !flags.invalidFormat && !flags.userInvalidated && (!flags.meridiem || flags.meridiem && parsedParts);
-            if (m2._strict) {
-              isNowValid = isNowValid && flags.charsLeftOver === 0 && flags.unusedTokens.length === 0 && flags.bigHour === void 0;
-            }
-            if (Object.isFrozen == null || !Object.isFrozen(m2)) {
-              m2._isValid = isNowValid;
-            } else {
-              return isNowValid;
-            }
-          }
-          return m2._isValid;
-        }
-        function createInvalid(flags) {
-          var m2 = createUTC(NaN);
-          if (flags != null) {
-            extend(getParsingFlags(m2), flags);
-          } else {
-            getParsingFlags(m2).userInvalidated = true;
-          }
-          return m2;
-        }
-        var momentProperties = hooks.momentProperties = [];
-        function copyConfig(to2, from2) {
-          var i, prop, val;
-          if (!isUndefined(from2._isAMomentObject)) {
-            to2._isAMomentObject = from2._isAMomentObject;
-          }
-          if (!isUndefined(from2._i)) {
-            to2._i = from2._i;
-          }
-          if (!isUndefined(from2._f)) {
-            to2._f = from2._f;
-          }
-          if (!isUndefined(from2._l)) {
-            to2._l = from2._l;
-          }
-          if (!isUndefined(from2._strict)) {
-            to2._strict = from2._strict;
-          }
-          if (!isUndefined(from2._tzm)) {
-            to2._tzm = from2._tzm;
-          }
-          if (!isUndefined(from2._isUTC)) {
-            to2._isUTC = from2._isUTC;
-          }
-          if (!isUndefined(from2._offset)) {
-            to2._offset = from2._offset;
-          }
-          if (!isUndefined(from2._pf)) {
-            to2._pf = getParsingFlags(from2);
-          }
-          if (!isUndefined(from2._locale)) {
-            to2._locale = from2._locale;
-          }
-          if (momentProperties.length > 0) {
-            for (i = 0; i < momentProperties.length; i++) {
-              prop = momentProperties[i];
-              val = from2[prop];
-              if (!isUndefined(val)) {
-                to2[prop] = val;
-              }
-            }
-          }
-          return to2;
-        }
-        var updateInProgress = false;
-        function Moment(config) {
-          copyConfig(this, config);
-          this._d = new Date(config._d != null ? config._d.getTime() : NaN);
-          if (!this.isValid()) {
-            this._d = /* @__PURE__ */ new Date(NaN);
-          }
-          if (updateInProgress === false) {
-            updateInProgress = true;
-            hooks.updateOffset(this);
-            updateInProgress = false;
-          }
-        }
-        function isMoment(obj) {
-          return obj instanceof Moment || obj != null && obj._isAMomentObject != null;
-        }
-        function absFloor(number) {
-          if (number < 0) {
-            return Math.ceil(number) || 0;
-          } else {
-            return Math.floor(number);
-          }
-        }
-        function toInt(argumentForCoercion) {
-          var coercedNumber = +argumentForCoercion, value = 0;
-          if (coercedNumber !== 0 && isFinite(coercedNumber)) {
-            value = absFloor(coercedNumber);
-          }
-          return value;
-        }
-        function compareArrays(array1, array2, dontConvert) {
-          var len = Math.min(array1.length, array2.length), lengthDiff = Math.abs(array1.length - array2.length), diffs = 0, i;
-          for (i = 0; i < len; i++) {
-            if (dontConvert && array1[i] !== array2[i] || !dontConvert && toInt(array1[i]) !== toInt(array2[i])) {
-              diffs++;
-            }
-          }
-          return diffs + lengthDiff;
-        }
-        function warn(msg) {
-          if (hooks.suppressDeprecationWarnings === false && typeof console !== "undefined" && console.warn) {
-            console.warn("Deprecation warning: " + msg);
-          }
-        }
-        function deprecate(msg, fn) {
-          var firstTime = true;
-          return extend(function() {
-            if (hooks.deprecationHandler != null) {
-              hooks.deprecationHandler(null, msg);
-            }
-            if (firstTime) {
-              var args = [];
-              var arg;
-              for (var i = 0; i < arguments.length; i++) {
-                arg = "";
-                if (typeof arguments[i] === "object") {
-                  arg += "\n[" + i + "] ";
-                  for (var key in arguments[0]) {
-                    arg += key + ": " + arguments[0][key] + ", ";
-                  }
-                  arg = arg.slice(0, -2);
-                } else {
-                  arg = arguments[i];
-                }
-                args.push(arg);
-              }
-              warn(msg + "\nArguments: " + Array.prototype.slice.call(args).join("") + "\n" + new Error().stack);
-              firstTime = false;
-            }
-            return fn.apply(this, arguments);
-          }, fn);
-        }
-        var deprecations = {};
-        function deprecateSimple(name, msg) {
-          if (hooks.deprecationHandler != null) {
-            hooks.deprecationHandler(name, msg);
-          }
-          if (!deprecations[name]) {
-            warn(msg);
-            deprecations[name] = true;
-          }
-        }
-        hooks.suppressDeprecationWarnings = false;
-        hooks.deprecationHandler = null;
-        function isFunction(input) {
-          return input instanceof Function || Object.prototype.toString.call(input) === "[object Function]";
-        }
-        function set(config) {
-          var prop, i;
-          for (i in config) {
-            prop = config[i];
-            if (isFunction(prop)) {
-              this[i] = prop;
-            } else {
-              this["_" + i] = prop;
-            }
-          }
-          this._config = config;
-          this._dayOfMonthOrdinalParseLenient = new RegExp((this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) + "|" + /\d{1,2}/.source);
-        }
-        function mergeConfigs(parentConfig, childConfig) {
-          var res = extend({}, parentConfig), prop;
-          for (prop in childConfig) {
-            if (hasOwnProp(childConfig, prop)) {
-              if (isObject2(parentConfig[prop]) && isObject2(childConfig[prop])) {
-                res[prop] = {};
-                extend(res[prop], parentConfig[prop]);
-                extend(res[prop], childConfig[prop]);
-              } else if (childConfig[prop] != null) {
-                res[prop] = childConfig[prop];
-              } else {
-                delete res[prop];
-              }
-            }
-          }
-          for (prop in parentConfig) {
-            if (hasOwnProp(parentConfig, prop) && !hasOwnProp(childConfig, prop) && isObject2(parentConfig[prop])) {
-              res[prop] = extend({}, res[prop]);
-            }
-          }
-          return res;
-        }
-        function Locale(config) {
-          if (config != null) {
-            this.set(config);
-          }
-        }
-        var keys;
-        if (Object.keys) {
-          keys = Object.keys;
-        } else {
-          keys = function keys2(obj) {
-            var i, res = [];
-            for (i in obj) {
-              if (hasOwnProp(obj, i)) {
-                res.push(i);
-              }
-            }
-            return res;
-          };
-        }
-        var defaultCalendar = {
-          sameDay: "[Today at] LT",
-          nextDay: "[Tomorrow at] LT",
-          nextWeek: "dddd [at] LT",
-          lastDay: "[Yesterday at] LT",
-          lastWeek: "[Last] dddd [at] LT",
-          sameElse: "L"
-        };
-        function calendar(key, mom, now2) {
-          var output = this._calendar[key] || this._calendar["sameElse"];
-          return isFunction(output) ? output.call(mom, now2) : output;
-        }
-        var defaultLongDateFormat = {
-          LTS: "h:mm:ss A",
-          LT: "h:mm A",
-          L: "MM/DD/YYYY",
-          LL: "MMMM D, YYYY",
-          LLL: "MMMM D, YYYY h:mm A",
-          LLLL: "dddd, MMMM D, YYYY h:mm A"
-        };
-        function longDateFormat(key) {
-          var _$format = this._longDateFormat[key], formatUpper = this._longDateFormat[key.toUpperCase()];
-          if (_$format || !formatUpper) {
-            return _$format;
-          }
-          this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function(val) {
-            return val.slice(1);
-          });
-          return this._longDateFormat[key];
-        }
-        var defaultInvalidDate = "Invalid date";
-        function invalidDate() {
-          return this._invalidDate;
-        }
-        var defaultOrdinal = "%d";
-        var defaultDayOfMonthOrdinalParse = /\d{1,2}/;
-        function ordinal(number) {
-          return this._ordinal.replace("%d", number);
-        }
-        var defaultRelativeTime = {
-          future: "in %s",
-          past: "%s ago",
-          s: "a few seconds",
-          ss: "%d seconds",
-          m: "a minute",
-          mm: "%d minutes",
-          h: "an hour",
-          hh: "%d hours",
-          d: "a day",
-          dd: "%d days",
-          M: "a month",
-          MM: "%d months",
-          y: "a year",
-          yy: "%d years"
-        };
-        function relativeTime(number, withoutSuffix, string, isFuture) {
-          var output = this._relativeTime[string];
-          return isFunction(output) ? output(number, withoutSuffix, string, isFuture) : output.replace(/%d/i, number);
-        }
-        function pastFuture(diff2, output) {
-          var _$format = this._relativeTime[diff2 > 0 ? "future" : "past"];
-          return isFunction(_$format) ? _$format(output) : _$format.replace(/%s/i, output);
-        }
-        var aliases = {};
-        function addUnitAlias(unit, shorthand) {
-          var lowerCase = unit.toLowerCase();
-          aliases[lowerCase] = aliases[lowerCase + "s"] = aliases[shorthand] = unit;
-        }
-        function normalizeUnits(units2) {
-          return typeof units2 === "string" ? aliases[units2] || aliases[units2.toLowerCase()] : void 0;
-        }
-        function normalizeObjectUnits(inputObject) {
-          var normalizedInput = {}, normalizedProp, prop;
-          for (prop in inputObject) {
-            if (hasOwnProp(inputObject, prop)) {
-              normalizedProp = normalizeUnits(prop);
-              if (normalizedProp) {
-                normalizedInput[normalizedProp] = inputObject[prop];
-              }
-            }
-          }
-          return normalizedInput;
-        }
-        var priorities = {};
-        function addUnitPriority(unit, priority) {
-          priorities[unit] = priority;
-        }
-        function getPrioritizedUnits(unitsObj) {
-          var units2 = [];
-          for (var u in unitsObj) {
-            units2.push({
-              unit: u,
-              priority: priorities[u]
-            });
-          }
-          units2.sort(function(a, b3) {
-            return a.priority - b3.priority;
-          });
-          return units2;
-        }
-        function zeroFill(number, targetLength, forceSign) {
-          var absNumber = "" + Math.abs(number), zerosToFill = targetLength - absNumber.length, sign2 = number >= 0;
-          return (sign2 ? forceSign ? "+" : "" : "-") + Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
-        }
-        var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
-        var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
-        var formatFunctions = {};
-        var formatTokenFunctions = {};
-        function addFormatToken(token2, padded, ordinal2, callback) {
-          var func = callback;
-          if (typeof callback === "string") {
-            func = function func2() {
-              return this[callback]();
-            };
-          }
-          if (token2) {
-            formatTokenFunctions[token2] = func;
-          }
-          if (padded) {
-            formatTokenFunctions[padded[0]] = function() {
-              return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
-            };
-          }
-          if (ordinal2) {
-            formatTokenFunctions[ordinal2] = function() {
-              return this.localeData().ordinal(func.apply(this, arguments), token2);
-            };
-          }
-        }
-        function removeFormattingTokens(input) {
-          if (input.match(/\[[\s\S]/)) {
-            return input.replace(/^\[|\]$/g, "");
-          }
-          return input.replace(/\\/g, "");
-        }
-        function makeFormatFunction(format2) {
-          var array = format2.match(formattingTokens), i, length;
-          for (i = 0, length = array.length; i < length; i++) {
-            if (formatTokenFunctions[array[i]]) {
-              array[i] = formatTokenFunctions[array[i]];
-            } else {
-              array[i] = removeFormattingTokens(array[i]);
-            }
-          }
-          return function(mom) {
-            var output = "", i2;
-            for (i2 = 0; i2 < length; i2++) {
-              output += isFunction(array[i2]) ? array[i2].call(mom, format2) : array[i2];
-            }
-            return output;
-          };
-        }
-        function formatMoment(m2, format2) {
-          if (!m2.isValid()) {
-            return m2.localeData().invalidDate();
-          }
-          format2 = expandFormat(format2, m2.localeData());
-          formatFunctions[format2] = formatFunctions[format2] || makeFormatFunction(format2);
-          return formatFunctions[format2](m2);
-        }
-        function expandFormat(format2, locale2) {
-          var i = 5;
-          function replaceLongDateFormatTokens(input) {
-            return locale2.longDateFormat(input) || input;
-          }
-          localFormattingTokens.lastIndex = 0;
-          while (i >= 0 && localFormattingTokens.test(format2)) {
-            format2 = format2.replace(localFormattingTokens, replaceLongDateFormatTokens);
-            localFormattingTokens.lastIndex = 0;
-            i -= 1;
-          }
-          return format2;
-        }
-        var match1 = /\d/;
-        var match2 = /\d\d/;
-        var match3 = /\d{3}/;
-        var match4 = /\d{4}/;
-        var match6 = /[+-]?\d{6}/;
-        var match1to2 = /\d\d?/;
-        var match3to4 = /\d\d\d\d?/;
-        var match5to6 = /\d\d\d\d\d\d?/;
-        var match1to3 = /\d{1,3}/;
-        var match1to4 = /\d{1,4}/;
-        var match1to6 = /[+-]?\d{1,6}/;
-        var matchUnsigned = /\d+/;
-        var matchSigned = /[+-]?\d+/;
-        var matchOffset = /Z|[+-]\d\d:?\d\d/gi;
-        var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi;
-        var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/;
-        var matchWord = /[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i;
-        var regexes = {};
-        function addRegexToken(token2, regex, strictRegex) {
-          regexes[token2] = isFunction(regex) ? regex : function(isStrict, localeData2) {
-            return isStrict && strictRegex ? strictRegex : regex;
-          };
-        }
-        function getParseRegexForToken(token2, config) {
-          if (!hasOwnProp(regexes, token2)) {
-            return new RegExp(unescapeFormat(token2));
-          }
-          return regexes[token2](config._strict, config._locale);
-        }
-        function unescapeFormat(s) {
-          return regexEscape(s.replace("\\", "").replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function(matched, p1, p2, p3, p4) {
-            return p1 || p2 || p3 || p4;
-          }));
-        }
-        function regexEscape(s) {
-          return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
-        }
-        var tokens2 = {};
-        function addParseToken(token2, callback) {
-          var i, func = callback;
-          if (typeof token2 === "string") {
-            token2 = [
-              token2
-            ];
-          }
-          if (isNumber(callback)) {
-            func = function func2(input, array) {
-              array[callback] = toInt(input);
-            };
-          }
-          for (i = 0; i < token2.length; i++) {
-            tokens2[token2[i]] = func;
-          }
-        }
-        function addWeekParseToken(token2, callback) {
-          addParseToken(token2, function(input, array, config, token3) {
-            config._w = config._w || {};
-            callback(input, config._w, config, token3);
-          });
-        }
-        function addTimeToArrayFromToken(token2, input, config) {
-          if (input != null && hasOwnProp(tokens2, token2)) {
-            tokens2[token2](input, config._a, config, token2);
-          }
-        }
-        var YEAR = 0;
-        var MONTH = 1;
-        var DATE = 2;
-        var HOUR = 3;
-        var MINUTE = 4;
-        var SECOND = 5;
-        var MILLISECOND = 6;
-        var WEEK = 7;
-        var WEEKDAY = 8;
-        addFormatToken("Y", 0, 0, function() {
-          var y2 = this.year();
-          return y2 <= 9999 ? "" + y2 : "+" + y2;
-        });
-        addFormatToken(0, [
-          "YY",
-          2
-        ], 0, function() {
-          return this.year() % 100;
-        });
-        addFormatToken(0, [
-          "YYYY",
-          4
-        ], 0, "year");
-        addFormatToken(0, [
-          "YYYYY",
-          5
-        ], 0, "year");
-        addFormatToken(0, [
-          "YYYYYY",
-          6,
-          true
-        ], 0, "year");
-        addUnitAlias("year", "y");
-        addUnitPriority("year", 1);
-        addRegexToken("Y", matchSigned);
-        addRegexToken("YY", match1to2, match2);
-        addRegexToken("YYYY", match1to4, match4);
-        addRegexToken("YYYYY", match1to6, match6);
-        addRegexToken("YYYYYY", match1to6, match6);
-        addParseToken([
-          "YYYYY",
-          "YYYYYY"
-        ], YEAR);
-        addParseToken("YYYY", function(input, array) {
-          array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
-        });
-        addParseToken("YY", function(input, array) {
-          array[YEAR] = hooks.parseTwoDigitYear(input);
-        });
-        addParseToken("Y", function(input, array) {
-          array[YEAR] = parseInt(input, 10);
-        });
-        function daysInYear(year) {
-          return isLeapYear(year) ? 366 : 365;
-        }
-        function isLeapYear(year) {
-          return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
-        }
-        hooks.parseTwoDigitYear = function(input) {
-          return toInt(input) + (toInt(input) > 68 ? 1900 : 2e3);
-        };
-        var getSetYear = makeGetSet("FullYear", true);
-        function getIsLeapYear() {
-          return isLeapYear(this.year());
-        }
-        function makeGetSet(unit, keepTime) {
-          return function(value) {
-            if (value != null) {
-              set$1(this, unit, value);
-              hooks.updateOffset(this, keepTime);
-              return this;
-            } else {
-              return get(this, unit);
-            }
-          };
-        }
-        function get(mom, unit) {
-          return mom.isValid() ? mom._d["get" + (mom._isUTC ? "UTC" : "") + unit]() : NaN;
-        }
-        function set$1(mom, unit, value) {
-          if (mom.isValid() && !isNaN(value)) {
-            if (unit === "FullYear" && isLeapYear(mom.year()) && mom.month() === 1 && mom.date() === 29) {
-              mom._d["set" + (mom._isUTC ? "UTC" : "") + unit](value, mom.month(), daysInMonth(value, mom.month()));
-            } else {
-              mom._d["set" + (mom._isUTC ? "UTC" : "") + unit](value);
-            }
-          }
-        }
-        function stringGet(units2) {
-          units2 = normalizeUnits(units2);
-          if (isFunction(this[units2])) {
-            return this[units2]();
-          }
-          return this;
-        }
-        function stringSet(units2, value) {
-          if (typeof units2 === "object") {
-            units2 = normalizeObjectUnits(units2);
-            var prioritized = getPrioritizedUnits(units2);
-            for (var i = 0; i < prioritized.length; i++) {
-              this[prioritized[i].unit](units2[prioritized[i].unit]);
-            }
-          } else {
-            units2 = normalizeUnits(units2);
-            if (isFunction(this[units2])) {
-              return this[units2](value);
-            }
-          }
-          return this;
-        }
-        function mod(n, x2) {
-          return (n % x2 + x2) % x2;
-        }
-        var indexOf;
-        if (Array.prototype.indexOf) {
-          indexOf = Array.prototype.indexOf;
-        } else {
-          indexOf = function indexOf2(o) {
-            var i;
-            for (i = 0; i < this.length; ++i) {
-              if (this[i] === o) {
-                return i;
-              }
-            }
-            return -1;
-          };
-        }
-        function daysInMonth(year, month) {
-          if (isNaN(year) || isNaN(month)) {
-            return NaN;
-          }
-          var modMonth = mod(month, 12);
-          year += (month - modMonth) / 12;
-          return modMonth === 1 ? isLeapYear(year) ? 29 : 28 : 31 - modMonth % 7 % 2;
-        }
-        addFormatToken("M", [
-          "MM",
-          2
-        ], "Mo", function() {
-          return this.month() + 1;
-        });
-        addFormatToken("MMM", 0, 0, function(format2) {
-          return this.localeData().monthsShort(this, format2);
-        });
-        addFormatToken("MMMM", 0, 0, function(format2) {
-          return this.localeData().months(this, format2);
-        });
-        addUnitAlias("month", "M");
-        addUnitPriority("month", 8);
-        addRegexToken("M", match1to2);
-        addRegexToken("MM", match1to2, match2);
-        addRegexToken("MMM", function(isStrict, locale2) {
-          return locale2.monthsShortRegex(isStrict);
-        });
-        addRegexToken("MMMM", function(isStrict, locale2) {
-          return locale2.monthsRegex(isStrict);
-        });
-        addParseToken([
-          "M",
-          "MM"
-        ], function(input, array) {
-          array[MONTH] = toInt(input) - 1;
-        });
-        addParseToken([
-          "MMM",
-          "MMMM"
-        ], function(input, array, config, token2) {
-          var month = config._locale.monthsParse(input, token2, config._strict);
-          if (month != null) {
-            array[MONTH] = month;
-          } else {
-            getParsingFlags(config).invalidMonth = input;
-          }
-        });
-        var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
-        var defaultLocaleMonths = "January_February_March_April_May_June_July_August_September_October_November_December".split("_");
-        function localeMonths(m2, format2) {
-          if (!m2) {
-            return isArray(this._months) ? this._months : this._months["standalone"];
-          }
-          return isArray(this._months) ? this._months[m2.month()] : this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format2) ? "format" : "standalone"][m2.month()];
-        }
-        var defaultLocaleMonthsShort = "Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_");
-        function localeMonthsShort(m2, format2) {
-          if (!m2) {
-            return isArray(this._monthsShort) ? this._monthsShort : this._monthsShort["standalone"];
-          }
-          return isArray(this._monthsShort) ? this._monthsShort[m2.month()] : this._monthsShort[MONTHS_IN_FORMAT.test(format2) ? "format" : "standalone"][m2.month()];
-        }
-        function handleStrictParse(monthName, format2, strict) {
-          var i, ii, mom, llc = monthName.toLocaleLowerCase();
-          if (!this._monthsParse) {
-            this._monthsParse = [];
-            this._longMonthsParse = [];
-            this._shortMonthsParse = [];
-            for (i = 0; i < 12; ++i) {
-              mom = createUTC([
-                2e3,
-                i
-              ]);
-              this._shortMonthsParse[i] = this.monthsShort(mom, "").toLocaleLowerCase();
-              this._longMonthsParse[i] = this.months(mom, "").toLocaleLowerCase();
-            }
-          }
-          if (strict) {
-            if (format2 === "MMM") {
-              ii = indexOf.call(this._shortMonthsParse, llc);
-              return ii !== -1 ? ii : null;
-            } else {
-              ii = indexOf.call(this._longMonthsParse, llc);
-              return ii !== -1 ? ii : null;
-            }
-          } else {
-            if (format2 === "MMM") {
-              ii = indexOf.call(this._shortMonthsParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._longMonthsParse, llc);
-              return ii !== -1 ? ii : null;
-            } else {
-              ii = indexOf.call(this._longMonthsParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._shortMonthsParse, llc);
-              return ii !== -1 ? ii : null;
-            }
-          }
-        }
-        function localeMonthsParse(monthName, format2, strict) {
-          var i, mom, regex;
-          if (this._monthsParseExact) {
-            return handleStrictParse.call(this, monthName, format2, strict);
-          }
-          if (!this._monthsParse) {
-            this._monthsParse = [];
-            this._longMonthsParse = [];
-            this._shortMonthsParse = [];
-          }
-          for (i = 0; i < 12; i++) {
-            mom = createUTC([
-              2e3,
-              i
-            ]);
-            if (strict && !this._longMonthsParse[i]) {
-              this._longMonthsParse[i] = new RegExp("^" + this.months(mom, "").replace(".", "") + "$", "i");
-              this._shortMonthsParse[i] = new RegExp("^" + this.monthsShort(mom, "").replace(".", "") + "$", "i");
-            }
-            if (!strict && !this._monthsParse[i]) {
-              regex = "^" + this.months(mom, "") + "|^" + this.monthsShort(mom, "");
-              this._monthsParse[i] = new RegExp(regex.replace(".", ""), "i");
-            }
-            if (strict && format2 === "MMMM" && this._longMonthsParse[i].test(monthName)) {
-              return i;
-            } else if (strict && format2 === "MMM" && this._shortMonthsParse[i].test(monthName)) {
-              return i;
-            } else if (!strict && this._monthsParse[i].test(monthName)) {
-              return i;
-            }
-          }
-        }
-        function setMonth(mom, value) {
-          var dayOfMonth;
-          if (!mom.isValid()) {
-            return mom;
-          }
-          if (typeof value === "string") {
-            if (/^\d+$/.test(value)) {
-              value = toInt(value);
-            } else {
-              value = mom.localeData().monthsParse(value);
-              if (!isNumber(value)) {
-                return mom;
-              }
-            }
-          }
-          dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
-          mom._d["set" + (mom._isUTC ? "UTC" : "") + "Month"](value, dayOfMonth);
-          return mom;
-        }
-        function getSetMonth(value) {
-          if (value != null) {
-            setMonth(this, value);
-            hooks.updateOffset(this, true);
-            return this;
-          } else {
-            return get(this, "Month");
-          }
-        }
-        function getDaysInMonth() {
-          return daysInMonth(this.year(), this.month());
-        }
-        var defaultMonthsShortRegex = matchWord;
-        function monthsShortRegex(isStrict) {
-          if (this._monthsParseExact) {
-            if (!hasOwnProp(this, "_monthsRegex")) {
-              computeMonthsParse.call(this);
-            }
-            if (isStrict) {
-              return this._monthsShortStrictRegex;
-            } else {
-              return this._monthsShortRegex;
-            }
-          } else {
-            if (!hasOwnProp(this, "_monthsShortRegex")) {
-              this._monthsShortRegex = defaultMonthsShortRegex;
-            }
-            return this._monthsShortStrictRegex && isStrict ? this._monthsShortStrictRegex : this._monthsShortRegex;
-          }
-        }
-        var defaultMonthsRegex = matchWord;
-        function monthsRegex(isStrict) {
-          if (this._monthsParseExact) {
-            if (!hasOwnProp(this, "_monthsRegex")) {
-              computeMonthsParse.call(this);
-            }
-            if (isStrict) {
-              return this._monthsStrictRegex;
-            } else {
-              return this._monthsRegex;
-            }
-          } else {
-            if (!hasOwnProp(this, "_monthsRegex")) {
-              this._monthsRegex = defaultMonthsRegex;
-            }
-            return this._monthsStrictRegex && isStrict ? this._monthsStrictRegex : this._monthsRegex;
-          }
-        }
-        function computeMonthsParse() {
-          function cmpLenRev(a, b3) {
-            return b3.length - a.length;
-          }
-          var shortPieces = [], longPieces = [], mixedPieces = [], i, mom;
-          for (i = 0; i < 12; i++) {
-            mom = createUTC([
-              2e3,
-              i
-            ]);
-            shortPieces.push(this.monthsShort(mom, ""));
-            longPieces.push(this.months(mom, ""));
-            mixedPieces.push(this.months(mom, ""));
-            mixedPieces.push(this.monthsShort(mom, ""));
-          }
-          shortPieces.sort(cmpLenRev);
-          longPieces.sort(cmpLenRev);
-          mixedPieces.sort(cmpLenRev);
-          for (i = 0; i < 12; i++) {
-            shortPieces[i] = regexEscape(shortPieces[i]);
-            longPieces[i] = regexEscape(longPieces[i]);
-          }
-          for (i = 0; i < 24; i++) {
-            mixedPieces[i] = regexEscape(mixedPieces[i]);
-          }
-          this._monthsRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
-          this._monthsShortRegex = this._monthsRegex;
-          this._monthsStrictRegex = new RegExp("^(" + longPieces.join("|") + ")", "i");
-          this._monthsShortStrictRegex = new RegExp("^(" + shortPieces.join("|") + ")", "i");
-        }
-        function createDate(y2, m2, d, h, M, s, ms) {
-          var date = new Date(y2, m2, d, h, M, s, ms);
-          if (y2 < 100 && y2 >= 0 && isFinite(date.getFullYear())) {
-            date.setFullYear(y2);
-          }
-          return date;
-        }
-        function createUTCDate(y2) {
-          var date = new Date(Date.UTC.apply(null, arguments));
-          if (y2 < 100 && y2 >= 0 && isFinite(date.getUTCFullYear())) {
-            date.setUTCFullYear(y2);
-          }
-          return date;
-        }
-        function firstWeekOffset(year, dow, doy) {
-          var fwd = 7 + dow - doy, fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
-          return -fwdlw + fwd - 1;
-        }
-        function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
-          var localWeekday = (7 + weekday - dow) % 7, weekOffset = firstWeekOffset(year, dow, doy), dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset, resYear, resDayOfYear;
-          if (dayOfYear <= 0) {
-            resYear = year - 1;
-            resDayOfYear = daysInYear(resYear) + dayOfYear;
-          } else if (dayOfYear > daysInYear(year)) {
-            resYear = year + 1;
-            resDayOfYear = dayOfYear - daysInYear(year);
-          } else {
-            resYear = year;
-            resDayOfYear = dayOfYear;
-          }
-          return {
-            year: resYear,
-            dayOfYear: resDayOfYear
-          };
-        }
-        function weekOfYear(mom, dow, doy) {
-          var weekOffset = firstWeekOffset(mom.year(), dow, doy), week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1, resWeek, resYear;
-          if (week < 1) {
-            resYear = mom.year() - 1;
-            resWeek = week + weeksInYear(resYear, dow, doy);
-          } else if (week > weeksInYear(mom.year(), dow, doy)) {
-            resWeek = week - weeksInYear(mom.year(), dow, doy);
-            resYear = mom.year() + 1;
-          } else {
-            resYear = mom.year();
-            resWeek = week;
-          }
-          return {
-            week: resWeek,
-            year: resYear
-          };
-        }
-        function weeksInYear(year, dow, doy) {
-          var weekOffset = firstWeekOffset(year, dow, doy), weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
-          return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
-        }
-        addFormatToken("w", [
-          "ww",
-          2
-        ], "wo", "week");
-        addFormatToken("W", [
-          "WW",
-          2
-        ], "Wo", "isoWeek");
-        addUnitAlias("week", "w");
-        addUnitAlias("isoWeek", "W");
-        addUnitPriority("week", 5);
-        addUnitPriority("isoWeek", 5);
-        addRegexToken("w", match1to2);
-        addRegexToken("ww", match1to2, match2);
-        addRegexToken("W", match1to2);
-        addRegexToken("WW", match1to2, match2);
-        addWeekParseToken([
-          "w",
-          "ww",
-          "W",
-          "WW"
-        ], function(input, week, config, token2) {
-          week[token2.substr(0, 1)] = toInt(input);
-        });
-        function localeWeek(mom) {
-          return weekOfYear(mom, this._week.dow, this._week.doy).week;
-        }
-        var defaultLocaleWeek = {
-          dow: 0,
-          doy: 6
-          // The week that contains Jan 1st is the first week of the year.
-        };
-        function localeFirstDayOfWeek() {
-          return this._week.dow;
-        }
-        function localeFirstDayOfYear() {
-          return this._week.doy;
-        }
-        function getSetWeek(input) {
-          var week = this.localeData().week(this);
-          return input == null ? week : this.add((input - week) * 7, "d");
-        }
-        function getSetISOWeek(input) {
-          var week = weekOfYear(this, 1, 4).week;
-          return input == null ? week : this.add((input - week) * 7, "d");
-        }
-        addFormatToken("d", 0, "do", "day");
-        addFormatToken("dd", 0, 0, function(format2) {
-          return this.localeData().weekdaysMin(this, format2);
-        });
-        addFormatToken("ddd", 0, 0, function(format2) {
-          return this.localeData().weekdaysShort(this, format2);
-        });
-        addFormatToken("dddd", 0, 0, function(format2) {
-          return this.localeData().weekdays(this, format2);
-        });
-        addFormatToken("e", 0, 0, "weekday");
-        addFormatToken("E", 0, 0, "isoWeekday");
-        addUnitAlias("day", "d");
-        addUnitAlias("weekday", "e");
-        addUnitAlias("isoWeekday", "E");
-        addUnitPriority("day", 11);
-        addUnitPriority("weekday", 11);
-        addUnitPriority("isoWeekday", 11);
-        addRegexToken("d", match1to2);
-        addRegexToken("e", match1to2);
-        addRegexToken("E", match1to2);
-        addRegexToken("dd", function(isStrict, locale2) {
-          return locale2.weekdaysMinRegex(isStrict);
-        });
-        addRegexToken("ddd", function(isStrict, locale2) {
-          return locale2.weekdaysShortRegex(isStrict);
-        });
-        addRegexToken("dddd", function(isStrict, locale2) {
-          return locale2.weekdaysRegex(isStrict);
-        });
-        addWeekParseToken([
-          "dd",
-          "ddd",
-          "dddd"
-        ], function(input, week, config, token2) {
-          var weekday = config._locale.weekdaysParse(input, token2, config._strict);
-          if (weekday != null) {
-            week.d = weekday;
-          } else {
-            getParsingFlags(config).invalidWeekday = input;
-          }
-        });
-        addWeekParseToken([
-          "d",
-          "e",
-          "E"
-        ], function(input, week, config, token2) {
-          week[token2] = toInt(input);
-        });
-        function parseWeekday(input, locale2) {
-          if (typeof input !== "string") {
-            return input;
-          }
-          if (!isNaN(input)) {
-            return parseInt(input, 10);
-          }
-          input = locale2.weekdaysParse(input);
-          if (typeof input === "number") {
-            return input;
-          }
-          return null;
-        }
-        function parseIsoWeekday(input, locale2) {
-          if (typeof input === "string") {
-            return locale2.weekdaysParse(input) % 7 || 7;
-          }
-          return isNaN(input) ? null : input;
-        }
-        var defaultLocaleWeekdays = "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_");
-        function localeWeekdays(m2, format2) {
-          if (!m2) {
-            return isArray(this._weekdays) ? this._weekdays : this._weekdays["standalone"];
-          }
-          return isArray(this._weekdays) ? this._weekdays[m2.day()] : this._weekdays[this._weekdays.isFormat.test(format2) ? "format" : "standalone"][m2.day()];
-        }
-        var defaultLocaleWeekdaysShort = "Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_");
-        function localeWeekdaysShort(m2) {
-          return m2 ? this._weekdaysShort[m2.day()] : this._weekdaysShort;
-        }
-        var defaultLocaleWeekdaysMin = "Su_Mo_Tu_We_Th_Fr_Sa".split("_");
-        function localeWeekdaysMin(m2) {
-          return m2 ? this._weekdaysMin[m2.day()] : this._weekdaysMin;
-        }
-        function handleStrictParse$1(weekdayName, format2, strict) {
-          var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
-          if (!this._weekdaysParse) {
-            this._weekdaysParse = [];
-            this._shortWeekdaysParse = [];
-            this._minWeekdaysParse = [];
-            for (i = 0; i < 7; ++i) {
-              mom = createUTC([
-                2e3,
-                1
-              ]).day(i);
-              this._minWeekdaysParse[i] = this.weekdaysMin(mom, "").toLocaleLowerCase();
-              this._shortWeekdaysParse[i] = this.weekdaysShort(mom, "").toLocaleLowerCase();
-              this._weekdaysParse[i] = this.weekdays(mom, "").toLocaleLowerCase();
-            }
-          }
-          if (strict) {
-            if (format2 === "dddd") {
-              ii = indexOf.call(this._weekdaysParse, llc);
-              return ii !== -1 ? ii : null;
-            } else if (format2 === "ddd") {
-              ii = indexOf.call(this._shortWeekdaysParse, llc);
-              return ii !== -1 ? ii : null;
-            } else {
-              ii = indexOf.call(this._minWeekdaysParse, llc);
-              return ii !== -1 ? ii : null;
-            }
-          } else {
-            if (format2 === "dddd") {
-              ii = indexOf.call(this._weekdaysParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._shortWeekdaysParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._minWeekdaysParse, llc);
-              return ii !== -1 ? ii : null;
-            } else if (format2 === "ddd") {
-              ii = indexOf.call(this._shortWeekdaysParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._weekdaysParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._minWeekdaysParse, llc);
-              return ii !== -1 ? ii : null;
-            } else {
-              ii = indexOf.call(this._minWeekdaysParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._weekdaysParse, llc);
-              if (ii !== -1) {
-                return ii;
-              }
-              ii = indexOf.call(this._shortWeekdaysParse, llc);
-              return ii !== -1 ? ii : null;
-            }
-          }
-        }
-        function localeWeekdaysParse(weekdayName, format2, strict) {
-          var i, mom, regex;
-          if (this._weekdaysParseExact) {
-            return handleStrictParse$1.call(this, weekdayName, format2, strict);
-          }
-          if (!this._weekdaysParse) {
-            this._weekdaysParse = [];
-            this._minWeekdaysParse = [];
-            this._shortWeekdaysParse = [];
-            this._fullWeekdaysParse = [];
-          }
-          for (i = 0; i < 7; i++) {
-            mom = createUTC([
-              2e3,
-              1
-            ]).day(i);
-            if (strict && !this._fullWeekdaysParse[i]) {
-              this._fullWeekdaysParse[i] = new RegExp("^" + this.weekdays(mom, "").replace(".", "\\.?") + "$", "i");
-              this._shortWeekdaysParse[i] = new RegExp("^" + this.weekdaysShort(mom, "").replace(".", "\\.?") + "$", "i");
-              this._minWeekdaysParse[i] = new RegExp("^" + this.weekdaysMin(mom, "").replace(".", "\\.?") + "$", "i");
-            }
-            if (!this._weekdaysParse[i]) {
-              regex = "^" + this.weekdays(mom, "") + "|^" + this.weekdaysShort(mom, "") + "|^" + this.weekdaysMin(mom, "");
-              this._weekdaysParse[i] = new RegExp(regex.replace(".", ""), "i");
-            }
-            if (strict && format2 === "dddd" && this._fullWeekdaysParse[i].test(weekdayName)) {
-              return i;
-            } else if (strict && format2 === "ddd" && this._shortWeekdaysParse[i].test(weekdayName)) {
-              return i;
-            } else if (strict && format2 === "dd" && this._minWeekdaysParse[i].test(weekdayName)) {
-              return i;
-            } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
-              return i;
-            }
-          }
-        }
-        function getSetDayOfWeek(input) {
-          if (!this.isValid()) {
-            return input != null ? this : NaN;
-          }
-          var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
-          if (input != null) {
-            input = parseWeekday(input, this.localeData());
-            return this.add(input - day, "d");
-          } else {
-            return day;
-          }
-        }
-        function getSetLocaleDayOfWeek(input) {
-          if (!this.isValid()) {
-            return input != null ? this : NaN;
-          }
-          var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
-          return input == null ? weekday : this.add(input - weekday, "d");
-        }
-        function getSetISODayOfWeek(input) {
-          if (!this.isValid()) {
-            return input != null ? this : NaN;
-          }
-          if (input != null) {
-            var weekday = parseIsoWeekday(input, this.localeData());
-            return this.day(this.day() % 7 ? weekday : weekday - 7);
-          } else {
-            return this.day() || 7;
-          }
-        }
-        var defaultWeekdaysRegex = matchWord;
-        function weekdaysRegex(isStrict) {
-          if (this._weekdaysParseExact) {
-            if (!hasOwnProp(this, "_weekdaysRegex")) {
-              computeWeekdaysParse.call(this);
-            }
-            if (isStrict) {
-              return this._weekdaysStrictRegex;
-            } else {
-              return this._weekdaysRegex;
-            }
-          } else {
-            if (!hasOwnProp(this, "_weekdaysRegex")) {
-              this._weekdaysRegex = defaultWeekdaysRegex;
-            }
-            return this._weekdaysStrictRegex && isStrict ? this._weekdaysStrictRegex : this._weekdaysRegex;
-          }
-        }
-        var defaultWeekdaysShortRegex = matchWord;
-        function weekdaysShortRegex(isStrict) {
-          if (this._weekdaysParseExact) {
-            if (!hasOwnProp(this, "_weekdaysRegex")) {
-              computeWeekdaysParse.call(this);
-            }
-            if (isStrict) {
-              return this._weekdaysShortStrictRegex;
-            } else {
-              return this._weekdaysShortRegex;
-            }
-          } else {
-            if (!hasOwnProp(this, "_weekdaysShortRegex")) {
-              this._weekdaysShortRegex = defaultWeekdaysShortRegex;
-            }
-            return this._weekdaysShortStrictRegex && isStrict ? this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
-          }
-        }
-        var defaultWeekdaysMinRegex = matchWord;
-        function weekdaysMinRegex(isStrict) {
-          if (this._weekdaysParseExact) {
-            if (!hasOwnProp(this, "_weekdaysRegex")) {
-              computeWeekdaysParse.call(this);
-            }
-            if (isStrict) {
-              return this._weekdaysMinStrictRegex;
-            } else {
-              return this._weekdaysMinRegex;
-            }
-          } else {
-            if (!hasOwnProp(this, "_weekdaysMinRegex")) {
-              this._weekdaysMinRegex = defaultWeekdaysMinRegex;
-            }
-            return this._weekdaysMinStrictRegex && isStrict ? this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
-          }
-        }
-        function computeWeekdaysParse() {
-          function cmpLenRev(a, b3) {
-            return b3.length - a.length;
-          }
-          var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [], i, mom, minp, shortp, longp;
-          for (i = 0; i < 7; i++) {
-            mom = createUTC([
-              2e3,
-              1
-            ]).day(i);
-            minp = this.weekdaysMin(mom, "");
-            shortp = this.weekdaysShort(mom, "");
-            longp = this.weekdays(mom, "");
-            minPieces.push(minp);
-            shortPieces.push(shortp);
-            longPieces.push(longp);
-            mixedPieces.push(minp);
-            mixedPieces.push(shortp);
-            mixedPieces.push(longp);
-          }
-          minPieces.sort(cmpLenRev);
-          shortPieces.sort(cmpLenRev);
-          longPieces.sort(cmpLenRev);
-          mixedPieces.sort(cmpLenRev);
-          for (i = 0; i < 7; i++) {
-            shortPieces[i] = regexEscape(shortPieces[i]);
-            longPieces[i] = regexEscape(longPieces[i]);
-            mixedPieces[i] = regexEscape(mixedPieces[i]);
-          }
-          this._weekdaysRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
-          this._weekdaysShortRegex = this._weekdaysRegex;
-          this._weekdaysMinRegex = this._weekdaysRegex;
-          this._weekdaysStrictRegex = new RegExp("^(" + longPieces.join("|") + ")", "i");
-          this._weekdaysShortStrictRegex = new RegExp("^(" + shortPieces.join("|") + ")", "i");
-          this._weekdaysMinStrictRegex = new RegExp("^(" + minPieces.join("|") + ")", "i");
-        }
-        function hFormat() {
-          return this.hours() % 12 || 12;
-        }
-        function kFormat() {
-          return this.hours() || 24;
-        }
-        addFormatToken("H", [
-          "HH",
-          2
-        ], 0, "hour");
-        addFormatToken("h", [
-          "hh",
-          2
-        ], 0, hFormat);
-        addFormatToken("k", [
-          "kk",
-          2
-        ], 0, kFormat);
-        addFormatToken("hmm", 0, 0, function() {
-          return "" + hFormat.apply(this) + zeroFill(this.minutes(), 2);
-        });
-        addFormatToken("hmmss", 0, 0, function() {
-          return "" + hFormat.apply(this) + zeroFill(this.minutes(), 2) + zeroFill(this.seconds(), 2);
-        });
-        addFormatToken("Hmm", 0, 0, function() {
-          return "" + this.hours() + zeroFill(this.minutes(), 2);
-        });
-        addFormatToken("Hmmss", 0, 0, function() {
-          return "" + this.hours() + zeroFill(this.minutes(), 2) + zeroFill(this.seconds(), 2);
-        });
-        function meridiem(token2, lowercase) {
-          addFormatToken(token2, 0, 0, function() {
-            return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
-          });
-        }
-        meridiem("a", true);
-        meridiem("A", false);
-        addUnitAlias("hour", "h");
-        addUnitPriority("hour", 13);
-        function matchMeridiem(isStrict, locale2) {
-          return locale2._meridiemParse;
-        }
-        addRegexToken("a", matchMeridiem);
-        addRegexToken("A", matchMeridiem);
-        addRegexToken("H", match1to2);
-        addRegexToken("h", match1to2);
-        addRegexToken("k", match1to2);
-        addRegexToken("HH", match1to2, match2);
-        addRegexToken("hh", match1to2, match2);
-        addRegexToken("kk", match1to2, match2);
-        addRegexToken("hmm", match3to4);
-        addRegexToken("hmmss", match5to6);
-        addRegexToken("Hmm", match3to4);
-        addRegexToken("Hmmss", match5to6);
-        addParseToken([
-          "H",
-          "HH"
-        ], HOUR);
-        addParseToken([
-          "k",
-          "kk"
-        ], function(input, array, config) {
-          var kInput = toInt(input);
-          array[HOUR] = kInput === 24 ? 0 : kInput;
-        });
-        addParseToken([
-          "a",
-          "A"
-        ], function(input, array, config) {
-          config._isPm = config._locale.isPM(input);
-          config._meridiem = input;
-        });
-        addParseToken([
-          "h",
-          "hh"
-        ], function(input, array, config) {
-          array[HOUR] = toInt(input);
-          getParsingFlags(config).bigHour = true;
-        });
-        addParseToken("hmm", function(input, array, config) {
-          var pos = input.length - 2;
-          array[HOUR] = toInt(input.substr(0, pos));
-          array[MINUTE] = toInt(input.substr(pos));
-          getParsingFlags(config).bigHour = true;
-        });
-        addParseToken("hmmss", function(input, array, config) {
-          var pos1 = input.length - 4;
-          var pos2 = input.length - 2;
-          array[HOUR] = toInt(input.substr(0, pos1));
-          array[MINUTE] = toInt(input.substr(pos1, 2));
-          array[SECOND] = toInt(input.substr(pos2));
-          getParsingFlags(config).bigHour = true;
-        });
-        addParseToken("Hmm", function(input, array, config) {
-          var pos = input.length - 2;
-          array[HOUR] = toInt(input.substr(0, pos));
-          array[MINUTE] = toInt(input.substr(pos));
-        });
-        addParseToken("Hmmss", function(input, array, config) {
-          var pos1 = input.length - 4;
-          var pos2 = input.length - 2;
-          array[HOUR] = toInt(input.substr(0, pos1));
-          array[MINUTE] = toInt(input.substr(pos1, 2));
-          array[SECOND] = toInt(input.substr(pos2));
-        });
-        function localeIsPM(input) {
-          return (input + "").toLowerCase().charAt(0) === "p";
-        }
-        var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
-        function localeMeridiem(hours2, minutes2, isLower) {
-          if (hours2 > 11) {
-            return isLower ? "pm" : "PM";
-          } else {
-            return isLower ? "am" : "AM";
-          }
-        }
-        var getSetHour = makeGetSet("Hours", true);
-        var baseConfig = {
-          calendar: defaultCalendar,
-          longDateFormat: defaultLongDateFormat,
-          invalidDate: defaultInvalidDate,
-          ordinal: defaultOrdinal,
-          dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
-          relativeTime: defaultRelativeTime,
-          months: defaultLocaleMonths,
-          monthsShort: defaultLocaleMonthsShort,
-          week: defaultLocaleWeek,
-          weekdays: defaultLocaleWeekdays,
-          weekdaysMin: defaultLocaleWeekdaysMin,
-          weekdaysShort: defaultLocaleWeekdaysShort,
-          meridiemParse: defaultLocaleMeridiemParse
-        };
-        var locales = {};
-        var localeFamilies = {};
-        var globalLocale;
-        function normalizeLocale(key) {
-          return key ? key.toLowerCase().replace("_", "-") : key;
-        }
-        function chooseLocale(names) {
-          var i = 0, j, next, _$locale, split;
-          while (i < names.length) {
-            split = normalizeLocale(names[i]).split("-");
-            j = split.length;
-            next = normalizeLocale(names[i + 1]);
-            next = next ? next.split("-") : null;
-            while (j > 0) {
-              _$locale = loadLocale(split.slice(0, j).join("-"));
-              if (_$locale) {
-                return _$locale;
-              }
-              if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
-                break;
-              }
-              j--;
-            }
-            i++;
-          }
-          return globalLocale;
-        }
-        function loadLocale(name) {
-          var oldLocale = null;
-          if (!locales[name] && typeof module !== "undefined" && module && module.exports) {
-            try {
-              oldLocale = globalLocale._abbr;
-              var aliasedRequire = __require;
-              aliasedRequire("./locale/" + name);
-              getSetGlobalLocale(oldLocale);
-            } catch (e) {
-            }
-          }
-          return locales[name];
-        }
-        function getSetGlobalLocale(key, values) {
-          var data;
-          if (key) {
-            if (isUndefined(values)) {
-              data = getLocale(key);
-            } else {
-              data = defineLocale(key, values);
-            }
-            if (data) {
-              globalLocale = data;
-            } else {
-              if (typeof console !== "undefined" && console.warn) {
-                console.warn("Locale " + key + " not found. Did you forget to load it?");
-              }
-            }
-          }
-          return globalLocale._abbr;
-        }
-        function defineLocale(name, config) {
-          if (config !== null) {
-            var _$locale, parentConfig = baseConfig;
-            config.abbr = name;
-            if (locales[name] != null) {
-              deprecateSimple("defineLocaleOverride", "use moment.updateLocale(localeName, config) to change an existing locale. moment.defineLocale(localeName, config) should only be used for creating a new locale See http://momentjs.com/guides/#/warnings/define-locale/ for more info.");
-              parentConfig = locales[name]._config;
-            } else if (config.parentLocale != null) {
-              if (locales[config.parentLocale] != null) {
-                parentConfig = locales[config.parentLocale]._config;
-              } else {
-                _$locale = loadLocale(config.parentLocale);
-                if (_$locale != null) {
-                  parentConfig = _$locale._config;
-                } else {
-                  if (!localeFamilies[config.parentLocale]) {
-                    localeFamilies[config.parentLocale] = [];
-                  }
-                  localeFamilies[config.parentLocale].push({
-                    name,
-                    config
-                  });
-                  return null;
-                }
-              }
-            }
-            locales[name] = new Locale(mergeConfigs(parentConfig, config));
-            if (localeFamilies[name]) {
-              localeFamilies[name].forEach(function(x2) {
-                defineLocale(x2.name, x2.config);
-              });
-            }
-            getSetGlobalLocale(name);
-            return locales[name];
-          } else {
-            delete locales[name];
-            return null;
-          }
-        }
-        function updateLocale(name, config) {
-          if (config != null) {
-            var _$locale, tmpLocale, parentConfig = baseConfig;
-            tmpLocale = loadLocale(name);
-            if (tmpLocale != null) {
-              parentConfig = tmpLocale._config;
-            }
-            config = mergeConfigs(parentConfig, config);
-            _$locale = new Locale(config);
-            _$locale.parentLocale = locales[name];
-            locales[name] = _$locale;
-            getSetGlobalLocale(name);
-          } else {
-            if (locales[name] != null) {
-              if (locales[name].parentLocale != null) {
-                locales[name] = locales[name].parentLocale;
-              } else if (locales[name] != null) {
-                delete locales[name];
-              }
-            }
-          }
-          return locales[name];
-        }
-        function getLocale(key) {
-          var _$locale;
-          if (key && key._locale && key._locale._abbr) {
-            key = key._locale._abbr;
-          }
-          if (!key) {
-            return globalLocale;
-          }
-          if (!isArray(key)) {
-            _$locale = loadLocale(key);
-            if (_$locale) {
-              return _$locale;
-            }
-            key = [
-              key
-            ];
-          }
-          return chooseLocale(key);
-        }
-        function listLocales() {
-          return keys(locales);
-        }
-        function checkOverflow(m2) {
-          var overflow;
-          var a = m2._a;
-          if (a && getParsingFlags(m2).overflow === -2) {
-            overflow = a[MONTH] < 0 || a[MONTH] > 11 ? MONTH : a[DATE] < 1 || a[DATE] > daysInMonth(a[YEAR], a[MONTH]) ? DATE : a[HOUR] < 0 || a[HOUR] > 24 || a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0) ? HOUR : a[MINUTE] < 0 || a[MINUTE] > 59 ? MINUTE : a[SECOND] < 0 || a[SECOND] > 59 ? SECOND : a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND : -1;
-            if (getParsingFlags(m2)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
-              overflow = DATE;
-            }
-            if (getParsingFlags(m2)._overflowWeeks && overflow === -1) {
-              overflow = WEEK;
-            }
-            if (getParsingFlags(m2)._overflowWeekday && overflow === -1) {
-              overflow = WEEKDAY;
-            }
-            getParsingFlags(m2).overflow = overflow;
-          }
-          return m2;
-        }
-        function defaults(a, b3, c2) {
-          if (a != null) {
-            return a;
-          }
-          if (b3 != null) {
-            return b3;
-          }
-          return c2;
-        }
-        function currentDateArray(config) {
-          var nowValue = new Date(hooks.now());
-          if (config._useUTC) {
-            return [
-              nowValue.getUTCFullYear(),
-              nowValue.getUTCMonth(),
-              nowValue.getUTCDate()
-            ];
-          }
-          return [
-            nowValue.getFullYear(),
-            nowValue.getMonth(),
-            nowValue.getDate()
-          ];
-        }
-        function configFromArray(config) {
-          var i, date, input = [], currentDate, expectedWeekday, yearToUse;
-          if (config._d) {
-            return;
-          }
-          currentDate = currentDateArray(config);
-          if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
-            dayOfYearFromWeekInfo(config);
-          }
-          if (config._dayOfYear != null) {
-            yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
-            if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
-              getParsingFlags(config)._overflowDayOfYear = true;
-            }
-            date = createUTCDate(yearToUse, 0, config._dayOfYear);
-            config._a[MONTH] = date.getUTCMonth();
-            config._a[DATE] = date.getUTCDate();
-          }
-          for (i = 0; i < 3 && config._a[i] == null; ++i) {
-            config._a[i] = input[i] = currentDate[i];
-          }
-          for (; i < 7; i++) {
-            config._a[i] = input[i] = config._a[i] == null ? i === 2 ? 1 : 0 : config._a[i];
-          }
-          if (config._a[HOUR] === 24 && config._a[MINUTE] === 0 && config._a[SECOND] === 0 && config._a[MILLISECOND] === 0) {
-            config._nextDay = true;
-            config._a[HOUR] = 0;
-          }
-          config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
-          expectedWeekday = config._useUTC ? config._d.getUTCDay() : config._d.getDay();
-          if (config._tzm != null) {
-            config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
-          }
-          if (config._nextDay) {
-            config._a[HOUR] = 24;
-          }
-          if (config._w && typeof config._w.d !== "undefined" && config._w.d !== expectedWeekday) {
-            getParsingFlags(config).weekdayMismatch = true;
-          }
-        }
-        function dayOfYearFromWeekInfo(config) {
-          var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
-          w = config._w;
-          if (w.GG != null || w.W != null || w.E != null) {
-            dow = 1;
-            doy = 4;
-            weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
-            week = defaults(w.W, 1);
-            weekday = defaults(w.E, 1);
-            if (weekday < 1 || weekday > 7) {
-              weekdayOverflow = true;
-            }
-          } else {
-            dow = config._locale._week.dow;
-            doy = config._locale._week.doy;
-            var curWeek = weekOfYear(createLocal(), dow, doy);
-            weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
-            week = defaults(w.w, curWeek.week);
-            if (w.d != null) {
-              weekday = w.d;
-              if (weekday < 0 || weekday > 6) {
-                weekdayOverflow = true;
-              }
-            } else if (w.e != null) {
-              weekday = w.e + dow;
-              if (w.e < 0 || w.e > 6) {
-                weekdayOverflow = true;
-              }
-            } else {
-              weekday = dow;
-            }
-          }
-          if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
-            getParsingFlags(config)._overflowWeeks = true;
-          } else if (weekdayOverflow != null) {
-            getParsingFlags(config)._overflowWeekday = true;
-          } else {
-            temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
-            config._a[YEAR] = temp.year;
-            config._dayOfYear = temp.dayOfYear;
-          }
-        }
-        var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-        var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
-        var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
-        var isoDates = [
-          [
-            "YYYYYY-MM-DD",
-            /[+-]\d{6}-\d\d-\d\d/
-          ],
-          [
-            "YYYY-MM-DD",
-            /\d{4}-\d\d-\d\d/
-          ],
-          [
-            "GGGG-[W]WW-E",
-            /\d{4}-W\d\d-\d/
-          ],
-          [
-            "GGGG-[W]WW",
-            /\d{4}-W\d\d/,
-            false
-          ],
-          [
-            "YYYY-DDD",
-            /\d{4}-\d{3}/
-          ],
-          [
-            "YYYY-MM",
-            /\d{4}-\d\d/,
-            false
-          ],
-          [
-            "YYYYYYMMDD",
-            /[+-]\d{10}/
-          ],
-          [
-            "YYYYMMDD",
-            /\d{8}/
-          ],
-          // YYYYMM is NOT allowed by the standard
-          [
-            "GGGG[W]WWE",
-            /\d{4}W\d{3}/
-          ],
-          [
-            "GGGG[W]WW",
-            /\d{4}W\d{2}/,
-            false
-          ],
-          [
-            "YYYYDDD",
-            /\d{7}/
-          ]
-        ];
-        var isoTimes = [
-          [
-            "HH:mm:ss.SSSS",
-            /\d\d:\d\d:\d\d\.\d+/
-          ],
-          [
-            "HH:mm:ss,SSSS",
-            /\d\d:\d\d:\d\d,\d+/
-          ],
-          [
-            "HH:mm:ss",
-            /\d\d:\d\d:\d\d/
-          ],
-          [
-            "HH:mm",
-            /\d\d:\d\d/
-          ],
-          [
-            "HHmmss.SSSS",
-            /\d\d\d\d\d\d\.\d+/
-          ],
-          [
-            "HHmmss,SSSS",
-            /\d\d\d\d\d\d,\d+/
-          ],
-          [
-            "HHmmss",
-            /\d\d\d\d\d\d/
-          ],
-          [
-            "HHmm",
-            /\d\d\d\d/
-          ],
-          [
-            "HH",
-            /\d\d/
-          ]
-        ];
-        var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
-        function configFromISO(config) {
-          var i, l, string = config._i, match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string), allowTime, dateFormat, timeFormat, tzFormat;
-          if (match) {
-            getParsingFlags(config).iso = true;
-            for (i = 0, l = isoDates.length; i < l; i++) {
-              if (isoDates[i][1].exec(match[1])) {
-                dateFormat = isoDates[i][0];
-                allowTime = isoDates[i][2] !== false;
-                break;
-              }
-            }
-            if (dateFormat == null) {
-              config._isValid = false;
-              return;
-            }
-            if (match[3]) {
-              for (i = 0, l = isoTimes.length; i < l; i++) {
-                if (isoTimes[i][1].exec(match[3])) {
-                  timeFormat = (match[2] || " ") + isoTimes[i][0];
-                  break;
-                }
-              }
-              if (timeFormat == null) {
-                config._isValid = false;
-                return;
-              }
-            }
-            if (!allowTime && timeFormat != null) {
-              config._isValid = false;
-              return;
-            }
-            if (match[4]) {
-              if (tzRegex.exec(match[4])) {
-                tzFormat = "Z";
-              } else {
-                config._isValid = false;
-                return;
-              }
-            }
-            config._f = dateFormat + (timeFormat || "") + (tzFormat || "");
-            configFromStringAndFormat(config);
-          } else {
-            config._isValid = false;
-          }
-        }
-        var rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/;
-        function extractFromRFC2822Strings(yearStr, monthStr, dayStr, hourStr, minuteStr, secondStr) {
-          var result = [
-            untruncateYear(yearStr),
-            defaultLocaleMonthsShort.indexOf(monthStr),
-            parseInt(dayStr, 10),
-            parseInt(hourStr, 10),
-            parseInt(minuteStr, 10)
-          ];
-          if (secondStr) {
-            result.push(parseInt(secondStr, 10));
-          }
-          return result;
-        }
-        function untruncateYear(yearStr) {
-          var year = parseInt(yearStr, 10);
-          if (year <= 49) {
-            return 2e3 + year;
-          } else if (year <= 999) {
-            return 1900 + year;
-          }
-          return year;
-        }
-        function preprocessRFC2822(s) {
-          return s.replace(/\([^)]*\)|[\n\t]/g, " ").replace(/(\s\s+)/g, " ").replace(/^\s\s*/, "").replace(/\s\s*$/, "");
-        }
-        function checkWeekday(weekdayStr, parsedInput, config) {
-          if (weekdayStr) {
-            var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr), weekdayActual = new Date(parsedInput[0], parsedInput[1], parsedInput[2]).getDay();
-            if (weekdayProvided !== weekdayActual) {
-              getParsingFlags(config).weekdayMismatch = true;
-              config._isValid = false;
-              return false;
-            }
-          }
-          return true;
-        }
-        var obsOffsets = {
-          UT: 0,
-          GMT: 0,
-          EDT: -4 * 60,
-          EST: -5 * 60,
-          CDT: -5 * 60,
-          CST: -6 * 60,
-          MDT: -6 * 60,
-          MST: -7 * 60,
-          PDT: -7 * 60,
-          PST: -8 * 60
-        };
-        function calculateOffset(obsOffset, militaryOffset, numOffset) {
-          if (obsOffset) {
-            return obsOffsets[obsOffset];
-          } else if (militaryOffset) {
-            return 0;
-          } else {
-            var hm = parseInt(numOffset, 10);
-            var m2 = hm % 100, h = (hm - m2) / 100;
-            return h * 60 + m2;
-          }
-        }
-        function configFromRFC2822(config) {
-          var match = rfc2822.exec(preprocessRFC2822(config._i));
-          if (match) {
-            var parsedArray = extractFromRFC2822Strings(match[4], match[3], match[2], match[5], match[6], match[7]);
-            if (!checkWeekday(match[1], parsedArray, config)) {
-              return;
-            }
-            config._a = parsedArray;
-            config._tzm = calculateOffset(match[8], match[9], match[10]);
-            config._d = createUTCDate.apply(null, config._a);
-            config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
-            getParsingFlags(config).rfc2822 = true;
-          } else {
-            config._isValid = false;
-          }
-        }
-        function configFromString(config) {
-          var matched = aspNetJsonRegex.exec(config._i);
-          if (matched !== null) {
-            config._d = /* @__PURE__ */ new Date(+matched[1]);
-            return;
-          }
-          configFromISO(config);
-          if (config._isValid === false) {
-            delete config._isValid;
-          } else {
-            return;
-          }
-          configFromRFC2822(config);
-          if (config._isValid === false) {
-            delete config._isValid;
-          } else {
-            return;
-          }
-          hooks.createFromInputFallback(config);
-        }
-        hooks.createFromInputFallback = deprecate("value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are discouraged and will be removed in an upcoming major release. Please refer to http://momentjs.com/guides/#/warnings/js-date/ for more info.", function(config) {
-          config._d = /* @__PURE__ */ new Date(config._i + (config._useUTC ? " UTC" : ""));
-        });
-        hooks.ISO_8601 = function() {
-        };
-        hooks.RFC_2822 = function() {
-        };
-        function configFromStringAndFormat(config) {
-          if (config._f === hooks.ISO_8601) {
-            configFromISO(config);
-            return;
-          }
-          if (config._f === hooks.RFC_2822) {
-            configFromRFC2822(config);
-            return;
-          }
-          config._a = [];
-          getParsingFlags(config).empty = true;
-          var string = "" + config._i, i, parsedInput, tokens3, token2, skipped, stringLength = string.length, totalParsedInputLength = 0;
-          tokens3 = expandFormat(config._f, config._locale).match(formattingTokens) || [];
-          for (i = 0; i < tokens3.length; i++) {
-            token2 = tokens3[i];
-            parsedInput = (string.match(getParseRegexForToken(token2, config)) || [])[0];
-            if (parsedInput) {
-              skipped = string.substr(0, string.indexOf(parsedInput));
-              if (skipped.length > 0) {
-                getParsingFlags(config).unusedInput.push(skipped);
-              }
-              string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
-              totalParsedInputLength += parsedInput.length;
-            }
-            if (formatTokenFunctions[token2]) {
-              if (parsedInput) {
-                getParsingFlags(config).empty = false;
-              } else {
-                getParsingFlags(config).unusedTokens.push(token2);
-              }
-              addTimeToArrayFromToken(token2, parsedInput, config);
-            } else if (config._strict && !parsedInput) {
-              getParsingFlags(config).unusedTokens.push(token2);
-            }
-          }
-          getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
-          if (string.length > 0) {
-            getParsingFlags(config).unusedInput.push(string);
-          }
-          if (config._a[HOUR] <= 12 && getParsingFlags(config).bigHour === true && config._a[HOUR] > 0) {
-            getParsingFlags(config).bigHour = void 0;
-          }
-          getParsingFlags(config).parsedDateParts = config._a.slice(0);
-          getParsingFlags(config).meridiem = config._meridiem;
-          config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
-          configFromArray(config);
-          checkOverflow(config);
-        }
-        function meridiemFixWrap(locale2, hour, meridiem2) {
-          var isPm;
-          if (meridiem2 == null) {
-            return hour;
-          }
-          if (locale2.meridiemHour != null) {
-            return locale2.meridiemHour(hour, meridiem2);
-          } else if (locale2.isPM != null) {
-            isPm = locale2.isPM(meridiem2);
-            if (isPm && hour < 12) {
-              hour += 12;
-            }
-            if (!isPm && hour === 12) {
-              hour = 0;
-            }
-            return hour;
-          } else {
-            return hour;
-          }
-        }
-        function configFromStringAndArray(config) {
-          var tempConfig, bestMoment, scoreToBeat, i, currentScore;
-          if (config._f.length === 0) {
-            getParsingFlags(config).invalidFormat = true;
-            config._d = /* @__PURE__ */ new Date(NaN);
-            return;
-          }
-          for (i = 0; i < config._f.length; i++) {
-            currentScore = 0;
-            tempConfig = copyConfig({}, config);
-            if (config._useUTC != null) {
-              tempConfig._useUTC = config._useUTC;
-            }
-            tempConfig._f = config._f[i];
-            configFromStringAndFormat(tempConfig);
-            if (!isValid(tempConfig)) {
-              continue;
-            }
-            currentScore += getParsingFlags(tempConfig).charsLeftOver;
-            currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
-            getParsingFlags(tempConfig).score = currentScore;
-            if (scoreToBeat == null || currentScore < scoreToBeat) {
-              scoreToBeat = currentScore;
-              bestMoment = tempConfig;
-            }
-          }
-          extend(config, bestMoment || tempConfig);
-        }
-        function configFromObject(config) {
-          if (config._d) {
-            return;
-          }
-          var i = normalizeObjectUnits(config._i);
-          config._a = map([
-            i.year,
-            i.month,
-            i.day || i.date,
-            i.hour,
-            i.minute,
-            i.second,
-            i.millisecond
-          ], function(obj) {
-            return obj && parseInt(obj, 10);
-          });
-          configFromArray(config);
-        }
-        function createFromConfig(config) {
-          var res = new Moment(checkOverflow(prepareConfig(config)));
-          if (res._nextDay) {
-            res.add(1, "d");
-            res._nextDay = void 0;
-          }
-          return res;
-        }
-        function prepareConfig(config) {
-          var input = config._i, _$format = config._f;
-          config._locale = config._locale || getLocale(config._l);
-          if (input === null || _$format === void 0 && input === "") {
-            return createInvalid({
-              nullInput: true
-            });
-          }
-          if (typeof input === "string") {
-            config._i = input = config._locale.preparse(input);
-          }
-          if (isMoment(input)) {
-            return new Moment(checkOverflow(input));
-          } else if (isDate(input)) {
-            config._d = input;
-          } else if (isArray(_$format)) {
-            configFromStringAndArray(config);
-          } else if (_$format) {
-            configFromStringAndFormat(config);
-          } else {
-            configFromInput(config);
-          }
-          if (!isValid(config)) {
-            config._d = null;
-          }
-          return config;
-        }
-        function configFromInput(config) {
-          var input = config._i;
-          if (isUndefined(input)) {
-            config._d = new Date(hooks.now());
-          } else if (isDate(input)) {
-            config._d = new Date(input.valueOf());
-          } else if (typeof input === "string") {
-            configFromString(config);
-          } else if (isArray(input)) {
-            config._a = map(input.slice(0), function(obj) {
-              return parseInt(obj, 10);
-            });
-            configFromArray(config);
-          } else if (isObject2(input)) {
-            configFromObject(config);
-          } else if (isNumber(input)) {
-            config._d = new Date(input);
-          } else {
-            hooks.createFromInputFallback(config);
-          }
-        }
-        function createLocalOrUTC(input, format2, locale2, strict, isUTC) {
-          var c2 = {};
-          if (locale2 === true || locale2 === false) {
-            strict = locale2;
-            locale2 = void 0;
-          }
-          if (isObject2(input) && isObjectEmpty(input) || isArray(input) && input.length === 0) {
-            input = void 0;
-          }
-          c2._isAMomentObject = true;
-          c2._useUTC = c2._isUTC = isUTC;
-          c2._l = locale2;
-          c2._i = input;
-          c2._f = format2;
-          c2._strict = strict;
-          return createFromConfig(c2);
-        }
-        function createLocal(input, format2, locale2, strict) {
-          return createLocalOrUTC(input, format2, locale2, strict, false);
-        }
-        var prototypeMin = deprecate("moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/", function() {
-          var other = createLocal.apply(null, arguments);
-          if (this.isValid() && other.isValid()) {
-            return other < this ? this : other;
-          } else {
-            return createInvalid();
-          }
-        });
-        var prototypeMax = deprecate("moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/", function() {
-          var other = createLocal.apply(null, arguments);
-          if (this.isValid() && other.isValid()) {
-            return other > this ? this : other;
-          } else {
-            return createInvalid();
-          }
-        });
-        function pickBy(fn, moments) {
-          var res, i;
-          if (moments.length === 1 && isArray(moments[0])) {
-            moments = moments[0];
-          }
-          if (!moments.length) {
-            return createLocal();
-          }
-          res = moments[0];
-          for (i = 1; i < moments.length; ++i) {
-            if (!moments[i].isValid() || moments[i][fn](res)) {
-              res = moments[i];
-            }
-          }
-          return res;
-        }
-        function min() {
-          var args = [].slice.call(arguments, 0);
-          return pickBy("isBefore", args);
-        }
-        function max() {
-          var args = [].slice.call(arguments, 0);
-          return pickBy("isAfter", args);
-        }
-        var now = function now2() {
-          return Date.now ? Date.now() : +/* @__PURE__ */ new Date();
-        };
-        var ordering = [
-          "year",
-          "quarter",
-          "month",
-          "week",
-          "day",
-          "hour",
-          "minute",
-          "second",
-          "millisecond"
-        ];
-        function isDurationValid(m2) {
-          for (var key in m2) {
-            if (!(indexOf.call(ordering, key) !== -1 && (m2[key] == null || !isNaN(m2[key])))) {
-              return false;
-            }
-          }
-          var unitHasDecimal = false;
-          for (var i = 0; i < ordering.length; ++i) {
-            if (m2[ordering[i]]) {
-              if (unitHasDecimal) {
-                return false;
-              }
-              if (parseFloat(m2[ordering[i]]) !== toInt(m2[ordering[i]])) {
-                unitHasDecimal = true;
-              }
-            }
-          }
-          return true;
-        }
-        function isValid$1() {
-          return this._isValid;
-        }
-        function createInvalid$1() {
-          return createDuration(NaN);
-        }
-        function Duration(duration) {
-          var normalizedInput = normalizeObjectUnits(duration), years2 = normalizedInput.year || 0, quarters = normalizedInput.quarter || 0, months2 = normalizedInput.month || 0, _$weeks = normalizedInput.week || 0, days2 = normalizedInput.day || 0, hours2 = normalizedInput.hour || 0, minutes2 = normalizedInput.minute || 0, seconds2 = normalizedInput.second || 0, milliseconds2 = normalizedInput.millisecond || 0;
-          this._isValid = isDurationValid(normalizedInput);
-          this._milliseconds = +milliseconds2 + seconds2 * 1e3 + // 1000
-          minutes2 * 6e4 + // 1000 * 60
-          hours2 * 1e3 * 60 * 60;
-          this._days = +days2 + _$weeks * 7;
-          this._months = +months2 + quarters * 3 + years2 * 12;
-          this._data = {};
-          this._locale = getLocale();
-          this._bubble();
-        }
-        function isDuration(obj) {
-          return obj instanceof Duration;
-        }
-        function absRound(number) {
-          if (number < 0) {
-            return Math.round(-1 * number) * -1;
-          } else {
-            return Math.round(number);
-          }
-        }
-        function offset(token2, separator) {
-          addFormatToken(token2, 0, 0, function() {
-            var _$offset = this.utcOffset();
-            var sign2 = "+";
-            if (_$offset < 0) {
-              _$offset = -_$offset;
-              sign2 = "-";
-            }
-            return sign2 + zeroFill(~~(_$offset / 60), 2) + separator + zeroFill(~~_$offset % 60, 2);
-          });
-        }
-        offset("Z", ":");
-        offset("ZZ", "");
-        addRegexToken("Z", matchShortOffset);
-        addRegexToken("ZZ", matchShortOffset);
-        addParseToken([
-          "Z",
-          "ZZ"
-        ], function(input, array, config) {
-          config._useUTC = true;
-          config._tzm = offsetFromString(matchShortOffset, input);
-        });
-        var chunkOffset = /([\+\-]|\d\d)/gi;
-        function offsetFromString(matcher, string) {
-          var matches = (string || "").match(matcher);
-          if (matches === null) {
-            return null;
-          }
-          var chunk = matches[matches.length - 1] || [];
-          var parts = (chunk + "").match(chunkOffset) || [
-            "-",
-            0,
-            0
-          ];
-          var minutes2 = +(parts[1] * 60) + toInt(parts[2]);
-          return minutes2 === 0 ? 0 : parts[0] === "+" ? minutes2 : -minutes2;
-        }
-        function cloneWithOffset(input, model) {
-          var res, _$diff;
-          if (model._isUTC) {
-            res = model.clone();
-            _$diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
-            res._d.setTime(res._d.valueOf() + _$diff);
-            hooks.updateOffset(res, false);
-            return res;
-          } else {
-            return createLocal(input).local();
-          }
-        }
-        function getDateOffset(m2) {
-          return -Math.round(m2._d.getTimezoneOffset() / 15) * 15;
-        }
-        hooks.updateOffset = function() {
-        };
-        function getSetOffset(input, keepLocalTime, keepMinutes) {
-          var _$offset = this._offset || 0, localAdjust;
-          if (!this.isValid()) {
-            return input != null ? this : NaN;
-          }
-          if (input != null) {
-            if (typeof input === "string") {
-              input = offsetFromString(matchShortOffset, input);
-              if (input === null) {
-                return this;
-              }
-            } else if (Math.abs(input) < 16 && !keepMinutes) {
-              input = input * 60;
-            }
-            if (!this._isUTC && keepLocalTime) {
-              localAdjust = getDateOffset(this);
-            }
-            this._offset = input;
-            this._isUTC = true;
-            if (localAdjust != null) {
-              this.add(localAdjust, "m");
-            }
-            if (_$offset !== input) {
-              if (!keepLocalTime || this._changeInProgress) {
-                addSubtract(this, createDuration(input - _$offset, "m"), 1, false);
-              } else if (!this._changeInProgress) {
-                this._changeInProgress = true;
-                hooks.updateOffset(this, true);
-                this._changeInProgress = null;
-              }
-            }
-            return this;
-          } else {
-            return this._isUTC ? _$offset : getDateOffset(this);
-          }
-        }
-        function getSetZone(input, keepLocalTime) {
-          if (input != null) {
-            if (typeof input !== "string") {
-              input = -input;
-            }
-            this.utcOffset(input, keepLocalTime);
-            return this;
-          } else {
-            return -this.utcOffset();
-          }
-        }
-        function setOffsetToUTC(keepLocalTime) {
-          return this.utcOffset(0, keepLocalTime);
-        }
-        function setOffsetToLocal(keepLocalTime) {
-          if (this._isUTC) {
-            this.utcOffset(0, keepLocalTime);
-            this._isUTC = false;
-            if (keepLocalTime) {
-              this.subtract(getDateOffset(this), "m");
-            }
-          }
-          return this;
-        }
-        function setOffsetToParsedOffset() {
-          if (this._tzm != null) {
-            this.utcOffset(this._tzm, false, true);
-          } else if (typeof this._i === "string") {
-            var tZone = offsetFromString(matchOffset, this._i);
-            if (tZone != null) {
-              this.utcOffset(tZone);
-            } else {
-              this.utcOffset(0, true);
-            }
-          }
-          return this;
-        }
-        function hasAlignedHourOffset(input) {
-          if (!this.isValid()) {
-            return false;
-          }
-          input = input ? createLocal(input).utcOffset() : 0;
-          return (this.utcOffset() - input) % 60 === 0;
-        }
-        function isDaylightSavingTime() {
-          return this.utcOffset() > this.clone().month(0).utcOffset() || this.utcOffset() > this.clone().month(5).utcOffset();
-        }
-        function isDaylightSavingTimeShifted() {
-          if (!isUndefined(this._isDSTShifted)) {
-            return this._isDSTShifted;
-          }
-          var c2 = {};
-          copyConfig(c2, this);
-          c2 = prepareConfig(c2);
-          if (c2._a) {
-            var other = c2._isUTC ? createUTC(c2._a) : createLocal(c2._a);
-            this._isDSTShifted = this.isValid() && compareArrays(c2._a, other.toArray()) > 0;
-          } else {
-            this._isDSTShifted = false;
-          }
-          return this._isDSTShifted;
-        }
-        function isLocal() {
-          return this.isValid() ? !this._isUTC : false;
-        }
-        function isUtcOffset() {
-          return this.isValid() ? this._isUTC : false;
-        }
-        function isUtc() {
-          return this.isValid() ? this._isUTC && this._offset === 0 : false;
-        }
-        var aspNetRegex = /^(\-|\+)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
-        var isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
-        function createDuration(input, key) {
-          var duration = input, match = null, sign2, ret, diffRes;
-          if (isDuration(input)) {
-            duration = {
-              ms: input._milliseconds,
-              d: input._days,
-              M: input._months
-            };
-          } else if (isNumber(input)) {
-            duration = {};
-            if (key) {
-              duration[key] = input;
-            } else {
-              duration.milliseconds = input;
-            }
-          } else if (!!(match = aspNetRegex.exec(input))) {
-            sign2 = match[1] === "-" ? -1 : 1;
-            duration = {
-              y: 0,
-              d: toInt(match[DATE]) * sign2,
-              h: toInt(match[HOUR]) * sign2,
-              m: toInt(match[MINUTE]) * sign2,
-              s: toInt(match[SECOND]) * sign2,
-              ms: toInt(absRound(match[MILLISECOND] * 1e3)) * sign2
-              // the millisecond decimal point is included in the match
-            };
-          } else if (!!(match = isoRegex.exec(input))) {
-            sign2 = match[1] === "-" ? -1 : match[1] === "+" ? 1 : 1;
-            duration = {
-              y: parseIso(match[2], sign2),
-              M: parseIso(match[3], sign2),
-              w: parseIso(match[4], sign2),
-              d: parseIso(match[5], sign2),
-              h: parseIso(match[6], sign2),
-              m: parseIso(match[7], sign2),
-              s: parseIso(match[8], sign2)
-            };
-          } else if (duration == null) {
-            duration = {};
-          } else if (typeof duration === "object" && ("from" in duration || "to" in duration)) {
-            diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
-            duration = {};
-            duration.ms = diffRes.milliseconds;
-            duration.M = diffRes.months;
-          }
-          ret = new Duration(duration);
-          if (isDuration(input) && hasOwnProp(input, "_locale")) {
-            ret._locale = input._locale;
-          }
-          return ret;
-        }
-        createDuration.fn = Duration.prototype;
-        createDuration.invalid = createInvalid$1;
-        function parseIso(inp, sign2) {
-          var res = inp && parseFloat(inp.replace(",", "."));
-          return (isNaN(res) ? 0 : res) * sign2;
-        }
-        function positiveMomentsDifference(base, other) {
-          var res = {
-            milliseconds: 0,
-            months: 0
-          };
-          res.months = other.month() - base.month() + (other.year() - base.year()) * 12;
-          if (base.clone().add(res.months, "M").isAfter(other)) {
-            --res.months;
-          }
-          res.milliseconds = +other - +base.clone().add(res.months, "M");
-          return res;
-        }
-        function momentsDifference(base, other) {
-          var res;
-          if (!(base.isValid() && other.isValid())) {
-            return {
-              milliseconds: 0,
-              months: 0
-            };
-          }
-          other = cloneWithOffset(other, base);
-          if (base.isBefore(other)) {
-            res = positiveMomentsDifference(base, other);
-          } else {
-            res = positiveMomentsDifference(other, base);
-            res.milliseconds = -res.milliseconds;
-            res.months = -res.months;
-          }
-          return res;
-        }
-        function createAdder(direction, name) {
-          return function(val, period) {
-            var dur, tmp;
-            if (period !== null && !isNaN(+period)) {
-              deprecateSimple(name, "moment()." + name + "(period, number) is deprecated. Please use moment()." + name + "(number, period). See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.");
-              tmp = val;
-              val = period;
-              period = tmp;
-            }
-            val = typeof val === "string" ? +val : val;
-            dur = createDuration(val, period);
-            addSubtract(this, dur, direction);
-            return this;
-          };
-        }
-        function addSubtract(mom, duration, isAdding, updateOffset) {
-          var milliseconds2 = duration._milliseconds, days2 = absRound(duration._days), months2 = absRound(duration._months);
-          if (!mom.isValid()) {
-            return;
-          }
-          updateOffset = updateOffset == null ? true : updateOffset;
-          if (months2) {
-            setMonth(mom, get(mom, "Month") + months2 * isAdding);
-          }
-          if (days2) {
-            set$1(mom, "Date", get(mom, "Date") + days2 * isAdding);
-          }
-          if (milliseconds2) {
-            mom._d.setTime(mom._d.valueOf() + milliseconds2 * isAdding);
-          }
-          if (updateOffset) {
-            hooks.updateOffset(mom, days2 || months2);
-          }
-        }
-        var add = createAdder(1, "add");
-        var subtract = createAdder(-1, "subtract");
-        function getCalendarFormat(myMoment, now2) {
-          var _$diff = myMoment.diff(now2, "days", true);
-          return _$diff < -6 ? "sameElse" : _$diff < -1 ? "lastWeek" : _$diff < 0 ? "lastDay" : _$diff < 1 ? "sameDay" : _$diff < 2 ? "nextDay" : _$diff < 7 ? "nextWeek" : "sameElse";
-        }
-        function calendar$1(time, formats) {
-          var now2 = time || createLocal(), sod = cloneWithOffset(now2, this).startOf("day"), _$format = hooks.calendarFormat(this, sod) || "sameElse";
-          var output = formats && (isFunction(formats[_$format]) ? formats[_$format].call(this, now2) : formats[_$format]);
-          return this.format(output || this.localeData().calendar(_$format, this, createLocal(now2)));
-        }
-        function clone() {
-          return new Moment(this);
-        }
-        function isAfter(input, units2) {
-          var localInput = isMoment(input) ? input : createLocal(input);
-          if (!(this.isValid() && localInput.isValid())) {
-            return false;
-          }
-          units2 = normalizeUnits(!isUndefined(units2) ? units2 : "millisecond");
-          if (units2 === "millisecond") {
-            return this.valueOf() > localInput.valueOf();
-          } else {
-            return localInput.valueOf() < this.clone().startOf(units2).valueOf();
-          }
-        }
-        function isBefore(input, units2) {
-          var localInput = isMoment(input) ? input : createLocal(input);
-          if (!(this.isValid() && localInput.isValid())) {
-            return false;
-          }
-          units2 = normalizeUnits(!isUndefined(units2) ? units2 : "millisecond");
-          if (units2 === "millisecond") {
-            return this.valueOf() < localInput.valueOf();
-          } else {
-            return this.clone().endOf(units2).valueOf() < localInput.valueOf();
-          }
-        }
-        function isBetween(from2, to2, units2, inclusivity) {
-          inclusivity = inclusivity || "()";
-          return (inclusivity[0] === "(" ? this.isAfter(from2, units2) : !this.isBefore(from2, units2)) && (inclusivity[1] === ")" ? this.isBefore(to2, units2) : !this.isAfter(to2, units2));
-        }
-        function isSame(input, units2) {
-          var localInput = isMoment(input) ? input : createLocal(input), inputMs;
-          if (!(this.isValid() && localInput.isValid())) {
-            return false;
-          }
-          units2 = normalizeUnits(units2 || "millisecond");
-          if (units2 === "millisecond") {
-            return this.valueOf() === localInput.valueOf();
-          } else {
-            inputMs = localInput.valueOf();
-            return this.clone().startOf(units2).valueOf() <= inputMs && inputMs <= this.clone().endOf(units2).valueOf();
-          }
-        }
-        function isSameOrAfter(input, units2) {
-          return this.isSame(input, units2) || this.isAfter(input, units2);
-        }
-        function isSameOrBefore(input, units2) {
-          return this.isSame(input, units2) || this.isBefore(input, units2);
-        }
-        function diff(input, units2, asFloat) {
-          var that, zoneDelta, output;
-          if (!this.isValid()) {
-            return NaN;
-          }
-          that = cloneWithOffset(input, this);
-          if (!that.isValid()) {
-            return NaN;
-          }
-          zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
-          units2 = normalizeUnits(units2);
-          switch (units2) {
-            case "year":
-              output = monthDiff(this, that) / 12;
-              break;
-            case "month":
-              output = monthDiff(this, that);
-              break;
-            case "quarter":
-              output = monthDiff(this, that) / 3;
-              break;
-            case "second":
-              output = (this - that) / 1e3;
-              break;
-            case "minute":
-              output = (this - that) / 6e4;
-              break;
-            case "hour":
-              output = (this - that) / 36e5;
-              break;
-            case "day":
-              output = (this - that - zoneDelta) / 864e5;
-              break;
-            case "week":
-              output = (this - that - zoneDelta) / 6048e5;
-              break;
-            default:
-              output = this - that;
-          }
-          return asFloat ? output : absFloor(output);
-        }
-        function monthDiff(a, b3) {
-          var wholeMonthDiff = (b3.year() - a.year()) * 12 + (b3.month() - a.month()), anchor = a.clone().add(wholeMonthDiff, "months"), anchor2, adjust;
-          if (b3 - anchor < 0) {
-            anchor2 = a.clone().add(wholeMonthDiff - 1, "months");
-            adjust = (b3 - anchor) / (anchor - anchor2);
-          } else {
-            anchor2 = a.clone().add(wholeMonthDiff + 1, "months");
-            adjust = (b3 - anchor) / (anchor2 - anchor);
-          }
-          return -(wholeMonthDiff + adjust) || 0;
-        }
-        hooks.defaultFormat = "YYYY-MM-DDTHH:mm:ssZ";
-        hooks.defaultFormatUtc = "YYYY-MM-DDTHH:mm:ss[Z]";
-        function toString() {
-          return this.clone().locale("en").format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ");
-        }
-        function toISOString(keepOffset) {
-          if (!this.isValid()) {
-            return null;
-          }
-          var utc = keepOffset !== true;
-          var m2 = utc ? this.clone().utc() : this;
-          if (m2.year() < 0 || m2.year() > 9999) {
-            return formatMoment(m2, utc ? "YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]" : "YYYYYY-MM-DD[T]HH:mm:ss.SSSZ");
-          }
-          if (isFunction(Date.prototype.toISOString)) {
-            if (utc) {
-              return this.toDate().toISOString();
-            } else {
-              return new Date(this.valueOf() + this.utcOffset() * 60 * 1e3).toISOString().replace("Z", formatMoment(m2, "Z"));
-            }
-          }
-          return formatMoment(m2, utc ? "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]" : "YYYY-MM-DD[T]HH:mm:ss.SSSZ");
-        }
-        function inspect() {
-          if (!this.isValid()) {
-            return "moment.invalid(/* " + this._i + " */)";
-          }
-          var func = "moment";
-          var zone = "";
-          if (!this.isLocal()) {
-            func = this.utcOffset() === 0 ? "moment.utc" : "moment.parseZone";
-            zone = "Z";
-          }
-          var prefix2 = "[" + func + '("]';
-          var year = 0 <= this.year() && this.year() <= 9999 ? "YYYY" : "YYYYYY";
-          var datetime = "-MM-DD[T]HH:mm:ss.SSS";
-          var suffix = zone + '[")]';
-          return this.format(prefix2 + year + datetime + suffix);
-        }
-        function format(inputString) {
-          if (!inputString) {
-            inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
-          }
-          var output = formatMoment(this, inputString);
-          return this.localeData().postformat(output);
-        }
-        function from(time, withoutSuffix) {
-          if (this.isValid() && (isMoment(time) && time.isValid() || createLocal(time).isValid())) {
-            return createDuration({
-              to: this,
-              from: time
-            }).locale(this.locale()).humanize(!withoutSuffix);
-          } else {
-            return this.localeData().invalidDate();
-          }
-        }
-        function fromNow(withoutSuffix) {
-          return this.from(createLocal(), withoutSuffix);
-        }
-        function to(time, withoutSuffix) {
-          if (this.isValid() && (isMoment(time) && time.isValid() || createLocal(time).isValid())) {
-            return createDuration({
-              from: this,
-              to: time
-            }).locale(this.locale()).humanize(!withoutSuffix);
-          } else {
-            return this.localeData().invalidDate();
-          }
-        }
-        function toNow(withoutSuffix) {
-          return this.to(createLocal(), withoutSuffix);
-        }
-        function locale(key) {
-          var newLocaleData;
-          if (key === void 0) {
-            return this._locale._abbr;
-          } else {
-            newLocaleData = getLocale(key);
-            if (newLocaleData != null) {
-              this._locale = newLocaleData;
-            }
-            return this;
-          }
-        }
-        var lang = deprecate("moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.", function(key) {
-          if (key === void 0) {
-            return this.localeData();
-          } else {
-            return this.locale(key);
-          }
-        });
-        function localeData() {
-          return this._locale;
-        }
-        function startOf(units2) {
-          units2 = normalizeUnits(units2);
-          switch (units2) {
-            case "year":
-              this.month(0);
-            case "quarter":
-            case "month":
-              this.date(1);
-            case "week":
-            case "isoWeek":
-            case "day":
-            case "date":
-              this.hours(0);
-            case "hour":
-              this.minutes(0);
-            case "minute":
-              this.seconds(0);
-            case "second":
-              this.milliseconds(0);
-          }
-          if (units2 === "week") {
-            this.weekday(0);
-          }
-          if (units2 === "isoWeek") {
-            this.isoWeekday(1);
-          }
-          if (units2 === "quarter") {
-            this.month(Math.floor(this.month() / 3) * 3);
-          }
-          return this;
-        }
-        function endOf(units2) {
-          units2 = normalizeUnits(units2);
-          if (units2 === void 0 || units2 === "millisecond") {
-            return this;
-          }
-          if (units2 === "date") {
-            units2 = "day";
-          }
-          return this.startOf(units2).add(1, units2 === "isoWeek" ? "week" : units2).subtract(1, "ms");
-        }
-        function valueOf() {
-          return this._d.valueOf() - (this._offset || 0) * 6e4;
-        }
-        function unix() {
-          return Math.floor(this.valueOf() / 1e3);
-        }
-        function toDate() {
-          return new Date(this.valueOf());
-        }
-        function toArray() {
-          var m2 = this;
-          return [
-            m2.year(),
-            m2.month(),
-            m2.date(),
-            m2.hour(),
-            m2.minute(),
-            m2.second(),
-            m2.millisecond()
-          ];
-        }
-        function toObject() {
-          var m2 = this;
-          return {
-            years: m2.year(),
-            months: m2.month(),
-            date: m2.date(),
-            hours: m2.hours(),
-            minutes: m2.minutes(),
-            seconds: m2.seconds(),
-            milliseconds: m2.milliseconds()
-          };
-        }
-        function toJSON() {
-          return this.isValid() ? this.toISOString() : null;
-        }
-        function isValid$2() {
-          return isValid(this);
-        }
-        function parsingFlags() {
-          return extend({}, getParsingFlags(this));
-        }
-        function invalidAt() {
-          return getParsingFlags(this).overflow;
-        }
-        function creationData() {
-          return {
-            input: this._i,
-            format: this._f,
-            locale: this._locale,
-            isUTC: this._isUTC,
-            strict: this._strict
-          };
-        }
-        addFormatToken(0, [
-          "gg",
-          2
-        ], 0, function() {
-          return this.weekYear() % 100;
-        });
-        addFormatToken(0, [
-          "GG",
-          2
-        ], 0, function() {
-          return this.isoWeekYear() % 100;
-        });
-        function addWeekYearFormatToken(token2, getter) {
-          addFormatToken(0, [
-            token2,
-            token2.length
-          ], 0, getter);
-        }
-        addWeekYearFormatToken("gggg", "weekYear");
-        addWeekYearFormatToken("ggggg", "weekYear");
-        addWeekYearFormatToken("GGGG", "isoWeekYear");
-        addWeekYearFormatToken("GGGGG", "isoWeekYear");
-        addUnitAlias("weekYear", "gg");
-        addUnitAlias("isoWeekYear", "GG");
-        addUnitPriority("weekYear", 1);
-        addUnitPriority("isoWeekYear", 1);
-        addRegexToken("G", matchSigned);
-        addRegexToken("g", matchSigned);
-        addRegexToken("GG", match1to2, match2);
-        addRegexToken("gg", match1to2, match2);
-        addRegexToken("GGGG", match1to4, match4);
-        addRegexToken("gggg", match1to4, match4);
-        addRegexToken("GGGGG", match1to6, match6);
-        addRegexToken("ggggg", match1to6, match6);
-        addWeekParseToken([
-          "gggg",
-          "ggggg",
-          "GGGG",
-          "GGGGG"
-        ], function(input, week, config, token2) {
-          week[token2.substr(0, 2)] = toInt(input);
-        });
-        addWeekParseToken([
-          "gg",
-          "GG"
-        ], function(input, week, config, token2) {
-          week[token2] = hooks.parseTwoDigitYear(input);
-        });
-        function getSetWeekYear(input) {
-          return getSetWeekYearHelper.call(this, input, this.week(), this.weekday(), this.localeData()._week.dow, this.localeData()._week.doy);
-        }
-        function getSetISOWeekYear(input) {
-          return getSetWeekYearHelper.call(this, input, this.isoWeek(), this.isoWeekday(), 1, 4);
-        }
-        function getISOWeeksInYear() {
-          return weeksInYear(this.year(), 1, 4);
-        }
-        function getWeeksInYear() {
-          var weekInfo = this.localeData()._week;
-          return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
-        }
-        function getSetWeekYearHelper(input, week, weekday, dow, doy) {
-          var weeksTarget;
-          if (input == null) {
-            return weekOfYear(this, dow, doy).year;
-          } else {
-            weeksTarget = weeksInYear(input, dow, doy);
-            if (week > weeksTarget) {
-              week = weeksTarget;
-            }
-            return setWeekAll.call(this, input, week, weekday, dow, doy);
-          }
-        }
-        function setWeekAll(weekYear, week, weekday, dow, doy) {
-          var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy), date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
-          this.year(date.getUTCFullYear());
-          this.month(date.getUTCMonth());
-          this.date(date.getUTCDate());
-          return this;
-        }
-        addFormatToken("Q", 0, "Qo", "quarter");
-        addUnitAlias("quarter", "Q");
-        addUnitPriority("quarter", 7);
-        addRegexToken("Q", match1);
-        addParseToken("Q", function(input, array) {
-          array[MONTH] = (toInt(input) - 1) * 3;
-        });
-        function getSetQuarter(input) {
-          return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
-        }
-        addFormatToken("D", [
-          "DD",
-          2
-        ], "Do", "date");
-        addUnitAlias("date", "D");
-        addUnitPriority("date", 9);
-        addRegexToken("D", match1to2);
-        addRegexToken("DD", match1to2, match2);
-        addRegexToken("Do", function(isStrict, locale2) {
-          return isStrict ? locale2._dayOfMonthOrdinalParse || locale2._ordinalParse : locale2._dayOfMonthOrdinalParseLenient;
-        });
-        addParseToken([
-          "D",
-          "DD"
-        ], DATE);
-        addParseToken("Do", function(input, array) {
-          array[DATE] = toInt(input.match(match1to2)[0]);
-        });
-        var getSetDayOfMonth = makeGetSet("Date", true);
-        addFormatToken("DDD", [
-          "DDDD",
-          3
-        ], "DDDo", "dayOfYear");
-        addUnitAlias("dayOfYear", "DDD");
-        addUnitPriority("dayOfYear", 4);
-        addRegexToken("DDD", match1to3);
-        addRegexToken("DDDD", match3);
-        addParseToken([
-          "DDD",
-          "DDDD"
-        ], function(input, array, config) {
-          config._dayOfYear = toInt(input);
-        });
-        function getSetDayOfYear(input) {
-          var dayOfYear = Math.round((this.clone().startOf("day") - this.clone().startOf("year")) / 864e5) + 1;
-          return input == null ? dayOfYear : this.add(input - dayOfYear, "d");
-        }
-        addFormatToken("m", [
-          "mm",
-          2
-        ], 0, "minute");
-        addUnitAlias("minute", "m");
-        addUnitPriority("minute", 14);
-        addRegexToken("m", match1to2);
-        addRegexToken("mm", match1to2, match2);
-        addParseToken([
-          "m",
-          "mm"
-        ], MINUTE);
-        var getSetMinute = makeGetSet("Minutes", false);
-        addFormatToken("s", [
-          "ss",
-          2
-        ], 0, "second");
-        addUnitAlias("second", "s");
-        addUnitPriority("second", 15);
-        addRegexToken("s", match1to2);
-        addRegexToken("ss", match1to2, match2);
-        addParseToken([
-          "s",
-          "ss"
-        ], SECOND);
-        var getSetSecond = makeGetSet("Seconds", false);
-        addFormatToken("S", 0, 0, function() {
-          return ~~(this.millisecond() / 100);
-        });
-        addFormatToken(0, [
-          "SS",
-          2
-        ], 0, function() {
-          return ~~(this.millisecond() / 10);
-        });
-        addFormatToken(0, [
-          "SSS",
-          3
-        ], 0, "millisecond");
-        addFormatToken(0, [
-          "SSSS",
-          4
-        ], 0, function() {
-          return this.millisecond() * 10;
-        });
-        addFormatToken(0, [
-          "SSSSS",
-          5
-        ], 0, function() {
-          return this.millisecond() * 100;
-        });
-        addFormatToken(0, [
-          "SSSSSS",
-          6
-        ], 0, function() {
-          return this.millisecond() * 1e3;
-        });
-        addFormatToken(0, [
-          "SSSSSSS",
-          7
-        ], 0, function() {
-          return this.millisecond() * 1e4;
-        });
-        addFormatToken(0, [
-          "SSSSSSSS",
-          8
-        ], 0, function() {
-          return this.millisecond() * 1e5;
-        });
-        addFormatToken(0, [
-          "SSSSSSSSS",
-          9
-        ], 0, function() {
-          return this.millisecond() * 1e6;
-        });
-        addUnitAlias("millisecond", "ms");
-        addUnitPriority("millisecond", 16);
-        addRegexToken("S", match1to3, match1);
-        addRegexToken("SS", match1to3, match2);
-        addRegexToken("SSS", match1to3, match3);
-        var token;
-        for (token = "SSSS"; token.length <= 9; token += "S") {
-          addRegexToken(token, matchUnsigned);
-        }
-        function parseMs(input, array) {
-          array[MILLISECOND] = toInt(("0." + input) * 1e3);
-        }
-        for (token = "S"; token.length <= 9; token += "S") {
-          addParseToken(token, parseMs);
-        }
-        var getSetMillisecond = makeGetSet("Milliseconds", false);
-        addFormatToken("z", 0, 0, "zoneAbbr");
-        addFormatToken("zz", 0, 0, "zoneName");
-        function getZoneAbbr() {
-          return this._isUTC ? "UTC" : "";
-        }
-        function getZoneName() {
-          return this._isUTC ? "Coordinated Universal Time" : "";
-        }
-        var proto = Moment.prototype;
-        proto.add = add;
-        proto.calendar = calendar$1;
-        proto.clone = clone;
-        proto.diff = diff;
-        proto.endOf = endOf;
-        proto.format = format;
-        proto.from = from;
-        proto.fromNow = fromNow;
-        proto.to = to;
-        proto.toNow = toNow;
-        proto.get = stringGet;
-        proto.invalidAt = invalidAt;
-        proto.isAfter = isAfter;
-        proto.isBefore = isBefore;
-        proto.isBetween = isBetween;
-        proto.isSame = isSame;
-        proto.isSameOrAfter = isSameOrAfter;
-        proto.isSameOrBefore = isSameOrBefore;
-        proto.isValid = isValid$2;
-        proto.lang = lang;
-        proto.locale = locale;
-        proto.localeData = localeData;
-        proto.max = prototypeMax;
-        proto.min = prototypeMin;
-        proto.parsingFlags = parsingFlags;
-        proto.set = stringSet;
-        proto.startOf = startOf;
-        proto.subtract = subtract;
-        proto.toArray = toArray;
-        proto.toObject = toObject;
-        proto.toDate = toDate;
-        proto.toISOString = toISOString;
-        proto.inspect = inspect;
-        proto.toJSON = toJSON;
-        proto.toString = toString;
-        proto.unix = unix;
-        proto.valueOf = valueOf;
-        proto.creationData = creationData;
-        proto.year = getSetYear;
-        proto.isLeapYear = getIsLeapYear;
-        proto.weekYear = getSetWeekYear;
-        proto.isoWeekYear = getSetISOWeekYear;
-        proto.quarter = proto.quarters = getSetQuarter;
-        proto.month = getSetMonth;
-        proto.daysInMonth = getDaysInMonth;
-        proto.week = proto.weeks = getSetWeek;
-        proto.isoWeek = proto.isoWeeks = getSetISOWeek;
-        proto.weeksInYear = getWeeksInYear;
-        proto.isoWeeksInYear = getISOWeeksInYear;
-        proto.date = getSetDayOfMonth;
-        proto.day = proto.days = getSetDayOfWeek;
-        proto.weekday = getSetLocaleDayOfWeek;
-        proto.isoWeekday = getSetISODayOfWeek;
-        proto.dayOfYear = getSetDayOfYear;
-        proto.hour = proto.hours = getSetHour;
-        proto.minute = proto.minutes = getSetMinute;
-        proto.second = proto.seconds = getSetSecond;
-        proto.millisecond = proto.milliseconds = getSetMillisecond;
-        proto.utcOffset = getSetOffset;
-        proto.utc = setOffsetToUTC;
-        proto.local = setOffsetToLocal;
-        proto.parseZone = setOffsetToParsedOffset;
-        proto.hasAlignedHourOffset = hasAlignedHourOffset;
-        proto.isDST = isDaylightSavingTime;
-        proto.isLocal = isLocal;
-        proto.isUtcOffset = isUtcOffset;
-        proto.isUtc = isUtc;
-        proto.isUTC = isUtc;
-        proto.zoneAbbr = getZoneAbbr;
-        proto.zoneName = getZoneName;
-        proto.dates = deprecate("dates accessor is deprecated. Use date instead.", getSetDayOfMonth);
-        proto.months = deprecate("months accessor is deprecated. Use month instead", getSetMonth);
-        proto.years = deprecate("years accessor is deprecated. Use year instead", getSetYear);
-        proto.zone = deprecate("moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/", getSetZone);
-        proto.isDSTShifted = deprecate("isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information", isDaylightSavingTimeShifted);
-        function createUnix(input) {
-          return createLocal(input * 1e3);
-        }
-        function createInZone() {
-          return createLocal.apply(null, arguments).parseZone();
-        }
-        function preParsePostFormat(string) {
-          return string;
-        }
-        var proto$1 = Locale.prototype;
-        proto$1.calendar = calendar;
-        proto$1.longDateFormat = longDateFormat;
-        proto$1.invalidDate = invalidDate;
-        proto$1.ordinal = ordinal;
-        proto$1.preparse = preParsePostFormat;
-        proto$1.postformat = preParsePostFormat;
-        proto$1.relativeTime = relativeTime;
-        proto$1.pastFuture = pastFuture;
-        proto$1.set = set;
-        proto$1.months = localeMonths;
-        proto$1.monthsShort = localeMonthsShort;
-        proto$1.monthsParse = localeMonthsParse;
-        proto$1.monthsRegex = monthsRegex;
-        proto$1.monthsShortRegex = monthsShortRegex;
-        proto$1.week = localeWeek;
-        proto$1.firstDayOfYear = localeFirstDayOfYear;
-        proto$1.firstDayOfWeek = localeFirstDayOfWeek;
-        proto$1.weekdays = localeWeekdays;
-        proto$1.weekdaysMin = localeWeekdaysMin;
-        proto$1.weekdaysShort = localeWeekdaysShort;
-        proto$1.weekdaysParse = localeWeekdaysParse;
-        proto$1.weekdaysRegex = weekdaysRegex;
-        proto$1.weekdaysShortRegex = weekdaysShortRegex;
-        proto$1.weekdaysMinRegex = weekdaysMinRegex;
-        proto$1.isPM = localeIsPM;
-        proto$1.meridiem = localeMeridiem;
-        function get$1(format2, index, field, setter) {
-          var _$locale = getLocale();
-          var utc = createUTC().set(setter, index);
-          return _$locale[field](utc, format2);
-        }
-        function listMonthsImpl(format2, index, field) {
-          if (isNumber(format2)) {
-            index = format2;
-            format2 = void 0;
-          }
-          format2 = format2 || "";
-          if (index != null) {
-            return get$1(format2, index, field, "month");
-          }
-          var i;
-          var out = [];
-          for (i = 0; i < 12; i++) {
-            out[i] = get$1(format2, i, field, "month");
-          }
-          return out;
-        }
-        function listWeekdaysImpl(localeSorted, format2, index, field) {
-          if (typeof localeSorted === "boolean") {
-            if (isNumber(format2)) {
-              index = format2;
-              format2 = void 0;
-            }
-            format2 = format2 || "";
-          } else {
-            format2 = localeSorted;
-            index = format2;
-            localeSorted = false;
-            if (isNumber(format2)) {
-              index = format2;
-              format2 = void 0;
-            }
-            format2 = format2 || "";
-          }
-          var _$locale = getLocale(), shift = localeSorted ? _$locale._week.dow : 0;
-          if (index != null) {
-            return get$1(format2, (index + shift) % 7, field, "day");
-          }
-          var i;
-          var out = [];
-          for (i = 0; i < 7; i++) {
-            out[i] = get$1(format2, (i + shift) % 7, field, "day");
-          }
-          return out;
-        }
-        function listMonths(format2, index) {
-          return listMonthsImpl(format2, index, "months");
-        }
-        function listMonthsShort(format2, index) {
-          return listMonthsImpl(format2, index, "monthsShort");
-        }
-        function listWeekdays(localeSorted, format2, index) {
-          return listWeekdaysImpl(localeSorted, format2, index, "weekdays");
-        }
-        function listWeekdaysShort(localeSorted, format2, index) {
-          return listWeekdaysImpl(localeSorted, format2, index, "weekdaysShort");
-        }
-        function listWeekdaysMin(localeSorted, format2, index) {
-          return listWeekdaysImpl(localeSorted, format2, index, "weekdaysMin");
-        }
-        getSetGlobalLocale("en", {
-          dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
-          ordinal: function ordinal2(number) {
-            var b3 = number % 10, output = toInt(number % 100 / 10) === 1 ? "th" : b3 === 1 ? "st" : b3 === 2 ? "nd" : b3 === 3 ? "rd" : "th";
-            return number + output;
-          }
-        });
-        hooks.lang = deprecate("moment.lang is deprecated. Use moment.locale instead.", getSetGlobalLocale);
-        hooks.langData = deprecate("moment.langData is deprecated. Use moment.localeData instead.", getLocale);
-        var mathAbs = Math.abs;
-        function abs() {
-          var data = this._data;
-          this._milliseconds = mathAbs(this._milliseconds);
-          this._days = mathAbs(this._days);
-          this._months = mathAbs(this._months);
-          data.milliseconds = mathAbs(data.milliseconds);
-          data.seconds = mathAbs(data.seconds);
-          data.minutes = mathAbs(data.minutes);
-          data.hours = mathAbs(data.hours);
-          data.months = mathAbs(data.months);
-          data.years = mathAbs(data.years);
-          return this;
-        }
-        function addSubtract$1(duration, input, value, direction) {
-          var other = createDuration(input, value);
-          duration._milliseconds += direction * other._milliseconds;
-          duration._days += direction * other._days;
-          duration._months += direction * other._months;
-          return duration._bubble();
-        }
-        function add$1(input, value) {
-          return addSubtract$1(this, input, value, 1);
-        }
-        function subtract$1(input, value) {
-          return addSubtract$1(this, input, value, -1);
-        }
-        function absCeil(number) {
-          if (number < 0) {
-            return Math.floor(number);
-          } else {
-            return Math.ceil(number);
-          }
-        }
-        function bubble() {
-          var milliseconds2 = this._milliseconds;
-          var days2 = this._days;
-          var months2 = this._months;
-          var data = this._data;
-          var seconds2, minutes2, hours2, years2, monthsFromDays;
-          if (!(milliseconds2 >= 0 && days2 >= 0 && months2 >= 0 || milliseconds2 <= 0 && days2 <= 0 && months2 <= 0)) {
-            milliseconds2 += absCeil(monthsToDays(months2) + days2) * 864e5;
-            days2 = 0;
-            months2 = 0;
-          }
-          data.milliseconds = milliseconds2 % 1e3;
-          seconds2 = absFloor(milliseconds2 / 1e3);
-          data.seconds = seconds2 % 60;
-          minutes2 = absFloor(seconds2 / 60);
-          data.minutes = minutes2 % 60;
-          hours2 = absFloor(minutes2 / 60);
-          data.hours = hours2 % 24;
-          days2 += absFloor(hours2 / 24);
-          monthsFromDays = absFloor(daysToMonths(days2));
-          months2 += monthsFromDays;
-          days2 -= absCeil(monthsToDays(monthsFromDays));
-          years2 = absFloor(months2 / 12);
-          months2 %= 12;
-          data.days = days2;
-          data.months = months2;
-          data.years = years2;
-          return this;
-        }
-        function daysToMonths(days2) {
-          return days2 * 4800 / 146097;
-        }
-        function monthsToDays(months2) {
-          return months2 * 146097 / 4800;
-        }
-        function as(units2) {
-          if (!this.isValid()) {
-            return NaN;
-          }
-          var days2;
-          var months2;
-          var milliseconds2 = this._milliseconds;
-          units2 = normalizeUnits(units2);
-          if (units2 === "month" || units2 === "year") {
-            days2 = this._days + milliseconds2 / 864e5;
-            months2 = this._months + daysToMonths(days2);
-            return units2 === "month" ? months2 : months2 / 12;
-          } else {
-            days2 = this._days + Math.round(monthsToDays(this._months));
-            switch (units2) {
-              case "week":
-                return days2 / 7 + milliseconds2 / 6048e5;
-              case "day":
-                return days2 + milliseconds2 / 864e5;
-              case "hour":
-                return days2 * 24 + milliseconds2 / 36e5;
-              case "minute":
-                return days2 * 1440 + milliseconds2 / 6e4;
-              case "second":
-                return days2 * 86400 + milliseconds2 / 1e3;
-              case "millisecond":
-                return Math.floor(days2 * 864e5) + milliseconds2;
-              default:
-                throw new Error("Unknown unit " + units2);
-            }
-          }
-        }
-        function valueOf$1() {
-          if (!this.isValid()) {
-            return NaN;
-          }
-          return this._milliseconds + this._days * 864e5 + this._months % 12 * 2592e6 + toInt(this._months / 12) * 31536e6;
-        }
-        function makeAs(alias) {
-          return function() {
-            return this.as(alias);
-          };
-        }
-        var asMilliseconds = makeAs("ms");
-        var asSeconds = makeAs("s");
-        var asMinutes = makeAs("m");
-        var asHours = makeAs("h");
-        var asDays = makeAs("d");
-        var asWeeks = makeAs("w");
-        var asMonths = makeAs("M");
-        var asYears = makeAs("y");
-        function clone$1() {
-          return createDuration(this);
-        }
-        function get$2(units2) {
-          units2 = normalizeUnits(units2);
-          return this.isValid() ? this[units2 + "s"]() : NaN;
-        }
-        function makeGetter(name) {
-          return function() {
-            return this.isValid() ? this._data[name] : NaN;
-          };
-        }
-        var milliseconds = makeGetter("milliseconds");
-        var seconds = makeGetter("seconds");
-        var minutes = makeGetter("minutes");
-        var hours = makeGetter("hours");
-        var days = makeGetter("days");
-        var months = makeGetter("months");
-        var years = makeGetter("years");
-        function weeks() {
-          return absFloor(this.days() / 7);
-        }
-        var round = Math.round;
-        var thresholds = {
-          ss: 44,
-          s: 45,
-          m: 45,
-          h: 22,
-          d: 26,
-          M: 11
-          // months to year
-        };
-        function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale2) {
-          return locale2.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
-        }
-        function relativeTime$1(posNegDuration, withoutSuffix, locale2) {
-          var duration = createDuration(posNegDuration).abs();
-          var seconds2 = round(duration.as("s"));
-          var minutes2 = round(duration.as("m"));
-          var hours2 = round(duration.as("h"));
-          var days2 = round(duration.as("d"));
-          var months2 = round(duration.as("M"));
-          var years2 = round(duration.as("y"));
-          var a = seconds2 <= thresholds.ss && [
-            "s",
-            seconds2
-          ] || seconds2 < thresholds.s && [
-            "ss",
-            seconds2
-          ] || minutes2 <= 1 && [
-            "m"
-          ] || minutes2 < thresholds.m && [
-            "mm",
-            minutes2
-          ] || hours2 <= 1 && [
-            "h"
-          ] || hours2 < thresholds.h && [
-            "hh",
-            hours2
-          ] || days2 <= 1 && [
-            "d"
-          ] || days2 < thresholds.d && [
-            "dd",
-            days2
-          ] || months2 <= 1 && [
-            "M"
-          ] || months2 < thresholds.M && [
-            "MM",
-            months2
-          ] || years2 <= 1 && [
-            "y"
-          ] || [
-            "yy",
-            years2
-          ];
-          a[2] = withoutSuffix;
-          a[3] = +posNegDuration > 0;
-          a[4] = locale2;
-          return substituteTimeAgo.apply(null, a);
-        }
-        function getSetRelativeTimeRounding(roundingFunction) {
-          if (roundingFunction === void 0) {
-            return round;
-          }
-          if (typeof roundingFunction === "function") {
-            round = roundingFunction;
-            return true;
-          }
-          return false;
-        }
-        function getSetRelativeTimeThreshold(threshold, limit) {
-          if (thresholds[threshold] === void 0) {
-            return false;
-          }
-          if (limit === void 0) {
-            return thresholds[threshold];
-          }
-          thresholds[threshold] = limit;
-          if (threshold === "s") {
-            thresholds.ss = limit - 1;
-          }
-          return true;
-        }
-        function humanize(withSuffix) {
-          if (!this.isValid()) {
-            return this.localeData().invalidDate();
-          }
-          var _$locale = this.localeData();
-          var output = relativeTime$1(this, !withSuffix, _$locale);
-          if (withSuffix) {
-            output = _$locale.pastFuture(+this, output);
-          }
-          return _$locale.postformat(output);
-        }
-        var abs$1 = Math.abs;
-        function sign(x2) {
-          return (x2 > 0) - (x2 < 0) || +x2;
-        }
-        function toISOString$1() {
-          if (!this.isValid()) {
-            return this.localeData().invalidDate();
-          }
-          var seconds2 = abs$1(this._milliseconds) / 1e3;
-          var days2 = abs$1(this._days);
-          var months2 = abs$1(this._months);
-          var minutes2, hours2, years2;
-          minutes2 = absFloor(seconds2 / 60);
-          hours2 = absFloor(minutes2 / 60);
-          seconds2 %= 60;
-          minutes2 %= 60;
-          years2 = absFloor(months2 / 12);
-          months2 %= 12;
-          var Y2 = years2;
-          var M = months2;
-          var D2 = days2;
-          var h = hours2;
-          var m2 = minutes2;
-          var s = seconds2 ? seconds2.toFixed(3).replace(/\.?0+$/, "") : "";
-          var total = this.asSeconds();
-          if (!total) {
-            return "P0D";
-          }
-          var totalSign = total < 0 ? "-" : "";
-          var ymSign = sign(this._months) !== sign(total) ? "-" : "";
-          var daysSign = sign(this._days) !== sign(total) ? "-" : "";
-          var hmsSign = sign(this._milliseconds) !== sign(total) ? "-" : "";
-          return totalSign + "P" + (Y2 ? ymSign + Y2 + "Y" : "") + (M ? ymSign + M + "M" : "") + (D2 ? daysSign + D2 + "D" : "") + (h || m2 || s ? "T" : "") + (h ? hmsSign + h + "H" : "") + (m2 ? hmsSign + m2 + "M" : "") + (s ? hmsSign + s + "S" : "");
-        }
-        var proto$2 = Duration.prototype;
-        proto$2.isValid = isValid$1;
-        proto$2.abs = abs;
-        proto$2.add = add$1;
-        proto$2.subtract = subtract$1;
-        proto$2.as = as;
-        proto$2.asMilliseconds = asMilliseconds;
-        proto$2.asSeconds = asSeconds;
-        proto$2.asMinutes = asMinutes;
-        proto$2.asHours = asHours;
-        proto$2.asDays = asDays;
-        proto$2.asWeeks = asWeeks;
-        proto$2.asMonths = asMonths;
-        proto$2.asYears = asYears;
-        proto$2.valueOf = valueOf$1;
-        proto$2._bubble = bubble;
-        proto$2.clone = clone$1;
-        proto$2.get = get$2;
-        proto$2.milliseconds = milliseconds;
-        proto$2.seconds = seconds;
-        proto$2.minutes = minutes;
-        proto$2.hours = hours;
-        proto$2.days = days;
-        proto$2.weeks = weeks;
-        proto$2.months = months;
-        proto$2.years = years;
-        proto$2.humanize = humanize;
-        proto$2.toISOString = toISOString$1;
-        proto$2.toString = toISOString$1;
-        proto$2.toJSON = toISOString$1;
-        proto$2.locale = locale;
-        proto$2.localeData = localeData;
-        proto$2.toIsoString = deprecate("toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)", toISOString$1);
-        proto$2.lang = lang;
-        addFormatToken("X", 0, 0, "unix");
-        addFormatToken("x", 0, 0, "valueOf");
-        addRegexToken("x", matchSigned);
-        addRegexToken("X", matchTimestamp);
-        addParseToken("X", function(input, array, config) {
-          config._d = new Date(parseFloat(input, 10) * 1e3);
-        });
-        addParseToken("x", function(input, array, config) {
-          config._d = new Date(toInt(input));
-        });
-        hooks.version = "2.22.2";
-        setHookCallback(createLocal);
-        hooks.fn = proto;
-        hooks.min = min;
-        hooks.max = max;
-        hooks.now = now;
-        hooks.utc = createUTC;
-        hooks.unix = createUnix;
-        hooks.months = listMonths;
-        hooks.isDate = isDate;
-        hooks.locale = getSetGlobalLocale;
-        hooks.invalid = createInvalid;
-        hooks.duration = createDuration;
-        hooks.isMoment = isMoment;
-        hooks.weekdays = listWeekdays;
-        hooks.parseZone = createInZone;
-        hooks.localeData = getLocale;
-        hooks.isDuration = isDuration;
-        hooks.monthsShort = listMonthsShort;
-        hooks.weekdaysMin = listWeekdaysMin;
-        hooks.defineLocale = defineLocale;
-        hooks.updateLocale = updateLocale;
-        hooks.locales = listLocales;
-        hooks.weekdaysShort = listWeekdaysShort;
-        hooks.normalizeUnits = normalizeUnits;
-        hooks.relativeTimeRounding = getSetRelativeTimeRounding;
-        hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
-        hooks.calendarFormat = getCalendarFormat;
-        hooks.prototype = proto;
-        hooks.HTML5_FMT = {
-          DATETIME_LOCAL: "YYYY-MM-DDTHH:mm",
-          DATETIME_LOCAL_SECONDS: "YYYY-MM-DDTHH:mm:ss",
-          DATETIME_LOCAL_MS: "YYYY-MM-DDTHH:mm:ss.SSS",
-          DATE: "YYYY-MM-DD",
-          TIME: "HH:mm",
-          TIME_SECONDS: "HH:mm:ss",
-          TIME_MS: "HH:mm:ss.SSS",
-          WEEK: "YYYY-[W]WW",
-          MONTH: "YYYY-MM"
-          // <input type="month" />
-        };
-        return hooks;
-      });
-    }
-  });
-
-  // globals:lodash
-  var require_lodash = __commonJS({
-    "globals:lodash"(exports, module) {
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      module.exports = require_depsModule()["lodash"];
-    }
-  });
-
-  // globals:util
-  var require_util = __commonJS({
-    "globals:util"(exports, module) {
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      module.exports = require_depsModule()["util"];
-    }
-  });
-
-  // src/core/vendetta/api.tsx
-  var import_react16, import_react_native46, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
-  var init_api3 = __esm({
-    "src/core/vendetta/api.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_alerts2();
-      init_storage();
-      init_storage();
-      init_themes();
-      init_assets();
-      init_commands();
-      init_debug();
-      init_loader();
-      init_patcher();
-      init_settings();
-      init_utils();
-      init_cyrb64();
-      init_logger();
-      init_metro();
-      init_modules2();
-      init_common();
-      init_components();
-      init_components();
-      init_color();
-      init_components2();
-      init_styles();
-      init_toasts();
-      init_dist();
-      import_react16 = __toESM(require_react());
-      import_react_native46 = __toESM(require_react_native());
-      init_plugins();
-      makeIcon = (leading) => leading;
-      CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
-      CompatSwitchRow = TableSwitchRow ?? Forms.FormSwitchRow ?? CompatRow;
-      CompatSection = TableRowGroup ?? Forms.FormSection ?? ReactNative.View;
-      PatchedFormRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatRow, {
-        label: props.label,
-        subLabel: props.subLabel,
-        icon: makeIcon(props.leading),
-        trailing: props.trailing,
-        onPress: props.onPress,
-        disabled: props.disabled,
-        arrow: props.arrow
-      });
-      PatchedFormRow.Icon = Forms.FormRow?.Icon ?? TableRow?.Icon ?? (() => null);
-      PatchedFormRow.Arrow = Forms.FormRow?.Arrow ?? TableRow?.Arrow ?? (() => null);
-      PatchedFormSwitchRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSwitchRow, {
-        label: props.label,
-        subLabel: props.subLabel,
-        icon: makeIcon(props.leading),
-        value: !!props.value,
-        onValueChange: props.onValueChange,
-        disabled: props.disabled
-      });
-      PatchedFormSection = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSection, {
-        title: props.title,
-        ...props
-      }, props.children);
-      PatchedForms = {
-        ...Forms,
-        FormRow: PatchedFormRow,
-        FormSwitchRow: PatchedFormSwitchRow,
-        FormSection: PatchedFormSection,
-        FormDivider: () => null
-      };
-      initVendettaObject = () => {
-        var createStackBasedFilter = (fn) => {
-          return (filter) => {
-            return fn(factories_exports.createSimpleFilter(filter, cyrb64Hash(new Error().stack)));
-          };
-        };
-        var api = globalThis.vendetta = {
-          patcher: {
-            before: patcher_default.before,
-            after: patcher_default.after,
-            instead: patcher_default.instead
-          },
-          metro: {
-            modules: metroModules,
-            find: createStackBasedFilter(findExports),
-            findAll: createStackBasedFilter(findAllExports),
-            findByProps: (...props) => {
-              if (props.length === 1 && props[0] === "KeyboardAwareScrollView") {
-                props.push("listenToKeyboardEvents");
-              }
-              var ret = findByProps(...props);
-              if (ret == null) {
-                if (props.includes("ActionSheetTitleHeader")) {
-                  var module = findByProps("ActionSheetRow");
-                  return {
-                    ...module,
-                    ActionSheetTitleHeader: module.BottomSheetTitleHeader,
-                    ActionSheetContentContainer: ({ children }) => {
-                      (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
-                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native46.View, null, children);
-                    }
-                  };
-                }
-              }
-              return ret;
-            },
-            findByPropsAll: (...props) => findByPropsAll(...props),
-            findByName: (name, defaultExp) => {
-              if (name === "create" && typeof defaultExp === "undefined") {
-                return findByName("create", false).default;
-              }
-              return findByName(name, defaultExp ?? true);
-            },
-            findByNameAll: (name, defaultExp = true) => findByNameAll(name, defaultExp),
-            findByDisplayName: (displayName2, defaultExp = true) => findByDisplayName(displayName2, defaultExp),
-            findByDisplayNameAll: (displayName2, defaultExp = true) => findByDisplayNameAll(displayName2, defaultExp),
-            findByTypeName: (typeName, defaultExp = true) => findByTypeName(typeName, defaultExp),
-            findByTypeNameAll: (typeName, defaultExp = true) => findByTypeNameAll(typeName, defaultExp),
-            findByStoreName: (name) => findByStoreName(name),
-            common: {
-              constants,
-              channels,
-              i18n,
-              url,
-              toasts,
-              stylesheet: {
-                createThemedStyleSheet
-              },
-              clipboard,
-              assets,
-              invites,
-              commands,
-              navigation,
-              navigationStack,
-              NavigationNative,
-              Flux,
-              FluxDispatcher,
-              React: React2,
-              ReactNative,
-              moment: require_moment(),
-              chroma: require_chroma(),
-              lodash: require_lodash(),
-              util: require_util()
-            }
-          },
-          constants: {
-            DISCORD_SERVER: "https://discord.gg/n9QQ4XhhJP",
-            GITHUB: "https://github.com/vendetta-mod",
-            PROXY_PREFIX: "https://vd-plugins.github.io/proxy",
-            HTTP_REGEX: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
-            HTTP_REGEX_MULTI: /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&//=]*)/g,
-            DISCORD_SERVER_ID: "1015931589865246730",
-            PLUGINS_CHANNEL_ID: "1091880384561684561",
-            THEMES_CHANNEL_ID: "1091880434939482202"
-          },
-          utils: {
-            findInReactTree: (tree, filter) => findInReactTree(tree, filter),
-            findInTree: (tree, filter, options) => findInTree(tree, filter, options),
-            safeFetch: (input, options, timeout) => safeFetch(input, options, timeout),
-            unfreeze: (obj) => Object.isFrozen(obj) ? {
-              ...obj
-            } : obj,
-            without: (object, ...keys) => omit(object, keys)
-          },
-          debug: {
-            connectToDebugger: (url2) => connectToDebugger2(url2),
-            getDebugInfo: () => getDebugInfo()
-          },
-          ui: {
-            components: {
-              Forms: PatchedForms,
-              General: ReactNative,
-              Alert: LegacyAlert,
-              Button: CompatButton,
-              HelpMessage: (...props) => /* @__PURE__ */ jsx(HelpMessage, {
-                ...props
-              }),
-              SafeAreaView: (...props) => /* @__PURE__ */ jsx(SafeAreaView, {
-                ...props
-              }),
-              Summary,
-              ErrorBoundary,
-              Codeblock,
-              Search: Search_default
-            },
-            toasts: {
-              showToast: (content, asset) => showToast(content, asset)
-            },
-            alerts: {
-              showConfirmationAlert: (options) => showConfirmationAlert(options),
-              showCustomAlert: (component, props) => showCustomAlert(component, props),
-              showInputAlert: (options) => showInputAlert(options)
-            },
-            assets: {
-              all: new Proxy({}, {
-                get(cache, p) {
-                  if (typeof p !== "string")
-                    return void 0;
-                  if (cache[p])
-                    return cache[p];
-                  for (var asset of iterateAssets()) {
-                    if (asset.name)
-                      return cache[p] = asset;
-                  }
-                },
-                ownKeys(cache) {
-                  var keys = /* @__PURE__ */ new Set();
-                  for (var asset of iterateAssets()) {
-                    cache[asset.name] = asset;
-                    keys.add(asset.name);
-                  }
-                  return [
-                    ...keys
-                  ];
-                }
-              }),
-              find: (filter) => findAsset(filter),
-              getAssetByName: (name) => findAsset(name),
-              getAssetByID: (id) => findAsset(id),
-              getAssetIDByName: (name) => findAssetId(name)
-            },
-            semanticColors,
-            rawColors
-          },
-          plugins: {
-            plugins: VdPluginManager.plugins,
-            fetchPlugin: (source) => VdPluginManager.fetchPlugin(source),
-            installPlugin: (source, enabled = true) => VdPluginManager.installPlugin(source, enabled),
-            startPlugin: (id) => VdPluginManager.startPlugin(id),
-            stopPlugin: (id, disable = true) => VdPluginManager.stopPlugin(id, disable),
-            removePlugin: (id) => VdPluginManager.removePlugin(id),
-            getSettings: (id) => VdPluginManager.getSettings(id)
-          },
-          themes: {
-            themes,
-            fetchTheme: (id, selected) => fetchTheme(id, selected),
-            installTheme: (id) => installTheme(id),
-            selectTheme: (id) => selectTheme(id === "default" ? null : themes[id]),
-            removeTheme: (id) => removeTheme(id),
-            getCurrentTheme: () => getThemeFromLoader(),
-            updateThemes: () => updateThemes()
-          },
-          commands: {
-            registerCommand
-          },
-          storage: {
-            createProxy: (target) => createProxy(target),
-            useProxy: (_storage) => useProxy(_storage),
-            createStorage: (backend) => createStorage(backend),
-            wrapSync: (store) => wrapSync(store),
-            awaitSyncWrapper: (store) => awaitStorage(store),
-            createMMKVBackend: (store) => createMMKVBackend(store),
-            createFileBackend: (file) => {
-              if (isPyonLoader() && file === "vendetta_theme.json") {
-                file = "pyon/current-theme.json";
-              }
-              return createFileBackend(file);
-            }
-          },
-          settings,
-          loader: {
-            identity: getVendettaLoaderIdentity() ?? void 0,
-            config: loaderConfig
-          },
-          logger: {
-            log: (...message) => console.log(...message),
-            info: (...message) => console.info(...message),
-            warn: (...message) => console.warn(...message),
-            error: (...message) => console.error(...message),
-            time: (...message) => console.time(...message),
-            trace: (...message) => console.trace(...message),
-            verbose: (...message) => console.log(...message)
-          },
-          version: versionHash,
-          unload: () => {
-            delete globalThis.vendetta;
-          }
-        };
-        return () => api.unload();
-      };
-    }
-  });
-
-  // src/lib/api/native/legacyRuntimeRefresh.ts
-  function invokeLegacyReload() {
-    return _async_to_generator(function* () {
-      var reader = import_react_native47.NativeModules.FileReaderModule ?? import_react_native47.NativeModules.RCTFileReaderModule;
-      if (typeof reader?.readAsDataURL !== "function")
-        return false;
-      yield reader.readAsDataURL({
-        rain: {
-          method: "updater.reload",
-          args: []
-        }
-      });
-      return true;
-    })();
-  }
-  function isCurrentCloudCordLoader() {
-    var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
-    return Boolean(nativeLoader && Number(nativeLoader.cloudcordAutoUpdateVersion ?? 0) >= 2);
-  }
-  function initLegacyRuntimeRefresh() {
-    return _async_to_generator(function* () {
-      var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
-      if (!nativeLoader || isCurrentCloudCordLoader())
-        return;
-      yield awaitStorage(loaderConfig);
-      var config = loaderConfig;
-      config.customLoadUrl ??= {
-        enabled: false,
-        url: ""
-      };
-      if (config.customLoadUrl.enabled && config.customLoadUrl.url && !config.customLoadUrl.url.startsWith("https://cloudcord.xohus.lol/"))
-        return;
-      config.customLoadUrl.url = CURRENT_RUNTIME_URL;
-      config.customLoadUrl.enabled = true;
-      try {
-        yield invokeLegacyReload();
-      } catch (e) {
-      }
-    })();
-  }
-  var import_react_native47, CURRENT_RUNTIME_URL;
-  var init_legacyRuntimeRefresh = __esm({
-    "src/lib/api/native/legacyRuntimeRefresh.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_storage();
-      init_settings();
-      import_react_native47 = __toESM(require_react_native());
-      CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
-    }
-  });
-
-  // src/global.d.ts
-  var init_global_d = __esm({
-    "src/global.d.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/modules.d.ts
-  var init_modules_d = __esm({
-    "src/modules.d.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-    }
-  });
-
-  // src/lib/ui/index.ts
-  var ui_exports = {};
-  __export(ui_exports, {
-    alerts: () => alerts_exports,
-    components: () => components_exports2,
-    settings: () => settings_exports2,
-    sheets: () => sheets_exports,
-    styles: () => styles_exports,
-    toasts: () => toasts_exports
-  });
-  var init_ui = __esm({
-    "src/lib/ui/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_alerts();
-      init_components2();
-      init_settings2();
-      init_sheets();
-      init_styles();
-      init_toasts();
-    }
-  });
-
-  // src/lib/index.ts
-  var lib_exports = {};
-  __export(lib_exports, {
-    _jsx: () => jsxRuntime_exports,
-    api: () => api_exports,
-    fonts: () => fonts_exports,
-    managers: () => managers,
-    metro: () => metro_exports,
-    plugins: () => plugins_exports2,
-    themes: () => themes_exports,
-    ui: () => ui_exports,
-    unload: () => unload,
-    utils: () => utils_exports
-  });
-  function unload() {
-    for (var d of _disposer)
-      if (typeof d === "function")
-        d();
-    delete globalThis.bunny;
-  }
-  var managers, _disposer;
-  var init_lib = __esm({
-    "src/lib/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_global_d();
-      init_modules_d();
-      init_fonts();
-      init_plugins4();
-      init_themes();
-      init_api();
-      init_ui();
-      init_utils();
-      init_metro();
-      init_fonts();
-      init_plugins4();
-      init_themes();
-      init_jsxRuntime();
-      init_lazy();
-      managers = proxyLazy(() => {
-        console.warn("bunny.managers.* is deprecated, and moved the top level (bunny.*). bunny.managers will be eventually removed soon");
-        return {
-          get fonts() {
-            return fonts_exports;
-          },
-          get plugins() {
-            return plugins_exports2;
-          },
-          get themes() {
-            return themes_exports;
-          }
-        };
-      }, {
-        hint: "object"
-      });
-      _disposer = [];
-      unload.push = (fn) => {
-        _disposer.push(fn);
-      };
-    }
-  });
-
   // src/core/plugins/shared/sendMessage.ts
   function onSendMessage(transform) {
     return before("sendMessage", messageUtil, (args) => {
@@ -48603,6 +40729,3614 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       shortenRun = new RegExp(`^    shorten-run (${quotedText}) with (${quotedText})$`);
       escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       links = /(https?:\/\/[^\s]+|www\.[^\s]+)/gi;
+    }
+  });
+
+  // node_modules/moment/moment.js
+  var require_moment = __commonJS({
+    "node_modules/moment/moment.js"(exports, module) {
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      (function(global, factory) {
+        typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : global.moment = factory();
+      })(exports, function() {
+        "use strict";
+        var hookCallback;
+        function hooks() {
+          return hookCallback.apply(null, arguments);
+        }
+        function setHookCallback(callback) {
+          hookCallback = callback;
+        }
+        function isArray(input) {
+          return input instanceof Array || Object.prototype.toString.call(input) === "[object Array]";
+        }
+        function isObject2(input) {
+          return input != null && Object.prototype.toString.call(input) === "[object Object]";
+        }
+        function isObjectEmpty(obj) {
+          if (Object.getOwnPropertyNames) {
+            return Object.getOwnPropertyNames(obj).length === 0;
+          } else {
+            var k;
+            for (k in obj) {
+              if (obj.hasOwnProperty(k)) {
+                return false;
+              }
+            }
+            return true;
+          }
+        }
+        function isUndefined(input) {
+          return input === void 0;
+        }
+        function isNumber(input) {
+          return typeof input === "number" || Object.prototype.toString.call(input) === "[object Number]";
+        }
+        function isDate(input) {
+          return input instanceof Date || Object.prototype.toString.call(input) === "[object Date]";
+        }
+        function map(arr, fn) {
+          var res = [], i;
+          for (i = 0; i < arr.length; ++i) {
+            res.push(fn(arr[i], i));
+          }
+          return res;
+        }
+        function hasOwnProp(a, b3) {
+          return Object.prototype.hasOwnProperty.call(a, b3);
+        }
+        function extend(a, b3) {
+          for (var i in b3) {
+            if (hasOwnProp(b3, i)) {
+              a[i] = b3[i];
+            }
+          }
+          if (hasOwnProp(b3, "toString")) {
+            a.toString = b3.toString;
+          }
+          if (hasOwnProp(b3, "valueOf")) {
+            a.valueOf = b3.valueOf;
+          }
+          return a;
+        }
+        function createUTC(input, format2, locale2, strict) {
+          return createLocalOrUTC(input, format2, locale2, strict, true).utc();
+        }
+        function defaultParsingFlags() {
+          return {
+            empty: false,
+            unusedTokens: [],
+            unusedInput: [],
+            overflow: -2,
+            charsLeftOver: 0,
+            nullInput: false,
+            invalidMonth: null,
+            invalidFormat: false,
+            userInvalidated: false,
+            iso: false,
+            parsedDateParts: [],
+            meridiem: null,
+            rfc2822: false,
+            weekdayMismatch: false
+          };
+        }
+        function getParsingFlags(m2) {
+          if (m2._pf == null) {
+            m2._pf = defaultParsingFlags();
+          }
+          return m2._pf;
+        }
+        var some;
+        if (Array.prototype.some) {
+          some = Array.prototype.some;
+        } else {
+          some = function some2(fun) {
+            var t = Object(this);
+            var len = t.length >>> 0;
+            for (var i = 0; i < len; i++) {
+              if (i in t && fun.call(this, t[i], i, t)) {
+                return true;
+              }
+            }
+            return false;
+          };
+        }
+        function isValid(m2) {
+          if (m2._isValid == null) {
+            var flags = getParsingFlags(m2);
+            var parsedParts = some.call(flags.parsedDateParts, function(i) {
+              return i != null;
+            });
+            var isNowValid = !isNaN(m2._d.getTime()) && flags.overflow < 0 && !flags.empty && !flags.invalidMonth && !flags.invalidWeekday && !flags.weekdayMismatch && !flags.nullInput && !flags.invalidFormat && !flags.userInvalidated && (!flags.meridiem || flags.meridiem && parsedParts);
+            if (m2._strict) {
+              isNowValid = isNowValid && flags.charsLeftOver === 0 && flags.unusedTokens.length === 0 && flags.bigHour === void 0;
+            }
+            if (Object.isFrozen == null || !Object.isFrozen(m2)) {
+              m2._isValid = isNowValid;
+            } else {
+              return isNowValid;
+            }
+          }
+          return m2._isValid;
+        }
+        function createInvalid(flags) {
+          var m2 = createUTC(NaN);
+          if (flags != null) {
+            extend(getParsingFlags(m2), flags);
+          } else {
+            getParsingFlags(m2).userInvalidated = true;
+          }
+          return m2;
+        }
+        var momentProperties = hooks.momentProperties = [];
+        function copyConfig(to2, from2) {
+          var i, prop, val;
+          if (!isUndefined(from2._isAMomentObject)) {
+            to2._isAMomentObject = from2._isAMomentObject;
+          }
+          if (!isUndefined(from2._i)) {
+            to2._i = from2._i;
+          }
+          if (!isUndefined(from2._f)) {
+            to2._f = from2._f;
+          }
+          if (!isUndefined(from2._l)) {
+            to2._l = from2._l;
+          }
+          if (!isUndefined(from2._strict)) {
+            to2._strict = from2._strict;
+          }
+          if (!isUndefined(from2._tzm)) {
+            to2._tzm = from2._tzm;
+          }
+          if (!isUndefined(from2._isUTC)) {
+            to2._isUTC = from2._isUTC;
+          }
+          if (!isUndefined(from2._offset)) {
+            to2._offset = from2._offset;
+          }
+          if (!isUndefined(from2._pf)) {
+            to2._pf = getParsingFlags(from2);
+          }
+          if (!isUndefined(from2._locale)) {
+            to2._locale = from2._locale;
+          }
+          if (momentProperties.length > 0) {
+            for (i = 0; i < momentProperties.length; i++) {
+              prop = momentProperties[i];
+              val = from2[prop];
+              if (!isUndefined(val)) {
+                to2[prop] = val;
+              }
+            }
+          }
+          return to2;
+        }
+        var updateInProgress = false;
+        function Moment(config) {
+          copyConfig(this, config);
+          this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+          if (!this.isValid()) {
+            this._d = /* @__PURE__ */ new Date(NaN);
+          }
+          if (updateInProgress === false) {
+            updateInProgress = true;
+            hooks.updateOffset(this);
+            updateInProgress = false;
+          }
+        }
+        function isMoment(obj) {
+          return obj instanceof Moment || obj != null && obj._isAMomentObject != null;
+        }
+        function absFloor(number) {
+          if (number < 0) {
+            return Math.ceil(number) || 0;
+          } else {
+            return Math.floor(number);
+          }
+        }
+        function toInt(argumentForCoercion) {
+          var coercedNumber = +argumentForCoercion, value = 0;
+          if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+            value = absFloor(coercedNumber);
+          }
+          return value;
+        }
+        function compareArrays(array1, array2, dontConvert) {
+          var len = Math.min(array1.length, array2.length), lengthDiff = Math.abs(array1.length - array2.length), diffs = 0, i;
+          for (i = 0; i < len; i++) {
+            if (dontConvert && array1[i] !== array2[i] || !dontConvert && toInt(array1[i]) !== toInt(array2[i])) {
+              diffs++;
+            }
+          }
+          return diffs + lengthDiff;
+        }
+        function warn(msg) {
+          if (hooks.suppressDeprecationWarnings === false && typeof console !== "undefined" && console.warn) {
+            console.warn("Deprecation warning: " + msg);
+          }
+        }
+        function deprecate(msg, fn) {
+          var firstTime = true;
+          return extend(function() {
+            if (hooks.deprecationHandler != null) {
+              hooks.deprecationHandler(null, msg);
+            }
+            if (firstTime) {
+              var args = [];
+              var arg;
+              for (var i = 0; i < arguments.length; i++) {
+                arg = "";
+                if (typeof arguments[i] === "object") {
+                  arg += "\n[" + i + "] ";
+                  for (var key in arguments[0]) {
+                    arg += key + ": " + arguments[0][key] + ", ";
+                  }
+                  arg = arg.slice(0, -2);
+                } else {
+                  arg = arguments[i];
+                }
+                args.push(arg);
+              }
+              warn(msg + "\nArguments: " + Array.prototype.slice.call(args).join("") + "\n" + new Error().stack);
+              firstTime = false;
+            }
+            return fn.apply(this, arguments);
+          }, fn);
+        }
+        var deprecations = {};
+        function deprecateSimple(name, msg) {
+          if (hooks.deprecationHandler != null) {
+            hooks.deprecationHandler(name, msg);
+          }
+          if (!deprecations[name]) {
+            warn(msg);
+            deprecations[name] = true;
+          }
+        }
+        hooks.suppressDeprecationWarnings = false;
+        hooks.deprecationHandler = null;
+        function isFunction(input) {
+          return input instanceof Function || Object.prototype.toString.call(input) === "[object Function]";
+        }
+        function set(config) {
+          var prop, i;
+          for (i in config) {
+            prop = config[i];
+            if (isFunction(prop)) {
+              this[i] = prop;
+            } else {
+              this["_" + i] = prop;
+            }
+          }
+          this._config = config;
+          this._dayOfMonthOrdinalParseLenient = new RegExp((this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) + "|" + /\d{1,2}/.source);
+        }
+        function mergeConfigs(parentConfig, childConfig) {
+          var res = extend({}, parentConfig), prop;
+          for (prop in childConfig) {
+            if (hasOwnProp(childConfig, prop)) {
+              if (isObject2(parentConfig[prop]) && isObject2(childConfig[prop])) {
+                res[prop] = {};
+                extend(res[prop], parentConfig[prop]);
+                extend(res[prop], childConfig[prop]);
+              } else if (childConfig[prop] != null) {
+                res[prop] = childConfig[prop];
+              } else {
+                delete res[prop];
+              }
+            }
+          }
+          for (prop in parentConfig) {
+            if (hasOwnProp(parentConfig, prop) && !hasOwnProp(childConfig, prop) && isObject2(parentConfig[prop])) {
+              res[prop] = extend({}, res[prop]);
+            }
+          }
+          return res;
+        }
+        function Locale(config) {
+          if (config != null) {
+            this.set(config);
+          }
+        }
+        var keys;
+        if (Object.keys) {
+          keys = Object.keys;
+        } else {
+          keys = function keys2(obj) {
+            var i, res = [];
+            for (i in obj) {
+              if (hasOwnProp(obj, i)) {
+                res.push(i);
+              }
+            }
+            return res;
+          };
+        }
+        var defaultCalendar = {
+          sameDay: "[Today at] LT",
+          nextDay: "[Tomorrow at] LT",
+          nextWeek: "dddd [at] LT",
+          lastDay: "[Yesterday at] LT",
+          lastWeek: "[Last] dddd [at] LT",
+          sameElse: "L"
+        };
+        function calendar(key, mom, now2) {
+          var output = this._calendar[key] || this._calendar["sameElse"];
+          return isFunction(output) ? output.call(mom, now2) : output;
+        }
+        var defaultLongDateFormat = {
+          LTS: "h:mm:ss A",
+          LT: "h:mm A",
+          L: "MM/DD/YYYY",
+          LL: "MMMM D, YYYY",
+          LLL: "MMMM D, YYYY h:mm A",
+          LLLL: "dddd, MMMM D, YYYY h:mm A"
+        };
+        function longDateFormat(key) {
+          var _$format = this._longDateFormat[key], formatUpper = this._longDateFormat[key.toUpperCase()];
+          if (_$format || !formatUpper) {
+            return _$format;
+          }
+          this._longDateFormat[key] = formatUpper.replace(/MMMM|MM|DD|dddd/g, function(val) {
+            return val.slice(1);
+          });
+          return this._longDateFormat[key];
+        }
+        var defaultInvalidDate = "Invalid date";
+        function invalidDate() {
+          return this._invalidDate;
+        }
+        var defaultOrdinal = "%d";
+        var defaultDayOfMonthOrdinalParse = /\d{1,2}/;
+        function ordinal(number) {
+          return this._ordinal.replace("%d", number);
+        }
+        var defaultRelativeTime = {
+          future: "in %s",
+          past: "%s ago",
+          s: "a few seconds",
+          ss: "%d seconds",
+          m: "a minute",
+          mm: "%d minutes",
+          h: "an hour",
+          hh: "%d hours",
+          d: "a day",
+          dd: "%d days",
+          M: "a month",
+          MM: "%d months",
+          y: "a year",
+          yy: "%d years"
+        };
+        function relativeTime(number, withoutSuffix, string, isFuture) {
+          var output = this._relativeTime[string];
+          return isFunction(output) ? output(number, withoutSuffix, string, isFuture) : output.replace(/%d/i, number);
+        }
+        function pastFuture(diff2, output) {
+          var _$format = this._relativeTime[diff2 > 0 ? "future" : "past"];
+          return isFunction(_$format) ? _$format(output) : _$format.replace(/%s/i, output);
+        }
+        var aliases = {};
+        function addUnitAlias(unit, shorthand) {
+          var lowerCase = unit.toLowerCase();
+          aliases[lowerCase] = aliases[lowerCase + "s"] = aliases[shorthand] = unit;
+        }
+        function normalizeUnits(units2) {
+          return typeof units2 === "string" ? aliases[units2] || aliases[units2.toLowerCase()] : void 0;
+        }
+        function normalizeObjectUnits(inputObject) {
+          var normalizedInput = {}, normalizedProp, prop;
+          for (prop in inputObject) {
+            if (hasOwnProp(inputObject, prop)) {
+              normalizedProp = normalizeUnits(prop);
+              if (normalizedProp) {
+                normalizedInput[normalizedProp] = inputObject[prop];
+              }
+            }
+          }
+          return normalizedInput;
+        }
+        var priorities = {};
+        function addUnitPriority(unit, priority) {
+          priorities[unit] = priority;
+        }
+        function getPrioritizedUnits(unitsObj) {
+          var units2 = [];
+          for (var u in unitsObj) {
+            units2.push({
+              unit: u,
+              priority: priorities[u]
+            });
+          }
+          units2.sort(function(a, b3) {
+            return a.priority - b3.priority;
+          });
+          return units2;
+        }
+        function zeroFill(number, targetLength, forceSign) {
+          var absNumber = "" + Math.abs(number), zerosToFill = targetLength - absNumber.length, sign2 = number >= 0;
+          return (sign2 ? forceSign ? "+" : "" : "-") + Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) + absNumber;
+        }
+        var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g;
+        var localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g;
+        var formatFunctions = {};
+        var formatTokenFunctions = {};
+        function addFormatToken(token2, padded, ordinal2, callback) {
+          var func = callback;
+          if (typeof callback === "string") {
+            func = function func2() {
+              return this[callback]();
+            };
+          }
+          if (token2) {
+            formatTokenFunctions[token2] = func;
+          }
+          if (padded) {
+            formatTokenFunctions[padded[0]] = function() {
+              return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+            };
+          }
+          if (ordinal2) {
+            formatTokenFunctions[ordinal2] = function() {
+              return this.localeData().ordinal(func.apply(this, arguments), token2);
+            };
+          }
+        }
+        function removeFormattingTokens(input) {
+          if (input.match(/\[[\s\S]/)) {
+            return input.replace(/^\[|\]$/g, "");
+          }
+          return input.replace(/\\/g, "");
+        }
+        function makeFormatFunction(format2) {
+          var array = format2.match(formattingTokens), i, length;
+          for (i = 0, length = array.length; i < length; i++) {
+            if (formatTokenFunctions[array[i]]) {
+              array[i] = formatTokenFunctions[array[i]];
+            } else {
+              array[i] = removeFormattingTokens(array[i]);
+            }
+          }
+          return function(mom) {
+            var output = "", i2;
+            for (i2 = 0; i2 < length; i2++) {
+              output += isFunction(array[i2]) ? array[i2].call(mom, format2) : array[i2];
+            }
+            return output;
+          };
+        }
+        function formatMoment(m2, format2) {
+          if (!m2.isValid()) {
+            return m2.localeData().invalidDate();
+          }
+          format2 = expandFormat(format2, m2.localeData());
+          formatFunctions[format2] = formatFunctions[format2] || makeFormatFunction(format2);
+          return formatFunctions[format2](m2);
+        }
+        function expandFormat(format2, locale2) {
+          var i = 5;
+          function replaceLongDateFormatTokens(input) {
+            return locale2.longDateFormat(input) || input;
+          }
+          localFormattingTokens.lastIndex = 0;
+          while (i >= 0 && localFormattingTokens.test(format2)) {
+            format2 = format2.replace(localFormattingTokens, replaceLongDateFormatTokens);
+            localFormattingTokens.lastIndex = 0;
+            i -= 1;
+          }
+          return format2;
+        }
+        var match1 = /\d/;
+        var match2 = /\d\d/;
+        var match3 = /\d{3}/;
+        var match4 = /\d{4}/;
+        var match6 = /[+-]?\d{6}/;
+        var match1to2 = /\d\d?/;
+        var match3to4 = /\d\d\d\d?/;
+        var match5to6 = /\d\d\d\d\d\d?/;
+        var match1to3 = /\d{1,3}/;
+        var match1to4 = /\d{1,4}/;
+        var match1to6 = /[+-]?\d{1,6}/;
+        var matchUnsigned = /\d+/;
+        var matchSigned = /[+-]?\d+/;
+        var matchOffset = /Z|[+-]\d\d:?\d\d/gi;
+        var matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi;
+        var matchTimestamp = /[+-]?\d+(\.\d{1,3})?/;
+        var matchWord = /[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i;
+        var regexes = {};
+        function addRegexToken(token2, regex, strictRegex) {
+          regexes[token2] = isFunction(regex) ? regex : function(isStrict, localeData2) {
+            return isStrict && strictRegex ? strictRegex : regex;
+          };
+        }
+        function getParseRegexForToken(token2, config) {
+          if (!hasOwnProp(regexes, token2)) {
+            return new RegExp(unescapeFormat(token2));
+          }
+          return regexes[token2](config._strict, config._locale);
+        }
+        function unescapeFormat(s) {
+          return regexEscape(s.replace("\\", "").replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function(matched, p1, p2, p3, p4) {
+            return p1 || p2 || p3 || p4;
+          }));
+        }
+        function regexEscape(s) {
+          return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+        }
+        var tokens2 = {};
+        function addParseToken(token2, callback) {
+          var i, func = callback;
+          if (typeof token2 === "string") {
+            token2 = [
+              token2
+            ];
+          }
+          if (isNumber(callback)) {
+            func = function func2(input, array) {
+              array[callback] = toInt(input);
+            };
+          }
+          for (i = 0; i < token2.length; i++) {
+            tokens2[token2[i]] = func;
+          }
+        }
+        function addWeekParseToken(token2, callback) {
+          addParseToken(token2, function(input, array, config, token3) {
+            config._w = config._w || {};
+            callback(input, config._w, config, token3);
+          });
+        }
+        function addTimeToArrayFromToken(token2, input, config) {
+          if (input != null && hasOwnProp(tokens2, token2)) {
+            tokens2[token2](input, config._a, config, token2);
+          }
+        }
+        var YEAR = 0;
+        var MONTH = 1;
+        var DATE = 2;
+        var HOUR = 3;
+        var MINUTE = 4;
+        var SECOND = 5;
+        var MILLISECOND = 6;
+        var WEEK = 7;
+        var WEEKDAY = 8;
+        addFormatToken("Y", 0, 0, function() {
+          var y2 = this.year();
+          return y2 <= 9999 ? "" + y2 : "+" + y2;
+        });
+        addFormatToken(0, [
+          "YY",
+          2
+        ], 0, function() {
+          return this.year() % 100;
+        });
+        addFormatToken(0, [
+          "YYYY",
+          4
+        ], 0, "year");
+        addFormatToken(0, [
+          "YYYYY",
+          5
+        ], 0, "year");
+        addFormatToken(0, [
+          "YYYYYY",
+          6,
+          true
+        ], 0, "year");
+        addUnitAlias("year", "y");
+        addUnitPriority("year", 1);
+        addRegexToken("Y", matchSigned);
+        addRegexToken("YY", match1to2, match2);
+        addRegexToken("YYYY", match1to4, match4);
+        addRegexToken("YYYYY", match1to6, match6);
+        addRegexToken("YYYYYY", match1to6, match6);
+        addParseToken([
+          "YYYYY",
+          "YYYYYY"
+        ], YEAR);
+        addParseToken("YYYY", function(input, array) {
+          array[YEAR] = input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+        });
+        addParseToken("YY", function(input, array) {
+          array[YEAR] = hooks.parseTwoDigitYear(input);
+        });
+        addParseToken("Y", function(input, array) {
+          array[YEAR] = parseInt(input, 10);
+        });
+        function daysInYear(year) {
+          return isLeapYear(year) ? 366 : 365;
+        }
+        function isLeapYear(year) {
+          return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
+        }
+        hooks.parseTwoDigitYear = function(input) {
+          return toInt(input) + (toInt(input) > 68 ? 1900 : 2e3);
+        };
+        var getSetYear = makeGetSet("FullYear", true);
+        function getIsLeapYear() {
+          return isLeapYear(this.year());
+        }
+        function makeGetSet(unit, keepTime) {
+          return function(value) {
+            if (value != null) {
+              set$1(this, unit, value);
+              hooks.updateOffset(this, keepTime);
+              return this;
+            } else {
+              return get(this, unit);
+            }
+          };
+        }
+        function get(mom, unit) {
+          return mom.isValid() ? mom._d["get" + (mom._isUTC ? "UTC" : "") + unit]() : NaN;
+        }
+        function set$1(mom, unit, value) {
+          if (mom.isValid() && !isNaN(value)) {
+            if (unit === "FullYear" && isLeapYear(mom.year()) && mom.month() === 1 && mom.date() === 29) {
+              mom._d["set" + (mom._isUTC ? "UTC" : "") + unit](value, mom.month(), daysInMonth(value, mom.month()));
+            } else {
+              mom._d["set" + (mom._isUTC ? "UTC" : "") + unit](value);
+            }
+          }
+        }
+        function stringGet(units2) {
+          units2 = normalizeUnits(units2);
+          if (isFunction(this[units2])) {
+            return this[units2]();
+          }
+          return this;
+        }
+        function stringSet(units2, value) {
+          if (typeof units2 === "object") {
+            units2 = normalizeObjectUnits(units2);
+            var prioritized = getPrioritizedUnits(units2);
+            for (var i = 0; i < prioritized.length; i++) {
+              this[prioritized[i].unit](units2[prioritized[i].unit]);
+            }
+          } else {
+            units2 = normalizeUnits(units2);
+            if (isFunction(this[units2])) {
+              return this[units2](value);
+            }
+          }
+          return this;
+        }
+        function mod(n, x2) {
+          return (n % x2 + x2) % x2;
+        }
+        var indexOf;
+        if (Array.prototype.indexOf) {
+          indexOf = Array.prototype.indexOf;
+        } else {
+          indexOf = function indexOf2(o) {
+            var i;
+            for (i = 0; i < this.length; ++i) {
+              if (this[i] === o) {
+                return i;
+              }
+            }
+            return -1;
+          };
+        }
+        function daysInMonth(year, month) {
+          if (isNaN(year) || isNaN(month)) {
+            return NaN;
+          }
+          var modMonth = mod(month, 12);
+          year += (month - modMonth) / 12;
+          return modMonth === 1 ? isLeapYear(year) ? 29 : 28 : 31 - modMonth % 7 % 2;
+        }
+        addFormatToken("M", [
+          "MM",
+          2
+        ], "Mo", function() {
+          return this.month() + 1;
+        });
+        addFormatToken("MMM", 0, 0, function(format2) {
+          return this.localeData().monthsShort(this, format2);
+        });
+        addFormatToken("MMMM", 0, 0, function(format2) {
+          return this.localeData().months(this, format2);
+        });
+        addUnitAlias("month", "M");
+        addUnitPriority("month", 8);
+        addRegexToken("M", match1to2);
+        addRegexToken("MM", match1to2, match2);
+        addRegexToken("MMM", function(isStrict, locale2) {
+          return locale2.monthsShortRegex(isStrict);
+        });
+        addRegexToken("MMMM", function(isStrict, locale2) {
+          return locale2.monthsRegex(isStrict);
+        });
+        addParseToken([
+          "M",
+          "MM"
+        ], function(input, array) {
+          array[MONTH] = toInt(input) - 1;
+        });
+        addParseToken([
+          "MMM",
+          "MMMM"
+        ], function(input, array, config, token2) {
+          var month = config._locale.monthsParse(input, token2, config._strict);
+          if (month != null) {
+            array[MONTH] = month;
+          } else {
+            getParsingFlags(config).invalidMonth = input;
+          }
+        });
+        var MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/;
+        var defaultLocaleMonths = "January_February_March_April_May_June_July_August_September_October_November_December".split("_");
+        function localeMonths(m2, format2) {
+          if (!m2) {
+            return isArray(this._months) ? this._months : this._months["standalone"];
+          }
+          return isArray(this._months) ? this._months[m2.month()] : this._months[(this._months.isFormat || MONTHS_IN_FORMAT).test(format2) ? "format" : "standalone"][m2.month()];
+        }
+        var defaultLocaleMonthsShort = "Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_");
+        function localeMonthsShort(m2, format2) {
+          if (!m2) {
+            return isArray(this._monthsShort) ? this._monthsShort : this._monthsShort["standalone"];
+          }
+          return isArray(this._monthsShort) ? this._monthsShort[m2.month()] : this._monthsShort[MONTHS_IN_FORMAT.test(format2) ? "format" : "standalone"][m2.month()];
+        }
+        function handleStrictParse(monthName, format2, strict) {
+          var i, ii, mom, llc = monthName.toLocaleLowerCase();
+          if (!this._monthsParse) {
+            this._monthsParse = [];
+            this._longMonthsParse = [];
+            this._shortMonthsParse = [];
+            for (i = 0; i < 12; ++i) {
+              mom = createUTC([
+                2e3,
+                i
+              ]);
+              this._shortMonthsParse[i] = this.monthsShort(mom, "").toLocaleLowerCase();
+              this._longMonthsParse[i] = this.months(mom, "").toLocaleLowerCase();
+            }
+          }
+          if (strict) {
+            if (format2 === "MMM") {
+              ii = indexOf.call(this._shortMonthsParse, llc);
+              return ii !== -1 ? ii : null;
+            } else {
+              ii = indexOf.call(this._longMonthsParse, llc);
+              return ii !== -1 ? ii : null;
+            }
+          } else {
+            if (format2 === "MMM") {
+              ii = indexOf.call(this._shortMonthsParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._longMonthsParse, llc);
+              return ii !== -1 ? ii : null;
+            } else {
+              ii = indexOf.call(this._longMonthsParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._shortMonthsParse, llc);
+              return ii !== -1 ? ii : null;
+            }
+          }
+        }
+        function localeMonthsParse(monthName, format2, strict) {
+          var i, mom, regex;
+          if (this._monthsParseExact) {
+            return handleStrictParse.call(this, monthName, format2, strict);
+          }
+          if (!this._monthsParse) {
+            this._monthsParse = [];
+            this._longMonthsParse = [];
+            this._shortMonthsParse = [];
+          }
+          for (i = 0; i < 12; i++) {
+            mom = createUTC([
+              2e3,
+              i
+            ]);
+            if (strict && !this._longMonthsParse[i]) {
+              this._longMonthsParse[i] = new RegExp("^" + this.months(mom, "").replace(".", "") + "$", "i");
+              this._shortMonthsParse[i] = new RegExp("^" + this.monthsShort(mom, "").replace(".", "") + "$", "i");
+            }
+            if (!strict && !this._monthsParse[i]) {
+              regex = "^" + this.months(mom, "") + "|^" + this.monthsShort(mom, "");
+              this._monthsParse[i] = new RegExp(regex.replace(".", ""), "i");
+            }
+            if (strict && format2 === "MMMM" && this._longMonthsParse[i].test(monthName)) {
+              return i;
+            } else if (strict && format2 === "MMM" && this._shortMonthsParse[i].test(monthName)) {
+              return i;
+            } else if (!strict && this._monthsParse[i].test(monthName)) {
+              return i;
+            }
+          }
+        }
+        function setMonth(mom, value) {
+          var dayOfMonth;
+          if (!mom.isValid()) {
+            return mom;
+          }
+          if (typeof value === "string") {
+            if (/^\d+$/.test(value)) {
+              value = toInt(value);
+            } else {
+              value = mom.localeData().monthsParse(value);
+              if (!isNumber(value)) {
+                return mom;
+              }
+            }
+          }
+          dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+          mom._d["set" + (mom._isUTC ? "UTC" : "") + "Month"](value, dayOfMonth);
+          return mom;
+        }
+        function getSetMonth(value) {
+          if (value != null) {
+            setMonth(this, value);
+            hooks.updateOffset(this, true);
+            return this;
+          } else {
+            return get(this, "Month");
+          }
+        }
+        function getDaysInMonth() {
+          return daysInMonth(this.year(), this.month());
+        }
+        var defaultMonthsShortRegex = matchWord;
+        function monthsShortRegex(isStrict) {
+          if (this._monthsParseExact) {
+            if (!hasOwnProp(this, "_monthsRegex")) {
+              computeMonthsParse.call(this);
+            }
+            if (isStrict) {
+              return this._monthsShortStrictRegex;
+            } else {
+              return this._monthsShortRegex;
+            }
+          } else {
+            if (!hasOwnProp(this, "_monthsShortRegex")) {
+              this._monthsShortRegex = defaultMonthsShortRegex;
+            }
+            return this._monthsShortStrictRegex && isStrict ? this._monthsShortStrictRegex : this._monthsShortRegex;
+          }
+        }
+        var defaultMonthsRegex = matchWord;
+        function monthsRegex(isStrict) {
+          if (this._monthsParseExact) {
+            if (!hasOwnProp(this, "_monthsRegex")) {
+              computeMonthsParse.call(this);
+            }
+            if (isStrict) {
+              return this._monthsStrictRegex;
+            } else {
+              return this._monthsRegex;
+            }
+          } else {
+            if (!hasOwnProp(this, "_monthsRegex")) {
+              this._monthsRegex = defaultMonthsRegex;
+            }
+            return this._monthsStrictRegex && isStrict ? this._monthsStrictRegex : this._monthsRegex;
+          }
+        }
+        function computeMonthsParse() {
+          function cmpLenRev(a, b3) {
+            return b3.length - a.length;
+          }
+          var shortPieces = [], longPieces = [], mixedPieces = [], i, mom;
+          for (i = 0; i < 12; i++) {
+            mom = createUTC([
+              2e3,
+              i
+            ]);
+            shortPieces.push(this.monthsShort(mom, ""));
+            longPieces.push(this.months(mom, ""));
+            mixedPieces.push(this.months(mom, ""));
+            mixedPieces.push(this.monthsShort(mom, ""));
+          }
+          shortPieces.sort(cmpLenRev);
+          longPieces.sort(cmpLenRev);
+          mixedPieces.sort(cmpLenRev);
+          for (i = 0; i < 12; i++) {
+            shortPieces[i] = regexEscape(shortPieces[i]);
+            longPieces[i] = regexEscape(longPieces[i]);
+          }
+          for (i = 0; i < 24; i++) {
+            mixedPieces[i] = regexEscape(mixedPieces[i]);
+          }
+          this._monthsRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
+          this._monthsShortRegex = this._monthsRegex;
+          this._monthsStrictRegex = new RegExp("^(" + longPieces.join("|") + ")", "i");
+          this._monthsShortStrictRegex = new RegExp("^(" + shortPieces.join("|") + ")", "i");
+        }
+        function createDate(y2, m2, d, h, M, s, ms) {
+          var date = new Date(y2, m2, d, h, M, s, ms);
+          if (y2 < 100 && y2 >= 0 && isFinite(date.getFullYear())) {
+            date.setFullYear(y2);
+          }
+          return date;
+        }
+        function createUTCDate(y2) {
+          var date = new Date(Date.UTC.apply(null, arguments));
+          if (y2 < 100 && y2 >= 0 && isFinite(date.getUTCFullYear())) {
+            date.setUTCFullYear(y2);
+          }
+          return date;
+        }
+        function firstWeekOffset(year, dow, doy) {
+          var fwd = 7 + dow - doy, fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+          return -fwdlw + fwd - 1;
+        }
+        function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+          var localWeekday = (7 + weekday - dow) % 7, weekOffset = firstWeekOffset(year, dow, doy), dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset, resYear, resDayOfYear;
+          if (dayOfYear <= 0) {
+            resYear = year - 1;
+            resDayOfYear = daysInYear(resYear) + dayOfYear;
+          } else if (dayOfYear > daysInYear(year)) {
+            resYear = year + 1;
+            resDayOfYear = dayOfYear - daysInYear(year);
+          } else {
+            resYear = year;
+            resDayOfYear = dayOfYear;
+          }
+          return {
+            year: resYear,
+            dayOfYear: resDayOfYear
+          };
+        }
+        function weekOfYear(mom, dow, doy) {
+          var weekOffset = firstWeekOffset(mom.year(), dow, doy), week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1, resWeek, resYear;
+          if (week < 1) {
+            resYear = mom.year() - 1;
+            resWeek = week + weeksInYear(resYear, dow, doy);
+          } else if (week > weeksInYear(mom.year(), dow, doy)) {
+            resWeek = week - weeksInYear(mom.year(), dow, doy);
+            resYear = mom.year() + 1;
+          } else {
+            resYear = mom.year();
+            resWeek = week;
+          }
+          return {
+            week: resWeek,
+            year: resYear
+          };
+        }
+        function weeksInYear(year, dow, doy) {
+          var weekOffset = firstWeekOffset(year, dow, doy), weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+          return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+        }
+        addFormatToken("w", [
+          "ww",
+          2
+        ], "wo", "week");
+        addFormatToken("W", [
+          "WW",
+          2
+        ], "Wo", "isoWeek");
+        addUnitAlias("week", "w");
+        addUnitAlias("isoWeek", "W");
+        addUnitPriority("week", 5);
+        addUnitPriority("isoWeek", 5);
+        addRegexToken("w", match1to2);
+        addRegexToken("ww", match1to2, match2);
+        addRegexToken("W", match1to2);
+        addRegexToken("WW", match1to2, match2);
+        addWeekParseToken([
+          "w",
+          "ww",
+          "W",
+          "WW"
+        ], function(input, week, config, token2) {
+          week[token2.substr(0, 1)] = toInt(input);
+        });
+        function localeWeek(mom) {
+          return weekOfYear(mom, this._week.dow, this._week.doy).week;
+        }
+        var defaultLocaleWeek = {
+          dow: 0,
+          doy: 6
+          // The week that contains Jan 1st is the first week of the year.
+        };
+        function localeFirstDayOfWeek() {
+          return this._week.dow;
+        }
+        function localeFirstDayOfYear() {
+          return this._week.doy;
+        }
+        function getSetWeek(input) {
+          var week = this.localeData().week(this);
+          return input == null ? week : this.add((input - week) * 7, "d");
+        }
+        function getSetISOWeek(input) {
+          var week = weekOfYear(this, 1, 4).week;
+          return input == null ? week : this.add((input - week) * 7, "d");
+        }
+        addFormatToken("d", 0, "do", "day");
+        addFormatToken("dd", 0, 0, function(format2) {
+          return this.localeData().weekdaysMin(this, format2);
+        });
+        addFormatToken("ddd", 0, 0, function(format2) {
+          return this.localeData().weekdaysShort(this, format2);
+        });
+        addFormatToken("dddd", 0, 0, function(format2) {
+          return this.localeData().weekdays(this, format2);
+        });
+        addFormatToken("e", 0, 0, "weekday");
+        addFormatToken("E", 0, 0, "isoWeekday");
+        addUnitAlias("day", "d");
+        addUnitAlias("weekday", "e");
+        addUnitAlias("isoWeekday", "E");
+        addUnitPriority("day", 11);
+        addUnitPriority("weekday", 11);
+        addUnitPriority("isoWeekday", 11);
+        addRegexToken("d", match1to2);
+        addRegexToken("e", match1to2);
+        addRegexToken("E", match1to2);
+        addRegexToken("dd", function(isStrict, locale2) {
+          return locale2.weekdaysMinRegex(isStrict);
+        });
+        addRegexToken("ddd", function(isStrict, locale2) {
+          return locale2.weekdaysShortRegex(isStrict);
+        });
+        addRegexToken("dddd", function(isStrict, locale2) {
+          return locale2.weekdaysRegex(isStrict);
+        });
+        addWeekParseToken([
+          "dd",
+          "ddd",
+          "dddd"
+        ], function(input, week, config, token2) {
+          var weekday = config._locale.weekdaysParse(input, token2, config._strict);
+          if (weekday != null) {
+            week.d = weekday;
+          } else {
+            getParsingFlags(config).invalidWeekday = input;
+          }
+        });
+        addWeekParseToken([
+          "d",
+          "e",
+          "E"
+        ], function(input, week, config, token2) {
+          week[token2] = toInt(input);
+        });
+        function parseWeekday(input, locale2) {
+          if (typeof input !== "string") {
+            return input;
+          }
+          if (!isNaN(input)) {
+            return parseInt(input, 10);
+          }
+          input = locale2.weekdaysParse(input);
+          if (typeof input === "number") {
+            return input;
+          }
+          return null;
+        }
+        function parseIsoWeekday(input, locale2) {
+          if (typeof input === "string") {
+            return locale2.weekdaysParse(input) % 7 || 7;
+          }
+          return isNaN(input) ? null : input;
+        }
+        var defaultLocaleWeekdays = "Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_");
+        function localeWeekdays(m2, format2) {
+          if (!m2) {
+            return isArray(this._weekdays) ? this._weekdays : this._weekdays["standalone"];
+          }
+          return isArray(this._weekdays) ? this._weekdays[m2.day()] : this._weekdays[this._weekdays.isFormat.test(format2) ? "format" : "standalone"][m2.day()];
+        }
+        var defaultLocaleWeekdaysShort = "Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_");
+        function localeWeekdaysShort(m2) {
+          return m2 ? this._weekdaysShort[m2.day()] : this._weekdaysShort;
+        }
+        var defaultLocaleWeekdaysMin = "Su_Mo_Tu_We_Th_Fr_Sa".split("_");
+        function localeWeekdaysMin(m2) {
+          return m2 ? this._weekdaysMin[m2.day()] : this._weekdaysMin;
+        }
+        function handleStrictParse$1(weekdayName, format2, strict) {
+          var i, ii, mom, llc = weekdayName.toLocaleLowerCase();
+          if (!this._weekdaysParse) {
+            this._weekdaysParse = [];
+            this._shortWeekdaysParse = [];
+            this._minWeekdaysParse = [];
+            for (i = 0; i < 7; ++i) {
+              mom = createUTC([
+                2e3,
+                1
+              ]).day(i);
+              this._minWeekdaysParse[i] = this.weekdaysMin(mom, "").toLocaleLowerCase();
+              this._shortWeekdaysParse[i] = this.weekdaysShort(mom, "").toLocaleLowerCase();
+              this._weekdaysParse[i] = this.weekdays(mom, "").toLocaleLowerCase();
+            }
+          }
+          if (strict) {
+            if (format2 === "dddd") {
+              ii = indexOf.call(this._weekdaysParse, llc);
+              return ii !== -1 ? ii : null;
+            } else if (format2 === "ddd") {
+              ii = indexOf.call(this._shortWeekdaysParse, llc);
+              return ii !== -1 ? ii : null;
+            } else {
+              ii = indexOf.call(this._minWeekdaysParse, llc);
+              return ii !== -1 ? ii : null;
+            }
+          } else {
+            if (format2 === "dddd") {
+              ii = indexOf.call(this._weekdaysParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._shortWeekdaysParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._minWeekdaysParse, llc);
+              return ii !== -1 ? ii : null;
+            } else if (format2 === "ddd") {
+              ii = indexOf.call(this._shortWeekdaysParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._weekdaysParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._minWeekdaysParse, llc);
+              return ii !== -1 ? ii : null;
+            } else {
+              ii = indexOf.call(this._minWeekdaysParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._weekdaysParse, llc);
+              if (ii !== -1) {
+                return ii;
+              }
+              ii = indexOf.call(this._shortWeekdaysParse, llc);
+              return ii !== -1 ? ii : null;
+            }
+          }
+        }
+        function localeWeekdaysParse(weekdayName, format2, strict) {
+          var i, mom, regex;
+          if (this._weekdaysParseExact) {
+            return handleStrictParse$1.call(this, weekdayName, format2, strict);
+          }
+          if (!this._weekdaysParse) {
+            this._weekdaysParse = [];
+            this._minWeekdaysParse = [];
+            this._shortWeekdaysParse = [];
+            this._fullWeekdaysParse = [];
+          }
+          for (i = 0; i < 7; i++) {
+            mom = createUTC([
+              2e3,
+              1
+            ]).day(i);
+            if (strict && !this._fullWeekdaysParse[i]) {
+              this._fullWeekdaysParse[i] = new RegExp("^" + this.weekdays(mom, "").replace(".", "\\.?") + "$", "i");
+              this._shortWeekdaysParse[i] = new RegExp("^" + this.weekdaysShort(mom, "").replace(".", "\\.?") + "$", "i");
+              this._minWeekdaysParse[i] = new RegExp("^" + this.weekdaysMin(mom, "").replace(".", "\\.?") + "$", "i");
+            }
+            if (!this._weekdaysParse[i]) {
+              regex = "^" + this.weekdays(mom, "") + "|^" + this.weekdaysShort(mom, "") + "|^" + this.weekdaysMin(mom, "");
+              this._weekdaysParse[i] = new RegExp(regex.replace(".", ""), "i");
+            }
+            if (strict && format2 === "dddd" && this._fullWeekdaysParse[i].test(weekdayName)) {
+              return i;
+            } else if (strict && format2 === "ddd" && this._shortWeekdaysParse[i].test(weekdayName)) {
+              return i;
+            } else if (strict && format2 === "dd" && this._minWeekdaysParse[i].test(weekdayName)) {
+              return i;
+            } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+              return i;
+            }
+          }
+        }
+        function getSetDayOfWeek(input) {
+          if (!this.isValid()) {
+            return input != null ? this : NaN;
+          }
+          var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+          if (input != null) {
+            input = parseWeekday(input, this.localeData());
+            return this.add(input - day, "d");
+          } else {
+            return day;
+          }
+        }
+        function getSetLocaleDayOfWeek(input) {
+          if (!this.isValid()) {
+            return input != null ? this : NaN;
+          }
+          var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+          return input == null ? weekday : this.add(input - weekday, "d");
+        }
+        function getSetISODayOfWeek(input) {
+          if (!this.isValid()) {
+            return input != null ? this : NaN;
+          }
+          if (input != null) {
+            var weekday = parseIsoWeekday(input, this.localeData());
+            return this.day(this.day() % 7 ? weekday : weekday - 7);
+          } else {
+            return this.day() || 7;
+          }
+        }
+        var defaultWeekdaysRegex = matchWord;
+        function weekdaysRegex(isStrict) {
+          if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, "_weekdaysRegex")) {
+              computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+              return this._weekdaysStrictRegex;
+            } else {
+              return this._weekdaysRegex;
+            }
+          } else {
+            if (!hasOwnProp(this, "_weekdaysRegex")) {
+              this._weekdaysRegex = defaultWeekdaysRegex;
+            }
+            return this._weekdaysStrictRegex && isStrict ? this._weekdaysStrictRegex : this._weekdaysRegex;
+          }
+        }
+        var defaultWeekdaysShortRegex = matchWord;
+        function weekdaysShortRegex(isStrict) {
+          if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, "_weekdaysRegex")) {
+              computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+              return this._weekdaysShortStrictRegex;
+            } else {
+              return this._weekdaysShortRegex;
+            }
+          } else {
+            if (!hasOwnProp(this, "_weekdaysShortRegex")) {
+              this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+            }
+            return this._weekdaysShortStrictRegex && isStrict ? this._weekdaysShortStrictRegex : this._weekdaysShortRegex;
+          }
+        }
+        var defaultWeekdaysMinRegex = matchWord;
+        function weekdaysMinRegex(isStrict) {
+          if (this._weekdaysParseExact) {
+            if (!hasOwnProp(this, "_weekdaysRegex")) {
+              computeWeekdaysParse.call(this);
+            }
+            if (isStrict) {
+              return this._weekdaysMinStrictRegex;
+            } else {
+              return this._weekdaysMinRegex;
+            }
+          } else {
+            if (!hasOwnProp(this, "_weekdaysMinRegex")) {
+              this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+            }
+            return this._weekdaysMinStrictRegex && isStrict ? this._weekdaysMinStrictRegex : this._weekdaysMinRegex;
+          }
+        }
+        function computeWeekdaysParse() {
+          function cmpLenRev(a, b3) {
+            return b3.length - a.length;
+          }
+          var minPieces = [], shortPieces = [], longPieces = [], mixedPieces = [], i, mom, minp, shortp, longp;
+          for (i = 0; i < 7; i++) {
+            mom = createUTC([
+              2e3,
+              1
+            ]).day(i);
+            minp = this.weekdaysMin(mom, "");
+            shortp = this.weekdaysShort(mom, "");
+            longp = this.weekdays(mom, "");
+            minPieces.push(minp);
+            shortPieces.push(shortp);
+            longPieces.push(longp);
+            mixedPieces.push(minp);
+            mixedPieces.push(shortp);
+            mixedPieces.push(longp);
+          }
+          minPieces.sort(cmpLenRev);
+          shortPieces.sort(cmpLenRev);
+          longPieces.sort(cmpLenRev);
+          mixedPieces.sort(cmpLenRev);
+          for (i = 0; i < 7; i++) {
+            shortPieces[i] = regexEscape(shortPieces[i]);
+            longPieces[i] = regexEscape(longPieces[i]);
+            mixedPieces[i] = regexEscape(mixedPieces[i]);
+          }
+          this._weekdaysRegex = new RegExp("^(" + mixedPieces.join("|") + ")", "i");
+          this._weekdaysShortRegex = this._weekdaysRegex;
+          this._weekdaysMinRegex = this._weekdaysRegex;
+          this._weekdaysStrictRegex = new RegExp("^(" + longPieces.join("|") + ")", "i");
+          this._weekdaysShortStrictRegex = new RegExp("^(" + shortPieces.join("|") + ")", "i");
+          this._weekdaysMinStrictRegex = new RegExp("^(" + minPieces.join("|") + ")", "i");
+        }
+        function hFormat() {
+          return this.hours() % 12 || 12;
+        }
+        function kFormat() {
+          return this.hours() || 24;
+        }
+        addFormatToken("H", [
+          "HH",
+          2
+        ], 0, "hour");
+        addFormatToken("h", [
+          "hh",
+          2
+        ], 0, hFormat);
+        addFormatToken("k", [
+          "kk",
+          2
+        ], 0, kFormat);
+        addFormatToken("hmm", 0, 0, function() {
+          return "" + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+        });
+        addFormatToken("hmmss", 0, 0, function() {
+          return "" + hFormat.apply(this) + zeroFill(this.minutes(), 2) + zeroFill(this.seconds(), 2);
+        });
+        addFormatToken("Hmm", 0, 0, function() {
+          return "" + this.hours() + zeroFill(this.minutes(), 2);
+        });
+        addFormatToken("Hmmss", 0, 0, function() {
+          return "" + this.hours() + zeroFill(this.minutes(), 2) + zeroFill(this.seconds(), 2);
+        });
+        function meridiem(token2, lowercase) {
+          addFormatToken(token2, 0, 0, function() {
+            return this.localeData().meridiem(this.hours(), this.minutes(), lowercase);
+          });
+        }
+        meridiem("a", true);
+        meridiem("A", false);
+        addUnitAlias("hour", "h");
+        addUnitPriority("hour", 13);
+        function matchMeridiem(isStrict, locale2) {
+          return locale2._meridiemParse;
+        }
+        addRegexToken("a", matchMeridiem);
+        addRegexToken("A", matchMeridiem);
+        addRegexToken("H", match1to2);
+        addRegexToken("h", match1to2);
+        addRegexToken("k", match1to2);
+        addRegexToken("HH", match1to2, match2);
+        addRegexToken("hh", match1to2, match2);
+        addRegexToken("kk", match1to2, match2);
+        addRegexToken("hmm", match3to4);
+        addRegexToken("hmmss", match5to6);
+        addRegexToken("Hmm", match3to4);
+        addRegexToken("Hmmss", match5to6);
+        addParseToken([
+          "H",
+          "HH"
+        ], HOUR);
+        addParseToken([
+          "k",
+          "kk"
+        ], function(input, array, config) {
+          var kInput = toInt(input);
+          array[HOUR] = kInput === 24 ? 0 : kInput;
+        });
+        addParseToken([
+          "a",
+          "A"
+        ], function(input, array, config) {
+          config._isPm = config._locale.isPM(input);
+          config._meridiem = input;
+        });
+        addParseToken([
+          "h",
+          "hh"
+        ], function(input, array, config) {
+          array[HOUR] = toInt(input);
+          getParsingFlags(config).bigHour = true;
+        });
+        addParseToken("hmm", function(input, array, config) {
+          var pos = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos));
+          array[MINUTE] = toInt(input.substr(pos));
+          getParsingFlags(config).bigHour = true;
+        });
+        addParseToken("hmmss", function(input, array, config) {
+          var pos1 = input.length - 4;
+          var pos2 = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos1));
+          array[MINUTE] = toInt(input.substr(pos1, 2));
+          array[SECOND] = toInt(input.substr(pos2));
+          getParsingFlags(config).bigHour = true;
+        });
+        addParseToken("Hmm", function(input, array, config) {
+          var pos = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos));
+          array[MINUTE] = toInt(input.substr(pos));
+        });
+        addParseToken("Hmmss", function(input, array, config) {
+          var pos1 = input.length - 4;
+          var pos2 = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos1));
+          array[MINUTE] = toInt(input.substr(pos1, 2));
+          array[SECOND] = toInt(input.substr(pos2));
+        });
+        function localeIsPM(input) {
+          return (input + "").toLowerCase().charAt(0) === "p";
+        }
+        var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i;
+        function localeMeridiem(hours2, minutes2, isLower) {
+          if (hours2 > 11) {
+            return isLower ? "pm" : "PM";
+          } else {
+            return isLower ? "am" : "AM";
+          }
+        }
+        var getSetHour = makeGetSet("Hours", true);
+        var baseConfig = {
+          calendar: defaultCalendar,
+          longDateFormat: defaultLongDateFormat,
+          invalidDate: defaultInvalidDate,
+          ordinal: defaultOrdinal,
+          dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
+          relativeTime: defaultRelativeTime,
+          months: defaultLocaleMonths,
+          monthsShort: defaultLocaleMonthsShort,
+          week: defaultLocaleWeek,
+          weekdays: defaultLocaleWeekdays,
+          weekdaysMin: defaultLocaleWeekdaysMin,
+          weekdaysShort: defaultLocaleWeekdaysShort,
+          meridiemParse: defaultLocaleMeridiemParse
+        };
+        var locales = {};
+        var localeFamilies = {};
+        var globalLocale;
+        function normalizeLocale(key) {
+          return key ? key.toLowerCase().replace("_", "-") : key;
+        }
+        function chooseLocale(names) {
+          var i = 0, j, next, _$locale, split;
+          while (i < names.length) {
+            split = normalizeLocale(names[i]).split("-");
+            j = split.length;
+            next = normalizeLocale(names[i + 1]);
+            next = next ? next.split("-") : null;
+            while (j > 0) {
+              _$locale = loadLocale(split.slice(0, j).join("-"));
+              if (_$locale) {
+                return _$locale;
+              }
+              if (next && next.length >= j && compareArrays(split, next, true) >= j - 1) {
+                break;
+              }
+              j--;
+            }
+            i++;
+          }
+          return globalLocale;
+        }
+        function loadLocale(name) {
+          var oldLocale = null;
+          if (!locales[name] && typeof module !== "undefined" && module && module.exports) {
+            try {
+              oldLocale = globalLocale._abbr;
+              var aliasedRequire = __require;
+              aliasedRequire("./locale/" + name);
+              getSetGlobalLocale(oldLocale);
+            } catch (e) {
+            }
+          }
+          return locales[name];
+        }
+        function getSetGlobalLocale(key, values) {
+          var data;
+          if (key) {
+            if (isUndefined(values)) {
+              data = getLocale(key);
+            } else {
+              data = defineLocale(key, values);
+            }
+            if (data) {
+              globalLocale = data;
+            } else {
+              if (typeof console !== "undefined" && console.warn) {
+                console.warn("Locale " + key + " not found. Did you forget to load it?");
+              }
+            }
+          }
+          return globalLocale._abbr;
+        }
+        function defineLocale(name, config) {
+          if (config !== null) {
+            var _$locale, parentConfig = baseConfig;
+            config.abbr = name;
+            if (locales[name] != null) {
+              deprecateSimple("defineLocaleOverride", "use moment.updateLocale(localeName, config) to change an existing locale. moment.defineLocale(localeName, config) should only be used for creating a new locale See http://momentjs.com/guides/#/warnings/define-locale/ for more info.");
+              parentConfig = locales[name]._config;
+            } else if (config.parentLocale != null) {
+              if (locales[config.parentLocale] != null) {
+                parentConfig = locales[config.parentLocale]._config;
+              } else {
+                _$locale = loadLocale(config.parentLocale);
+                if (_$locale != null) {
+                  parentConfig = _$locale._config;
+                } else {
+                  if (!localeFamilies[config.parentLocale]) {
+                    localeFamilies[config.parentLocale] = [];
+                  }
+                  localeFamilies[config.parentLocale].push({
+                    name,
+                    config
+                  });
+                  return null;
+                }
+              }
+            }
+            locales[name] = new Locale(mergeConfigs(parentConfig, config));
+            if (localeFamilies[name]) {
+              localeFamilies[name].forEach(function(x2) {
+                defineLocale(x2.name, x2.config);
+              });
+            }
+            getSetGlobalLocale(name);
+            return locales[name];
+          } else {
+            delete locales[name];
+            return null;
+          }
+        }
+        function updateLocale(name, config) {
+          if (config != null) {
+            var _$locale, tmpLocale, parentConfig = baseConfig;
+            tmpLocale = loadLocale(name);
+            if (tmpLocale != null) {
+              parentConfig = tmpLocale._config;
+            }
+            config = mergeConfigs(parentConfig, config);
+            _$locale = new Locale(config);
+            _$locale.parentLocale = locales[name];
+            locales[name] = _$locale;
+            getSetGlobalLocale(name);
+          } else {
+            if (locales[name] != null) {
+              if (locales[name].parentLocale != null) {
+                locales[name] = locales[name].parentLocale;
+              } else if (locales[name] != null) {
+                delete locales[name];
+              }
+            }
+          }
+          return locales[name];
+        }
+        function getLocale(key) {
+          var _$locale;
+          if (key && key._locale && key._locale._abbr) {
+            key = key._locale._abbr;
+          }
+          if (!key) {
+            return globalLocale;
+          }
+          if (!isArray(key)) {
+            _$locale = loadLocale(key);
+            if (_$locale) {
+              return _$locale;
+            }
+            key = [
+              key
+            ];
+          }
+          return chooseLocale(key);
+        }
+        function listLocales() {
+          return keys(locales);
+        }
+        function checkOverflow(m2) {
+          var overflow;
+          var a = m2._a;
+          if (a && getParsingFlags(m2).overflow === -2) {
+            overflow = a[MONTH] < 0 || a[MONTH] > 11 ? MONTH : a[DATE] < 1 || a[DATE] > daysInMonth(a[YEAR], a[MONTH]) ? DATE : a[HOUR] < 0 || a[HOUR] > 24 || a[HOUR] === 24 && (a[MINUTE] !== 0 || a[SECOND] !== 0 || a[MILLISECOND] !== 0) ? HOUR : a[MINUTE] < 0 || a[MINUTE] > 59 ? MINUTE : a[SECOND] < 0 || a[SECOND] > 59 ? SECOND : a[MILLISECOND] < 0 || a[MILLISECOND] > 999 ? MILLISECOND : -1;
+            if (getParsingFlags(m2)._overflowDayOfYear && (overflow < YEAR || overflow > DATE)) {
+              overflow = DATE;
+            }
+            if (getParsingFlags(m2)._overflowWeeks && overflow === -1) {
+              overflow = WEEK;
+            }
+            if (getParsingFlags(m2)._overflowWeekday && overflow === -1) {
+              overflow = WEEKDAY;
+            }
+            getParsingFlags(m2).overflow = overflow;
+          }
+          return m2;
+        }
+        function defaults(a, b3, c2) {
+          if (a != null) {
+            return a;
+          }
+          if (b3 != null) {
+            return b3;
+          }
+          return c2;
+        }
+        function currentDateArray(config) {
+          var nowValue = new Date(hooks.now());
+          if (config._useUTC) {
+            return [
+              nowValue.getUTCFullYear(),
+              nowValue.getUTCMonth(),
+              nowValue.getUTCDate()
+            ];
+          }
+          return [
+            nowValue.getFullYear(),
+            nowValue.getMonth(),
+            nowValue.getDate()
+          ];
+        }
+        function configFromArray(config) {
+          var i, date, input = [], currentDate, expectedWeekday, yearToUse;
+          if (config._d) {
+            return;
+          }
+          currentDate = currentDateArray(config);
+          if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+            dayOfYearFromWeekInfo(config);
+          }
+          if (config._dayOfYear != null) {
+            yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
+            if (config._dayOfYear > daysInYear(yearToUse) || config._dayOfYear === 0) {
+              getParsingFlags(config)._overflowDayOfYear = true;
+            }
+            date = createUTCDate(yearToUse, 0, config._dayOfYear);
+            config._a[MONTH] = date.getUTCMonth();
+            config._a[DATE] = date.getUTCDate();
+          }
+          for (i = 0; i < 3 && config._a[i] == null; ++i) {
+            config._a[i] = input[i] = currentDate[i];
+          }
+          for (; i < 7; i++) {
+            config._a[i] = input[i] = config._a[i] == null ? i === 2 ? 1 : 0 : config._a[i];
+          }
+          if (config._a[HOUR] === 24 && config._a[MINUTE] === 0 && config._a[SECOND] === 0 && config._a[MILLISECOND] === 0) {
+            config._nextDay = true;
+            config._a[HOUR] = 0;
+          }
+          config._d = (config._useUTC ? createUTCDate : createDate).apply(null, input);
+          expectedWeekday = config._useUTC ? config._d.getUTCDay() : config._d.getDay();
+          if (config._tzm != null) {
+            config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+          }
+          if (config._nextDay) {
+            config._a[HOUR] = 24;
+          }
+          if (config._w && typeof config._w.d !== "undefined" && config._w.d !== expectedWeekday) {
+            getParsingFlags(config).weekdayMismatch = true;
+          }
+        }
+        function dayOfYearFromWeekInfo(config) {
+          var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow;
+          w = config._w;
+          if (w.GG != null || w.W != null || w.E != null) {
+            dow = 1;
+            doy = 4;
+            weekYear = defaults(w.GG, config._a[YEAR], weekOfYear(createLocal(), 1, 4).year);
+            week = defaults(w.W, 1);
+            weekday = defaults(w.E, 1);
+            if (weekday < 1 || weekday > 7) {
+              weekdayOverflow = true;
+            }
+          } else {
+            dow = config._locale._week.dow;
+            doy = config._locale._week.doy;
+            var curWeek = weekOfYear(createLocal(), dow, doy);
+            weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
+            week = defaults(w.w, curWeek.week);
+            if (w.d != null) {
+              weekday = w.d;
+              if (weekday < 0 || weekday > 6) {
+                weekdayOverflow = true;
+              }
+            } else if (w.e != null) {
+              weekday = w.e + dow;
+              if (w.e < 0 || w.e > 6) {
+                weekdayOverflow = true;
+              }
+            } else {
+              weekday = dow;
+            }
+          }
+          if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+            getParsingFlags(config)._overflowWeeks = true;
+          } else if (weekdayOverflow != null) {
+            getParsingFlags(config)._overflowWeekday = true;
+          } else {
+            temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+            config._a[YEAR] = temp.year;
+            config._dayOfYear = temp.dayOfYear;
+          }
+        }
+        var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+        var basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/;
+        var tzRegex = /Z|[+-]\d\d(?::?\d\d)?/;
+        var isoDates = [
+          [
+            "YYYYYY-MM-DD",
+            /[+-]\d{6}-\d\d-\d\d/
+          ],
+          [
+            "YYYY-MM-DD",
+            /\d{4}-\d\d-\d\d/
+          ],
+          [
+            "GGGG-[W]WW-E",
+            /\d{4}-W\d\d-\d/
+          ],
+          [
+            "GGGG-[W]WW",
+            /\d{4}-W\d\d/,
+            false
+          ],
+          [
+            "YYYY-DDD",
+            /\d{4}-\d{3}/
+          ],
+          [
+            "YYYY-MM",
+            /\d{4}-\d\d/,
+            false
+          ],
+          [
+            "YYYYYYMMDD",
+            /[+-]\d{10}/
+          ],
+          [
+            "YYYYMMDD",
+            /\d{8}/
+          ],
+          // YYYYMM is NOT allowed by the standard
+          [
+            "GGGG[W]WWE",
+            /\d{4}W\d{3}/
+          ],
+          [
+            "GGGG[W]WW",
+            /\d{4}W\d{2}/,
+            false
+          ],
+          [
+            "YYYYDDD",
+            /\d{7}/
+          ]
+        ];
+        var isoTimes = [
+          [
+            "HH:mm:ss.SSSS",
+            /\d\d:\d\d:\d\d\.\d+/
+          ],
+          [
+            "HH:mm:ss,SSSS",
+            /\d\d:\d\d:\d\d,\d+/
+          ],
+          [
+            "HH:mm:ss",
+            /\d\d:\d\d:\d\d/
+          ],
+          [
+            "HH:mm",
+            /\d\d:\d\d/
+          ],
+          [
+            "HHmmss.SSSS",
+            /\d\d\d\d\d\d\.\d+/
+          ],
+          [
+            "HHmmss,SSSS",
+            /\d\d\d\d\d\d,\d+/
+          ],
+          [
+            "HHmmss",
+            /\d\d\d\d\d\d/
+          ],
+          [
+            "HHmm",
+            /\d\d\d\d/
+          ],
+          [
+            "HH",
+            /\d\d/
+          ]
+        ];
+        var aspNetJsonRegex = /^\/?Date\((\-?\d+)/i;
+        function configFromISO(config) {
+          var i, l, string = config._i, match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string), allowTime, dateFormat, timeFormat, tzFormat;
+          if (match) {
+            getParsingFlags(config).iso = true;
+            for (i = 0, l = isoDates.length; i < l; i++) {
+              if (isoDates[i][1].exec(match[1])) {
+                dateFormat = isoDates[i][0];
+                allowTime = isoDates[i][2] !== false;
+                break;
+              }
+            }
+            if (dateFormat == null) {
+              config._isValid = false;
+              return;
+            }
+            if (match[3]) {
+              for (i = 0, l = isoTimes.length; i < l; i++) {
+                if (isoTimes[i][1].exec(match[3])) {
+                  timeFormat = (match[2] || " ") + isoTimes[i][0];
+                  break;
+                }
+              }
+              if (timeFormat == null) {
+                config._isValid = false;
+                return;
+              }
+            }
+            if (!allowTime && timeFormat != null) {
+              config._isValid = false;
+              return;
+            }
+            if (match[4]) {
+              if (tzRegex.exec(match[4])) {
+                tzFormat = "Z";
+              } else {
+                config._isValid = false;
+                return;
+              }
+            }
+            config._f = dateFormat + (timeFormat || "") + (tzFormat || "");
+            configFromStringAndFormat(config);
+          } else {
+            config._isValid = false;
+          }
+        }
+        var rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/;
+        function extractFromRFC2822Strings(yearStr, monthStr, dayStr, hourStr, minuteStr, secondStr) {
+          var result = [
+            untruncateYear(yearStr),
+            defaultLocaleMonthsShort.indexOf(monthStr),
+            parseInt(dayStr, 10),
+            parseInt(hourStr, 10),
+            parseInt(minuteStr, 10)
+          ];
+          if (secondStr) {
+            result.push(parseInt(secondStr, 10));
+          }
+          return result;
+        }
+        function untruncateYear(yearStr) {
+          var year = parseInt(yearStr, 10);
+          if (year <= 49) {
+            return 2e3 + year;
+          } else if (year <= 999) {
+            return 1900 + year;
+          }
+          return year;
+        }
+        function preprocessRFC2822(s) {
+          return s.replace(/\([^)]*\)|[\n\t]/g, " ").replace(/(\s\s+)/g, " ").replace(/^\s\s*/, "").replace(/\s\s*$/, "");
+        }
+        function checkWeekday(weekdayStr, parsedInput, config) {
+          if (weekdayStr) {
+            var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr), weekdayActual = new Date(parsedInput[0], parsedInput[1], parsedInput[2]).getDay();
+            if (weekdayProvided !== weekdayActual) {
+              getParsingFlags(config).weekdayMismatch = true;
+              config._isValid = false;
+              return false;
+            }
+          }
+          return true;
+        }
+        var obsOffsets = {
+          UT: 0,
+          GMT: 0,
+          EDT: -4 * 60,
+          EST: -5 * 60,
+          CDT: -5 * 60,
+          CST: -6 * 60,
+          MDT: -6 * 60,
+          MST: -7 * 60,
+          PDT: -7 * 60,
+          PST: -8 * 60
+        };
+        function calculateOffset(obsOffset, militaryOffset, numOffset) {
+          if (obsOffset) {
+            return obsOffsets[obsOffset];
+          } else if (militaryOffset) {
+            return 0;
+          } else {
+            var hm = parseInt(numOffset, 10);
+            var m2 = hm % 100, h = (hm - m2) / 100;
+            return h * 60 + m2;
+          }
+        }
+        function configFromRFC2822(config) {
+          var match = rfc2822.exec(preprocessRFC2822(config._i));
+          if (match) {
+            var parsedArray = extractFromRFC2822Strings(match[4], match[3], match[2], match[5], match[6], match[7]);
+            if (!checkWeekday(match[1], parsedArray, config)) {
+              return;
+            }
+            config._a = parsedArray;
+            config._tzm = calculateOffset(match[8], match[9], match[10]);
+            config._d = createUTCDate.apply(null, config._a);
+            config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+            getParsingFlags(config).rfc2822 = true;
+          } else {
+            config._isValid = false;
+          }
+        }
+        function configFromString(config) {
+          var matched = aspNetJsonRegex.exec(config._i);
+          if (matched !== null) {
+            config._d = /* @__PURE__ */ new Date(+matched[1]);
+            return;
+          }
+          configFromISO(config);
+          if (config._isValid === false) {
+            delete config._isValid;
+          } else {
+            return;
+          }
+          configFromRFC2822(config);
+          if (config._isValid === false) {
+            delete config._isValid;
+          } else {
+            return;
+          }
+          hooks.createFromInputFallback(config);
+        }
+        hooks.createFromInputFallback = deprecate("value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are discouraged and will be removed in an upcoming major release. Please refer to http://momentjs.com/guides/#/warnings/js-date/ for more info.", function(config) {
+          config._d = /* @__PURE__ */ new Date(config._i + (config._useUTC ? " UTC" : ""));
+        });
+        hooks.ISO_8601 = function() {
+        };
+        hooks.RFC_2822 = function() {
+        };
+        function configFromStringAndFormat(config) {
+          if (config._f === hooks.ISO_8601) {
+            configFromISO(config);
+            return;
+          }
+          if (config._f === hooks.RFC_2822) {
+            configFromRFC2822(config);
+            return;
+          }
+          config._a = [];
+          getParsingFlags(config).empty = true;
+          var string = "" + config._i, i, parsedInput, tokens3, token2, skipped, stringLength = string.length, totalParsedInputLength = 0;
+          tokens3 = expandFormat(config._f, config._locale).match(formattingTokens) || [];
+          for (i = 0; i < tokens3.length; i++) {
+            token2 = tokens3[i];
+            parsedInput = (string.match(getParseRegexForToken(token2, config)) || [])[0];
+            if (parsedInput) {
+              skipped = string.substr(0, string.indexOf(parsedInput));
+              if (skipped.length > 0) {
+                getParsingFlags(config).unusedInput.push(skipped);
+              }
+              string = string.slice(string.indexOf(parsedInput) + parsedInput.length);
+              totalParsedInputLength += parsedInput.length;
+            }
+            if (formatTokenFunctions[token2]) {
+              if (parsedInput) {
+                getParsingFlags(config).empty = false;
+              } else {
+                getParsingFlags(config).unusedTokens.push(token2);
+              }
+              addTimeToArrayFromToken(token2, parsedInput, config);
+            } else if (config._strict && !parsedInput) {
+              getParsingFlags(config).unusedTokens.push(token2);
+            }
+          }
+          getParsingFlags(config).charsLeftOver = stringLength - totalParsedInputLength;
+          if (string.length > 0) {
+            getParsingFlags(config).unusedInput.push(string);
+          }
+          if (config._a[HOUR] <= 12 && getParsingFlags(config).bigHour === true && config._a[HOUR] > 0) {
+            getParsingFlags(config).bigHour = void 0;
+          }
+          getParsingFlags(config).parsedDateParts = config._a.slice(0);
+          getParsingFlags(config).meridiem = config._meridiem;
+          config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem);
+          configFromArray(config);
+          checkOverflow(config);
+        }
+        function meridiemFixWrap(locale2, hour, meridiem2) {
+          var isPm;
+          if (meridiem2 == null) {
+            return hour;
+          }
+          if (locale2.meridiemHour != null) {
+            return locale2.meridiemHour(hour, meridiem2);
+          } else if (locale2.isPM != null) {
+            isPm = locale2.isPM(meridiem2);
+            if (isPm && hour < 12) {
+              hour += 12;
+            }
+            if (!isPm && hour === 12) {
+              hour = 0;
+            }
+            return hour;
+          } else {
+            return hour;
+          }
+        }
+        function configFromStringAndArray(config) {
+          var tempConfig, bestMoment, scoreToBeat, i, currentScore;
+          if (config._f.length === 0) {
+            getParsingFlags(config).invalidFormat = true;
+            config._d = /* @__PURE__ */ new Date(NaN);
+            return;
+          }
+          for (i = 0; i < config._f.length; i++) {
+            currentScore = 0;
+            tempConfig = copyConfig({}, config);
+            if (config._useUTC != null) {
+              tempConfig._useUTC = config._useUTC;
+            }
+            tempConfig._f = config._f[i];
+            configFromStringAndFormat(tempConfig);
+            if (!isValid(tempConfig)) {
+              continue;
+            }
+            currentScore += getParsingFlags(tempConfig).charsLeftOver;
+            currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+            getParsingFlags(tempConfig).score = currentScore;
+            if (scoreToBeat == null || currentScore < scoreToBeat) {
+              scoreToBeat = currentScore;
+              bestMoment = tempConfig;
+            }
+          }
+          extend(config, bestMoment || tempConfig);
+        }
+        function configFromObject(config) {
+          if (config._d) {
+            return;
+          }
+          var i = normalizeObjectUnits(config._i);
+          config._a = map([
+            i.year,
+            i.month,
+            i.day || i.date,
+            i.hour,
+            i.minute,
+            i.second,
+            i.millisecond
+          ], function(obj) {
+            return obj && parseInt(obj, 10);
+          });
+          configFromArray(config);
+        }
+        function createFromConfig(config) {
+          var res = new Moment(checkOverflow(prepareConfig(config)));
+          if (res._nextDay) {
+            res.add(1, "d");
+            res._nextDay = void 0;
+          }
+          return res;
+        }
+        function prepareConfig(config) {
+          var input = config._i, _$format = config._f;
+          config._locale = config._locale || getLocale(config._l);
+          if (input === null || _$format === void 0 && input === "") {
+            return createInvalid({
+              nullInput: true
+            });
+          }
+          if (typeof input === "string") {
+            config._i = input = config._locale.preparse(input);
+          }
+          if (isMoment(input)) {
+            return new Moment(checkOverflow(input));
+          } else if (isDate(input)) {
+            config._d = input;
+          } else if (isArray(_$format)) {
+            configFromStringAndArray(config);
+          } else if (_$format) {
+            configFromStringAndFormat(config);
+          } else {
+            configFromInput(config);
+          }
+          if (!isValid(config)) {
+            config._d = null;
+          }
+          return config;
+        }
+        function configFromInput(config) {
+          var input = config._i;
+          if (isUndefined(input)) {
+            config._d = new Date(hooks.now());
+          } else if (isDate(input)) {
+            config._d = new Date(input.valueOf());
+          } else if (typeof input === "string") {
+            configFromString(config);
+          } else if (isArray(input)) {
+            config._a = map(input.slice(0), function(obj) {
+              return parseInt(obj, 10);
+            });
+            configFromArray(config);
+          } else if (isObject2(input)) {
+            configFromObject(config);
+          } else if (isNumber(input)) {
+            config._d = new Date(input);
+          } else {
+            hooks.createFromInputFallback(config);
+          }
+        }
+        function createLocalOrUTC(input, format2, locale2, strict, isUTC) {
+          var c2 = {};
+          if (locale2 === true || locale2 === false) {
+            strict = locale2;
+            locale2 = void 0;
+          }
+          if (isObject2(input) && isObjectEmpty(input) || isArray(input) && input.length === 0) {
+            input = void 0;
+          }
+          c2._isAMomentObject = true;
+          c2._useUTC = c2._isUTC = isUTC;
+          c2._l = locale2;
+          c2._i = input;
+          c2._f = format2;
+          c2._strict = strict;
+          return createFromConfig(c2);
+        }
+        function createLocal(input, format2, locale2, strict) {
+          return createLocalOrUTC(input, format2, locale2, strict, false);
+        }
+        var prototypeMin = deprecate("moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/", function() {
+          var other = createLocal.apply(null, arguments);
+          if (this.isValid() && other.isValid()) {
+            return other < this ? this : other;
+          } else {
+            return createInvalid();
+          }
+        });
+        var prototypeMax = deprecate("moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/", function() {
+          var other = createLocal.apply(null, arguments);
+          if (this.isValid() && other.isValid()) {
+            return other > this ? this : other;
+          } else {
+            return createInvalid();
+          }
+        });
+        function pickBy(fn, moments) {
+          var res, i;
+          if (moments.length === 1 && isArray(moments[0])) {
+            moments = moments[0];
+          }
+          if (!moments.length) {
+            return createLocal();
+          }
+          res = moments[0];
+          for (i = 1; i < moments.length; ++i) {
+            if (!moments[i].isValid() || moments[i][fn](res)) {
+              res = moments[i];
+            }
+          }
+          return res;
+        }
+        function min() {
+          var args = [].slice.call(arguments, 0);
+          return pickBy("isBefore", args);
+        }
+        function max() {
+          var args = [].slice.call(arguments, 0);
+          return pickBy("isAfter", args);
+        }
+        var now = function now2() {
+          return Date.now ? Date.now() : +/* @__PURE__ */ new Date();
+        };
+        var ordering = [
+          "year",
+          "quarter",
+          "month",
+          "week",
+          "day",
+          "hour",
+          "minute",
+          "second",
+          "millisecond"
+        ];
+        function isDurationValid(m2) {
+          for (var key in m2) {
+            if (!(indexOf.call(ordering, key) !== -1 && (m2[key] == null || !isNaN(m2[key])))) {
+              return false;
+            }
+          }
+          var unitHasDecimal = false;
+          for (var i = 0; i < ordering.length; ++i) {
+            if (m2[ordering[i]]) {
+              if (unitHasDecimal) {
+                return false;
+              }
+              if (parseFloat(m2[ordering[i]]) !== toInt(m2[ordering[i]])) {
+                unitHasDecimal = true;
+              }
+            }
+          }
+          return true;
+        }
+        function isValid$1() {
+          return this._isValid;
+        }
+        function createInvalid$1() {
+          return createDuration(NaN);
+        }
+        function Duration(duration) {
+          var normalizedInput = normalizeObjectUnits(duration), years2 = normalizedInput.year || 0, quarters = normalizedInput.quarter || 0, months2 = normalizedInput.month || 0, _$weeks = normalizedInput.week || 0, days2 = normalizedInput.day || 0, hours2 = normalizedInput.hour || 0, minutes2 = normalizedInput.minute || 0, seconds2 = normalizedInput.second || 0, milliseconds2 = normalizedInput.millisecond || 0;
+          this._isValid = isDurationValid(normalizedInput);
+          this._milliseconds = +milliseconds2 + seconds2 * 1e3 + // 1000
+          minutes2 * 6e4 + // 1000 * 60
+          hours2 * 1e3 * 60 * 60;
+          this._days = +days2 + _$weeks * 7;
+          this._months = +months2 + quarters * 3 + years2 * 12;
+          this._data = {};
+          this._locale = getLocale();
+          this._bubble();
+        }
+        function isDuration(obj) {
+          return obj instanceof Duration;
+        }
+        function absRound(number) {
+          if (number < 0) {
+            return Math.round(-1 * number) * -1;
+          } else {
+            return Math.round(number);
+          }
+        }
+        function offset(token2, separator) {
+          addFormatToken(token2, 0, 0, function() {
+            var _$offset = this.utcOffset();
+            var sign2 = "+";
+            if (_$offset < 0) {
+              _$offset = -_$offset;
+              sign2 = "-";
+            }
+            return sign2 + zeroFill(~~(_$offset / 60), 2) + separator + zeroFill(~~_$offset % 60, 2);
+          });
+        }
+        offset("Z", ":");
+        offset("ZZ", "");
+        addRegexToken("Z", matchShortOffset);
+        addRegexToken("ZZ", matchShortOffset);
+        addParseToken([
+          "Z",
+          "ZZ"
+        ], function(input, array, config) {
+          config._useUTC = true;
+          config._tzm = offsetFromString(matchShortOffset, input);
+        });
+        var chunkOffset = /([\+\-]|\d\d)/gi;
+        function offsetFromString(matcher, string) {
+          var matches = (string || "").match(matcher);
+          if (matches === null) {
+            return null;
+          }
+          var chunk = matches[matches.length - 1] || [];
+          var parts = (chunk + "").match(chunkOffset) || [
+            "-",
+            0,
+            0
+          ];
+          var minutes2 = +(parts[1] * 60) + toInt(parts[2]);
+          return minutes2 === 0 ? 0 : parts[0] === "+" ? minutes2 : -minutes2;
+        }
+        function cloneWithOffset(input, model) {
+          var res, _$diff;
+          if (model._isUTC) {
+            res = model.clone();
+            _$diff = (isMoment(input) || isDate(input) ? input.valueOf() : createLocal(input).valueOf()) - res.valueOf();
+            res._d.setTime(res._d.valueOf() + _$diff);
+            hooks.updateOffset(res, false);
+            return res;
+          } else {
+            return createLocal(input).local();
+          }
+        }
+        function getDateOffset(m2) {
+          return -Math.round(m2._d.getTimezoneOffset() / 15) * 15;
+        }
+        hooks.updateOffset = function() {
+        };
+        function getSetOffset(input, keepLocalTime, keepMinutes) {
+          var _$offset = this._offset || 0, localAdjust;
+          if (!this.isValid()) {
+            return input != null ? this : NaN;
+          }
+          if (input != null) {
+            if (typeof input === "string") {
+              input = offsetFromString(matchShortOffset, input);
+              if (input === null) {
+                return this;
+              }
+            } else if (Math.abs(input) < 16 && !keepMinutes) {
+              input = input * 60;
+            }
+            if (!this._isUTC && keepLocalTime) {
+              localAdjust = getDateOffset(this);
+            }
+            this._offset = input;
+            this._isUTC = true;
+            if (localAdjust != null) {
+              this.add(localAdjust, "m");
+            }
+            if (_$offset !== input) {
+              if (!keepLocalTime || this._changeInProgress) {
+                addSubtract(this, createDuration(input - _$offset, "m"), 1, false);
+              } else if (!this._changeInProgress) {
+                this._changeInProgress = true;
+                hooks.updateOffset(this, true);
+                this._changeInProgress = null;
+              }
+            }
+            return this;
+          } else {
+            return this._isUTC ? _$offset : getDateOffset(this);
+          }
+        }
+        function getSetZone(input, keepLocalTime) {
+          if (input != null) {
+            if (typeof input !== "string") {
+              input = -input;
+            }
+            this.utcOffset(input, keepLocalTime);
+            return this;
+          } else {
+            return -this.utcOffset();
+          }
+        }
+        function setOffsetToUTC(keepLocalTime) {
+          return this.utcOffset(0, keepLocalTime);
+        }
+        function setOffsetToLocal(keepLocalTime) {
+          if (this._isUTC) {
+            this.utcOffset(0, keepLocalTime);
+            this._isUTC = false;
+            if (keepLocalTime) {
+              this.subtract(getDateOffset(this), "m");
+            }
+          }
+          return this;
+        }
+        function setOffsetToParsedOffset() {
+          if (this._tzm != null) {
+            this.utcOffset(this._tzm, false, true);
+          } else if (typeof this._i === "string") {
+            var tZone = offsetFromString(matchOffset, this._i);
+            if (tZone != null) {
+              this.utcOffset(tZone);
+            } else {
+              this.utcOffset(0, true);
+            }
+          }
+          return this;
+        }
+        function hasAlignedHourOffset(input) {
+          if (!this.isValid()) {
+            return false;
+          }
+          input = input ? createLocal(input).utcOffset() : 0;
+          return (this.utcOffset() - input) % 60 === 0;
+        }
+        function isDaylightSavingTime() {
+          return this.utcOffset() > this.clone().month(0).utcOffset() || this.utcOffset() > this.clone().month(5).utcOffset();
+        }
+        function isDaylightSavingTimeShifted() {
+          if (!isUndefined(this._isDSTShifted)) {
+            return this._isDSTShifted;
+          }
+          var c2 = {};
+          copyConfig(c2, this);
+          c2 = prepareConfig(c2);
+          if (c2._a) {
+            var other = c2._isUTC ? createUTC(c2._a) : createLocal(c2._a);
+            this._isDSTShifted = this.isValid() && compareArrays(c2._a, other.toArray()) > 0;
+          } else {
+            this._isDSTShifted = false;
+          }
+          return this._isDSTShifted;
+        }
+        function isLocal() {
+          return this.isValid() ? !this._isUTC : false;
+        }
+        function isUtcOffset() {
+          return this.isValid() ? this._isUTC : false;
+        }
+        function isUtc() {
+          return this.isValid() ? this._isUTC && this._offset === 0 : false;
+        }
+        var aspNetRegex = /^(\-|\+)?(?:(\d*)[. ])?(\d+)\:(\d+)(?:\:(\d+)(\.\d*)?)?$/;
+        var isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
+        function createDuration(input, key) {
+          var duration = input, match = null, sign2, ret, diffRes;
+          if (isDuration(input)) {
+            duration = {
+              ms: input._milliseconds,
+              d: input._days,
+              M: input._months
+            };
+          } else if (isNumber(input)) {
+            duration = {};
+            if (key) {
+              duration[key] = input;
+            } else {
+              duration.milliseconds = input;
+            }
+          } else if (!!(match = aspNetRegex.exec(input))) {
+            sign2 = match[1] === "-" ? -1 : 1;
+            duration = {
+              y: 0,
+              d: toInt(match[DATE]) * sign2,
+              h: toInt(match[HOUR]) * sign2,
+              m: toInt(match[MINUTE]) * sign2,
+              s: toInt(match[SECOND]) * sign2,
+              ms: toInt(absRound(match[MILLISECOND] * 1e3)) * sign2
+              // the millisecond decimal point is included in the match
+            };
+          } else if (!!(match = isoRegex.exec(input))) {
+            sign2 = match[1] === "-" ? -1 : match[1] === "+" ? 1 : 1;
+            duration = {
+              y: parseIso(match[2], sign2),
+              M: parseIso(match[3], sign2),
+              w: parseIso(match[4], sign2),
+              d: parseIso(match[5], sign2),
+              h: parseIso(match[6], sign2),
+              m: parseIso(match[7], sign2),
+              s: parseIso(match[8], sign2)
+            };
+          } else if (duration == null) {
+            duration = {};
+          } else if (typeof duration === "object" && ("from" in duration || "to" in duration)) {
+            diffRes = momentsDifference(createLocal(duration.from), createLocal(duration.to));
+            duration = {};
+            duration.ms = diffRes.milliseconds;
+            duration.M = diffRes.months;
+          }
+          ret = new Duration(duration);
+          if (isDuration(input) && hasOwnProp(input, "_locale")) {
+            ret._locale = input._locale;
+          }
+          return ret;
+        }
+        createDuration.fn = Duration.prototype;
+        createDuration.invalid = createInvalid$1;
+        function parseIso(inp, sign2) {
+          var res = inp && parseFloat(inp.replace(",", "."));
+          return (isNaN(res) ? 0 : res) * sign2;
+        }
+        function positiveMomentsDifference(base, other) {
+          var res = {
+            milliseconds: 0,
+            months: 0
+          };
+          res.months = other.month() - base.month() + (other.year() - base.year()) * 12;
+          if (base.clone().add(res.months, "M").isAfter(other)) {
+            --res.months;
+          }
+          res.milliseconds = +other - +base.clone().add(res.months, "M");
+          return res;
+        }
+        function momentsDifference(base, other) {
+          var res;
+          if (!(base.isValid() && other.isValid())) {
+            return {
+              milliseconds: 0,
+              months: 0
+            };
+          }
+          other = cloneWithOffset(other, base);
+          if (base.isBefore(other)) {
+            res = positiveMomentsDifference(base, other);
+          } else {
+            res = positiveMomentsDifference(other, base);
+            res.milliseconds = -res.milliseconds;
+            res.months = -res.months;
+          }
+          return res;
+        }
+        function createAdder(direction, name) {
+          return function(val, period) {
+            var dur, tmp;
+            if (period !== null && !isNaN(+period)) {
+              deprecateSimple(name, "moment()." + name + "(period, number) is deprecated. Please use moment()." + name + "(number, period). See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.");
+              tmp = val;
+              val = period;
+              period = tmp;
+            }
+            val = typeof val === "string" ? +val : val;
+            dur = createDuration(val, period);
+            addSubtract(this, dur, direction);
+            return this;
+          };
+        }
+        function addSubtract(mom, duration, isAdding, updateOffset) {
+          var milliseconds2 = duration._milliseconds, days2 = absRound(duration._days), months2 = absRound(duration._months);
+          if (!mom.isValid()) {
+            return;
+          }
+          updateOffset = updateOffset == null ? true : updateOffset;
+          if (months2) {
+            setMonth(mom, get(mom, "Month") + months2 * isAdding);
+          }
+          if (days2) {
+            set$1(mom, "Date", get(mom, "Date") + days2 * isAdding);
+          }
+          if (milliseconds2) {
+            mom._d.setTime(mom._d.valueOf() + milliseconds2 * isAdding);
+          }
+          if (updateOffset) {
+            hooks.updateOffset(mom, days2 || months2);
+          }
+        }
+        var add = createAdder(1, "add");
+        var subtract = createAdder(-1, "subtract");
+        function getCalendarFormat(myMoment, now2) {
+          var _$diff = myMoment.diff(now2, "days", true);
+          return _$diff < -6 ? "sameElse" : _$diff < -1 ? "lastWeek" : _$diff < 0 ? "lastDay" : _$diff < 1 ? "sameDay" : _$diff < 2 ? "nextDay" : _$diff < 7 ? "nextWeek" : "sameElse";
+        }
+        function calendar$1(time, formats) {
+          var now2 = time || createLocal(), sod = cloneWithOffset(now2, this).startOf("day"), _$format = hooks.calendarFormat(this, sod) || "sameElse";
+          var output = formats && (isFunction(formats[_$format]) ? formats[_$format].call(this, now2) : formats[_$format]);
+          return this.format(output || this.localeData().calendar(_$format, this, createLocal(now2)));
+        }
+        function clone() {
+          return new Moment(this);
+        }
+        function isAfter(input, units2) {
+          var localInput = isMoment(input) ? input : createLocal(input);
+          if (!(this.isValid() && localInput.isValid())) {
+            return false;
+          }
+          units2 = normalizeUnits(!isUndefined(units2) ? units2 : "millisecond");
+          if (units2 === "millisecond") {
+            return this.valueOf() > localInput.valueOf();
+          } else {
+            return localInput.valueOf() < this.clone().startOf(units2).valueOf();
+          }
+        }
+        function isBefore(input, units2) {
+          var localInput = isMoment(input) ? input : createLocal(input);
+          if (!(this.isValid() && localInput.isValid())) {
+            return false;
+          }
+          units2 = normalizeUnits(!isUndefined(units2) ? units2 : "millisecond");
+          if (units2 === "millisecond") {
+            return this.valueOf() < localInput.valueOf();
+          } else {
+            return this.clone().endOf(units2).valueOf() < localInput.valueOf();
+          }
+        }
+        function isBetween(from2, to2, units2, inclusivity) {
+          inclusivity = inclusivity || "()";
+          return (inclusivity[0] === "(" ? this.isAfter(from2, units2) : !this.isBefore(from2, units2)) && (inclusivity[1] === ")" ? this.isBefore(to2, units2) : !this.isAfter(to2, units2));
+        }
+        function isSame(input, units2) {
+          var localInput = isMoment(input) ? input : createLocal(input), inputMs;
+          if (!(this.isValid() && localInput.isValid())) {
+            return false;
+          }
+          units2 = normalizeUnits(units2 || "millisecond");
+          if (units2 === "millisecond") {
+            return this.valueOf() === localInput.valueOf();
+          } else {
+            inputMs = localInput.valueOf();
+            return this.clone().startOf(units2).valueOf() <= inputMs && inputMs <= this.clone().endOf(units2).valueOf();
+          }
+        }
+        function isSameOrAfter(input, units2) {
+          return this.isSame(input, units2) || this.isAfter(input, units2);
+        }
+        function isSameOrBefore(input, units2) {
+          return this.isSame(input, units2) || this.isBefore(input, units2);
+        }
+        function diff(input, units2, asFloat) {
+          var that, zoneDelta, output;
+          if (!this.isValid()) {
+            return NaN;
+          }
+          that = cloneWithOffset(input, this);
+          if (!that.isValid()) {
+            return NaN;
+          }
+          zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+          units2 = normalizeUnits(units2);
+          switch (units2) {
+            case "year":
+              output = monthDiff(this, that) / 12;
+              break;
+            case "month":
+              output = monthDiff(this, that);
+              break;
+            case "quarter":
+              output = monthDiff(this, that) / 3;
+              break;
+            case "second":
+              output = (this - that) / 1e3;
+              break;
+            case "minute":
+              output = (this - that) / 6e4;
+              break;
+            case "hour":
+              output = (this - that) / 36e5;
+              break;
+            case "day":
+              output = (this - that - zoneDelta) / 864e5;
+              break;
+            case "week":
+              output = (this - that - zoneDelta) / 6048e5;
+              break;
+            default:
+              output = this - that;
+          }
+          return asFloat ? output : absFloor(output);
+        }
+        function monthDiff(a, b3) {
+          var wholeMonthDiff = (b3.year() - a.year()) * 12 + (b3.month() - a.month()), anchor = a.clone().add(wholeMonthDiff, "months"), anchor2, adjust;
+          if (b3 - anchor < 0) {
+            anchor2 = a.clone().add(wholeMonthDiff - 1, "months");
+            adjust = (b3 - anchor) / (anchor - anchor2);
+          } else {
+            anchor2 = a.clone().add(wholeMonthDiff + 1, "months");
+            adjust = (b3 - anchor) / (anchor2 - anchor);
+          }
+          return -(wholeMonthDiff + adjust) || 0;
+        }
+        hooks.defaultFormat = "YYYY-MM-DDTHH:mm:ssZ";
+        hooks.defaultFormatUtc = "YYYY-MM-DDTHH:mm:ss[Z]";
+        function toString() {
+          return this.clone().locale("en").format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ");
+        }
+        function toISOString(keepOffset) {
+          if (!this.isValid()) {
+            return null;
+          }
+          var utc = keepOffset !== true;
+          var m2 = utc ? this.clone().utc() : this;
+          if (m2.year() < 0 || m2.year() > 9999) {
+            return formatMoment(m2, utc ? "YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]" : "YYYYYY-MM-DD[T]HH:mm:ss.SSSZ");
+          }
+          if (isFunction(Date.prototype.toISOString)) {
+            if (utc) {
+              return this.toDate().toISOString();
+            } else {
+              return new Date(this.valueOf() + this.utcOffset() * 60 * 1e3).toISOString().replace("Z", formatMoment(m2, "Z"));
+            }
+          }
+          return formatMoment(m2, utc ? "YYYY-MM-DD[T]HH:mm:ss.SSS[Z]" : "YYYY-MM-DD[T]HH:mm:ss.SSSZ");
+        }
+        function inspect() {
+          if (!this.isValid()) {
+            return "moment.invalid(/* " + this._i + " */)";
+          }
+          var func = "moment";
+          var zone = "";
+          if (!this.isLocal()) {
+            func = this.utcOffset() === 0 ? "moment.utc" : "moment.parseZone";
+            zone = "Z";
+          }
+          var prefix2 = "[" + func + '("]';
+          var year = 0 <= this.year() && this.year() <= 9999 ? "YYYY" : "YYYYYY";
+          var datetime = "-MM-DD[T]HH:mm:ss.SSS";
+          var suffix = zone + '[")]';
+          return this.format(prefix2 + year + datetime + suffix);
+        }
+        function format(inputString) {
+          if (!inputString) {
+            inputString = this.isUtc() ? hooks.defaultFormatUtc : hooks.defaultFormat;
+          }
+          var output = formatMoment(this, inputString);
+          return this.localeData().postformat(output);
+        }
+        function from(time, withoutSuffix) {
+          if (this.isValid() && (isMoment(time) && time.isValid() || createLocal(time).isValid())) {
+            return createDuration({
+              to: this,
+              from: time
+            }).locale(this.locale()).humanize(!withoutSuffix);
+          } else {
+            return this.localeData().invalidDate();
+          }
+        }
+        function fromNow(withoutSuffix) {
+          return this.from(createLocal(), withoutSuffix);
+        }
+        function to(time, withoutSuffix) {
+          if (this.isValid() && (isMoment(time) && time.isValid() || createLocal(time).isValid())) {
+            return createDuration({
+              from: this,
+              to: time
+            }).locale(this.locale()).humanize(!withoutSuffix);
+          } else {
+            return this.localeData().invalidDate();
+          }
+        }
+        function toNow(withoutSuffix) {
+          return this.to(createLocal(), withoutSuffix);
+        }
+        function locale(key) {
+          var newLocaleData;
+          if (key === void 0) {
+            return this._locale._abbr;
+          } else {
+            newLocaleData = getLocale(key);
+            if (newLocaleData != null) {
+              this._locale = newLocaleData;
+            }
+            return this;
+          }
+        }
+        var lang = deprecate("moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.", function(key) {
+          if (key === void 0) {
+            return this.localeData();
+          } else {
+            return this.locale(key);
+          }
+        });
+        function localeData() {
+          return this._locale;
+        }
+        function startOf(units2) {
+          units2 = normalizeUnits(units2);
+          switch (units2) {
+            case "year":
+              this.month(0);
+            case "quarter":
+            case "month":
+              this.date(1);
+            case "week":
+            case "isoWeek":
+            case "day":
+            case "date":
+              this.hours(0);
+            case "hour":
+              this.minutes(0);
+            case "minute":
+              this.seconds(0);
+            case "second":
+              this.milliseconds(0);
+          }
+          if (units2 === "week") {
+            this.weekday(0);
+          }
+          if (units2 === "isoWeek") {
+            this.isoWeekday(1);
+          }
+          if (units2 === "quarter") {
+            this.month(Math.floor(this.month() / 3) * 3);
+          }
+          return this;
+        }
+        function endOf(units2) {
+          units2 = normalizeUnits(units2);
+          if (units2 === void 0 || units2 === "millisecond") {
+            return this;
+          }
+          if (units2 === "date") {
+            units2 = "day";
+          }
+          return this.startOf(units2).add(1, units2 === "isoWeek" ? "week" : units2).subtract(1, "ms");
+        }
+        function valueOf() {
+          return this._d.valueOf() - (this._offset || 0) * 6e4;
+        }
+        function unix() {
+          return Math.floor(this.valueOf() / 1e3);
+        }
+        function toDate() {
+          return new Date(this.valueOf());
+        }
+        function toArray() {
+          var m2 = this;
+          return [
+            m2.year(),
+            m2.month(),
+            m2.date(),
+            m2.hour(),
+            m2.minute(),
+            m2.second(),
+            m2.millisecond()
+          ];
+        }
+        function toObject() {
+          var m2 = this;
+          return {
+            years: m2.year(),
+            months: m2.month(),
+            date: m2.date(),
+            hours: m2.hours(),
+            minutes: m2.minutes(),
+            seconds: m2.seconds(),
+            milliseconds: m2.milliseconds()
+          };
+        }
+        function toJSON() {
+          return this.isValid() ? this.toISOString() : null;
+        }
+        function isValid$2() {
+          return isValid(this);
+        }
+        function parsingFlags() {
+          return extend({}, getParsingFlags(this));
+        }
+        function invalidAt() {
+          return getParsingFlags(this).overflow;
+        }
+        function creationData() {
+          return {
+            input: this._i,
+            format: this._f,
+            locale: this._locale,
+            isUTC: this._isUTC,
+            strict: this._strict
+          };
+        }
+        addFormatToken(0, [
+          "gg",
+          2
+        ], 0, function() {
+          return this.weekYear() % 100;
+        });
+        addFormatToken(0, [
+          "GG",
+          2
+        ], 0, function() {
+          return this.isoWeekYear() % 100;
+        });
+        function addWeekYearFormatToken(token2, getter) {
+          addFormatToken(0, [
+            token2,
+            token2.length
+          ], 0, getter);
+        }
+        addWeekYearFormatToken("gggg", "weekYear");
+        addWeekYearFormatToken("ggggg", "weekYear");
+        addWeekYearFormatToken("GGGG", "isoWeekYear");
+        addWeekYearFormatToken("GGGGG", "isoWeekYear");
+        addUnitAlias("weekYear", "gg");
+        addUnitAlias("isoWeekYear", "GG");
+        addUnitPriority("weekYear", 1);
+        addUnitPriority("isoWeekYear", 1);
+        addRegexToken("G", matchSigned);
+        addRegexToken("g", matchSigned);
+        addRegexToken("GG", match1to2, match2);
+        addRegexToken("gg", match1to2, match2);
+        addRegexToken("GGGG", match1to4, match4);
+        addRegexToken("gggg", match1to4, match4);
+        addRegexToken("GGGGG", match1to6, match6);
+        addRegexToken("ggggg", match1to6, match6);
+        addWeekParseToken([
+          "gggg",
+          "ggggg",
+          "GGGG",
+          "GGGGG"
+        ], function(input, week, config, token2) {
+          week[token2.substr(0, 2)] = toInt(input);
+        });
+        addWeekParseToken([
+          "gg",
+          "GG"
+        ], function(input, week, config, token2) {
+          week[token2] = hooks.parseTwoDigitYear(input);
+        });
+        function getSetWeekYear(input) {
+          return getSetWeekYearHelper.call(this, input, this.week(), this.weekday(), this.localeData()._week.dow, this.localeData()._week.doy);
+        }
+        function getSetISOWeekYear(input) {
+          return getSetWeekYearHelper.call(this, input, this.isoWeek(), this.isoWeekday(), 1, 4);
+        }
+        function getISOWeeksInYear() {
+          return weeksInYear(this.year(), 1, 4);
+        }
+        function getWeeksInYear() {
+          var weekInfo = this.localeData()._week;
+          return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+        }
+        function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+          var weeksTarget;
+          if (input == null) {
+            return weekOfYear(this, dow, doy).year;
+          } else {
+            weeksTarget = weeksInYear(input, dow, doy);
+            if (week > weeksTarget) {
+              week = weeksTarget;
+            }
+            return setWeekAll.call(this, input, week, weekday, dow, doy);
+          }
+        }
+        function setWeekAll(weekYear, week, weekday, dow, doy) {
+          var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy), date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+          this.year(date.getUTCFullYear());
+          this.month(date.getUTCMonth());
+          this.date(date.getUTCDate());
+          return this;
+        }
+        addFormatToken("Q", 0, "Qo", "quarter");
+        addUnitAlias("quarter", "Q");
+        addUnitPriority("quarter", 7);
+        addRegexToken("Q", match1);
+        addParseToken("Q", function(input, array) {
+          array[MONTH] = (toInt(input) - 1) * 3;
+        });
+        function getSetQuarter(input) {
+          return input == null ? Math.ceil((this.month() + 1) / 3) : this.month((input - 1) * 3 + this.month() % 3);
+        }
+        addFormatToken("D", [
+          "DD",
+          2
+        ], "Do", "date");
+        addUnitAlias("date", "D");
+        addUnitPriority("date", 9);
+        addRegexToken("D", match1to2);
+        addRegexToken("DD", match1to2, match2);
+        addRegexToken("Do", function(isStrict, locale2) {
+          return isStrict ? locale2._dayOfMonthOrdinalParse || locale2._ordinalParse : locale2._dayOfMonthOrdinalParseLenient;
+        });
+        addParseToken([
+          "D",
+          "DD"
+        ], DATE);
+        addParseToken("Do", function(input, array) {
+          array[DATE] = toInt(input.match(match1to2)[0]);
+        });
+        var getSetDayOfMonth = makeGetSet("Date", true);
+        addFormatToken("DDD", [
+          "DDDD",
+          3
+        ], "DDDo", "dayOfYear");
+        addUnitAlias("dayOfYear", "DDD");
+        addUnitPriority("dayOfYear", 4);
+        addRegexToken("DDD", match1to3);
+        addRegexToken("DDDD", match3);
+        addParseToken([
+          "DDD",
+          "DDDD"
+        ], function(input, array, config) {
+          config._dayOfYear = toInt(input);
+        });
+        function getSetDayOfYear(input) {
+          var dayOfYear = Math.round((this.clone().startOf("day") - this.clone().startOf("year")) / 864e5) + 1;
+          return input == null ? dayOfYear : this.add(input - dayOfYear, "d");
+        }
+        addFormatToken("m", [
+          "mm",
+          2
+        ], 0, "minute");
+        addUnitAlias("minute", "m");
+        addUnitPriority("minute", 14);
+        addRegexToken("m", match1to2);
+        addRegexToken("mm", match1to2, match2);
+        addParseToken([
+          "m",
+          "mm"
+        ], MINUTE);
+        var getSetMinute = makeGetSet("Minutes", false);
+        addFormatToken("s", [
+          "ss",
+          2
+        ], 0, "second");
+        addUnitAlias("second", "s");
+        addUnitPriority("second", 15);
+        addRegexToken("s", match1to2);
+        addRegexToken("ss", match1to2, match2);
+        addParseToken([
+          "s",
+          "ss"
+        ], SECOND);
+        var getSetSecond = makeGetSet("Seconds", false);
+        addFormatToken("S", 0, 0, function() {
+          return ~~(this.millisecond() / 100);
+        });
+        addFormatToken(0, [
+          "SS",
+          2
+        ], 0, function() {
+          return ~~(this.millisecond() / 10);
+        });
+        addFormatToken(0, [
+          "SSS",
+          3
+        ], 0, "millisecond");
+        addFormatToken(0, [
+          "SSSS",
+          4
+        ], 0, function() {
+          return this.millisecond() * 10;
+        });
+        addFormatToken(0, [
+          "SSSSS",
+          5
+        ], 0, function() {
+          return this.millisecond() * 100;
+        });
+        addFormatToken(0, [
+          "SSSSSS",
+          6
+        ], 0, function() {
+          return this.millisecond() * 1e3;
+        });
+        addFormatToken(0, [
+          "SSSSSSS",
+          7
+        ], 0, function() {
+          return this.millisecond() * 1e4;
+        });
+        addFormatToken(0, [
+          "SSSSSSSS",
+          8
+        ], 0, function() {
+          return this.millisecond() * 1e5;
+        });
+        addFormatToken(0, [
+          "SSSSSSSSS",
+          9
+        ], 0, function() {
+          return this.millisecond() * 1e6;
+        });
+        addUnitAlias("millisecond", "ms");
+        addUnitPriority("millisecond", 16);
+        addRegexToken("S", match1to3, match1);
+        addRegexToken("SS", match1to3, match2);
+        addRegexToken("SSS", match1to3, match3);
+        var token;
+        for (token = "SSSS"; token.length <= 9; token += "S") {
+          addRegexToken(token, matchUnsigned);
+        }
+        function parseMs(input, array) {
+          array[MILLISECOND] = toInt(("0." + input) * 1e3);
+        }
+        for (token = "S"; token.length <= 9; token += "S") {
+          addParseToken(token, parseMs);
+        }
+        var getSetMillisecond = makeGetSet("Milliseconds", false);
+        addFormatToken("z", 0, 0, "zoneAbbr");
+        addFormatToken("zz", 0, 0, "zoneName");
+        function getZoneAbbr() {
+          return this._isUTC ? "UTC" : "";
+        }
+        function getZoneName() {
+          return this._isUTC ? "Coordinated Universal Time" : "";
+        }
+        var proto = Moment.prototype;
+        proto.add = add;
+        proto.calendar = calendar$1;
+        proto.clone = clone;
+        proto.diff = diff;
+        proto.endOf = endOf;
+        proto.format = format;
+        proto.from = from;
+        proto.fromNow = fromNow;
+        proto.to = to;
+        proto.toNow = toNow;
+        proto.get = stringGet;
+        proto.invalidAt = invalidAt;
+        proto.isAfter = isAfter;
+        proto.isBefore = isBefore;
+        proto.isBetween = isBetween;
+        proto.isSame = isSame;
+        proto.isSameOrAfter = isSameOrAfter;
+        proto.isSameOrBefore = isSameOrBefore;
+        proto.isValid = isValid$2;
+        proto.lang = lang;
+        proto.locale = locale;
+        proto.localeData = localeData;
+        proto.max = prototypeMax;
+        proto.min = prototypeMin;
+        proto.parsingFlags = parsingFlags;
+        proto.set = stringSet;
+        proto.startOf = startOf;
+        proto.subtract = subtract;
+        proto.toArray = toArray;
+        proto.toObject = toObject;
+        proto.toDate = toDate;
+        proto.toISOString = toISOString;
+        proto.inspect = inspect;
+        proto.toJSON = toJSON;
+        proto.toString = toString;
+        proto.unix = unix;
+        proto.valueOf = valueOf;
+        proto.creationData = creationData;
+        proto.year = getSetYear;
+        proto.isLeapYear = getIsLeapYear;
+        proto.weekYear = getSetWeekYear;
+        proto.isoWeekYear = getSetISOWeekYear;
+        proto.quarter = proto.quarters = getSetQuarter;
+        proto.month = getSetMonth;
+        proto.daysInMonth = getDaysInMonth;
+        proto.week = proto.weeks = getSetWeek;
+        proto.isoWeek = proto.isoWeeks = getSetISOWeek;
+        proto.weeksInYear = getWeeksInYear;
+        proto.isoWeeksInYear = getISOWeeksInYear;
+        proto.date = getSetDayOfMonth;
+        proto.day = proto.days = getSetDayOfWeek;
+        proto.weekday = getSetLocaleDayOfWeek;
+        proto.isoWeekday = getSetISODayOfWeek;
+        proto.dayOfYear = getSetDayOfYear;
+        proto.hour = proto.hours = getSetHour;
+        proto.minute = proto.minutes = getSetMinute;
+        proto.second = proto.seconds = getSetSecond;
+        proto.millisecond = proto.milliseconds = getSetMillisecond;
+        proto.utcOffset = getSetOffset;
+        proto.utc = setOffsetToUTC;
+        proto.local = setOffsetToLocal;
+        proto.parseZone = setOffsetToParsedOffset;
+        proto.hasAlignedHourOffset = hasAlignedHourOffset;
+        proto.isDST = isDaylightSavingTime;
+        proto.isLocal = isLocal;
+        proto.isUtcOffset = isUtcOffset;
+        proto.isUtc = isUtc;
+        proto.isUTC = isUtc;
+        proto.zoneAbbr = getZoneAbbr;
+        proto.zoneName = getZoneName;
+        proto.dates = deprecate("dates accessor is deprecated. Use date instead.", getSetDayOfMonth);
+        proto.months = deprecate("months accessor is deprecated. Use month instead", getSetMonth);
+        proto.years = deprecate("years accessor is deprecated. Use year instead", getSetYear);
+        proto.zone = deprecate("moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/", getSetZone);
+        proto.isDSTShifted = deprecate("isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information", isDaylightSavingTimeShifted);
+        function createUnix(input) {
+          return createLocal(input * 1e3);
+        }
+        function createInZone() {
+          return createLocal.apply(null, arguments).parseZone();
+        }
+        function preParsePostFormat(string) {
+          return string;
+        }
+        var proto$1 = Locale.prototype;
+        proto$1.calendar = calendar;
+        proto$1.longDateFormat = longDateFormat;
+        proto$1.invalidDate = invalidDate;
+        proto$1.ordinal = ordinal;
+        proto$1.preparse = preParsePostFormat;
+        proto$1.postformat = preParsePostFormat;
+        proto$1.relativeTime = relativeTime;
+        proto$1.pastFuture = pastFuture;
+        proto$1.set = set;
+        proto$1.months = localeMonths;
+        proto$1.monthsShort = localeMonthsShort;
+        proto$1.monthsParse = localeMonthsParse;
+        proto$1.monthsRegex = monthsRegex;
+        proto$1.monthsShortRegex = monthsShortRegex;
+        proto$1.week = localeWeek;
+        proto$1.firstDayOfYear = localeFirstDayOfYear;
+        proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+        proto$1.weekdays = localeWeekdays;
+        proto$1.weekdaysMin = localeWeekdaysMin;
+        proto$1.weekdaysShort = localeWeekdaysShort;
+        proto$1.weekdaysParse = localeWeekdaysParse;
+        proto$1.weekdaysRegex = weekdaysRegex;
+        proto$1.weekdaysShortRegex = weekdaysShortRegex;
+        proto$1.weekdaysMinRegex = weekdaysMinRegex;
+        proto$1.isPM = localeIsPM;
+        proto$1.meridiem = localeMeridiem;
+        function get$1(format2, index, field, setter) {
+          var _$locale = getLocale();
+          var utc = createUTC().set(setter, index);
+          return _$locale[field](utc, format2);
+        }
+        function listMonthsImpl(format2, index, field) {
+          if (isNumber(format2)) {
+            index = format2;
+            format2 = void 0;
+          }
+          format2 = format2 || "";
+          if (index != null) {
+            return get$1(format2, index, field, "month");
+          }
+          var i;
+          var out = [];
+          for (i = 0; i < 12; i++) {
+            out[i] = get$1(format2, i, field, "month");
+          }
+          return out;
+        }
+        function listWeekdaysImpl(localeSorted, format2, index, field) {
+          if (typeof localeSorted === "boolean") {
+            if (isNumber(format2)) {
+              index = format2;
+              format2 = void 0;
+            }
+            format2 = format2 || "";
+          } else {
+            format2 = localeSorted;
+            index = format2;
+            localeSorted = false;
+            if (isNumber(format2)) {
+              index = format2;
+              format2 = void 0;
+            }
+            format2 = format2 || "";
+          }
+          var _$locale = getLocale(), shift = localeSorted ? _$locale._week.dow : 0;
+          if (index != null) {
+            return get$1(format2, (index + shift) % 7, field, "day");
+          }
+          var i;
+          var out = [];
+          for (i = 0; i < 7; i++) {
+            out[i] = get$1(format2, (i + shift) % 7, field, "day");
+          }
+          return out;
+        }
+        function listMonths(format2, index) {
+          return listMonthsImpl(format2, index, "months");
+        }
+        function listMonthsShort(format2, index) {
+          return listMonthsImpl(format2, index, "monthsShort");
+        }
+        function listWeekdays(localeSorted, format2, index) {
+          return listWeekdaysImpl(localeSorted, format2, index, "weekdays");
+        }
+        function listWeekdaysShort(localeSorted, format2, index) {
+          return listWeekdaysImpl(localeSorted, format2, index, "weekdaysShort");
+        }
+        function listWeekdaysMin(localeSorted, format2, index) {
+          return listWeekdaysImpl(localeSorted, format2, index, "weekdaysMin");
+        }
+        getSetGlobalLocale("en", {
+          dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
+          ordinal: function ordinal2(number) {
+            var b3 = number % 10, output = toInt(number % 100 / 10) === 1 ? "th" : b3 === 1 ? "st" : b3 === 2 ? "nd" : b3 === 3 ? "rd" : "th";
+            return number + output;
+          }
+        });
+        hooks.lang = deprecate("moment.lang is deprecated. Use moment.locale instead.", getSetGlobalLocale);
+        hooks.langData = deprecate("moment.langData is deprecated. Use moment.localeData instead.", getLocale);
+        var mathAbs = Math.abs;
+        function abs() {
+          var data = this._data;
+          this._milliseconds = mathAbs(this._milliseconds);
+          this._days = mathAbs(this._days);
+          this._months = mathAbs(this._months);
+          data.milliseconds = mathAbs(data.milliseconds);
+          data.seconds = mathAbs(data.seconds);
+          data.minutes = mathAbs(data.minutes);
+          data.hours = mathAbs(data.hours);
+          data.months = mathAbs(data.months);
+          data.years = mathAbs(data.years);
+          return this;
+        }
+        function addSubtract$1(duration, input, value, direction) {
+          var other = createDuration(input, value);
+          duration._milliseconds += direction * other._milliseconds;
+          duration._days += direction * other._days;
+          duration._months += direction * other._months;
+          return duration._bubble();
+        }
+        function add$1(input, value) {
+          return addSubtract$1(this, input, value, 1);
+        }
+        function subtract$1(input, value) {
+          return addSubtract$1(this, input, value, -1);
+        }
+        function absCeil(number) {
+          if (number < 0) {
+            return Math.floor(number);
+          } else {
+            return Math.ceil(number);
+          }
+        }
+        function bubble() {
+          var milliseconds2 = this._milliseconds;
+          var days2 = this._days;
+          var months2 = this._months;
+          var data = this._data;
+          var seconds2, minutes2, hours2, years2, monthsFromDays;
+          if (!(milliseconds2 >= 0 && days2 >= 0 && months2 >= 0 || milliseconds2 <= 0 && days2 <= 0 && months2 <= 0)) {
+            milliseconds2 += absCeil(monthsToDays(months2) + days2) * 864e5;
+            days2 = 0;
+            months2 = 0;
+          }
+          data.milliseconds = milliseconds2 % 1e3;
+          seconds2 = absFloor(milliseconds2 / 1e3);
+          data.seconds = seconds2 % 60;
+          minutes2 = absFloor(seconds2 / 60);
+          data.minutes = minutes2 % 60;
+          hours2 = absFloor(minutes2 / 60);
+          data.hours = hours2 % 24;
+          days2 += absFloor(hours2 / 24);
+          monthsFromDays = absFloor(daysToMonths(days2));
+          months2 += monthsFromDays;
+          days2 -= absCeil(monthsToDays(monthsFromDays));
+          years2 = absFloor(months2 / 12);
+          months2 %= 12;
+          data.days = days2;
+          data.months = months2;
+          data.years = years2;
+          return this;
+        }
+        function daysToMonths(days2) {
+          return days2 * 4800 / 146097;
+        }
+        function monthsToDays(months2) {
+          return months2 * 146097 / 4800;
+        }
+        function as(units2) {
+          if (!this.isValid()) {
+            return NaN;
+          }
+          var days2;
+          var months2;
+          var milliseconds2 = this._milliseconds;
+          units2 = normalizeUnits(units2);
+          if (units2 === "month" || units2 === "year") {
+            days2 = this._days + milliseconds2 / 864e5;
+            months2 = this._months + daysToMonths(days2);
+            return units2 === "month" ? months2 : months2 / 12;
+          } else {
+            days2 = this._days + Math.round(monthsToDays(this._months));
+            switch (units2) {
+              case "week":
+                return days2 / 7 + milliseconds2 / 6048e5;
+              case "day":
+                return days2 + milliseconds2 / 864e5;
+              case "hour":
+                return days2 * 24 + milliseconds2 / 36e5;
+              case "minute":
+                return days2 * 1440 + milliseconds2 / 6e4;
+              case "second":
+                return days2 * 86400 + milliseconds2 / 1e3;
+              case "millisecond":
+                return Math.floor(days2 * 864e5) + milliseconds2;
+              default:
+                throw new Error("Unknown unit " + units2);
+            }
+          }
+        }
+        function valueOf$1() {
+          if (!this.isValid()) {
+            return NaN;
+          }
+          return this._milliseconds + this._days * 864e5 + this._months % 12 * 2592e6 + toInt(this._months / 12) * 31536e6;
+        }
+        function makeAs(alias) {
+          return function() {
+            return this.as(alias);
+          };
+        }
+        var asMilliseconds = makeAs("ms");
+        var asSeconds = makeAs("s");
+        var asMinutes = makeAs("m");
+        var asHours = makeAs("h");
+        var asDays = makeAs("d");
+        var asWeeks = makeAs("w");
+        var asMonths = makeAs("M");
+        var asYears = makeAs("y");
+        function clone$1() {
+          return createDuration(this);
+        }
+        function get$2(units2) {
+          units2 = normalizeUnits(units2);
+          return this.isValid() ? this[units2 + "s"]() : NaN;
+        }
+        function makeGetter(name) {
+          return function() {
+            return this.isValid() ? this._data[name] : NaN;
+          };
+        }
+        var milliseconds = makeGetter("milliseconds");
+        var seconds = makeGetter("seconds");
+        var minutes = makeGetter("minutes");
+        var hours = makeGetter("hours");
+        var days = makeGetter("days");
+        var months = makeGetter("months");
+        var years = makeGetter("years");
+        function weeks() {
+          return absFloor(this.days() / 7);
+        }
+        var round = Math.round;
+        var thresholds = {
+          ss: 44,
+          s: 45,
+          m: 45,
+          h: 22,
+          d: 26,
+          M: 11
+          // months to year
+        };
+        function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale2) {
+          return locale2.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+        }
+        function relativeTime$1(posNegDuration, withoutSuffix, locale2) {
+          var duration = createDuration(posNegDuration).abs();
+          var seconds2 = round(duration.as("s"));
+          var minutes2 = round(duration.as("m"));
+          var hours2 = round(duration.as("h"));
+          var days2 = round(duration.as("d"));
+          var months2 = round(duration.as("M"));
+          var years2 = round(duration.as("y"));
+          var a = seconds2 <= thresholds.ss && [
+            "s",
+            seconds2
+          ] || seconds2 < thresholds.s && [
+            "ss",
+            seconds2
+          ] || minutes2 <= 1 && [
+            "m"
+          ] || minutes2 < thresholds.m && [
+            "mm",
+            minutes2
+          ] || hours2 <= 1 && [
+            "h"
+          ] || hours2 < thresholds.h && [
+            "hh",
+            hours2
+          ] || days2 <= 1 && [
+            "d"
+          ] || days2 < thresholds.d && [
+            "dd",
+            days2
+          ] || months2 <= 1 && [
+            "M"
+          ] || months2 < thresholds.M && [
+            "MM",
+            months2
+          ] || years2 <= 1 && [
+            "y"
+          ] || [
+            "yy",
+            years2
+          ];
+          a[2] = withoutSuffix;
+          a[3] = +posNegDuration > 0;
+          a[4] = locale2;
+          return substituteTimeAgo.apply(null, a);
+        }
+        function getSetRelativeTimeRounding(roundingFunction) {
+          if (roundingFunction === void 0) {
+            return round;
+          }
+          if (typeof roundingFunction === "function") {
+            round = roundingFunction;
+            return true;
+          }
+          return false;
+        }
+        function getSetRelativeTimeThreshold(threshold, limit) {
+          if (thresholds[threshold] === void 0) {
+            return false;
+          }
+          if (limit === void 0) {
+            return thresholds[threshold];
+          }
+          thresholds[threshold] = limit;
+          if (threshold === "s") {
+            thresholds.ss = limit - 1;
+          }
+          return true;
+        }
+        function humanize(withSuffix) {
+          if (!this.isValid()) {
+            return this.localeData().invalidDate();
+          }
+          var _$locale = this.localeData();
+          var output = relativeTime$1(this, !withSuffix, _$locale);
+          if (withSuffix) {
+            output = _$locale.pastFuture(+this, output);
+          }
+          return _$locale.postformat(output);
+        }
+        var abs$1 = Math.abs;
+        function sign(x2) {
+          return (x2 > 0) - (x2 < 0) || +x2;
+        }
+        function toISOString$1() {
+          if (!this.isValid()) {
+            return this.localeData().invalidDate();
+          }
+          var seconds2 = abs$1(this._milliseconds) / 1e3;
+          var days2 = abs$1(this._days);
+          var months2 = abs$1(this._months);
+          var minutes2, hours2, years2;
+          minutes2 = absFloor(seconds2 / 60);
+          hours2 = absFloor(minutes2 / 60);
+          seconds2 %= 60;
+          minutes2 %= 60;
+          years2 = absFloor(months2 / 12);
+          months2 %= 12;
+          var Y2 = years2;
+          var M = months2;
+          var D2 = days2;
+          var h = hours2;
+          var m2 = minutes2;
+          var s = seconds2 ? seconds2.toFixed(3).replace(/\.?0+$/, "") : "";
+          var total = this.asSeconds();
+          if (!total) {
+            return "P0D";
+          }
+          var totalSign = total < 0 ? "-" : "";
+          var ymSign = sign(this._months) !== sign(total) ? "-" : "";
+          var daysSign = sign(this._days) !== sign(total) ? "-" : "";
+          var hmsSign = sign(this._milliseconds) !== sign(total) ? "-" : "";
+          return totalSign + "P" + (Y2 ? ymSign + Y2 + "Y" : "") + (M ? ymSign + M + "M" : "") + (D2 ? daysSign + D2 + "D" : "") + (h || m2 || s ? "T" : "") + (h ? hmsSign + h + "H" : "") + (m2 ? hmsSign + m2 + "M" : "") + (s ? hmsSign + s + "S" : "");
+        }
+        var proto$2 = Duration.prototype;
+        proto$2.isValid = isValid$1;
+        proto$2.abs = abs;
+        proto$2.add = add$1;
+        proto$2.subtract = subtract$1;
+        proto$2.as = as;
+        proto$2.asMilliseconds = asMilliseconds;
+        proto$2.asSeconds = asSeconds;
+        proto$2.asMinutes = asMinutes;
+        proto$2.asHours = asHours;
+        proto$2.asDays = asDays;
+        proto$2.asWeeks = asWeeks;
+        proto$2.asMonths = asMonths;
+        proto$2.asYears = asYears;
+        proto$2.valueOf = valueOf$1;
+        proto$2._bubble = bubble;
+        proto$2.clone = clone$1;
+        proto$2.get = get$2;
+        proto$2.milliseconds = milliseconds;
+        proto$2.seconds = seconds;
+        proto$2.minutes = minutes;
+        proto$2.hours = hours;
+        proto$2.days = days;
+        proto$2.weeks = weeks;
+        proto$2.months = months;
+        proto$2.years = years;
+        proto$2.humanize = humanize;
+        proto$2.toISOString = toISOString$1;
+        proto$2.toString = toISOString$1;
+        proto$2.toJSON = toISOString$1;
+        proto$2.locale = locale;
+        proto$2.localeData = localeData;
+        proto$2.toIsoString = deprecate("toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)", toISOString$1);
+        proto$2.lang = lang;
+        addFormatToken("X", 0, 0, "unix");
+        addFormatToken("x", 0, 0, "valueOf");
+        addRegexToken("x", matchSigned);
+        addRegexToken("X", matchTimestamp);
+        addParseToken("X", function(input, array, config) {
+          config._d = new Date(parseFloat(input, 10) * 1e3);
+        });
+        addParseToken("x", function(input, array, config) {
+          config._d = new Date(toInt(input));
+        });
+        hooks.version = "2.22.2";
+        setHookCallback(createLocal);
+        hooks.fn = proto;
+        hooks.min = min;
+        hooks.max = max;
+        hooks.now = now;
+        hooks.utc = createUTC;
+        hooks.unix = createUnix;
+        hooks.months = listMonths;
+        hooks.isDate = isDate;
+        hooks.locale = getSetGlobalLocale;
+        hooks.invalid = createInvalid;
+        hooks.duration = createDuration;
+        hooks.isMoment = isMoment;
+        hooks.weekdays = listWeekdays;
+        hooks.parseZone = createInZone;
+        hooks.localeData = getLocale;
+        hooks.isDuration = isDuration;
+        hooks.monthsShort = listMonthsShort;
+        hooks.weekdaysMin = listWeekdaysMin;
+        hooks.defineLocale = defineLocale;
+        hooks.updateLocale = updateLocale;
+        hooks.locales = listLocales;
+        hooks.weekdaysShort = listWeekdaysShort;
+        hooks.normalizeUnits = normalizeUnits;
+        hooks.relativeTimeRounding = getSetRelativeTimeRounding;
+        hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+        hooks.calendarFormat = getCalendarFormat;
+        hooks.prototype = proto;
+        hooks.HTML5_FMT = {
+          DATETIME_LOCAL: "YYYY-MM-DDTHH:mm",
+          DATETIME_LOCAL_SECONDS: "YYYY-MM-DDTHH:mm:ss",
+          DATETIME_LOCAL_MS: "YYYY-MM-DDTHH:mm:ss.SSS",
+          DATE: "YYYY-MM-DD",
+          TIME: "HH:mm",
+          TIME_SECONDS: "HH:mm:ss",
+          TIME_MS: "HH:mm:ss.SSS",
+          WEEK: "YYYY-[W]WW",
+          MONTH: "YYYY-MM"
+          // <input type="month" />
+        };
+        return hooks;
+      });
     }
   });
 
@@ -60572,7 +56306,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     };
   }
   function NavigationButton({ label: label2, text, onPress }) {
-    return /* @__PURE__ */ jsx(import_react_native48.Pressable, {
+    return /* @__PURE__ */ jsx(import_react_native32.Pressable, {
       accessibilityRole: "button",
       accessibilityLabel: label2,
       onPress,
@@ -60582,7 +56316,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         alignItems: "center",
         justifyContent: "center"
       },
-      children: /* @__PURE__ */ jsx(import_react_native48.Text, {
+      children: /* @__PURE__ */ jsx(import_react_native32.Text, {
         style: {
           color: resolveSemanticColor(semanticColors.INTERACTIVE_TEXT_DEFAULT),
           fontSize: text === "\u2191" ? 20 : 10,
@@ -60596,7 +56330,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var latency = React2.useSyncExternalStore(voicePing.subscribe, () => voicePing.read(channelId));
     if (!latency || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsx(import_react_native48.Text, {
+    return /* @__PURE__ */ jsx(import_react_native32.Text, {
       accessibilityLabel: "Voice latency",
       style: {
         textAlign: "center",
@@ -60613,7 +56347,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var elapsed = React2.useSyncExternalStore(callClock.subscribe, () => callClock.read(channelId));
     if (!elapsed || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsxs(import_react_native48.Text, {
+    return /* @__PURE__ */ jsxs(import_react_native32.Text, {
       style: {
         textAlign: "center",
         fontSize: 12,
@@ -60633,7 +56367,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       userId
     ]);
     var elapsed = React2.useSyncExternalStore(subscribe, () => voiceMemberClock.read(userId, channelId));
-    return elapsed ? /* @__PURE__ */ jsx(import_react_native48.Text, {
+    return elapsed ? /* @__PURE__ */ jsx(import_react_native32.Text, {
       accessibilityLabel: "Call time " + elapsed,
       style: {
         marginStart: 6,
@@ -60650,20 +56384,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var count = React2.useSyncExternalStore(voiceCounts.subscribe, () => voiceCounts.read(channel));
     if (!count)
       return content;
-    return /* @__PURE__ */ jsxs(import_react_native48.View, {
+    return /* @__PURE__ */ jsxs(import_react_native32.View, {
       style: {
         flex: 1,
         flexDirection: "row",
         alignItems: "center"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native48.View, {
+        /* @__PURE__ */ jsx(import_react_native32.View, {
           style: {
             flex: 1
           },
           children: content
         }),
-        /* @__PURE__ */ jsx(import_react_native48.Text, {
+        /* @__PURE__ */ jsx(import_react_native32.Text, {
           accessibilityLabel: "Voice occupancy " + count,
           style: {
             marginStart: 4,
@@ -60711,7 +56445,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     if (!row || typeof voice?.getVoiceStateForUser !== "function")
       throw new Error("Discord's voice members are unavailable");
     var stopClock = voiceMemberClock.bind({
-      account: () => UserStore3.getCurrentUser()?.id,
+      account: () => UserStore2.getCurrentUser()?.id,
       state: (id) => voice.getVoiceStateForUser(id),
       channelGuild: (id) => ChannelStore.getChannel(id)?.guild_id,
       enabled: () => !settings.safeMode?.enabled,
@@ -60909,7 +56643,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     if (splitSender)
       throw new Error("A CX message splitter is already active");
     var sender = createCxSplitSender({
-      currentUser: () => UserStore3?.getCurrentUser?.(),
+      currentUser: () => UserStore2?.getCurrentUser?.(),
       channel: (id) => ChannelStore?.getChannel?.(id),
       enabled: () => splitSender === sender && !settings.safeMode?.enabled,
       failed: () => {
@@ -60973,7 +56707,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           return invoke(args);
         if (pending2)
           return;
-        var account = UserStore3?.getCurrentUser?.()?.id;
+        var account = UserStore2?.getCurrentUser?.()?.id;
         var selected = SelectedChannelStore?.getChannelId?.();
         var request = {};
         pending2 = request;
@@ -60982,7 +56716,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             pending2 = void 0;
         };
         try {
-          import_react_native48.Alert.alert("Confirm message", body, [
+          import_react_native32.Alert.alert("Confirm message", body, [
             {
               text: "Cancel",
               style: "cancel",
@@ -60994,7 +56728,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 if (pending2 !== request)
                   return;
                 dismiss();
-                if (active && !settings.safeMode?.enabled && account && account === UserStore3?.getCurrentUser?.()?.id && selected === SelectedChannelStore?.getChannelId?.() && draft?.text === text && draft?.params?.channel?.id === channel)
+                if (active && !settings.safeMode?.enabled && account && account === UserStore2?.getCurrentUser?.()?.id && selected === SelectedChannelStore?.getChannelId?.() && draft?.text === text && draft?.params?.channel?.id === channel)
                   invoke(args);
               }
             }
@@ -61138,7 +56872,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   label: "Open Sticker Link",
                   onPress: () => {
                     if (enabled())
-                      void import_react_native48.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
+                      void import_react_native32.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
                   }
                 })
               ]
@@ -61249,7 +56983,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             label: label2,
             onPress: () => {
               if (enabled())
-                void import_react_native48.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
+                void import_react_native32.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
             }
           }))
         });
@@ -61268,7 +57002,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var name = getCxImageTitle(link, full);
       return name ? () => {
         if (enabled())
-          import_react_native48.Alert.alert(label2, name);
+          import_react_native32.Alert.alert(label2, name);
       } : void 0;
     });
     return () => {
@@ -61672,20 +57406,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           borderRadius: 3,
           backgroundColor
         };
-        return /* @__PURE__ */ jsxs(import_react_native48.View, {
+        return /* @__PURE__ */ jsxs(import_react_native32.View, {
           style: {
             flexDirection: "row",
             gap: 4
           },
           accessible: false,
           children: [
-            /* @__PURE__ */ jsx(import_react_native48.View, {
+            /* @__PURE__ */ jsx(import_react_native32.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native48.View, {
+            /* @__PURE__ */ jsx(import_react_native32.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native48.View, {
+            /* @__PURE__ */ jsx(import_react_native32.View, {
               style: dot
             })
           ]
@@ -61789,7 +57523,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     ], (element) => {
       if (element.key !== "guild-channel-user-list" || element.props.getItemSize != null)
         return element;
-      if (import_react_native48.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
+      if (import_react_native32.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
         return element;
       return React2.cloneElement(element, {
         getItemSize: 44
@@ -62069,7 +57803,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     if (typeof actions?.selectVoiceChannel !== "function" || typeof voice?.getVoiceStatesForChannel !== "function" || typeof permission?.can !== "function" || bits?.CONNECT == null || bits?.VIEW_CHANNEL == null || bits?.MOVE_MEMBERS == null || !sheet || !Row2?.Group)
       throw new Error("Discord's voice queue controls are unavailable");
     var queue = createCxVoiceQueue({
-      account: () => UserStore3.getCurrentUser()?.id,
+      account: () => UserStore2.getCurrentUser()?.id,
       currentVoice: () => SelectedChannelStore.getVoiceChannelId(),
       room(id) {
         var channel = ChannelStore.getChannel(id);
@@ -62078,7 +57812,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         return getCxVoiceQueueRoom(channel, voice.getVoiceStatesForChannel(id));
       },
       join: (id) => actions.selectVoiceChannel(id),
-      prompt: (title, body, label2, confirm, cancel) => import_react_native48.Alert.alert(title, body, [
+      prompt: (title, body, label2, confirm, cancel) => import_react_native32.Alert.alert(title, body, [
         {
           text: "Cancel",
           style: "cancel",
@@ -62176,7 +57910,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   }
   function registerCopyChannelName(enabled) {
     return registerChannelSheetEntry("cx-copy-channel-name", enabled, (channel) => {
-      var copy = getCxChannelNameCopy(channel, (id) => UserStore3?.getUser?.(id)?.username);
+      var copy = getCxChannelNameCopy(channel, (id) => UserStore2?.getUser?.(id)?.username);
       if (!copy)
         return;
       return {
@@ -62206,9 +57940,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         return handlers.map((handler) => handler.name === "DraftStore" && typeof handler.actionHandler === "function" ? {
           ...handler,
           actionHandler(action) {
-            var userId = UserStore3?.getCurrentUser?.()?.id;
+            var userId = UserStore2?.getCurrentUser?.()?.id;
             var result = handler.actionHandler.call(this, action);
-            if (action !== payload || !enabled() || !isCxProfileUserId(userId) || UserStore3?.getCurrentUser?.()?.id !== userId)
+            if (action !== payload || !enabled() || !isCxProfileUserId(userId) || UserStore2?.getCurrentUser?.()?.id !== userId)
               return result;
             var entry = store.getState?.()?.[userId]?.[channelId]?.[draftType];
             if (entry?.draft === draft.slice(0, limit))
@@ -62303,7 +58037,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return registerMessageMenuActions(enabled, ({ message, channel }, close) => {
       if (!message || !channel)
         return [];
-      var getToggle = (candidate) => getCxEmbedToggle(candidate, channel.id, UserStore3?.getCurrentUser?.()?.id, {
+      var getToggle = (candidate) => getCxEmbedToggle(candidate, channel.id, UserStore2?.getCurrentUser?.()?.id, {
         canEmbed: !channel.guild_id || Permissions?.EMBED_LINKS != null && permissionStore?.can?.(Permissions.EMBED_LINKS, channel) === true,
         canManage: !!channel.guild_id && Permissions?.MANAGE_MESSAGES != null && permissionStore?.can?.(Permissions.MANAGE_MESSAGES, channel) === true
       });
@@ -62456,7 +58190,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               if (!settings.safeMode?.enabled && (gestures.edit || gestures.reply) && channelId === SelectedChannelStore?.getChannelId?.()) {
                 var id = getNativeSyntheticEventData(event)?.messageId;
                 var message = isCxProfileUserId(id) ? MessageStore?.getMessage?.(channelId, id) : void 0;
-                var action = getCxMessageGesture(message, UserStore3?.getCurrentUser?.()?.id, gestures);
+                var action = getCxMessageGesture(message, UserStore2?.getCurrentUser?.()?.id, gestures);
                 if (action === "edit")
                   return onInitiateEdit(event);
                 if (action === "reply")
@@ -62856,7 +58590,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return registerProfileMenuEntry({
       key: action,
       getItems(id, guildId) {
-        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore3, GuildMemberStore);
+        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore2, GuildMemberStore);
         if ((scope === "server" || scope === "identity") && !getCopy())
           return [];
         return [
@@ -62881,9 +58615,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var pageSize = 8;
     var search = query.trim().toLowerCase();
     var matches = items.filter((item) => item.name.toLowerCase().includes(search));
-    return /* @__PURE__ */ jsxs(import_react_native48.View, {
+    return /* @__PURE__ */ jsxs(import_react_native32.View, {
       children: [
-        /* @__PURE__ */ jsx(import_react_native48.TextInput, {
+        /* @__PURE__ */ jsx(import_react_native32.TextInput, {
           accessibilityLabel: "Search saved channels",
           placeholder: "Search saved channels",
           value: query,
@@ -62896,7 +58630,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
           }
         }),
-        /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
+        /* @__PURE__ */ jsx(import_react_native32.ScrollView, {
           style: {
             maxHeight: 270
           },
@@ -62935,7 +58669,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       throw new Error("Discord's note editor is unavailable");
     var getStorage = () => localUserNotesStorage ??= createStorageAsync("plugins/storage/cloudcord.cx-user-notes.json");
     var key = (account) => (tags ? "tags:" : channel ? "channel:" : "") + account;
-    var notes = createCxUserNotes(() => UserStore3.getCurrentUser()?.id, (account) => _async_to_generator(function* () {
+    var notes = createCxUserNotes(() => UserStore2.getCurrentUser()?.id, (account) => _async_to_generator(function* () {
       return (yield getStorage())[key(account)];
     })(), (account, mutate) => _async_to_generator(function* () {
       var storage = yield getStorage();
@@ -62947,7 +58681,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var draft = initial;
       openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
         title: label2,
-        extraContent: /* @__PURE__ */ jsx(import_react_native48.TextInput, {
+        extraContent: /* @__PURE__ */ jsx(import_react_native32.TextInput, {
           accessibilityLabel: tags ? "Private tags" : "Private note",
           defaultValue: initial,
           multiline: true,
@@ -63005,7 +58739,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }
           var items = ids.map((id) => ({
             id,
-            name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id), (user) => UserStore3?.getUser?.(user)?.username, (guild) => GuildStore?.getGuild?.(guild)?.name)
+            name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id), (user) => UserStore2?.getUser?.(user)?.username, (guild) => GuildStore?.getGuild?.(guild)?.name)
           })).sort((a, b3) => a.name.localeCompare(b3.name));
           openAlert(browseKey, /* @__PURE__ */ jsx(AlertModal5, {
             title: "Saved channel notes",
@@ -63030,7 +58764,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       findLocalUserTags = notes.search;
     else
       clearLocalNotes[kind] = () => {
-        void notes.clear(() => new Promise((resolve) => import_react_native48.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
+        void notes.clear(() => new Promise((resolve) => import_react_native32.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
           {
             text: "Cancel",
             style: "cancel",
@@ -63067,7 +58801,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var stop = registerProfileMenuEntry({
       key: "profile-media",
       getItems(id) {
-        var user = UserStore3?.getUser?.(id);
+        var user = UserStore2?.getUser?.(id);
         if (!user)
           return [];
         return getCxProfileMedia(id, user, UserProfileStore?.getUserProfile?.(id)?.banner).flatMap((asset) => [
@@ -63102,7 +58836,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               if (asset.kind === "Avatar")
                 open(512, 512);
               else
-                import_react_native48.Image.getSize(asset.url, open, () => open(1024, 384));
+                import_react_native32.Image.getSize(asset.url, open, () => open(1024, 384));
             }
           },
           {
@@ -63161,7 +58895,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       registerIncomingRules(rules) {
         var active = true;
         var context = {
-          currentUser: () => UserStore3?.getCurrentUser?.()?.id,
+          currentUser: () => UserStore2?.getCurrentUser?.()?.id,
           channel: (id) => ChannelStore?.getChannel?.(id),
           replyAuthor: (channel, id) => MessageStore?.getMessage?.(channel, id)?.author,
           blocked: (id) => RelationshipStore?.isBlocked?.(id) === true,
@@ -63172,16 +58906,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
             muted: (id, channel) => isCxNotificationMuted(id, channel, UserGuildSettingsStore),
             notify: ({ title, body }) => {
-              var account = UserStore3?.getCurrentUser?.()?.id;
+              var account = UserStore2?.getCurrentUser?.()?.id;
               setTimeout(() => {
-                if (active && !settings.safeMode?.enabled && account === UserStore3?.getCurrentUser?.()?.id)
+                if (active && !settings.safeMode?.enabled && account === UserStore2?.getCurrentUser?.()?.id)
                   showToast(body ? title + ": " + body : title);
               }, 0);
             }
           },
           openLink: (link, channel, user) => setTimeout(() => {
             if (active && !settings.safeMode?.enabled && context.currentUser() === user && context.selectedChannel() === channel)
-              void import_react_native48.Linking.openURL(link).catch(() => {
+              void import_react_native32.Linking.openURL(link).catch(() => {
               });
           }, 0),
           notify: (body) => setTimeout(() => {
@@ -63194,7 +58928,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           notify: context.notify,
           isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
           userName: (id) => {
-            var user = UserStore3?.getUser?.(id);
+            var user = UserStore2?.getUser?.(id);
             return user?.globalName || user?.username;
           },
           channelName: (id) => ChannelStore?.getChannel?.(id)?.name,
@@ -63256,7 +58990,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               throw new Error("Missing camera tone options");
             var voice = findByStoreName("VoiceStateStore");
             return bindCxCameraTone({
-              account: () => UserStore3.getCurrentUser()?.id,
+              account: () => UserStore2.getCurrentUser()?.id,
               selected() {
                 var id = SelectedChannelStore.getVoiceChannelId();
                 var channel = id && ChannelStore.getChannel(id);
@@ -63383,7 +59117,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var link = getCxSteamLink(options.href);
                 if (!link?.mobile || blockedDomains.isBlockedDomain(link.https) !== null)
                   return invoke(args);
-                void import_react_native48.Linking.openURL(link.https).catch(() => {
+                void import_react_native32.Linking.openURL(link.https).catch(() => {
                   if (enabled())
                     showToast("Couldn't open the Steam link.");
                 });
@@ -63498,7 +59232,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   label: "Decode Base64",
                   run() {
                     close();
-                    import_react_native48.Alert.alert("Decoded Base64", decoded, [
+                    import_react_native32.Alert.alert("Decoded Base64", decoded, [
                       {
                         text: "Close",
                         style: "cancel"
@@ -63516,7 +59250,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               ];
             }, false);
           case "hide-profile-banner-images":
-            return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore3?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
+            return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore2?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
           case "quote-message":
             if (!effectOptions || !("includeLink" in effectOptions))
               throw new Error("Missing quote options");
@@ -63586,7 +59320,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               read: ReadStateStore,
               enabled,
               selected: () => SelectedChannelStore?.getChannelId?.(),
-              user: () => UserStore3?.getCurrentUser?.()?.id,
+              user: () => UserStore2?.getCurrentUser?.()?.id,
               jump: (target) => actions.jumpToMessage(target)
             });
           }
@@ -63696,7 +59430,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         var editor = findByProps("editMessage", "startEditMessage");
         if (typeof editor?.editMessage !== "function")
           throw new Error("Discord message edits are unavailable");
-        var currentUser = () => UserStore3?.getCurrentUser?.()?.id;
+        var currentUser = () => UserStore2?.getCurrentUser?.()?.id;
         var handle = createCxPreviousSendHandler(rule, {
           currentUser,
           previous(channel, own) {
@@ -63767,7 +59501,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         });
       },
       getUserAvatarUrl(id) {
-        var user = id ? UserStore3?.getUser?.(id) : UserStore3?.getCurrentUser?.();
+        var user = id ? UserStore2?.getUser?.(id) : UserStore2?.getCurrentUser?.();
         if (user)
           return findByProps("getUserAvatarURL", "getGuildIconURL")?.getUserAvatarURL(user, true, 1024);
       },
@@ -63830,10 +59564,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               },
               prepareChannel() {
                 var channelId = context.channel?.id;
-                var accountId = UserStore3?.getCurrentUser?.()?.id;
+                var accountId = UserStore2?.getCurrentUser?.()?.id;
                 if (!channelId || !accountId)
                   return;
-                var isCurrent = () => !settings.safeMode?.enabled && UserStore3?.getCurrentUser?.()?.id === accountId;
+                var isCurrent = () => !settings.safeMode?.enabled && UserStore2?.getCurrentUser?.()?.id === accountId;
                 return {
                   reply(content) {
                     if (isCurrent())
@@ -63859,9 +59593,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     var ids = guild ? GuildMemberStore?.getMemberIds?.(guild) ?? [] : [];
                     return formatCxRandomMember(input, ids.map((userId) => ({
                       userId
-                    })), UserStore3?.getCurrentUser?.()?.id);
+                    })), UserStore2?.getCurrentUser?.()?.id);
                   }
-                  return formatCxRoleMembers(input, guild, guild ? GuildMemberStore?.getMembers?.(guild) ?? [] : [], (id) => UserStore3?.getUser?.(id));
+                  return formatCxRoleMembers(input, guild, guild ? GuildMemberStore?.getMembers?.(guild) ?? [] : [], (id) => UserStore2?.getUser?.(id));
                 }
                 var track = SpotifyStore?.getTrack?.();
                 if (track)
@@ -64053,7 +59787,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         refreshRememberedAppearance();
       }
     }
-    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native32.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16
@@ -64071,7 +59805,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }),
           !kind && showCatalog && /* @__PURE__ */ jsxs(Fragment, {
             children: [
-              /* @__PURE__ */ jsx(import_react_native48.TextInput, {
+              /* @__PURE__ */ jsx(import_react_native32.TextInput, {
                 accessibilityLabel: "Search CX catalog",
                 placeholder: "Search name, feature or /command",
                 placeholderTextColor: "#b5bac1",
@@ -64090,13 +59824,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   padding: 12
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native48.View, {
+              /* @__PURE__ */ jsx(import_react_native32.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 6
                 },
-                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native48.Pressable, {
+                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native32.Pressable, {
                   accessibilityRole: "button",
                   accessibilityLabel: `Filter by ${value}`,
                   accessibilityState: {
@@ -64118,7 +59852,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     borderColor: resolveSemanticColor(category === value ? semanticColors.INTERACTIVE_TEXT_DEFAULT : semanticColors.BORDER_SUBTLE),
                     backgroundColor: resolveSemanticColor(semanticColors.CARD_BACKGROUND_DEFAULT)
                   },
-                  children: /* @__PURE__ */ jsx(import_react_native48.Text, {
+                  children: /* @__PURE__ */ jsx(import_react_native32.Text, {
                     style: {
                       color: resolveSemanticColor(semanticColors.TEXT_DEFAULT),
                       fontWeight: category === value ? "700" : "400"
@@ -64191,13 +59925,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               })
             ]
           }),
-          !entry && /* @__PURE__ */ jsx(import_react_native48.Text, {
+          !entry && /* @__PURE__ */ jsx(import_react_native32.Text, {
             style: {
               color: "#b5bac1"
             },
             children: "Paste the contents of a .cx file to review it."
           }),
-          !entry && /* @__PURE__ */ jsx(import_react_native48.TextInput, {
+          !entry && /* @__PURE__ */ jsx(import_react_native32.TextInput, {
             accessibilityLabel: "CX source",
             placeholder: 'theme "Midnight":',
             placeholderTextColor: "#b5bac1",
@@ -64325,7 +60059,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               })
             ]
           }),
-          /* @__PURE__ */ jsx(import_react_native48.Text, {
+          /* @__PURE__ */ jsx(import_react_native32.Text, {
             accessibilityLiveRegion: "polite",
             style: {
               color: "#b5bac1"
@@ -64336,7 +60070,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native48, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, rememberedAppearanceListeners, rememberedAppearanceUpdates;
+  var import_react_native32, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore2, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, rememberedAppearanceListeners, rememberedAppearanceUpdates;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -64380,7 +60114,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cx();
       init_common();
       init_components();
-      import_react_native48 = __toESM(require_react_native());
+      import_react_native32 = __toESM(require_react_native());
       session = createCxSession();
       callClock = createCxCallClock();
       voiceMemberClock = createCxVoiceMemberClock();
@@ -64408,7 +60142,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         titles: 0,
         dashless: 0
       };
-      UserStore3 = findByStoreNameLazy("UserStore");
+      UserStore2 = findByStoreNameLazy("UserStore");
       ChannelStore = findByStoreNameLazy("ChannelStore");
       MessageStore = findByStoreNameLazy("MessageStore");
       EmojiStore = findByStoreNameLazy("EmojiStore");
@@ -64481,12 +60215,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerHiddenAppearancePaths(mobile.hideComponentPaths);
           if ("scrollIndicators" in mobile) {
             var scrollViews = /* @__PURE__ */ new Set([
-              import_react_native48.ScrollView,
-              import_react_native48.FlatList,
-              import_react_native48.SectionList,
-              import_react_native48.Animated?.ScrollView,
-              import_react_native48.Animated?.FlatList,
-              import_react_native48.Animated?.SectionList
+              import_react_native32.ScrollView,
+              import_react_native32.FlatList,
+              import_react_native32.SectionList,
+              import_react_native32.Animated?.ScrollView,
+              import_react_native32.Animated?.FlatList,
+              import_react_native32.Animated?.SectionList
             ]);
             var components = [
               ...scrollViews
@@ -64621,7 +60355,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerReducedMotion();
           if ("mentionHighlight" in style) {
             var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-            var highlightColor = (0, import_react_native48.processColor)(style.mentionHighlight);
+            var highlightColor = (0, import_react_native32.processColor)(style.mentionHighlight);
             if (typeof highlightColor !== "number")
               throw new Error("Discord's message highlight color is unavailable");
             return overrideCxMethods(renderer, {
@@ -64662,7 +60396,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var input = args[0];
                 if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number")
                   return presentation;
-                var width = style.width * import_react_native48.PixelRatio.getFontScale();
+                var width = style.width * import_react_native32.PixelRatio.getFontScale();
                 return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width ? {
                   ...presentation,
                   constrainedWidth: width
@@ -64703,7 +60437,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               }
               if (typeof icon3.value === "string" && "size" in icon3 && typeof icon3.animate === "boolean") {
                 return React2.cloneElement(element, {
-                  children: /* @__PURE__ */ jsx(import_react_native48.View, {
+                  children: /* @__PURE__ */ jsx(import_react_native32.View, {
                     style: iconStyle,
                     children
                   })
@@ -64850,6 +60584,4387 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/core/ui/components/AddonCard.tsx
+  function AddonCard(props) {
+    var styles2 = useStyles3();
+    return /* @__PURE__ */ jsx(Card, {
+      children: /* @__PURE__ */ jsxs(Stack, {
+        spacing: 16,
+        children: [
+          /* @__PURE__ */ jsxs(import_react_native33.View, {
+            style: {
+              flexDirection: "row",
+              alignItems: "center"
+            },
+            children: [
+              /* @__PURE__ */ jsxs(import_react_native33.View, {
+                style: styles2.headerLeading,
+                children: [
+                  /* @__PURE__ */ jsx(Text, {
+                    style: styles2.headerLabel,
+                    children: props.headerLabel
+                  }),
+                  props.headerSublabel && /* @__PURE__ */ jsx(Text, {
+                    style: styles2.headerSubtitle,
+                    children: props.headerSublabel
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsxs(import_react_native33.View, {
+                style: [
+                  styles2.headerTrailing,
+                  {
+                    marginLeft: "auto"
+                  }
+                ],
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native33.View, {
+                    style: styles2.actions,
+                    children: [
+                      props.overflowActions && /* @__PURE__ */ jsx(IconButton, {
+                        onPress: () => showSimpleActionSheet3({
+                          key: "CardOverflow",
+                          header: {
+                            title: props.overflowTitle,
+                            icon: props.headerIcon && /* @__PURE__ */ jsx(LegacyFormRow.Icon, {
+                              style: {
+                                marginRight: 8
+                              },
+                              source: findAssetId(props.headerIcon)
+                            }),
+                            onClose: () => hideActionSheet2()
+                          },
+                          options: props.overflowActions?.map((i) => ({
+                            ...i,
+                            icon: findAssetId(i.icon)
+                          }))
+                        }),
+                        size: "sm",
+                        variant: "secondary",
+                        icon: findAssetId("CircleInformationIcon-primary")
+                      }),
+                      props.actions?.map(({ icon: icon3, onPress, disabled }) => /* @__PURE__ */ jsx(IconButton, {
+                        onPress,
+                        disabled,
+                        size: "sm",
+                        variant: "secondary",
+                        icon: findAssetId(icon3)
+                      }))
+                    ]
+                  }),
+                  props.toggleType && (props.toggleType === "switch" ? /* @__PURE__ */ jsx(FormSwitch, {
+                    value: props.toggleValue(),
+                    onValueChange: props.onToggleChange
+                  }) : /* @__PURE__ */ jsx(import_react_native33.TouchableOpacity, {
+                    onPress: () => {
+                      props.onToggleChange?.(!props.toggleValue());
+                    },
+                    children: /* @__PURE__ */ jsx(FormRadio, {
+                      selected: props.toggleValue()
+                    })
+                  }))
+                ]
+              })
+            ]
+          }),
+          props.descriptionLabel && /* @__PURE__ */ jsx(Text, {
+            variant: "text-md/medium",
+            children: props.descriptionLabel
+          })
+        ]
+      })
+    });
+  }
+  var import_react_native33, hideActionSheet2, showSimpleActionSheet3, useStyles3;
+  var init_AddonCard = __esm({
+    "src/core/ui/components/AddonCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_assets();
+      init_lazy();
+      init_components();
+      init_wrappers();
+      init_color();
+      init_styles();
+      import_react_native33 = __toESM(require_react_native());
+      ({ hideActionSheet: hideActionSheet2 } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet")));
+      ({ showSimpleActionSheet: showSimpleActionSheet3 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
+      useStyles3 = createStyles({
+        card: {
+          backgroundColor: semanticColors?.CARD_SECONDARY_BG,
+          borderRadius: 12,
+          overflow: "hidden"
+        },
+        header: {
+          padding: 0
+        },
+        headerLeading: {
+          flex: 1,
+          flexDirection: "column",
+          justifyContent: "center",
+          scale: 1.2
+        },
+        headerTrailing: {
+          display: "flex",
+          flexDirection: "row",
+          gap: 15,
+          alignItems: "center"
+        },
+        headerLabel: {
+          ...TextStyleSheet["heading-lg/semibold"]
+        },
+        headerLabelCompact: {
+          ...TextStyleSheet["text-md/semibold"]
+        },
+        headerSubtitle: {
+          ...TextStyleSheet["text-sm/semibold"],
+          color: semanticColors.TEXT_MUTED
+        },
+        descriptionLabel: {
+          ...TextStyleSheet["text-md/semibold"],
+          color: "text-strong"
+        },
+        actions: {
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          gap: 5
+        },
+        iconStyle: {
+          tintColor: semanticColors.LOGO_PRIMARY,
+          opacity: 0.2,
+          height: 64,
+          width: 64,
+          left: void 0,
+          right: "30%",
+          top: "-10%"
+        }
+      });
+    }
+  });
+
+  // src/core/ui/settings/pages/CxExtensions/AddonCard.tsx
+  function useAddonReview(kind, entry) {
+    var navigation2 = NavigationNative.useNavigation();
+    return () => navigation2.push("PUPU_CUSTOM_PAGE", {
+      title: entry?.name ?? `Import ${kind}`,
+      render: () => /* @__PURE__ */ jsx(CxExtensions, {
+        kind,
+        entry
+      })
+    });
+  }
+  function ImportCxAddonButton({ kind }) {
+    var review = useAddonReview(kind);
+    var label2 = kind === "plugin" ? "Import plugin file" : "Import theme file";
+    return /* @__PURE__ */ jsx(Button, {
+      text: label2,
+      variant: "secondary",
+      size: "small",
+      onPress: review
+    });
+  }
+  function CxAddonCard({ kind, entry }) {
+    var review = useAddonReview(kind, entry);
+    return /* @__PURE__ */ jsx(AddonCard, {
+      headerLabel: entry.name,
+      descriptionLabel: entry.description,
+      toggleType: kind === "theme" ? "radio" : "switch",
+      toggleValue: () => entry.active,
+      actions: entry.active ? [
+        {
+          icon: "SettingsIcon",
+          onPress: review
+        }
+      ] : void 0,
+      onToggleChange: (enabled) => {
+        if (enabled) {
+          if (settings.safeMode?.enabled)
+            return showToast("Add-ons are paused in Safe Mode.");
+          return review();
+        }
+        try {
+          disableCxAddon(entry.id, entry.name);
+        } catch (error) {
+          showToast(error instanceof Error ? error.message : String(error));
+        }
+      }
+    });
+  }
+  var init_AddonCard2 = __esm({
+    "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_AddonCard();
+      init_settings();
+      init_toasts();
+      init_common();
+      init_components();
+      init_CxExtensions();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts
+  var usePluginCardStyles;
+  var init_usePluginCardStyles = __esm({
+    "src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_common();
+      init_styles();
+      usePluginCardStyles = createStyles({
+        smallIcon: {
+          tintColor: tokens.colors.LOGO_PRIMARY,
+          height: 18,
+          width: 18
+        },
+        badgeIcon: {
+          tintColor: tokens.colors.LOGO_PRIMARY,
+          height: 12,
+          width: 12
+        },
+        badgesContainer: {
+          flexWrap: "wrap",
+          flexDirection: "row",
+          gap: 6,
+          borderRadius: 6,
+          padding: 4
+        }
+      });
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/components/PluginCard.tsx
+  function getHighlightColor() {
+    return (0, import_chroma_js4.default)(tokens.unsafe_rawColors.YELLOW_300).alpha(0.3).hex();
+  }
+  function Title() {
+    var styles2 = usePluginCardStyles();
+    var { plugin: plugin2, result } = useCardContext();
+    var highlightedNode = result[0].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+      style: {
+        backgroundColor: getHighlightColor()
+      },
+      children: m2
+    }, i));
+    var icon3 = plugin2.icon && findAssetId(plugin2.icon);
+    var textNode = /* @__PURE__ */ jsx(Text, {
+      numberOfLines: 1,
+      variant: "heading-lg/semibold",
+      children: highlightedNode.length ? highlightedNode : plugin2.name
+    });
+    return /* @__PURE__ */ jsxs(import_react_native34.View, {
+      style: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6
+      },
+      children: [
+        icon3 && /* @__PURE__ */ jsx(import_react_native34.Image, {
+          style: styles2.smallIcon,
+          source: icon3
+        }),
+        textNode
+      ]
+    });
+  }
+  function Authors() {
+    var { plugin: plugin2, result } = useCardContext();
+    var styles2 = usePluginCardStyles();
+    if (!plugin2.authors)
+      return null;
+    var highlightedNode = result[2].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+      style: {
+        backgroundColor: getHighlightColor()
+      },
+      children: m2
+    }, i));
+    var badges = plugin2.getBadges();
+    var authorText = highlightedNode.length > 0 ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
+    return /* @__PURE__ */ jsxs(import_react_native34.View, {
+      style: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        flexShrink: 1,
+        gap: 4
+      },
+      children: [
+        /* @__PURE__ */ jsxs(Text, {
+          variant: "text-sm/semibold",
+          color: "text-muted",
+          children: [
+            "by ",
+            authorText
+          ]
+        }),
+        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native34.View, {
+          style: styles2.badgesContainer,
+          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native34.Image, {
+            source: b3.source,
+            style: styles2.badgeIcon
+          }, i))
+        })
+      ]
+    });
+  }
+  function Description() {
+    var { plugin: plugin2, result } = useCardContext();
+    var highlightedNode = result[1].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+      style: {
+        backgroundColor: getHighlightColor()
+      },
+      children: m2
+    }, i));
+    return /* @__PURE__ */ jsx(Text, {
+      variant: "text-md/medium",
+      children: highlightedNode.length ? highlightedNode : plugin2.description
+    });
+  }
+  function PluginCard({ result, item: plugin2 }) {
+    plugin2.usePluginState();
+    var [toggling, setToggling] = (0, import_react12.useState)(false);
+    var cardContextValue = (0, import_react12.useMemo)(() => ({
+      plugin: plugin2,
+      result
+    }), [
+      plugin2,
+      result
+    ]);
+    var core = isCorePlugin(plugin2.id);
+    return /* @__PURE__ */ jsx(CardContext.Provider, {
+      value: cardContextValue,
+      children: /* @__PURE__ */ jsx(Card, {
+        children: /* @__PURE__ */ jsxs(Stack, {
+          spacing: 16,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native34.View, {
+              style: {
+                flexDirection: "row",
+                justifyContent: "space-between"
+              },
+              children: [
+                /* @__PURE__ */ jsxs(import_react_native34.View, {
+                  style: {
+                    flexShrink: 1
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx(Title, {}),
+                    /* @__PURE__ */ jsx(Authors, {})
+                  ]
+                }),
+                /* @__PURE__ */ jsx(import_react_native34.View, {
+                  children: /* @__PURE__ */ jsxs(Stack, {
+                    spacing: 12,
+                    direction: "horizontal",
+                    children: [
+                      /* @__PURE__ */ jsx(Actions, {}),
+                      /* @__PURE__ */ jsx(import_react_native34.View, {
+                        style: core ? {
+                          opacity: 0.5
+                        } : void 0,
+                        children: /* @__PURE__ */ jsx(TableSwitch, {
+                          value: core ? true : plugin2.isEnabled(),
+                          disabled: core || toggling,
+                          onValueChange: (v2) => _async_to_generator(function* () {
+                            if (!core) {
+                              setToggling(true);
+                              try {
+                                yield plugin2.toggle(v2);
+                              } catch (error) {
+                                showToast(error instanceof Error ? error.message : String(error), findAssetId("CircleXIcon-primary"));
+                              } finally {
+                                setToggling(false);
+                              }
+                            }
+                          })()
+                        })
+                      })
+                    ]
+                  })
+                })
+              ]
+            }),
+            /* @__PURE__ */ jsx(Description, {})
+          ]
+        })
+      })
+    });
+  }
+  var import_chroma_js4, import_react12, import_react_native34, CardContext, useCardContext, Actions;
+  var init_PluginCard = __esm({
+    "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_usePluginCardStyles();
+      init_assets();
+      init_toasts();
+      init_common();
+      init_components();
+      init_sheets();
+      import_chroma_js4 = __toESM(require_chroma());
+      import_react12 = __toESM(require_react());
+      import_react_native34 = __toESM(require_react_native());
+      init_plugins4();
+      CardContext = /* @__PURE__ */ (0, import_react12.createContext)(null);
+      useCardContext = () => (0, import_react12.useContext)(CardContext);
+      Actions = () => {
+        var { plugin: plugin2 } = useCardContext();
+        var navigation2 = NavigationNative.useNavigation();
+        return /* @__PURE__ */ jsxs(import_react_native34.View, {
+          style: {
+            flexDirection: "row",
+            gap: 6
+          },
+          children: [
+            /* @__PURE__ */ jsx(IconButton, {
+              size: "sm",
+              variant: "secondary",
+              icon: findAssetId("WrenchIcon"),
+              disabled: !plugin2.getPluginSettingsComponent(),
+              onPress: () => navigation2.push("PUPU_CUSTOM_PAGE", {
+                title: plugin2.name,
+                render: plugin2.getPluginSettingsComponent()
+              })
+            }),
+            /* @__PURE__ */ jsx(IconButton, {
+              size: "sm",
+              variant: "secondary",
+              icon: findAssetId("CircleInformationIcon-primary"),
+              onPress: () => void showSheet("PluginInfoActionSheet", plugin2.resolveSheetComponent(), {
+                plugin: plugin2,
+                navigation: navigation2
+              })
+            })
+          ]
+        });
+      };
+    }
+  });
+
+  // src/metro/common/stores.ts
+  var UserStore3;
+  var init_stores = __esm({
+    "src/metro/common/stores.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_wrappers();
+      UserStore3 = findByStoreNameLazy("UserStore");
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx
+  function TitleComponent({ plugin: plugin2 }) {
+    var users = FluxUtils.useStateFromStoresArray([
+      UserStore3
+    ], () => {
+      plugin2.authors?.forEach((a) => a.id && maybeFetchUser(a.id));
+      return plugin2.authors?.map((a) => UserStore3.getUser(a.id));
+    });
+    var { authors } = plugin2;
+    var authorTextNode = [];
+    if (authors) {
+      var _loop2 = function(author2) {
+        authorTextNode.push(/* @__PURE__ */ jsx(Text, {
+          onPress: () => showUserProfileActionSheet({
+            userId: author2.id
+          }),
+          variant: "text-md/medium",
+          children: author2.name
+        }));
+        authorTextNode.push(", ");
+      };
+      for (var author of authors)
+        _loop2(author);
+      authorTextNode.pop();
+    }
+    return /* @__PURE__ */ jsxs(import_react_native35.View, {
+      style: {
+        gap: 4
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native35.View, {
+          children: /* @__PURE__ */ jsx(Text, {
+            variant: "heading-xl/semibold",
+            children: plugin2.name
+          })
+        }),
+        /* @__PURE__ */ jsx(import_react_native35.View, {
+          style: {
+            flexDirection: "row",
+            flexShrink: 1
+          },
+          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native35.View, {
+            style: {
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+              backgroundColor: "#00000016",
+              borderRadius: 32
+            },
+            children: [
+              users.length && /* @__PURE__ */ jsx(AvatarPile, {
+                size: "xxsmall",
+                names: plugin2.authors?.map((a) => a.name),
+                totalCount: plugin2.authors?.length,
+                children: users.map((a) => /* @__PURE__ */ jsx(Avatar, {
+                  size: "xxsmall",
+                  user: a
+                }))
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/medium",
+                children: authorTextNode
+              })
+            ]
+          })
+        })
+      ]
+    });
+  }
+  var import_react_native35, showUserProfileActionSheet, maybeFetchUser;
+  var init_TitleComponent = __esm({
+    "src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_lazy();
+      init_metro();
+      init_common();
+      init_components();
+      init_stores();
+      import_react_native35 = __toESM(require_react_native());
+      showUserProfileActionSheet = findByNameLazy("showUserProfileActionSheet");
+      ({ getUser: maybeFetchUser } = lazyDestructure(() => findByProps("getUser", "fetchProfile")));
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx
+  var PluginInfoActionSheet_exports = {};
+  __export(PluginInfoActionSheet_exports, {
+    default: () => PluginInfoActionSheet
+  });
+  function PluginInfoIconButton(props) {
+    var { onPress } = props;
+    props.onPress &&= () => {
+      hideSheet("PluginInfoActionSheet");
+      onPress?.();
+    };
+    return /* @__PURE__ */ jsx(IconButton, {
+      ...props
+    });
+  }
+  function PluginInfoActionSheet({ plugin: plugin2, navigation: navigation2 }) {
+    plugin2.usePluginState();
+    var [loading, setLoading] = (0, import_react13.useState)(false);
+    var isVendettaPlugin = plugin2.id.includes("/");
+    var isCorePlugin2 = plugin2.id.startsWith("bunny.") || plugin2.id.startsWith("vendetta.");
+    var copyPluginUrl = () => {
+      var url2 = plugin2.id;
+      if (isVendettaPlugin) {
+        url2 = plugin2.id;
+      } else {
+        try {
+          var pluginAny = plugin2;
+          var repoUrl = (
+            //@ts-expect-error
+            pluginAny._manifest?.parentRepository || //@ts-expect-error
+            pluginAny.manifest?.parentRepository
+          );
+          url2 = repoUrl ? `${repoUrl}/builds/${plugin2.id}` : plugin2.id;
+        } catch (e) {
+          url2 = plugin2.id;
+        }
+      }
+      clipboard.setString(url2);
+      showToast("Copied to clipboard!", findAssetId("toast_copy_link"));
+    };
+    var refetchPlugin = () => _async_to_generator(function* () {
+      setLoading(true);
+      try {
+        if (isVendettaPlugin) {
+          var vdPlugin = VdPluginManager.plugins[plugin2.id];
+          if (vdPlugin.enabled)
+            VdPluginManager.stopPlugin(plugin2.id, false);
+          yield VdPluginManager.fetchPlugin(plugin2.id);
+          if (vdPlugin.enabled)
+            yield VdPluginManager.startPlugin(plugin2.id);
+          showToast("Plugin refreshed successfully");
+        } else {
+          showToast("Plugin refreshed successfully");
+        }
+      } catch (e) {
+        showToast("Failed to refresh plugin");
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var clearPluginData = () => {
+      showConfirmationAlert({
+        title: "Clear Data",
+        content: "Are you sure you want to clear all data for this plugin? This action cannot be undone.",
+        confirmText: "Clear",
+        confirmColor: "red",
+        cancelText: "Cancel",
+        onConfirm: () => _async_to_generator(function* () {
+          hideSheet("PluginInfoActionSheet");
+          try {
+            if (isVendettaPlugin) {
+              var vdPlugin = VdPluginManager.plugins[plugin2.id];
+              if (vdPlugin.enabled)
+                VdPluginManager.stopPlugin(plugin2.id, false);
+              yield purgeStorage(plugin2.id);
+              if (vdPlugin.enabled)
+                yield VdPluginManager.startPlugin(plugin2.id);
+            } else {
+              yield purgeStorage2(`plugins/storage/${plugin2.id}.json`);
+            }
+            showToast("Plugin data cleared successfully");
+          } catch (e) {
+            showToast("Failed to clear plugin data");
+          }
+        })()
+      });
+    };
+    var uninstallPluginHandler = () => {
+      if (isCorePlugin2) {
+        showToast("Core plugins cannot be uninstalled");
+        return;
+      }
+      showConfirmationAlert({
+        title: "Uninstall Plugin",
+        content: "Are you sure you want to uninstall this plugin? This action cannot be undone.",
+        confirmText: "Uninstall",
+        confirmColor: "red",
+        cancelText: "Cancel",
+        onConfirm: () => _async_to_generator(function* () {
+          hideSheet("PluginInfoActionSheet");
+          try {
+            if (isVendettaPlugin) {
+              yield VdPluginManager.removePlugin(plugin2.id);
+            } else {
+            }
+            showToast("Plugin uninstalled successfully");
+          } catch (e) {
+            showToast(`Failed to uninstall plugin: ${e instanceof Error ? e.message : String(e)}`);
+          }
+        })()
+      });
+    };
+    return /* @__PURE__ */ jsx(ActionSheet, {
+      children: /* @__PURE__ */ jsxs(import_react_native36.ScrollView, {
+        contentContainerStyle: {
+          gap: 12,
+          marginBottom: 12
+        },
+        children: [
+          /* @__PURE__ */ jsx(import_react_native36.View, {
+            style: {
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              paddingVertical: 24,
+              justifyContent: "space-between",
+              width: "100%"
+            },
+            children: /* @__PURE__ */ jsx(TitleComponent, {
+              plugin: plugin2
+            })
+          }),
+          /* @__PURE__ */ jsxs(import_react_native36.View, {
+            style: {
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 22,
+              paddingHorizontal: 4
+            },
+            children: [
+              /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Configure",
+                variant: "secondary",
+                disabled: !plugin2.getPluginSettingsComponent(),
+                icon: findAssetId("WrenchIcon"),
+                onPress: () => {
+                  navigation2.push("PUPU_CUSTOM_PAGE", {
+                    title: plugin2.name,
+                    render: () => /* @__PURE__ */ jsx(ScaledPluginSettings, {
+                      component: plugin2.getPluginSettingsComponent()
+                    })
+                  });
+                }
+              }),
+              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Refetch",
+                variant: "secondary",
+                icon: findAssetId("RetryIcon"),
+                onPress: refetchPlugin,
+                disabled: loading
+              }),
+              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Copy URL",
+                variant: "secondary",
+                icon: findAssetId("LinkIcon"),
+                onPress: copyPluginUrl
+              }),
+              /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Clear Data",
+                variant: "secondary",
+                icon: findAssetId("FileIcon"),
+                onPress: clearPluginData
+              }),
+              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Uninstall",
+                variant: "secondary",
+                icon: findAssetId("TrashIcon"),
+                onPress: uninstallPluginHandler
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsxs(Card, {
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/semibold",
+                color: "text-primary",
+                style: {
+                  marginBottom: 4,
+                  color: "text-strong"
+                },
+                children: "Description"
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/medium",
+                children: plugin2.description
+              })
+            ]
+          })
+        ]
+      })
+    });
+  }
+  var import_react13, import_react_native36;
+  var init_PluginInfoActionSheet = __esm({
+    "src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_sheets();
+      init_components();
+      init_common();
+      init_toasts();
+      init_alerts2();
+      init_plugins();
+      init_storage();
+      init_storage2();
+      init_assets();
+      import_react13 = __toESM(require_react());
+      import_react_native36 = __toESM(require_react_native());
+      init_TitleComponent();
+      init_ScaledPluginSettings();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/models/bunny.ts
+  function unifyBunnyPlugin(manifest) {
+    return {
+      id: manifest.id,
+      name: manifest.display.name,
+      description: manifest.display.description,
+      authors: manifest.display.authors,
+      getBadges() {
+        return [
+          {
+            source: {
+              uri: cloudcord_default
+            }
+          }
+        ];
+      },
+      isEnabled: () => isPluginEnabled(manifest.id),
+      isInstalled: () => manifest.id in pluginSettings,
+      usePluginState() {
+        useObservable([
+          pluginSettings
+        ]);
+      },
+      toggle(start) {
+        try {
+          start ? enablePlugin(manifest.id, true) : disablePlugin(manifest.id);
+        } catch (e) {
+          console.error(e);
+        }
+      },
+      resolveSheetComponent() {
+        return Promise.resolve({
+          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
+        });
+      },
+      getPluginSettingsComponent() {
+        return getPluginSettingsComponent(manifest.id);
+      }
+    };
+  }
+  var init_bunny = __esm({
+    "src/core/ui/settings/pages/Plugins/models/bunny.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_settings3();
+      init_plugins4();
+      init_storage2();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/models/vendetta.ts
+  function unifyVdPlugin(vdPlugin) {
+    return {
+      id: vdPlugin.id,
+      name: vdPlugin.manifest.name,
+      description: vdPlugin.manifest.description,
+      authors: vdPlugin.manifest.authors,
+      icon: vdPlugin.manifest.vendetta?.icon,
+      getBadges() {
+        return [];
+      },
+      isEnabled: () => vdPlugin.enabled,
+      isInstalled: () => Boolean(vdPlugin && VdPluginManager.plugins[vdPlugin.id]),
+      usePluginState() {
+        useProxy(VdPluginManager.plugins[vdPlugin.id]);
+      },
+      toggle(start) {
+        return _async_to_generator(function* () {
+          if (start)
+            yield VdPluginManager.startPlugin(vdPlugin.id);
+          else
+            VdPluginManager.stopPlugin(vdPlugin.id);
+        })();
+      },
+      resolveSheetComponent() {
+        return Promise.resolve({
+          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
+        });
+      },
+      getPluginSettingsComponent() {
+        return VdPluginManager.getSettings(vdPlugin.id);
+      }
+    };
+  }
+  var init_vendetta = __esm({
+    "src/core/ui/settings/pages/Plugins/models/vendetta.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_plugins();
+      init_storage();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/index.tsx
+  var Plugins_exports = {};
+  __export(Plugins_exports, {
+    default: () => Plugins
+  });
+  function PluginListCard({ item, result }) {
+    return "source" in item ? /* @__PURE__ */ jsx(CxAddonCard, {
+      kind: "plugin",
+      entry: item
+    }) : /* @__PURE__ */ jsx(PluginCard, {
+      item,
+      result
+    });
+  }
+  function PluginPage(props) {
+    var items = props.useItems();
+    return /* @__PURE__ */ jsx(AddonPage, {
+      CardComponent: PluginListCard,
+      isEnabled: isPluginRowEnabled,
+      title: Strings.PLUGINS,
+      searchKeywords: [
+        "name",
+        "description",
+        (p) => ("source" in p ? [
+          p.keywords,
+          ...(p.commands ?? []).map((command) => "/" + command)
+        ].filter(Boolean).join(" ") : p.authors?.map((a) => typeof a === "string" ? a : a.name).join()) || ""
+      ],
+      sortOptions: {
+        "Name (A-Z)": (a, b3) => a.name.localeCompare(b3.name),
+        "Name (Z-A)": (a, b3) => b3.name.localeCompare(a.name)
+      },
+      safeModeHint: {
+        message: Strings.SAFE_MODE_NOTICE_PLUGINS
+      },
+      items,
+      ...props
+    });
+  }
+  function Plugins() {
+    useProxy(settings);
+    var navigation2 = NavigationNative.useNavigation();
+    return /* @__PURE__ */ jsx(PluginPage, {
+      useItems: () => {
+        useProxy(VdPluginManager.plugins);
+        useObservable([
+          pluginSettings
+        ]);
+        var corePlugins = [
+          ...registeredPlugins.values()
+        ].filter((p) => isPluginInstalled(p.id) && isCorePlugin(p.id)).map(unifyBunnyPlugin);
+        var vdPlugins = Object.values(VdPluginManager.plugins).map(unifyVdPlugin);
+        var bnPlugins = [
+          ...registeredPlugins.values()
+        ].filter((p) => isPluginInstalled(p.id) && !isCorePlugin(p.id)).map(unifyBunnyPlugin);
+        var catalog = useCxAddonRows("plugin");
+        var native = [
+          ...corePlugins,
+          ...vdPlugins,
+          ...bnPlugins
+        ];
+        var nativeNames = new Set(native.map((plugin2) => plugin2.name.toLowerCase()));
+        return [
+          ...native,
+          ...catalog.filter((plugin2) => plugin2.active || !nativeNames.has(plugin2.name.toLowerCase()))
+        ];
+      },
+      ListHeaderComponent: () => {
+        var unproxiedPlugins = Object.values(VdPluginManager.plugins).filter((p) => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));
+        if (!unproxiedPlugins.length)
+          return /* @__PURE__ */ jsx(ImportCxAddonButton, {
+            kind: "plugin"
+          });
+        return /* @__PURE__ */ jsxs(import_react_native37.View, {
+          style: {
+            marginVertical: 12,
+            marginHorizontal: 10
+          },
+          children: [
+            /* @__PURE__ */ jsx(ImportCxAddonButton, {
+              kind: "plugin"
+            }),
+            /* @__PURE__ */ jsx(Card, {
+              border: "strong",
+              children: /* @__PURE__ */ jsxs(import_react_native37.View, {
+                style: {
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "row"
+                },
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native37.View, {
+                    style: {
+                      gap: 6,
+                      flexShrink: 1
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx(Text, {
+                        variant: "heading-md/bold",
+                        children: "Unproxied Plugins Found"
+                      }),
+                      /* @__PURE__ */ jsx(Text, {
+                        variant: "text-sm/medium",
+                        color: "text-muted",
+                        children: "Plugins installed from unproxied sources may run unverified code in this app without your awareness."
+                      })
+                    ]
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native37.View, {
+                    style: {
+                      marginLeft: "auto"
+                    },
+                    children: /* @__PURE__ */ jsx(IconButton, {
+                      size: "sm",
+                      variant: "secondary",
+                      icon: findAssetId("CircleInformationIcon-primary"),
+                      style: {
+                        marginLeft: 8
+                      },
+                      onPress: () => {
+                        navigation2.push("PUPU_CUSTOM_PAGE", {
+                          title: "Unproxied Plugins",
+                          render: () => {
+                            return /* @__PURE__ */ jsx(FlashList, {
+                              data: unproxiedPlugins,
+                              contentContainerStyle: {
+                                padding: 8
+                              },
+                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native37.View, {
+                                style: {
+                                  height: 8
+                                }
+                              }),
+                              renderItem: ({ item: p }) => /* @__PURE__ */ jsx(Card, {
+                                children: /* @__PURE__ */ jsx(Text, {
+                                  variant: "heading-md/semibold",
+                                  children: p.id
+                                })
+                              })
+                            });
+                          }
+                        });
+                      }
+                    })
+                  })
+                ]
+              })
+            })
+          ]
+        });
+      },
+      installAction: {
+        label: "Install a plugin",
+        fetchFn: (url2) => _async_to_generator(function* () {
+          if (!url2.startsWith(VD_PROXY_PREFIX) && !url2.startsWith(BUNNY_PROXY_PREFIX) && !settings.developerSettings) {
+            openAlert2("bunny-plugin-unproxied-confirmation", /* @__PURE__ */ jsx(AlertModal3, {
+              title: "Hold On!",
+              content: "You're trying to install a plugin from an unproxied external source. This means you're trusting the creator to run their code in this app without your knowledge. Are you sure you want to continue?",
+              extraContent: /* @__PURE__ */ jsx(Card, {
+                children: /* @__PURE__ */ jsx(Text, {
+                  variant: "text-md/bold",
+                  children: url2
+                })
+              }),
+              actions: /* @__PURE__ */ jsxs(AlertActions2, {
+                children: [
+                  /* @__PURE__ */ jsx(AlertActionButton3, {
+                    text: "Continue",
+                    variant: "primary",
+                    onPress: () => {
+                      VdPluginManager.installPlugin(url2).then(() => showToast(Strings.TOASTS_INSTALLED_PLUGIN, findAssetId("Check"))).catch((e) => openAlert2("bunny-plugin-install-failed", /* @__PURE__ */ jsx(AlertModal3, {
+                        title: "Install Failed",
+                        content: `Unable to install plugin from '${url2}':`,
+                        extraContent: /* @__PURE__ */ jsx(Card, {
+                          children: /* @__PURE__ */ jsx(Text, {
+                            variant: "text-md/normal",
+                            children: e instanceof Error ? e.message : String(e)
+                          })
+                        }),
+                        actions: /* @__PURE__ */ jsx(AlertActionButton3, {
+                          text: "Okay",
+                          variant: "primary"
+                        })
+                      })));
+                    }
+                  }),
+                  /* @__PURE__ */ jsx(AlertActionButton3, {
+                    text: "Cancel",
+                    variant: "secondary"
+                  })
+                ]
+              })
+            }));
+          } else {
+            return yield VdPluginManager.installPlugin(url2);
+          }
+        })()
+      }
+    });
+  }
+  var import_react_native37, openAlert2, AlertModal3, AlertActions2, AlertActionButton3, isPluginRowEnabled;
+  var init_Plugins = __esm({
+    "src/core/ui/settings/pages/Plugins/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_i18n();
+      init_AddonPage();
+      init_CxExtensions();
+      init_AddonCard2();
+      init_PluginCard();
+      init_plugins();
+      init_storage();
+      init_plugins4();
+      init_assets();
+      init_settings();
+      init_storage2();
+      init_toasts();
+      init_constants();
+      init_lazy();
+      init_metro();
+      init_common();
+      init_components();
+      import_react_native37 = __toESM(require_react_native());
+      init_bunny();
+      init_vendetta();
+      ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ AlertModal: AlertModal3, AlertActions: AlertActions2, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
+      isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
+    }
+  });
+
+  // src/core/ui/settings/pages/PluginBrowser/index.tsx
+  var PluginBrowser_exports = {};
+  __export(PluginBrowser_exports, {
+    default: () => BrowserPage
+  });
+  function normalizeIdFromInstallUrl(url2) {
+    return url2.endsWith("/") ? url2 : url2 + "/";
+  }
+  function InstallButton({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
+    var normId = normalizeIdFromInstallUrl(addon.installUrl);
+    var [installed, setInstalled] = React2.useState(() => isPluginMode ? Boolean(VdPluginManager.plugins[normId]) : Boolean(themes[addon.installUrl]));
+    React2.useEffect(() => {
+      setInstalled(isPluginMode ? Boolean(VdPluginManager.plugins[normId]) : Boolean(themes[addon.installUrl]));
+    }, [
+      addon.installUrl,
+      setRefreshTick,
+      isPluginMode
+    ]);
+    var installAddon = () => _async_to_generator(function* () {
+      if (installing.has(normId))
+        return;
+      setInstalling((prev) => new Set(prev).add(normId));
+      try {
+        if (isPluginMode) {
+          yield VdPluginManager.installPlugin(normId, true);
+        } else {
+          yield installTheme(addon.installUrl);
+        }
+        showToast(`Installed ${addon.name}`, findAssetId("CheckIcon"));
+        setInstalled(true);
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
+      } finally {
+        setInstalling((prev) => {
+          var s = new Set(prev);
+          s.delete(normId);
+          return s;
+        });
+        setRefreshTick((t) => t + 1);
+      }
+    })();
+    var uninstallAddon = () => _async_to_generator(function* () {
+      try {
+        if (isPluginMode) {
+          yield VdPluginManager.removePlugin(normId);
+        } else {
+          yield removeTheme(addon.installUrl);
+        }
+        showToast(`Uninstalled ${addon.name}`, findAssetId("TrashIcon"));
+        setInstalled(false);
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
+      } finally {
+        setRefreshTick((t) => t + 1);
+      }
+    })();
+    var promptInstall = () => {
+      if (!isPluginMode)
+        return installAddon();
+      var plugin2 = addon;
+      var needsWarn = plugin2.status && plugin2.status !== "working" || plugin2.warningMessage && plugin2.warningMessage.trim().length > 0;
+      if (!needsWarn)
+        return installAddon();
+      var lines = [];
+      if (plugin2.status && plugin2.status !== "working") {
+        if (plugin2.status === "broken")
+          lines.push("This plugin is marked as broken, please be aware you may encounter issues");
+        else if (plugin2.status === "warning")
+          lines.push("This plugin may have issues");
+        else
+          lines.push(`Status: ${plugin2.status}`);
+      }
+      if (plugin2.warningMessage)
+        lines.push(plugin2.warningMessage);
+      openAlert("plugins-list-install-warning", /* @__PURE__ */ jsx(AlertModal, {
+        title: "Warning!",
+        content: "This plugin may not work as expected.",
+        extraContent: /* @__PURE__ */ jsx(Text, {
+          variant: "text-sm/normal",
+          color: "text-muted",
+          children: lines.join("\n\n")
+        }),
+        actions: /* @__PURE__ */ jsxs(AlertActions, {
+          children: [
+            /* @__PURE__ */ jsx(AlertActionButton2, {
+              text: "Install Anyway",
+              variant: "primary",
+              onPress: () => {
+                dismissAlert("plugins-list-install-warning");
+                installAddon();
+              }
+            }),
+            /* @__PURE__ */ jsx(AlertActionButton2, {
+              text: "Cancel",
+              variant: "secondary",
+              onPress: () => dismissAlert("plugins-list-install-warning")
+            })
+          ]
+        })
+      }));
+    };
+    return /* @__PURE__ */ jsx(Button, {
+      size: "sm",
+      loading: installing.has(normId),
+      text: !installed ? installing.has(normId) ? "Installing..." : "Install" : "Uninstall",
+      disabled: installing.has(normId),
+      onPress: !installed ? promptInstall : uninstallAddon,
+      variant: !installed ? "primary" : "destructive",
+      icon: findAssetId(!installed ? "DownloadIcon" : "TrashIcon")
+    });
+  }
+  function TrailingButtons({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
+    var copyAddonLink = () => {
+      clipboard.setString(addon.installUrl);
+      showToast.showCopyToClipboard?.();
+    };
+    var copySourceUrl = () => {
+      var plugin2 = addon;
+      clipboard.setString(plugin2.sourceUrl);
+      showToast.showCopyToClipboard?.();
+    };
+    var openAddonMenu = () => {
+      var actions = [
+        {
+          label: `Copy ${isPluginMode ? "Plugin" : "Theme"} Link`,
+          icon: findAssetId("CopyIcon"),
+          onPress: copyAddonLink
+        }
+      ];
+      if (isPluginMode && addon.sourceUrl) {
+        actions.push({
+          label: "Copy Source URL",
+          icon: findAssetId("CopyIcon"),
+          onPress: copySourceUrl
+        });
+      }
+      var sheetKey = `${isPluginMode ? "plugin" : "theme"}-menu`;
+      showSheet(sheetKey, () => /* @__PURE__ */ jsx(ActionSheet, {
+        children: /* @__PURE__ */ jsx(TableRowGroup, {
+          title: `${isPluginMode ? "Plugin" : "Theme"} Info`,
+          children: actions.map((action, index) => /* @__PURE__ */ jsx(TableRow, {
+            label: action.label,
+            icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+              source: action.icon
+            }),
+            onPress: () => {
+              action.onPress();
+              hideSheet(sheetKey);
+            }
+          }, index))
+        })
+      }));
+    };
+    return /* @__PURE__ */ jsxs(Stack, {
+      spacing: 8,
+      direction: "horizontal",
+      children: [
+        /* @__PURE__ */ jsx(IconButton, {
+          size: "sm",
+          onPress: openAddonMenu,
+          variant: "secondary",
+          icon: findAssetId("MoreHorizontalIcon")
+        }),
+        /* @__PURE__ */ jsx(InstallButton, {
+          addon,
+          isPluginMode,
+          installing,
+          setInstalling,
+          setRefreshTick
+        })
+      ]
+    });
+  }
+  function AddonCard2({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
+    var { name, description, authors } = addon;
+    var plugin2 = addon;
+    var statusColor = "text-normal";
+    if (isPluginMode) {
+      if (plugin2.status === "working")
+        statusColor = "#4ADE80";
+      if (plugin2.status === "broken")
+        statusColor = "#EF4444";
+      if (plugin2.status === "warning")
+        statusColor = "#F59E0B";
+    }
+    return /* @__PURE__ */ jsx(Card, {
+      children: /* @__PURE__ */ jsxs(Stack, {
+        spacing: 16,
+        children: [
+          /* @__PURE__ */ jsxs(import_react_native38.View, {
+            style: {
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center"
+            },
+            children: [
+              /* @__PURE__ */ jsxs(import_react_native38.View, {
+                style: {
+                  flexShrink: 1
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Text, {
+                    numberOfLines: 1,
+                    variant: "heading-lg/semibold",
+                    children: name
+                  }),
+                  /* @__PURE__ */ jsxs(Text, {
+                    variant: "text-md/semibold",
+                    color: "text-muted",
+                    children: [
+                      "by ",
+                      authors?.join(", ") || "Unknown"
+                    ]
+                  }),
+                  isPluginMode && /* @__PURE__ */ jsxs(Text, {
+                    variant: "text-md/semibold",
+                    style: {
+                      color: statusColor
+                    },
+                    children: [
+                      "Status: ",
+                      plugin2.status
+                    ]
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsx(import_react_native38.View, {
+                children: /* @__PURE__ */ jsx(TrailingButtons, {
+                  addon,
+                  isPluginMode,
+                  installing,
+                  setInstalling,
+                  setRefreshTick
+                })
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsx(Text, {
+            variant: "text-md/medium",
+            children: description
+          }),
+          isPluginMode && plugin2.warningMessage && /* @__PURE__ */ jsxs(Text, {
+            variant: "text-sm/medium",
+            color: "text-muted",
+            children: [
+              "Warning: ",
+              plugin2.warningMessage
+            ]
+          })
+        ]
+      })
+    });
+  }
+  function BrowserPage() {
+    var navigation2 = NavigationNative.useNavigation();
+    var [mode, setMode] = React2.useState("plugins");
+    var [plugins2, setPlugins] = React2.useState([]);
+    var [themesList, setThemesList] = React2.useState([]);
+    var [loading, setLoading] = React2.useState(true);
+    var [error, setError] = React2.useState(null);
+    var [searchQuery, setSearchQuery] = React2.useState("");
+    var [installing, setInstalling] = React2.useState(/* @__PURE__ */ new Set());
+    var [refreshTick, setRefreshTick] = React2.useState(0);
+    var [sort, setSort] = React2.useState("Newest");
+    React2.useEffect(() => {
+      navigation2.setOptions({
+        title: "Browser"
+      });
+    }, [
+      navigation2
+    ]);
+    var fetchData = React2.useCallback((isPluginMode) => _async_to_generator(function* () {
+      setLoading(true);
+      setError(null);
+      try {
+        var url2 = isPluginMode ? PLUGIN_URL2 : THEME_URL;
+        var response = yield safeFetch(url2);
+        if (!response.ok)
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        var data = yield response.json();
+        var addonList = [];
+        if (Array.isArray(data)) {
+          addonList = data;
+        } else if (isPluginMode && data.OFFICIAL_PLUGINS) {
+          addonList = data.OFFICIAL_PLUGINS;
+        } else if (!isPluginMode) {
+          addonList = data.OFFICIAL_THEMES || data.themes || data.THEMES || data.items || [];
+        }
+        if (isPluginMode) {
+          setPlugins(addonList);
+        } else {
+          setThemesList(addonList);
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : String(e));
+        if (isPluginMode) {
+          setPlugins([]);
+        } else {
+          setThemesList([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    })(), []);
+    var fetchPlugins = React2.useCallback(() => fetchData(true), [
+      fetchData
+    ]);
+    var fetchThemes = React2.useCallback(() => fetchData(false), [
+      fetchData
+    ]);
+    React2.useEffect(() => {
+      fetchPlugins();
+      fetchThemes();
+    }, [
+      fetchPlugins,
+      fetchThemes
+    ]);
+    var filterList = (list) => {
+      if (!list)
+        return [];
+      var q3 = searchQuery.toLowerCase();
+      if (!q3)
+        return list;
+      return list.filter((p) => p.name.toLowerCase().includes(q3) || p.description.toLowerCase().includes(q3) || (p.authors || []).some((a) => a.toLowerCase().includes(q3)));
+    };
+    var sortedAndFiltered = React2.useMemo(() => {
+      var list = filterList(mode === "plugins" ? plugins2 : themesList);
+      var getStatusPriority = (status, sortBy) => {
+        if (sortBy === "Working First") {
+          return status === "working" || status === "warning" ? 0 : 1;
+        }
+        if (sortBy === "Broken First") {
+          return status === "broken" ? 0 : 1;
+        }
+        return 0;
+      };
+      switch (sort) {
+        case "Newest":
+          return [
+            ...list
+          ].reverse();
+        case "Oldest":
+          return [
+            ...list
+          ];
+        case "Name (A\u2013Z)":
+          return [
+            ...list
+          ].sort((a, b3) => a.name.localeCompare(b3.name));
+        case "Name (Z\u2013A)":
+          return [
+            ...list
+          ].sort((a, b3) => b3.name.localeCompare(a.name));
+        case "Working First":
+          if (mode === "plugins") {
+            return [
+              ...list
+            ].sort((a, b3) => {
+              var pa = getStatusPriority(a.status, "Working First");
+              var pb = getStatusPriority(b3.status, "Working First");
+              return pa !== pb ? pa - pb : a.name.localeCompare(b3.name);
+            });
+          }
+          return list;
+        case "Broken First":
+          if (mode === "plugins") {
+            return [
+              ...list
+            ].sort((a, b3) => {
+              var pa = getStatusPriority(a.status, "Broken First");
+              var pb = getStatusPriority(b3.status, "Broken First");
+              return pa !== pb ? pa - pb : a.name.localeCompare(b3.name);
+            });
+          }
+          return list;
+        default:
+          return list;
+      }
+    }, [
+      plugins2,
+      themesList,
+      mode,
+      searchQuery,
+      sort
+    ]);
+    if (error) {
+      return /* @__PURE__ */ jsx(import_react_native38.View, {
+        style: {
+          flex: 1,
+          paddingHorizontal: 8,
+          justifyContent: "center",
+          alignItems: "center"
+        },
+        children: /* @__PURE__ */ jsxs(Card, {
+          style: {
+            gap: 8
+          },
+          children: [
+            /* @__PURE__ */ jsx(Text, {
+              style: {
+                textAlign: "center"
+              },
+              variant: "heading-lg/bold",
+              children: "An error occurred while fetching the repository"
+            }),
+            /* @__PURE__ */ jsx(Text, {
+              style: {
+                textAlign: "center"
+              },
+              variant: "text-sm/medium",
+              color: "text-muted",
+              children: error
+            }),
+            /* @__PURE__ */ jsx(Button, {
+              size: "lg",
+              text: "Refetch",
+              onPress: () => fetchData(mode === "plugins"),
+              icon: findAssetId("RetryIcon")
+            })
+          ]
+        })
+      });
+    }
+    return /* @__PURE__ */ jsxs(import_react_native38.View, {
+      style: {
+        flex: 1
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native38.View, {
+          style: {
+            paddingHorizontal: 10
+          },
+          children: /* @__PURE__ */ jsxs(Stack, {
+            spacing: 12,
+            children: [
+              /* @__PURE__ */ jsx(import_react_native38.View, {
+                style: {
+                  flexDirection: "row",
+                  paddingTop: 10
+                },
+                children: /* @__PURE__ */ jsxs(import_react_native38.View, {
+                  style: {
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center"
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx(Button, {
+                      size: "md",
+                      text: "Plugins",
+                      variant: mode === "plugins" ? "primary" : "secondary",
+                      onPress: () => setMode("plugins"),
+                      style: {
+                        flex: 1
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(import_react_native38.View, {
+                      style: {
+                        width: 8
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(Button, {
+                      size: "md",
+                      text: "Themes",
+                      variant: mode === "themes" ? "primary" : "secondary",
+                      onPress: () => setMode("themes"),
+                      style: {
+                        flex: 1
+                      }
+                    })
+                  ]
+                })
+              }),
+              /* @__PURE__ */ jsxs(import_react_native38.View, {
+                style: {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 8,
+                  paddingBottom: 6
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Search_default, {
+                    placeholder: `Search ${mode}...`,
+                    isRound: true,
+                    onChangeText: setSearchQuery,
+                    style: {
+                      flex: 1
+                    }
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native38.View, {
+                    style: {
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8
+                    },
+                    children: /* @__PURE__ */ jsx(IconButton, {
+                      size: "md",
+                      variant: "tertiary",
+                      icon: findAssetId("MoreVerticalIcon"),
+                      disabled: !!searchQuery,
+                      onPress: () => showSimpleActionSheet4({
+                        key: "AddonListSortOptions",
+                        header: {
+                          title: "Sort Options",
+                          onClose: () => hideActionSheet3("AddonListSortOptions")
+                        },
+                        options: Object.entries(Sort).map(([key, value]) => ({
+                          label: value,
+                          onPress: () => {
+                            setSort(value);
+                          }
+                        }))
+                      })
+                    })
+                  })
+                ]
+              })
+            ]
+          })
+        }),
+        /* @__PURE__ */ jsx(FlashList, {
+          data: sortedAndFiltered,
+          refreshing: loading,
+          onRefresh: mode === "plugins" ? fetchPlugins : fetchThemes,
+          estimatedItemSize: 200,
+          contentContainerStyle: {
+            paddingBottom: 90,
+            paddingHorizontal: 5
+          },
+          ListHeaderComponent: mode === "plugins" ? /* @__PURE__ */ jsx(import_react_native38.View, {
+            style: {
+              paddingVertical: 6,
+              paddingHorizontal: 8
+            },
+            children: /* @__PURE__ */ jsx(Card, {
+              border: "strong",
+              children: /* @__PURE__ */ jsx(import_react_native38.View, {
+                style: {
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "row"
+                },
+                children: /* @__PURE__ */ jsxs(import_react_native38.View, {
+                  style: {
+                    gap: 6,
+                    flexShrink: 1
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx(Text, {
+                      variant: "heading-md/bold",
+                      children: "Unproxied Plugins"
+                    }),
+                    /* @__PURE__ */ jsx(Text, {
+                      variant: "text-sm/medium",
+                      color: "text-muted",
+                      children: "Plugins installed from this source have not been checked for safety, install at your own risk"
+                    })
+                  ]
+                })
+              })
+            })
+          }) : null,
+          //@ts-ignore
+          renderItem: ({ item: addon }) => /* @__PURE__ */ jsx(import_react_native38.View, {
+            style: {
+              paddingVertical: 6,
+              paddingHorizontal: 8
+            },
+            children: /* @__PURE__ */ jsx(AddonCard2, {
+              addon,
+              isPluginMode: mode === "plugins",
+              installing,
+              setInstalling,
+              setRefreshTick
+            })
+          })
+        })
+      ]
+    });
+  }
+  var import_react_native38, showSimpleActionSheet4, hideActionSheet3, PLUGIN_URL2, THEME_URL, Sort;
+  var init_PluginBrowser = __esm({
+    "src/core/ui/settings/pages/PluginBrowser/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_common();
+      import_react_native38 = __toESM(require_react_native());
+      init_components();
+      init_assets();
+      init_safeFetch();
+      init_toasts();
+      init_Search();
+      init_plugins();
+      init_themes();
+      init_common();
+      init_sheets();
+      init_wrappers2();
+      init_alerts();
+      init_components();
+      init_lazy();
+      init_metro();
+      ({ showSimpleActionSheet: showSimpleActionSheet4 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
+      ({ hideActionSheet: hideActionSheet3 } = lazyDestructure(() => findByProps("hideActionSheet")));
+      PLUGIN_URL2 = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
+      THEME_URL = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
+      Sort = /* @__PURE__ */ function(Sort2) {
+        Sort2["DateNewest"] = "Newest";
+        Sort2["DateOldest"] = "Oldest";
+        Sort2["NameAZ"] = "Name (A\u2013Z)";
+        Sort2["NameZA"] = "Name (Z\u2013A)";
+        Sort2["WorkingFirst"] = "Working First";
+        Sort2["BrokenFirst"] = "Broken First";
+        return Sort2;
+      }(Sort || {});
+    }
+  });
+
+  // src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx
+  var ThemeInfoActionSheet_exports = {};
+  __export(ThemeInfoActionSheet_exports, {
+    default: () => ThemeInfoActionSheet
+  });
+  function ThemeInfoIconButton(props) {
+    var { onPress } = props;
+    props.onPress &&= () => {
+      hideSheet("ThemeInfoActionSheet");
+      onPress?.();
+    };
+    return /* @__PURE__ */ jsx(IconButton, {
+      ...props,
+      label: props.label
+    });
+  }
+  function TitleComponent2({ theme }) {
+    var { authors } = theme.data;
+    return /* @__PURE__ */ jsxs(import_react_native39.View, {
+      style: {
+        gap: 4
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native39.View, {
+          children: /* @__PURE__ */ jsx(Text, {
+            variant: "heading-xl/semibold",
+            children: theme.data.name
+          })
+        }),
+        /* @__PURE__ */ jsx(import_react_native39.View, {
+          style: {
+            flexDirection: "row",
+            flexShrink: 1
+          },
+          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native39.TouchableOpacity, {
+            style: {
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+              backgroundColor: "#00000016",
+              borderRadius: 32
+            },
+            disabled: !authors.some((a) => a.id),
+            children: /* @__PURE__ */ jsxs(Text, {
+              variant: "text-md/medium",
+              children: [
+                "by ",
+                authors.map((a) => a.name).join(", ")
+              ]
+            })
+          })
+        })
+      ]
+    });
+  }
+  function ThemeInfoActionSheet({ theme, navigation: navigation2 }) {
+    var [themeState, setThemeState] = (0, import_react14.useState)({
+      ...theme
+    });
+    var [loading, setLoading] = (0, import_react14.useState)(false);
+    (0, import_react14.useEffect)(() => {
+      var interval = setInterval(() => {
+        setThemeState({
+          ...theme
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    }, [
+      theme
+    ]);
+    var copyThemeUrl = () => {
+      clipboard.setString(themeState.id);
+      if (typeof showToast?.showCopyToClipboard === "function") {
+        showToast.showCopyToClipboard();
+      } else {
+        showToast("Copied to clipboard");
+      }
+    };
+    var refetchTheme = () => _async_to_generator(function* () {
+      setLoading(true);
+      try {
+        yield fetchTheme(themeState.id, themeState.selected);
+        showToast("Theme refreshed successfully");
+      } catch (e) {
+        console.error("Failed to refresh theme:", e);
+        showToast("Failed to refresh theme");
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var removeThemeHandler = () => {
+      showConfirmationAlert({
+        title: Strings.HOLD_UP,
+        content: formatString("ARE_YOU_SURE_TO_DELETE_THEME", {
+          name: themeState.data.name
+        }),
+        confirmText: Strings.DELETE,
+        cancelText: Strings.CANCEL,
+        confirmColor: "red",
+        onConfirm: () => _async_to_generator(function* () {
+          hideSheet("ThemeInfoActionSheet");
+          try {
+            var wasSelected = yield removeTheme(themeState.id);
+            if (wasSelected)
+              selectTheme(null);
+            showToast("Theme removed successfully");
+          } catch (e) {
+            console.error("Failed to remove theme:", e);
+            showToast("Failed to remove theme");
+          }
+        })()
+      });
+    };
+    var applyTheme = () => {
+      try {
+        selectTheme(themeState);
+        hideSheet("ThemeInfoActionSheet");
+        showToast(`Applied theme: ${themeState.data.name}`);
+      } catch (e) {
+        console.error("Failed to apply theme:", e);
+        showToast("Failed to apply theme");
+      }
+    };
+    return /* @__PURE__ */ jsx(ActionSheet, {
+      children: /* @__PURE__ */ jsxs(import_react_native39.ScrollView, {
+        contentContainerStyle: {
+          gap: 12,
+          marginBottom: 12
+        },
+        children: [
+          /* @__PURE__ */ jsx(import_react_native39.View, {
+            style: {
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              paddingVertical: 24,
+              justifyContent: "space-between",
+              width: "100%"
+            },
+            children: /* @__PURE__ */ jsx(TitleComponent2, {
+              theme: themeState
+            })
+          }),
+          /* @__PURE__ */ jsxs(import_react_native39.View, {
+            style: {
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 65,
+              paddingHorizontal: 8
+            },
+            children: [
+              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
+                label: Strings.REFETCH,
+                variant: "secondary",
+                icon: findAssetId("RetryIcon"),
+                onPress: refetchTheme,
+                disabled: loading
+              }),
+              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
+                label: Strings.COPY_URL,
+                variant: "secondary",
+                icon: findAssetId("LinkIcon"),
+                onPress: copyThemeUrl
+              }),
+              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
+                label: Strings.UNINSTALL,
+                variant: "secondary",
+                icon: findAssetId("TrashIcon"),
+                onPress: removeThemeHandler
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsxs(Card, {
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/semibold",
+                style: {
+                  marginBottom: 4,
+                  color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY
+                },
+                children: "Description"
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/medium",
+                children: themeState.data.description || "No description provided."
+              })
+            ]
+          })
+        ]
+      })
+    });
+  }
+  var import_react14, import_react_native39;
+  var init_ThemeInfoActionSheet = __esm({
+    "src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_assets();
+      init_sheets();
+      init_components();
+      init_common();
+      import_react14 = __toESM(require_react());
+      import_react_native39 = __toESM(require_react_native());
+      init_toasts();
+      init_alerts2();
+      init_themes();
+      init_i18n();
+      init_color();
+    }
+  });
+
+  // src/core/ui/settings/pages/Themes/ThemeCard.tsx
+  function ThemeCard({ item: theme, overridden, beforeSelect }) {
+    var navigation2 = NavigationNative.useNavigation();
+    var [removed, setRemoved] = React2.useState(false);
+    if (removed)
+      return null;
+    var { authors } = theme.data;
+    return /* @__PURE__ */ jsx(AddonCard, {
+      headerLabel: theme.data.name,
+      headerSublabel: authors ? `by ${authors.map((i) => i.name).join(", ")}` : "",
+      descriptionLabel: theme.data.description ?? "No description.",
+      toggleType: !settings.safeMode?.enabled ? "radio" : void 0,
+      toggleValue: () => !overridden && themes[theme.id].selected,
+      onToggleChange: (v2) => _async_to_generator(function* () {
+        try {
+          if (v2)
+            beforeSelect?.();
+          yield selectTheme(v2 ? theme : null);
+          showToast(v2 ? `Applied ${theme.data.name}` : "Theme disabled", findAssetId("Check"));
+        } catch (e) {
+          console.error("Error while selecting theme:", e);
+          showToast(e?.message ?? "Could not apply theme", findAssetId("CircleXIcon-primary"));
+        }
+      })(),
+      overflowTitle: theme.data.name,
+      actions: [
+        {
+          icon: "CircleInformationIcon-primary",
+          onPress: () => {
+            var importPromise = Promise.resolve().then(() => (init_ThemeInfoActionSheet(), ThemeInfoActionSheet_exports));
+            showSheet("ThemeInfoActionSheet", importPromise, {
+              theme,
+              navigation: navigation2
+            });
+          }
+        }
+      ]
+    });
+  }
+  var init_ThemeCard = __esm({
+    "src/core/ui/settings/pages/Themes/ThemeCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_AddonCard();
+      init_themes();
+      init_assets();
+      init_settings();
+      init_toasts();
+      init_sheets();
+      init_common();
+    }
+  });
+
+  // src/core/ui/settings/pages/Themes/index.tsx
+  var Themes_exports = {};
+  __export(Themes_exports, {
+    default: () => Themes
+  });
+  function Themes() {
+    useProxy(settings);
+    useProxy(themes);
+    var cxThemes = useCxAddonRows("theme");
+    var activeCxTheme = cxThemes.find((theme) => theme.active);
+    var themeName = (theme) => "source" in theme ? theme.name : theme.data.name;
+    return /* @__PURE__ */ jsx(AddonPage, {
+      title: Strings.THEMES,
+      isEnabled: (theme) => "source" in theme ? theme.active : !activeCxTheme && theme.selected,
+      searchKeywords: [
+        themeName,
+        (p) => ("source" in p ? p.description : p.data.description) ?? "",
+        (p) => "source" in p ? p.keywords ?? "" : p.data.authors?.map((a) => a.name).join(", ") ?? ""
+      ],
+      sortOptions: {
+        "Name (A-Z)": (a, b3) => themeName(a).localeCompare(themeName(b3)),
+        "Name (Z-A)": (a, b3) => themeName(b3).localeCompare(themeName(a))
+      },
+      installAction: {
+        label: "Install a theme",
+        fetchFn: installTheme
+      },
+      items: [
+        ...Object.values(themes),
+        ...cxThemes
+      ],
+      ListHeaderComponent: () => /* @__PURE__ */ jsx(ImportCxAddonButton, {
+        kind: "theme"
+      }),
+      safeModeHint: {
+        message: formatString("SAFE_MODE_NOTICE_THEMES", {
+          enabled: Boolean(settings.safeMode?.currentThemeId)
+        }),
+        footer: settings.safeMode?.currentThemeId && /* @__PURE__ */ jsx(Button, {
+          size: "small",
+          text: Strings.DISABLE_THEME,
+          onPress: () => delete settings.safeMode?.currentThemeId,
+          style: {
+            marginTop: 8
+          }
+        })
+      },
+      CardComponent: ({ item, result }) => "source" in item ? /* @__PURE__ */ jsx(CxAddonCard, {
+        kind: "theme",
+        entry: item
+      }) : /* @__PURE__ */ jsx(ThemeCard, {
+        item,
+        result,
+        overridden: !!activeCxTheme,
+        beforeSelect: () => {
+          if (activeCxTheme)
+            disableCxAddon(activeCxTheme.id, activeCxTheme.name);
+        }
+      }),
+      OptionsActionSheetComponent: () => {
+        useObservable([
+          colorsPref
+        ]);
+        return /* @__PURE__ */ jsxs(ActionSheet, {
+          children: [
+            /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
+              title: "Options"
+            }),
+            /* @__PURE__ */ jsxs(import_react_native40.View, {
+              style: {
+                paddingVertical: 20,
+                gap: 12
+              },
+              children: [
+                /* @__PURE__ */ jsxs(TableRowGroup, {
+                  title: "Override Theme Type",
+                  children: [
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Auto",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("RobotIcon")
+                      }),
+                      value: !colorsPref.type,
+                      onValueChange: (enabled) => {
+                        if (enabled) {
+                          colorsPref.type = void 0;
+                        } else {
+                          colorsPref.type = "dark";
+                        }
+                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
+                          update: true
+                        });
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Dark",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("ThemeDarkIcon")
+                      }),
+                      value: colorsPref.type === "dark",
+                      onValueChange: (enabled) => {
+                        colorsPref.type = enabled ? "dark" : void 0;
+                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
+                          update: true
+                        });
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Light",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("ThemeLightIcon")
+                      }),
+                      value: colorsPref.type === "light",
+                      onValueChange: (enabled) => {
+                        colorsPref.type = enabled ? "light" : void 0;
+                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
+                          update: true
+                        });
+                      }
+                    })
+                  ]
+                }),
+                /* @__PURE__ */ jsxs(TableRowGroup, {
+                  title: "Chat Background",
+                  children: [
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Show Background",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("ImageIcon")
+                      }),
+                      value: !colorsPref.customBackground,
+                      onValueChange: (enabled) => {
+                        colorsPref.customBackground = enabled ? null : "hidden";
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Hide Background",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("DenyIcon")
+                      }),
+                      value: colorsPref.customBackground === "hidden",
+                      onValueChange: (enabled) => {
+                        colorsPref.customBackground = enabled ? "hidden" : null;
+                      }
+                    })
+                  ]
+                })
+              ]
+            })
+          ]
+        });
+      }
+    });
+  }
+  var import_react_native40;
+  var init_Themes = __esm({
+    "src/core/ui/settings/pages/Themes/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_i18n();
+      init_AddonPage();
+      init_CxExtensions();
+      init_AddonCard2();
+      init_ThemeCard();
+      init_storage();
+      init_themes();
+      init_preferences();
+      init_updater();
+      init_assets();
+      init_settings();
+      init_storage2();
+      init_components();
+      import_react_native40 = __toESM(require_react_native());
+    }
+  });
+
+  // src/core/ui/settings/pages/ThemeStore/index.tsx
+  var ThemeStore_exports = {};
+  __export(ThemeStore_exports, {
+    default: () => ThemeStore3
+  });
+  function loadThemes() {
+    return _async_to_generator(function* () {
+      var [index, market] = yield allSettled([
+        safeFetch(CLOUDCORD_INDEX, {
+          cache: "no-store"
+        }).then((r) => r.json()),
+        safeFetch(MARKETPLACE, {
+          cache: "no-store"
+        }).then((r) => r.json())
+      ]);
+      var list = [];
+      if (index.status === "fulfilled" && Array.isArray(index.value?.themes)) {
+        for (var t of index.value.themes) {
+          list.push({
+            url: t.id,
+            name: t.name,
+            description: t.description ?? "",
+            authors: t.authors ?? [],
+            source: t.source ?? "CloudCord",
+            hasBackground: t.hasBackground,
+            preview: t.preview
+          });
+        }
+      }
+      if (market.status === "fulfilled" && Array.isArray(market.value)) {
+        for (var t1 of market.value) {
+          if (typeof t1?.installUrl !== "string" || typeof t1?.name !== "string")
+            continue;
+          list.push({
+            url: t1.installUrl,
+            name: t1.name,
+            description: t1.description ?? "",
+            authors: Array.isArray(t1.authors) ? t1.authors : [],
+            source: "Marketplace"
+          });
+        }
+      }
+      if (!list.length)
+        throw new Error("Couldn't load the theme store. Check your connection and try again.");
+      var seen = /* @__PURE__ */ new Set();
+      return list.filter((t2) => !seen.has(t2.url) && seen.add(t2.url));
+    })();
+  }
+  function Swatches({ preview: preview2 }) {
+    if (!preview2)
+      return null;
+    var colors = [
+      preview2.background,
+      preview2.surface,
+      preview2.accent,
+      preview2.text
+    ];
+    return /* @__PURE__ */ jsx(import_react_native41.View, {
+      style: {
+        flexDirection: "row",
+        gap: 6
+      },
+      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native41.View, {
+        style: {
+          width: 22,
+          height: 22,
+          borderRadius: 11,
+          backgroundColor: c2,
+          borderWidth: 1,
+          borderColor: "rgba(255,255,255,0.15)"
+        }
+      }, i))
+    });
+  }
+  function ThemeRow({ theme, refresh }) {
+    var [busy, setBusy] = React2.useState(false);
+    var installed = Boolean(themes[theme.url]);
+    var active = getCurrentTheme()?.id === theme.url;
+    var use = () => _async_to_generator(function* () {
+      setBusy(true);
+      try {
+        if (!themes[theme.url])
+          yield installTheme(theme.url);
+        yield selectTheme(themes[theme.url]);
+        showToast(`Now using ${theme.name}`, findAssetId("CheckIcon"));
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
+      } finally {
+        setBusy(false);
+        refresh();
+      }
+    })();
+    var remove = () => _async_to_generator(function* () {
+      setBusy(true);
+      try {
+        yield removeTheme(theme.url);
+        showToast(`Removed ${theme.name}`, findAssetId("TrashIcon"));
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
+      } finally {
+        setBusy(false);
+        refresh();
+      }
+    })();
+    return /* @__PURE__ */ jsx(Card, {
+      style: {
+        borderRadius: 22
+      },
+      children: /* @__PURE__ */ jsxs(Stack, {
+        spacing: 8,
+        children: [
+          /* @__PURE__ */ jsxs(import_react_native41.View, {
+            style: {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12
+            },
+            children: [
+              /* @__PURE__ */ jsxs(import_react_native41.View, {
+                style: {
+                  flex: 1
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Text, {
+                    variant: "heading-md/semibold",
+                    numberOfLines: 1,
+                    children: theme.name
+                  }),
+                  /* @__PURE__ */ jsxs(Text, {
+                    variant: "text-sm/medium",
+                    color: "text-muted",
+                    numberOfLines: 1,
+                    children: [
+                      theme.authors.length ? `by ${theme.authors.join(", ")}` : theme.source,
+                      theme.hasBackground ? " \xB7 background" : ""
+                    ]
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsx(Swatches, {
+                preview: theme.preview
+              })
+            ]
+          }),
+          !!theme.description && /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/normal",
+            numberOfLines: 2,
+            children: theme.description
+          }),
+          /* @__PURE__ */ jsxs(import_react_native41.View, {
+            style: {
+              flexDirection: "row",
+              gap: 8
+            },
+            children: [
+              /* @__PURE__ */ jsx(import_react_native41.View, {
+                style: {
+                  flex: 1
+                },
+                children: /* @__PURE__ */ jsx(Button, {
+                  size: "md",
+                  variant: active ? "secondary" : "primary",
+                  text: active ? "In use" : busy ? "Working\u2026" : "Use",
+                  disabled: busy || active,
+                  onPress: use
+                })
+              }),
+              installed && /* @__PURE__ */ jsx(import_react_native41.View, {
+                style: {
+                  flex: 1
+                },
+                children: /* @__PURE__ */ jsx(Button, {
+                  size: "md",
+                  variant: "destructive",
+                  text: "Remove",
+                  disabled: busy,
+                  onPress: remove
+                })
+              })
+            ]
+          })
+        ]
+      })
+    });
+  }
+  function ThemeStore3() {
+    var [list, setList] = React2.useState(null);
+    var [error, setError] = React2.useState("");
+    var [query, setQuery] = React2.useState("");
+    var [, setTick] = React2.useState(0);
+    var refresh = () => setTick((t) => t + 1);
+    React2.useEffect(() => {
+      loadThemes().then(setList, (e) => setError(e instanceof Error ? e.message : String(e)));
+    }, []);
+    var q3 = query.trim().toLowerCase();
+    var shown = (list ?? []).filter((t) => !q3 || [
+      t.name,
+      t.description,
+      t.source,
+      ...t.authors
+    ].some((v2) => v2?.toLowerCase().includes(q3)));
+    return /* @__PURE__ */ jsxs(import_react_native41.View, {
+      style: {
+        flex: 1
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native41.View, {
+          style: {
+            paddingHorizontal: 12,
+            paddingTop: 12,
+            paddingBottom: 4
+          },
+          children: /* @__PURE__ */ jsx(Search_default, {
+            placeholder: list ? `Search ${list.length} themes` : "Search themes",
+            onChangeText: setQuery
+          })
+        }),
+        error ? /* @__PURE__ */ jsx(Text, {
+          variant: "text-md/medium",
+          color: "text-muted",
+          style: {
+            textAlign: "center",
+            padding: 24
+          },
+          children: error
+        }) : !list ? /* @__PURE__ */ jsx(Text, {
+          variant: "text-md/medium",
+          color: "text-muted",
+          style: {
+            textAlign: "center",
+            padding: 24
+          },
+          children: "Loading themes\u2026"
+        }) : /* @__PURE__ */ jsx(FlashList, {
+          data: shown,
+          estimatedItemSize: 150,
+          keyExtractor: (t) => t.url,
+          contentContainerStyle: {
+            padding: 12,
+            paddingBottom: 48
+          },
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native41.View, {
+            style: {
+              height: 10
+            }
+          }),
+          ListEmptyComponent: /* @__PURE__ */ jsxs(Text, {
+            variant: "text-md/medium",
+            color: "text-muted",
+            style: {
+              textAlign: "center",
+              padding: 24
+            },
+            children: [
+              "No themes match \u201C",
+              query,
+              "\u201D."
+            ]
+          }),
+          renderItem: ({ item }) => /* @__PURE__ */ jsx(ThemeRow, {
+            theme: item,
+            refresh
+          })
+        })
+      ]
+    });
+  }
+  var import_react_native41, CLOUDCORD_INDEX, MARKETPLACE;
+  var init_ThemeStore = __esm({
+    "src/core/ui/settings/pages/ThemeStore/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_themes();
+      init_assets();
+      init_safeFetch();
+      init_common();
+      init_components();
+      init_Search();
+      init_toasts();
+      import_react_native41 = __toESM(require_react_native());
+      CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/themes/mobile/index.json";
+      MARKETPLACE = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
+    }
+  });
+
+  // src/lib/addons/fonts/index.ts
+  var fonts_exports = {};
+  __export(fonts_exports, {
+    fonts: () => fonts,
+    installFont: () => installFont,
+    removeFont: () => removeFont,
+    saveFont: () => saveFont,
+    selectFont: () => selectFont,
+    updateFont: () => updateFont,
+    updateFonts: () => updateFonts,
+    validateFont: () => validateFont
+  });
+  function writeFont(font) {
+    return _async_to_generator(function* () {
+      if (!font && font !== null)
+        throw new Error("Arg font must be a valid object or null");
+      if (font) {
+        yield writeFile("fonts.json", JSON.stringify(font));
+      } else {
+        yield removeFile("fonts.json");
+      }
+    })();
+  }
+  function validateFont(font) {
+    if (!font || typeof font !== "object")
+      throw new Error("URL returned a null/non-object JSON");
+    if (typeof font.spec !== "number")
+      throw new Error("Invalid font 'spec' number");
+    if (font.spec !== 1)
+      throw new Error("Only fonts which follows spec:1 are supported");
+    var requiredFields = [
+      "name",
+      "main"
+    ];
+    if (requiredFields.some((f) => !font[f]))
+      throw new Error(`Font is missing one of the fields: ${requiredFields}`);
+    if (font.name.startsWith("__"))
+      throw new Error("Font names cannot start with __");
+    if (font.name in fonts)
+      throw new Error(`There is already a font named '${font.name}' installed`);
+  }
+  function saveFont(data, selected = false) {
+    return _async_to_generator(function* () {
+      var fontDefJson;
+      if (typeof data === "string") {
+        try {
+          fontDefJson = yield (yield safeFetch(data)).json();
+        } catch (e) {
+          throw new Error(`Failed to fetch fonts at ${data}`, {
+            cause: e
+          });
+        }
+      } else {
+        fontDefJson = data;
+      }
+      validateFont(fontDefJson);
+      var errors = yield allSettled(Object.entries(fontDefJson.main).map(([font, url2]) => _async_to_generator(function* () {
+        var ext = url2.split(".").pop();
+        if (ext !== "ttf" && ext !== "otf")
+          ext = "ttf";
+        var path = `downloads/fonts/${fontDefJson.name}/${font}.${ext}`;
+        if (!(yield fileExists(path)))
+          yield downloadFile(url2, path);
+      })())).then((it) => it.map((it2) => it2.status === "fulfilled" ? void 0 : it2.reason));
+      if (errors.some((it) => it))
+        throw errors;
+      fonts[fontDefJson.name] = fontDefJson;
+      if (selected)
+        writeFont(fonts[fontDefJson.name]);
+      return fontDefJson;
+    })();
+  }
+  function updateFont(fontDef) {
+    return _async_to_generator(function* () {
+      var fontDefCopy = {
+        ...fontDef
+      };
+      if (fontDefCopy.source)
+        fontDefCopy = {
+          ...yield fetch(fontDefCopy.source).then((it) => it.json()),
+          // Can't change these properties
+          name: fontDef.name,
+          source: fontDef.source
+        };
+      var selected = fonts.__selected === fontDef.name;
+      yield removeFont(fontDef.name);
+      yield saveFont(fontDefCopy, selected);
+    })();
+  }
+  function installFont(url2, selected = false) {
+    return _async_to_generator(function* () {
+      var font = yield saveFont(url2);
+      if (selected)
+        yield selectFont(font.name);
+    })();
+  }
+  function selectFont(name) {
+    return _async_to_generator(function* () {
+      if (name && !(name in fonts))
+        throw new Error("Selected font does not exist!");
+      if (name) {
+        fonts.__selected = name;
+      } else {
+        delete fonts.__selected;
+      }
+      yield writeFont(name == null ? null : fonts[name]);
+    })();
+  }
+  function removeFont(name) {
+    return _async_to_generator(function* () {
+      var selected = fonts.__selected === name;
+      if (selected)
+        yield selectFont(null);
+      delete fonts[name];
+      try {
+        yield clearFolder(`downloads/fonts/${name}`);
+      } catch (e) {
+      }
+    })();
+  }
+  function updateFonts() {
+    return _async_to_generator(function* () {
+      yield awaitStorage(fonts);
+      allSettled(Object.keys(fonts).map((name) => saveFont(fonts[name], fonts.__selected === name)));
+    })();
+  }
+  var fonts;
+  var init_fonts = __esm({
+    "src/lib/addons/fonts/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_storage();
+      init_fs();
+      init_utils();
+      fonts = wrapSync(createStorage(createMMKVBackend("BUNNY_FONTS")));
+    }
+  });
+
+  // src/core/ui/settings/pages/Fonts/FontEditor.tsx
+  function promptDetachConfirmationForThen(fontName, cb) {
+    if (fontName && fonts[fontName].source)
+      openAlert3("revenge-fonts-detach-source-confirmation", /* @__PURE__ */ jsx(AlertModal4, {
+        title: "Detach font pack URL?",
+        content: "You need to detach the font pack URL from this font pack before you can manually edit its font entries. Do you want to detach the font pack URL?",
+        actions: /* @__PURE__ */ jsxs(Stack, {
+          children: [
+            /* @__PURE__ */ jsx(AlertActionButton4, {
+              text: "Detach",
+              variant: "destructive",
+              onPress: () => {
+                delete fonts[fontName].source;
+                cb();
+              }
+            }),
+            /* @__PURE__ */ jsx(AlertActionButton4, {
+              text: Strings.CANCEL,
+              variant: "secondary"
+            })
+          ]
+        })
+      }));
+    else
+      cb();
+  }
+  function guessFontName(urls) {
+    var fileNames = urls.map((url2) => {
+      var { pathname } = new URL(url2);
+      var fileName = pathname.replace(/\.[^/.]+$/, "");
+      return fileName.split("/").pop();
+    }).filter(Boolean);
+    var shortest = fileNames.reduce((shortest2, name) => {
+      return name.length < shortest2.length ? name : shortest2;
+    }, fileNames[0] || "");
+    return shortest?.replace(/-[A-Za-z]*$/, "") || null;
+  }
+  function RevengeFontsExtractor({ fonts: fonts2, setName }) {
+    var currentTheme = getCurrentTheme().data;
+    var themeFonts = currentTheme.fonts;
+    var [fontName, setFontName] = (0, import_react15.useState)(guessFontName(Object.values(themeFonts)));
+    var [error, setError] = (0, import_react15.useState)(void 0);
+    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+      style: {
+        padding: 8,
+        paddingBottom: 16,
+        gap: 12
+      },
+      children: [
+        /* @__PURE__ */ jsx(TextInput, {
+          autoFocus: true,
+          size: "md",
+          label: Strings.FONT_NAME,
+          value: fontName,
+          placeholder: fontName || "Whitney",
+          onChange: setFontName,
+          errorMessage: error,
+          state: error ? "error" : void 0
+        }),
+        /* @__PURE__ */ jsx(Text, {
+          variant: "text-xs/normal",
+          color: "text-muted",
+          children: formatString("THEME_EXTRACTOR_DESC", {
+            fonts: Object.keys(themeFonts).join(Strings.SEPARATOR)
+          })
+        }),
+        /* @__PURE__ */ jsx(Button, {
+          size: "md",
+          variant: "primary",
+          text: Strings.EXTRACT,
+          disabled: !fontName,
+          onPress: () => {
+            if (!fontName)
+              return;
+            try {
+              validateFont({
+                spec: 1,
+                name: fontName,
+                main: themeFonts
+              });
+              setName(fontName);
+              Object.assign(fonts2, themeFonts);
+              actionSheet2.hideActionSheet();
+            } catch (e) {
+              setError(String(e));
+            }
+          }
+        })
+      ]
+    });
+  }
+  function JsonFontImporter({ fonts: fonts2, setName, setSource }) {
+    var [fontLink, setFontLink] = (0, import_react15.useState)("");
+    var [saving, setSaving] = (0, import_react15.useState)(false);
+    var [error, setError] = (0, import_react15.useState)(void 0);
+    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+      style: {
+        padding: 8,
+        paddingBottom: 16,
+        gap: 12
+      },
+      children: [
+        /* @__PURE__ */ jsx(TextInput, {
+          autoFocus: true,
+          size: "md",
+          label: "Font Link",
+          value: fontLink,
+          placeholder: "https://link.to/font/pack.json",
+          onChange: setFontLink,
+          errorMessage: error,
+          state: error ? "error" : void 0
+        }),
+        /* @__PURE__ */ jsx(Button, {
+          size: "md",
+          variant: "primary",
+          text: "Import",
+          disabled: !fontLink || saving,
+          loading: saving,
+          onPress: () => {
+            setSaving(true);
+            (() => _async_to_generator(function* () {
+              var res = yield safeFetch(fontLink, {
+                cache: "no-store"
+              });
+              var json = yield res.json();
+              validateFont(json);
+              setName(json.name);
+              setSource(fontLink);
+              Object.assign(fonts2, json.main);
+            })())().then(() => actionSheet2.hideActionSheet()).catch((e) => setError(String(e))).finally(() => setSaving(false));
+          }
+        })
+      ]
+    });
+  }
+  function EntryEditorActionSheet(props) {
+    var [familyName, setFamilyName] = (0, import_react15.useState)(props.name);
+    var [fontUrl, setFontUrl] = (0, import_react15.useState)(props.fontEntries[props.name]);
+    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+      style: {
+        padding: 8,
+        paddingBottom: 16,
+        gap: 12
+      },
+      children: [
+        /* @__PURE__ */ jsx(TextInput, {
+          autoFocus: true,
+          size: "md",
+          label: "Family Name (to override)",
+          value: familyName,
+          placeholder: "ggsans-Bold",
+          onChange: setFamilyName
+        }),
+        /* @__PURE__ */ jsx(TextInput, {
+          size: "md",
+          label: "Font URL",
+          value: fontUrl,
+          placeholder: "https://link.to/the/font.ttf",
+          onChange: setFontUrl
+        }),
+        /* @__PURE__ */ jsx(Button, {
+          size: "md",
+          variant: "primary",
+          text: "Apply",
+          onPress: () => {
+            delete props.fontEntries[props.name];
+            props.fontEntries[familyName] = fontUrl;
+            props.onChange();
+            actionSheet2.hideActionSheet();
+          }
+        })
+      ]
+    });
+  }
+  function promptActionSheet(Component2, fontEntries, props) {
+    actionSheet2.openLazy(Promise.resolve({
+      default: () => /* @__PURE__ */ jsx(ErrorBoundary, {
+        children: /* @__PURE__ */ jsxs(ActionSheet, {
+          children: [
+            /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
+              title: "Import Font"
+            }),
+            /* @__PURE__ */ jsx(Component2, {
+              fonts: fontEntries,
+              ...props
+            })
+          ]
+        })
+      })
+    }), "FontEditorActionSheet");
+  }
+  function NewEntryRow({ fontName, fontEntry }) {
+    var nameRef = (0, import_react15.useRef)();
+    var urlRef = (0, import_react15.useRef)();
+    var [nameSet, setNameSet] = (0, import_react15.useState)(false);
+    var [error, setError] = (0, import_react15.useState)();
+    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+      style: {
+        flexDirection: "row",
+        gap: 8,
+        justifyContent: "flex-start"
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native42.View, {
+          style: {
+            flex: 1
+          },
+          children: /* @__PURE__ */ jsx(TextInput, {
+            isRound: true,
+            size: "md",
+            label: nameSet ? nameRef.current : void 0,
+            placeholder: nameSet ? "https://path.to/the/file.ttf" : "PostScript name (e.g. ggsans-Bold)",
+            leadingIcon: () => nameSet ? null : /* @__PURE__ */ jsx(TableRow.Icon, {
+              source: findAssetId("PlusSmallIcon")
+            }),
+            leadingText: nameSet ? nameRef.current : "",
+            onChange: (text) => (nameSet ? urlRef : nameRef).current = text,
+            errorMessage: error,
+            state: error ? "error" : void 0
+          })
+        }),
+        nameSet && /* @__PURE__ */ jsx(IconButton, {
+          size: "md",
+          variant: "secondary",
+          onPress: () => {
+            nameRef.current = "";
+            setNameSet(false);
+          },
+          icon: findAssetId("TrashIcon")
+        }),
+        /* @__PURE__ */ jsx(IconButton, {
+          size: "md",
+          variant: "primary",
+          onPress: () => promptDetachConfirmationForThen(fontName, () => {
+            if (!nameSet && nameRef.current) {
+              setNameSet(true);
+            } else if (nameSet && nameRef.current && urlRef.current) {
+              try {
+                var parsedUrl = new URL(urlRef.current);
+                if (!parsedUrl.protocol || !parsedUrl.host) {
+                  throw "Invalid URL";
+                }
+                fontEntry[nameRef.current] = urlRef.current;
+                nameRef.current = void 0;
+                urlRef.current = void 0;
+                setNameSet(false);
+              } catch (e) {
+                setError(String(e));
+              }
+            }
+          }),
+          icon: findAssetId(nameSet ? "PlusSmallIcon" : "ArrowLargeRightIcon")
+        })
+      ]
+    });
+  }
+  function FontEditor(props) {
+    var [name, setName] = (0, import_react15.useState)(props.name);
+    var [source, setSource] = (0, import_react15.useState)(props.name && fonts[props.name].source);
+    var [importing, setIsImporting] = (0, import_react15.useState)(false);
+    var [errors, setErrors] = (0, import_react15.useState)();
+    var memoEntry = (0, import_react15.useMemo)(() => {
+      return createProxy(props.name ? {
+        ...fonts[props.name].main
+      } : {}).proxy;
+    }, [
+      props.name
+    ]);
+    var fontEntries = useProxy(memoEntry);
+    var navigation2 = NavigationNative.useNavigation();
+    var [, forceUpdate] = React.useReducer(() => ({}), 0);
+    return /* @__PURE__ */ jsx(import_react_native42.ScrollView, {
+      style: {
+        flex: 1
+      },
+      contentContainerStyle: {
+        paddingBottom: 38
+      },
+      children: /* @__PURE__ */ jsxs(Stack, {
+        style: {
+          paddingVertical: 24,
+          paddingHorizontal: 12
+        },
+        spacing: 12,
+        children: [
+          !props.name ? /* @__PURE__ */ jsxs(TableRowGroup, {
+            title: "Import",
+            children: [
+              getCurrentTheme()?.data?.fonts && /* @__PURE__ */ jsx(TableRow, {
+                label: Strings.LABEL_EXTRACT_FONTS_FROM_THEME,
+                subLabel: Strings.DESC_EXTRACT_FONTS_FROM_THEME,
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: findAssetId("HammerIcon")
+                }),
+                onPress: () => promptActionSheet(RevengeFontsExtractor, fontEntries, {
+                  setName
+                })
+              }),
+              /* @__PURE__ */ jsx(TableRow, {
+                label: "Import font entries from a link",
+                subLabel: "Directly import from a link with a pre-configured JSON file",
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: findAssetId("LinkIcon")
+                }),
+                onPress: () => promptActionSheet(JsonFontImporter, fontEntries, {
+                  setName,
+                  setSource
+                })
+              })
+            ]
+          }) : /* @__PURE__ */ jsxs(TableRowGroup, {
+            title: "Actions",
+            children: [
+              /* @__PURE__ */ jsx(TableRow, {
+                label: "Refetch fonts from source",
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: findAssetId("RetryIcon")
+                }),
+                onPress: () => _async_to_generator(function* () {
+                  yield updateFont(fonts[props.name]);
+                  navigation2.goBack();
+                })()
+              }),
+              /* @__PURE__ */ jsx(TableRow, {
+                variant: "danger",
+                label: "Delete font pack",
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  variant: "danger",
+                  source: findAssetId("TrashIcon")
+                }),
+                onPress: () => removeFont(props.name).then(() => navigation2.goBack())
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsx(TextInput, {
+            size: "lg",
+            value: name,
+            label: Strings.FONT_NAME,
+            placeholder: "Whitney",
+            onChange: setName
+          }),
+          props.name && fonts[props.name].source && /* @__PURE__ */ jsx(TextInput, {
+            size: "lg",
+            value: source,
+            label: "Font Pack URL",
+            onChange: setSource
+          }),
+          /* @__PURE__ */ jsxs(TableRowGroup, {
+            title: "Font Entries",
+            children: [
+              Object.entries(fontEntries).map(([name2, url2], index) => {
+                var error = errors?.[index];
+                return /* @__PURE__ */ jsx(TableRow, {
+                  label: name2,
+                  subLabel: error ? /* @__PURE__ */ jsx(Text, {
+                    variant: "text-xs/medium",
+                    color: "text-feedback-critical",
+                    children: error.message
+                  }) : url2,
+                  trailing: /* @__PURE__ */ jsxs(Stack, {
+                    spacing: 8,
+                    direction: "horizontal",
+                    children: [
+                      /* @__PURE__ */ jsx(IconButton, {
+                        size: "sm",
+                        variant: "secondary",
+                        icon: findAssetId("PencilIcon"),
+                        onPress: () => promptDetachConfirmationForThen(props.name, () => promptActionSheet(EntryEditorActionSheet, fontEntries, {
+                          name: name2,
+                          fontEntries,
+                          onChange: () => {
+                            setErrors(void 0);
+                            forceUpdate();
+                          }
+                        }))
+                      }),
+                      /* @__PURE__ */ jsx(IconButton, {
+                        size: "sm",
+                        variant: "secondary",
+                        icon: findAssetId("TrashIcon"),
+                        onPress: () => promptDetachConfirmationForThen(props.name, () => {
+                          delete fontEntries[name2];
+                          setErrors(void 0);
+                        })
+                      })
+                    ]
+                  })
+                });
+              }),
+              /* @__PURE__ */ jsx(TableRow, {
+                label: /* @__PURE__ */ jsx(NewEntryRow, {
+                  fontName: props.name,
+                  fontEntry: fontEntries
+                })
+              })
+            ]
+          }),
+          errors && /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/medium",
+            color: "text-feedback-critical",
+            children: "Some font entries cannot be imported. Please modify the entries and try again."
+          }),
+          /* @__PURE__ */ jsx(import_react_native42.View, {
+            style: {
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              bottom: 0,
+              left: 0
+            },
+            children: /* @__PURE__ */ jsx(Button, {
+              size: "lg",
+              loading: importing,
+              disabled: importing || !name || Object.keys(fontEntries).length === 0,
+              variant: "primary",
+              text: props.name ? "Save" : "Import",
+              onPress: () => _async_to_generator(function* () {
+                if (!name)
+                  return;
+                setErrors(void 0);
+                setIsImporting(true);
+                if (!props.name) {
+                  saveFont({
+                    spec: 1,
+                    name,
+                    main: fontEntries,
+                    source
+                  }).then(() => navigation2.goBack()).catch((e) => setErrors(e)).finally(() => setIsImporting(false));
+                } else {
+                  Object.assign(fonts[props.name], {
+                    name,
+                    main: fontEntries
+                  });
+                  updateFont(fonts[props.name]).then(() => navigation2.goBack()).catch((e) => setErrors(e)).finally(() => setIsImporting(false));
+                }
+              })(),
+              icon: findAssetId(props.name ? "toast_image_saved" : "DownloadIcon"),
+              style: {
+                marginLeft: 8
+              }
+            })
+          })
+        ]
+      })
+    });
+  }
+  var import_react15, import_react_native42, actionSheet2, openAlert3, AlertModal4, AlertActionButton4;
+  var init_FontEditor = __esm({
+    "src/core/ui/settings/pages/Fonts/FontEditor.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_i18n();
+      init_storage();
+      init_fonts();
+      init_themes();
+      init_assets();
+      init_utils();
+      init_lazy();
+      init_common();
+      init_components();
+      init_wrappers();
+      init_components2();
+      import_react15 = __toESM(require_react());
+      import_react_native42 = __toESM(require_react_native());
+      actionSheet2 = findByPropsLazy("hideActionSheet");
+      ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ AlertModal: AlertModal4, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
+    }
+  });
+
+  // src/core/ui/settings/pages/Fonts/FontCard.tsx
+  function FontCard({ item: font }) {
+    useProxy(fonts);
+    var navigation2 = NavigationNative.useNavigation();
+    var selected = fonts.__selected === font.name;
+    return /* @__PURE__ */ jsx(Card, {
+      children: /* @__PURE__ */ jsx(Stack, {
+        spacing: 16,
+        children: /* @__PURE__ */ jsxs(import_react_native43.View, {
+          style: {
+            flexDirection: "row",
+            alignItems: "center"
+          },
+          children: [
+            /* @__PURE__ */ jsx(import_react_native43.View, {
+              children: /* @__PURE__ */ jsx(Text, {
+                variant: "heading-lg/semibold",
+                children: font.name
+              })
+            }),
+            /* @__PURE__ */ jsx(import_react_native43.View, {
+              style: {
+                marginLeft: "auto"
+              },
+              children: /* @__PURE__ */ jsxs(Stack, {
+                spacing: 12,
+                direction: "horizontal",
+                children: [
+                  /* @__PURE__ */ jsx(IconButton, {
+                    onPress: () => {
+                      navigation2.push("BUNNY_CUSTOM_PAGE", {
+                        title: "Edit Font",
+                        render: () => /* @__PURE__ */ jsx(FontEditor, {
+                          name: font.name
+                        })
+                      });
+                    },
+                    size: "sm",
+                    variant: "secondary",
+                    disabled: selected,
+                    icon: findAssetId("WrenchIcon")
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "sm",
+                    variant: selected ? "secondary" : "primary",
+                    text: selected ? "Unapply" : "Apply",
+                    onPress: () => _async_to_generator(function* () {
+                      yield selectFont(selected ? null : font.name);
+                      showConfirmationAlert({
+                        title: Strings.HOLD_UP,
+                        content: "Reload Discord to apply changes?",
+                        confirmText: Strings.RELOAD,
+                        cancelText: Strings.CANCEL,
+                        confirmColor: "red",
+                        onConfirm: BundleUpdaterManager.reload
+                      });
+                    })()
+                  })
+                ]
+              })
+            })
+          ]
+        })
+      })
+    });
+  }
+  var import_react_native43, useToken2;
+  var init_FontCard = __esm({
+    "src/core/ui/settings/pages/Fonts/FontCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_i18n();
+      init_alerts2();
+      init_storage();
+      init_fonts();
+      init_assets();
+      init_modules();
+      init_lazy();
+      init_metro();
+      init_common();
+      init_components();
+      import_react_native43 = __toESM(require_react_native());
+      init_FontEditor();
+      ({ useToken: useToken2 } = lazyDestructure(() => findByProps("useToken")));
+    }
+  });
+
+  // src/core/ui/settings/pages/Fonts/index.tsx
+  var Fonts_exports = {};
+  __export(Fonts_exports, {
+    default: () => Fonts
+  });
+  function Fonts() {
+    useProxy(settings);
+    useProxy(fonts);
+    var navigation2 = NavigationNative.useNavigation();
+    return /* @__PURE__ */ jsx(AddonPage, {
+      title: Strings.FONTS,
+      searchKeywords: [
+        "name",
+        "description"
+      ],
+      sortOptions: {
+        "Name (A-Z)": (a, b3) => a.name.localeCompare(b3.name),
+        "Name (Z-A)": (a, b3) => b3.name.localeCompare(a.name)
+      },
+      items: Object.values(fonts),
+      safeModeHint: {
+        message: Strings.SAFE_MODE_NOTICE_FONTS
+      },
+      CardComponent: FontCard,
+      installAction: {
+        label: "Install a font",
+        onPress: () => {
+          navigation2.push("BUNNY_CUSTOM_PAGE", {
+            title: "Import Font",
+            render: () => /* @__PURE__ */ jsx(FontEditor, {})
+          });
+        }
+      }
+    });
+  }
+  var init_Fonts = __esm({
+    "src/core/ui/settings/pages/Fonts/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_i18n();
+      init_AddonPage();
+      init_FontEditor();
+      init_storage();
+      init_fonts();
+      init_settings();
+      init_common();
+      init_FontCard();
+    }
+  });
+
+  // src/core/ui/settings/pages/Addons/index.tsx
+  var Addons_exports = {};
+  __export(Addons_exports, {
+    default: () => Addons
+  });
+  function icon2(...names) {
+    for (var name of names) {
+      try {
+        var id = findAssetId(name);
+        if (id)
+          return /* @__PURE__ */ jsx(TableRow.Icon, {
+            source: id
+          });
+      } catch (e) {
+      }
+    }
+    return void 0;
+  }
+  function Addons() {
+    var navigation2 = NavigationNative.useNavigation();
+    var open = React2.useMemo(() => {
+      var actions = /* @__PURE__ */ new Map();
+      return (title, load) => {
+        if (!actions.has(title))
+          actions.set(title, wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+            return load();
+          })(), title, void 0, "push"));
+        return actions.get(title)();
+      };
+    }, [
+      navigation2
+    ]);
+    return /* @__PURE__ */ jsx(import_react_native44.ScrollView, {
+      contentContainerStyle: {
+        paddingBottom: 38
+      },
+      children: /* @__PURE__ */ jsx(Stack, {
+        style: {
+          paddingVertical: 24,
+          paddingHorizontal: 12
+        },
+        spacing: 24,
+        children: /* @__PURE__ */ jsxs(TableRowGroup, {
+          title: "Add-ons",
+          children: [
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Plugins",
+              subLabel: "Manage and configure your plugins",
+              icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
+              onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Discover plugins",
+              subLabel: "Browse and install new plugins",
+              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "SettingsIcon"),
+              onPress: () => open("Discover plugins", () => (init_PluginBrowser(), __toCommonJS(PluginBrowser_exports)))
+            }),
+            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Themes",
+              subLabel: "Manage your Discord themes",
+              icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
+              onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
+            }),
+            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Discover themes",
+              subLabel: "Browse community themes and use one in a tap",
+              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "PaintPaletteIcon"),
+              onPress: () => open("Discover themes", () => (init_ThemeStore(), __toCommonJS(ThemeStore_exports)))
+            }),
+            isFontSupported() ? /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Fonts",
+              subLabel: "Choose and manage fonts",
+              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon"),
+              onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
+            }) : /* @__PURE__ */ jsx(TableRow, {
+              label: "Fonts",
+              subLabel: "Custom fonts are unavailable on this loader",
+              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon")
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Extras",
+              subLabel: "Fake Nitro, gift links, boosts, friend requests and account tools",
+              icon: icon2("GiftIcon", "NitroWheelIcon", "StarIcon", "SettingsIcon"),
+              onPress: () => open("Extras", () => ({
+                default: (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).ExtrasPage
+              }))
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Cloudsync",
+              subLabel: "Back up and sync your settings",
+              icon: icon2("CloudIcon", "SyncIcon", "SettingsIcon"),
+              onPress: () => open("Cloudsync", () => (init_StoreCloud(), __toCommonJS(StoreCloud_exports)))
+            })
+          ]
+        })
+      })
+    });
+  }
+  var import_react_native44;
+  var init_Addons = __esm({
+    "src/core/ui/settings/pages/Addons/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      import_react_native44 = __toESM(require_react_native());
+      init_common();
+      init_components();
+      init_loader();
+      init_assets();
+      init_shared();
+    }
+  });
+
+  // src/core/ui/settings/pages/TestingPlugins/index.tsx
+  var TestingPlugins_exports = {};
+  __export(TestingPlugins_exports, {
+    default: () => TestingPlugins
+  });
+  function TestingReview({ assignment }) {
+    var backend = React2.useMemo(() => createFileBackend(testingStorageKey(assignment) + ".json"), [
+      assignment.userId,
+      assignment.platform
+    ]);
+    var storage = {
+      read: backend.get,
+      write: backend.set
+    };
+    var authorized = () => currentTestingAssignment()?.userId === assignment.userId;
+    var discord = "";
+    try {
+      var info = NativeClientInfoModule.getConstants();
+      if (info.Version && info.Build)
+        discord = String(info.Version) + " (" + String(info.Build) + ")";
+      else if (info.Version || info.Build)
+        discord = String(info.Version ?? info.Build);
+    } catch (e) {
+    }
+    var revision = globalThis.__CLOUDCORD_RUNTIME_REVISION__;
+    var cloudcord = typeof revision === "string" && revision ? "v1.4.3 " + revision : "v1.4.3";
+    var review = useTestingReview(React2, assignment, storage, {
+      cloudcord,
+      discord
+    }, authorized);
+    var [exportMessage, setExportMessage] = React2.useState("");
+    function saveResults() {
+      return _async_to_generator(function* () {
+        var text = review.export();
+        if (!text)
+          return;
+        var filename = "cx-testing-" + assignment.platform + "-" + assignment.userId + ".csv";
+        try {
+          yield writeFile(filename, text, {
+            prefix: ""
+          });
+          setExportMessage("Saved " + filename + " in the app folder.");
+        } catch (e) {
+          setExportMessage("Could not save the CSV.");
+        }
+      })();
+    }
+    var disabled = !review.ready || review.saving;
+    var field = (label2, value, onChange, maxLength) => /* @__PURE__ */ jsxs(Stack, {
+      spacing: 5,
+      children: [
+        /* @__PURE__ */ jsx(Text, {
+          variant: "text-sm/medium",
+          children: label2
+        }),
+        /* @__PURE__ */ jsx(TextInput, {
+          size: "lg",
+          value,
+          maxLength,
+          onChange: (input) => onChange(typeof input === "string" ? input : input?.nativeEvent?.text ?? "")
+        })
+      ]
+    });
+    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
+      keyboardShouldPersistTaps: "handled",
+      contentContainerStyle: {
+        padding: 16,
+        paddingBottom: 40
+      },
+      children: /* @__PURE__ */ jsxs(Stack, {
+        spacing: 14,
+        children: [
+          /* @__PURE__ */ jsxs(Text, {
+            variant: "text-md/medium",
+            children: [
+              assignment.label,
+              " \xB7 ",
+              review.completed,
+              " of ",
+              assignment.entries.length,
+              " reviewed"
+            ]
+          }),
+          field("Search assigned plugins", review.search, review.searchFor, 120),
+          field("CloudCord build", review.build.cloudcord, (value) => review.setBuild("cloudcord", value), 100),
+          field("Discord build", review.build.discord, (value) => review.setBuild("discord", value), 100),
+          review.entry ? /* @__PURE__ */ jsxs(Stack, {
+            spacing: 10,
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "heading-lg/semibold",
+                children: review.entry.name
+              }),
+              /* @__PURE__ */ jsxs(Text, {
+                variant: "text-sm/normal",
+                children: [
+                  review.entry.id,
+                  " \xB7 ",
+                  review.entry.group
+                ]
+              }),
+              /* @__PURE__ */ jsxs(Text, {
+                variant: "text-sm/medium",
+                children: [
+                  review.review?.status ?? "Pending",
+                  " \xB7 ",
+                  review.index + 1,
+                  " of ",
+                  review.count
+                ]
+              }),
+              field("Exact error or blocker", review.error, review.setError, 3e3),
+              /* @__PURE__ */ jsxs(import_react_native45.View, {
+                style: {
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "primary",
+                    text: "Approve",
+                    disabled,
+                    onPress: () => void review.save("Pass")
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "destructive",
+                    text: "Disapprove",
+                    disabled,
+                    onPress: () => void review.save("Fail")
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "secondary",
+                    text: "Blocked",
+                    disabled,
+                    onPress: () => void review.save("Blocked")
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsxs(import_react_native45.View, {
+                style: {
+                  flexDirection: "row",
+                  gap: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "secondary",
+                    text: "Previous",
+                    disabled: review.saving || review.index === 0,
+                    onPress: () => review.move(-1)
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "secondary",
+                    text: "Next",
+                    disabled: review.saving || review.index + 1 >= review.count,
+                    onPress: () => review.move(1)
+                  })
+                ]
+              })
+            ]
+          }) : /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/normal",
+            children: "No assigned plugins match your search."
+          }),
+          /* @__PURE__ */ jsx(Button, {
+            size: "md",
+            variant: "secondary",
+            text: "Save results as CSV",
+            disabled: !review.completed || review.saving,
+            onPress: () => void saveResults()
+          }),
+          !!(review.message || !review.ready) && /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/medium",
+            children: review.message || "Loading results\u2026"
+          }),
+          !!exportMessage && /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/medium",
+            children: exportMessage
+          })
+        ]
+      })
+    });
+  }
+  function TestingPlugins() {
+    var assignment = useMobileTestingAssignment();
+    return assignment ? /* @__PURE__ */ jsx(TestingReview, {
+      assignment
+    }, assignment.userId) : null;
+  }
+  var import_react_native45;
+  var init_TestingPlugins = __esm({
+    "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_storage();
+      init_cxTesting();
+      init_fs();
+      init_modules();
+      init_pluginTesting();
+      init_common();
+      init_components();
+      import_react_native45 = __toESM(require_react_native());
+    }
+  });
+
+  // src/core/ui/settings/index.ts
+  var settings_exports3 = {};
+  __export(settings_exports3, {
+    PupuIcon: () => cloudcord_default,
+    default: () => initSettings
+  });
+  function safeAsset(...names) {
+    for (var name of names) {
+      try {
+        var asset = findAssetId(name);
+        if (asset)
+          return asset;
+      } catch (e) {
+      }
+    }
+    return cloudcord_default;
+  }
+  function initSettings() {
+    if (settings.cloudcordDiagnosticsEnabled === true)
+      void Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)).then((module) => module.initializeDiagnosticsCapture()).catch(() => {
+      });
+    var coreItem = {
+      key: "CLOUDCORD",
+      title: () => "Overview",
+      icon: safeAsset("CircleInformationIcon-primary", "CircleInformationIcon", "InfoIcon"),
+      render: () => Promise.resolve().then(() => (init_General(), General_exports)),
+      useTrailing: () => `(${"v1.4.3"})`
+    };
+    var hiddenControlsItem = {
+      key: "CLOUDCORD_HIDDEN_CONTROLS",
+      title: () => "Developer options",
+      icon: safeAsset("WrenchIcon", "SettingsIcon"),
+      render: () => Promise.resolve().then(() => (init_Customization(), Customization_exports)),
+      usePredicate: () => useProxy(settings).cloudcordSectionHidden ?? false,
+      useTrailing: () => "\xB7",
+      nativeSection: "developer"
+    };
+    var baseItems = [
+      coreItem,
+      {
+        key: "BOTCORD",
+        title: () => "Botcord",
+        icon: safeAsset("RobotIcon", "AppsIcon"),
+        render: () => Promise.resolve().then(() => (init_BotCord(), BotCord_exports))
+      },
+      {
+        key: "FAKE_PROFILE",
+        title: () => "Profile",
+        icon: safeAsset("UserIcon", "SettingsIcon"),
+        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))
+      },
+      {
+        key: "STORE_CLOUD",
+        title: () => "Cloudsync",
+        icon: {
+          uri: "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png"
+        },
+        render: () => Promise.resolve().then(() => (init_StoreCloud(), StoreCloud_exports))
+      },
+      {
+        key: "BUNNY_PLUGINS",
+        title: () => "Add-ons",
+        icon: safeAsset("AppsIcon"),
+        render: () => Promise.resolve().then(() => (init_Addons(), Addons_exports))
+      },
+      {
+        key: "CLOUDCORD_TESTING_PLUGINS",
+        title: () => "Testing Plugins",
+        icon: safeAsset("AppsIcon", "WrenchIcon"),
+        render: () => Promise.resolve().then(() => (init_TestingPlugins(), TestingPlugins_exports)),
+        usePredicate: () => Boolean(useMobileTestingAssignment())
+      },
+      {
+        key: "CLOUDCORD_PLUGIN_BROWSER",
+        title: () => "Discover plugins",
+        icon: safeAsset("ChannelListMagnifyingGlassIcon", "SearchIcon", "AppsIcon"),
+        render: () => Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports))
+      },
+      {
+        key: "CLOUDCORD_DIAGNOSTICS",
+        title: () => "Diagnostics",
+        icon: safeAsset("WrenchIcon", "SettingsIcon"),
+        render: () => Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)),
+        usePredicate: () => useProxy(settings).cloudcordDiagnosticsEnabled === true
+      }
+    ];
+    var defaultOrder = [
+      "CLOUDCORD",
+      "BOTCORD",
+      "FAKE_PROFILE",
+      "BUNNY_PLUGINS",
+      "CLOUDCORD_TESTING_PLUGINS",
+      "CLOUDCORD_DIAGNOSTICS"
+    ];
+    var configurableKeys = new Set(defaultOrder.filter((key) => key !== "CLOUDCORD"));
+    var configuredOrder = settings.cloudcordTabOrder ?? [];
+    var orderIndex = new Map(configuredOrder.map((key, index) => [
+      key,
+      index
+    ]));
+    var items = [
+      ...baseItems,
+      hiddenControlsItem
+    ].filter((row) => ![
+      "STORE_CLOUD",
+      "CLOUDCORD_PLUGIN_BROWSER",
+      "CLOUDCORD_RECOVERY"
+    ].includes(row.key)).map((row) => {
+      if (row.nativeSection)
+        return row;
+      var originalPredicate = row.usePredicate;
+      return {
+        ...row,
+        usePredicate: () => {
+          var state2 = useProxy(settings);
+          var originalVisible = originalPredicate?.() ?? true;
+          if (state2.cloudcordSectionHidden ?? false)
+            return false;
+          if (configurableKeys.has(row.key) && (state2.cloudcordHiddenTabs ?? []).includes(row.key))
+            return false;
+          return originalVisible;
+        }
+      };
+    }).sort((a, b3) => {
+      var rank = (key) => key === "CLOUDCORD" ? -1 : key === "BUNNY_DEVELOPER" ? Number.MAX_SAFE_INTEGER : orderIndex.get(key) ?? (defaultOrder.includes(key) ? defaultOrder.indexOf(key) : defaultOrder.length);
+      return rank(a.key) - rank(b3.key);
+    });
+    registerSection({
+      name: "CloudCord",
+      items
+    });
+    globalThis.__CLOUDCORD_SETTINGS_CORE_REGISTERED__ = true;
+    registerSection({
+      name: "Bunny",
+      items: []
+    });
+    registerSection({
+      name: "Revenge",
+      items: []
+    });
+    registerSection({
+      name: "Vendetta",
+      items: []
+    });
+  }
+  var init_settings3 = __esm({
+    "src/core/ui/settings/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_cloudcord();
+      init_storage();
+      init_assets();
+      init_settings();
+      init_pluginTesting();
+      init_settings2();
+    }
+  });
+
+  // src/core/ui/settings/pages/CloudCordVerification/index.tsx
+  function initializeCloudCordVerification() {
+  }
+  var init_CloudCordVerification = __esm({
+    "src/core/ui/settings/pages/CloudCordVerification/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/core/ui/botcord/FloatingSwitcher.tsx
+  function initBotCordSwitcher() {
+    return () => {
+    };
+  }
+  var init_FloatingSwitcher = __esm({
+    "src/core/ui/botcord/FloatingSwitcher.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/core/ui/reporter/components/ErrorBoundaryScreen.tsx
+  function ErrorBoundaryScreen(props) {
+    var styles2 = useStyles4();
+    var debugInfo = getDebugInfo();
+    return /* @__PURE__ */ jsx(ErrorBoundary, {
+      children: /* @__PURE__ */ jsx(SafeAreaProvider, {
+        children: /* @__PURE__ */ jsxs(SafeAreaView, {
+          style: styles2.container,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native46.View, {
+              style: {
+                gap: 4
+              },
+              children: [
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "display-lg",
+                  children: "Uh oh."
+                }),
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-md/normal",
+                  children: "A crash occurred while rendering a component. This could be caused by a plugin, CloudCord, or Discord itself."
+                }),
+                /* @__PURE__ */ jsxs(Text, {
+                  variant: "text-sm/normal",
+                  color: "text-muted",
+                  children: [
+                    debugInfo.os.name,
+                    "; ",
+                    debugInfo.discord.build,
+                    " (",
+                    debugInfo.discord.version,
+                    "); ",
+                    debugInfo.bunny.version
+                  ]
+                })
+              ]
+            }),
+            /* @__PURE__ */ jsxs(import_react_native46.ScrollView, {
+              fadingEdgeLength: 64,
+              contentContainerStyle: {
+                gap: 12
+              },
+              children: [
+                /* @__PURE__ */ jsx(Codeblock, {
+                  selectable: true,
+                  children: props.error.message
+                }),
+                hasStack(props.error) && /* @__PURE__ */ jsx(ErrorStackCard, {
+                  error: props.error
+                }),
+                isComponentStack(props.error) ? /* @__PURE__ */ jsx(ErrorComponentStackCard, {
+                  componentStack: props.error.componentStack
+                }) : null
+              ]
+            }),
+            /* @__PURE__ */ jsxs(Card, {
+              style: {
+                gap: 6
+              },
+              children: [
+                /* @__PURE__ */ jsx(Button, {
+                  text: "Reload Discord",
+                  onPress: () => BundleUpdaterManager.reload()
+                }),
+                !settings.safeMode?.enabled && /* @__PURE__ */ jsx(Button, {
+                  text: "Reload in Safe Mode",
+                  onPress: () => toggleSafeMode()
+                }),
+                /* @__PURE__ */ jsx(Button, {
+                  variant: "destructive",
+                  text: "Retry Render",
+                  onPress: () => props.rerender()
+                })
+              ]
+            })
+          ]
+        })
+      })
+    });
+  }
+  var import_react_native46, useStyles4;
+  var init_ErrorBoundaryScreen = __esm({
+    "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_isStack();
+      init_debug();
+      init_modules();
+      init_settings();
+      init_components2();
+      init_styles();
+      init_common();
+      init_components();
+      import_react_native46 = __toESM(require_react_native());
+      init_ErrorComponentStackCard();
+      init_ErrorStackCard();
+      useStyles4 = createStyles({
+        container: {
+          flex: 1,
+          backgroundColor: tokens.colors.BG_BASE_SECONDARY,
+          paddingHorizontal: 16,
+          height: "100%",
+          gap: 12
+        }
+      });
+    }
+  });
+
+  // src/core/debug/patches/patchErrorBoundary.tsx
+  function getErrorBoundaryContext() {
+    var ctxt = findByNameLazy("ErrorBoundary")[_lazyContextSymbol];
+    return new Promise((resolve) => ctxt.getExports((exp) => resolve(exp.prototype)));
+  }
+  function patchErrorBoundary() {
+    return after.await("render", getErrorBoundaryContext(), function() {
+      if (!this.state.error)
+        return;
+      return /* @__PURE__ */ jsx(ErrorBoundaryScreen, {
+        error: this.state.error,
+        rerender: () => this.setState({
+          info: null,
+          error: null
+        })
+      });
+    });
+  }
+  var init_patchErrorBoundary = __esm({
+    "src/core/debug/patches/patchErrorBoundary.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_ErrorBoundaryScreen();
+      init_patcher();
+      init_lazy2();
+      init_wrappers();
+    }
+  });
+
+  // src/core/fixes.ts
+  function onDispatch({ locale }) {
+    try {
+      findByProps("isMoment", "locale")?.locale(locale.toLowerCase());
+    } catch (e) {
+      logger.error("Failed to fix timestamps...", e);
+    }
+    FluxDispatcher.unsubscribe("I18N_LOAD_SUCCESS", onDispatch);
+  }
+  var fixes_default;
+  var init_fixes = __esm({
+    "src/core/fixes.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_logger();
+      init_common();
+      init_wrappers();
+      fixes_default = () => {
+        FluxDispatcher.subscribe("I18N_LOAD_SUCCESS", onDispatch);
+      };
+    }
+  });
+
+  // globals:lodash
+  var require_lodash = __commonJS({
+    "globals:lodash"(exports, module) {
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      module.exports = require_depsModule()["lodash"];
+    }
+  });
+
+  // globals:util
+  var require_util = __commonJS({
+    "globals:util"(exports, module) {
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      module.exports = require_depsModule()["util"];
+    }
+  });
+
+  // src/core/vendetta/api.tsx
+  var import_react16, import_react_native47, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
+  var init_api3 = __esm({
+    "src/core/vendetta/api.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_alerts2();
+      init_storage();
+      init_storage();
+      init_themes();
+      init_assets();
+      init_commands();
+      init_debug();
+      init_loader();
+      init_patcher();
+      init_settings();
+      init_utils();
+      init_cyrb64();
+      init_logger();
+      init_metro();
+      init_modules2();
+      init_common();
+      init_components();
+      init_components();
+      init_color();
+      init_components2();
+      init_styles();
+      init_toasts();
+      init_dist();
+      import_react16 = __toESM(require_react());
+      import_react_native47 = __toESM(require_react_native());
+      init_plugins();
+      makeIcon = (leading) => leading;
+      CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
+      CompatSwitchRow = TableSwitchRow ?? Forms.FormSwitchRow ?? CompatRow;
+      CompatSection = TableRowGroup ?? Forms.FormSection ?? ReactNative.View;
+      PatchedFormRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatRow, {
+        label: props.label,
+        subLabel: props.subLabel,
+        icon: makeIcon(props.leading),
+        trailing: props.trailing,
+        onPress: props.onPress,
+        disabled: props.disabled,
+        arrow: props.arrow
+      });
+      PatchedFormRow.Icon = Forms.FormRow?.Icon ?? TableRow?.Icon ?? (() => null);
+      PatchedFormRow.Arrow = Forms.FormRow?.Arrow ?? TableRow?.Arrow ?? (() => null);
+      PatchedFormSwitchRow = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSwitchRow, {
+        label: props.label,
+        subLabel: props.subLabel,
+        icon: makeIcon(props.leading),
+        value: !!props.value,
+        onValueChange: props.onValueChange,
+        disabled: props.disabled
+      });
+      PatchedFormSection = (props) => /* @__PURE__ */ (0, import_react16.createElement)(CompatSection, {
+        title: props.title,
+        ...props
+      }, props.children);
+      PatchedForms = {
+        ...Forms,
+        FormRow: PatchedFormRow,
+        FormSwitchRow: PatchedFormSwitchRow,
+        FormSection: PatchedFormSection,
+        FormDivider: () => null
+      };
+      initVendettaObject = () => {
+        var createStackBasedFilter = (fn) => {
+          return (filter) => {
+            return fn(factories_exports.createSimpleFilter(filter, cyrb64Hash(new Error().stack)));
+          };
+        };
+        var api = globalThis.vendetta = {
+          patcher: {
+            before: patcher_default.before,
+            after: patcher_default.after,
+            instead: patcher_default.instead
+          },
+          metro: {
+            modules: metroModules,
+            find: createStackBasedFilter(findExports),
+            findAll: createStackBasedFilter(findAllExports),
+            findByProps: (...props) => {
+              if (props.length === 1 && props[0] === "KeyboardAwareScrollView") {
+                props.push("listenToKeyboardEvents");
+              }
+              var ret = findByProps(...props);
+              if (ret == null) {
+                if (props.includes("ActionSheetTitleHeader")) {
+                  var module = findByProps("ActionSheetRow");
+                  return {
+                    ...module,
+                    ActionSheetTitleHeader: module.BottomSheetTitleHeader,
+                    ActionSheetContentContainer: ({ children }) => {
+                      (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
+                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native47.View, null, children);
+                    }
+                  };
+                }
+              }
+              return ret;
+            },
+            findByPropsAll: (...props) => findByPropsAll(...props),
+            findByName: (name, defaultExp) => {
+              if (name === "create" && typeof defaultExp === "undefined") {
+                return findByName("create", false).default;
+              }
+              return findByName(name, defaultExp ?? true);
+            },
+            findByNameAll: (name, defaultExp = true) => findByNameAll(name, defaultExp),
+            findByDisplayName: (displayName2, defaultExp = true) => findByDisplayName(displayName2, defaultExp),
+            findByDisplayNameAll: (displayName2, defaultExp = true) => findByDisplayNameAll(displayName2, defaultExp),
+            findByTypeName: (typeName, defaultExp = true) => findByTypeName(typeName, defaultExp),
+            findByTypeNameAll: (typeName, defaultExp = true) => findByTypeNameAll(typeName, defaultExp),
+            findByStoreName: (name) => findByStoreName(name),
+            common: {
+              constants,
+              channels,
+              i18n,
+              url,
+              toasts,
+              stylesheet: {
+                createThemedStyleSheet
+              },
+              clipboard,
+              assets,
+              invites,
+              commands,
+              navigation,
+              navigationStack,
+              NavigationNative,
+              Flux,
+              FluxDispatcher,
+              React: React2,
+              ReactNative,
+              moment: require_moment(),
+              chroma: require_chroma(),
+              lodash: require_lodash(),
+              util: require_util()
+            }
+          },
+          constants: {
+            DISCORD_SERVER: "https://discord.gg/n9QQ4XhhJP",
+            GITHUB: "https://github.com/vendetta-mod",
+            PROXY_PREFIX: "https://vd-plugins.github.io/proxy",
+            HTTP_REGEX: /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&/=]*)$/,
+            HTTP_REGEX_MULTI: /https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_+.~#?&//=]*)/g,
+            DISCORD_SERVER_ID: "1015931589865246730",
+            PLUGINS_CHANNEL_ID: "1091880384561684561",
+            THEMES_CHANNEL_ID: "1091880434939482202"
+          },
+          utils: {
+            findInReactTree: (tree, filter) => findInReactTree(tree, filter),
+            findInTree: (tree, filter, options) => findInTree(tree, filter, options),
+            safeFetch: (input, options, timeout) => safeFetch(input, options, timeout),
+            unfreeze: (obj) => Object.isFrozen(obj) ? {
+              ...obj
+            } : obj,
+            without: (object, ...keys) => omit(object, keys)
+          },
+          debug: {
+            connectToDebugger: (url2) => connectToDebugger2(url2),
+            getDebugInfo: () => getDebugInfo()
+          },
+          ui: {
+            components: {
+              Forms: PatchedForms,
+              General: ReactNative,
+              Alert: LegacyAlert,
+              Button: CompatButton,
+              HelpMessage: (...props) => /* @__PURE__ */ jsx(HelpMessage, {
+                ...props
+              }),
+              SafeAreaView: (...props) => /* @__PURE__ */ jsx(SafeAreaView, {
+                ...props
+              }),
+              Summary,
+              ErrorBoundary,
+              Codeblock,
+              Search: Search_default
+            },
+            toasts: {
+              showToast: (content, asset) => showToast(content, asset)
+            },
+            alerts: {
+              showConfirmationAlert: (options) => showConfirmationAlert(options),
+              showCustomAlert: (component, props) => showCustomAlert(component, props),
+              showInputAlert: (options) => showInputAlert(options)
+            },
+            assets: {
+              all: new Proxy({}, {
+                get(cache, p) {
+                  if (typeof p !== "string")
+                    return void 0;
+                  if (cache[p])
+                    return cache[p];
+                  for (var asset of iterateAssets()) {
+                    if (asset.name)
+                      return cache[p] = asset;
+                  }
+                },
+                ownKeys(cache) {
+                  var keys = /* @__PURE__ */ new Set();
+                  for (var asset of iterateAssets()) {
+                    cache[asset.name] = asset;
+                    keys.add(asset.name);
+                  }
+                  return [
+                    ...keys
+                  ];
+                }
+              }),
+              find: (filter) => findAsset(filter),
+              getAssetByName: (name) => findAsset(name),
+              getAssetByID: (id) => findAsset(id),
+              getAssetIDByName: (name) => findAssetId(name)
+            },
+            semanticColors,
+            rawColors
+          },
+          plugins: {
+            plugins: VdPluginManager.plugins,
+            fetchPlugin: (source) => VdPluginManager.fetchPlugin(source),
+            installPlugin: (source, enabled = true) => VdPluginManager.installPlugin(source, enabled),
+            startPlugin: (id) => VdPluginManager.startPlugin(id),
+            stopPlugin: (id, disable = true) => VdPluginManager.stopPlugin(id, disable),
+            removePlugin: (id) => VdPluginManager.removePlugin(id),
+            getSettings: (id) => VdPluginManager.getSettings(id)
+          },
+          themes: {
+            themes,
+            fetchTheme: (id, selected) => fetchTheme(id, selected),
+            installTheme: (id) => installTheme(id),
+            selectTheme: (id) => selectTheme(id === "default" ? null : themes[id]),
+            removeTheme: (id) => removeTheme(id),
+            getCurrentTheme: () => getThemeFromLoader(),
+            updateThemes: () => updateThemes()
+          },
+          commands: {
+            registerCommand
+          },
+          storage: {
+            createProxy: (target) => createProxy(target),
+            useProxy: (_storage) => useProxy(_storage),
+            createStorage: (backend) => createStorage(backend),
+            wrapSync: (store) => wrapSync(store),
+            awaitSyncWrapper: (store) => awaitStorage(store),
+            createMMKVBackend: (store) => createMMKVBackend(store),
+            createFileBackend: (file) => {
+              if (isPyonLoader() && file === "vendetta_theme.json") {
+                file = "pyon/current-theme.json";
+              }
+              return createFileBackend(file);
+            }
+          },
+          settings,
+          loader: {
+            identity: getVendettaLoaderIdentity() ?? void 0,
+            config: loaderConfig
+          },
+          logger: {
+            log: (...message) => console.log(...message),
+            info: (...message) => console.info(...message),
+            warn: (...message) => console.warn(...message),
+            error: (...message) => console.error(...message),
+            time: (...message) => console.time(...message),
+            trace: (...message) => console.trace(...message),
+            verbose: (...message) => console.log(...message)
+          },
+          version: versionHash,
+          unload: () => {
+            delete globalThis.vendetta;
+          }
+        };
+        return () => api.unload();
+      };
+    }
+  });
+
+  // src/lib/api/native/legacyRuntimeRefresh.ts
+  function invokeLegacyReload() {
+    return _async_to_generator(function* () {
+      var reader = import_react_native48.NativeModules.FileReaderModule ?? import_react_native48.NativeModules.RCTFileReaderModule;
+      if (typeof reader?.readAsDataURL !== "function")
+        return false;
+      yield reader.readAsDataURL({
+        rain: {
+          method: "updater.reload",
+          args: []
+        }
+      });
+      return true;
+    })();
+  }
+  function isCurrentCloudCordLoader() {
+    var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
+    return Boolean(nativeLoader && Number(nativeLoader.cloudcordAutoUpdateVersion ?? 0) >= 2);
+  }
+  function initLegacyRuntimeRefresh() {
+    return _async_to_generator(function* () {
+      var nativeLoader = globalThis.__CLOUDCORD_LOADER__;
+      if (!nativeLoader || isCurrentCloudCordLoader())
+        return;
+      yield awaitStorage(loaderConfig);
+      var config = loaderConfig;
+      config.customLoadUrl ??= {
+        enabled: false,
+        url: ""
+      };
+      if (config.customLoadUrl.enabled && config.customLoadUrl.url && !config.customLoadUrl.url.startsWith("https://cloudcord.xohus.lol/"))
+        return;
+      config.customLoadUrl.url = CURRENT_RUNTIME_URL;
+      config.customLoadUrl.enabled = true;
+      try {
+        yield invokeLegacyReload();
+      } catch (e) {
+      }
+    })();
+  }
+  var import_react_native48, CURRENT_RUNTIME_URL;
+  var init_legacyRuntimeRefresh = __esm({
+    "src/lib/api/native/legacyRuntimeRefresh.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_storage();
+      init_settings();
+      import_react_native48 = __toESM(require_react_native());
+      CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
+    }
+  });
+
+  // src/global.d.ts
+  var init_global_d = __esm({
+    "src/global.d.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/modules.d.ts
+  var init_modules_d = __esm({
+    "src/modules.d.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+    }
+  });
+
+  // src/lib/ui/index.ts
+  var ui_exports = {};
+  __export(ui_exports, {
+    alerts: () => alerts_exports,
+    components: () => components_exports2,
+    settings: () => settings_exports2,
+    sheets: () => sheets_exports,
+    styles: () => styles_exports,
+    toasts: () => toasts_exports
+  });
+  var init_ui = __esm({
+    "src/lib/ui/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_alerts();
+      init_components2();
+      init_settings2();
+      init_sheets();
+      init_styles();
+      init_toasts();
+    }
+  });
+
+  // src/lib/index.ts
+  var lib_exports = {};
+  __export(lib_exports, {
+    _jsx: () => jsxRuntime_exports,
+    api: () => api_exports,
+    fonts: () => fonts_exports,
+    managers: () => managers,
+    metro: () => metro_exports,
+    plugins: () => plugins_exports2,
+    themes: () => themes_exports,
+    ui: () => ui_exports,
+    unload: () => unload,
+    utils: () => utils_exports
+  });
+  function unload() {
+    for (var d of _disposer)
+      if (typeof d === "function")
+        d();
+    delete globalThis.bunny;
+  }
+  var managers, _disposer;
+  var init_lib = __esm({
+    "src/lib/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_global_d();
+      init_modules_d();
+      init_fonts();
+      init_plugins4();
+      init_themes();
+      init_api();
+      init_ui();
+      init_utils();
+      init_metro();
+      init_fonts();
+      init_plugins4();
+      init_themes();
+      init_jsxRuntime();
+      init_lazy();
+      managers = proxyLazy(() => {
+        console.warn("bunny.managers.* is deprecated, and moved the top level (bunny.*). bunny.managers will be eventually removed soon");
+        return {
+          get fonts() {
+            return fonts_exports;
+          },
+          get plugins() {
+            return plugins_exports2;
+          },
+          get themes() {
+            return themes_exports;
+          }
+        };
+      }, {
+        hint: "object"
+      });
+      _disposer = [];
+      unload.push = (fn) => {
+        _disposer.push(fn);
+      };
+    }
+  });
+
   // src/index.ts
   var src_exports = {};
   __export(src_exports, {
@@ -64980,7 +65095,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0be2365b4647c39d7e862aec933c2a7fc435c7a5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e3b12efb877d8a0eb96bf4a6e80daa5b6e4d461a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
