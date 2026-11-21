@@ -1,0 +1,3 @@
+plugin "NotificationVolume":
+  needs notifications.volume
+  use notification-volume

@@ -1096,6 +1096,10 @@ const desktopEffectRecipes = {
         effect: "no-middle-click-paste",
         sha256: "9a681e749029652f7e89997e4289387102a5c43fdea024ba7dab9b6290b7b610",
     },
+    NotificationVolume: {
+        effect: "notification-volume",
+        sha256: "03b833d1b2115083ec2663f1f4f942becf0361fc433e6ca24c6f7bcbd51e6f37",
+    },
 };
 
 function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {

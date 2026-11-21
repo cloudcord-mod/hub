@@ -2713,6 +2713,8 @@ export default function CxExtensions() {
                             throw new Error("Middle-click paste control is available on Linux.");
                         case "avatar-crop-zoom":
                             throw new Error("Avatar crop zoom is available on desktop and browser.");
+                        case "notification-volume":
+                            throw new Error("Notification volume control is available on desktop and browser.");
                         case "animated-assets":
                             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                         case "floor-relative-time":

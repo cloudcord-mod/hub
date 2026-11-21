@@ -476,6 +476,7 @@ function preventMiddleClickPaste(event: MouseEvent) {
     if (event.button === 1) event.preventDefault();
 }
 const avatarCropZoomLimits = new Map<symbol, number>();
+const notificationVolumeLimits = new Map<symbol, number>();
 let bypassPinPromptUsers = 0;
 let longDraftUsers = 0;
 let ownerCrownUsers = 0;
@@ -1253,6 +1254,12 @@ export function CxSettings() {
                             avatarCropZoomLimits.set(grant, effectOptions.maxAvatarCropZoom);
                             return () => { avatarCropZoomLimits.delete(grant); };
                         }
+                        case "notification-volume": {
+                            if (!effectOptions || !("notificationVolume" in effectOptions)) throw new Error("Missing notification volume");
+                            const grant = Symbol();
+                            notificationVolumeLimits.set(grant, effectOptions.notificationVolume);
+                            return () => { notificationVolumeLimits.delete(grant); };
+                        }
                         case "stop-auto-unread":
                             return overrideCxMethods(findStore("UnreadSettingNoticeStore2"), { maybeAutoUpgradeChannel: () => false });
                     }
@@ -1503,6 +1510,17 @@ export function CxSettings() {
             <strong>{candidate.review.name}</strong>
             <ul>{candidate.review.effects.map(effect => <li key={effect}>{effect}</li>)}</ul>
             {candidate.review.commands && <p>{candidate.review.commands.join(", ")}</p>}
+            {candidate.review.numberOptions.map(({ effect, label, value, min, max, unit }) => <label key={effect} style={{ display: "block" }}>
+                {label} <input type="range" aria-label={label} aria-valuetext={value + unit} value={value} min={min} max={max} onChange={event => {
+                    const selected = event.currentTarget.valueAsNumber;
+                    if (!Number.isInteger(selected) || selected < min || selected > max || selected === value) return;
+                    const directive = new RegExp("^  use " + effect + "(?: \\d+)?(?=\\r?$)", "m");
+                    const next = candidate.source.replace(directive, "  use " + effect + " " + selected);
+                    if (next === candidate.source) return;
+                    setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
+                    setCandidate({ ...candidate, source: next, loader: undefined, review: reviewCx(next) });
+                }} /> {value}{unit}
+            </label>)}
             {candidate.review.appearanceOptions.map(({ target, label }) => <div key={target}>
                 <label><input type="checkbox" aria-label={label} checked={candidate.selected.includes(target)} onChange={event => {
                     setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, event.currentTarget.checked) });
@@ -1575,6 +1593,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // NotificationVolume by philipbry, GPL-3.0-or-later.
+        find: "ensureAudio(){",
+        replacement: {
+            match: /(?=Math\.min\(\i\.\i\.getOutputVolume\(\)\/100)/g,
+            replace: "$self.notificationVolumeFactor()*",
+        },
+    }, {
         // PlainFolderIcon by botato (GPL-3.0-or-later). The class is inert until CX applies its stylesheet.
         find: "#{intl::GUILD_FOLDER_TOOLTIP_A11Y_LABEL}",
         replacement: {
@@ -1854,6 +1879,7 @@ export default definePlugin({
     shouldSkipPinPrompt() { return bypassPinPromptUsers > 0; },
     usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
     avatarCropZoom(original: number) { return Math.max(original, ...avatarCropZoomLimits.values()); },
+    notificationVolumeFactor() { return Math.min(100, ...notificationVolumeLimits.values()) / 100; },
     sortMessageReactions<T extends { count: number; }>(reactions: readonly T[]) {
         return reactionSortUsers > 0 ? sortCxReactions(reactions) : reactions;
     },

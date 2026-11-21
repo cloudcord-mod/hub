@@ -220,6 +220,7 @@ import plugin_catalog_no_shadows from "../../../../examples/cx/catalog/plugins/n
 import plugin_catalog_no_typing_animation from "../../../../examples/cx/catalog/plugins/no-typing-animation.cx";
 import plugin_catalog_no_unblock_to_jump from "../../../../examples/cx/catalog/plugins/no-unblock-to-jump.cx";
 import plugin_catalog_normalize_message_links from "../../../../examples/cx/catalog/plugins/normalize-message-links.cx";
+import plugin_catalog_notification_volume from "../../../../examples/cx/catalog/plugins/notification-volume.cx";
 import plugin_catalog_notify_when_muted from "../../../../examples/cx/catalog/plugins/notify-when-muted.cx";
 import plugin_catalog_number_base_converter from "../../../../examples/cx/catalog/plugins/number-base-converter.cx";
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
@@ -635,6 +636,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "NoTypingAnimation", source: plugin_catalog_no_typing_animation, description: "Keep Discord's typing dots still", categories: ["Appearance"], appearanceRevision: "33ca72b51483126bf3dd4f9e40adb8ef725d2b01edc0beafcf567cd84e6f5f9a" },
         { name: "NoUnblockToJump", source: plugin_catalog_no_unblock_to_jump, description: "Skip the blocked, ignored, or spam author prompt when jumping to a message", categories: ["Chat"] },
         { name: "NormalizeMessageLinks", source: plugin_catalog_normalize_message_links, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
+        { name: "NotificationVolume", source: plugin_catalog_notification_volume, description: "Adjust the volume of Discord notifications and in-app sounds (100%)", desktopOnly: true, categories: ["Chat"] },
         { name: "NotifyWhenMuted", source: plugin_catalog_notify_when_muted, description: "Play a sound when you try to speak while muted", categories: ["Voice & calls"] },
         { name: "Number Base Converter", source: plugin_catalog_number_base_converter, description: "/convertbase", commands: ["convertbase"], categories: ["Commands"] },
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"] },

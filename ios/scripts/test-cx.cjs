@@ -1035,6 +1035,25 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(windowListeners.get("mouseup"), onMouseUp);
             click(render(), "Disable Second Paste Control");
             assert.equal(windowListeners.size, 0);
+
+            const volumePatch = runtime.patches.find(patch => patch.find === "ensureAudio(){").replacement;
+            const volumeMatch = new RegExp(volumePatch.match.source.replaceAll("\\i", "[a-z]+"), volumePatch.match.flags);
+            const nativeVolume = Function("$self", "a", "return Math.min(a.b.getOutputVolume()/100,1);".replace(volumeMatch, volumePatch.replace));
+            const volume = () => nativeVolume(runtime, { b: { getOutputVolume: () => 80 } });
+            assert.equal(volume(), 0.8);
+            selectCatalog("NotificationVolume");
+            const volumeSlider = () => find(render(), item => item.props["aria-label"] === "Notification volume");
+            assert.equal(volumeSlider().props.value, 100);
+            volumeSlider().props.onChange({ currentTarget: { valueAsNumber: 101 } });
+            assert.equal(volumeSlider().props.value, 100);
+            volumeSlider().props.onChange({ currentTarget: { valueAsNumber: 25 } });
+            assert.equal(volumeSlider().props["aria-valuetext"], "25%");
+            assert.match(find(render(), item => item.props["aria-label"] === "CX source").props.value, /notification-volume 25/);
+            assert.equal(volume(), 0.8);
+            click(render(), "Allow for this session");
+            assert.equal(volume(), 0.2);
+            click(render(), "Disable NotificationVolume");
+            assert.equal(volume(), 0.8);
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));
