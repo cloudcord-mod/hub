@@ -22189,6 +22189,40 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       resizeMode: "cover"
     });
   }
+  function PreviewCosmetics({ frame, effect }) {
+    if (!frame && !effect)
+      return null;
+    var chip = (label2, value) => /* @__PURE__ */ jsx(import_react_native24.View, {
+      style: {
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 99,
+        backgroundColor: C3.panel()
+      },
+      children: /* @__PURE__ */ jsxs(Text, {
+        variant: "text-xs/semibold",
+        style: {
+          color: C3.muted()
+        },
+        children: [
+          label2,
+          ": ",
+          value
+        ]
+      })
+    });
+    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+      style: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 6
+      },
+      children: [
+        frame ? chip("Frame", frame) : null,
+        effect ? chip("Effect", effect) : null
+      ]
+    });
+  }
   function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.page();
@@ -22298,7 +22332,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           tagText,
           tagIcon,
           badges,
-          officialBadgeIcon
+          officialBadgeIcon,
+          frame,
+          effect
         }) : /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
             borderRadius: R2.lg,
@@ -22515,51 +22551,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: bio
                 }) : null,
-                frame || effect ? /* @__PURE__ */ jsxs(import_react_native24.View, {
-                  style: {
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    gap: 6
-                  },
-                  children: [
-                    frame ? /* @__PURE__ */ jsx(import_react_native24.View, {
-                      style: {
-                        paddingHorizontal: 8,
-                        paddingVertical: 3,
-                        borderRadius: 99,
-                        backgroundColor: C3.panel()
-                      },
-                      children: /* @__PURE__ */ jsxs(Text, {
-                        variant: "text-xs/semibold",
-                        style: {
-                          color: C3.muted()
-                        },
-                        children: [
-                          "Frame: ",
-                          frame
-                        ]
-                      })
-                    }) : null,
-                    effect ? /* @__PURE__ */ jsx(import_react_native24.View, {
-                      style: {
-                        paddingHorizontal: 8,
-                        paddingVertical: 3,
-                        borderRadius: 99,
-                        backgroundColor: C3.panel()
-                      },
-                      children: /* @__PURE__ */ jsxs(Text, {
-                        variant: "text-xs/semibold",
-                        style: {
-                          color: C3.muted()
-                        },
-                        children: [
-                          "Effect: ",
-                          effect
-                        ]
-                      })
-                    }) : null
-                  ]
-                }) : null
+                /* @__PURE__ */ jsx(PreviewCosmetics, {
+                  frame,
+                  effect
+                })
               ]
             })
           ]
@@ -22605,7 +22600,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [], officialBadgeIcon }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
     var themed = !!primary;
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
@@ -22847,7 +22842,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   ]
                 }) : null
               ]
-            }) : null
+            }) : null,
+            /* @__PURE__ */ jsx(PreviewCosmetics, {
+              frame,
+              effect
+            })
           ]
         })
       ]
@@ -31276,7 +31275,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       status: profilePreviewStatus(data, nativeStatus)
     };
   }
-  function SavedProfiles({ ownerId, current, realUser, onUse }) {
+  function SavedProfiles({ ownerId, current, realUser, catalog, onUse }) {
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [, redraw] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
     var [name, setName] = (0, import_react9.useState)("");
@@ -31444,6 +31443,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 decoration: data.avatarDecoration || void 0,
                 badges,
                 officialBadgeIcon: CLOUDCORD_BADGE_ICON,
+                frame: data.profileFrame ? catalog?.frames.find((item2) => item2.skuId === data.profileFrame.skuId)?.label ?? "Selected" : void 0,
+                effect: data.profileEffect ? catalog?.effects.find((item2) => item2.skuId === data.profileEffect.skuId)?.title ?? "Selected" : void 0,
                 customStatus: data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : void 0,
                 activity: data.customActivity ? {
                   verb: ACTIVITY_TYPES.find((type) => type.value === data.customActivity?.type)?.label || "",
@@ -32561,6 +32562,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ownerId: editorOwner.current,
             current: preview,
             realUser: realCurrentUser,
+            catalog,
             onUse: (data) => {
               if (!editorOwner.current || editorOwner.current !== currentUserId)
                 return;
@@ -65410,7 +65412,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "06d728543d60215826de76b20bf61801aeb82e58";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d706ae97cf6ad83e67a67e35b34c5582280d85eb";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
