@@ -29,7 +29,7 @@ import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
-import { canRememberCxExtension, isPrivateCxCommand, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
+import { canRememberCxExtension, isPrivateCxCommand, MAX_REMEMBERED_CX_EXTENSIONS, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
 import type { CxMessageLatencyOptions } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
@@ -919,7 +919,7 @@ function bundledAppearanceSource(review: ReturnType<typeof reviewCx>): string | 
 
 function readRememberedAppearance(value: unknown): RememberedAppearance[] {
     if (!Array.isArray(value)) return [];
-    return value.slice(0, 16).filter((entry): entry is RememberedAppearance =>
+    return value.slice(0, MAX_REMEMBERED_CX_EXTENSIONS).filter((entry): entry is RememberedAppearance =>
         typeof entry?.id === "string" && typeof entry.source === "string" && entry.source.length <= MAX_CX_SOURCE
         && Array.isArray(entry.selected) && entry.selected.every(target => typeof target === "string"));
 }
@@ -930,7 +930,10 @@ async function writeRememberedAppearance(id: string, entry?: RememberedAppearanc
         next = readRememberedAppearance(current);
         if (onlyIfExisting && !next.some(saved => saved.id === id && saved.source === entry?.source)) return next;
         next = next.filter(saved => saved.id !== id);
-        if (entry) next = [entry, ...next].slice(0, 16);
+        if (entry) {
+            if (next.length >= MAX_REMEMBERED_CX_EXTENSIONS) throw new Error("Remove a saved CX approval before saving another.");
+            next = [entry, ...next];
+        }
         return next;
     });
     rememberedAppearance = next;
@@ -1555,7 +1558,7 @@ export function CxSettings() {
                 rememberingAppearance.add(rememberId);
                 return writeRememberedAppearance(rememberId, { id: rememberId, source: candidate.source, selected: candidate.selected }).then(() => {
                     setStatus(`${candidate.review.name} is active and will reopen with CloudCord.`);
-                }, () => setStatus("Couldn't remember this appearance. It is active for this session.")).finally(() => {
+                }, error => setStatus((error instanceof Error ? error.message : "Couldn't save the CX approval.") + " Active for this session.")).finally(() => {
                     rememberingAppearance.delete(rememberId);
                     refreshRememberedAppearance();
                 });

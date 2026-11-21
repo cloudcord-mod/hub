@@ -279,6 +279,10 @@ export function isPrivateCxCommand(permissions: readonly CxPermission[]) {
     return permissions.length === 2 && permissions.includes("commands.register") && permissions.includes("reply.local");
 }
 
+const maxPrivateCxCommandPlugins = 64;
+const maxOtherCxExtensions = 16;
+export const MAX_REMEMBERED_CX_EXTENSIONS = maxPrivateCxCommandPlugins + maxOtherCxExtensions;
+
 export function canRememberCxExtension(document: { kind: "plugin" | "theme"; permissions?: readonly CxPermission[]; }) {
     const permissions = document.permissions ?? [];
     return document.kind === "theme" || isPrivateCxCommand(permissions) || (permissions.length > 0 && permissions.every(permission =>
@@ -1219,7 +1223,7 @@ export function runCxIncomingRules(rules: readonly IncomingRule[], payload: Inco
 
 
 export function createCxSession() {
-    const active = new Map<string, { name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; }>();
+    const active = new Map<string, { name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; privateCommand: boolean; }>();
     return {
         list: () => [...active].map(([id, { name }]) => ({ id, name })),
         source: (id: string) => active.get(id)?.source,
@@ -1236,8 +1240,12 @@ export function createCxSession() {
             const review = reviewCx(source);
             const id = review.kind === "theme" ? "theme" : "plugin:" + review.name;
             if (active.has(id)) throw new Error(review.kind === "theme" ? "Disable the active CX theme first" : "This CX plugin is already active");
-            if (active.size >= 16) throw new Error("Disable an extension before adding another");
-            active.set(id, { name: review.name, source, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected) });
+            const privateCommand = isPrivateCxCommand(review.permissions);
+            const activeSameType = [...active.values()].filter(entry => entry.privateCommand === privateCommand).length;
+            if (activeSameType >= (privateCommand ? maxPrivateCxCommandPlugins : maxOtherCxExtensions)) {
+                throw new Error(privateCommand ? "Disable a private command plugin before adding another" : "Disable an active theme or plugin with effects before adding another");
+            }
+            active.set(id, { name: review.name, source, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected), privateCommand });
         },
         disable(id: string) {
             const entry = active.get(id);

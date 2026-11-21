@@ -4,7 +4,7 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
-import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
+import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, MAX_REMEMBERED_CX_EXTENSIONS, searchCxCatalog } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
@@ -2232,7 +2232,7 @@ type RememberedAppearance = NonNullable<typeof settings.cxRememberedAppearance>[
 function readRememberedAppearance(): RememberedAppearance[] {
     const records = settings.cxRememberedAppearance;
     if (!Array.isArray(records)) return [];
-    return records.slice(0, 16).filter(entry => typeof entry?.name === "string" && typeof entry.revision === "string"
+    return records.slice(0, MAX_REMEMBERED_CX_EXTENSIONS).filter(entry => typeof entry?.name === "string" && typeof entry.revision === "string"
         && Array.isArray(entry.selected) && entry.selected.every(target => typeof target === "string"));
 }
 
@@ -2243,7 +2243,8 @@ function forgetRememberedAppearance(name: string) {
 function rememberAppearance(entry: RememberedAppearance, replaceTheme = false) {
     const remaining = readRememberedAppearance().filter(saved => saved.name !== entry.name
         && (!replaceTheme || rememberedCatalog.get(saved.name)?.id !== "theme"));
-    settings.cxRememberedAppearance = [entry, ...remaining].slice(0, 16);
+    if (remaining.length >= MAX_REMEMBERED_CX_EXTENSIONS) throw new Error("Remove a saved CX approval before saving another. Active for this session.");
+    settings.cxRememberedAppearance = [entry, ...remaining];
 }
 
 const rememberedAppearanceListeners = new Set<() => void>();

@@ -106,6 +106,19 @@ assert.equal(callbacks.size, 0);
 session.clear();
 assert.equal(background, undefined);
 
+const privateGrants = ["commands.register", "reply.local"];
+const privatePlugin = index => 'plugin "Private ' + index + '":\n  needs commands.register\n  needs reply.local\n  on command "private' + index + '":\n    reply "Hello"';
+const toastPlugin = index => 'plugin "Toast ' + index + '":\n  needs commands.register\n  needs ui.toast\n  on command "toast' + index + '":\n    toast "Hello"';
+for (let index = 0; index < 64; index++) session.enable(privatePlugin(index), host, privateGrants);
+for (let index = 0; index < 16; index++) session.enable(toastPlugin(index), host, grants);
+assert.equal(session.list().length, 80);
+assert.throws(() => session.enable(privatePlugin(64), host, privateGrants), /Disable a private command plugin/);
+assert.throws(() => session.enable(toastPlugin(16), host, grants), /Disable an active theme or plugin with effects/);
+session.disable("plugin:Private 0");
+session.enable(privatePlugin(64), host, privateGrants);
+session.clear();
+assert.equal(callbacks.size, 0);
+
 const stopFailure = new Error("unsubscribe failed");
 const stopped = [];
 const failingStopHost = {
@@ -5729,6 +5742,34 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(settings.cxRememberedAppearance.length, 0);
             unloadCommands();
         }
+
+        // Confirm that a saved catalog library can exceed the old combined limit
+        // while still restoring the original set on both host adapters.
+        const savedCommandPlugins = cxCatalog.plugins.filter(entry => entry.commands?.length
+            && moduleBox.exports.isPrivateCxCommand(reviewCx(entry.source).permissions)).slice(0, 20);
+        assert.equal(savedCommandPlugins.length, 20);
+        for (const entry of savedCommandPlugins) {
+            selectCatalog(entry.name);
+            await click(render(), "Allow and remember on this device");
+        }
+        const restoreCatalogCommands = async () => {
+            if (desktop) {
+                desktopPlugin.start();
+                await new Promise(setImmediate);
+                return () => desktopPlugin.stop();
+            }
+            return module.exports.restoreRememberedCxAppearance();
+        };
+        if (desktop) desktopPlugin.stop();
+        else module.exports.restoreRememberedCxAppearance()();
+        assert.equal(Object.keys(registered).length, 0);
+        const unloadCatalogCommands = await restoreCatalogCommands();
+        for (const entry of savedCommandPlugins) {
+            for (const name of entry.commands) assert.ok(registered[name], name + " restores");
+            await click(render(), "Disable " + entry.name);
+        }
+        assert.equal(Object.keys(registered).length, 0);
+        unloadCatalogCommands();
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
     assert.equal(parseCx(migrateCxPalette(":root { --background-primary: #123; --brand-500: #8765ab; }", "Test")).background, "#112233");
