@@ -246,6 +246,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const roleId = "100000000000000005";
         let selectedRoleGuild;
         const roleIcon = "b".repeat(32);
+        const menuGroupId = "100000000000000009";
+        let serverMenuData;
+        let groupMenuData;
         const jumpChannel = { id: "100000000000000016", type: 0, guild_id: guildId };
         const jumpRequests = [], jumpRoutes = [];
         let resolveJump;
@@ -416,7 +419,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 getGuildMemberProfile: (id, guild) => id === sender && guild === guildId
                     ? { themeColors: [0x123, 0xffffff], bio: "Hello from the **server profile**" } : undefined,
             },
-            ChannelStore: { getChannel: id => id === queueChannel.id ? queueChannel : id === jumpChannel.id ? jumpChannel : ({ id, name: "test", recipients: [sender], nsfw: id === "nsfw-channel", guild_id: id === "guild-channel" || id === repeatChannel ? guildId : undefined,
+            ChannelStore: { getChannel: id => id === menuGroupId ? groupMenuData : id === queueChannel.id ? queueChannel : id === jumpChannel.id ? jumpChannel : ({ id, name: "test", recipients: [sender], nsfw: id === "nsfw-channel", guild_id: id === "guild-channel" || id === repeatChannel ? guildId : undefined,
                 rateLimitPerUser: id === "slow-channel" ? 10 : 0 }) },
             PermissionStore: { can: (bit, channel) => channel?.id === queueChannel.id
                 ? bit === embedPermissions.MOVE_MEMBERS ? canBypassQueue : canJoinQueue
@@ -430,7 +433,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             GuildRoleStore: { getRole: (guild, id) => guild === guildId && id === roleId
                 ? { id, colorStrings: { primaryColor: "#12abcd" }, icon: roleIcon } : undefined },
             GuildStore: { getGuilds: () => ({ [guildId]: { id: guildId } }),
-                getGuild: id => id === guildId ? { id, ownerId: me } : undefined },
+                getGuild: id => id === guildId ? { id, ownerId: me, ...serverMenuData } : undefined },
             GuildChannelStore: { getChannels: () => ({
                 SELECTABLE: [{ channel: { id: "first" } }, { channel: { id: "missing" } }],
                 VOCAL: [{ channel: { id: "first" } }],
@@ -687,7 +690,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             },
             "@api/Settings": { Settings: { plugins: { CallTimer: { enabled: false } } } },
             "@api/ContextMenu": {
-                addContextMenuPatch: (menus, patch) => { assert.ok(["user-context", "expression-picker", "image-context", "message", "channel-context", "dev-context"].some(menu => menus.includes(menu))); menuPatches.add(patch); },
+                addContextMenuPatch: (menus, patch) => { assert.ok(["user-context", "expression-picker", "image-context", "message", "channel-context", "dev-context", "guild-context", "gdm-context"].some(menu => menus.includes(menu))); menuPatches.add(patch); },
                 findGroupChildrenByChildId: (id, children) => children.some(item => item?.props?.id === id) ? children : null,
                 removeContextMenuPatch: (_, patch) => menuPatches.delete(patch),
             },
@@ -1194,6 +1197,39 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(clipboardWrites.length, 0);
             assert.equal(menuPatches.size, 0);
             selectedRoleGuild = undefined;
+
+            const serverPlugins = ["View Server Media", "Copy Server Media Links", "Copy Server Details", "View Group DM Icon"];
+            for (const name of serverPlugins) {
+                selectCatalog(name);
+                click(render(), "Allow for this session");
+            }
+            const icon = "c".repeat(32);
+            const banner = "a_" + "d".repeat(32);
+            assert.deepEqual(roleActions({ guild: { id: guildId, icon } }), [], "the displayed menu payload cannot replace stored server metadata");
+            serverMenuData = { icon, banner, name: "Test server", description: "Server description" };
+            const serverMenu = roleActions({ guild: { id: guildId } });
+            assert.deepEqual(serverMenu.map(item => item.props.label), ["View Server Icon", "View Server Banner", "Copy Server Icon Link",
+                "Copy Server Banner Link", "Copy Server Name", "Copy Server Description"]);
+            for (const item of serverMenu) item.props.action();
+            const iconUrl = "https://cdn.discordapp.com/icons/" + guildId + "/" + icon + ".png?size=4096";
+            const serverBannerUrl = "https://cdn.discordapp.com/banners/" + guildId + "/" + banner + ".gif?size=4096";
+            assert.deepEqual(clipboardWrites.splice(0), [iconUrl, serverBannerUrl, "Test server", "Server description"]);
+            assert.deepEqual(viewedProfiles.splice(0).map(item => [item.url, item.animated]), [[iconUrl, false], [serverBannerUrl, true]]);
+            serverMenuData.icon = "https://example.com/not-a-discord-icon";
+            serverMenu[0].props.action();
+            assert.equal(viewedProfiles.length, 0);
+            groupMenuData = { id: menuGroupId, type: 1, icon };
+            const groupProps = { channel: { id: menuGroupId } };
+            assert.deepEqual(roleActions(groupProps), []);
+            groupMenuData.type = 3;
+            roleActions(groupProps)[0].props.action();
+            assert.equal(viewedProfiles.pop().url, "https://cdn.discordapp.com/channel-icons/" + menuGroupId + "/" + icon + ".png?size=4096");
+            for (const name of serverPlugins) click(render(), "Disable " + name);
+            serverMenu[5].props.action();
+            assert.equal(clipboardWrites.length, 0);
+            assert.equal(menuPatches.size, 0);
+            serverMenuData = undefined;
+            groupMenuData = undefined;
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));

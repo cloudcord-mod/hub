@@ -200,6 +200,57 @@ function registerRoleMenuAction(effect: "copy-role-color" | "copy-role-mention" 
     return () => { active = false; removeContextMenuPatch("dev-context", patch); };
 }
 
+type ServerMenuEffect = "view-server-media" | "copy-server-media-links" | "copy-server-details" | "view-group-dm-icon";
+
+function getCxGuildAssetUrl(path: "icons" | "banners" | "channel-icons", id: string, hash: unknown) {
+    if (typeof hash !== "string" || !/^(?:a_)?[a-f0-9]{32}$/.test(hash)) return;
+    const format = hash.startsWith("a_") ? "gif" : "png";
+    return "https://cdn.discordapp.com/" + path + "/" + id + "/" + hash + "." + format + "?size=4096";
+}
+
+function registerServerMenuActions(effect: ServerMenuEffect) {
+    // Server and group DM viewing adapted from ViewIcons (GPL-3.0-or-later).
+    const group = effect === "view-group-dm-icon";
+    const view = group || effect === "view-server-media";
+    const fields = group ? [{ key: "icon", label: "View Group Icon", width: 512 }] as const
+        : effect === "copy-server-details" ? [{ key: "name", label: "Copy Server Name" }, { key: "description", label: "Copy Server Description" }] as const
+            : [{ key: "icon", label: view ? "View Server Icon" : "Copy Server Icon Link", width: 512 },
+                { key: "banner", label: view ? "View Server Banner" : "Copy Server Banner Link", width: 1024 }] as const;
+    let active = true;
+    const patch: NavContextMenuPatchCallback = (children, props) => {
+        const id = group ? props?.channel?.id : props?.guild?.id;
+        if (!active || !isCxProfileUserId(id)) return;
+        for (const field of fields) {
+            const itemId = "cx-" + effect + "-" + field.key;
+            if (children.some(child => child?.props?.id === itemId)) continue;
+            const getValue = () => {
+                if (group) {
+                    const channel = ChannelStore.getChannel(id);
+                    return channel?.id === id && channel.type === 3 ? getCxGuildAssetUrl("channel-icons", id, channel.icon) : undefined;
+                }
+                const guild = GuildStore.getGuild(id);
+                if (guild?.id !== id) return;
+                if (field.key === "icon" || field.key === "banner")
+                    return getCxGuildAssetUrl(field.key === "icon" ? "icons" : "banners", id, guild[field.key]);
+                const text = guild[field.key];
+                return typeof text === "string" && text.trim() ? text : undefined;
+            };
+            if (!getValue()) continue;
+            children.push(<Menu.MenuItem id={itemId} label={field.label} action={() => {
+                if (!active) return;
+                const value = getValue();
+                if (!value) return;
+                if (view && "width" in field) openImageModal({ url: value, width: field.width, height: field.key === "icon" ? field.width : undefined,
+                    animated: value.includes(".gif?") });
+                else void copyToClipboard(value).catch(() => showToast("Couldn't copy the selected information."));
+            }} />);
+        }
+    };
+    const menus = group ? "gdm-context" : "guild-context";
+    addContextMenuPatch(menus, patch);
+    return () => { active = false; removeContextMenuPatch(menus, patch); };
+}
+
 const clearLocalNotes: Partial<Record<"notes" | "channels", () => void>> = {};
 let browseLocalChannelNotes: (() => void) | undefined;
 let findLocalUserTags: ((query: string) => Promise<string | undefined>) | undefined;
@@ -1087,6 +1138,11 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "copy-role-mention":
                 case "view-role-icon":
                     return registerRoleMenuAction(effect);
+                case "view-server-media":
+                case "copy-server-media-links":
+                case "copy-server-details":
+                case "view-group-dm-icon":
+                    return registerServerMenuActions(effect);
                 case "hide-suggested-channels":
                     return registerHideSuggestedChannels();
                 case "copy-text-attachment":

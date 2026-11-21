@@ -1,0 +1,3 @@
+plugin "View Server Media":
+  needs servers.mediaview
+  use view-server-media

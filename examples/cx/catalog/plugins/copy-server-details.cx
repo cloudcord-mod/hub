@@ -1,0 +1,3 @@
+plugin "Copy Server Details":
+  needs servers.detailscopy
+  use copy-server-details

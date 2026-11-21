@@ -1,0 +1,3 @@
+plugin "Copy Server Media Links":
+  needs servers.mediacopy
+  use copy-server-media-links

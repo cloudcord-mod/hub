@@ -2401,6 +2401,11 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "copy-role-mention":
                 case "view-role-icon":
                     throw new Error("Role menu actions are available on desktop and browser.");
+                case "view-server-media":
+                case "copy-server-media-links":
+                case "copy-server-details":
+                case "view-group-dm-icon":
+                    throw new Error("These server and group menu actions are available on desktop and browser.");
                 case "hide-suggested-channels": {
                     const suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
                     if (!suggested) throw new Error("Discord's suggested channels section is unavailable");

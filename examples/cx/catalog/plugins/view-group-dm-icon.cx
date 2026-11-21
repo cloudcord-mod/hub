@@ -1,0 +1,3 @@
+plugin "View Group DM Icon":
+  needs channels.iconview
+  use view-group-dm-icon

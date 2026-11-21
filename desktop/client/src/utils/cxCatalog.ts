@@ -52,6 +52,8 @@ import plugin_catalog_copy_raw_text from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_copy_role_color from "../../../../examples/cx/catalog/plugins/copy-role-color.cx";
 import plugin_catalog_copy_role_mention from "../../../../examples/cx/catalog/plugins/copy-role-mention.cx";
 import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plugins/copy-server-bio.cx";
+import plugin_catalog_copy_server_details from "../../../../examples/cx/catalog/plugins/copy-server-details.cx";
+import plugin_catalog_copy_server_media_links from "../../../../examples/cx/catalog/plugins/copy-server-media-links.cx";
 import plugin_catalog_copy_server_nickname from "../../../../examples/cx/catalog/plugins/copy-server-nickname.cx";
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
@@ -301,7 +303,9 @@ import plugin_catalog_user_notes from "../../../../examples/cx/catalog/plugins/u
 import plugin_catalog_user_tags from "../../../../examples/cx/catalog/plugins/user-tags.cx";
 import plugin_catalog_utf_8_byte_count from "../../../../examples/cx/catalog/plugins/utf-8-byte-count.cx";
 import plugin_catalog_vibe_check from "../../../../examples/cx/catalog/plugins/vibe-check.cx";
+import plugin_catalog_view_group_dm_icon from "../../../../examples/cx/catalog/plugins/view-group-dm-icon.cx";
 import plugin_catalog_view_role_icon from "../../../../examples/cx/catalog/plugins/view-role-icon.cx";
+import plugin_catalog_view_server_media from "../../../../examples/cx/catalog/plugins/view-server-media.cx";
 import plugin_catalog_voice_count from "../../../../examples/cx/catalog/plugins/voice-count.cx";
 import plugin_catalog_voice_join_messages from "../../../../examples/cx/catalog/plugins/voice-join-messages.cx";
 import plugin_catalog_vriska_s_typing_quirk from "../../../../examples/cx/catalog/plugins/vriska-s-typing-quirk.cx";
@@ -474,6 +478,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyRoleColor", source: plugin_catalog_copy_role_color, description: "Copy the selected server role's hex color", desktopOnly: true, categories: ["Servers & channels"] },
         { name: "CopyRoleMention", source: plugin_catalog_copy_role_mention, description: "Copy mention markup for the selected server role", desktopOnly: true, categories: ["Servers & channels"] },
         { name: "CopyServerBio", source: plugin_catalog_copy_server_bio, description: "Copy Server Bio", categories: ["Profiles"] },
+        { name: "Copy Server Details", source: plugin_catalog_copy_server_details, description: "Copy the selected server's name or description", desktopOnly: true, categories: ["Servers & channels"] },
+        { name: "Copy Server Media Links", source: plugin_catalog_copy_server_media_links, description: "Copy links to the selected server's icon and banner", desktopOnly: true, categories: ["Media","Servers & channels"] },
         { name: "CopyServerNickname", source: plugin_catalog_copy_server_nickname, description: "Copy Server Nickname", categories: ["Profiles"] },
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links, description: "Add Copy Sticker Link and Open Sticker Link actions", categories: ["Media"] },
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention, description: "Copy User Mention", categories: ["Profiles"] },
@@ -723,7 +729,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "UserTags", source: plugin_catalog_user_tags, description: "Tag users in profile menus and search those tags on this device", commands: ["find-user-tags"], categories: ["Commands","Profiles"] },
         { name: "UTF-8 Byte Count", source: plugin_catalog_utf_8_byte_count, description: "/utf8size", commands: ["utf8size"], categories: ["Commands"] },
         { name: "VibeCheck", source: plugin_catalog_vibe_check, description: "/vibe", commands: ["vibe"], categories: ["Chat","Commands"] },
-        { name: "ViewRoleIcon", source: plugin_catalog_view_role_icon, description: "Open the selected server role's icon in Discord's image viewer", desktopOnly: true, categories: ["Servers & channels"] },
+        { name: "View Group DM Icon", source: plugin_catalog_view_group_dm_icon, description: "View the selected group DM's icon", desktopOnly: true, categories: ["Media","Servers & channels"] },
+        { name: "ViewRoleIcon", source: plugin_catalog_view_role_icon, description: "Open the selected server role's icon in Discord's image viewer", desktopOnly: true, categories: ["Media","Servers & channels"] },
+        { name: "View Server Media", source: plugin_catalog_view_server_media, description: "View the selected server's icon and banner", desktopOnly: true, categories: ["Media","Servers & channels"] },
         { name: "VoiceCount", source: plugin_catalog_voice_count, description: "Show occupancy and capacity in the channel list", categories: ["Voice & calls"] },
         { name: "VoiceJoinMessages", source: plugin_catalog_voice_join_messages, description: "Show local notifications when friends join or move between voice channels", categories: ["Voice & calls"] },
         { name: "Vriska'sTypingQuirk", source: plugin_catalog_vriska_s_typing_quirk, description: "Apply 38 text rules to message sends and preserve links", categories: ["Chat"] },
