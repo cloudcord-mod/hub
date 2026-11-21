@@ -596,6 +596,9 @@ function fromSharedProfile(data: any): CustomProfileData {
         hiddenBadgeIds: Array.isArray(data?.hiddenBadgeIds) ? data.hiddenBadgeIds : [],
         nativeBadgeOrder: Array.isArray(data?.nativeBadgeOrder) ? data.nativeBadgeOrder.map(Number) : [],
         nativeHiddenBadges: Array.isArray(data?.nativeHiddenBadges) ? data.nativeHiddenBadges.map(Number) : [],
+        activityAmounts: data?.activityAmounts && typeof data.activityAmounts === "object" && !Array.isArray(data.activityAmounts)
+            ? Object.fromEntries(Object.entries(data.activityAmounts).filter(([, amount]) => Number.isSafeInteger(amount) && Number(amount) >= 0 && Number(amount) <= 1_000_000))
+            : {},
         badgeOrder: Array.isArray(data?.badgeOrder) ? data.badgeOrder : []
     };
 }
@@ -707,10 +710,19 @@ let profileRuntimeGeneration = 0;
 // Set while a template is previewed on your profile.
 let templatePreview: { data: CustomProfileData; enabled: boolean; pullUntil: number; name: string; } | null = null;
 const LOCAL_ONLY_FIELDS = ["localOnly", "hideOtherProfiles", "nativeEditorImages", "hideBadgesWhenSyncOff", "copiedUserId"];
+const DESKTOP_PROFILE_FIELDS = new Set([
+    ...LOCAL_ONLY_FIELDS, "username", "globalName", "displayName", "avatar", "banner", "bio", "pronouns",
+    "accentColor", "accentColor2", "primaryColor", "profileColorsEnabled", "badgeFlags", "createdAt",
+    "nitro", "nitroLevel", "nitroSince", "boostMonths", "customBadgeIds", "replaceRealBadges", "giftLevel",
+    "nativeBadgeOrder", "nativeHiddenBadges", "hiddenBadgeIds", "badgeOrder", "activityAmounts",
+    "oldName", "decorationAsset", "decorationSkuId", "avatarDecoration", "avatarDecorationSku",
+    "signupDate", "joinedSince", "syncRevision", "displayNameStyles", "serverTag", "nameplate",
+    "profileEffect", "profileFrame", "customStatus", "customActivity", "presenceStatus", "customConnections", "customFriends",
+]);
 function remoteOnlyFields() {
     if (!lastRemoteProfile || typeof lastRemoteProfile !== "object") return {};
     const kept: Record<string, any> = {};
-    for (const [key, value] of Object.entries(lastRemoteProfile)) if (!LOCAL_ONLY_FIELDS.includes(key)) kept[key] = value;
+    for (const [key, value] of Object.entries(lastRemoteProfile)) if (!DESKTOP_PROFILE_FIELDS.has(key)) kept[key] = value;
     return kept;
 }
 
@@ -795,7 +807,7 @@ async function publishSharedProfileSnapshot(allowRetry = true): Promise<void> {
     const response = await fetchProfileResponse(`${SHARED_PROFILE_API}${saved.id ? `/v1/profiles/${encodeURIComponent(saved.id)}` : "/v1/profiles"}`, {
         method: saved.id ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", ...(saved.editToken ? { Authorization: `Bearer ${saved.editToken}` } : {}) },
-        // Keep fields only the phone app knows about, so saving here never wipes them.
+        // Preserve unknown fields. Desktop-owned fields must reflect the saved look, including removals.
         body: JSON.stringify({ ownerId, profile: { ...remoteOnlyFields(), ...toSharedProfile(storedData) } })
     });
     if (!profileRuntimeActive || generation !== profileRuntimeGeneration || activeUserId() !== ownerId) return;

@@ -1218,6 +1218,8 @@ jobs:
                   avatarDecoration: snapshot.avatarDecoration || null,
                   avatarDecorationSku: snapshot.avatarDecorationSku || null,
                   profileColorsEnabled: snapshot.profileColorsEnabled,
+                  displayNameStyles: null, serverTag: null, nameplate: null, profileEffect: null, profileFrame: null,
+                  customStatus: null, customActivity: null, presenceStatus: null, customConnections: [], customFriends: [],
                   ...normalizeProfileAppearance(snapshot),
                   primaryColor: snapshot.profileColorsEnabled ? colorNumber(snapshot.primaryColor) : null,
                   accentColor: snapshot.profileColorsEnabled ? colorNumber(snapshot.accentColor) : null,
@@ -1231,7 +1233,7 @@ jobs:
                   replaceRealBadges: snapshot.replaceBadges === true,
                   hiddenBadgeIds: [...snapshot.hiddenBadgeIds],
                   nativeBadgeOrder: (() => { try { return rootSettings.fakeProfileNativeOrder || []; } catch { return []; } })(),
-                  activityAmounts: preview.activityAmounts || {},
+                  activityAmounts: snapshot.activityAmounts || {},
                   nativeHiddenBadges: (() => { try { return rootSettings.fakeProfileNativeHidden || []; } catch { return []; } })(),
                   badgeOrder: [...snapshot.badgeOrder],
                   customBadgeIds: [
@@ -1419,7 +1421,7 @@ jobs:
                       selectedBadges,
                       hiddenBadgeIds: Array.isArray(data.hiddenBadgeIds) ? data.hiddenBadgeIds : [],
                       badgeOrder: Array.isArray(data.badgeOrder) ? data.badgeOrder : [],
-                      activityAmounts: data.activityAmounts && typeof data.activityAmounts === "object" ? data.activityAmounts : (preview.activityAmounts || {}),
+                      activityAmounts: data.activityAmounts && typeof data.activityAmounts === "object" && !Array.isArray(data.activityAmounts) ? data.activityAmounts : {},
                       syncRevision: Number(data.syncRevision || 0)
                   } satisfies PreviewSettings;
                   // Polls commonly return the same snapshot. Replacing the
@@ -4937,7 +4939,12 @@ jobs:
                               preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw();
                           }} /> : null}
                           {(activeTab as string) === "saved" ? <SavedProfiles current={preview} realUser={realCurrentUser} onUse={(data: any) => {
-                              rootSettings.fakeProfile = loadSavedLook(preview, data);
+                              const restored = loadSavedLook(preview, data);
+                              for (const field of ["avatarMedia", "bannerMedia"] as const) {
+                                  if (restored[field]) unmarkMediaCleared(field);
+                                  else markMediaCleared(field);
+                              }
+                              rootSettings.fakeProfile = restored;
                               preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw();
                           }} /> : null}
                           {activeTab === "others" ? <Card><LocalProfiles badges={BADGES} refresh={() => { clearCache(); refreshPreview(); redraw(); }}

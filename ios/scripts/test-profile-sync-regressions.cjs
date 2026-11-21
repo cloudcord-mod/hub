@@ -294,12 +294,16 @@ assert.equal(nativeSave.storedData.syncRevision, undefined, 'device-only saves n
         saveDataSync() {}, saveAllDataSync() {}, DataStore: { get: async () => ({}), set: async () => {} },
         localStorage: { getItem: () => null },
         fetch: async (_url, options) => options?.method ? (published = JSON.parse(options.body), { ok: true, json: async () => ({ id: 'saved', editToken: 'test' }) })
-            : ({ ok: true, json: async () => ({ profile: { mobileOnly: 'latest', replaceRealBadges: true, syncRevision: 5 } }) })
+            : ({ ok: true, json: async () => ({ profile: { mobileOnly: 'latest', replaceRealBadges: true, syncRevision: 5,
+                avatar: 'stale avatar', banner: 'stale banner', profileFrame: { skuId: 'stale frame' }, activityAmounts: { streaming: 20 } } }) })
     });
     vm.runInContext(compile(block(desktop, 'const LOCAL_ONLY_FIELDS', 'async function publishSharedProfile(') + block(desktop, 'async function publishSharedProfile(', '// Save edits made outside the modal')), publisher);
     await publisher.publishSharedProfile();
     assert.equal(published.profile.mobileOnly, 'latest', 'preserve fresh remote-only fields, not an old cached snapshot');
     assert.equal(published.profile.replaceRealBadges, false);
+    for (const key of ['avatar', 'banner', 'profileFrame', 'activityAmounts']) {
+        assert.equal(Object.hasOwn(published.profile, key), false, key + ' from a previous saved look must not come back');
+    }
     assert.equal(published.profile.hideBadgesWhenSyncOff, undefined, 'local badge visibility must not leak into shared settings');
     publisher.activeUserId = () => 'switched';
     publisher.fetch = async () => { publisher.activeUserId = () => 'another'; return { ok: true }; };

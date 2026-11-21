@@ -26,6 +26,10 @@ vm.runInContext(compile(block('function monthsAgo(', 'function durationLabel(')
     assert.equal(context.profileDate('2024-02-29').toISOString().slice(0, 10), '2024-02-29');
     assert(context.nitroSubscriberLabel(3, '2025-07-28').includes('7/28/25'), 'badge tooltip uses saved subscriber date, not the tier-derived estimate');
     assert.equal((await context.ownSharedProfile()).nitroSince, '2025-07-28', 'mobile re-publishing preserves the explicit desktop subscriber date');
+    context.preview.activityAmounts = { streaming: 99 };
+    const saved = await context.ownSharedProfile({ ...context.preview, activityAmounts: { streaming: 12 } });
+    assert.equal(saved.activityAmounts.streaming, 12, 'publication uses the captured look even when live activity edits differ');
+    for (const key of ['nameplate', 'profileEffect', 'profileFrame', 'customStatus']) assert.equal(saved[key], null);
     context.preview.nitroSince = '2026-02-30';
     assert.equal((await context.ownSharedProfile()).nitroSince, '2025-12-31', 'invalid explicit date falls back to a valid milestone estimate');
     assert(source.includes('nitroSince: typeof data.nitroSince === "string" ? data.nitroSince : ""'), 'own profile pull retains the shared date');
