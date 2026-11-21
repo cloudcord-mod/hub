@@ -1,0 +1,3 @@
+plugin "HideDownloadAppsButton":
+  needs appearance.style
+  style hide-download-apps-button

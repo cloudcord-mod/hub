@@ -1,0 +1,3 @@
+plugin "FocusMode":
+  needs appearance.style
+  style focus-mode

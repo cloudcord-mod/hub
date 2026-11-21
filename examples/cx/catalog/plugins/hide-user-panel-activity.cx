@@ -1,0 +1,3 @@
+plugin "HideUserPanelActivity":
+  needs appearance.style
+  style hide-user-panel-activity

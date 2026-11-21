@@ -1,0 +1,3 @@
+plugin "NoMessageHoverBar":
+  needs appearance.style
+  style no-message-hover-bar

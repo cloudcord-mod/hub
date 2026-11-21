@@ -1,0 +1,3 @@
+plugin "SmoothScrolling":
+  needs appearance.style
+  style smooth-scrolling

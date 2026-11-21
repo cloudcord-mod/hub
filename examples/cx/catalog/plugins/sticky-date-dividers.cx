@@ -1,0 +1,3 @@
+plugin "StickyDateDividers":
+  needs appearance.style
+  style sticky-date-dividers

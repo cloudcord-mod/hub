@@ -10,12 +10,15 @@ import plugin_catalog_avatar_grabber from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_better_chat_names from "../../../../examples/cx/catalog/plugins/better-chat-names.cx";
 import plugin_catalog_better_gif_alt_text from "../../../../examples/cx/catalog/plugins/better-gif-alt-text.cx";
 import plugin_catalog_better_plus_reacts from "../../../../examples/cx/catalog/plugins/better-plus-reacts.cx";
+import plugin_catalog_bigger_avatars_in_chat from "../../../../examples/cx/catalog/plugins/bigger-avatars-in-chat.cx";
 import plugin_catalog_bigger_code_blocks from "../../../../examples/cx/catalog/plugins/bigger-code-blocks.cx";
+import plugin_catalog_bigger_jumbo_emojis from "../../../../examples/cx/catalog/plugins/bigger-jumbo-emojis.cx";
 import plugin_catalog_bigger_server_icons from "../../../../examples/cx/catalog/plugins/bigger-server-icons.cx";
 import plugin_catalog_block_keywords from "../../../../examples/cx/catalog/plugins/block-keywords.cx";
 import plugin_catalog_blur_images_until_hover from "../../../../examples/cx/catalog/plugins/blur-images-until-hover.cx";
 import plugin_catalog_blur_nsfw from "../../../../examples/cx/catalog/plugins/blur-nsfw.cx";
 import plugin_catalog_bold_text from "../../../../examples/cx/catalog/plugins/bold-text.cx";
+import plugin_catalog_bold_usernames from "../../../../examples/cx/catalog/plugins/bold-usernames.cx";
 import plugin_catalog_bypass_pin_prompt from "../../../../examples/cx/catalog/plugins/bypass-pin-prompt.cx";
 import plugin_catalog_calculator from "../../../../examples/cx/catalog/plugins/calculator.cx";
 import plugin_catalog_call_time_counter from "../../../../examples/cx/catalog/plugins/call-time-counter.cx";
@@ -28,7 +31,9 @@ import plugin_catalog_client_side_block from "../../../../examples/cx/catalog/pl
 import plugin_catalog_cloud_cord_accent from "../../../../examples/cx/catalog/plugins/cloud-cord-accent.cx";
 import plugin_catalog_color_text from "../../../../examples/cx/catalog/plugins/color-text.cx";
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
+import plugin_catalog_compact_compose from "../../../../examples/cx/catalog/plugins/compact-compose.cx";
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
+import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
@@ -55,12 +60,14 @@ import plugin_catalog_fix_codeblock_gap from "../../../../examples/cx/catalog/pl
 import plugin_catalog_fix_file_extensions from "../../../../examples/cx/catalog/plugins/fix-file-extensions.cx";
 import plugin_catalog_fix_images_quality from "../../../../examples/cx/catalog/plugins/fix-images-quality.cx";
 import plugin_catalog_floating_chat_bar from "../../../../examples/cx/catalog/plugins/floating-chat-bar.cx";
+import plugin_catalog_focus_mode from "../../../../examples/cx/catalog/plugins/focus-mode.cx";
 import plugin_catalog_follow_voice_user from "../../../../examples/cx/catalog/plugins/follow-voice-user.cx";
 import plugin_catalog_force_owner_crown from "../../../../examples/cx/catalog/plugins/force-owner-crown.cx";
 import plugin_catalog_foreign_copy_handler from "../../../../examples/cx/catalog/plugins/foreign-copy-handler.cx";
 import plugin_catalog_friend_invites from "../../../../examples/cx/catalog/plugins/friend-invites.cx";
 import plugin_catalog_gamzee_s_typing_quirk from "../../../../examples/cx/catalog/plugins/gamzee-s-typing-quirk.cx";
 import plugin_catalog_google_that from "../../../../examples/cx/catalog/plugins/google-that.cx";
+import plugin_catalog_grayscale_images from "../../../../examples/cx/catalog/plugins/grayscale-images.cx";
 import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plugins/hide-active-now.cx";
 import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catalog/plugins/hide-add-server-button.cx";
 import plugin_catalog_hide_apps_button from "../../../../examples/cx/catalog/plugins/hide-apps-button.cx";
@@ -74,7 +81,9 @@ import plugin_catalog_hide_character_count from "../../../../examples/cx/catalog
 import plugin_catalog_hide_clan_tags from "../../../../examples/cx/catalog/plugins/hide-clan-tags.cx";
 import plugin_catalog_hide_custom_statuses from "../../../../examples/cx/catalog/plugins/hide-custom-statuses.cx";
 import plugin_catalog_hide_disabled_emojis from "../../../../examples/cx/catalog/plugins/hide-disabled-emojis.cx";
+import plugin_catalog_hide_discover_button from "../../../../examples/cx/catalog/plugins/hide-discover-button.cx";
 import plugin_catalog_hide_dm_search from "../../../../examples/cx/catalog/plugins/hide-dm-search.cx";
+import plugin_catalog_hide_download_apps_button from "../../../../examples/cx/catalog/plugins/hide-download-apps-button.cx";
 import plugin_catalog_hide_edited_label from "../../../../examples/cx/catalog/plugins/hide-edited-label.cx";
 import plugin_catalog_hide_embeds from "../../../../examples/cx/catalog/plugins/hide-embeds.cx";
 import plugin_catalog_hide_emoji_button from "../../../../examples/cx/catalog/plugins/hide-emoji-button.cx";
@@ -87,7 +96,9 @@ import plugin_catalog_hide_help_button from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hide_image_alt_text from "../../../../examples/cx/catalog/plugins/hide-image-alt-text.cx";
 import plugin_catalog_hide_inbox_button from "../../../../examples/cx/catalog/plugins/hide-inbox-button.cx";
 import plugin_catalog_hide_jump_to_present from "../../../../examples/cx/catalog/plugins/hide-jump-to-present.cx";
+import plugin_catalog_hide_keyboard_tips from "../../../../examples/cx/catalog/plugins/hide-keyboard-tips.cx";
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
+import plugin_catalog_hide_member_list_button from "../../../../examples/cx/catalog/plugins/hide-member-list-button.cx";
 import plugin_catalog_hide_mention_badges from "../../../../examples/cx/catalog/plugins/hide-mention-badges.cx";
 import plugin_catalog_hide_nameplates from "../../../../examples/cx/catalog/plugins/hide-nameplates.cx";
 import plugin_catalog_hide_new_messages_bar from "../../../../examples/cx/catalog/plugins/hide-new-messages-bar.cx";
@@ -115,6 +126,8 @@ import plugin_catalog_hide_timestamps from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_typing_indicator from "../../../../examples/cx/catalog/plugins/hide-typing-indicator.cx";
 import plugin_catalog_hide_unread_pills from "../../../../examples/cx/catalog/plugins/hide-unread-pills.cx";
 import plugin_catalog_hide_upload_button from "../../../../examples/cx/catalog/plugins/hide-upload-button.cx";
+import plugin_catalog_hide_user_panel_activity from "../../../../examples/cx/catalog/plugins/hide-user-panel-activity.cx";
+import plugin_catalog_hide_voice_panel_tips from "../../../../examples/cx/catalog/plugins/hide-voice-panel-tips.cx";
 import plugin_catalog_hide_voice_user_avatars from "../../../../examples/cx/catalog/plugins/hide-voice-user-avatars.cx";
 import plugin_catalog_high_contrast_text from "../../../../examples/cx/catalog/plugins/high-contrast-text.cx";
 import plugin_catalog_high_res_profile_images from "../../../../examples/cx/catalog/plugins/high-res-profile-images.cx";
@@ -122,6 +135,7 @@ import plugin_catalog_highlight_links from "../../../../examples/cx/catalog/plug
 import plugin_catalog_highlight_mentions from "../../../../examples/cx/catalog/plugins/highlight-mentions.cx";
 import plugin_catalog_hold_your_tongue from "../../../../examples/cx/catalog/plugins/hold-your-tongue.cx";
 import plugin_catalog_hop_on from "../../../../examples/cx/catalog/plugins/hop-on.cx";
+import plugin_catalog_hover_highlight_messages from "../../../../examples/cx/catalog/plugins/hover-highlight-messages.cx";
 import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins/ignore-calls.cx";
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
@@ -143,6 +157,7 @@ import plugin_catalog_no_blocked_messages from "../../../../examples/cx/catalog/
 import plugin_catalog_no_chat_bar_border from "../../../../examples/cx/catalog/plugins/no-chat-bar-border.cx";
 import plugin_catalog_no_confirm_pin from "../../../../examples/cx/catalog/plugins/no-confirm-pin.cx";
 import plugin_catalog_no_draft_length_limit from "../../../../examples/cx/catalog/plugins/no-draft-length-limit.cx";
+import plugin_catalog_no_message_hover_bar from "../../../../examples/cx/catalog/plugins/no-message-hover-bar.cx";
 import plugin_catalog_no_mosaic from "../../../../examples/cx/catalog/plugins/no-mosaic.cx";
 import plugin_catalog_no_pending_count from "../../../../examples/cx/catalog/plugins/no-pending-count.cx";
 import plugin_catalog_no_profile_themes from "../../../../examples/cx/catalog/plugins/no-profile-themes.cx";
@@ -150,6 +165,7 @@ import plugin_catalog_no_reply_mention from "../../../../examples/cx/catalog/plu
 import plugin_catalog_no_reply_ping from "../../../../examples/cx/catalog/plugins/no-reply-ping.cx";
 import plugin_catalog_no_role_headers from "../../../../examples/cx/catalog/plugins/no-role-headers.cx";
 import plugin_catalog_no_server_emojis from "../../../../examples/cx/catalog/plugins/no-server-emojis.cx";
+import plugin_catalog_no_shadows from "../../../../examples/cx/catalog/plugins/no-shadows.cx";
 import plugin_catalog_no_typing_animation from "../../../../examples/cx/catalog/plugins/no-typing-animation.cx";
 import plugin_catalog_no_unblock_to_jump from "../../../../examples/cx/catalog/plugins/no-unblock-to-jump.cx";
 import plugin_catalog_normalize_message_links from "../../../../examples/cx/catalog/plugins/normalize-message-links.cx";
@@ -173,6 +189,7 @@ import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_rot13_text from "../../../../examples/cx/catalog/plugins/rot13-text.cx";
 import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/plugins/round-server-icons.cx";
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
+import plugin_catalog_rounded_images from "../../../../examples/cx/catalog/plugins/rounded-images.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
 import plugin_catalog_scroll_to_latest from "../../../../examples/cx/catalog/plugins/scroll-to-latest.cx";
 import plugin_catalog_sed_enhanced from "../../../../examples/cx/catalog/plugins/sed-enhanced.cx";
@@ -184,6 +201,9 @@ import plugin_catalog_signature from "../../../../examples/cx/catalog/plugins/si
 import plugin_catalog_silence_users from "../../../../examples/cx/catalog/plugins/silence-users.cx";
 import plugin_catalog_silent_message_toggle from "../../../../examples/cx/catalog/plugins/silent-message-toggle.cx";
 import plugin_catalog_silent_typing from "../../../../examples/cx/catalog/plugins/silent-typing.cx";
+import plugin_catalog_smaller_avatars_in_chat from "../../../../examples/cx/catalog/plugins/smaller-avatars-in-chat.cx";
+import plugin_catalog_smooth_scrolling from "../../../../examples/cx/catalog/plugins/smooth-scrolling.cx";
+import plugin_catalog_soft_corners from "../../../../examples/cx/catalog/plugins/soft-corners.cx";
 import plugin_catalog_sollux_typing_quirk from "../../../../examples/cx/catalog/plugins/sollux-typing-quirk.cx";
 import plugin_catalog_sort_reactions from "../../../../examples/cx/catalog/plugins/sort-reactions.cx";
 import plugin_catalog_space_out from "../../../../examples/cx/catalog/plugins/space-out.cx";
@@ -191,10 +211,12 @@ import plugin_catalog_split_large_messages from "../../../../examples/cx/catalog
 import plugin_catalog_spotify_share_commands from "../../../../examples/cx/catalog/plugins/spotify-share-commands.cx";
 import plugin_catalog_starify from "../../../../examples/cx/catalog/plugins/starify.cx";
 import plugin_catalog_sticker_blocker from "../../../../examples/cx/catalog/plugins/sticker-blocker.cx";
+import plugin_catalog_sticky_date_dividers from "../../../../examples/cx/catalog/plugins/sticky-date-dividers.cx";
 import plugin_catalog_stop_auto_unread from "../../../../examples/cx/catalog/plugins/stop-auto-unread.cx";
 import plugin_catalog_talk_in_reverse from "../../../../examples/cx/catalog/plugins/talk-in-reverse.cx";
 import plugin_catalog_terezi_typing_quirk from "../../../../examples/cx/catalog/plugins/terezi-typing-quirk.cx";
 import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins/text-replace.cx";
+import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plugins/thin-scrollbars.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
@@ -210,6 +232,7 @@ import plugin_catalog_vriska_s_typing_quirk from "../../../../examples/cx/catalo
 import plugin_catalog_wait_for_slot from "../../../../examples/cx/catalog/plugins/wait-for-slot.cx";
 import plugin_catalog_webcam_start_notifier from "../../../../examples/cx/catalog/plugins/webcam-start-notifier.cx";
 import plugin_catalog_wider_channel_list from "../../../../examples/cx/catalog/plugins/wider-channel-list.cx";
+import plugin_catalog_wider_chat from "../../../../examples/cx/catalog/plugins/wider-chat.cx";
 import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/wiki-lookup.cx";
 import plugin_catalog_write_upper_case from "../../../../examples/cx/catalog/plugins/write-upper-case.cx";
 import plugin_catalog_zero_width_sanitizer from "../../../../examples/cx/catalog/plugins/zero-width-sanitizer.cx";
@@ -327,12 +350,15 @@ export const cxCatalog = {
         { name: "BetterChatNames", source: plugin_catalog_better_chat_names },
         { name: "BetterGifAltText", source: plugin_catalog_better_gif_alt_text },
         { name: "BetterPlusReacts", source: plugin_catalog_better_plus_reacts },
+        { name: "BiggerAvatarsInChat", source: plugin_catalog_bigger_avatars_in_chat },
         { name: "BiggerCodeBlocks", source: plugin_catalog_bigger_code_blocks },
+        { name: "BiggerJumboEmojis", source: plugin_catalog_bigger_jumbo_emojis },
         { name: "BiggerServerIcons", source: plugin_catalog_bigger_server_icons },
         { name: "BlockKeywords", source: plugin_catalog_block_keywords },
         { name: "BlurImagesUntilHover", source: plugin_catalog_blur_images_until_hover },
         { name: "BlurNSFW", source: plugin_catalog_blur_nsfw },
         { name: "BoldText", source: plugin_catalog_bold_text },
+        { name: "BoldUsernames", source: plugin_catalog_bold_usernames },
         { name: "BypassPinPrompt", source: plugin_catalog_bypass_pin_prompt },
         { name: "Calculator", source: plugin_catalog_calculator },
         { name: "CallTimeCounter", source: plugin_catalog_call_time_counter },
@@ -345,7 +371,9 @@ export const cxCatalog = {
         { name: "CloudCordAccent", source: plugin_catalog_cloud_cord_accent },
         { name: "ColorText", source: plugin_catalog_color_text },
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions },
+        { name: "CompactCompose", source: plugin_catalog_compact_compose },
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list },
+        { name: "CompactServerList", source: plugin_catalog_compact_server_list },
         { name: "CopyBios", source: plugin_catalog_copy_bios },
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown },
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents },
@@ -372,12 +400,14 @@ export const cxCatalog = {
         { name: "FixFileExtensions", source: plugin_catalog_fix_file_extensions },
         { name: "FixImagesQuality", source: plugin_catalog_fix_images_quality },
         { name: "FloatingChatBar", source: plugin_catalog_floating_chat_bar },
+        { name: "FocusMode", source: plugin_catalog_focus_mode },
         { name: "FollowVoiceUser", source: plugin_catalog_follow_voice_user },
         { name: "ForceOwnerCrown", source: plugin_catalog_force_owner_crown },
         { name: "foreignCopyHandler", source: plugin_catalog_foreign_copy_handler },
         { name: "FriendInvites", source: plugin_catalog_friend_invites },
         { name: "Gamzee'sTypingQuirk", source: plugin_catalog_gamzee_s_typing_quirk },
         { name: "GoogleThat", source: plugin_catalog_google_that },
+        { name: "GrayscaleImages", source: plugin_catalog_grayscale_images },
         { name: "HideActiveNow", source: plugin_catalog_hide_active_now },
         { name: "HideAddServerButton", source: plugin_catalog_hide_add_server_button },
         { name: "HideAppsButton", source: plugin_catalog_hide_apps_button },
@@ -391,7 +421,9 @@ export const cxCatalog = {
         { name: "HideClanTags", source: plugin_catalog_hide_clan_tags },
         { name: "HideCustomStatuses", source: plugin_catalog_hide_custom_statuses },
         { name: "HideDisabledEmojis", source: plugin_catalog_hide_disabled_emojis },
+        { name: "HideDiscoverButton", source: plugin_catalog_hide_discover_button },
         { name: "HideDmSearch", source: plugin_catalog_hide_dm_search },
+        { name: "HideDownloadAppsButton", source: plugin_catalog_hide_download_apps_button },
         { name: "HideEditedLabel", source: plugin_catalog_hide_edited_label },
         { name: "HideEmbeds", source: plugin_catalog_hide_embeds },
         { name: "HideEmojiButton", source: plugin_catalog_hide_emoji_button },
@@ -404,7 +436,9 @@ export const cxCatalog = {
         { name: "HideImageAltText", source: plugin_catalog_hide_image_alt_text },
         { name: "HideInboxButton", source: plugin_catalog_hide_inbox_button },
         { name: "HideJumpToPresent", source: plugin_catalog_hide_jump_to_present },
+        { name: "HideKeyboardTips", source: plugin_catalog_hide_keyboard_tips },
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities },
+        { name: "HideMemberListButton", source: plugin_catalog_hide_member_list_button },
         { name: "HideMentionBadges", source: plugin_catalog_hide_mention_badges },
         { name: "HideNameplates", source: plugin_catalog_hide_nameplates },
         { name: "HideNewMessagesBar", source: plugin_catalog_hide_new_messages_bar },
@@ -432,6 +466,8 @@ export const cxCatalog = {
         { name: "HideTypingIndicator", source: plugin_catalog_hide_typing_indicator },
         { name: "HideUnreadPills", source: plugin_catalog_hide_unread_pills },
         { name: "HideUploadButton", source: plugin_catalog_hide_upload_button },
+        { name: "HideUserPanelActivity", source: plugin_catalog_hide_user_panel_activity },
+        { name: "HideVoicePanelTips", source: plugin_catalog_hide_voice_panel_tips },
         { name: "HideVoiceUserAvatars", source: plugin_catalog_hide_voice_user_avatars },
         { name: "HighContrastText", source: plugin_catalog_high_contrast_text },
         { name: "High-Res Profile Images", source: plugin_catalog_high_res_profile_images },
@@ -439,13 +475,14 @@ export const cxCatalog = {
         { name: "HighlightMentions", source: plugin_catalog_highlight_mentions },
         { name: "HoldYourTongue", source: plugin_catalog_hold_your_tongue },
         { name: "HopOn", source: plugin_catalog_hop_on },
+        { name: "HoverHighlightMessages", source: plugin_catalog_hover_highlight_messages },
         { name: "IgnoreCalls", source: plugin_catalog_ignore_calls },
         { name: "ImageFilename", source: plugin_catalog_image_filename },
         { name: "ImageLink", source: plugin_catalog_image_link },
         { name: "InRole", source: plugin_catalog_in_role },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator },
-        { name: "JumpToTop", source: plugin_catalog_jump_to_top },
         { name: "JumpTo", source: plugin_catalog_jump_to },
+        { name: "JumpToTop", source: plugin_catalog_jump_to_top },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify },
         { name: "LeetText", source: plugin_catalog_leet_text },
         { name: "LinkConverter", source: plugin_catalog_link_converter },
@@ -460,6 +497,7 @@ export const cxCatalog = {
         { name: "NoChatBarBorder", source: plugin_catalog_no_chat_bar_border },
         { name: "NoConfirmPin", source: plugin_catalog_no_confirm_pin },
         { name: "NoDraftLengthLimit", source: plugin_catalog_no_draft_length_limit },
+        { name: "NoMessageHoverBar", source: plugin_catalog_no_message_hover_bar },
         { name: "NoMosaic", source: plugin_catalog_no_mosaic },
         { name: "NoPendingCount", source: plugin_catalog_no_pending_count },
         { name: "NoProfileThemes", source: plugin_catalog_no_profile_themes },
@@ -467,6 +505,7 @@ export const cxCatalog = {
         { name: "NoReplyPing", source: plugin_catalog_no_reply_ping },
         { name: "NoRoleHeaders", source: plugin_catalog_no_role_headers },
         { name: "NoServerEmojis", source: plugin_catalog_no_server_emojis },
+        { name: "NoShadows", source: plugin_catalog_no_shadows },
         { name: "NoTypingAnimation", source: plugin_catalog_no_typing_animation },
         { name: "NoUnblockToJump", source: plugin_catalog_no_unblock_to_jump },
         { name: "NormalizeMessageLinks", source: plugin_catalog_normalize_message_links },
@@ -477,8 +516,8 @@ export const cxCatalog = {
         { name: "ProfileMedia", source: plugin_catalog_profile_media },
         { name: "QuickMention", source: plugin_catalog_quick_mention },
         { name: "QuoteMessage", source: plugin_catalog_quote_message },
-        { name: "ReadAllNotificationsButton", source: plugin_catalog_read_all_notifications_button },
         { name: "ReadAllNotifications", source: plugin_catalog_read_all_notifications },
+        { name: "ReadAllNotificationsButton", source: plugin_catalog_read_all_notifications_button },
         { name: "ReadableLineLength", source: plugin_catalog_readable_line_length },
         { name: "ReadableSpoilers", source: plugin_catalog_readable_spoilers },
         { name: "RealtimeTimestamps", source: plugin_catalog_realtime_timestamps },
@@ -490,6 +529,7 @@ export const cxCatalog = {
         { name: "ROT13 Text", source: plugin_catalog_rot13_text },
         { name: "RoundServerIcons", source: plugin_catalog_round_server_icons },
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar },
+        { name: "RoundedImages", source: plugin_catalog_rounded_images },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages },
         { name: "ScrollToLatest", source: plugin_catalog_scroll_to_latest },
         { name: "SedEnhanced", source: plugin_catalog_sed_enhanced },
@@ -501,6 +541,9 @@ export const cxCatalog = {
         { name: "SilenceUsers", source: plugin_catalog_silence_users },
         { name: "SilentMessageToggle", source: plugin_catalog_silent_message_toggle },
         { name: "SilentTyping", source: plugin_catalog_silent_typing },
+        { name: "SmallerAvatarsInChat", source: plugin_catalog_smaller_avatars_in_chat },
+        { name: "SmoothScrolling", source: plugin_catalog_smooth_scrolling },
+        { name: "SoftCorners", source: plugin_catalog_soft_corners },
         { name: "SolluxTypingQuirk", source: plugin_catalog_sollux_typing_quirk },
         { name: "SortReactions", source: plugin_catalog_sort_reactions },
         { name: "SpaceOut", source: plugin_catalog_space_out },
@@ -508,10 +551,12 @@ export const cxCatalog = {
         { name: "SpotifyShareCommands", source: plugin_catalog_spotify_share_commands },
         { name: "Starify", source: plugin_catalog_starify },
         { name: "StickerBlocker", source: plugin_catalog_sticker_blocker },
+        { name: "StickyDateDividers", source: plugin_catalog_sticky_date_dividers },
         { name: "StopAutoUnread", source: plugin_catalog_stop_auto_unread },
         { name: "TalkInReverse", source: plugin_catalog_talk_in_reverse },
         { name: "TereziTypingQuirk", source: plugin_catalog_terezi_typing_quirk },
         { name: "TextReplace", source: plugin_catalog_text_replace },
+        { name: "ThinScrollbars", source: plugin_catalog_thin_scrollbars },
         { name: "Translate", source: plugin_catalog_translate },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar },
         { name: "Unindent", source: plugin_catalog_unindent },
@@ -527,6 +572,7 @@ export const cxCatalog = {
         { name: "WaitForSlot", source: plugin_catalog_wait_for_slot },
         { name: "WebcamStartNotifier", source: plugin_catalog_webcam_start_notifier },
         { name: "WiderChannelList", source: plugin_catalog_wider_channel_list },
+        { name: "WiderChat", source: plugin_catalog_wider_chat },
         { name: "WikiLookup", source: plugin_catalog_wiki_lookup },
         { name: "WriteUpperCase", source: plugin_catalog_write_upper_case },
         { name: "ZeroWidthSanitizer", source: plugin_catalog_zero_width_sanitizer },

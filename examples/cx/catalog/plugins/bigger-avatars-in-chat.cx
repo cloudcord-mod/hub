@@ -1,0 +1,3 @@
+plugin "BiggerAvatarsInChat":
+  needs appearance.style
+  style bigger-avatars-in-chat

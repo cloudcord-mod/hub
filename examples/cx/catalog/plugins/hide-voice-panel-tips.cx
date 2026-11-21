@@ -1,0 +1,3 @@
+plugin "HideVoicePanelTips":
+  needs appearance.style
+  style hide-voice-panel-tips

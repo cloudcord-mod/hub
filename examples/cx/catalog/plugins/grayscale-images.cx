@@ -1,0 +1,3 @@
+plugin "GrayscaleImages":
+  needs appearance.style
+  style grayscale-images

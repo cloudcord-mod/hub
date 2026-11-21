@@ -1,0 +1,3 @@
+plugin "WiderChat":
+  needs appearance.style
+  style wider-chat

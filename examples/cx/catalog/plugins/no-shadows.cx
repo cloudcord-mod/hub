@@ -1,0 +1,3 @@
+plugin "NoShadows":
+  needs appearance.style
+  style no-shadows

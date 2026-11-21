@@ -1,0 +1,3 @@
+plugin "RoundedImages":
+  needs appearance.style
+  style rounded-images

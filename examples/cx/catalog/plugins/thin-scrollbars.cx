@@ -1,0 +1,3 @@
+plugin "ThinScrollbars":
+  needs appearance.style
+  style thin-scrollbars

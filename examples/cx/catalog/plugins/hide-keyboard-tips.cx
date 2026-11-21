@@ -1,0 +1,3 @@
+plugin "HideKeyboardTips":
+  needs appearance.style
+  style hide-keyboard-tips

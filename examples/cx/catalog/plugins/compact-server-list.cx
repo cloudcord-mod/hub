@@ -1,0 +1,3 @@
+plugin "CompactServerList":
+  needs appearance.style
+  style compact-server-list

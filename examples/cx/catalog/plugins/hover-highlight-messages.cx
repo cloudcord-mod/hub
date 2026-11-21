@@ -1,0 +1,3 @@
+plugin "HoverHighlightMessages":
+  needs appearance.style
+  style hover-highlight-messages

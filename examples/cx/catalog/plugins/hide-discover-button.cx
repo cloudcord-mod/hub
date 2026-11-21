@@ -1,0 +1,3 @@
+plugin "HideDiscoverButton":
+  needs appearance.style
+  style hide-discover-button

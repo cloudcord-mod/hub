@@ -1,0 +1,3 @@
+plugin "HideMemberListButton":
+  needs appearance.style
+  style hide-member-list-button

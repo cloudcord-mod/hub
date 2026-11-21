@@ -1,0 +1,3 @@
+plugin "BoldUsernames":
+  needs appearance.style
+  style bold-usernames

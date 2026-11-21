@@ -1,0 +1,3 @@
+plugin "CompactCompose":
+  needs appearance.style
+  style compact-compose

@@ -1,0 +1,3 @@
+plugin "BiggerJumboEmojis":
+  needs appearance.style
+  style bigger-jumbo-emojis
