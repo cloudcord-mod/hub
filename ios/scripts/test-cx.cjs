@@ -5275,6 +5275,38 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             await click(render(), "Forget theme");
             assert.equal(localNotes[storageKey].length, 0);
             plugin.stop();
+
+            const lazySource = 'theme "Lazy Wallpaper":\n  background: #101018';
+            selectCatalog("Lazy Wallpaper");
+            resolveCatalogEntry(lazySource);
+            await new Promise(setImmediate);
+            await click(render(), "Allow and remember on this device");
+            plugin.stop();
+            plugin.start();
+            await new Promise(setImmediate);
+            resolveCatalogEntry(lazySource);
+            await new Promise(setImmediate);
+            assert.ok(button(render(), "Disable Lazy Wallpaper"), "browser restores the unmodified bundled theme");
+            filterActive(true);
+            assert.ok(button(render(), "Lazy Wallpaper"), "the restored browser theme appears in the active filter");
+            filterActive(false);
+
+            plugin.stop();
+            plugin.start();
+            await new Promise(setImmediate);
+            resolveCatalogEntry(lazySource.replace("#101018", "#282840"));
+            await new Promise(setImmediate);
+            assert.ok(!button(render(), "Disable Lazy Wallpaper"), "a changed browser catalog asset requires review");
+
+            plugin.stop();
+            plugin.start();
+            await new Promise(setImmediate);
+            await click(render(), "Forget theme");
+            resolveCatalogEntry(lazySource);
+            await new Promise(setImmediate);
+            assert.ok(!button(render(), "Disable Lazy Wallpaper"), "a theme forgotten during fetch stays disabled");
+            assert.equal(localNotes[storageKey].length, 0);
+            plugin.stop();
         } else {
             const restore = module.exports.restoreRememberedCxAppearance;
             selectCatalog("QuickMention");

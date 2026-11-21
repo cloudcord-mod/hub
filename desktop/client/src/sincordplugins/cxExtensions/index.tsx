@@ -799,11 +799,10 @@ function refreshRememberedAppearance() {
     appearanceListeners.forEach(listener => listener());
 }
 
-function bundledAppearanceId(source: string, review: ReturnType<typeof reviewCx>) {
+function bundledAppearanceSource(review: ReturnType<typeof reviewCx>): string | (() => Promise<string>) | undefined {
     if (!canRememberCxAppearance(review)) return;
     const entries = review.kind === "theme" ? cxCatalog.themes : cxCatalog.plugins;
-    if (!entries.some(entry => entry.source === source)) return;
-    return review.kind === "theme" ? "theme" : "plugin:" + review.name;
+    return entries.find(entry => entry.name === review.name)?.source;
 }
 
 function readRememberedAppearance(value: unknown): RememberedAppearance[] {
@@ -835,12 +834,19 @@ async function restoreRememberedAppearance(generation: number) {
             if (session.source(entry.id) !== undefined) continue;
             try {
                 const review = reviewCx(entry.source);
-                if (bundledAppearanceId(entry.source, review) !== entry.id) continue;
+                const id = review.kind === "theme" ? "theme" : "plugin:" + review.name;
+                if (id !== entry.id) continue;
+                const bundled = bundledAppearanceSource(review);
+                const source = typeof bundled === "function" ? await bundled() : bundled;
+                if (generation !== appearanceGeneration) return;
+                const saved = rememberedAppearance.find(record => record.id === id && record.source === source);
+                if (source !== entry.source || !saved || session.source(id) !== undefined) continue;
                 session.enable(entry.source, {
                     applyTheme, hideAppearanceTarget: applyAppearanceCss, styleAppearanceTarget: applyAppearanceCss,
                     registerCommand() { throw new Error("Saved appearance cannot register commands"); },
                     toast() {},
-                }, review.permissions, entry.selected);
+                }, review.permissions, saved.selected);
+                if (typeof bundled === "function") activeCatalogLoaders.set(id, bundled);
             } catch { /* A saved appearance remains available to remove or review again. */ }
         }
     } catch {
@@ -863,7 +869,9 @@ export function CxSettings() {
     const [status, setStatus] = useState("");
     const selection = useRef(0);
     React.useSyncExternalStore(subscribeAppearance, () => appearanceUpdates);
-    const rememberId = candidate && bundledAppearanceId(candidate.source, candidate.review);
+    const bundled = candidate && bundledAppearanceSource(candidate.review);
+    const rememberId = candidate && bundled !== undefined && bundled === (candidate.loader ?? candidate.source)
+        ? candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name : undefined;
 
     function review(next: string, loader?: () => Promise<string>) {
         selection.current++;
