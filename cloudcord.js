@@ -17275,6 +17275,29 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function profilePreviewTagIcon(tag) {
     return serverTagCustomIcon(tag?.icon) || serverTagIconURL(tag);
   }
+  function profileMentionAliasScore(data, query) {
+    if (!data || typeof query !== "string" || !query || query.length > 128)
+      return 0;
+    var fold = (value) => value.normalize("NFKD").toLocaleLowerCase().replace(RegExp("\\p{M}", "gu"), "");
+    var prefix2 = fold(query);
+    if (!prefix2)
+      return 0;
+    var score = 0;
+    for (var name of [
+      data.username,
+      data.globalName,
+      data.displayName
+    ]) {
+      if (typeof name !== "string" || !name || name.length > 128)
+        continue;
+      var alias = fold(name);
+      if (alias === prefix2)
+        return 2;
+      if (alias.startsWith(prefix2))
+        score = 1;
+    }
+    return score;
+  }
   function profilePreviewStatus(data, nativeStatus) {
     if (nativeStatus === "offline" || nativeStatus === "invisible")
       return "invisible";
@@ -27389,10 +27412,123 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     return copyProfilePresentation(result, fields);
   }
+  function installMentionAliases(resolver) {
+    var _loop2 = function(method12) {
+      addPatch(method12, resolver, (args, original) => {
+        var _loop3 = function(id12) {
+          if (combined.length >= limit)
+            return "break";
+          try {
+            var rows = original({
+              ...options,
+              query: id12,
+              limit: 1,
+              allowSnowflake: true,
+              request: false,
+              checkRecentlyTalkedOnEmptyQuery: false
+            }, ...args.slice(1));
+            var match = Array.isArray(rows) && rows.find((row) => row?.record?.id === id12);
+            if (match)
+              combined.push(match);
+          } catch (e) {
+            return "break";
+          }
+        };
+        var result = original(...args);
+        var options = args[0];
+        var query = options?.query;
+        var scope = method12 === "queryChannelUsers" ? options?.channelId : options?.guildId;
+        if (!mentionDepth || !Array.isArray(result) || !isProfileViewUserId(scope) || typeof query !== "string" || query.length < 2 || query.length > 128)
+          return result;
+        var limit = options.limit ?? 10;
+        if (!Number.isInteger(limit) || limit <= result.length || limit > 50)
+          return result;
+        var seen = new Set(result.map((row) => row?.record?.id));
+        var local = settings.cloudcordLocalProfiles;
+        var candidates = /* @__PURE__ */ new Set([
+          ...Object.keys(local || {}),
+          ...sharedProfiles.keys()
+        ]);
+        if (currentUserId && preview.enabled)
+          candidates.add(currentUserId);
+        var matches = [];
+        for (var id of candidates) {
+          if (!isProfileViewUserId(id) || seen.has(id))
+            continue;
+          var score = profileMentionAliasScore(profile(id), query);
+          if (score)
+            matches.push({
+              id,
+              score
+            });
+        }
+        if (!matches.length)
+          return result;
+        var combined = [
+          ...result
+        ];
+        for (var { id: id1 } of matches.sort((a, b3) => b3.score - a.score).slice(0, 3)) {
+          var _ret = _loop3(id1);
+          if (_ret === "break")
+            break;
+        }
+        return combined.length === result.length ? result : combined;
+      });
+    };
+    if (!resolver)
+      return;
+    var mentionDepth = 0;
+    var profile = (id) => isCurrentUser(id) ? preview.enabled ? preview : void 0 : getProfileOverride(id);
+    for (var method of [
+      "queryMentionResults",
+      "queryGuildMentionResults"
+    ]) {
+      addPatch(method, resolver, (args, original) => {
+        var result;
+        mentionDepth++;
+        try {
+          result = original(...args);
+        } finally {
+          mentionDepth--;
+        }
+        if (!Array.isArray(result?.users))
+          return result;
+        var changed = false;
+        var users = result.users.map((row) => {
+          var id = row?.user?.id ?? row?.record?.id;
+          if (!isProfileViewUserId(id))
+            return row;
+          var data = profile(id);
+          var name = data?.globalName || data?.displayName || data?.username;
+          if (typeof name !== "string" || !name || name.length > 128 || name === row.nick)
+            return row;
+          changed = true;
+          return {
+            ...row,
+            nick: name
+          };
+        });
+        return changed ? {
+          ...result,
+          users
+        } : result;
+      });
+    }
+    for (var method1 of [
+      "queryChannelUsers",
+      "queryGuildUsers"
+    ])
+      _loop2(method1);
+  }
   function ensurePatches() {
     if (initialized)
       return;
     initialized = true;
+    try {
+      installMentionAliases(findByProps("queryMentionResults", "queryChannelUsers", "queryGuildUsers"));
+    } catch (error) {
+      diagnostics.last = error?.message || "Could not connect mention autocomplete";
+    }
     globalThis.__CLOUDCORD_PRESENTATION_USER__ = (user) => {
       if (!user?.id)
         return user;
@@ -64832,7 +64968,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e5a8fbd9f8571fe2256d0675f87d5d2d53add03f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b1b0c725826e6ed242bbf8f24bb75c85bea5bde8";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
