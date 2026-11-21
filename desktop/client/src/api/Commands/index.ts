@@ -28,6 +28,15 @@ export * from "./types";
 
 export let BUILT_IN: VencordCommand[];
 export const commands = {} as Record<string, VencordCommand>;
+const readyListeners = new Set<() => void>();
+
+export function onBuiltInCommandsReady(listener: () => void) {
+    let active = true;
+    const notify = () => { if (active) listener(); };
+    if (BUILT_IN) queueMicrotask(notify);
+    else readyListeners.add(notify);
+    return () => { active = false; readyListeners.delete(notify); };
+}
 
 // hack for plugins being evaluated before we can grab these from webpack
 const OptPlaceholder = Symbol("OptionalMessageOption") as any as CommandOption;
@@ -59,6 +68,8 @@ export const _init = function (cmds: VencordCommand[]) {
     } catch (e) {
         new Logger("CommandsAPI").error("Failed to load CommandsApi", e, " - cmds is", cmds);
     }
+    for (const listener of readyListeners) queueMicrotask(listener);
+    readyListeners.clear();
     return cmds;
 } as never;
 

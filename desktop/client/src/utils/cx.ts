@@ -275,8 +275,13 @@ function quoted(value: string, limit: number, allowEmpty = false) {
 export const CX_CATALOG_CATEGORIES = ["All", "Appearance", "Chat", "Commands", "Media", "Profiles", "Servers & channels", "Voice & calls", "Themes"] as const;
 export type CxCatalogCategory = typeof CX_CATALOG_CATEGORIES[number];
 
-export function canRememberCxAppearance(document: { kind: "plugin" | "theme"; permissions?: readonly CxPermission[]; }) {
-    return document.kind === "theme" || Boolean(document.permissions?.length && document.permissions.every(permission =>
+export function isPrivateCxCommand(permissions: readonly CxPermission[]) {
+    return permissions.length === 2 && permissions.includes("commands.register") && permissions.includes("reply.local");
+}
+
+export function canRememberCxExtension(document: { kind: "plugin" | "theme"; permissions?: readonly CxPermission[]; }) {
+    const permissions = document.permissions ?? [];
+    return document.kind === "theme" || isPrivateCxCommand(permissions) || (permissions.length > 0 && permissions.every(permission =>
         permission === "appearance.hide" || permission === "appearance.style"));
 }
 

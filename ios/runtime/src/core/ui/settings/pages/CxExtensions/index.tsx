@@ -4,7 +4,7 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
-import { canRememberCxAppearance, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
+import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
@@ -2818,11 +2818,10 @@ export function restoreRememberedCxAppearance() {
         if (!entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== undefined) continue;
         try {
             const review = reviewCx(entry.source);
-            if (!canRememberCxAppearance(review)) continue;
+            if (!canRememberCxExtension(review)) continue;
             session.enable(entry.source, {
                 ...createMobileCxHost(),
                 toast() {},
-                registerCommand() { throw new Error("Saved appearance cannot register commands"); },
             }, review.permissions, saved.selected);
         } catch { /* The appearance remains available to review or forget. */ }
     }
@@ -2995,7 +2994,7 @@ export default function CxExtensions() {
                 {remembered.filter(saved => {
                     const entry = rememberedCatalog.get(saved.name);
                     return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
-                }).map(saved => <TableRow key={saved.name} label={`Forget ${saved.name}`} subLabel={settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered appearance needs review"} onPress={() => {
+                }).map(saved => <TableRow key={saved.name} label={`Forget ${saved.name}`} subLabel={settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered extension is inactive"} onPress={() => {
                     try { forgetRememberedAppearance(saved.name); refreshRememberedAppearance(); }
                     catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
                 }} />)}

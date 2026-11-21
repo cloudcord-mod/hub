@@ -1,5 +1,5 @@
 import { playAudio } from "@api/AudioPlayer";
-import { ApplicationCommandInputType, ApplicationCommandOptionType, commands, findOption, registerCommand, sendBotMessage, unregisterCommand, type VencordCommand } from "@api/Commands";
+import { ApplicationCommandInputType, ApplicationCommandOptionType, BUILT_IN, commands, findOption, onBuiltInCommandsReady, registerCommand, sendBotMessage, unregisterCommand, type VencordCommand } from "@api/Commands";
 import { addContextMenuPatch, findGroupChildrenByChildId, removeContextMenuPatch, type NavContextMenuPatchCallback } from "@api/ContextMenu";
 import * as DataStore from "@api/DataStore";
 import { addMessagePreEditListener, addMessagePreSendListener, removeMessagePreEditListener, removeMessagePreSendListener } from "@api/MessageEvents";
@@ -29,7 +29,7 @@ import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
-import { canRememberCxAppearance, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
+import { canRememberCxExtension, isPrivateCxCommand, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
 import type { CxMessageLatencyOptions } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
@@ -897,6 +897,7 @@ type RememberedAppearance = { id: string; source: string; selected: string[]; };
 const rememberedAppearanceKey = "cloudcord.cx.appearance";
 let rememberedAppearance: readonly RememberedAppearance[] = [];
 const rememberingAppearance = new Set<string>();
+const pendingCommandRestores = new Set<() => void>();
 let appearanceRestoreNotice = "";
 let appearanceGeneration = 0;
 const appearanceListeners = new Set<() => void>();
@@ -911,7 +912,7 @@ function refreshRememberedAppearance() {
 }
 
 function bundledAppearanceSource(review: ReturnType<typeof reviewCx>): string | (() => Promise<string>) | undefined {
-    if (!canRememberCxAppearance(review)) return;
+    if (!canRememberCxExtension(review)) return;
     const entries = review.kind === "theme" ? cxCatalog.themes : cxCatalog.plugins;
     return entries.find(entry => entry.name === review.name)?.source;
 }
@@ -1467,18 +1468,27 @@ async function restoreRememberedAppearance(generation: number) {
                 const bundled = bundledAppearanceSource(review);
                 const source = typeof bundled === "function" ? await bundled() : bundled;
                 if (generation !== appearanceGeneration) return;
-                const saved = rememberedAppearance.find(record => record.id === id && record.source === source);
-                if (source !== entry.source || !saved || session.source(id) !== undefined) continue;
-                session.enable(entry.source, {
-                    ...createDesktopCxHost(review.name),
-                    registerCommand() { throw new Error("Saved appearance cannot register commands"); },
-                    toast() {},
-                }, review.permissions, saved.selected);
-                if (typeof bundled === "function") activeCatalogLoaders.set(id, bundled);
+                if (source !== entry.source) continue;
+                const restore = () => {
+                    if (generation !== appearanceGeneration || session.source(id) !== undefined) return;
+                    const saved = rememberedAppearance.find(record => record.id === id && record.source === source);
+                    if (!saved) return;
+                    session.enable(source, { ...createDesktopCxHost(review.name), toast() {} }, review.permissions, saved.selected);
+                    if (typeof bundled === "function") activeCatalogLoaders.set(id, bundled);
+                };
+                if (isPrivateCxCommand(review.permissions) && !BUILT_IN) {
+                    const cancel = onBuiltInCommandsReady(() => {
+                        pendingCommandRestores.delete(cancel);
+                        try { restore(); }
+                        catch { /* The approval stays available to review or forget. */ }
+                        finally { if (generation === appearanceGeneration) refreshRememberedAppearance(); }
+                    });
+                    pendingCommandRestores.add(cancel);
+                } else restore();
             } catch { /* A saved appearance remains available to remove or review again. */ }
         }
     } catch {
-        if (generation === appearanceGeneration) appearanceRestoreNotice = "Couldn't load remembered CX appearance.";
+        if (generation === appearanceGeneration) appearanceRestoreNotice = "Couldn't load remembered CX extensions.";
     } finally {
         if (generation === appearanceGeneration) refreshRememberedAppearance();
     }
@@ -1681,7 +1691,7 @@ export function CxSettings() {
                         activeCatalogLoaders.delete(id);
                         session.disable(id);
                         setStatus(`${name} disabled.`);
-                    }, () => setStatus("Couldn't remove the remembered appearance. Try disabling it again."));
+                    }, () => setStatus("Couldn't remove the saved approval. Try disabling it again."));
                     activeCatalogLoaders.delete(id);
                     session.disable(id);
                     setStatus(`${name} disabled.`);
@@ -1689,8 +1699,8 @@ export function CxSettings() {
             </div>;
         })}
         {rememberedAppearance.filter(entry => session.source(entry.id) !== entry.source).map(({ id }) => <div key={id}>
-            <span>Remembered appearance needs review</span>
-            <button onClick={() => writeRememberedAppearance(id).catch(() => setStatus("Couldn't remove the remembered appearance."))}>Forget {id === "theme" ? "theme" : id.slice(7)}</button>
+            <span>Remembered extension is inactive</span>
+            <button onClick={() => writeRememberedAppearance(id).catch(() => setStatus("Couldn't remove the saved approval."))}>Forget {id === "theme" ? "theme" : id.slice(7)}</button>
         </div>)}
         {appearanceRestoreNotice && <p>{appearanceRestoreNotice}</p>}
         {clearLocalNotes.notes && <button onClick={clearLocalNotes.notes}>Clear local user notes</button>}
@@ -2125,6 +2135,8 @@ export default definePlugin({
     },
     stop() {
         appearanceGeneration++;
+        for (const cancel of pendingCommandRestores) cancel();
+        pendingCommandRestores.clear();
         activeCatalogLoaders.clear();
         session.clear();
     },

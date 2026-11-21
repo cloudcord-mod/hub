@@ -649,8 +649,15 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
         };
         const jsx = (type, props) => ({ type, props });
+        let commandRegistryReady = true;
+        const commandReadyListeners = new Set();
         const commandApi = {
             commands: registered,
+            get BUILT_IN() { return commandRegistryReady ? [] : undefined; },
+            onBuiltInCommandsReady(listener) {
+                commandReadyListeners.add(listener);
+                return () => { commandReadyListeners.delete(listener); };
+            },
             ApplicationCommandInputType: { BUILT_IN: 0, BUILT_IN_TEXT: 1 },
             ApplicationCommandOptionType: { STRING: 3, INTEGER: 4, BOOLEAN: 5, USER: 6, ROLE: 8 },
             ApplicationCommandType: { CHAT: 1 },
@@ -5631,6 +5638,29 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(formatTimestamp(), nativeTimestamp.timestamp);
             assert.equal(localNotes[storageKey].length, 0);
             plugin.stop();
+            selectCatalog("UnitConverter");
+            assert.ok(!button(render(), "Allow and remember on this device"), "a plugin that can send messages requires a session approval");
+            for (const name of ["JSON Compact", "Duration Converter"]) {
+                selectCatalog(name);
+                await click(render(), "Allow and remember on this device");
+            }
+            plugin.stop();
+            commandRegistryReady = false;
+            plugin.start();
+            await new Promise(setImmediate);
+            assert.equal(registered.compactjson, undefined);
+            assert.equal(commandReadyListeners.size, 2);
+            await click(render(), "Forget Duration Converter");
+            commandRegistryReady = true;
+            for (const listener of commandReadyListeners) listener();
+            commandReadyListeners.clear();
+            assert.equal(registered.convertduration, undefined, "a forgotten approval cannot register when commands become ready");
+            assert.equal(registered.compactjson.execute([{ name: "text", value: '{ "a": 1 }' }], { channel: { id: "test-channel" } }), undefined);
+            assert.match(delivered.at(-1)[1], /\{"a":1\}/);
+            await click(render(), "Disable JSON Compact");
+            assert.equal(registered.compactjson, undefined);
+            assert.equal(localNotes[storageKey].length, 0);
+            plugin.stop();
         } else {
             const restore = module.exports.restoreRememberedCxAppearance;
             selectCatalog("QuickMention");
@@ -5683,6 +5713,21 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(formatTimestamp(), nativeTimestamp.timestamp);
             assert.equal(settings.cxRememberedAppearance.length, 0);
             unloadEffects();
+            selectCatalog("JSON Compact");
+            click(render(), "Allow and remember on this device");
+            restore()();
+            assert.equal(registered.compactjson, undefined);
+            settings.safeMode.enabled = true;
+            assert.equal(restore(), undefined);
+            assert.equal(registered.compactjson, undefined);
+            settings.safeMode.enabled = false;
+            const unloadCommands = restore();
+            assert.equal(registered.compactjson.execute([{ name: "text", value: '{ "a": 1 }' }], { channel: { id: "test-channel" } }), undefined);
+            assert.match(delivered.at(-1)[1], /\{"a":1\}/);
+            click(render(), "Disable JSON Compact");
+            assert.equal(registered.compactjson, undefined);
+            assert.equal(settings.cxRememberedAppearance.length, 0);
+            unloadCommands();
         }
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");

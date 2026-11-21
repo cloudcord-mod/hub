@@ -28,7 +28,7 @@ function pluginBody(source) {
 }
 
 function buildCatalog(additions = new Map()) {
-    const { parseCx, reviewCx, cxAppearanceTargets, cxNativeEffects, getCxCatalogCategories, canRememberCxAppearance } = loadCxRuntime();
+    const { parseCx, reviewCx, cxAppearanceTargets, cxNativeEffects, getCxCatalogCategories, canRememberCxExtension } = loadCxRuntime();
     const names = new Set();
     const commands = new Set();
     const groups = {};
@@ -85,7 +85,7 @@ function buildCatalog(additions = new Map()) {
                 ? [parsed.mode && (parsed.mode[0].toUpperCase() + parsed.mode.slice(1) + " theme"), parsed.wallpaper && "Wallpaper"].filter(Boolean).join(" · ")
                 : (specific[0] ?? (commandNames.length ? commandNames.slice(0, 3).map(command => "/" + command).join(" · ") : review?.effects[0] ?? "")).slice(0, 160);
             const keywords = [...new Set([...specific.slice(1), ...(review?.appearanceOptions ?? []).map(option => option.label)])].join(" ").slice(0, 520);
-            const appearanceRevision = !desktopOnly && canRememberCxAppearance(parsed)
+            const appearanceRevision = !desktopOnly && canRememberCxExtension(parsed)
                 ? createHash("sha256").update(document.replaceAll("\r\n", "\n")).digest("hex") : undefined;
             return { name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories: getCxCatalogCategories(parsed), appearanceRevision };
         });
