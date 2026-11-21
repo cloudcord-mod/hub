@@ -3231,6 +3231,8 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 return <div key={item.id} className="cpx-saved-item">
                     <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
                         decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined}
+                        frameName={data.profileFrame ? frameFor(data.profileFrame.skuId) ?? "Selected" : undefined}
+                        effectName={data.profileEffect ? effectFor(data.profileEffect.skuId) ?? "Selected" : undefined}
                         nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined} badges={badges} />
                     <div className="cpx-saved-foot">
                         <div className="cpx-saved-meta">

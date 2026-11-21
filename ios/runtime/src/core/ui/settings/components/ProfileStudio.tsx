@@ -392,6 +392,17 @@ function PreviewNameplate({ uri }: { uri: string }) {
     return <Image source={{ uri }} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", borderRadius: 8 }} resizeMode="cover" />;
 }
 
+function PreviewCosmetics({ frame, effect }: { frame?: string; effect?: string }) {
+    if (!frame && !effect) return null;
+    const chip = (label: string, value: string) => <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, backgroundColor: C.panel() }}>
+        <Text variant="text-xs/semibold" style={{ color: C.muted() }}>{label}: {value}</Text>
+    </View>;
+    return <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+        {frame ? chip("Frame", frame) : null}
+        {effect ? chip("Effect", effect) : null}
+    </View>;
+}
+
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
 export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
     name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
@@ -416,7 +427,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
         </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent} bannerColor={bannerColor}
-            decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
+            decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} frame={frame} effect={effect} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             {primary && accent && accent !== primary ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "55%", borderBottomLeftRadius: R.lg, borderBottomRightRadius: R.lg, backgroundColor: accent }} /> : null}
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: bannerColor || primary || C.raised() }}>
                 {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
@@ -445,10 +456,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                     {activity.details ? <Text variant="text-xs/medium" numberOfLines={1} style={{ color: C.muted() }}>{activity.details}</Text> : null}
                 </View> : null}
                 {bio ? <Text variant="text-sm/medium" numberOfLines={4} style={{ color: C.text() }}>{bio}</Text> : null}
-                {frame || effect ? <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-                    {frame ? <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, backgroundColor: C.panel() }}><Text variant="text-xs/semibold" style={{ color: C.muted() }}>Frame: {frame}</Text></View> : null}
-                    {effect ? <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 99, backgroundColor: C.panel() }}><Text variant="text-xs/semibold" style={{ color: C.muted() }}>Effect: {effect}</Text></View> : null}
-                </View> : null}
+                <PreviewCosmetics frame={frame} effect={effect} />
             </View>
         </View>}
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: GAP.sm }}>
@@ -472,9 +480,10 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [], officialBadgeIcon }: {
+export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
     name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
     customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[]; officialBadgeIcon?: string;
+    frame?: string; effect?: string;
 }) {
     const themed = !!primary;
     const colors = palette();
@@ -515,6 +524,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
                     {activity.details ? <Text variant="text-xs/medium" numberOfLines={1} style={{ color: colors.muted }}>{activity.details}</Text> : null}
                 </View> : null}
             </View> : null}
+            <PreviewCosmetics frame={frame} effect={effect} />
         </View>
     </View>;
     if (!themed) return <View style={{ borderRadius: 10, overflow: "hidden" }}>{inner}</View>;

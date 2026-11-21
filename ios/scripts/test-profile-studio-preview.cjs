@@ -36,7 +36,7 @@ function flatten(value) {
 
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
 const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
-const mobileProfile = { name: "Preview User", username: "preview", tagText: "CLOD", tagIcon: "https://getcloudcord.com/tag.png",
+const mobileProfile = { name: "Preview User", username: "preview", tagText: "CLOD", tagIcon: "https://getcloudcord.com/tag.png", frame: "Starlight", effect: "Snowfall",
     nameplate: "https://cdn.example/nameplate.png", bio: "My bio", badges: ["https://cdn.example/badge.png"] };
 const mobileRender = profile => flatten(PreviewCard(profile));
 const media = nodes => nodes.filter(node => node.type === "Image").map(node => node.props.source.uri);
@@ -46,6 +46,12 @@ const selectTab = (nodes, label) => nodes.find(node => node.type === "Pressable"
 selectTab(mobileInitial, "Popout").props.onPress();
 theme = "light";
 const mobilePopout = mobileRender(mobileProfile);
+const containsText = (nodes, value) => nodes.some(node => []
+    .concat(node.props.children).filter(child => typeof child === "string").join("") === value);
+for (const nodes of [mobileInitial, mobilePopout]) {
+    assert.ok(containsText(nodes, "Frame: Starlight"));
+    assert.ok(containsText(nodes, "Effect: Snowfall"));
+}
 assert.equal(selectTab(mobilePopout, "Popout").props.accessibilityState.selected, true);
 assert.deepEqual(media(mobilePopout), [...mobileProfile.badges, mobileProfile.nameplate, mobileProfile.tagIcon]);
 const badgeIcons = Array.from({ length: 12 }, (_, i) => `https://cdn.example/badge-${i}.png`);
@@ -55,6 +61,7 @@ theme = "dark";
 assert.equal(mobileRender(mobileProfile).find(node => node.props.children === mobileProfile.name).props.style.color, "#F2F3F5");
 selectTab(mobilePopout, "Chat").props.onPress();
 assert.deepEqual(media(mobileRender(mobileProfile)), [mobileProfile.tagIcon]);
+assert.equal(containsText(mobileRender(mobileProfile), "Frame: Starlight"), false);
 assert.deepEqual(media(mobileRender({ name: "No cosmetics", username: "plain" })), []);
 
 const { ProfilePreview } = load("desktop/client/src/sincordplugins/fakeProfile/editorUi.tsx");
@@ -91,7 +98,10 @@ layout = "popout";
 const desktopBadgeRows = badgeIcons.map((icon, index) => ({ icon, id: String(index), label: "Badge " + index }));
 const desktopPopout = flatten(ProfilePreview({
     data: {}, fallbackName: "Native", fallbackUsername: "native", fallbackAvatar: "avatar", fallbackSurface, badges: desktopBadgeRows,
+    frameName: "Starlight", effectName: "Snowfall",
 }));
+assert.ok(containsText(desktopPopout, "Frame: Starlight"));
+assert.ok(containsText(desktopPopout, "Effect: Snowfall"));
 assert.deepEqual(flatten(desktopPopout.find(node => node.props.className === "cpx-dc-badges")).filter(node => node.type === "img")
     .map(node => node.props.src), badgeIcons);
 assert.equal(bannerStyle(previewDesktop({ banner: "https://example.com/draft.png" })).backgroundImage, 'url("https://example.com/draft.png")');
@@ -106,6 +116,8 @@ const mobileAppearance = vm.runInNewContext(transformSync(mobileSource + "\nstud
         readNativePresence: userId => userId === id ? "dnd" : undefined });
 assert.match(page, /<K\.PreviewCard \{\.\.\.appearance\}/);
 assert.match(page, /<S\.DiscordProfileCard \{\.\.\.appearance\}/);
+assert.match(page, /frame=\{data\.profileFrame \? catalog\?\.frames\.find/);
+assert.match(page, /effect=\{data\.profileEffect \? catalog\?\.effects\.find/);
 const account = { id, username: "real", getAvatarURL: () => "avatar" };
 const nativeLook = mobileAppearance({}, account);
 assert.equal(nativeLook.banner, nativeBanner);
@@ -167,6 +179,8 @@ assert.match(page, /badges=\{studioBadgeIcons\(preview\)\}/);
 const desktopEditor = fs.readFileSync("desktop/client/src/sincordplugins/fakeProfile/index.tsx", "utf8");
 const savedPanelSource = desktopEditor.slice(desktopEditor.indexOf("function SavedProfilesPanel("),
     desktopEditor.indexOf("// ---- Copy someone's profile:"));
+assert.match(savedPanelSource, /frameName=\{data\.profileFrame \? frameFor\(data\.profileFrame\.skuId\)/);
+assert.match(savedPanelSource, /effectName=\{data\.profileEffect \? effectFor\(data\.profileEffect\.skuId\)/);
 let canSave = false;
 let savedRows;
 let lookName = "Main";

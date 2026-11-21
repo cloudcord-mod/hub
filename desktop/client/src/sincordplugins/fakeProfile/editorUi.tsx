@@ -188,6 +188,14 @@ function previewSurface(data: { nitro?: boolean; banner?: string; accentColor?: 
     };
 }
 
+function PreviewCosmetics({ frameName, effectName }: { frameName?: string; effectName?: string; }) {
+    if (!frameName && !effectName) return null;
+    return <div className="cpx-card-chips">
+        {frameName && <span className="cpx-chip">Frame: {frameName}</span>}
+        {effectName && <span className="cpx-chip">Effect: {effectName}</span>}
+    </div>;
+}
+
 /** Approximation of how the profile will look; Discord draws the real thing. */
 export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, effectName, frameName, bare, badges = [], onBadges, onSaved }: {
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
@@ -219,7 +227,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 </div>
                 <p>Hey! This is how your profile looks in chat.</p>
             </div>
-        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
+        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} frameName={frameName} effectName={effectName} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
             <div className="cpx-card-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
             <div className="cpx-card-avatar">
                 <img className="cpx-card-avatar-img" src={avatar} alt="" />
@@ -236,10 +244,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 {data.customStatus && <div className="cpx-card-custom">{data.customStatus.emoji} {data.customStatus.text}</div>}
                 {activity?.name && <div className="cpx-card-activity"><span>{activityVerb}</span><strong>{activity.name}</strong>{activity.details && <span>{activity.details}</span>}</div>}
                 {bio && <p className="cpx-card-bio">{bio}</p>}
-                {(effectName || frameName) && <div className="cpx-card-chips">
-                    {frameName && <span className="cpx-chip">Frame: {frameName}</span>}
-                    {effectName && <span className="cpx-chip">Effect: {effectName}</span>}
-                </div>}
+                <PreviewCosmetics frameName={frameName} effectName={effectName} />
             </div>
         </div>}
         {!bare && <div className="cpx-inline cpx-preview-modes">
@@ -250,8 +255,9 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
 }
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, badges = [] }: {
+export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, frameName, effectName, badges = [] }: {
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
+    frameName?: string; effectName?: string;
     fallbackSurface?: ProfilePreviewSurface;
 }) {
     const { banner, primary, accent, bannerColor, bio, pronouns } = previewSurface(data, fallbackSurface);
@@ -283,6 +289,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
                     {bio && <div className="cpx-dc-bio">{bio}</div>}
                     {activity?.name && <div className="cpx-dc-activity"><span className="cpx-dc-activity-verb">{ACTIVITY_TYPES.find(type => type.value === activity.type)?.label || "Playing"}</span><strong>{activity.name}</strong>{activity.details && <span>{activity.details}</span>}</div>}
                 </div>}
+                <PreviewCosmetics frameName={frameName} effectName={effectName} />
             </div>
         </div>
     </div>;
