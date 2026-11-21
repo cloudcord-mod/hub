@@ -1,0 +1,5 @@
+plugin "File Size Converter":
+  needs commands.register
+  needs reply.local
+  on command "convertfilesize" with text:
+    reply "${convertFileSize(text)}" else "Enter bytes or a size such as 1.5 MiB or 250 MB."

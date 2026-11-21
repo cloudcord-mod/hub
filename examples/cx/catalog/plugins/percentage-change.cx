@@ -1,0 +1,7 @@
+plugin "Percentage Change":
+  needs commands.register
+  needs reply.local
+  on command "percentchange":
+    input "before" text
+    input "after" text
+    reply "${percentChange(before, after)}" else "Enter two decimal numbers."

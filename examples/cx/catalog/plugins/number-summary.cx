@@ -1,0 +1,5 @@
+plugin "Number Summary":
+  needs commands.register
+  needs reply.local
+  on command "numberstats" with text:
+    reply "${summarizeNumbers(text)}" else "Enter up to 128 decimal numbers separated by commas or spaces."

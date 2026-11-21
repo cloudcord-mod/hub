@@ -1,0 +1,7 @@
+plugin "JSON Pointer":
+  needs commands.register
+  needs reply.local
+  on command "jsonpointer":
+    input "document" text
+    input "path" text optional
+    reply "${jsonPointer(document, path)}"

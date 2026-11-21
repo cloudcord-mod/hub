@@ -1,0 +1,5 @@
+plugin "Extract Mentions":
+  needs commands.register
+  needs reply.local
+  on command "extractmentions" with text:
+    reply "${extractDiscordMentions(text)}"

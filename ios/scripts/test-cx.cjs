@@ -2699,6 +2699,35 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["checklistprogress", { text: "- [x] Build\r\n  * [ ] Deploy\r\n2. [X] Test\nPlain [ ] ignored" }, /^2 of 3 complete · 67% · 1 remaining$/],
                 ["checklistprogress", { text: "normal list" }, /^No Markdown checklist items/],
             ]],
+            ["JSON Pointer", [
+                ["jsonpointer", { document: '{"items":[{"a/b":{"~k":9007199254740993}},null]}', path: "/items/0/a~1b/~0k" }, /9007199254740993/],
+                ["jsonpointer", { document: '{"id":1,"id":2}', path: "/id" }, /\n2\n/],
+                ["jsonpointer", { document: " [ 1, 2 ] " }, /\n\[1,2\]\n/],
+                ["jsonpointer", { document: "{}", path: "/constructor" }, /^That JSON pointer does not exist/],
+                ["jsonpointer", { document: '{"a":1}', path: "/~2" }, /^Use a JSON pointer/],
+            ]],
+            ["Duplicate Lines", [
+                ["duplicatelines", { text: "alpha\r\nBeta\nalpha\nBeta\nbeta\n  \n  \nalpha" }, /\n3 × alpha\n2 × Beta\n/],
+                ["duplicatelines", { text: "\n \n \nalpha\nbeta" }, /^No duplicate nonempty lines/],
+            ]],
+            ["Number Summary", [
+                ["numberstats", { text: "1, 2.5 5, -0.5" }, /^Count 4 · Sum 8 · Mean 2 · Median 1.75 · Min -0.5 · Max 5$/],
+                ["numberstats", { text: "3,,4" }, /^Enter up to 128/],
+            ]],
+            ["File Size Converter", [
+                ["convertfilesize", { text: "1.5 MiB" }, /^1572864 B · 1.572864 MB · 1.5 MiB$/],
+                ["convertfilesize", { text: "0 B" }, /^0 B$/],
+                ["convertfilesize", { text: "9007199254740992 B" }, /^Enter bytes or a size/],
+            ]],
+            ["Extract Mentions", [
+                ["extractmentions", { text: "<@!123456789012345678> <@123456789012345678> <@&234567890123456789> <#345678901234567890>" }, /^User \x60123456789012345678\x60\nRole \x60234567890123456789\x60\nChannel \x60345678901234567890\x60$/],
+                ["extractmentions", { text: "no mentions" }, /^No Discord/],
+            ]],
+            ["Percentage Change", [
+                ["percentchange", { before: "80", after: "100" }, /^\+25%$/],
+                ["percentchange", { before: "-10", after: "-8" }, /^\+20%$/],
+                ["percentchange", { before: "0", after: "5" }, /^Percentage change from zero/],
+            ]],
         ]) {
             selectCatalog(plugin);
             click(render(), "Allow for this session");

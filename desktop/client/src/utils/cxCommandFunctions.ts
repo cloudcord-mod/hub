@@ -89,6 +89,26 @@ function jsonTokens(text: string) {
     return text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
 }
 
+function endOfJsonValue(tokens: string[], start: number) {
+    if (tokens[start] !== "{" && tokens[start] !== "[") return start + 1;
+    let depth = 1;
+    let end = start + 1;
+    for (; depth > 0; end++) {
+        const token = tokens[end];
+        if (token === "{" || token === "[") depth++;
+        if (token === "}" || token === "]") depth--;
+    }
+    return end;
+}
+
+function fileSizeUnits(base: number, labels: string[]) {
+    return new Map(labels.map((label, exponent) => [label, base ** exponent]));
+}
+
+const decimalFileUnits = fileSizeUnits(1000, ["B", "kB", "MB", "GB", "TB", "PB"]);
+const binaryFileUnits = fileSizeUnits(1024, ["B", "KiB", "MiB", "GiB", "TiB", "PiB"]);
+const displayNumber = (value: number) => String(Number(value.toPrecision(12)));
+
 function markdownTable(rows: string[][]) {
     const columns = rows[0]?.length ?? 0;
     if (columns < 2 || columns > 16 || rows.length > 64 || rows.some(row => row.length !== columns)) return;
@@ -209,6 +229,88 @@ export const cxCommandFunctions = {
             const keys = JSON.stringify(Object.keys(value), null, 2).replaceAll("`", "\\u0060");
             return keys.length <= 3900 ? codeFence + "json\n" + keys + "\n" + codeFence : "The key list is too long for one reply.";
         } catch { return "Invalid JSON."; }
+    },
+    jsonPointer(text: string, path: string) {
+        const tokens = jsonTokens(text);
+        if (!tokens) return "Invalid JSON.";
+        if (path && (!path.startsWith("/") || /~(?![01])/.test(path))) return "Use a JSON pointer such as /items/0. Escape / as ~1 and ~ as ~0.";
+        let start = 0;
+        for (const part of path ? path.slice(1).split("/") : []) {
+            const key = part.replaceAll("~1", "/").replaceAll("~0", "~");
+            const container = tokens[start];
+            let match: number | undefined;
+            if (container === "{" || container === "[") {
+                const end = endOfJsonValue(tokens, start) - 1;
+                let position = start + 1;
+                for (let index = 0; position < end; index++) {
+                    const name = container === "{" ? JSON.parse(tokens[position]) : String(index);
+                    const valuePosition = container === "{" ? position + 2 : position;
+                    if (name === key) match = valuePosition;
+                    position = endOfJsonValue(tokens, valuePosition) + 1;
+                }
+            }
+            if (match === undefined) return "That JSON pointer does not exist.";
+            start = match;
+        }
+        const value = tokens.slice(start, endOfJsonValue(tokens, start)).join("").replaceAll("`", "\\u0060");
+        return value.length <= 3900 ? codeFence + "json\n" + value + "\n" + codeFence : "The selected value is too long for one reply.";
+    },
+    duplicateLines(text: string) {
+        const counts = new Map<string, number>();
+        for (const line of text.split(/\r\n|\r|\n/)) {
+            if (line.trim()) counts.set(line, (counts.get(line) ?? 0) + 1);
+        }
+        const results = [...counts].filter(([, count]) => count > 1).map(([line, count]) => count + " × " + line)
+            .join("\n").replace(/`(?=``)/g, "`\u200b");
+        if (!results) return "No duplicate nonempty lines.";
+        return results.length <= 3900 ? codeFence + "\n" + results + "\n" + codeFence : "The duplicate list is too long for one reply.";
+    },
+    summarizeNumbers(text: string) {
+        const tokens = text.trim().split(/\s*,\s*|\s+/);
+        if (tokens.length > 128 || tokens.some(token => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(token))) return;
+        const values = tokens.map(Number).sort((left, right) => left - right);
+        if (values.some(value => Math.abs(value) > Number.MAX_SAFE_INTEGER)) return;
+        const count = values.length;
+        const middle = Math.floor(count / 2);
+        const sum = values.reduce((total, value) => total + value, 0);
+        const median = count % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
+        return [
+            "Count " + count, "Sum " + displayNumber(sum), "Mean " + displayNumber(sum / count),
+            "Median " + displayNumber(median), "Min " + displayNumber(values[0]), "Max " + displayNumber(values[count - 1]),
+        ].join(" · ");
+    },
+    convertFileSize(text: string) {
+        const match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
+        if (!match) return;
+        const inputUnit = match[2] === "KB" ? "kB" : match[2];
+        const bytes = Number(match[1]) * (decimalFileUnits.get(inputUnit) ?? binaryFileUnits.get(inputUnit)!);
+        if (!Number.isFinite(bytes) || bytes > Number.MAX_SAFE_INTEGER) return;
+        const format = (units: Map<string, number>) => {
+            const [unit, divisor] = [...units].reverse().find(([, scale]) => scale <= bytes) ?? ["B", 1];
+            return displayNumber(bytes / divisor) + " " + unit;
+        };
+        return [String(bytes) + " B", format(decimalFileUnits), format(binaryFileUnits)]
+            .filter((entry, index, values) => values.indexOf(entry) === index).join(" · ");
+    },
+    extractDiscordMentions(text: string) {
+        const mentions = new Map<string, string>();
+        for (const [, prefix, id] of text.matchAll(/<(@!|@&|@|#)([1-9]\d{14,21})>/g)) {
+            const kind = prefix === "@&" ? "Role" : prefix === "#" ? "Channel" : "User";
+            mentions.set(kind + id, kind + " `" + id + "`");
+        }
+        if (!mentions.size) return "No Discord user, role, or channel mentions found.";
+        const output = [...mentions.values()].join("\n");
+        return output.length <= 3900 ? output : "The mention list is too long for one reply.";
+    },
+    percentChange(before: string, after: string) {
+        const values = [before.trim(), after.trim()];
+        if (values.some(value => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value))) return;
+        const [original, updated] = values.map(Number);
+        if (!Number.isFinite(original) || !Number.isFinite(updated)) return;
+        if (!original) return "Percentage change from zero is undefined.";
+        const change = (updated - original) / Math.abs(original) * 100;
+        if (!Number.isFinite(change)) return;
+        return (change > 0 ? "+" : "") + displayNumber(change) + "%";
     },
     commonLines(first: string, second: string) {
         const otherLines = new Set(second.split(/\r\n|\r|\n/));

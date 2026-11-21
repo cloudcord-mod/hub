@@ -1,0 +1,5 @@
+plugin "Duplicate Lines":
+  needs commands.register
+  needs reply.local
+  on command "duplicatelines" with text:
+    reply "${duplicateLines(text)}"

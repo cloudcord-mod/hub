@@ -75,14 +75,17 @@ import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/pl
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
 import plugin_catalog_double_click_edit from "../../../../examples/cx/catalog/plugins/double-click-edit.cx";
 import plugin_catalog_double_click_to_reply from "../../../../examples/cx/catalog/plugins/double-click-to-reply.cx";
+import plugin_catalog_duplicate_lines from "../../../../examples/cx/catalog/plugins/duplicate-lines.cx";
 import plugin_catalog_duration_converter from "../../../../examples/cx/catalog/plugins/duration-converter.cx";
 import plugin_catalog_embedded_urls from "../../../../examples/cx/catalog/plugins/embedded-urls.cx";
 import plugin_catalog_encode_base64 from "../../../../examples/cx/catalog/plugins/encode-base64.cx";
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
+import plugin_catalog_extract_mentions from "../../../../examples/cx/catalog/plugins/extract-mentions.cx";
 import plugin_catalog_fake_profile_themes from "../../../../examples/cx/catalog/plugins/fake-profile-themes.cx";
 import plugin_catalog_feferi_typing_quirk from "../../../../examples/cx/catalog/plugins/feferi-typing-quirk.cx";
 import plugin_catalog_file_name_randomization from "../../../../examples/cx/catalog/plugins/file-name-randomization.cx";
+import plugin_catalog_file_size_converter from "../../../../examples/cx/catalog/plugins/file-size-converter.cx";
 import plugin_catalog_fix_codeblock_gap from "../../../../examples/cx/catalog/plugins/fix-codeblock-gap.cx";
 import plugin_catalog_fix_file_extensions from "../../../../examples/cx/catalog/plugins/fix-file-extensions.cx";
 import plugin_catalog_fix_images_quality from "../../../../examples/cx/catalog/plugins/fix-images-quality.cx";
@@ -193,6 +196,7 @@ import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/j
 import plugin_catalog_json_compact from "../../../../examples/cx/catalog/plugins/json-compact.cx";
 import plugin_catalog_json_format from "../../../../examples/cx/catalog/plugins/json-format.cx";
 import plugin_catalog_json_keys from "../../../../examples/cx/catalog/plugins/json-keys.cx";
+import plugin_catalog_json_pointer from "../../../../examples/cx/catalog/plugins/json-pointer.cx";
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
 import plugin_catalog_keyword_notify from "../../../../examples/cx/catalog/plugins/keyword-notify.cx";
@@ -236,7 +240,9 @@ import plugin_catalog_notification_volume from "../../../../examples/cx/catalog/
 import plugin_catalog_notify_when_muted from "../../../../examples/cx/catalog/plugins/notify-when-muted.cx";
 import plugin_catalog_number_base_converter from "../../../../examples/cx/catalog/plugins/number-base-converter.cx";
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
+import plugin_catalog_number_summary from "../../../../examples/cx/catalog/plugins/number-summary.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
+import plugin_catalog_percentage_change from "../../../../examples/cx/catalog/plugins/percentage-change.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
 import plugin_catalog_plain_folder_icon from "../../../../examples/cx/catalog/plugins/plain-folder-icon.cx";
 import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugins/polish-wording.cx";
@@ -509,14 +515,17 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps, description: "Round relative timestamps down", categories: ["Appearance"], appearanceRevision: "fb96d0a8d75d3d356b8fd7a704d9e33da540ec46dcf55ff268f2de79ae842880" },
         { name: "DoubleClickEdit", source: plugin_catalog_double_click_edit, description: "Open the editor for your own message on double-click or double-tap", categories: ["Chat"] },
         { name: "DoubleClickToReply", source: plugin_catalog_double_click_to_reply, description: "Open a reply to another user's message on double-click or double-tap", categories: ["Chat"] },
+        { name: "Duplicate Lines", source: plugin_catalog_duplicate_lines, description: "/duplicatelines", commands: ["duplicatelines"], categories: ["Commands"], appearanceRevision: "10cad05d5a25d1c1c69f4f7df88993efd796f408992bdcef7b2140223400501e" },
         { name: "Duration Converter", source: plugin_catalog_duration_converter, description: "/convertduration", commands: ["convertduration"], categories: ["Commands"], appearanceRevision: "62d8be3950f686cb41cb3570da9b245ecc1a1344e759dda3904deaae623de90b" },
         { name: "EmbeddedURLs", source: plugin_catalog_embedded_urls, description: "https://www.tiktok.com → https://www.tnktok.com", keywords: "https://vt.tiktok.com → https://www.tnktok.com https://x.com → https://www.fxtwitter.com https://www.twitter.com → https://www.fxtwitter.com https://www.instagram.com → https://www.kkinstagram.com", categories: ["Chat"] },
         { name: "Encode Base64", source: plugin_catalog_encode_base64, description: "/encodebase64", commands: ["encodebase64"], categories: ["Commands"], appearanceRevision: "d695cbf61031f6f60e1492fcc9e387c435f14933328eab0416384d9fa7d3ab7c" },
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
+        { name: "Extract Mentions", source: plugin_catalog_extract_mentions, description: "/extractmentions", commands: ["extractmentions"], categories: ["Commands"], appearanceRevision: "3ec2a4e37763a849937c21c6d3e06749f3edf63ef132424ff41d0a51f1ebec14" },
         { name: "FakeProfileThemes", source: plugin_catalog_fake_profile_themes, description: "Show colors encoded in bios when the profile has no native theme", commands: ["cx-profile-colors"], categories: ["Appearance","Commands"] },
         { name: "FeferiTypingQuirk", source: plugin_catalog_feferi_typing_quirk, description: "Apply 168 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "FileNameRandomization", source: plugin_catalog_file_name_randomization, description: "Use format upload names when selected for a file", categories: ["Media"] },
+        { name: "File Size Converter", source: plugin_catalog_file_size_converter, description: "/convertfilesize", commands: ["convertfilesize"], categories: ["Commands"], appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7" },
         { name: "FixCodeblockGap", source: plugin_catalog_fix_codeblock_gap, description: "Remove the extra blank line after fenced code blocks", categories: ["Appearance"], appearanceRevision: "38be5817842b779d1c8c9dcd688ef0755dbc9370e7832efbbe90c72399c1074b" },
         { name: "FixFileExtensions", source: plugin_catalog_fix_file_extensions, description: "Use supported filename extensions for listed attachment formats", categories: ["Media"] },
         { name: "FixImagesQuality", source: plugin_catalog_fix_images_quality, description: "Improve attachment previews and load originals in the media viewer", categories: ["Media"] },
@@ -627,6 +636,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "JSON Compact", source: plugin_catalog_json_compact, description: "/compactjson", commands: ["compactjson"], categories: ["Commands"], appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb" },
         { name: "JSON Format", source: plugin_catalog_json_format, description: "/formatjson", commands: ["formatjson"], categories: ["Commands"], appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c" },
         { name: "JSON Keys", source: plugin_catalog_json_keys, description: "/jsonkeys", commands: ["jsonkeys"], categories: ["Commands"], appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d" },
+        { name: "JSON Pointer", source: plugin_catalog_json_pointer, description: "/jsonpointer", commands: ["jsonpointer"], categories: ["Commands"], appearanceRevision: "cce9a34c37c39761ba736fcf2101312f25ca0cf5cdbf8a20a16f8db085f6d900" },
         { name: "JumpToTop", source: plugin_catalog_jump_to_top, description: "Add a channel header button to jump to the first message", categories: ["Servers & channels"] },
         { name: "JumpTo", source: plugin_catalog_jump_to, description: "Jump to the first or last message from channel and message menus", categories: ["Servers & channels"] },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify, description: "Edit the source to enter keywords", categories: ["Chat"] },
@@ -670,7 +680,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "NotifyWhenMuted", source: plugin_catalog_notify_when_muted, description: "Play a sound when you try to speak while muted", categories: ["Voice & calls"] },
         { name: "Number Base Converter", source: plugin_catalog_number_base_converter, description: "/convertbase", commands: ["convertbase"], categories: ["Commands"], appearanceRevision: "a3d8ed0516a0744ae8bfba7d9aaedc3d52b2d1801ce4f5cf8c28865d2597b10c" },
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"], appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da" },
+        { name: "Number Summary", source: plugin_catalog_number_summary, description: "/numberstats", commands: ["numberstats"], categories: ["Commands"], appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb" },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
+        { name: "Percentage Change", source: plugin_catalog_percentage_change, description: "/percentchange", commands: ["percentchange"], categories: ["Commands"], appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e" },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },
         { name: "PlainFolderIcon", source: plugin_catalog_plain_folder_icon, description: "Replace the mini server icons in collapsed folders with a plain folder icon", desktopOnly: true, categories: ["Appearance"] },
         { name: "PolishWording", source: plugin_catalog_polish_wording, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
