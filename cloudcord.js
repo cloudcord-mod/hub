@@ -39426,6 +39426,46 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           desktopOnly: true,
           style: {}
         },
+        "thread-suggestions": {
+          plugin: "HideThreadSuggestions",
+          label: "thread suggestions above the composer",
+          css: '[class^="threadSuggestionBar_"], [class*=" threadSuggestionBar_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "sticker-search-suggestions": {
+          plugin: "HideStickerSearchSuggestions",
+          label: "suggested searches in the sticker picker",
+          css: '[class^="searchSuggestions_"], [class*=" searchSuggestions_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "sticker-picker-promotions": {
+          plugin: "HideStickerPickerPromotions",
+          label: "shop and promotional cards in the sticker picker",
+          css: '[class^="packHeaderShopWrapper_"], [class*=" packHeaderShopWrapper_"], [class^="emptyGuildUpsell_"], [class*=" emptyGuildUpsell_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "add-friend-hint": {
+          plugin: "HideAddFriendHint",
+          label: "the hint below the Add Friend field",
+          css: '[class^="addFriendHint_"], [class*=" addFriendHint_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
+        "profile-friend-request-banner": {
+          plugin: "HideProfileFriendRequestBanner",
+          label: "friend request banners in profiles",
+          css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
+          desktopOnly: true,
+          mobile: [],
+          catalogOriginal: true
+        },
         "voice-krisp-button": {
           plugin: "ShowPing",
           label: "the desktop Krisp button beside the voice connection controls",
@@ -39616,6 +39656,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "profile-notes": {
           plugin: "HideProfileNotes",
           label: "local notes in profile cards",
+          catalogOriginal: true,
           css: '[class*="noteText_"], [class*="notePreview_"] { display: none !important; }',
           mobile: {
             hideComponentPaths: [
@@ -39626,6 +39667,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "profile-connections": {
           plugin: "HideProfileConnections",
           label: "connections in profile cards",
+          catalogOriginal: true,
           css: '[class*="connectedAccounts_"] { display: none !important; }',
           mobile: {
             hideComponentPaths: [
@@ -39637,6 +39679,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "profile-mutuals": {
           plugin: "HideProfileMutuals",
           label: "mutual friends and servers in profile cards",
+          catalogOriginal: true,
           css: '[class*="mutuals_"], [class*="mutualGuilds_"] { display: none !important; }',
           mobile: {
             hideComponentPaths: [
@@ -50493,6 +50536,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-add-friend-hint.cx
+  var hide_add_friend_hint_default;
+  var init_hide_add_friend_hint = __esm({
+    "../examples/cx/catalog/plugins/hide-add-friend-hint.cx"() {
+      hide_add_friend_hint_default = 'plugin "HideAddFriendHint":\n  needs appearance.hide\n  hide add-friend-hint\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-add-server-button.cx
   var hide_add_server_button_default;
   var init_hide_add_server_button = __esm({
@@ -50821,6 +50872,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-friend-request-banner.cx
+  var hide_profile_friend_request_banner_default;
+  var init_hide_profile_friend_request_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-friend-request-banner.cx"() {
+      hide_profile_friend_request_banner_default = 'plugin "HideProfileFriendRequestBanner":\n  needs appearance.hide\n  hide profile-friend-request-banner\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-mutuals.cx
   var hide_profile_mutuals_default;
   var init_hide_profile_mutuals = __esm({
@@ -50925,6 +50984,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-sticker-picker-promotions.cx
+  var hide_sticker_picker_promotions_default;
+  var init_hide_sticker_picker_promotions = __esm({
+    "../examples/cx/catalog/plugins/hide-sticker-picker-promotions.cx"() {
+      hide_sticker_picker_promotions_default = 'plugin "HideStickerPickerPromotions":\n  needs appearance.hide\n  hide sticker-picker-promotions\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-sticker-search-suggestions.cx
+  var hide_sticker_search_suggestions_default;
+  var init_hide_sticker_search_suggestions = __esm({
+    "../examples/cx/catalog/plugins/hide-sticker-search-suggestions.cx"() {
+      hide_sticker_search_suggestions_default = 'plugin "HideStickerSearchSuggestions":\n  needs appearance.hide\n  hide sticker-search-suggestions\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-stickers.cx
   var hide_stickers_default;
   var init_hide_stickers = __esm({
@@ -50954,6 +51029,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_hide_system_messages = __esm({
     "../examples/cx/catalog/plugins/hide-system-messages.cx"() {
       hide_system_messages_default = 'plugin "HideSystemMessages":\n  needs messages.filterlocal\n  on incoming hide-system "pins,joins,boosts"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-thread-suggestions.cx
+  var hide_thread_suggestions_default;
+  var init_hide_thread_suggestions = __esm({
+    "../examples/cx/catalog/plugins/hide-thread-suggestions.cx"() {
+      hide_thread_suggestions_default = 'plugin "HideThreadSuggestions":\n  needs appearance.hide\n  hide thread-suggestions\n';
     }
   });
 
@@ -53132,6 +53215,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_google_that();
       init_grayscale_images();
       init_hide_active_now();
+      init_hide_add_friend_hint();
       init_hide_add_server_button();
       init_hide_apps_button();
       init_hide_avatar_decorations();
@@ -53173,6 +53257,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_profile_banner_images();
       init_hide_profile_connections();
       init_hide_profile_effects();
+      init_hide_profile_friend_request_banner();
       init_hide_profile_mutuals();
       init_hide_profile_notes();
       init_hide_quests_tab();
@@ -53186,10 +53271,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_spoiler_warnings();
       init_hide_status_emojis();
       init_hide_sticker_button();
+      init_hide_sticker_picker_promotions();
+      init_hide_sticker_search_suggestions();
       init_hide_stickers();
       init_hide_stream_previews();
       init_hide_suggested_channels();
       init_hide_system_messages();
+      init_hide_thread_suggestions();
       init_hide_threads_button();
       init_hide_timestamps();
       init_hide_typing_indicator();
@@ -53890,6 +53978,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the active friends panel"
           },
           {
+            name: "HideAddFriendHint",
+            source: hide_add_friend_hint_default,
+            description: "Hide the hint below the Add Friend field",
+            desktopOnly: true
+          },
+          {
             name: "HideAddServerButton",
             source: hide_add_server_button_default,
             description: "Hide the add-a-server button"
@@ -54099,6 +54193,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide profile effects"
           },
           {
+            name: "HideProfileFriendRequestBanner",
+            source: hide_profile_friend_request_banner_default,
+            description: "Hide friend request banners in profiles",
+            desktopOnly: true
+          },
+          {
             name: "HideProfileMutuals",
             source: hide_profile_mutuals_default,
             description: "Hide mutual friends and servers in profile cards"
@@ -54164,6 +54264,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the sticker picker shortcut"
           },
           {
+            name: "HideStickerPickerPromotions",
+            source: hide_sticker_picker_promotions_default,
+            description: "Hide shop and promotional cards in the sticker picker",
+            desktopOnly: true
+          },
+          {
+            name: "HideStickerSearchSuggestions",
+            source: hide_sticker_search_suggestions_default,
+            description: "Hide suggested searches in the sticker picker",
+            desktopOnly: true
+          },
+          {
             name: "HideStickers",
             source: hide_stickers_default,
             description: "Hide stickers in chat"
@@ -54182,6 +54294,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             name: "HideSystemMessages",
             source: hide_system_messages_default,
             description: "Hide system messages for pins, joins, boosts"
+          },
+          {
+            name: "HideThreadSuggestions",
+            source: hide_thread_suggestions_default,
+            description: "Hide thread suggestions above the composer",
+            desktopOnly: true
           },
           {
             name: "HideThreadsButton",
@@ -60907,7 +61025,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cb33d2fb55a7d68a64396c95bd15d9c3335c9c7a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b6e7629525ba91fdceacd7a91949a989e37382f";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
