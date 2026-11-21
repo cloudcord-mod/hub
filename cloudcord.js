@@ -39613,6 +39613,38 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             "ProfileBadgeRows"
           ]
         },
+        "profile-notes": {
+          plugin: "HideProfileNotes",
+          label: "local notes in profile cards",
+          css: '[class*="noteText_"], [class*="notePreview_"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileNote.tsx"
+            ]
+          }
+        },
+        "profile-connections": {
+          plugin: "HideProfileConnections",
+          label: "connections in profile cards",
+          css: '[class*="connectedAccounts_"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileConnections.tsx",
+              "modules/user_profile/native/LegacyUserProfileConnections.tsx"
+            ]
+          }
+        },
+        "profile-mutuals": {
+          plugin: "HideProfileMutuals",
+          label: "mutual friends and servers in profile cards",
+          css: '[class*="mutuals_"], [class*="mutualGuilds_"] { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileMutuals.tsx",
+              "modules/user_profile/native/UserProfileMutualGuilds.tsx"
+            ]
+          }
+        },
         "custom-status-emojis": {
           plugin: "HideStatusEmojis",
           label: "emojis in custom status bubbles",
@@ -50656,11 +50688,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-connections.cx
+  var hide_profile_connections_default;
+  var init_hide_profile_connections = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-connections.cx"() {
+      hide_profile_connections_default = 'plugin "HideProfileConnections":\n  needs appearance.hide\n  hide profile-connections\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-effects.cx
   var hide_profile_effects_default;
   var init_hide_profile_effects = __esm({
     "../examples/cx/catalog/plugins/hide-profile-effects.cx"() {
       hide_profile_effects_default = 'plugin "HideProfileEffects":\n  needs appearance.hide\n  hide profile-effects\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-mutuals.cx
+  var hide_profile_mutuals_default;
+  var init_hide_profile_mutuals = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-mutuals.cx"() {
+      hide_profile_mutuals_default = 'plugin "HideProfileMutuals":\n  needs appearance.hide\n  hide profile-mutuals\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-notes.cx
+  var hide_profile_notes_default;
+  var init_hide_profile_notes = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-notes.cx"() {
+      hide_profile_notes_default = 'plugin "HideProfileNotes":\n  needs appearance.hide\n  hide profile-notes\n';
     }
   });
 
@@ -52989,7 +53045,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_notification_bell();
       init_hide_pins_button();
       init_hide_profile_banner_images();
+      init_hide_profile_connections();
       init_hide_profile_effects();
+      init_hide_profile_mutuals();
+      init_hide_profile_notes();
       init_hide_quests_tab();
       init_hide_reactions();
       init_hide_reply_previews();
@@ -53776,8 +53835,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: hide_profile_banner_images_default
           },
           {
+            name: "HideProfileConnections",
+            source: hide_profile_connections_default
+          },
+          {
             name: "HideProfileEffects",
             source: hide_profile_effects_default
+          },
+          {
+            name: "HideProfileMutuals",
+            source: hide_profile_mutuals_default
+          },
+          {
+            name: "HideProfileNotes",
+            source: hide_profile_notes_default
           },
           {
             name: "HideQuestsTab",
@@ -60192,7 +60263,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "70a8f502d75eb692910691e46f25a1364bce3a07";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b77209d3dba1a021a80aafa524a7b01e3049d42";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
