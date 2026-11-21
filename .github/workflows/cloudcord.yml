@@ -4138,7 +4138,7 @@ jobs:
               </K.Section>;
           }
 
-          function ExtrasCard({ onReset }: { onReset: () => void }) {
+          function ExtrasCard({ section, onReset }: { section: "previews" | "tools"; onReset: () => void }) {
               const [, force] = useReducer((x: number) => x + 1, 0);
               const K = require("@core/ui/settings/components/ProfileStudio") as typeof import("@core/ui/settings/components/ProfileStudio");
               const [friendId, setFriendId] = useState("");
@@ -4148,6 +4148,7 @@ jobs:
               const link = state.giftCode ? "https://discord.gift/" + state.giftCode : "";
               const save = (next: ExtrasState) => { setExtras(next); applyFakeNitro(); force(); };
               return <View style={{ padding: 16, gap: 24 }}>
+                  {section === "previews" ? <>
                   <K.Section title="Fake Nitro" description="Only on this device. Nothing changes for other people.">
                       <ToggleRow label="Act like I have Nitro" subLabel="Removes Nitro previews and upsells. Real Nitro features still need Nitro" value={state.fakeNitro === true} onPress={() => save({ ...state, fakeNitro: !state.fakeNitro })} />
                   </K.Section>
@@ -4179,6 +4180,7 @@ jobs:
                   </K.Section>
                   <FakeMessagesSection />
                   <FakeConversationsList />
+                  </> : <>
                   <ServerCloneSection />
                   <K.Section title="Account tools">
                       <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
@@ -4186,15 +4188,19 @@ jobs:
                           <Button text="Reset CloudCord" variant="destructive" size="sm" onPress={() => confirmResetCloudCordProfile(onReset)} />
                       </View>
                   </K.Section>
+                  </>}
               </View>;
           }
 
-          export function ExtrasPage() {
+          function ExtrasPage({ section }: { section: "previews" | "tools"; }) {
               // Keep taps working with the keyboard open and scroll fields above it.
               return <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: 12, paddingBottom: 320 }}>
-                  <Card border="strong"><ExtrasCard onReset={() => { try { bindSavedPreview(); clearCache(); refreshPreview(); } catch {} }} /></Card>
+                  <Card border="strong"><ExtrasCard section={section} onReset={() => { try { bindSavedPreview(); clearCache(); refreshPreview(); } catch {} }} /></Card>
               </ScrollView>;
           }
+
+          export function PreviewsPage() { return <ExtrasPage section="previews" />; }
+          export function AccountToolsPage() { return <ExtrasPage section="tools" />; }
 
           export function initializeFakeProfile() {
               if (initPromise) return initPromise;
@@ -5701,7 +5707,7 @@ jobs:
 
               store_cloud_item = f'''            {{
                   key: "STORE_CLOUD",
-                  title: () => "Cloudsync",
+                  title: () => "CloudSync",
                   icon: {{ uri: "{CLOUDCORD_ICON}" }},
                   render: () => import("@core/ui/settings/pages/StoreCloud")
               }},'''

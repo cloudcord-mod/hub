@@ -35,6 +35,8 @@ const SIDEBAR: Record<string, string> = {
     cloudcord_fake_profile: "Profile",
     cloudcord_botcord: "Botcord",
     cloudcord_cloud_sync: "Add-ons",
+    cloudcord_tweaks: "Tweaks",
+    cloudcord_sync: "CloudSync",
 };
 
 function open(key: string, addonsTab?: string) {
@@ -61,12 +63,12 @@ const QUICK_TWEAKS: [string, string][] = [
 ];
 
 const FEATURES: { title: string; text: string; key: string; tab?: string; Icon: ComponentType<IconProps>; }[] = [
-    { title: "Plugins", text: "592 plugins with search, sorting and one-click switches.", key: "cloudcord_cloud_sync", tab: "Plugins", Icon: PluginsIcon },
+    { title: "Plugins", text: "Search, sort, and manage your plugins.", key: "cloudcord_cloud_sync", tab: "Plugins", Icon: PluginsIcon },
     { title: "Fake Profile", text: "Custom avatar, banner, badges and effects, shared with CloudCord users.", key: "cloudcord_fake_profile", Icon: UserIcon },
     { title: "BotCord", text: "Use bot accounts like a normal Discord client, right inside CloudCord.", key: "cloudcord_botcord", Icon: RobotIcon },
     { title: "Theme store", text: "Browse 100+ themes with previews and install one in a click.", key: "cloudcord_cloud_sync", tab: "Themes", Icon: PaintbrushIcon },
-    { title: "Tweaks", text: "100 instant switches to hide clutter and restyle Discord.", key: "cloudcord_cloud_sync", tab: "Tweaks", Icon: TweakIcon },
-    { title: "CloudSync", text: "Back up your settings and keep them in sync across devices.", key: "cloudcord_cloud_sync", tab: "Sync", Icon: CloudIcon },
+    { title: "Tweaks", text: "Hide clutter and restyle Discord.", key: "cloudcord_tweaks", Icon: TweakIcon },
+    { title: "CloudSync", text: "Back up your settings and keep them in sync across devices.", key: "cloudcord_sync", Icon: CloudIcon },
 ];
 
 type UpdateState = "checking" | "current" | "available" | "updating" | "done" | "error";
@@ -132,7 +134,7 @@ export function OverviewHome() {
                 <button className={cl("stat")} onClick={() => open("cloudcord_cloud_sync", "Plugins")}>
                     <b>{counts.activePlugins}</b><span>of {counts.plugins} plugins on</span>
                 </button>
-                <button className={cl("stat")} onClick={() => open("cloudcord_cloud_sync", "Tweaks")}>
+                <button className={cl("stat")} onClick={() => open("cloudcord_tweaks")}>
                     <b>{tweaksOn}</b><span>of {tweaks.length} tweaks on</span>
                 </button>
                 <button className={cl("stat")} onClick={() => open("cloudcord_cloud_sync", "Themes")}>

@@ -855,12 +855,12 @@ export function stopExtras() {
     localRequestActions = undefined;
 }
 
-export function ExtrasPanel() {
+export function ExtrasPanel({ section }: { section: "previews" | "tools"; }) {
     const state = useExtras();
     const [friendId, setFriendId] = React.useState("");
     const [dmUserId, setDmUserId] = React.useState("");
     const [cloneGuildId, setCloneGuildId] = React.useState("");
-    const guilds = Object.values(GuildStore.getGuilds() as Record<string, any>).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    const guilds = section === "tools" ? Object.values(GuildStore.getGuilds() as Record<string, any>).sort((a, b) => String(a.name).localeCompare(String(b.name))) : [];
     const [, force] = React.useReducer(x => x + 1, 0);
     const code = state.giftCode;
     const copy = async () => {
@@ -872,7 +872,7 @@ export function ExtrasPanel() {
             showToast("Couldn’t copy the link. Select it to copy it manually.", Toasts.Type.FAILURE);
         }
     };
-    return <>
+    return section === "previews" ? <>
         <Section title="Fake Nitro" description="Only on this device. Nothing changes for other people.">
             <Switch label="Act like I have Nitro" description="Removes Nitro previews, upsells and Get Nitro prompts. Turns on by itself while Nitro is on in your custom profile. Real Nitro features like big uploads still need real Nitro." checked={state.fakeNitro === true} onChange={value => { writeExtras({ ...extras, fakeNitro: value }); applyFakeNitro(); }} />
         </Section>
@@ -908,18 +908,19 @@ export function ExtrasPanel() {
                 {fakeConversationCount() > 0 && <span className="cpx-hint">{fakeConversationCount()} saved. Open it in any chat to edit or delete them.</span>}
             </div>
             <div className="cpx-inline">
-                <input className="cpx-input" placeholder="User ID for a fake DM" inputMode="numeric" value={dmUserId} onChange={event => setDmUserId(event.target.value.replace(/D/g, ""))} />
+                <input className="cpx-input" placeholder="User ID for a fake DM" inputMode="numeric" value={dmUserId} onChange={event => setDmUserId(event.target.value.replace(/\D/g, ""))} />
                 <button type="button" className="cpx-btn" onClick={() => openFakeDm(dmUserId)}>Fake DM</button>
             </div>
             <span className="cpx-hint">You can also right-click a chat (Fake conversation) or a user (Fake DM).</span>
         </Section>
+        <FakeToolsSection Section={Section} SelectField={SelectField} />
+    </> : <>
         <Section title="Clone a server" description="Copies roles, channels, permissions, emojis, stickers and settings into a new server you own, using your account. Messages and members are never copied. Only clone servers you have the right to copy.">
             <div className="cpx-inline">
                 <SelectField label="Server" options={[{ value: "", label: "Pick a server" }, ...guilds.map(guild => ({ value: guild.id, label: guild.name }))]} value={cloneGuildId} onChange={value => setCloneGuildId(String(value))} />
                 <button type="button" className="cpx-btn" disabled={!cloneGuildId} onClick={() => openServerClone(GuildStore.getGuild(cloneGuildId))}>Clone server</button>
             </div>
         </Section>
-        <FakeToolsSection Section={Section} SelectField={SelectField} />
         <Section title="Account tools">
             <div className="cpx-inline">
                 <button type="button" className="cpx-btn cpx-btn-danger" onClick={confirmLeaveAll}>Leave all servers</button>

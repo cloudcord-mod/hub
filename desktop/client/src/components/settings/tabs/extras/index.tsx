@@ -6,15 +6,12 @@
 
 import "@sincordplugins/fakeProfile/editor.css";
 
-import { Heading } from "@components/Heading";
-import { Paragraph } from "@components/Paragraph";
 import { ExtrasPanel } from "@sincordplugins/fakeProfile/extras";
 
-// Device-only mods: Fake Nitro, gift links, boosts, friend requests and account tools.
-export default function ExtrasTab() {
-    return <>
-        <Heading tag="h2" style={{ marginTop: 20, marginBottom: 8 }}>Extras</Heading>
-        <Paragraph>Everything here only changes what you see on this device, except Leave all servers and Reset.</Paragraph>
-        <div className="cpx-root cpx-page"><ExtrasPanel /></div>
-    </>;
+export function PreviewsTab() {
+    return <div className="cpx-root cpx-page"><ExtrasPanel section="previews" /></div>;
+}
+
+export function AccountToolsTab() {
+    return <div className="cpx-root cpx-page"><ExtrasPanel section="tools" /></div>;
 }

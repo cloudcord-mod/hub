@@ -188,7 +188,7 @@ const userMenu: NavContextMenuPatchCallback = (children, { user, guildId }: { us
     children.push(<Menu.MenuItem id="cc-fake-ban" label={banned ? "Unban (fake)" : "Ban (fake)"} color={banned ? undefined : "danger"} action={() => fakeBan(guild, user.id, !banned)} />);
 };
 
-/** The Fake tools section in Extras. */
+/** The Fake tools section in Previews. */
 export function FakeToolsSection({ Section, SelectField }: { Section: any; SelectField: any; }) {
     const state = useData();
     const guilds = Object.values(GuildStore.getGuilds() as Record<string, any>).sort((a, b) => String(a.name).localeCompare(String(b.name)));
@@ -249,7 +249,7 @@ export function FakeToolsSection({ Section, SelectField }: { Section: any; Selec
 
 export default definePlugin({
     name: "FakeTools",
-    description: "Device-only pranks: a fake account-disabled screen, fake removal from a server on a timer, fake typing, fake unread pings and fake bans that hide someone's messages for you. Controls are in Extras.",
+    description: "Device-only pranks: a fake account-disabled screen, fake removal from a server on a timer, fake typing, fake unread pings and fake bans that hide someone's messages for you. Controls are in Previews.",
     authors: [Devs.Xohus],
     tags: ["Fun"],
     enabledByDefault: true,

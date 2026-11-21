@@ -9,6 +9,9 @@ const tabs = [
     ["BOTCORD", "Botcord"],
     ["FAKE_PROFILE", "Profile"],
     ["BUNNY_PLUGINS", "Add-ons"],
+    ["CLOUDCORD_PREVIEWS", "Previews"],
+    ["CLOUDCORD_ACCOUNT_TOOLS", "Account Tools"],
+    ["STORE_CLOUD", "CloudSync"],
 ] as const;
 
 export default function Customization() {

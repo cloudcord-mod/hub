@@ -49,7 +49,7 @@ export default function initSettings() {
             coreItem,
             {
                 key: "STORE_CLOUD",
-                title: () => "Cloudsync",
+                title: () => "CloudSync",
                 icon: { uri: PupuIcon },
                 render: () => import("@core/ui/settings/pages/StoreCloud")
             },
@@ -64,6 +64,18 @@ export default function initSettings() {
                 title: () => "Add-ons",
                 icon: safeAsset("AppsIcon"),
                 render: () => import("@core/ui/settings/pages/Addons")
+            },
+            {
+                key: "CLOUDCORD_PREVIEWS",
+                title: () => "Previews",
+                icon: safeAsset("EyeIcon", "GiftIcon", "SettingsIcon"),
+                render: () => import("@core/ui/settings/pages/FakeProfile").then(module => ({ default: module.PreviewsPage }))
+            },
+            {
+                key: "CLOUDCORD_ACCOUNT_TOOLS",
+                title: () => "Account Tools",
+                icon: safeAsset("WrenchIcon", "SettingsIcon"),
+                render: () => import("@core/ui/settings/pages/FakeProfile").then(module => ({ default: module.AccountToolsPage }))
             },
             {
                 key: "CLOUDCORD_TESTING_PLUGINS",
@@ -87,12 +99,12 @@ export default function initSettings() {
             }
         ];
 
-    const defaultOrder = ["CLOUDCORD", "BOTCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_TESTING_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
+    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_PREVIEWS", "CLOUDCORD_ACCOUNT_TOOLS", "STORE_CLOUD", "BOTCORD", "CLOUDCORD_TESTING_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
     const configurableKeys = new Set(defaultOrder.filter(key => key !== "CLOUDCORD"));
     const configuredOrder = settings.cloudcordTabOrder ?? [];
     const orderIndex = new Map(configuredOrder.map((key, index) => [key, index]));
     const items = [...baseItems, hiddenControlsItem]
-        .filter(row => !["STORE_CLOUD", "CLOUDCORD_PLUGIN_BROWSER", "CLOUDCORD_RECOVERY"].includes(row.key))
+        .filter(row => !["CLOUDCORD_PLUGIN_BROWSER", "CLOUDCORD_RECOVERY"].includes(row.key))
         .map(row => {
             if (row.nativeSection) return row;
             const originalPredicate = row.usePredicate;

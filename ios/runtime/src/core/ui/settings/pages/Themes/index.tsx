@@ -1,7 +1,7 @@
 import { formatString, Strings } from "@core/i18n";
 import AddonPage from "@core/ui/components/AddonPage";
 import { type CxAddonRow, disableCxAddon, useCxAddonRows } from "@core/ui/settings/pages/CxExtensions";
-import { CxAddonCard, ImportCxAddonButton } from "@core/ui/settings/pages/CxExtensions/AddonCard";
+import { AddonActions, CxAddonCard } from "@core/ui/settings/pages/CxExtensions/AddonCard";
 import ThemeCard from "@core/ui/settings/pages/Themes/ThemeCard";
 import { useProxy } from "@core/vendetta/storage";
 import {
@@ -57,7 +57,7 @@ export default function Themes() {
         fetchFn: installTheme,
       }}
       items={[...Object.values(themes), ...cxThemes]}
-      ListHeaderComponent={() => <ImportCxAddonButton kind="theme" />}
+      ListHeaderComponent={() => <AddonActions kind="theme" />}
       safeModeHint={{
         message: formatString("SAFE_MODE_NOTICE_THEMES", {
           enabled: Boolean(settings.safeMode?.currentThemeId),

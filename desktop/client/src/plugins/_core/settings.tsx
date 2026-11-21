@@ -6,9 +6,12 @@
 
 import { definePluginSettings } from "@api/Settings";
 import {
+    CloudIcon,
+    EyeIcon,
     MainSettingsIcon,
     InfoIcon,
     PluginsIcon,
+    PaintbrushIcon,
     RobotIcon,
     UserIcon
 } from "@components/Icons";
@@ -18,7 +21,9 @@ import {
     CloudCordDiagnosticsTab,
     FakeProfileTab,
     VencordTab,
+    wrapTab,
 } from "@components/settings";
+import { currentAssignment } from "@components/settings/tabs/addons/testingAccess";
 import { CloudCordDeveloperControls } from "@components/settings/tabs/customization";
 import { gitHashShort } from "@shared/vencordUserAgent";
 import { Devs } from "@utils/constants";
@@ -27,6 +32,27 @@ import definePlugin, { IconProps, OptionType } from "@utils/types";
 import { waitFor } from "@webpack";
 import { React } from "@webpack/common";
 import type { ComponentType, PropsWithChildren, ReactNode } from "react";
+
+const PreviewsTab = wrapTab(() => {
+    const { PreviewsTab: Page } = require("@components/settings/tabs/extras");
+    return <Page />;
+}, "Previews");
+const AccountToolsTab = wrapTab(() => {
+    const { AccountToolsTab: Page } = require("@components/settings/tabs/extras");
+    return <Page />;
+}, "Account Tools");
+const TweaksTab = wrapTab(() => {
+    const { TweaksPage: Page } = require("@components/settings/tabs/addons/TweaksPage");
+    return <Page />;
+}, "Tweaks");
+const CloudSyncTab = wrapTab(() => {
+    const Page = require("@components/settings/tabs/sync/CloudTab").default;
+    return <Page />;
+}, "CloudSync");
+const TestingPluginsTab = wrapTab(() => {
+    const Page = require("@components/settings/tabs/addons/TestingPlugins").default;
+    return <Page />;
+}, "Testing Plugins");
 
 let LayoutTypes = {
     SECTION: 1,
@@ -247,6 +273,11 @@ export default definePlugin({
                 Component: AddonsTab,
                 Icon: PluginsIcon
             }),
+            buildEntry({ key: "cloudcord_tweaks", title: "Tweaks", Component: TweaksTab, Icon: PaintbrushIcon }),
+            buildEntry({ key: "cloudcord_previews", title: "Previews", Component: PreviewsTab, Icon: EyeIcon }),
+            buildEntry({ key: "cloudcord_account_tools", title: "Account Tools", Component: AccountToolsTab, Icon: MainSettingsIcon }),
+            settings.store.showCloudSyncTab && buildEntry({ key: "cloudcord_sync", title: "CloudSync", Component: CloudSyncTab, Icon: CloudIcon }),
+            currentAssignment() && buildEntry({ key: "cloudcord_testing_plugins", title: "Testing Plugins", Component: TestingPluginsTab, Icon: PluginsIcon }),
             settings.store.diagnosticsMode === true && buildEntry({
                 key: "cloudcord_diagnostics",
                 title: "Diagnostics",

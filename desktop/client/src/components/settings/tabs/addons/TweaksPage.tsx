@@ -3,7 +3,7 @@
  * Copyright (c) 2026 xohus and CloudCord contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
  *
- * Add-ons > Tweaks: every CloudCord tweak as an instant switch, grouped by category.
+ * CloudCord tweaks grouped by category.
  * Tweaks are plain stylesheets, so they turn on and off without a restart.
  */
 

@@ -2,7 +2,7 @@ import { Strings } from "@core/i18n";
 import type { CardWrapper } from "@core/ui/components/AddonCard";
 import AddonPage from "@core/ui/components/AddonPage";
 import { type CxAddonRow, useCxAddonRows } from "@core/ui/settings/pages/CxExtensions";
-import { CxAddonCard, ImportCxAddonButton } from "@core/ui/settings/pages/CxExtensions/AddonCard";
+import { AddonActions, CxAddonCard } from "@core/ui/settings/pages/CxExtensions/AddonCard";
 import PluginCard from "@core/ui/settings/pages/Plugins/components/PluginCard";
 import { VdPluginManager } from "@core/vendetta/plugins";
 import { useProxy } from "@core/vendetta/storage";
@@ -94,11 +94,11 @@ export default function Plugins() {
         }}
         ListHeaderComponent={() => {
             const unproxiedPlugins = Object.values(VdPluginManager.plugins).filter(p => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));
-            if (!unproxiedPlugins.length) return <ImportCxAddonButton kind="plugin" />;
+            if (!unproxiedPlugins.length) return <AddonActions kind="plugin" />;
 
         return (
           <View style={{ marginVertical: 12, marginHorizontal: 10 }}>
-            <ImportCxAddonButton kind="plugin" />
+            <AddonActions kind="plugin" />
             <Card border="strong">
               <View
                 style={{
