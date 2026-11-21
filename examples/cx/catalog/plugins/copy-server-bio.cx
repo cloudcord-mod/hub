@@ -1,0 +1,3 @@
+plugin "CopyServerBio":
+  needs profilemenu.copy
+  on profile menu copy server-profile-bio

@@ -1837,17 +1837,19 @@ function registerProfileMenuEntry(entry: ProfileMenuEntry) {
 }
 
 function registerProfileMenuAction(action: CxProfileMenuAction) {
-    const { label, scope } = cxProfileMenuActions[action];
+    const entry = cxProfileMenuActions[action];
+    const { label, scope } = entry;
     return registerProfileMenuEntry({
         key: action,
         getItems(id, guildId) {
-            if (scope === "server" && !getCxProfileMenuCopy(action, id, UserProfileStore, guildId)) return [];
+            const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore);
+            if ((scope === "server" || scope === "identity") && !getCopy()) return [];
             return [{ label, action: () => {
-                const text = getCxProfileMenuCopy(action, id, UserProfileStore, guildId);
+                const text = getCopy();
                 if (text) {
                     clipboard.setString(text);
                     showToast.showCopyToClipboard?.();
-                } else showToast(action === "profile-bio" ? "No profile bio found." : "No profile colors found.");
+                } else showToast("unavailable" in entry ? entry.unavailable : "This profile field is unavailable.");
             } }];
         },
     });

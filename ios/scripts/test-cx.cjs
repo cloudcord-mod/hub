@@ -382,6 +382,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         let voicePingMs, voicePingChannel, voicePingConnected;
         let speakingWhileMuted = false, selfMuted = false, serverMuted = false, selfDeafened = false;
         const mediaListeners = new Set();
+        let includeProfileNames = false;
         const stores = {
             MediaEngineStore: {
                 getSpeakingWhileMuted: () => speakingWhileMuted,
@@ -401,10 +402,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             PresenceStore: { getStatus: () => pingDnd ? "dnd" : "online" },
             UserGuildSettingsStore: { isMuted: () => pingMuted },
             UnreadSettingNoticeStore2: { maybeAutoUpgradeChannel: upgradeChannel },
-            UserStore: { getCurrentUser: () => ({ id: activeAccount }), getUser: id => [me, sender, other].includes(id) ? { id } : undefined },
+            UserStore: { getCurrentUser: () => ({ id: activeAccount }), getUser: id => {
+                if (id === sender && includeProfileNames) return { id, username: "sender.account", globalName: "Sender Display Name" };
+                if ([me, sender, other].includes(id)) return { id };
+            } },
             UserProfileStore: {
                 getUserProfile: id => id === sender ? { bio: "Hello from the **profile**", themeColors: Object.freeze([0, 0x12abcd]), banner: "a_" + "a".repeat(32) } : undefined,
-                getGuildMemberProfile: (id, guild) => id === sender && guild === guildId ? { themeColors: [0x123, 0xffffff] } : undefined,
+                getGuildMemberProfile: (id, guild) => id === sender && guild === guildId
+                    ? { themeColors: [0x123, 0xffffff], bio: "Hello from the **server profile**" } : undefined,
             },
             ChannelStore: { getChannel: id => id === queueChannel.id ? queueChannel : id === jumpChannel.id ? jumpChannel : ({ id, name: "test", recipients: [sender], nsfw: id === "nsfw-channel", guild_id: id === "guild-channel" || id === repeatChannel ? guildId : undefined,
                 rateLimitPerUser: id === "slow-channel" ? 10 : 0 }) },
@@ -1945,6 +1950,21 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         actionList(other)[0].action();
         assert.equal(notifications.pop(), "No profile bio found.");
         click(render(), "Disable CopyBios");
+        assert.equal(menuPatches.size + appearanceHooks.size, 0);
+        includeProfileNames = true;
+        for (const name of ["CopyProfileNames", "CopyServerBio"]) {
+            selectCatalog(name);
+            click(render(), "Allow for this session");
+        }
+        assert.deepEqual(actionList(other, guildId), []);
+        assert.deepEqual(Array.from(actionList(sender), item => item.label), ["Copy Username", "Copy Display Name"]);
+        const profileFields = actionList(sender, guildId);
+        assert.deepEqual(Array.from(profileFields, item => item.label), ["Copy Username", "Copy Display Name", "Copy Server Bio"]);
+        for (const action of profileFields) action.action();
+        assert.deepEqual(clipboardWrites.slice(-3), ["sender.account", "Sender Display Name", "Hello from the **server profile**"]);
+        click(render(), "Disable CopyProfileNames");
+        click(render(), "Disable CopyServerBio");
+        includeProfileNames = false;
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
         {
             const port = cxCatalog.plugins.find(entry => entry.name === "UserNotes").source;

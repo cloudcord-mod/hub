@@ -1,8 +1,11 @@
 export const cxProfileMenuActions = {
     "user-url": { label: "Copy User URL", scope: "none", format: (id: string) => "<https://discord.com/users/" + id + ">" },
     "user-mention": { label: "Copy User Mention", scope: "none", format: (id: string) => "<@" + id + ">" },
-    "profile-bio": { label: "Copy Bio", scope: "user" },
-    "profile-colors": { label: "Copy Profile Colors", scope: "user" },
+    "username": { label: "Copy Username", scope: "identity" },
+    "display-name": { label: "Copy Display Name", scope: "identity" },
+    "profile-bio": { label: "Copy Bio", scope: "user", unavailable: "No profile bio found." },
+    "server-profile-bio": { label: "Copy Server Bio", scope: "server" },
+    "profile-colors": { label: "Copy Profile Colors", scope: "user", unavailable: "No profile colors found." },
     "server-profile-colors": { label: "Copy Server Profile Colors", scope: "server" },
 } as const;
 
@@ -33,22 +36,29 @@ export function getCxProfileMedia(id: string, user: { avatar?: unknown; discrimi
     return assets;
 }
 
+type Profile = { themeColors?: unknown; bio?: unknown; };
 type ProfileStore = {
-    getUserProfile?: (id: string) => { themeColors?: unknown; bio?: unknown; } | null | undefined;
-    getGuildMemberProfile?: (id: string, guildId: string) => { themeColors?: unknown; } | null | undefined;
+    getUserProfile?: (id: string) => Profile | null | undefined;
+    getGuildMemberProfile?: (id: string, guildId: string) => Profile | null | undefined;
 };
+type UserStore = { getUser?: (id: string) => { username?: unknown; globalName?: unknown; } | null | undefined; };
 
-export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, profiles?: ProfileStore, guildId?: string) {
+function nonBlankText(value: unknown) {
+    return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, profiles?: ProfileStore, guildId?: string, users?: UserStore) {
     const entry = cxProfileMenuActions[action];
     if (entry.scope === "none") return entry.format(id);
     if (entry.scope === "server" && !guildId) return;
     try {
-        if (action === "profile-bio") {
-            const bio = profiles?.getUserProfile?.(id)?.bio;
-            return typeof bio === "string" && bio.trim() ? bio : undefined;
+        if (entry.scope === "identity") {
+            const user = users?.getUser?.(id);
+            return nonBlankText(action === "username" ? user?.username : user?.globalName);
         }
         const profile = entry.scope === "server"
             ? profiles?.getGuildMemberProfile?.(id, guildId!) : profiles?.getUserProfile?.(id);
+        if (action === "profile-bio" || action === "server-profile-bio") return nonBlankText(profile?.bio);
         const colors = profile?.themeColors;
         if (!Array.isArray(colors) || colors.length < 2) return;
         const hex = colors.slice(0, 2).map(color =>

@@ -1,0 +1,4 @@
+plugin "CopyProfileNames":
+  needs profilemenu.copy
+  on profile menu copy username
+  on profile menu copy display-name

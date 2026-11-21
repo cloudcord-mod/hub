@@ -837,20 +837,24 @@ export function CxSettings() {
                     };
                 },
                 registerProfileMenuAction(action) {
-                    const { label, scope } = cxProfileMenuActions[action];
+                    const entry = cxProfileMenuActions[action];
+                    const { label, scope } = entry;
                     let active = true;
                     const itemId = "cx-profile-" + action;
                     const patch: NavContextMenuPatchCallback = (children, props) => {
                         const id = props?.user?.id ?? props?.userId;
                         if (!active || !isCxProfileUserId(id) || children.some(child => child?.props?.id === itemId)) return;
-                        const selectedGuild = scope === "server" ? props?.guildId ?? SelectedGuildStore?.getGuildId() : undefined;
+                        const selectedGuild = scope === "server" ? props?.displayProfile?.guildId ?? props?.guildId
+                            ?? props?.channel?.guild_id ?? (action === "server-profile-colors" && !props?.channel
+                                ? SelectedGuildStore?.getGuildId() : undefined) : undefined;
                         const guildId = isCxProfileUserId(selectedGuild) ? selectedGuild : undefined;
-                        if (scope === "server" && !getCxProfileMenuCopy(action, id, UserProfileStore, guildId)) return;
+                        const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore);
+                        if ((scope === "server" || scope === "identity") && !getCopy()) return;
                         children.push(<Menu.MenuItem id={itemId} label={label} action={() => {
                             if (!active) return;
-                            const text = getCxProfileMenuCopy(action, id, UserProfileStore, guildId);
+                            const text = getCopy();
                             if (text) void copyToClipboard(text).catch(() => showToast("Couldn't copy to clipboard."));
-                            else showToast(action === "profile-bio" ? "No profile bio found." : "No profile colors found.");
+                            else showToast("unavailable" in entry ? entry.unavailable : "This profile field is unavailable.");
                         }} />);
                     };
                     const menus = ["user-context", "user-profile-actions", "user-profile-overflow-menu"];
