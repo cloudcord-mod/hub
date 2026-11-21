@@ -72,6 +72,7 @@ jobs:
         run: |
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-mobile-report-regressions.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-profile-refresh.cjs
+          NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-profile-refresh-budget.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-real-profile-view.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-profile-sync-regressions.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-profile-studio-preview.cjs
@@ -1437,6 +1438,8 @@ jobs:
           }
 
           const sharedProfileSeenAt = new Map<string, number>();
+          const SHARED_RECENT_PROFILE_LIMIT = 256;
+          const SHARED_PROFILE_CACHE_LIMIT = 512;
           let sharedRenderTimer: ReturnType<typeof setTimeout> | null = null;
           function queueSharedRenderRefresh() {
               if (sharedRenderTimer) return;
@@ -1449,18 +1452,35 @@ jobs:
                   try { safeStore("MessageStore")?.emitChange?.(); } catch {}
               }, 250);
           }
+          function recordSharedProfileFetch(id: string, now: number) {
+              sharedProfileFetchedAt.delete(id);
+              sharedProfileFetchedAt.set(id, now);
+              for (const candidate of sharedProfileFetchedAt.keys()) {
+                  if (sharedProfileFetchedAt.size <= SHARED_PROFILE_CACHE_LIMIT) break;
+                  if (sharedRequests.has(candidate)) continue;
+                  sharedProfileFetchedAt.delete(candidate);
+                  sharedProfiles.delete(candidate);
+              }
+          }
           function requestSharedProfile(userId?: string, force = false) {
               const id = String(userId || "");
-              if (!force) sharedProfileSeenAt.set(id, Date.now());
+              if (AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId) return false;
+              const now = Date.now();
+              const seenAt = sharedProfileSeenAt.get(id);
+              if (!force && (seenAt === undefined || now - seenAt >= 5_000)) {
+                  sharedProfileSeenAt.delete(id);
+                  sharedProfileSeenAt.set(id, now);
+                  if (sharedProfileSeenAt.size > SHARED_RECENT_PROFILE_LIMIT) sharedProfileSeenAt.delete(sharedProfileSeenAt.keys().next().value!);
+              }
               const fetchedAt = sharedProfileFetchedAt.get(id) || 0;
               // Cache misses quietly, but recheck profiles being actively viewed
               // within a minute so newly published badges do not stay invisible.
               const cached = sharedProfiles.get(id);
               const ttl = cached && !Object.keys(cached).length ? (force ? 60_000 : 15 * 60_000) : force ? 30_000 : 2 * 60_000;
-              if (AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId || sharedRequests.has(id) || Date.now() - fetchedAt < ttl || sharedRequests.size >= 4) return;
+              if (sharedRequests.has(id) || now - fetchedAt < ttl || sharedRequests.size >= 4) return false;
               sharedRequests.add(id);
-              sharedProfileFetchedAt.set(id, Date.now());
-              void fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(id)}?v=${Date.now()}`, { cache: "no-store" })
+              recordSharedProfileFetch(id, now);
+              void fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(id)}?v=${now}`, { cache: "no-store" })
                   .then(response => {
                       if (response.ok) return response.json();
                       if (response.status === 404) return null;
@@ -1474,13 +1494,14 @@ jobs:
                       const previous = sharedProfiles.get(id);
                       const changed = JSON.stringify(previous ?? {}) !== JSON.stringify(next);
                       sharedProfiles.set(id, next);
-                      sharedProfileFetchedAt.set(id, Date.now());
+                      recordSharedProfileFetch(id, Date.now());
                       if (!changed) return;
                       try { reapplyBadgeDirectory(id); } catch {}
                       queueSharedRenderRefresh();
                   })
                   .catch(() => {})
                   .finally(() => sharedRequests.delete(id));
+              return true;
           }
 
           function isRealProfileView(id: string) {
@@ -1559,9 +1580,7 @@ jobs:
               let budget = 4;
               for (const [id, seenAt] of sharedProfileSeenAt) {
                   if (now - seenAt > 120_000) { sharedProfileSeenAt.delete(id); continue; }
-                  if (now - (sharedProfileFetchedAt.get(id) || 0) < 30_000) continue;
-                  requestSharedProfile(id, true);
-                  if (--budget === 0) break;
+                  if (requestSharedProfile(id, true) && --budget === 0) break;
               }
           }
 
