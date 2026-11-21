@@ -24633,11 +24633,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     preview = rootSettings.fakeProfile;
     configReady = true;
   }
+  function ownedTemplateBackup(ownerId) {
+    var owner = rootSettings.fakeProfilePreviewOwner ?? rootSettings.fakeProfileOwnerId;
+    return ownerId && owner === ownerId ? rootSettings.fakeProfilePreviewBackup : void 0;
+  }
+  function clearTemplateBackup() {
+    delete rootSettings.fakeProfilePreviewBackup;
+    delete rootSettings.fakeProfilePreviewOwner;
+  }
   function adoptProfileAccount(user) {
     var nextId = user?.id ? String(user.id) : null;
     realCurrentUser = user || null;
     var previousId = rootSettings.fakeProfileOwnerId || currentUserId;
     currentUserId = nextId;
+    if (configReady && isProfileViewUserId(nextId) && Array.isArray(rootSettings.fakeProfileSaved)) {
+      rootSettings.fakeProfileSaved = {
+        [nextId]: rootSettings.fakeProfileSaved
+      };
+    }
     if (configReady && isProfileViewUserId(nextId) && rootSettings.cloudcordRealProfileUsersByAccount == null && Array.isArray(rootSettings.cloudcordRealProfileUsers)) {
       var users = normalizeProfileViewUsers(rootSettings.cloudcordRealProfileUsers).filter((id) => id !== nextId);
       rootSettings.cloudcordRealProfileUsersByAccount = {
@@ -24661,12 +24674,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     mediaSelections.clear();
     if (previousId)
       accounts[previousId] = {
-        profile: rootSettings.fakeProfile || preview,
+        profile: ownedTemplateBackup(previousId) || rootSettings.fakeProfile || preview,
         localOnly: !!rootSettings.fakeProfileLocalOnly,
         mediaCleared: {
           ...rootSettings.fakeProfileMediaCleared || {}
         }
       };
+    clearTemplateBackup();
     rootSettings.fakeProfileAccounts = accounts;
     var next = nextId ? accounts[nextId] : null;
     rootSettings.fakeProfileOwnerId = nextId;
@@ -25087,6 +25101,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return _async_to_generator(function* () {
       if (rootSettings.fakeProfileLocalOnly)
         return;
+      if (rootSettings.fakeProfilePreviewBackup)
+        return;
       if (!force && (fakeProfileEditorOpen || Date.now() < suppressOwnPullUntil))
         return;
       if (!force && customSocialValidationErrors(preview).length)
@@ -25110,7 +25126,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         if (!response.ok)
           return;
         var payload = yield response.json();
-        if (rootSettings.fakeProfileLocalOnly || currentUserId !== requestedUserId || JSON.stringify(preview) !== localSnapshot || !force && (fakeProfileEditorOpen || Date.now() < suppressOwnPullUntil))
+        if (rootSettings.fakeProfileLocalOnly || rootSettings.fakeProfilePreviewBackup || currentUserId !== requestedUserId || JSON.stringify(preview) !== localSnapshot || !force && (fakeProfileEditorOpen || Date.now() < suppressOwnPullUntil))
           return;
         var data = payload?.profile ?? payload;
         if (!data || typeof data !== "object")
@@ -29909,19 +29925,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function initializeFakeProfile() {
-    try {
-      var backup = rootSettings.fakeProfilePreviewBackup;
-      if (backup) {
-        rootSettings.fakeProfile = backup;
-        delete rootSettings.fakeProfilePreviewBackup;
-      }
-    } catch (e) {
-    }
     if (initPromise)
       return initPromise;
     initPromise = (() => _async_to_generator(function* () {
       try {
         yield awaitStorage(settings);
+        var ownerId = rootSettings.fakeProfileOwnerId ?? null;
+        if (rootSettings.fakeProfilePreviewBackup) {
+          rootSettings.fakeProfile = ownedTemplateBackup(ownerId) ?? (!ownerId && !rootSettings.fakeProfilePreviewOwner ? rootSettings.fakeProfilePreviewBackup : void 0) ?? rootSettings.fakeProfileAccounts?.[ownerId]?.profile ?? defaultPreview();
+        }
+        clearTemplateBackup();
         bindSavedPreview();
         yield pullRealCordConfiguration();
         if (globalThis.__CLOUDCORD_LOADER__?.loaderName === "RealCord" && !realCordSyncTimer) {
@@ -30557,9 +30570,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return result;
     })();
   }
-  function publishShare(_0, _1) {
-    return _async_to_generator(function* (item, visibility, extra = {}) {
+  function publishShare(_0, _1, _2) {
+    return _async_to_generator(function* (ownerId, item, visibility, extra = {}) {
+      if (!isProfileViewUserId(ownerId) || ownerId !== currentUserId)
+        throw new Error("Switch to this Discord account to publish its profile.");
       var profile = yield ownSharedProfile(item.data);
+      if (ownerId !== currentUserId)
+        throw new Error("Your Discord account changed.");
       if (item.share) {
         yield shareRequest("/" + item.share.id, "PUT", {
           name: item.name,
@@ -30572,10 +30589,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           visibility
         };
       }
-      if (!currentUserId)
-        throw new Error("Sign in to Discord first.");
       var created = yield shareRequest("", "POST", {
-        ownerId: currentUserId,
+        ownerId,
         name: item.name,
         visibility,
         profile,
@@ -30587,6 +30602,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         visibility
       };
     }).apply(this, arguments);
+  }
+  function readSavedProfiles(ownerId) {
+    var list = isProfileViewUserId(ownerId) ? rootSettings.fakeProfileSaved?.[ownerId] : void 0;
+    return Array.isArray(list) ? list.filter((item) => item?.id && item?.data) : [];
+  }
+  function writeSavedProfiles(ownerId, next) {
+    if (!isProfileViewUserId(ownerId))
+      return;
+    var existing = rootSettings.fakeProfileSaved;
+    var accounts = existing && typeof existing === "object" && !Array.isArray(existing) ? existing : {};
+    rootSettings.fakeProfileSaved = {
+      ...accounts,
+      [ownerId]: next
+    };
   }
   function savedSnapshot(data) {
     var { syncRevision: _revision, enabled: _enabled, hideBadgesWhenSyncOff: _hideBadges, ...rest } = data || {};
@@ -30601,17 +30630,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       syncRevision: Date.now()
     };
   }
-  function ProfileTemplates({ current, onUse, onPreview }) {
+  function ProfileTemplates({ ownerId, current, onUse, onPreview }) {
     var [previewing, setPreviewing] = (0, import_react9.useState)(null);
     (0, import_react9.useEffect)(() => {
-      var backup = Reflect.get(rootSettings, "fakeProfilePreviewBackup");
-      if (backup && !previewing)
+      if (ownedTemplateBackup(ownerId))
         setPreviewing({
           id: "",
           name: "Template",
           data: null
         });
-    }, []);
+    }, [
+      ownerId
+    ]);
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [query, setQuery] = (0, import_react9.useState)("");
     var [category, setCategory] = (0, import_react9.useState)("");
@@ -30624,7 +30654,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [pubCategory, setPubCategory] = (0, import_react9.useState)("Aesthetic");
     var [pubVisibility, setPubVisibility] = (0, import_react9.useState)("public");
     var [publishedId, setPublishedId] = (0, import_react9.useState)(null);
-    var saved = () => Array.isArray(rootSettings.fakeProfileSaved) ? rootSettings.fakeProfileSaved : [];
+    var saved = () => readSavedProfiles(ownerId);
     (0, import_react9.useEffect)(() => {
       var cancelled = false;
       var timer = setTimeout(() => _async_to_generator(function* () {
@@ -30648,11 +30678,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       sort
     ]);
     var run = (task) => _async_to_generator(function* () {
+      if (!ownerId || ownerId !== currentUserId)
+        return;
       setBusy(true);
       try {
         yield task();
       } catch (error) {
-        import_react_native28.Alert.alert("Templates", /not found/i.test(String(error?.message)) ? "That template doesn't exist or is private." : error?.message || "Something went wrong.");
+        if (ownerId === currentUserId)
+          import_react_native28.Alert.alert("Templates", /not found/i.test(String(error?.message)) ? "That template doesn't exist or is private." : error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
@@ -30660,6 +30693,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var fetchTemplate = (id) => _async_to_generator(function* () {
       var own = saved().find((item) => item.share?.id === id);
       var share = yield shareRequest("/" + id, "GET", void 0, own?.share?.token);
+      if (ownerId !== currentUserId)
+        throw new Error("Your Discord account changed.");
       return {
         name: String(share.name || "Template").slice(0, 40),
         data: savedSnapshot({
@@ -30693,7 +30728,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     })());
     var save = (id) => run(() => _async_to_generator(function* () {
       var template = yield fetchTemplate(id);
-      rootSettings.fakeProfileSaved = [
+      writeSavedProfiles(ownerId, [
         {
           id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
           name: template.name,
@@ -30701,7 +30736,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           data: template.data
         },
         ...saved()
-      ];
+      ]);
       countTemplateUse(id);
       showToast("Added \u201C" + template.name + "\u201D to Saved");
     })());
@@ -30715,17 +30750,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         savedAt: Date.now(),
         data: savedSnapshot(current)
       };
-      var share = yield publishShare(item, pubVisibility, {
+      var share = yield publishShare(ownerId, item, pubVisibility, {
         category: pubCategory,
         description: pubDescription.trim()
       });
-      rootSettings.fakeProfileSaved = [
+      writeSavedProfiles(ownerId, [
         {
           ...item,
           share
         },
         ...saved()
-      ];
+      ]);
       setPublishedId(share.id);
       showToast(pubVisibility === "public" ? "Published to templates" : "Template link created");
     })());
@@ -31017,14 +31052,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       status: data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online"
     };
   }
-  function SavedProfiles({ current, realUser, onUse }) {
+  function SavedProfiles({ ownerId, current, realUser, onUse }) {
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [, redraw] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
     var [name, setName] = (0, import_react9.useState)("");
     var [renaming, setRenaming] = (0, import_react9.useState)(null);
-    var items = Array.isArray(rootSettings.fakeProfileSaved) ? rootSettings.fakeProfileSaved : [];
+    var items = readSavedProfiles(ownerId);
     var commit = (next) => {
-      rootSettings.fakeProfileSaved = next;
+      writeSavedProfiles(ownerId, next);
       redraw();
     };
     var currentJson = JSON.stringify(savedSnapshot(current));
@@ -31047,11 +31082,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [sharing, setSharing] = (0, import_react9.useState)(null);
     var [publicShares, setPublicShares] = (0, import_react9.useState)(null);
     var run = (task) => _async_to_generator(function* () {
+      if (!ownerId || ownerId !== currentUserId)
+        return;
       setBusy(true);
       try {
         yield task();
       } catch (error) {
-        import_react_native28.Alert.alert("Sharing", error?.message || "Something went wrong.");
+        if (ownerId === currentUserId)
+          import_react_native28.Alert.alert("Sharing", error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
@@ -31067,6 +31105,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (error) {
         throw new Error(/not found/i.test(String(error?.message)) ? "That profile doesn't exist or is private." : error?.message);
       }
+      if (ownerId !== currentUserId)
+        return;
       var data = savedSnapshot({
         ...current,
         ...previewFromShared(share.profile || {})
@@ -31078,14 +31118,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           savedAt: Date.now(),
           data
         },
-        ...items
+        ...readSavedProfiles(ownerId)
       ]);
       setCode("");
       showToast("Added \u201C" + share.name + "\u201D to Saved");
     })());
     var shareItem = (item, visibility) => run(() => _async_to_generator(function* () {
-      var share = yield publishShare(item, visibility);
-      commit(items.map((other) => other.id === item.id ? {
+      var share = yield publishShare(ownerId, item, visibility);
+      commit(readSavedProfiles(ownerId).map((other) => other.id === item.id ? {
         ...other,
         share
       } : other));
@@ -31097,12 +31137,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           if (!/not found|only the device/i.test(String(error?.message)))
             throw error;
         });
-      commit(items.map((other) => other.id === item.id ? {
+      commit(readSavedProfiles(ownerId).map((other) => other.id === item.id ? {
         ...other,
         share: void 0
       } : other));
     })());
     var copyLink = (id) => {
+      if (!ownerId || ownerId !== currentUserId)
+        return;
       try {
         findByProps("setString", "getString")?.setString?.(shareLink(id));
         showToast("Link copied");
@@ -31138,7 +31180,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         /* @__PURE__ */ jsx(S2.Panel, {
           children: /* @__PURE__ */ jsxs(S2.Section, {
             title: "Save your profile",
-            description: "Keep copies of your custom profile and switch between them. Saved on this device.",
+            description: "Keep copies of this account\u2019s custom profile on this device.",
             children: [
               /* @__PURE__ */ jsx(S2.Field, {
                 label: "Name",
@@ -32256,13 +32298,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           }) : null,
           activeTab === "templates" ? /* @__PURE__ */ jsx(ProfileTemplates, {
+            ownerId: editorOwner.current,
             current: preview,
             onPreview: (data) => {
-              var backup = rootSettings.fakeProfilePreviewBackup;
+              var ownerId = editorOwner.current;
+              if (!ownerId || ownerId !== currentUserId)
+                return;
+              var backup = ownedTemplateBackup(ownerId);
               if (data) {
                 var original = backup || preview;
-                if (!backup)
+                if (!backup) {
+                  rootSettings.fakeProfilePreviewOwner = ownerId;
                   rootSettings.fakeProfilePreviewBackup = JSON.parse(JSON.stringify(original));
+                }
                 rootSettings.fakeProfile = {
                   ...original,
                   avatarDecoration: null,
@@ -32277,7 +32325,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 };
               } else if (backup) {
                 rootSettings.fakeProfile = backup;
-                delete rootSettings.fakeProfilePreviewBackup;
+                clearTemplateBackup();
               } else
                 return;
               preview = rootSettings.fakeProfile;
@@ -32287,6 +32335,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               redraw();
             },
             onUse: (data) => {
+              if (!editorOwner.current || editorOwner.current !== currentUserId)
+                return;
               rootSettings.fakeProfile = {
                 ...preview,
                 ...data,
@@ -32302,10 +32352,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }
           }) : null,
           activeTab === "saved" ? /* @__PURE__ */ jsx(SavedProfiles, {
+            ownerId: editorOwner.current,
             current: preview,
             realUser: realCurrentUser,
             onUse: (data) => {
-              var restored = loadSavedLook(preview, data);
+              if (!editorOwner.current || editorOwner.current !== currentUserId)
+                return;
+              var backup = ownedTemplateBackup(editorOwner.current);
+              var restored = loadSavedLook(backup || preview, data);
+              if (backup)
+                clearTemplateBackup();
               for (var field of [
                 "avatarMedia",
                 "bannerMedia"
@@ -63230,7 +63286,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "06a3f383ddeb8723e65c6b4d7611e1c7c18b9d80";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f03ce3af2eed355f752d8d0cc7bb3f4c5a25a177";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
