@@ -526,6 +526,20 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "UserProfileNote", "UserProfileConnections", "LegacyUserProfileConnections", "UserProfileMutuals", "UserProfileMutualGuilds"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
+        const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>
+            (rule.mobile?.hideComponentPaths ?? []).map(path => {
+                const name = path.split("/").at(-1).replace(".tsx", "");
+                const component = nativeHeaders.get(name);
+                assert.ok(component, "missing appearance test fixture for " + name);
+                if (name === "UserProfileMutualGuilds") return {
+                    __filePath: path, isInitialized: false,
+                    get publicModule() { assert.fail("a dormant appearance module must not be read"); },
+                };
+                return {
+                    __filePath: path, isInitialized: true,
+                    publicModule: { exports: name === "UserProfileConnections" ? { [name]: component } : { default: component } },
+                };
+            }));
         const forwardedRefs = [];
         function ActivityStatus(props) { return props.output; }
         nativeHeaders.set("ActivityStatus", ActivityStatus);
@@ -770,6 +784,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 incomingHooks.push(callback);
                 return () => { incomingHooks.splice(incomingHooks.indexOf(callback), 1); };
             } },
+            "@metro/internals/modules": { metroModules: hiddenComponentModules },
             "@metro": { findByFilePath: path => path.endsWith("/ButtonEllipsis.native.tsx") ? { Ellipsis: typingEllipsis }
                 : path.endsWith("/useMessageMaxLength.tsx") ? splitLimit
                 : path.endsWith("/ChatInputSendUtils.tsx") ? splitComposer
@@ -1600,9 +1615,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 continue;
             } else if (rule.mobile.hideComponentPaths) {
                 const bindings = rule.mobile.hideComponentPaths.map(path => {
-                    const type = nativeHeaders.get(path.split("/").at(-1).replace(".tsx", ""));
+                    const name = path.split("/").at(-1).replace(".tsx", "");
+                    const type = nativeHeaders.get(name);
+                    const target = name === "UserProfileMutualGuilds" ? name : type;
                     const native = jsx(type, { progress: 0.5 });
-                    const wrapped = appearanceHooks.get(type)(type, native);
+                    const wrapped = appearanceHooks.get(target)(type, native);
                     assert.equal(wrapped.type(wrapped.props), null);
                     settings.safeMode = { enabled: true };
                     assert.equal(wrapped.type(wrapped.props), native);

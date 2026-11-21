@@ -28,6 +28,7 @@ import { dismissAlert, openAlert } from "@lib/ui/alerts";
 import { resolveSemanticColor, semanticColors } from "@lib/ui/color";
 import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
+import { metroModules } from "@metro/internals/modules";
 import { getCxMessageGesture } from "@lib/api/cx";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, runCxCleanups } from "@lib/api/cx";
@@ -462,6 +463,26 @@ function registerJsxAppearance(names: readonly (string | object)[], change: Appe
         return bind(change, beforeWrapping);
     });
     return () => { for (const cleanup of cleanups) cleanup(); };
+}
+
+function registerHiddenAppearancePaths(paths: readonly string[]) {
+    // Component names remain usable when the native module is loaded after
+    // CloudCord. Never require dormant Metro modules for a visual preference.
+    const targets = new Map<string, string | object>(paths.map(path => [path, path.slice(path.lastIndexOf("/") + 1).replace(/\.tsx$/, "")]));
+    if (metroModules) for (const id in metroModules) {
+        const module = metroModules[Number(id)];
+        const path = module?.__filePath;
+        if (!module?.isInitialized || module.hasError || !path) continue;
+        const name = targets.get(path);
+        if (typeof name !== "string") continue;
+        try {
+            const exports = module.publicModule?.exports;
+            const component = exports?.default ?? exports?.[name] ?? exports;
+            if (typeof component === "function" || component?.$$typeof === Symbol.for("react.memo")
+                || component?.$$typeof === Symbol.for("react.forward_ref")) targets.set(path, component);
+        } catch { /* An inaccessible export can still use the component name. */ }
+    }
+    return registerJsxAppearance([...new Set(targets.values())], () => null);
 }
 
 function bindExpressionSheets() {
@@ -2053,11 +2074,7 @@ export default function CxExtensions() {
                     }
                     if ("expressionPickerTab" in mobile) return registerExpressionPickerTab(mobile.expressionPickerTab);
                     if ("settingsEntry" in mobile) return hideSettingsEntry(mobile.settingsEntry);
-                    if ("hideComponentPaths" in mobile) {
-                        const components = mobile.hideComponentPaths.map(path => findByFilePath(path)?.default);
-                        if (components.some(component => !component)) throw new Error("Discord's appearance components are unavailable");
-                        return registerJsxAppearance(components, () => null);
-                    }
+                    if ("hideComponentPaths" in mobile) return registerHiddenAppearancePaths(mobile.hideComponentPaths);
                     if ("scrollIndicators" in mobile) {
                         const scrollViews = new Set([ScrollView, FlatList, SectionList, Animated?.ScrollView, Animated?.FlatList, Animated?.SectionList]);
                         const components = [...scrollViews].filter((component): component is NonNullable<typeof component> => component != null);
