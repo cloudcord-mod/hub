@@ -24666,6 +24666,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         avatarDecoration: snapshot2.avatarDecoration || null,
         avatarDecorationSku: snapshot2.avatarDecorationSku || null,
         profileColorsEnabled: snapshot2.profileColorsEnabled,
+        displayNameStyles: null,
+        serverTag: null,
+        nameplate: null,
+        profileEffect: null,
+        profileFrame: null,
+        customStatus: null,
+        customActivity: null,
+        presenceStatus: null,
+        customConnections: [],
+        customFriends: [],
         ...normalizeProfileAppearance(snapshot2),
         primaryColor: snapshot2.profileColorsEnabled ? colorNumber(snapshot2.primaryColor) : null,
         accentColor: snapshot2.profileColorsEnabled ? colorNumber(snapshot2.accentColor) : null,
@@ -24687,7 +24697,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return [];
           }
         })(),
-        activityAmounts: preview.activityAmounts || {},
+        activityAmounts: snapshot2.activityAmounts || {},
         nativeHiddenBadges: (() => {
           try {
             return rootSettings.fakeProfileNativeHidden || [];
@@ -24973,7 +24983,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           selectedBadges,
           hiddenBadgeIds: Array.isArray(data.hiddenBadgeIds) ? data.hiddenBadgeIds : [],
           badgeOrder: Array.isArray(data.badgeOrder) ? data.badgeOrder : [],
-          activityAmounts: data.activityAmounts && typeof data.activityAmounts === "object" ? data.activityAmounts : preview.activityAmounts || {},
+          activityAmounts: data.activityAmounts && typeof data.activityAmounts === "object" && !Array.isArray(data.activityAmounts) ? data.activityAmounts : {},
           syncRevision: Number(data.syncRevision || 0)
         };
         if (JSON.stringify(nextPreview) === JSON.stringify(preview))
@@ -31999,7 +32009,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             current: preview,
             realUser: realCurrentUser,
             onUse: (data) => {
-              rootSettings.fakeProfile = loadSavedLook(preview, data);
+              var restored = loadSavedLook(preview, data);
+              for (var field of [
+                "avatarMedia",
+                "bannerMedia"
+              ]) {
+                if (restored[field])
+                  unmarkMediaCleared(field);
+                else
+                  markMediaCleared(field);
+              }
+              rootSettings.fakeProfile = restored;
               preview = rootSettings.fakeProfile;
               queueSharedPublish();
               clearCache();
@@ -59737,7 +59757,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "04120480f47ce10e65d4f5f2e1eec62d3f70462a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "23e57607b63d89c633d0a26f0fa7fc046ca84a45";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
