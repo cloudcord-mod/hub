@@ -5143,6 +5143,37 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(stylesheet, undefined, entry.name);
             assert.equal(nativeTheme, selectedTheme, entry.name);
         }
+        if (desktop) {
+            const plugin = module.exports.default;
+            const storageKey = "cloudcord.cx.appearance";
+            selectCatalog("QuickMention");
+            assert.ok(!button(render(), "Allow and remember on this device"), "plugins with chat permissions cannot reopen automatically");
+            selectCatalog("Declutter");
+            await click(render(), "Allow and remember on this device");
+            const label = "Declutter · Hide avatar decorations";
+            const findOption = () => find(render(), item => item.props["aria-label"] === label);
+            assert.equal(findOption().props.checked, false);
+            findOption().props.onChange({ currentTarget: { checked: true } });
+            await new Promise(setImmediate);
+            selectCatalog("Blue Hour");
+            await click(render(), "Allow and remember on this device");
+            plugin.stop();
+            assert.ok(!button(render(), "Disable Blue Hour"));
+            plugin.start();
+            await new Promise(setImmediate);
+            assert.equal(findOption().props.checked, true, "startup restores a remembered optional appearance setting");
+            assert.ok(button(render(), "Disable Blue Hour"), "startup restores the approved bundled theme");
+            await click(render(), "Disable Declutter");
+            assert.equal(localNotes[storageKey].length, 1);
+            plugin.stop();
+            localNotes[storageKey][0].source = localNotes[storageKey][0].source.replace("#12192d", "#ffffff");
+            plugin.start();
+            await new Promise(setImmediate);
+            assert.ok(!button(render(), "Disable Blue Hour"), "changed source requires a new approval");
+            await click(render(), "Forget theme");
+            assert.equal(localNotes[storageKey].length, 0);
+            plugin.stop();
+        }
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
     assert.equal(parseCx(migrateCxPalette(":root { --background-primary: #123; --brand-500: #8765ab; }", "Test")).background, "#112233");

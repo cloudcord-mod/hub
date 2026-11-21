@@ -1156,9 +1156,10 @@ export function runCxIncomingRules(rules: readonly IncomingRule[], payload: Inco
 
 
 export function createCxSession() {
-    const active = new Map<string, { name: string; options: CxAppearanceOption[]; binding: CxBinding; }>();
+    const active = new Map<string, { name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; }>();
     return {
         list: () => [...active].map(([id, { name }]) => ({ id, name })),
+        source: (id: string) => active.get(id)?.source,
         appearanceOptions(id: string) {
             const entry = active.get(id);
             return entry?.options.map(option => ({ ...option, enabled: Boolean(entry.binding.isAppearanceOptionEnabled?.(option.target)) })) ?? [];
@@ -1173,7 +1174,7 @@ export function createCxSession() {
             const id = review.kind === "theme" ? "theme" : "plugin:" + review.name;
             if (active.has(id)) throw new Error(review.kind === "theme" ? "Disable the active CX theme first" : "This CX plugin is already active");
             if (active.size >= 16) throw new Error("Disable an extension before adding another");
-            active.set(id, { name: review.name, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected) });
+            active.set(id, { name: review.name, source, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected) });
         },
         disable(id: string) {
             const entry = active.get(id);

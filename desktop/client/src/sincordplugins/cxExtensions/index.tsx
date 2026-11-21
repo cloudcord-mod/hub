@@ -26,7 +26,7 @@ import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
-import { runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
+import { type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -726,6 +726,130 @@ function AnonymousUploadButton({ upload }: { upload: Parameters<CxUploadAnonymis
     }}>{selected ? "Anonymous name" : "Original name"}</button>;
 }
 
+function applyTheme(theme: CxTheme) {
+    const style = document.createElement("style");
+    const surface = theme.surface ?? theme.background;
+    const sidebar = theme.sidebar ?? surface;
+    const shade = Math.round((1 - (theme.wallpaperOpacity ?? 1)) * 255).toString(16).padStart(2, "0");
+    const tint = theme.background + shade;
+    const wallpaper = `linear-gradient(${tint}, ${tint}), ${theme.background} url("${theme.wallpaper}") center / cover no-repeat`;
+    const blur = theme.wallpaperBlur ?? 0;
+    const colorTokens = {
+        ...Object.fromEntries(Object.entries(theme.rawColors ?? {}).filter(([key]) =>
+            /^(?:BRAND|PRIMARY|RED|GREEN|BLUE|YELLOW|PLUM|WHITE|BLACK)_[0-9]+$/.test(key))),
+        ...Object.fromEntries(Object.entries(theme.semanticColors ?? {}).filter(([key]) =>
+            /^(?:BACKGROUND|TEXT|INTERACTIVE|CHANNEL|BUTTON|STATUS|MENTION|SCROLLBAR|HEADER|BORDER|INPUT|BG)_/.test(key))),
+    };
+    const colorVariables = Object.entries(colorTokens)
+        .map(([key, color]) => "--" + key.toLowerCase().replaceAll("_", "-") + ": " + color + ";")
+        .join("\n");
+    style.textContent = `
+        .theme-dark, .theme-light {
+            ${colorVariables}
+            ${theme.mode ? `color-scheme: ${theme.mode};` : ""}
+            --background-primary: ${theme.background};
+            --background-secondary: ${surface};
+            --background-tertiary: ${sidebar};
+            --background-base-lowest: ${sidebar};
+            --background-base-lower: ${surface};
+            --background-base-low: ${theme.background};
+            --bg-base-primary: ${theme.background};
+            --chat-background-default: ${theme.background};
+            ${theme.text ? `--text-normal: ${theme.text}; --text-primary: ${theme.text}; --text-default: ${theme.text}; --text-strong: ${theme.text};` : ""}
+            ${theme.muted ? `--text-muted: ${theme.muted}; --text-secondary: ${theme.muted}; --text-subtle: ${theme.muted};` : ""}
+            ${theme.accent ? `--brand-500: ${theme.accent}; --text-link: ${theme.accent};` : ""}
+        }
+        ${theme.wallpaper ? `
+            [class^="chatContent_"] {
+                ${blur ? `position: relative; isolation: isolate; background: ${theme.background};` : `background: ${wallpaper};`}
+            }
+            ${blur ? `
+                [class^="chatContent_"]::before {
+                    content: "";
+                    position: absolute;
+                    inset: 0;
+                    pointer-events: none;
+                    z-index: -1;
+                    clip-path: inset(0);
+                    background: ${wallpaper};
+                    filter: blur(${blur}px);
+                }
+            ` : ""}
+            [class^="chatContent_"] [class^="messagesWrapper_"] { background: transparent; }
+        ` : ""}
+    `;
+    document.head.append(style);
+    return () => style.remove();
+}
+
+type RememberedAppearance = { id: string; source: string; selected: string[]; };
+const rememberedAppearanceKey = "cloudcord.cx.appearance";
+let rememberedAppearance: readonly RememberedAppearance[] = [];
+const rememberingAppearance = new Set<string>();
+let appearanceRestoreNotice = "";
+let appearanceGeneration = 0;
+const appearanceListeners = new Set<() => void>();
+const subscribeAppearance = (listener: () => void) => {
+    appearanceListeners.add(listener);
+    return () => { appearanceListeners.delete(listener); };
+};
+let appearanceUpdates = 0;
+function refreshRememberedAppearance() {
+    appearanceUpdates++;
+    appearanceListeners.forEach(listener => listener());
+}
+
+function bundledAppearanceId(source: string, review: ReturnType<typeof reviewCx>) {
+    if (review.kind === "plugin" && !review.permissions.every(permission => permission === "appearance.hide" || permission === "appearance.style")) return;
+    const entries = review.kind === "theme" ? cxCatalog.themes : cxCatalog.plugins;
+    if (!entries.some(entry => entry.source === source)) return;
+    return review.kind === "theme" ? "theme" : "plugin:" + review.name;
+}
+
+function readRememberedAppearance(value: unknown): RememberedAppearance[] {
+    if (!Array.isArray(value)) return [];
+    return value.slice(0, 16).filter((entry): entry is RememberedAppearance =>
+        typeof entry?.id === "string" && typeof entry.source === "string" && entry.source.length <= MAX_CX_SOURCE
+        && Array.isArray(entry.selected) && entry.selected.every(target => typeof target === "string"));
+}
+
+async function writeRememberedAppearance(id: string, entry?: RememberedAppearance, onlyIfExisting = false) {
+    let next: RememberedAppearance[] = [];
+    await DataStore.update<unknown>(rememberedAppearanceKey, current => {
+        next = readRememberedAppearance(current);
+        if (onlyIfExisting && !next.some(saved => saved.id === id && saved.source === entry?.source)) return next;
+        next = next.filter(saved => saved.id !== id);
+        if (entry) next = [entry, ...next].slice(0, 16);
+        return next;
+    });
+    rememberedAppearance = next;
+    refreshRememberedAppearance();
+}
+
+async function restoreRememberedAppearance(generation: number) {
+    try {
+        const stored = readRememberedAppearance(await DataStore.get<unknown>(rememberedAppearanceKey));
+        if (generation !== appearanceGeneration) return;
+        rememberedAppearance = stored;
+        for (const entry of stored) {
+            if (session.source(entry.id) !== undefined) continue;
+            try {
+                const review = reviewCx(entry.source);
+                if (bundledAppearanceId(entry.source, review) !== entry.id) continue;
+                session.enable(entry.source, {
+                    applyTheme, hideAppearanceTarget: applyAppearanceCss, styleAppearanceTarget: applyAppearanceCss,
+                    registerCommand() { throw new Error("Saved appearance cannot register commands"); },
+                    toast() {},
+                }, review.permissions, entry.selected);
+            } catch { /* A saved appearance remains available to remove or review again. */ }
+        }
+    } catch {
+        if (generation === appearanceGeneration) appearanceRestoreNotice = "Couldn't load remembered CX appearance.";
+    } finally {
+        if (generation === appearanceGeneration) refreshRememberedAppearance();
+    }
+}
+
 export function CxSettings() {
     const [source, setSource] = useState("");
     const [search, setSearch] = useState("");
@@ -735,6 +859,8 @@ export function CxSettings() {
     const [, refreshOptions] = useState(0);
     const [status, setStatus] = useState("");
     const selection = useRef(0);
+    React.useSyncExternalStore(subscribeAppearance, () => appearanceUpdates);
+    const rememberId = candidate && bundledAppearanceId(candidate.source, candidate.review);
 
     function review(next: string) {
         selection.current++;
@@ -766,7 +892,7 @@ export function CxSettings() {
         });
     }
 
-    function enable() {
+    function enable(remember = false) {
         if (!candidate) return;
         try {
             session.enable(candidate.source, {
@@ -1236,64 +1362,19 @@ export function CxSettings() {
                     return () => { if (commands[name] === command) unregisterCommand(name); };
                 },
                 toast: body => { void showNotification({ title: candidate.review.name, body }); },
-                applyTheme(theme) {
-                    const style = document.createElement("style");
-                    const surface = theme.surface ?? theme.background;
-                    const sidebar = theme.sidebar ?? surface;
-                    const shade = Math.round((1 - (theme.wallpaperOpacity ?? 1)) * 255).toString(16).padStart(2, "0");
-                    const tint = theme.background + shade;
-                    const wallpaper = `linear-gradient(${tint}, ${tint}), ${theme.background} url("${theme.wallpaper}") center / cover no-repeat`;
-                    const blur = theme.wallpaperBlur ?? 0;
-                    const colorTokens = {
-                        ...Object.fromEntries(Object.entries(theme.rawColors ?? {}).filter(([key]) =>
-                            /^(?:BRAND|PRIMARY|RED|GREEN|BLUE|YELLOW|PLUM|WHITE|BLACK)_[0-9]+$/.test(key))),
-                        ...Object.fromEntries(Object.entries(theme.semanticColors ?? {}).filter(([key]) =>
-                            /^(?:BACKGROUND|TEXT|INTERACTIVE|CHANNEL|BUTTON|STATUS|MENTION|SCROLLBAR|HEADER|BORDER|INPUT|BG)_/.test(key))),
-                    };
-                    const colorVariables = Object.entries(colorTokens)
-                        .map(([key, color]) => "--" + key.toLowerCase().replaceAll("_", "-") + ": " + color + ";")
-                        .join("\n");
-                    style.textContent = `
-                        .theme-dark, .theme-light {
-                            ${colorVariables}
-                            ${theme.mode ? `color-scheme: ${theme.mode};` : ""}
-                            --background-primary: ${theme.background};
-                            --background-secondary: ${surface};
-                            --background-tertiary: ${sidebar};
-                            --background-base-lowest: ${sidebar};
-                            --background-base-lower: ${surface};
-                            --background-base-low: ${theme.background};
-                            --bg-base-primary: ${theme.background};
-                            --chat-background-default: ${theme.background};
-                            ${theme.text ? `--text-normal: ${theme.text}; --text-primary: ${theme.text}; --text-default: ${theme.text}; --text-strong: ${theme.text};` : ""}
-                            ${theme.muted ? `--text-muted: ${theme.muted}; --text-secondary: ${theme.muted}; --text-subtle: ${theme.muted};` : ""}
-                            ${theme.accent ? `--brand-500: ${theme.accent}; --text-link: ${theme.accent};` : ""}
-                        }
-                        ${theme.wallpaper ? `
-                            [class^="chatContent_"] {
-                                ${blur ? `position: relative; isolation: isolate; background: ${theme.background};` : `background: ${wallpaper};`}
-                            }
-                            ${blur ? `
-                                [class^="chatContent_"]::before {
-                                    content: "";
-                                    position: absolute;
-                                    inset: 0;
-                                    pointer-events: none;
-                                    z-index: -1;
-                                    clip-path: inset(0);
-                                    background: ${wallpaper};
-                                    filter: blur(${blur}px);
-                                }
-                            ` : ""}
-                            [class^="chatContent_"] [class^="messagesWrapper_"] { background: transparent; }
-                        ` : ""}
-                    `;
-                    document.head.append(style);
-                    return () => style.remove();
-                },
+                applyTheme,
             }, candidate.review.permissions, candidate.selected);
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
+            if (remember && rememberId) {
+                rememberingAppearance.add(rememberId);
+                return writeRememberedAppearance(rememberId, { id: rememberId, source: candidate.source, selected: candidate.selected }).then(() => {
+                    setStatus(`${candidate.review.name} is active and will reopen with CloudCord.`);
+                }, () => setStatus("Couldn't remember this appearance. It is active for this session.")).finally(() => {
+                    rememberingAppearance.delete(rememberId);
+                    refreshRememberedAppearance();
+                });
+            }
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));
         }
@@ -1375,24 +1456,43 @@ export function CxSettings() {
                     setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, event.currentTarget.checked) });
                 }} /> {label}</label>
             </div>)}
-            <button onClick={enable}>Allow for this session</button>
+            <button onClick={() => enable()}>Allow for this session</button>
+            {rememberId && <button onClick={() => enable(true)}>Allow and remember on this device</button>}
             {!source && <button onClick={() => setSource(candidate.source)}>Edit CX source</button>}
         </div>}
-        {session.list().map(({ id, name }) => <div key={id}>
-            {session.appearanceOptions(id).map(({ target, label, enabled }) => <div key={target}>
-                <label><input type="checkbox" aria-label={`${name} · ${label}`} checked={enabled} onChange={event => {
-                    try {
-                        session.setAppearanceOption(id, target, event.currentTarget.checked);
-                        setStatus("");
-                        refreshOptions(value => value + 1);
-                    } catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
-                }} /> {label}</label>
-            </div>)}
-            <button onClick={() => {
-                session.disable(id);
-                setStatus(`${name} disabled.`);
-            }}>Disable {name}</button>
+        {session.list().map(({ id, name }) => {
+            const saved = rememberedAppearance.find(entry => entry.id === id && entry.source === session.source(id));
+            return <div key={id}>
+                {saved && <small>Remembered on this device</small>}
+                {session.appearanceOptions(id).map(({ target, label, enabled }) => <div key={target}>
+                    <label><input type="checkbox" aria-label={`${name} · ${label}`} checked={enabled} disabled={rememberingAppearance.has(id)} onChange={event => {
+                        try {
+                            session.setAppearanceOption(id, target, event.currentTarget.checked);
+                            if (saved) {
+                                const selected = session.appearanceOptions(id).filter(option => option.enabled).map(option => option.target);
+                                void writeRememberedAppearance(id, { ...saved, selected }, true).catch(() => setStatus("Couldn't remember the new option. It changed for this session."));
+                            }
+                            setStatus("");
+                            refreshOptions(value => value + 1);
+                        } catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
+                    }} /> {label}</label>
+                </div>)}
+                <button disabled={rememberingAppearance.has(id)} onClick={() => {
+                    if (rememberingAppearance.has(id)) return;
+                    if (saved) return writeRememberedAppearance(id).then(() => {
+                        session.disable(id);
+                        setStatus(`${name} disabled.`);
+                    }, () => setStatus("Couldn't remove the remembered appearance. Try disabling it again."));
+                    session.disable(id);
+                    setStatus(`${name} disabled.`);
+                }}>Disable {name}</button>
+            </div>;
+        })}
+        {rememberedAppearance.filter(entry => session.source(entry.id) !== entry.source).map(({ id }) => <div key={id}>
+            <span>Remembered appearance needs review</span>
+            <button onClick={() => writeRememberedAppearance(id).catch(() => setStatus("Couldn't remove the remembered appearance."))}>Forget {id === "theme" ? "theme" : id.slice(7)}</button>
         </div>)}
+        {appearanceRestoreNotice && <p>{appearanceRestoreNotice}</p>}
         {clearLocalNotes.notes && <button onClick={clearLocalNotes.notes}>Clear local user notes</button>}
         {browseLocalChannelNotes && <button onClick={browseLocalChannelNotes}>Browse channel notes</button>}
         {clearLocalNotes.channels && <button onClick={clearLocalNotes.channels}>Clear local channel notes</button>}
@@ -1405,6 +1505,10 @@ export default definePlugin({
     description: "Review and run permission-scoped CX plugins and themes.",
     authors: [{ name: "CloudCord", id: 0n }],
     required: true,
+    start() {
+        appearanceRestoreNotice = "";
+        void restoreRememberedAppearance(++appearanceGeneration);
+    },
     dependencies: ["CommandsAPI", "MessageEventsAPI", "ContextMenuAPI", "ServerListAPI", "MessagePopoverAPI", "MessageAccessoriesAPI", "DynamicImageModalAPI"],
     flux: {
         CHANNEL_SETTINGS_INIT({ channelId }: { channelId: string; }) {
@@ -1740,6 +1844,7 @@ export default definePlugin({
         return isStatic ? { focused: false } : focus;
     },
     stop() {
+        appearanceGeneration++;
         session.clear();
     },
 });
