@@ -840,6 +840,506 @@ async function writeRememberedAppearance(id: string, entry?: RememberedAppearanc
     refreshRememberedAppearance();
 }
 
+function createDesktopCxHost(pluginName: string): Parameters<typeof session.enable>[1] {
+    return {
+        registerIncomingRules(rules) {
+            if (typeof FluxDispatcher?.addInterceptor !== "function") throw new Error("Discord events are unavailable");
+            let active = true;
+            const muteStore = rules.some(rule => rule.kind === "ping-alerts") ? findStore("UserGuildSettingsStore") : undefined;
+            const context = {
+                currentUser: () => UserStore.getCurrentUser()?.id,
+                channel: (id: string) => ChannelStore.getChannel(id),
+                replyAuthor: (channel: string, id: string) => MessageStore.getMessage(channel, id)?.author,
+                blocked: (id: string) => RelationshipStore?.isBlocked(id) === true,
+                ignored: (id: string) => RelationshipStore?.isIgnored?.(id) === true,
+                selectedChannel: () => SelectedChannelStore?.getChannelId?.(),
+                pingAlerts: {
+                    status: (id: string) => PresenceStore?.getStatus(id),
+                    isFriend: (id: string) => RelationshipStore?.isFriend?.(id) === true,
+                    muted: (id: string, channel: Parameters<typeof isCxNotificationMuted>[1]) => isCxNotificationMuted(id, channel, muteStore),
+                    notify: (alert: CxMessageAlert) => {
+                        const account = UserStore.getCurrentUser()?.id;
+                        setTimeout(() => {
+                            if (!active || account !== UserStore.getCurrentUser()?.id) return;
+                            const { author, channel, message, guild, title, body } = alert;
+                            void showNotification({ title, body, icon: UserStore.getUser(author)?.getAvatarURL?.(undefined, 128),
+                                noPersist: true, onClick: () => {
+                                    if (active && account === UserStore.getCurrentUser()?.id)
+                                        NavigationRouter.transitionTo(`/channels/${isCxProfileUserId(guild) ? guild : "@me"}/${channel}/${message}`);
+                                } });
+                        }, 0);
+                    },
+                },
+                openLink: (link: string, channel: string, user: string) => setTimeout(() => {
+                    if (!active || context.currentUser() !== user || context.selectedChannel() !== channel) return;
+                    if (IS_WEB) window.open(link, "_blank", "noopener,noreferrer");
+                    else void VencordNative.native.openExternal(link).catch(() => {});
+                }, 0),
+                notify: (body: string) => setTimeout(() => {
+                    if (active) void showNotification({ title: pluginName, body });
+                }, 0),
+            };
+            const social = bindCxSocialEvents(rules, {
+                currentUser: context.currentUser, notify: context.notify,
+                isFriend: id => RelationshipStore?.isFriend?.(id) === true,
+                userName: id => { const user = UserStore?.getUser(id); return user?.globalName || user?.username; },
+                channelName: id => ChannelStore?.getChannel(id)?.name,
+                voiceChannel: () => SelectedChannelStore?.getVoiceChannelId(),
+                joinVoice: id => ChannelActions.selectVoiceChannel(id),
+                removalActions: () => findByProps("removeRelationship"),
+                enabled: () => active,
+            });
+            const interceptor = (payload: Parameters<typeof runCxIncomingRules>[1]) => {
+                try {
+                    if (active) {
+                        const patch = runCxIncomingRules(rules, payload, context);
+                        if (patch === false) return true;
+                        if (patch) Object.assign(payload, patch);
+                        social?.observe(payload);
+                    }
+                } catch { /* Discord must still receive its original event. */ }
+            };
+            try { FluxDispatcher.addInterceptor(interceptor); }
+            catch (error) { social?.stop(); throw error; }
+            return () => {
+                active = false;
+                const interceptors = FluxDispatcher._interceptors;
+                const index = interceptors?.indexOf(interceptor) ?? -1;
+                if (index !== -1) interceptors.splice(index, 1);
+                social?.stop();
+            };
+        },
+        registerProfileMenuAction(action) {
+            const entry = cxProfileMenuActions[action];
+            const { label, scope } = entry;
+            let active = true;
+            const itemId = "cx-profile-" + action;
+            const patch: NavContextMenuPatchCallback = (children, props) => {
+                const id = props?.user?.id ?? props?.userId;
+                if (!active || !isCxProfileUserId(id) || children.some(child => child?.props?.id === itemId)) return;
+                const selectedGuild = scope === "server" ? props?.displayProfile?.guildId ?? props?.guildId
+                    ?? props?.channel?.guild_id ?? (action === "server-profile-colors" && !props?.channel
+                        ? SelectedGuildStore?.getGuildId() : undefined) : undefined;
+                const guildId = isCxProfileUserId(selectedGuild) ? selectedGuild : undefined;
+                const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore, GuildMemberStore);
+                if ((scope === "server" || scope === "identity") && !getCopy()) return;
+                children.push(<Menu.MenuItem id={itemId} label={label} action={() => {
+                    if (!active) return;
+                    const text = getCopy();
+                    if (text) void copyToClipboard(text).catch(() => showToast("Couldn't copy to clipboard."));
+                    else showToast("unavailable" in entry ? entry.unavailable : "This profile field is unavailable.");
+                }} />);
+            };
+            const menus = ["user-context", "user-profile-actions", "user-profile-overflow-menu"];
+            addContextMenuPatch(menus, patch);
+            return () => {
+                active = false;
+                removeContextMenuPatch(menus, patch);
+            };
+        },
+        hideAppearanceTarget: applyAppearanceCss,
+        styleAppearanceTarget: applyAppearanceCss,
+        registerTimestampFormats: timestamps.register,
+        registerUploadAnonymiser(anonymiser) {
+            if (uploadAnonymiser) throw new Error("An upload naming rule is already enabled");
+            uploadAnonymiser = anonymiser;
+            return () => { uploadAnonymiser = undefined; };
+        },
+        registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
+            switch (effect) {
+                case "show-voice-ping":
+                    return voicePing.bind(RTCConnectionStore, FluxDispatcher);
+                case "voice-channel-count":
+                    if (!effectOptions || !("showEmpty" in effectOptions)) throw new Error("Missing voice count options");
+                    return voiceCounts.bind(VoiceStateStore, effectOptions);
+                case "notify-when-muted":
+                    if (!effectOptions || !("serverMute" in effectOptions)) throw new Error("Missing mute alert options");
+                    return bindCxMutedVoice(MediaEngineStore, () => Boolean(SelectedChannelStore.getVoiceChannelId()),
+                        () => { playAudio("user_leave"); }, effectOptions);
+                case "webcam-start-notifier":
+                    if (!effectOptions || !("scope" in effectOptions)) throw new Error("Missing camera tone options");
+                    return bindCxCameraTone({
+                        account: () => UserStore.getCurrentUser()?.id,
+                        selected() {
+                            const id = SelectedChannelStore.getVoiceChannelId();
+                            const channel = id && ChannelStore.getChannel(id);
+                            if (id && channel) return { id, private: channel.type === 1 || channel.type === 3 };
+                        },
+                        states: id => VoiceStateStore?.getVoiceStatesForChannel?.(id),
+                        play: on => { playAudio(on ? "user_join" : "user_leave"); },
+                        dispatcher: FluxDispatcher,
+                    }, effectOptions);
+                case "wait-for-slot":
+                    if (!effectOptions || !("autoJoin" in effectOptions)) throw new Error("Missing voice queue options");
+                    return registerWaitForSlot(effectOptions);
+                case "all-call-time-counter":
+                    if (!effectOptions || !("human" in effectOptions)) throw new Error("Missing voice member timer options");
+                    return voiceMemberClock.bind({
+                        account: () => UserStore.getCurrentUser()?.id,
+                        state: id => VoiceStateStore?.getVoiceStateForUser?.(id),
+                        channelGuild: id => ChannelStore.getChannel(id)?.guild_id,
+                        dispatcher: FluxDispatcher,
+                    }, effectOptions);
+                case "call-time-counter":
+                    return callClock.bind(SelectedChannelStore, FluxDispatcher);
+                case "jump-to-message-menu":
+                    return registerJumpToMessageMenu();
+                case "jump-without-unblocking":
+                case "jump-to-first-message":
+                    return navigationControls.register(effect);
+                case "read-all-servers-button":
+                    return navigationControls.register(effect, () => {
+                        addServerListElement(ServerListRenderPosition.Above, ReadAllServersButton);
+                        return () => removeServerListElement(ServerListRenderPosition.Above, ReadAllServersButton);
+                    });
+                case "clean-channel-names":
+                case "title-channel-names":
+                    return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles");
+                case "dashless-channel-names":
+                    return registerChannelNames("dashless");
+                case "static-typing-dots":
+                    return registerStaticTypingDots();
+                case "code-block-gap":
+                    codeBlockGapUsers++;
+                    return () => { codeBlockGapUsers--; };
+                case "hide-disabled-emojis":
+                    return hideDisabledEmojiInPicker();
+                case "copy-emoji-markdown":
+                case "sticker-links":
+                    return registerExpressionLinks(effect);
+                case "reverse-image-search":
+                    return registerReverseImageSearch();
+                case "copy-media-link":
+                    return registerMediaLinkCopy();
+                case "open-steam-links": {
+                    const onClick = (event: MouseEvent) => {
+                        if (!event.isTrusted || event.defaultPrevented || event.button !== 0
+                            || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || !(event.target instanceof Element)) return;
+                        const anchor = event.target.closest("a[href]");
+                        if (!anchor?.closest("[data-message-id], [id^='chat-messages-']")) return;
+                        const link = getCxSteamLink(anchor.getAttribute("href"));
+                        if (!link || getCxSteamLink(anchor.textContent?.trim())?.https !== link.https) return;
+                        if (findStore("BlockedDomainStore")?.isBlockedDomain?.(link.https) != null) return;
+                        event.preventDefault();
+                        event.stopPropagation();
+                        if (IS_WEB) window.open(link.steam, "_blank", "noopener,noreferrer");
+                        else void VencordNative.native.openExternal(link.steam).catch(() => showToast("Couldn't open the Steam link."));
+                    };
+                    document.addEventListener("click", onClick, true);
+                    return () => document.removeEventListener("click", onClick, true);
+                }
+                case "profile-media":
+                    return registerProfileMedia();
+                case "user-notes":
+                    return registerLocalText("notes");
+                case "user-tags":
+                    return registerLocalText("tags");
+                case "channel-notes":
+                    return registerLocalText("channels");
+                case "copy-channel-name":
+                    return registerCopyChannelName();
+                case "hide-suggested-channels":
+                    return registerHideSuggestedChannels();
+                case "copy-text-attachment":
+                    fileCopyUsers++;
+                    return () => { fileCopyUsers--; };
+                case "attachment-image-quality":
+                    attachmentQualityUsers++;
+                    return () => { attachmentQualityUsers--; };
+                case "original-attachment-images":
+                    originalAttachmentUsers++;
+                    return () => { originalAttachmentUsers--; };
+                case "image-filename":
+                    imageFilenameUsers++;
+                    return () => { imageFilenameUsers--; };
+                case "image-full-url":
+                    imageFullUrlUsers++;
+                    return () => { imageFullUrlUsers--; };
+                case "descriptive-gif-alt":
+                    descriptiveGifAltUsers++;
+                    return () => { descriptiveGifAltUsers--; };
+                case "preserve-image-links":
+                    imageLinkUsers++;
+                    return () => { imageLinkUsers--; };
+                case "double-click-edit":
+                case "double-click-reply":
+                    return registerMessageGesture(effect === "double-click-edit" ? "edit" : "reply");
+                case "quick-mention":
+                    return registerQuickMention();
+                case "copy-raw-text":
+                case "copy-message-reference":
+                    return registerMessageClipboard(effect);
+                case "message-word-count": {
+                    const id = "cx-word-count-" + ++wordCountSequence;
+                    addMessageAccessory(id, ({ message }) => {
+                        const label = formatCxWordCount(message?.content);
+                        return label ? <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{label}</div> : null;
+                    }, 2);
+                    return () => removeMessageAccessory(id);
+                }
+                case "decode-base64":
+                    return registerDecodeBase64();
+                case "hide-profile-banner-images":
+                    return hideCxProfileBannerImages(IconUtils, id => id === UserStore.getCurrentUser()?.id || RelationshipStore?.isFriend?.(id) === true);
+                case "quote-message":
+                    if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
+                    return registerQuoteMessage(effectOptions.includeLink);
+                case "keep-long-drafts":
+                    longDraftUsers++;
+                    return () => { longDraftUsers--; };
+                case "bypass-pin-prompt":
+                    bypassPinPromptUsers++;
+                    return () => { bypassPinPromptUsers--; };
+                case "pin-message-shortcut":
+                    return registerPinShortcut();
+                case "toggle-message-embeds":
+                    return registerEmbedToggle();
+                case "repeat-message":
+                    return registerRepeatMessages();
+                case "scroll-to-latest":
+                    return bindCxChannelOpenRead({ dispatcher: FluxDispatcher, read: ReadStateStore,
+                        selected: () => SelectedChannelStore?.getChannelId(), user: () => UserStore?.getCurrentUser()?.id,
+                        jump: target => MessageActions.jumpToMessage(target) });
+                case "unicode-emoji-autocomplete":
+                case "local-emoji-autocomplete":
+                    return filterCxEmojiAutocomplete(EmojiStore, effect === "local-emoji-autocomplete" ? "local" : "unicode",
+                        findByProps("EmojiIntention")?.EmojiIntention);
+                case "split-long-messages": {
+                    if (splitSender) throw new Error("A CX message splitter is already active");
+                    const sender = createCxSplitSender({
+                        currentUser: () => UserStore?.getCurrentUser(),
+                        channel: id => ChannelStore?.getChannel(id),
+                        enabled: (): boolean => splitSender === sender,
+                        failed: () => { showToast("The remaining message parts were not sent."); },
+                    });
+                    const stop = overrideCxMethods(findByProps("sendMessage", "editMessage"), { sendMessage: sender.send });
+                    splitSender = sender;
+                    return () => { splitSender = undefined; stop(); };
+                }
+                case "flat-attachments":
+                    flatAttachmentUsers++;
+                    return () => { flatAttachmentUsers--; };
+                case "fix-file-extensions":
+                    fixFileExtensionUsers++;
+                    return () => { fixFileExtensionUsers--; };
+                case "plus-reactions": {
+                    const actions = findByProps("sendMessage", "getSendMessageOptions");
+                    const handle = createCxPlusReactionHandler({
+                        messages: channel => MessageStore?.getMessages(channel),
+                        guild: channel => ChannelStore?.getChannel(channel)?.guild_id,
+                        emojis: () => EmojiStore,
+                        unicode: name => findByProps("convertNameToSurrogate")?.convertNameToSurrogate(name),
+                        react: (channel, message, emoji) => RestAPI.put({
+                            url: Constants.Endpoints.REACTION(channel, message, emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name, "@me"),
+                        }),
+                        error: () => { showToast("Couldn’t react to the previous message."); },
+                    });
+                    return overrideCxMethods(actions, {
+                        sendMessage: (args, original) => handle(args[0], args[1] as Parameters<typeof handle>[1], args[3] as Parameters<typeof handle>[2])
+                            ?? original(args),
+                    });
+                }
+                case "silent-typing":
+                    return overrideCxMethods(findByProps("startTyping", "stopTyping"), {
+                        startTyping: () => Promise.resolve(),
+                    });
+                case "pending-friend-count":
+                    return overrideCxMethods(RelationshipStore, { getPendingCount: () => 0, getPendingIncomingCount: () => 0 });
+                case "force-owner-crown":
+                    ownerCrownUsers++;
+                    return () => { ownerCrownUsers--; };
+                case "spotify-song-name":
+                    spotifySongNameUsers++;
+                    return () => { spotifySongNameUsers--; };
+                case "sort-reactions-by-count":
+                    reactionSortUsers++;
+                    return () => { reactionSortUsers--; };
+                case "plain-url-paste":
+                    plainUrlPasteUsers++;
+                    return () => { plainUrlPasteUsers--; };
+                case "reveal-spoilers-shortcut":
+                    revealSpoilerUsers++;
+                    return () => { revealSpoilerUsers--; };
+                case "reply-timestamp":
+                    replyTimestampUsers++;
+                    return () => { replyTimestampUsers--; };
+                case "no-middle-click-paste":
+                    if (!IS_LINUX || IS_MOBILE) throw new Error("Middle-click paste control is available on Linux.");
+                    if (noMiddleClickPasteUsers === 0) window.addEventListener("mouseup", preventMiddleClickPaste);
+                    noMiddleClickPasteUsers++;
+                    return () => {
+                        if (--noMiddleClickPasteUsers === 0) window.removeEventListener("mouseup", preventMiddleClickPaste);
+                    };
+                case "hide-role-headers":
+                    roleHeaderUsers++;
+                    return () => { roleHeaderUsers--; };
+                case "animated-assets":
+                    return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), true);
+                case "floor-relative-time":
+                    return floorCxRelativeTime(findByProps("relativeTimeRounding", "locale"));
+                case "avatar-resolution":
+                    return raiseCxAvatarResolution(findByProps("getUserAvatarURL", "getGuildIconURL"), avatarResolution);
+                case "avatar-crop-zoom": {
+                    if (!effectOptions || !("maxAvatarCropZoom" in effectOptions)) throw new Error("Missing avatar crop zoom");
+                    const grant = Symbol();
+                    avatarCropZoomLimits.set(grant, effectOptions.maxAvatarCropZoom);
+                    return () => { avatarCropZoomLimits.delete(grant); };
+                }
+                case "notification-volume": {
+                    if (!effectOptions || !("notificationVolume" in effectOptions)) throw new Error("Missing notification volume");
+                    const grant = Symbol();
+                    notificationVolumeLimits.set(grant, effectOptions.notificationVolume);
+                    return () => { notificationVolumeLimits.delete(grant); };
+                }
+                case "stop-auto-unread":
+                    return overrideCxMethods(findStore("UnreadSettingNoticeStore2"), { maybeAutoUpgradeChannel: () => false });
+            }
+        },
+        registerReplyPingSuppression() {
+            const listener = addMessagePreSendListener((_, _message, { replyOptions }) => {
+                if (!replyOptions?.messageReference) return;
+                replyOptions.allowedMentions = { parse: ["users", "roles", "everyone"], ...replyOptions.allowedMentions, repliedUser: false };
+            });
+            return () => { removeMessagePreSendListener(listener); };
+        },
+        registerPreviousMessageRule(rule) {
+            let active = true;
+            const handle = createCxPreviousSendHandler(rule, {
+                currentUser: () => UserStore?.getCurrentUser()?.id,
+                previous: (channel, own) => own ? MessageStore?.getLastEditableMessage(channel) : MessageStore?.getLastMessage(channel),
+                edit: (channel, id, content) => MessageActions.editMessage(channel, id, { content }),
+                error: () => { showToast("Couldn’t edit the previous message."); },
+            });
+            const listener = addMessagePreSendListener(async (channel, message, options) => {
+                if (!active) return;
+                const edit = handle(channel, message.content, Boolean(message.tts || options?.replyOptions?.messageReference
+                    || options?.uploads?.length || options?.stickers?.length));
+                if (!edit) return;
+                await edit;
+                return { cancel: true };
+            });
+            return () => {
+                active = false;
+                removeMessagePreSendListener(listener);
+            };
+        },
+        registerMessageTransform(transform) {
+            const listener = addMessagePreSendListener((_, message) => {
+                if (typeof message.content === "string") message.content = transform(message.content);
+            });
+            return () => { removeMessagePreSendListener(listener); };
+        },
+        registerSendConfirmation(check) {
+            if (typeof Alerts?.show !== "function") throw new Error("Discord's send confirmation is unavailable");
+            let active = true;
+            let cancelPending: (() => void) | undefined;
+            const listener = addMessagePreSendListener(async (_, message) => {
+                if (!active) return;
+                const body = check(message.content);
+                if (!body) return;
+                if (cancelPending) return { cancel: true };
+                const { content } = message;
+                const account = UserStore.getCurrentUser()?.id;
+                const selected = SelectedChannelStore.getChannelId();
+                try {
+                    const confirmed = await new Promise<boolean>(resolve => {
+                        cancelPending = () => resolve(false);
+                        Alerts.show({ title: "Confirm message", body, cancelText: "Cancel", confirmText: "Send anyway",
+                            onConfirm: () => resolve(true), onCancel: cancelPending,
+                            onCloseCallback: () => queueMicrotask(() => resolve(false)),
+                        });
+                    });
+                    return { cancel: !confirmed || !active || !account || account !== UserStore.getCurrentUser()?.id
+                        || selected !== SelectedChannelStore.getChannelId() || message.content !== content };
+                } catch {
+                    return { cancel: true };
+                } finally {
+                    cancelPending = undefined;
+                }
+            });
+            return () => { active = false; cancelPending?.(); removeMessagePreSendListener(listener); };
+        },
+        registerMessageEditTransform(transform) {
+            const listener = addMessagePreEditListener((_, _id, message) => {
+                if (typeof message.content === "string") message.content = transform(message.content);
+            });
+            return () => { removeMessagePreEditListener(listener); };
+        },
+        registerProfileBioTransform(transform) {
+            profileBioTransforms.add(transform);
+            return () => { profileBioTransforms.delete(transform); };
+        },
+        getUserAvatarUrl(id) {
+            const user = id ? UserStore?.getUser(id) : UserStore?.getCurrentUser?.();
+            if (user) return IconUtils.getUserAvatarURL(user, true, 1024);
+        },
+        registerCommand(name, execute, acceptsText, sendsMessage, optionalSend, inputs) {
+            if (Object.prototype.hasOwnProperty.call(commands, name) || name in Object.prototype)
+                throw new Error(`Command /${name} already exists`);
+            const command: VencordCommand = {
+                name,
+                description: "Local CX command",
+                inputType: sendsMessage ? ApplicationCommandInputType.BUILT_IN_TEXT : ApplicationCommandInputType.BUILT_IN,
+                options: [
+                    ...(acceptsText ? [{ name: "text", description: "Text to use", type: ApplicationCommandOptionType.STRING, required: true }] : []),
+                    ...inputs.map(input => ({
+                        name: input.name, description: input.name.replace(/[_-]/g, " "), required: input.required,
+                        type: input.type === "integer" ? ApplicationCommandOptionType.INTEGER
+                            : input.type === "boolean" ? ApplicationCommandOptionType.BOOLEAN
+                                : input.type === "user" ? ApplicationCommandOptionType.USER
+                                    : input.type === "role" ? ApplicationCommandOptionType.ROLE : ApplicationCommandOptionType.STRING,
+                        choices: input.choices?.map(value => ({ name: value, label: value, value })),
+                    })),
+                    ...(optionalSend ? [{ name: "send", description: "Send the result to this chat", type: ApplicationCommandOptionType.BOOLEAN }] : []),
+                ],
+                execute(args, context) {
+                    const outgoing = execute({
+                        text: acceptsText ? findOption(args, "text", "") : undefined,
+                        inputs: Object.fromEntries(inputs.map(input => [input.name, findOption(args, input.name)])),
+                        sendRequested: optionalSend && findOption<boolean>(args, "send") === true,
+                        reply: message => { if (context.channel?.id) sendBotMessage(context.channel.id, { content: message }); },
+                        prepareChannel() {
+                            const channelId = context.channel?.id;
+                            const accountId = UserStore?.getCurrentUser()?.id;
+                            if (!channelId || !accountId) return;
+                            const isCurrent = () => UserStore?.getCurrentUser()?.id === accountId;
+                            return {
+                                reply(content) { if (isCurrent()) sendBotMessage(channelId, { content }); },
+                                async send(content) {
+                                    if (!isCurrent()) return;
+                                    if (!ChannelStore?.getChannel(channelId)) throw new Error("The original channel is unavailable");
+                                    await MessageActions.sendMessage(channelId, { content, invalidEmojis: [], validNonShortcutEmojis: [], tts: false });
+                                },
+                            };
+                        },
+                        lookup(name, input) {
+                            if (name !== "roleMembers" && name !== "randomMember") return formatCxSpotify(name, input, SpotifyStore?.getTrack?.());
+                            const guild = context.guild?.id ?? context.channel?.guild_id;
+                            const members = guild ? GuildMemberStore?.getMembers(guild) ?? [] : [];
+                            return name === "randomMember" ? formatCxRandomMember(input, members, UserStore?.getCurrentUser()?.id)
+                                : formatCxRoleMembers(input, guild, members, id => UserStore?.getUser(id));
+                        },
+                        friendInvites: operation => runCxFriendInvites(operation, findByProps("createFriendInvite")),
+                        findUserTags: findLocalUserTags,
+                        async copyDiagnostics() {
+                            const report = inspectCcpRuntime("desktop", findStore, wreq?.c);
+                            await copyToClipboard(JSON.stringify(report));
+                            return describeCcpReport(report);
+                        },
+                        markServersRead: () => markCxServersRead(getReadStores(), acknowledgeServers),
+                    });
+                    if (outgoing !== undefined) return { content: outgoing };
+                },
+            };
+            registerCommand(command, "CxExtensions");
+            if (commands[name] !== command) throw new Error("Discord commands are not ready yet");
+            return () => { if (commands[name] === command) unregisterCommand(name); };
+        },
+        toast: body => { void showNotification({ title: pluginName, body }); },
+        applyTheme,
+    };
+}
+
 async function restoreRememberedAppearance(generation: number) {
     try {
         const stored = readRememberedAppearance(await DataStore.get<unknown>(rememberedAppearanceKey));
@@ -857,7 +1357,7 @@ async function restoreRememberedAppearance(generation: number) {
                 const saved = rememberedAppearance.find(record => record.id === id && record.source === source);
                 if (source !== entry.source || !saved || session.source(id) !== undefined) continue;
                 session.enable(entry.source, {
-                    applyTheme, hideAppearanceTarget: applyAppearanceCss, styleAppearanceTarget: applyAppearanceCss,
+                    ...createDesktopCxHost(review.name),
                     registerCommand() { throw new Error("Saved appearance cannot register commands"); },
                     toast() {},
                 }, review.permissions, saved.selected);
@@ -921,503 +1421,7 @@ export function CxSettings() {
     function enable(remember = false) {
         if (!candidate) return;
         try {
-            session.enable(candidate.source, {
-                registerIncomingRules(rules) {
-                    if (typeof FluxDispatcher?.addInterceptor !== "function") throw new Error("Discord events are unavailable");
-                    let active = true;
-                    const muteStore = rules.some(rule => rule.kind === "ping-alerts") ? findStore("UserGuildSettingsStore") : undefined;
-                    const context = {
-                        currentUser: () => UserStore.getCurrentUser()?.id,
-                        channel: (id: string) => ChannelStore.getChannel(id),
-                        replyAuthor: (channel: string, id: string) => MessageStore.getMessage(channel, id)?.author,
-                        blocked: (id: string) => RelationshipStore?.isBlocked(id) === true,
-                        ignored: (id: string) => RelationshipStore?.isIgnored?.(id) === true,
-                        selectedChannel: () => SelectedChannelStore?.getChannelId?.(),
-                        pingAlerts: {
-                            status: (id: string) => PresenceStore?.getStatus(id),
-                            isFriend: (id: string) => RelationshipStore?.isFriend?.(id) === true,
-                            muted: (id: string, channel: Parameters<typeof isCxNotificationMuted>[1]) => isCxNotificationMuted(id, channel, muteStore),
-                            notify: (alert: CxMessageAlert) => {
-                                const account = UserStore.getCurrentUser()?.id;
-                                setTimeout(() => {
-                                    if (!active || account !== UserStore.getCurrentUser()?.id) return;
-                                    const { author, channel, message, guild, title, body } = alert;
-                                    void showNotification({ title, body, icon: UserStore.getUser(author)?.getAvatarURL?.(undefined, 128),
-                                        noPersist: true, onClick: () => {
-                                            if (active && account === UserStore.getCurrentUser()?.id)
-                                                NavigationRouter.transitionTo(`/channels/${isCxProfileUserId(guild) ? guild : "@me"}/${channel}/${message}`);
-                                        } });
-                                }, 0);
-                            },
-                        },
-                        openLink: (link: string, channel: string, user: string) => setTimeout(() => {
-                            if (!active || context.currentUser() !== user || context.selectedChannel() !== channel) return;
-                            if (IS_WEB) window.open(link, "_blank", "noopener,noreferrer");
-                            else void VencordNative.native.openExternal(link).catch(() => {});
-                        }, 0),
-                        notify: (body: string) => setTimeout(() => {
-                            if (active) void showNotification({ title: candidate.review.name, body });
-                        }, 0),
-                    };
-                    const social = bindCxSocialEvents(rules, {
-                        currentUser: context.currentUser, notify: context.notify,
-                        isFriend: id => RelationshipStore?.isFriend?.(id) === true,
-                        userName: id => { const user = UserStore?.getUser(id); return user?.globalName || user?.username; },
-                        channelName: id => ChannelStore?.getChannel(id)?.name,
-                        voiceChannel: () => SelectedChannelStore?.getVoiceChannelId(),
-                        joinVoice: id => ChannelActions.selectVoiceChannel(id),
-                        removalActions: () => findByProps("removeRelationship"),
-                        enabled: () => active,
-                    });
-                    const interceptor = (payload: Parameters<typeof runCxIncomingRules>[1]) => {
-                        try {
-                            if (active) {
-                                const patch = runCxIncomingRules(rules, payload, context);
-                                if (patch === false) return true;
-                                if (patch) Object.assign(payload, patch);
-                                social?.observe(payload);
-                            }
-                        } catch { /* Discord must still receive its original event. */ }
-                    };
-                    try { FluxDispatcher.addInterceptor(interceptor); }
-                    catch (error) { social?.stop(); throw error; }
-                    return () => {
-                        active = false;
-                        const interceptors = FluxDispatcher._interceptors;
-                        const index = interceptors?.indexOf(interceptor) ?? -1;
-                        if (index !== -1) interceptors.splice(index, 1);
-                        social?.stop();
-                    };
-                },
-                registerProfileMenuAction(action) {
-                    const entry = cxProfileMenuActions[action];
-                    const { label, scope } = entry;
-                    let active = true;
-                    const itemId = "cx-profile-" + action;
-                    const patch: NavContextMenuPatchCallback = (children, props) => {
-                        const id = props?.user?.id ?? props?.userId;
-                        if (!active || !isCxProfileUserId(id) || children.some(child => child?.props?.id === itemId)) return;
-                        const selectedGuild = scope === "server" ? props?.displayProfile?.guildId ?? props?.guildId
-                            ?? props?.channel?.guild_id ?? (action === "server-profile-colors" && !props?.channel
-                                ? SelectedGuildStore?.getGuildId() : undefined) : undefined;
-                        const guildId = isCxProfileUserId(selectedGuild) ? selectedGuild : undefined;
-                        const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore, GuildMemberStore);
-                        if ((scope === "server" || scope === "identity") && !getCopy()) return;
-                        children.push(<Menu.MenuItem id={itemId} label={label} action={() => {
-                            if (!active) return;
-                            const text = getCopy();
-                            if (text) void copyToClipboard(text).catch(() => showToast("Couldn't copy to clipboard."));
-                            else showToast("unavailable" in entry ? entry.unavailable : "This profile field is unavailable.");
-                        }} />);
-                    };
-                    const menus = ["user-context", "user-profile-actions", "user-profile-overflow-menu"];
-                    addContextMenuPatch(menus, patch);
-                    return () => {
-                        active = false;
-                        removeContextMenuPatch(menus, patch);
-                    };
-                },
-                hideAppearanceTarget: applyAppearanceCss,
-                styleAppearanceTarget: applyAppearanceCss,
-                registerTimestampFormats: timestamps.register,
-                registerUploadAnonymiser(anonymiser) {
-                    if (uploadAnonymiser) throw new Error("An upload naming rule is already enabled");
-                    uploadAnonymiser = anonymiser;
-                    return () => { uploadAnonymiser = undefined; };
-                },
-                registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
-                    switch (effect) {
-                        case "show-voice-ping":
-                            return voicePing.bind(RTCConnectionStore, FluxDispatcher);
-                        case "voice-channel-count":
-                            if (!effectOptions || !("showEmpty" in effectOptions)) throw new Error("Missing voice count options");
-                            return voiceCounts.bind(VoiceStateStore, effectOptions);
-                        case "notify-when-muted":
-                            if (!effectOptions || !("serverMute" in effectOptions)) throw new Error("Missing mute alert options");
-                            return bindCxMutedVoice(MediaEngineStore, () => Boolean(SelectedChannelStore.getVoiceChannelId()),
-                                () => { playAudio("user_leave"); }, effectOptions);
-                        case "webcam-start-notifier":
-                            if (!effectOptions || !("scope" in effectOptions)) throw new Error("Missing camera tone options");
-                            return bindCxCameraTone({
-                                account: () => UserStore.getCurrentUser()?.id,
-                                selected() {
-                                    const id = SelectedChannelStore.getVoiceChannelId();
-                                    const channel = id && ChannelStore.getChannel(id);
-                                    if (id && channel) return { id, private: channel.type === 1 || channel.type === 3 };
-                                },
-                                states: id => VoiceStateStore?.getVoiceStatesForChannel?.(id),
-                                play: on => { playAudio(on ? "user_join" : "user_leave"); },
-                                dispatcher: FluxDispatcher,
-                            }, effectOptions);
-                        case "wait-for-slot":
-                            if (!effectOptions || !("autoJoin" in effectOptions)) throw new Error("Missing voice queue options");
-                            return registerWaitForSlot(effectOptions);
-                        case "all-call-time-counter":
-                            if (!effectOptions || !("human" in effectOptions)) throw new Error("Missing voice member timer options");
-                            return voiceMemberClock.bind({
-                                account: () => UserStore.getCurrentUser()?.id,
-                                state: id => VoiceStateStore?.getVoiceStateForUser?.(id),
-                                channelGuild: id => ChannelStore.getChannel(id)?.guild_id,
-                                dispatcher: FluxDispatcher,
-                            }, effectOptions);
-                        case "call-time-counter":
-                            return callClock.bind(SelectedChannelStore, FluxDispatcher);
-                        case "jump-to-message-menu":
-                            return registerJumpToMessageMenu();
-                        case "jump-without-unblocking":
-                        case "jump-to-first-message":
-                            return navigationControls.register(effect);
-                        case "read-all-servers-button":
-                            return navigationControls.register(effect, () => {
-                                addServerListElement(ServerListRenderPosition.Above, ReadAllServersButton);
-                                return () => removeServerListElement(ServerListRenderPosition.Above, ReadAllServersButton);
-                            });
-                        case "clean-channel-names":
-                        case "title-channel-names":
-                            return registerChannelNames(effect === "clean-channel-names" ? "clean" : "titles");
-                        case "dashless-channel-names":
-                            return registerChannelNames("dashless");
-                        case "static-typing-dots":
-                            return registerStaticTypingDots();
-                        case "code-block-gap":
-                            codeBlockGapUsers++;
-                            return () => { codeBlockGapUsers--; };
-                        case "hide-disabled-emojis":
-                            return hideDisabledEmojiInPicker();
-                        case "copy-emoji-markdown":
-                        case "sticker-links":
-                            return registerExpressionLinks(effect);
-                        case "reverse-image-search":
-                            return registerReverseImageSearch();
-                        case "copy-media-link":
-                            return registerMediaLinkCopy();
-                        case "open-steam-links": {
-                            const onClick = (event: MouseEvent) => {
-                                if (!event.isTrusted || event.defaultPrevented || event.button !== 0
-                                    || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || !(event.target instanceof Element)) return;
-                                const anchor = event.target.closest("a[href]");
-                                if (!anchor?.closest("[data-message-id], [id^='chat-messages-']")) return;
-                                const link = getCxSteamLink(anchor.getAttribute("href"));
-                                if (!link || getCxSteamLink(anchor.textContent?.trim())?.https !== link.https) return;
-                                if (findStore("BlockedDomainStore")?.isBlockedDomain?.(link.https) != null) return;
-                                event.preventDefault();
-                                event.stopPropagation();
-                                if (IS_WEB) window.open(link.steam, "_blank", "noopener,noreferrer");
-                                else void VencordNative.native.openExternal(link.steam).catch(() => showToast("Couldn't open the Steam link."));
-                            };
-                            document.addEventListener("click", onClick, true);
-                            return () => document.removeEventListener("click", onClick, true);
-                        }
-                        case "profile-media":
-                            return registerProfileMedia();
-                        case "user-notes":
-                            return registerLocalText("notes");
-                        case "user-tags":
-                            return registerLocalText("tags");
-                        case "channel-notes":
-                            return registerLocalText("channels");
-                        case "copy-channel-name":
-                            return registerCopyChannelName();
-                        case "hide-suggested-channels":
-                            return registerHideSuggestedChannels();
-                        case "copy-text-attachment":
-                            fileCopyUsers++;
-                            return () => { fileCopyUsers--; };
-                        case "attachment-image-quality":
-                            attachmentQualityUsers++;
-                            return () => { attachmentQualityUsers--; };
-                        case "original-attachment-images":
-                            originalAttachmentUsers++;
-                            return () => { originalAttachmentUsers--; };
-                        case "image-filename":
-                            imageFilenameUsers++;
-                            return () => { imageFilenameUsers--; };
-                        case "image-full-url":
-                            imageFullUrlUsers++;
-                            return () => { imageFullUrlUsers--; };
-                        case "descriptive-gif-alt":
-                            descriptiveGifAltUsers++;
-                            return () => { descriptiveGifAltUsers--; };
-                        case "preserve-image-links":
-                            imageLinkUsers++;
-                            return () => { imageLinkUsers--; };
-                        case "double-click-edit":
-                        case "double-click-reply":
-                            return registerMessageGesture(effect === "double-click-edit" ? "edit" : "reply");
-                        case "quick-mention":
-                            return registerQuickMention();
-                        case "copy-raw-text":
-                        case "copy-message-reference":
-                            return registerMessageClipboard(effect);
-                        case "message-word-count": {
-                            const id = "cx-word-count-" + ++wordCountSequence;
-                            addMessageAccessory(id, ({ message }) => {
-                                const label = formatCxWordCount(message?.content);
-                                return label ? <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{label}</div> : null;
-                            }, 2);
-                            return () => removeMessageAccessory(id);
-                        }
-                        case "decode-base64":
-                            return registerDecodeBase64();
-                        case "hide-profile-banner-images":
-                            return hideCxProfileBannerImages(IconUtils, id => id === UserStore.getCurrentUser()?.id || RelationshipStore?.isFriend?.(id) === true);
-                        case "quote-message":
-                            if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
-                            return registerQuoteMessage(effectOptions.includeLink);
-                        case "keep-long-drafts":
-                            longDraftUsers++;
-                            return () => { longDraftUsers--; };
-                        case "bypass-pin-prompt":
-                            bypassPinPromptUsers++;
-                            return () => { bypassPinPromptUsers--; };
-                        case "pin-message-shortcut":
-                            return registerPinShortcut();
-                        case "toggle-message-embeds":
-                            return registerEmbedToggle();
-                        case "repeat-message":
-                            return registerRepeatMessages();
-                        case "scroll-to-latest":
-                            return bindCxChannelOpenRead({ dispatcher: FluxDispatcher, read: ReadStateStore,
-                                selected: () => SelectedChannelStore?.getChannelId(), user: () => UserStore?.getCurrentUser()?.id,
-                                jump: target => MessageActions.jumpToMessage(target) });
-                        case "unicode-emoji-autocomplete":
-                        case "local-emoji-autocomplete":
-                            return filterCxEmojiAutocomplete(EmojiStore, effect === "local-emoji-autocomplete" ? "local" : "unicode",
-                                findByProps("EmojiIntention")?.EmojiIntention);
-                        case "split-long-messages": {
-                            if (splitSender) throw new Error("A CX message splitter is already active");
-                            const sender = createCxSplitSender({
-                                currentUser: () => UserStore?.getCurrentUser(),
-                                channel: id => ChannelStore?.getChannel(id),
-                                enabled: (): boolean => splitSender === sender,
-                                failed: () => { showToast("The remaining message parts were not sent."); },
-                            });
-                            const stop = overrideCxMethods(findByProps("sendMessage", "editMessage"), { sendMessage: sender.send });
-                            splitSender = sender;
-                            return () => { splitSender = undefined; stop(); };
-                        }
-                        case "flat-attachments":
-                            flatAttachmentUsers++;
-                            return () => { flatAttachmentUsers--; };
-                        case "fix-file-extensions":
-                            fixFileExtensionUsers++;
-                            return () => { fixFileExtensionUsers--; };
-                        case "plus-reactions": {
-                            const actions = findByProps("sendMessage", "getSendMessageOptions");
-                            const handle = createCxPlusReactionHandler({
-                                messages: channel => MessageStore?.getMessages(channel),
-                                guild: channel => ChannelStore?.getChannel(channel)?.guild_id,
-                                emojis: () => EmojiStore,
-                                unicode: name => findByProps("convertNameToSurrogate")?.convertNameToSurrogate(name),
-                                react: (channel, message, emoji) => RestAPI.put({
-                                    url: Constants.Endpoints.REACTION(channel, message, emoji.id ? `${emoji.name}:${emoji.id}` : emoji.name, "@me"),
-                                }),
-                                error: () => { showToast("Couldn’t react to the previous message."); },
-                            });
-                            return overrideCxMethods(actions, {
-                                sendMessage: (args, original) => handle(args[0], args[1] as Parameters<typeof handle>[1], args[3] as Parameters<typeof handle>[2])
-                                    ?? original(args),
-                            });
-                        }
-                        case "silent-typing":
-                            return overrideCxMethods(findByProps("startTyping", "stopTyping"), {
-                                startTyping: () => Promise.resolve(),
-                            });
-                        case "pending-friend-count":
-                            return overrideCxMethods(RelationshipStore, { getPendingCount: () => 0, getPendingIncomingCount: () => 0 });
-                        case "force-owner-crown":
-                            ownerCrownUsers++;
-                            return () => { ownerCrownUsers--; };
-                        case "spotify-song-name":
-                            spotifySongNameUsers++;
-                            return () => { spotifySongNameUsers--; };
-                        case "sort-reactions-by-count":
-                            reactionSortUsers++;
-                            return () => { reactionSortUsers--; };
-                        case "plain-url-paste":
-                            plainUrlPasteUsers++;
-                            return () => { plainUrlPasteUsers--; };
-                        case "reveal-spoilers-shortcut":
-                            revealSpoilerUsers++;
-                            return () => { revealSpoilerUsers--; };
-                        case "reply-timestamp":
-                            replyTimestampUsers++;
-                            return () => { replyTimestampUsers--; };
-                        case "no-middle-click-paste":
-                            if (!IS_LINUX || IS_MOBILE) throw new Error("Middle-click paste control is available on Linux.");
-                            if (noMiddleClickPasteUsers === 0) window.addEventListener("mouseup", preventMiddleClickPaste);
-                            noMiddleClickPasteUsers++;
-                            return () => {
-                                if (--noMiddleClickPasteUsers === 0) window.removeEventListener("mouseup", preventMiddleClickPaste);
-                            };
-                        case "hide-role-headers":
-                            roleHeaderUsers++;
-                            return () => { roleHeaderUsers--; };
-                        case "animated-assets":
-                            return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), true);
-                        case "floor-relative-time":
-                            return floorCxRelativeTime(findByProps("relativeTimeRounding", "locale"));
-                        case "avatar-resolution":
-                            return raiseCxAvatarResolution(findByProps("getUserAvatarURL", "getGuildIconURL"), avatarResolution);
-                        case "avatar-crop-zoom": {
-                            if (!effectOptions || !("maxAvatarCropZoom" in effectOptions)) throw new Error("Missing avatar crop zoom");
-                            const grant = Symbol();
-                            avatarCropZoomLimits.set(grant, effectOptions.maxAvatarCropZoom);
-                            return () => { avatarCropZoomLimits.delete(grant); };
-                        }
-                        case "notification-volume": {
-                            if (!effectOptions || !("notificationVolume" in effectOptions)) throw new Error("Missing notification volume");
-                            const grant = Symbol();
-                            notificationVolumeLimits.set(grant, effectOptions.notificationVolume);
-                            return () => { notificationVolumeLimits.delete(grant); };
-                        }
-                        case "stop-auto-unread":
-                            return overrideCxMethods(findStore("UnreadSettingNoticeStore2"), { maybeAutoUpgradeChannel: () => false });
-                    }
-                },
-                registerReplyPingSuppression() {
-                    const listener = addMessagePreSendListener((_, _message, { replyOptions }) => {
-                        if (!replyOptions?.messageReference) return;
-                        replyOptions.allowedMentions = { parse: ["users", "roles", "everyone"], ...replyOptions.allowedMentions, repliedUser: false };
-                    });
-                    return () => { removeMessagePreSendListener(listener); };
-                },
-                registerPreviousMessageRule(rule) {
-                    let active = true;
-                    const handle = createCxPreviousSendHandler(rule, {
-                        currentUser: () => UserStore?.getCurrentUser()?.id,
-                        previous: (channel, own) => own ? MessageStore?.getLastEditableMessage(channel) : MessageStore?.getLastMessage(channel),
-                        edit: (channel, id, content) => MessageActions.editMessage(channel, id, { content }),
-                        error: () => { showToast("Couldn’t edit the previous message."); },
-                    });
-                    const listener = addMessagePreSendListener(async (channel, message, options) => {
-                        if (!active) return;
-                        const edit = handle(channel, message.content, Boolean(message.tts || options?.replyOptions?.messageReference
-                            || options?.uploads?.length || options?.stickers?.length));
-                        if (!edit) return;
-                        await edit;
-                        return { cancel: true };
-                    });
-                    return () => {
-                        active = false;
-                        removeMessagePreSendListener(listener);
-                    };
-                },
-                registerMessageTransform(transform) {
-                    const listener = addMessagePreSendListener((_, message) => {
-                        if (typeof message.content === "string") message.content = transform(message.content);
-                    });
-                    return () => { removeMessagePreSendListener(listener); };
-                },
-                registerSendConfirmation(check) {
-                    if (typeof Alerts?.show !== "function") throw new Error("Discord's send confirmation is unavailable");
-                    let active = true;
-                    let cancelPending: (() => void) | undefined;
-                    const listener = addMessagePreSendListener(async (_, message) => {
-                        if (!active) return;
-                        const body = check(message.content);
-                        if (!body) return;
-                        if (cancelPending) return { cancel: true };
-                        const { content } = message;
-                        const account = UserStore.getCurrentUser()?.id;
-                        const selected = SelectedChannelStore.getChannelId();
-                        try {
-                            const confirmed = await new Promise<boolean>(resolve => {
-                                cancelPending = () => resolve(false);
-                                Alerts.show({ title: "Confirm message", body, cancelText: "Cancel", confirmText: "Send anyway",
-                                    onConfirm: () => resolve(true), onCancel: cancelPending,
-                                    onCloseCallback: () => queueMicrotask(() => resolve(false)),
-                                });
-                            });
-                            return { cancel: !confirmed || !active || !account || account !== UserStore.getCurrentUser()?.id
-                                || selected !== SelectedChannelStore.getChannelId() || message.content !== content };
-                        } catch {
-                            return { cancel: true };
-                        } finally {
-                            cancelPending = undefined;
-                        }
-                    });
-                    return () => { active = false; cancelPending?.(); removeMessagePreSendListener(listener); };
-                },
-                registerMessageEditTransform(transform) {
-                    const listener = addMessagePreEditListener((_, _id, message) => {
-                        if (typeof message.content === "string") message.content = transform(message.content);
-                    });
-                    return () => { removeMessagePreEditListener(listener); };
-                },
-                registerProfileBioTransform(transform) {
-                    profileBioTransforms.add(transform);
-                    return () => { profileBioTransforms.delete(transform); };
-                },
-                getUserAvatarUrl(id) {
-                    const user = id ? UserStore?.getUser(id) : UserStore?.getCurrentUser?.();
-                    if (user) return IconUtils.getUserAvatarURL(user, true, 1024);
-                },
-                registerCommand(name, execute, acceptsText, sendsMessage, optionalSend, inputs) {
-                    if (Object.prototype.hasOwnProperty.call(commands, name) || name in Object.prototype)
-                        throw new Error(`Command /${name} already exists`);
-                    const command: VencordCommand = {
-                        name,
-                        description: "Local CX command",
-                        inputType: sendsMessage ? ApplicationCommandInputType.BUILT_IN_TEXT : ApplicationCommandInputType.BUILT_IN,
-                        options: [
-                            ...(acceptsText ? [{ name: "text", description: "Text to use", type: ApplicationCommandOptionType.STRING, required: true }] : []),
-                            ...inputs.map(input => ({
-                                name: input.name, description: input.name.replace(/[_-]/g, " "), required: input.required,
-                                type: input.type === "integer" ? ApplicationCommandOptionType.INTEGER
-                                    : input.type === "boolean" ? ApplicationCommandOptionType.BOOLEAN
-                                        : input.type === "user" ? ApplicationCommandOptionType.USER
-                                            : input.type === "role" ? ApplicationCommandOptionType.ROLE : ApplicationCommandOptionType.STRING,
-                                choices: input.choices?.map(value => ({ name: value, label: value, value })),
-                            })),
-                            ...(optionalSend ? [{ name: "send", description: "Send the result to this chat", type: ApplicationCommandOptionType.BOOLEAN }] : []),
-                        ],
-                        execute(args, context) {
-                            const outgoing = execute({
-                                text: acceptsText ? findOption(args, "text", "") : undefined,
-                                inputs: Object.fromEntries(inputs.map(input => [input.name, findOption(args, input.name)])),
-                                sendRequested: optionalSend && findOption<boolean>(args, "send") === true,
-                                reply: message => { if (context.channel?.id) sendBotMessage(context.channel.id, { content: message }); },
-                                prepareChannel() {
-                                    const channelId = context.channel?.id;
-                                    const accountId = UserStore?.getCurrentUser()?.id;
-                                    if (!channelId || !accountId) return;
-                                    const isCurrent = () => UserStore?.getCurrentUser()?.id === accountId;
-                                    return {
-                                        reply(content) { if (isCurrent()) sendBotMessage(channelId, { content }); },
-                                        async send(content) {
-                                            if (!isCurrent()) return;
-                                            if (!ChannelStore?.getChannel(channelId)) throw new Error("The original channel is unavailable");
-                                            await MessageActions.sendMessage(channelId, { content, invalidEmojis: [], validNonShortcutEmojis: [], tts: false });
-                                        },
-                                    };
-                                },
-                                lookup(name, input) {
-                                    if (name !== "roleMembers" && name !== "randomMember") return formatCxSpotify(name, input, SpotifyStore?.getTrack?.());
-                                    const guild = context.guild?.id ?? context.channel?.guild_id;
-                                    const members = guild ? GuildMemberStore?.getMembers(guild) ?? [] : [];
-                                    return name === "randomMember" ? formatCxRandomMember(input, members, UserStore?.getCurrentUser()?.id)
-                                        : formatCxRoleMembers(input, guild, members, id => UserStore?.getUser(id));
-                                },
-                                friendInvites: operation => runCxFriendInvites(operation, findByProps("createFriendInvite")),
-                                findUserTags: findLocalUserTags,
-                                async copyDiagnostics() {
-                                    const report = inspectCcpRuntime("desktop", findStore, wreq?.c);
-                                    await copyToClipboard(JSON.stringify(report));
-                                    return describeCcpReport(report);
-                                },
-                                markServersRead: () => markCxServersRead(getReadStores(), acknowledgeServers),
-                            });
-                            if (outgoing !== undefined) return { content: outgoing };
-                        },
-                    };
-                    registerCommand(command, "CxExtensions");
-                    if (commands[name] !== command) throw new Error("Discord commands are not ready yet");
-                    return () => { if (commands[name] === command) unregisterCommand(name); };
-                },
-                toast: body => { void showNotification({ title: candidate.review.name, body }); },
-                applyTheme,
-            }, candidate.review.permissions, candidate.selected);
+            session.enable(candidate.source, createDesktopCxHost(candidate.review.name), candidate.review.permissions, candidate.selected);
             if (candidate.loader) {
                 const id = candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name;
                 activeCatalogLoaders.set(id, candidate.loader);

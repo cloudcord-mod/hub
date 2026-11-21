@@ -5507,6 +5507,24 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.ok(!button(render(), "Disable Lazy Wallpaper"), "a theme forgotten during fetch stays disabled");
             assert.equal(localNotes[storageKey].length, 0);
             plugin.stop();
+
+            for (const name of ["NoTypingAnimation", "RealtimeTimestamps"]) {
+                selectCatalog(name);
+                await click(render(), "Allow and remember on this device");
+            }
+            plugin.stop();
+            assert.equal(plugin.useTypingFocus(focus), focus);
+            assert.equal(formatTimestamp(), nativeTimestamp.timestamp);
+            plugin.start();
+            await new Promise(setImmediate);
+            assert.equal(plugin.useTypingFocus(focus).focused, false);
+            assert.equal(formatTimestamp(), "14:42:19");
+            await click(render(), "Disable NoTypingAnimation");
+            await click(render(), "Disable RealtimeTimestamps");
+            assert.equal(plugin.useTypingFocus(focus), focus);
+            assert.equal(formatTimestamp(), nativeTimestamp.timestamp);
+            assert.equal(localNotes[storageKey].length, 0);
+            plugin.stop();
         } else {
             const restore = module.exports.restoreRememberedCxAppearance;
             selectCatalog("QuickMention");
@@ -5542,6 +5560,23 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Forget Blue Hour");
             assert.equal(settings.cxRememberedAppearance.length, 0);
             unloadStale();
+
+            for (const name of ["NoTypingAnimation", "RealtimeTimestamps"]) {
+                selectCatalog(name);
+                click(render(), "Allow and remember on this device");
+            }
+            restore()();
+            assert.equal(appearanceHooks.size, 0);
+            assert.equal(formatTimestamp(), nativeTimestamp.timestamp);
+            const unloadEffects = restore();
+            assert.ok(appearanceHooks.has("TypingIndicatorInner"));
+            assert.equal(formatTimestamp(), "14:42:19");
+            click(render(), "Disable NoTypingAnimation");
+            click(render(), "Disable RealtimeTimestamps");
+            assert.equal(appearanceHooks.size, 0);
+            assert.equal(formatTimestamp(), nativeTimestamp.timestamp);
+            assert.equal(settings.cxRememberedAppearance.length, 0);
+            unloadEffects();
         }
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
