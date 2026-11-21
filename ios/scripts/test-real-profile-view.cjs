@@ -44,13 +44,18 @@ const profile = Object.freeze({ username: 'custom-name', bio: 'custom bio' });
 const root = { fakeProfile: profile };
 const hooks = new Map();
 const badgeRefreshes = [];
+const openedProfiles = [];
+let hiddenSheets = 0;
+let nativeProfileAvailable = true;
 let intercept;
 let lastSheet;
 const mobile = vm.createContext({ ...profileAppearance, rootSettings: root, settings: {}, sharedProfiles: new Map([[id, profile]]),
     currentUserId: other, isCurrentUser: uid => uid === mobile.currentUserId, clearCache() {}, identityRefreshers: new Set(),
     reapplyBadgeDirectory: uid => badgeRefreshes.push(uid),
-    safeStore: () => ({ emitChange() {} }), simpleSheets: { showSimpleActionSheet() {}, hideActionSheet() {} },
-    findByName: () => () => {}, setTimeout: fn => fn(),
+    safeStore: () => ({ emitChange() {} }), simpleSheets: { showSimpleActionSheet() {}, hideActionSheet() { hiddenSheets++; } },
+    findByName: () => undefined, findByProps: () => nativeProfileAvailable ? {
+        showUserProfileActionSheet: options => openedProfiles.push(options),
+    } : undefined, setTimeout: fn => fn(),
     instead: (_method, _parent, fn) => { intercept = fn; },
     onJsxCreate: (name, fn) => hooks.set(name, fn), TableRow: 'row',
     createElement: (type, props) => ({ type, props }),
@@ -58,7 +63,8 @@ const mobile = vm.createContext({ ...profileAppearance, rootSettings: root, sett
 vm.runInContext(compile(helpers), mobile);
 mobile.connectRealProfileMenu();
 assert.equal(mobile.getProfileOverride(id), profile);
-const original = { key: 'UserProfileOverflow', userId: id, options: [{ label: 'Block' }] };
+const originGuild = '1517960356180529162';
+const original = { key: 'UserProfileOverflow', userId: id, guildId: originGuild, options: [{ label: 'Block' }] };
 intercept([original], sheet => { lastSheet = sheet; });
 assert.equal(original.options.length, 1, 'native menu stays immutable');
 assert.equal(lastSheet.options.at(-1).label, 'Show real profile');
@@ -79,6 +85,13 @@ assert.equal(lastSheet.options.at(-1).label, 'Show CloudCord profile');
 lastSheet.options.at(-1).onPress();
 assert.equal(mobile.getProfileOverride(id), profile, 'switching back restores the retained shared snapshot');
 assert.deepEqual(badgeRefreshes, [id, id], 'changing the profile view also refreshes the native directory');
+assert.equal(hiddenSheets, 2);
+assert.deepEqual(JSON.parse(JSON.stringify(openedProfiles)), [{ userId: id, guildId: originGuild }, { userId: id, guildId: originGuild }]);
+nativeProfileAvailable = false;
+lastSheet.options.at(-1).onPress();
+assert.equal(hiddenSheets, 2, 'a Discord build without an opener keeps the current sheet open');
+assert.equal(mobile.getProfileOverride(id), undefined, 'the choice still applies without reopening');
+lastSheet.options.at(-1).onPress();
 const unrelated = { key: 'ChannelMenu', userId: id, options: [] };
 intercept([unrelated], sheet => { lastSheet = sheet; });
 assert.equal(lastSheet, unrelated, 'unrelated menus stay untouched');

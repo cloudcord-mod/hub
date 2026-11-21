@@ -117,4 +117,43 @@ assert.equal(twoToneDraft.bannerColor, "#765432");
 const fullPreview = mobileRender(twoToneDraft);
 assert.ok(fullPreview.some(node => node.props.style?.backgroundColor === "#234567" && node.props.style?.padding === 3));
 assert.ok(fullPreview.some(node => node.props.style?.backgroundColor === "#765432" && node.props.style?.height === "55%"));
-console.log("PASS Profile Studio modes, native profile fields, two-tone previews, draft precedence and saved-look wiring");
+async function testMobilePreviewOpening() {
+    const handoff = page.slice(page.indexOf("const openPreview = async"), page.indexOf("const K = require", page.indexOf("const openPreview = async")));
+    const toasts = [];
+    const nativeOpens = [];
+    let livePreviewOpened = false;
+    let refreshes = 0;
+    const context = {
+        currentUserId: id, realCurrentUser: account,
+        isProfileViewUserId: profileAppearance.isProfileViewUserId,
+        nativeProfileOpener: () => options => nativeOpens.push(options.userId),
+        refreshPreview: () => { refreshes++; },
+        setShowPreview: value => { livePreviewOpened = value; },
+        showToast: text => toasts.push(text),
+    };
+    const openPreview = vm.runInNewContext(transformSync(handoff + "\nopenPreview;", { loader: "ts" }).code, context);
+    await openPreview();
+    assert.deepEqual(nativeOpens, [id]);
+    assert.equal(refreshes, 1);
+    assert.equal(livePreviewOpened, false);
+    context.nativeProfileOpener = () => undefined;
+    await openPreview();
+    assert.equal(livePreviewOpened, true);
+    assert.match(toasts.pop(), /Showing the live preview/);
+    livePreviewOpened = false;
+    context.nativeProfileOpener = () => () => Promise.reject(new Error("sheet failed"));
+    await openPreview();
+    assert.equal(livePreviewOpened, true);
+    livePreviewOpened = false;
+    const stale = openPreview();
+    context.currentUserId = "123456789012345679";
+    await stale;
+    assert.equal(livePreviewOpened, false, "a failure on the previous account must not change this account's preview");
+}
+
+testMobilePreviewOpening().then(() => {
+    console.log("PASS Profile Studio modes, native profile fields, preview fallback, two-tone previews and saved-look wiring");
+}).catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+});

@@ -1599,7 +1599,17 @@ jobs:
               const users = rootSettings.cloudcordRealProfileUsersByAccount?.[currentUserId];
               return Array.isArray(users) && users.includes(id);
           }
-          function toggleRealProfileView(id: string, viewerId: string | null) {
+          function nativeProfileOpener(): ((options: { userId: string; guildId?: string }) => unknown) | undefined {
+              try {
+                  const open = findByName("showUserProfileActionSheet");
+                  if (typeof open === "function") return open;
+              } catch {}
+              try {
+                  const actions = findByProps("showUserProfileActionSheet");
+                  if (typeof actions?.showUserProfileActionSheet === "function") return options => actions.showUserProfileActionSheet(options);
+              } catch {}
+          }
+          function toggleRealProfileView(id: string, viewerId: string | null, guildId?: string) {
               if (!isProfileViewUserId(id) || !isProfileViewUserId(viewerId) || viewerId !== currentUserId || id === viewerId) return;
               const accounts = { ...rootSettings.cloudcordRealProfileUsersByAccount };
               const users = new Set(normalizeProfileViewUsers(accounts[viewerId]));
@@ -1612,24 +1622,29 @@ jobs:
               for (const store of ["UserStore", "UserProfileStore", "MessageStore"]) {
                   try { safeStore(store)?.emitChange?.(); } catch {}
               }
+              const open = nativeProfileOpener();
+              if (!open) return;
               try { simpleSheets.hideActionSheet?.(); } catch {}
-              const open = findByName("showUserProfileActionSheet", false) as any;
-              if (typeof open === "function") setTimeout(() => { if (currentUserId === viewerId) open({ userId: id }); }, 0);
+              setTimeout(async () => {
+                  if (currentUserId !== viewerId) return;
+                  try { await open({ userId: id, ...(isProfileViewUserId(guildId) ? { guildId } : {}) }); }
+                  catch { if (currentUserId === viewerId) showToast("Profile view updated. Reopen the profile to see it."); }
+              }, 0);
           }
           let realProfileMenuConnected = false;
           function connectRealProfileMenu() {
               if (realProfileMenuConnected) return;
               realProfileMenuConnected = true;
-              const option = (id: string) => {
+              const option = (id: string, guildId?: string) => {
                   const viewerId = currentUserId;
                   if (!isProfileViewUserId(viewerId) || !isProfileViewUserId(id) || id === viewerId) return;
-                  return { label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile", onPress: () => toggleRealProfileView(id, viewerId) };
+                  return { label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile", onPress: () => toggleRealProfileView(id, viewerId, guildId) };
               };
               if (typeof simpleSheets?.showSimpleActionSheet === "function") {
                   instead("showSimpleActionSheet", simpleSheets, (args: any[], original: Function) => {
                       const sheet = args[0];
                       const id = String(sheet?.userId || sheet?.user?.id || sheet?.props?.userId || sheet?.props?.user?.id || "");
-                      const action = option(id);
+                      const action = option(id, sheet?.guildId ?? sheet?.props?.guildId);
                       if (!action || !/user|profile/i.test(String(sheet?.key || "")) || !Array.isArray(sheet?.options)) return original(...args);
                       return original({ ...sheet, options: [...sheet.options, action] }, ...args.slice(1));
                   });
@@ -1638,7 +1653,7 @@ jobs:
                   onJsxCreate(name, (_component, rendered) => {
                       const props: any = rendered?.props;
                       const id = String(props?.userId || props?.user?.id || props?.profile?.userId || "");
-                      const action = option(id);
+                      const action = option(id, props?.displayProfile?.guildId ?? props?.guildId ?? props?.channel?.guild_id);
                       if (!action || props?.__cloudcordRealProfileMenu) return rendered;
                       if (Array.isArray(props?.options)) return cloneElement(rendered, { __cloudcordRealProfileMenu: true, options: [...props.options, action] });
                       if (!props?.children) return rendered;
@@ -5054,15 +5069,22 @@ jobs:
                   );
               };
 
-              const openPreview = () => {
+              const openPreview = async () => {
+                  const viewerId = currentUserId;
+                  const userId = viewerId || realCurrentUser?.id;
+                  if (!isProfileViewUserId(userId)) {
+                      showToast("Your Discord account is still loading.");
+                      return;
+                  }
                   try {
-                      const userId = currentUserId || realCurrentUser?.id;
-                      if (!userId) throw new Error("Your Discord account is still loading.");
+                      const open = nativeProfileOpener();
+                      if (!open) throw new Error("Discord's profile sheet is unavailable.");
                       refreshPreview();
-                      const showProfile = findByNameLazy("showUserProfileActionSheet");
-                      showProfile({ userId });
-                  } catch (error: any) {
-                      Alert.alert("Couldn't open preview", error?.message || "Try opening your profile from Discord.");
+                      await open({ userId });
+                  } catch {
+                      if (currentUserId !== viewerId) return;
+                      setShowPreview(true);
+                      showToast("Discord's profile sheet is unavailable. Showing the live preview.");
                   }
               };
 
