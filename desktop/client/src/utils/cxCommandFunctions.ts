@@ -109,6 +109,19 @@ const decimalFileUnits = fileSizeUnits(1000, ["B", "kB", "MB", "GB", "TB", "PB"]
 const binaryFileUnits = fileSizeUnits(1024, ["B", "KiB", "MiB", "GiB", "TiB", "PiB"]);
 const displayNumber = (value: number) => String(Number(value.toPrecision(12)));
 
+function planningRows(text: string) {
+    return text.split(/\r\n|\r|\n/).map(row => row.trim()).filter(Boolean);
+}
+
+function planningBlock(text: string) {
+    const result = text.replace(/`(?=``)/g, "`\u200b");
+    return result.length <= 3800 ? codeFence + "\n" + result + "\n" + codeFence : "The result is too long for one reply.";
+}
+
+function discordId(value: string) {
+    return /^[1-9]\d{16,19}$/.test(value) && BigInt(value) <= 0xffffffffffffffffn;
+}
+
 function markdownTable(rows: string[][]) {
     const columns = rows[0]?.length ?? 0;
     if (columns < 2 || columns > 16 || rows.length > 64 || rows.some(row => row.length !== columns)) return;
@@ -447,6 +460,69 @@ export const cxCommandFunctions = {
         const timestamp = Math.floor(ms / 1000);
         return `<t:${timestamp}:F> (<t:${timestamp}:R>)\nCopy \`<t:${timestamp}:F>\``;
     },
+    timestampStyles(input: string) {
+        const ms = isoUnixMilliseconds(input);
+        if (ms === undefined || ms < 0) return;
+        const seconds = Math.floor(ms / 1000);
+        return [["t", "Short time"], ["T", "Time with seconds"], ["d", "Short date"],
+            ["D", "Long date"], ["f", "Date and time"], ["F", "Full date and time"], ["R", "Relative"]]
+            .map(([style, label]) => {
+                const markup = `<t:${seconds}:${style}>`;
+                return `${label} · ${markup} · \`${markup}\``;
+            }).join("\n");
+    },
+    recurringTimestamps(start: string, interval: string, count: string) {
+        const ms = isoUnixMilliseconds(start);
+        const step = durationSeconds(interval), occurrences = integerText(count);
+        if (ms === undefined || ms < 0 || !step || occurrences === undefined || occurrences < 2 || occurrences > 20) return;
+        const seconds = Math.floor(ms / 1000);
+        if (seconds + step * (occurrences - 1) > 253402300799) return;
+        const times = Array.from({ length: occurrences }, (_, index) => `<t:${seconds + index * step}:F>`);
+        return times.map((timestamp, index) => `${index + 1}. ${timestamp} · \`${timestamp}\``).join("\n");
+    },
+    buildMessageLink(server: string, channel: string, message: string) {
+        const scope = server.trim(), channelId = channel.trim(), messageId = message.trim();
+        if ((scope !== "@me" && !discordId(scope)) || !discordId(channelId) || (messageId && !discordId(messageId))) return;
+        return `<https://discord.com/channels/${scope}/${channelId}${messageId ? "/" + messageId : ""}>`;
+    },
+    balanceGroups(text: string, count: string) {
+        const rows = planningRows(text);
+        const groups = integerText(count);
+        if (groups === undefined || groups < 2 || groups > 20 || rows.length < groups || rows.length > 100) return;
+        const lists: string[][] = Array.from({ length: groups }, (_, index) => [`Group ${index + 1}`]);
+        rows.forEach((row, index) => lists[index % groups].push("- " + row));
+        return planningBlock(lists.map(group => group.join("\n")).join("\n\n"));
+    },
+    testResultSummary(text: string) {
+        const rows = planningRows(text);
+        if (!rows.length || rows.length > 150) return;
+        const counts = { pass: 0, fail: 0, blocked: 0, unclassified: 0 };
+        for (const row of rows) {
+            const match = /^(pass|fail|blocked)(?:\s|:|$)/i.exec(row);
+            const status = match ? match[1].toLowerCase() as "pass" | "fail" | "blocked" : "unclassified";
+            counts[status]++;
+        }
+        return `Passed ${counts.pass} · Failed ${counts.fail} · Blocked ${counts.blocked} · Unclassified ${counts.unclassified} · Total ${rows.length}`;
+    },
+    totalTime(text: string) {
+        const rows = planningRows(text);
+        if (!rows.length || rows.length > 100) return;
+        let total = 0;
+        for (const [index, row] of rows.entries()) {
+            const duration = durationSeconds(row);
+            if (duration === undefined) return `Line ${index + 1} needs a duration such as 2h 30m.`;
+            total += duration;
+        }
+        if (!Number.isSafeInteger(total)) return "The total is too large.";
+        const hours = Math.floor(total / 3600);
+        return `${hours}h ${Math.floor(total % 3600 / 60)}m ${total % 60}s · ${total} seconds across ${rows.length} entries`;
+    },
+    messageBudget(text: string, limit: string) {
+        const cap = integerText(limit);
+        if (cap !== 2000 && cap !== 4000) return;
+        const difference = cap - text.length;
+        return `${text.length}/${cap} UTF-16 units · ${Math.abs(difference)} ${difference < 0 ? "over" : "remaining"}`;
+    },
     discordLinkDetails(input: string) {
         const text = input.trim().replace(/^<([^<>]+)>$/, "$1");
         const match = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/channels\/(@me|\d{17,20})\/(\d{17,20})(?:\/(\d{17,20}))?\/?$/i.exec(text);
@@ -454,7 +530,7 @@ export const cxCommandFunctions = {
         const [, guild, channel, message] = match;
         const direct = guild.toLowerCase() === "@me";
         const ids = [direct ? undefined : guild, channel, message];
-        if (ids.some(id => id && (id.startsWith("0") || BigInt(id) > 0xffffffffffffffffn))) return;
+        if (ids.some(id => id && !discordId(id))) return;
         return [direct ? "Direct message" : `Server \`${guild}\``, `Channel \`${channel}\``,
             ...(message ? [`Message \`${message}\``] : [])].join("\n");
     },

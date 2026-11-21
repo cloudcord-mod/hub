@@ -8,6 +8,7 @@ import plugin_catalog_aspect_ratio from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_at_someone from "../../../../examples/cx/catalog/plugins/at-someone.cx";
 import plugin_catalog_auto_vaporwave from "../../../../examples/cx/catalog/plugins/auto-vaporwave.cx";
 import plugin_catalog_avatar_grabber from "../../../../examples/cx/catalog/plugins/avatar-grabber.cx";
+import plugin_catalog_balanced_groups from "../../../../examples/cx/catalog/plugins/balanced-groups.cx";
 import plugin_catalog_better_chat_names from "../../../../examples/cx/catalog/plugins/better-chat-names.cx";
 import plugin_catalog_better_gif_alt_text from "../../../../examples/cx/catalog/plugins/better-gif-alt-text.cx";
 import plugin_catalog_better_plus_reacts from "../../../../examples/cx/catalog/plugins/better-plus-reacts.cx";
@@ -21,6 +22,7 @@ import plugin_catalog_blur_images_until_hover from "../../../../examples/cx/cata
 import plugin_catalog_blur_nsfw from "../../../../examples/cx/catalog/plugins/blur-nsfw.cx";
 import plugin_catalog_bold_text from "../../../../examples/cx/catalog/plugins/bold-text.cx";
 import plugin_catalog_bold_usernames from "../../../../examples/cx/catalog/plugins/bold-usernames.cx";
+import plugin_catalog_build_discord_link from "../../../../examples/cx/catalog/plugins/build-discord-link.cx";
 import plugin_catalog_bypass_pin_prompt from "../../../../examples/cx/catalog/plugins/bypass-pin-prompt.cx";
 import plugin_catalog_calculator from "../../../../examples/cx/catalog/plugins/calculator.cx";
 import plugin_catalog_call_time_counter from "../../../../examples/cx/catalog/plugins/call-time-counter.cx";
@@ -208,6 +210,7 @@ import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/
 import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/plugins/markdown-checklist.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_meeting_timestamp from "../../../../examples/cx/catalog/plugins/meeting-timestamp.cx";
+import plugin_catalog_message_budget from "../../../../examples/cx/catalog/plugins/message-budget.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
 import plugin_catalog_message_latency from "../../../../examples/cx/catalog/plugins/message-latency.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
@@ -254,6 +257,7 @@ import plugin_catalog_read_all_notifications from "../../../../examples/cx/catal
 import plugin_catalog_readable_line_length from "../../../../examples/cx/catalog/plugins/readable-line-length.cx";
 import plugin_catalog_readable_spoilers from "../../../../examples/cx/catalog/plugins/readable-spoilers.cx";
 import plugin_catalog_realtime_timestamps from "../../../../examples/cx/catalog/plugins/realtime-timestamps.cx";
+import plugin_catalog_recurring_timestamps from "../../../../examples/cx/catalog/plugins/recurring-timestamps.cx";
 import plugin_catalog_relationship_notifier from "../../../../examples/cx/catalog/plugins/relationship-notifier.cx";
 import plugin_catalog_repeat_messages from "../../../../examples/cx/catalog/plugins/repeat-messages.cx";
 import plugin_catalog_reply_ping_control from "../../../../examples/cx/catalog/plugins/reply-ping-control.cx";
@@ -298,8 +302,11 @@ import plugin_catalog_stop_auto_unread from "../../../../examples/cx/catalog/plu
 import plugin_catalog_strip_url_tracking from "../../../../examples/cx/catalog/plugins/strip-url-tracking.cx";
 import plugin_catalog_talk_in_reverse from "../../../../examples/cx/catalog/plugins/talk-in-reverse.cx";
 import plugin_catalog_terezi_typing_quirk from "../../../../examples/cx/catalog/plugins/terezi-typing-quirk.cx";
+import plugin_catalog_test_result_summary from "../../../../examples/cx/catalog/plugins/test-result-summary.cx";
 import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins/text-replace.cx";
 import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plugins/thin-scrollbars.cx";
+import plugin_catalog_timestamp_styles from "../../../../examples/cx/catalog/plugins/timestamp-styles.cx";
+import plugin_catalog_total_time from "../../../../examples/cx/catalog/plugins/total-time.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
@@ -448,6 +455,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "AtSomeone", source: plugin_catalog_at_someone, description: "/someone", commands: ["someone"], categories: ["Chat","Commands","Servers & channels"] },
         { name: "AutoVaporwave", source: plugin_catalog_auto_vaporwave, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "AvatarGrabber", source: plugin_catalog_avatar_grabber, description: "/avatar", commands: ["avatar"], categories: ["Chat","Commands","Media","Profiles"] },
+        { name: "Balanced Groups", source: plugin_catalog_balanced_groups, description: "/balancegroups", commands: ["balancegroups"], categories: ["Commands"], appearanceRevision: "9f44d571612fa60f9dfcfedb1cb7ec791b3c58422f07e9f2c7fa260477f74f6e" },
         { name: "BetterChatNames", source: plugin_catalog_better_chat_names, description: "Format displayed server channel names as titles", categories: ["Appearance"], appearanceRevision: "435eb8c7dfa38e86a016810782e3bc2cd1879beedbd5095c9da1a6e56bbd4801" },
         { name: "BetterGifAltText", source: plugin_catalog_better_gif_alt_text, description: "Use meaningful filenames for GIFs with generic alt text", categories: ["Media"] },
         { name: "BetterPlusReacts", source: plugin_catalog_better_plus_reacts, description: "React to the matching previous message when you send a plus shortcut", categories: ["Chat"] },
@@ -461,6 +469,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "BlurNSFW", source: plugin_catalog_blur_nsfw, description: "conceal attachments in age-restricted channels until you reveal them", categories: ["Appearance"], appearanceRevision: "e3edcc2c4aa6e765b04dcb42f0c57c97847f458f856da79368398f677b71b128" },
         { name: "BoldText", source: plugin_catalog_bold_text, description: "/bold", commands: ["bold"], categories: ["Chat","Commands"] },
         { name: "BoldUsernames", source: plugin_catalog_bold_usernames, description: "Makes usernames in chat bolder", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Build Discord Link", source: plugin_catalog_build_discord_link, description: "/builddiscordlink", commands: ["builddiscordlink"], categories: ["Commands"], appearanceRevision: "fe5e0c4e8428a16dbec7380657ff718ba561b9ba9a5806b840aa7608ff03d1c8" },
         { name: "BypassPinPrompt", source: plugin_catalog_bypass_pin_prompt, description: "Use Discord’s Pin and Unpin actions without a confirmation prompt", categories: ["Chat"] },
         { name: "Calculator", source: plugin_catalog_calculator, description: "/calc", commands: ["calc"], categories: ["Chat","Commands"] },
         { name: "CallTimeCounter", source: plugin_catalog_call_time_counter, description: "Show the elapsed time in your current call", categories: ["Voice & calls"] },
@@ -648,6 +657,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Markdown Checklist", source: plugin_catalog_markdown_checklist, description: "/markdownchecklist", commands: ["markdownchecklist"], categories: ["Commands"], appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261" },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"], appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b" },
         { name: "Meeting Timestamp", source: plugin_catalog_meeting_timestamp, description: "/meetingtimestamp", commands: ["meetingtimestamp"], categories: ["Commands"], appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce" },
+        { name: "Message Budget", source: plugin_catalog_message_budget, description: "/messagebudget", commands: ["messagebudget"], categories: ["Commands"], appearanceRevision: "871e9aef7a49228b859b27c889d33df5db666dd2a0e986542f90450951cb301f" },
         { name: "MessageBurst", source: plugin_catalog_message_burst, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
         { name: "MessageLatency", source: plugin_catalog_message_latency, description: "Show an estimated send-delay indicator on messages", desktopOnly: true, categories: ["Chat"] },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },
@@ -694,6 +704,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ReadableLineLength", source: plugin_catalog_readable_line_length, description: "limit the width of long message lines", categories: ["Appearance"], appearanceRevision: "e30b087d4786298624d546ab6a0b4832e6091f12cd6ff3ce0b48d5386144f214" },
         { name: "ReadableSpoilers", source: plugin_catalog_readable_spoilers, description: "outline concealed spoilers", categories: ["Appearance"], appearanceRevision: "47032e939cf4992d24d2cebdf4ffb7e2d8afe49fffa2dcba7d9a08921cf75853" },
         { name: "RealtimeTimestamps", source: plugin_catalog_realtime_timestamps, description: "Format cozy timestamps as HH:mm:ss", keywords: "Format compact timestamps as HH:mm:ss Format tooltip timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss Format markdown timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss", categories: ["Appearance"], appearanceRevision: "f1714e6be55c954394bb91974ab838b366e4cc70f0428848bfcef46a51aca753" },
+        { name: "Recurring Timestamps", source: plugin_catalog_recurring_timestamps, description: "/recurringtimes", commands: ["recurringtimes"], categories: ["Commands"], appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7" },
         { name: "RelationshipNotifier", source: plugin_catalog_relationship_notifier, description: "Show a local notification when a friend removes you", categories: ["Profiles"] },
         { name: "RepeatMessages", source: plugin_catalog_repeat_messages, description: "Send the selected message again with its attachments and stickers", categories: ["Chat"] },
         { name: "ReplyPingControl", source: plugin_catalog_reply_ping_control, description: "Choose whether incoming replies ping you on this device", categories: ["Chat"] },
@@ -738,8 +749,11 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Strip URL Tracking", source: plugin_catalog_strip_url_tracking, description: "/striptracking", commands: ["striptracking"], categories: ["Commands"], appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40" },
         { name: "TalkInReverse", source: plugin_catalog_talk_in_reverse, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "TereziTypingQuirk", source: plugin_catalog_terezi_typing_quirk, description: "Apply 3 text rules to message sends and preserve links", categories: ["Chat"] },
+        { name: "Test Result Summary", source: plugin_catalog_test_result_summary, description: "/testresultsummary", commands: ["testresultsummary"], categories: ["Commands"], appearanceRevision: "af2bfbac3d600fd166703c4a2c13b91075a9fb497c568c7d400048bcf1fe1f9a" },
         { name: "TextReplace", source: plugin_catalog_text_replace, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ThinScrollbars", source: plugin_catalog_thin_scrollbars, description: "Thinner scrollbars", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Timestamp Styles", source: plugin_catalog_timestamp_styles, description: "/timestampstyles", commands: ["timestampstyles"], categories: ["Commands"], appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4" },
+        { name: "Total Time", source: plugin_catalog_total_time, description: "/totaltime", commands: ["totaltime"], categories: ["Commands"], appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca" },
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar, description: "make the chat input background translucent", categories: ["Appearance"], appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e" },
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"], appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849" },

@@ -1,0 +1,5 @@
+plugin "Test Result Summary":
+  needs commands.register
+  needs reply.local
+  on command "testresultsummary" with text:
+    reply "${testResultSummary(text)}" else "Paste up to 150 results with Pass, Fail, or Blocked at the start of each line."

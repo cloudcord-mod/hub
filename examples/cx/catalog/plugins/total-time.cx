@@ -1,0 +1,5 @@
+plugin "Total Time":
+  needs commands.register
+  needs reply.local
+  on command "totaltime" with text:
+    reply "${totalTime(text)}" else "Enter up to 100 durations, one per line, such as 2h 30m."

@@ -1,0 +1,7 @@
+plugin "Message Budget":
+  needs commands.register
+  needs reply.local
+  on command "messagebudget":
+    input "text" text
+    input "limit" choice "2000,4000"
+    reply "${messageBudget(text, limit)}" else "Choose a character limit of 2000 or 4000."

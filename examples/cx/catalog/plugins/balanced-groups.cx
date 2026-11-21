@@ -1,0 +1,7 @@
+plugin "Balanced Groups":
+  needs commands.register
+  needs reply.local
+  on command "balancegroups":
+    input "text" text
+    input "count" text
+    reply "${balanceGroups(text, count)}" else "Enter one participant or item per line, then choose 2 to 20 groups."

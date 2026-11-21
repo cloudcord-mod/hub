@@ -1,0 +1,8 @@
+plugin "Recurring Timestamps":
+  needs commands.register
+  needs reply.local
+  on command "recurringtimes":
+    input "start" text
+    input "interval" text
+    input "count" text
+    reply "${recurringTimestamps(start, interval, count)}" else "Enter an ISO date and timezone, an interval such as 7d, and a count from 2 to 20."

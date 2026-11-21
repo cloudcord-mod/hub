@@ -1,0 +1,8 @@
+plugin "Build Discord Link":
+  needs commands.register
+  needs reply.local
+  on command "builddiscordlink":
+    input "server" text
+    input "channel" text
+    input "message" text optional
+    reply "${buildMessageLink(server, channel, message)}" else "Enter Discord IDs, or use @me for a direct-message channel. The message ID is optional."

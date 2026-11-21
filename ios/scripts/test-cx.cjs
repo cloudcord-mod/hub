@@ -2620,6 +2620,34 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(Object.keys(registered).length, 0, platform + " unregisters on disable");
 
         for (const [plugin, examples] of [
+            ["Timestamp Styles", [
+                ["timestampstyles", { text: "1970-01-01T04:00:00+03:00" }, /Short time · <t:3600:t>.*Time with seconds · <t:3600:T>.*Relative · <t:3600:R>/s],
+                ["timestampstyles", { text: "1970-01-01T04:00:00" }, /^Enter a date and time with a timezone/],
+            ]],
+            ["Recurring Timestamps", [
+                ["recurringtimes", { start: "1970-01-01T00:00:00Z", interval: "7d", count: "3" }, /^1\. <t:0:F>.*\n2\. <t:604800:F>.*\n3\. <t:1209600:F>/],
+                ["recurringtimes", { start: "9999-12-31T00:00:00Z", interval: "1d", count: "2" }, /^Enter an ISO date/],
+            ]],
+            ["Build Discord Link", [
+                ["builddiscordlink", { server: "@me", channel: "123456789012345678" }, /^<https:\/\/discord\.com\/channels\/@me\/123456789012345678>$/],
+                ["builddiscordlink", { server: "123456789012345678", channel: "234567890123456789", message: "345678901234567890" }, /^<https:\/\/discord\.com\/channels\/123456789012345678\/234567890123456789\/345678901234567890>$/],
+                ["builddiscordlink", { server: "@me", channel: "18446744073709551616" }, /^Enter Discord IDs/],
+            ]],
+            ["Balanced Groups", [
+                ["balancegroups", { text: "A\r\n B\n\nC\nD\nE", count: "2" }, /Group 1\n- A\n- C\n- E\n\nGroup 2\n- B\n- D/],
+                ["balancegroups", { text: "A", count: "2" }, /^Enter one participant/],
+            ]],
+            ["Test Result Summary", [
+                ["testresultsummary", { text: "Pass: theme\nFAIL plugin\nBlocked install\nFailure untagged\nPass" }, /^Passed 2 · Failed 1 · Blocked 1 · Unclassified 1 · Total 5$/],
+            ]],
+            ["Total Time", [
+                ["totaltime", { text: "1d\n2h30m\n5s" }, /^26h 30m 5s · 95405 seconds across 3 entries$/],
+                ["totaltime", { text: "1h\n2h3h" }, /^Line 2 needs a duration/],
+            ]],
+            ["Message Budget", [
+                ["messagebudget", { text: "A🔔", limit: "2000" }, /^3\/2000 UTF-16 units · 1997 remaining$/],
+                ["messagebudget", { text: "🔔".repeat(1001), limit: "2000" }, /^2002\/2000 UTF-16 units · 2 over$/],
+            ]],
             ["Color Contrast", [
                 ["colorcontrast", { foreground: "#fff", background: "#000" }, /^Contrast ≈ 21\.00:1.*normal text passes/s],
                 ["colorcontrast", { foreground: "#777", background: "#fff" }, /normal text fails.*large text passes/s],

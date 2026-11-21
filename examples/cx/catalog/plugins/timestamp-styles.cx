@@ -1,0 +1,5 @@
+plugin "Timestamp Styles":
+  needs commands.register
+  needs reply.local
+  on command "timestampstyles" with text:
+    reply "${timestampStyles(text)}" else "Enter a date and time with a timezone, such as 2026-11-22T20:00:00+03:00."
