@@ -2006,7 +2006,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
         </>,
         others: <OtherProfilesPanel />,
         templates: <TemplatesPanel current={data} onApply={value => setData({ ...data, ...value })} />,
-        saved: <SavedProfilesPanel current={data} onLoad={value => setData({ ...value })} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar}
+        saved: <SavedProfilesPanel current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar}
             decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
             effectFor={skuId => catalogData?.effects.find(item => item.skuId === skuId)?.title} frameFor={skuId => catalogData?.frames.find(item => item.skuId === skuId)?.label} />,
         connections: <>
@@ -3061,12 +3061,18 @@ function writeSavedProfiles(next: SavedProfile[]) {
 }
 // Only the look is saved; sync bookkeeping stays with the live profile.
 function savedSnapshot(data: CustomProfileData): CustomProfileData {
-    const { syncRevision: _revision, localOnly: _localOnly, ...rest } = data as any;
+    const { syncRevision: _revision, localOnly: _localOnly, hideOtherProfiles: _hideOthers,
+        nativeEditorImages: _nativeEditorImages, hideBadgesWhenSyncOff: _hideBadges, ...rest } = data;
     return JSON.parse(JSON.stringify(rest));
 }
 
-function SavedProfilesPanel({ current, onLoad, fallbackName, fallbackUsername, fallbackAvatar, decorationFor, effectFor, frameFor }: {
-    current: CustomProfileData; onLoad: (data: CustomProfileData) => void; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
+function loadSavedLook(current: CustomProfileData, look: CustomProfileData): CustomProfileData {
+    const { syncRevision, localOnly, hideOtherProfiles, nativeEditorImages, hideBadgesWhenSyncOff } = current;
+    return { ...savedSnapshot(look), syncRevision, localOnly, hideOtherProfiles, nativeEditorImages, hideBadgesWhenSyncOff };
+}
+
+function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUsername, fallbackAvatar, decorationFor, effectFor, frameFor }: {
+    current: CustomProfileData; userId: string; onLoad: (data: CustomProfileData) => void; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
     decorationFor: (asset: string) => string | undefined; effectFor: (skuId: string) => string | undefined; frameFor: (skuId: string) => string | undefined;
 }) {
     const [items, setItems] = React.useState<SavedProfile[]>(readSavedProfiles);
@@ -3081,7 +3087,7 @@ function SavedProfilesPanel({ current, onLoad, fallbackName, fallbackUsername, f
         setName("");
         showToast(`Saved "${label}".`, Toasts.Type.SUCCESS);
     };
-    const load = (item: SavedProfile) => { onLoad({ ...current, ...item.data }); showToast(`Loaded "${item.name}". Press Save to use it.`, Toasts.Type.SUCCESS); };
+    const load = (item: SavedProfile) => { onLoad(loadSavedLook(current, item.data)); showToast(`Loaded "${item.name}". Press Save to use it.`, Toasts.Type.SUCCESS); };
     const date = (time: number) => new Date(time).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
     return <>
         <Section title="Saved profiles" description="Keep copies of your custom profile and switch between them. Saved on this device.">
@@ -3094,12 +3100,13 @@ function SavedProfilesPanel({ current, onLoad, fallbackName, fallbackUsername, f
         <div className="cpx-saved-grid">
             {items.map(item => {
                 const data = item.data;
-                const active = JSON.stringify(data) === currentJson;
-                const badges = profilePreviewBadges(data, UserStore.getCurrentUser()?.id ?? "");
+                const active = JSON.stringify(savedSnapshot(data)) === currentJson;
+                const badges = profilePreviewBadges(data, userId);
                 const rename = () => { commit(items.map(other => other.id === item.id ? { ...other, name: renameText.trim() || other.name } : other)); setRenaming(null); };
                 return <div key={item.id} className="cpx-saved-item">
                     <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar}
-                        decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined} badges={badges} />
+                        decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined}
+                        nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined} badges={badges} />
                     <div className="cpx-saved-foot">
                         <div className="cpx-saved-meta">
                             {renaming === item.id

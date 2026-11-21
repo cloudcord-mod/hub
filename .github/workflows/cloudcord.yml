@@ -4207,8 +4207,12 @@ jobs:
               return { id: created.id, token: created.editToken, visibility };
           }
           function savedSnapshot(data: any) {
-              const { syncRevision: _revision, enabled: _enabled, ...rest } = data || {};
+              const { syncRevision: _revision, enabled: _enabled, hideBadgesWhenSyncOff: _hideBadges, ...rest } = data || {};
               return JSON.parse(JSON.stringify(rest));
+          }
+          function loadSavedLook(current: PreviewSettings, look: Partial<PreviewSettings>): PreviewSettings {
+              return { ...defaultPreview(), ...savedSnapshot(look), enabled: current.enabled,
+                  hideBadgesWhenSyncOff: current.hideBadgesWhenSyncOff, syncRevision: Date.now() };
           }
           // Templates: community profiles from getcloudcord.com/templates.
           const TEMPLATE_CATEGORIES = ["Aesthetic", "Anime", "Gaming", "Minimal", "Dark", "Cute", "Funny", "Other"];
@@ -4398,7 +4402,7 @@ jobs:
                   {!items.length ? <Text variant="text-sm/medium" color="text-muted">No saved profiles yet. Set up your profile, then save it here to come back to it later.</Text> : null}
                   {items.map(item => {
                       const data = item.data || {};
-                      const active = JSON.stringify(data) === currentJson;
+                      const active = JSON.stringify(savedSnapshot(data)) === currentJson;
                       const colors = data.profileColorsEnabled;
                       const rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({ id, iconSrc }));
                       if (data.nitroEnabled) rows.push({ id: nitroBadgeId(data.nitroMonths), iconSrc: milestoneIcon(data.nitroMonths, NITRO_ICONS) });
@@ -4933,7 +4937,7 @@ jobs:
                               preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw();
                           }} /> : null}
                           {(activeTab as string) === "saved" ? <SavedProfiles current={preview} realUser={realCurrentUser} onUse={(data: any) => {
-                              rootSettings.fakeProfile = { ...preview, ...data, enabled: preview.enabled, syncRevision: Date.now() };
+                              rootSettings.fakeProfile = loadSavedLook(preview, data);
                               preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw();
                           }} /> : null}
                           {activeTab === "others" ? <Card><LocalProfiles badges={BADGES} refresh={() => { clearCache(); refreshPreview(); redraw(); }}

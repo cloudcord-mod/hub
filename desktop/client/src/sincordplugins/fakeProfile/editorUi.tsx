@@ -7,7 +7,7 @@
 // Building blocks for the Custom Profile editor. Every control uses the same
 // spacing tokens (see editor.css), so sections can't drift or overlap.
 
-import { ACTIVITY_TYPES, serverTagCustomIcon, serverTagIconURL } from "@utils/profileAppearance";
+import { ACTIVITY_TYPES, serverTagCustomIcon, serverTagIconURL, streamURL } from "@utils/profileAppearance";
 import { React } from "@webpack/common";
 
 let idCounter = 0;
@@ -189,7 +189,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     const color2 = data.accentColor2 != null ? `#${Number(data.accentColor2).toString(16).padStart(6, "0")}` : color;
     const tag = data.serverTag;
     const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
-    const status = data.presenceStatus || "online";
+    const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
     const activity = data.customActivity;
     const activityVerb = activity ? ACTIVITY_TYPES.find(type => type.value === activity.type)?.label : "";
     return <aside className={bare ? "cpx-preview cpx-preview-bare" : "cpx-preview"} aria-label="Preview">
@@ -200,12 +200,12 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
         {mode === "chat" ? <div className="cpx-chat-preview">
             <img src={avatar} alt="" />
             <div><strong>{name}</strong>{tag?.tag && <span className="cpx-card-tag">{tagIcon && <img src={tagIcon} alt="" />}{tag.tag}</span>}<p>Hey! This is how your profile looks in chat.</p></div>
-        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} decorationUrl={decorationUrl} badges={badges} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={{ "--cpx-accent": color, "--cpx-accent2": color2 } as any}>
+        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={{ "--cpx-accent": color, "--cpx-accent2": color2 } as any}>
             <div className="cpx-card-banner" style={banner ? { backgroundImage: `url("${banner.replace(/"/g, "%22")}")` } : undefined} />
             <div className="cpx-card-avatar">
                 <img className="cpx-card-avatar-img" src={avatar} alt="" />
                 {decorationUrl && <img className="cpx-card-decoration" src={decorationUrl} alt="" />}
-                <span className="cpx-card-status" style={{ background: activity?.type === 1 && activity.url ? "#593695" : STATUS_COLORS[status] }} aria-label={`Status: ${status}`} />
+                <span className="cpx-card-status" style={{ background: status === "streaming" ? "#593695" : STATUS_COLORS[status] }} aria-label={`Status: ${status}`} />
             </div>
             <div className="cpx-card-body">
                 <div className="cpx-card-name" style={nameplateUrl ? { backgroundImage: `url("${nameplateUrl}")` } : undefined}>
@@ -231,15 +231,15 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
 }
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, decorationUrl, badges = [] }: {
-    data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; badges?: { id: string; icon: string; label: string; }[];
+export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, decorationUrl, nameplateUrl, badges = [] }: {
+    data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
 }) {
     const hexOf = (value: any) => value != null ? `#${Number(value).toString(16).padStart(6, "0")}` : null;
     const primary = hexOf(data.accentColor);
     const secondary = hexOf(data.accentColor2) || primary;
     const themed = !!primary;
     const banner = data.banner || "";
-    const status = data.customActivity?.type === 1 && data.customActivity?.url ? "streaming" : data.presenceStatus || "online";
+    const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
     const tag = data.serverTag;
     const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
     const activity = data.customActivity;
@@ -253,7 +253,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
             </div>
             {badges.length > 0 && <div className="cpx-dc-badges">{badges.slice(0, 8).map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} />)}</div>}
             <div className="cpx-dc-body">
-                <div className="cpx-dc-names">
+                <div className="cpx-dc-names" style={nameplateUrl ? { backgroundImage: `url("${nameplateUrl}")`, backgroundSize: "cover", backgroundPosition: "center", borderRadius: 8 } : undefined}>
                     <div className="cpx-dc-display">{data.globalName || fallbackName}</div>
                     <div className="cpx-dc-username">
                         <span>{data.username || fallbackUsername}</span>
