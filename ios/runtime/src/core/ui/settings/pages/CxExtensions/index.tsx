@@ -2283,6 +2283,7 @@ export default function CxExtensions() {
     const [search, setSearch] = React.useState("");
     const [pages, setPages] = React.useState({ Plugins: 0, Themes: 0 });
     const [category, setCategory] = React.useState<CxCatalogCategory>("All");
+    const [activeOnly, setActiveOnly] = React.useState(false);
     const [status, setStatus] = React.useState("");
     const [candidate, setCandidate] = React.useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
     const [, refreshOptions] = React.useState(0);
@@ -2890,13 +2891,19 @@ export default function CxExtensions() {
                         <Text style={{ color: resolveSemanticColor(semanticColors.TEXT_DEFAULT), fontWeight: category === value ? "700" : "400" }}>{value}</Text>
                     </Pressable>)}
                 </View>
+                <TableSwitchRow label="Active only" value={activeOnly} onValueChange={(value: boolean) => {
+                    setActiveOnly(value);
+                    setPages({ Plugins: 0, Themes: 0 });
+                }} />
                 {([["Plugins", mobileCatalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
                     if (category !== "All" && (kind === "Themes") !== (category === "Themes")) return null;
-                    const matches = searchCxCatalog(entries, search, category);
-                    const page = pages[kind];
+                    const isActive = (entry: (typeof entries)[number]) => session.source(kind === "Themes" ? "theme" : "plugin:" + entry.name) === entry.source;
+                    const matches = searchCxCatalog(activeOnly ? entries.filter(isActive) : entries, search, category);
+                    const page = Math.min(pages[kind], Math.max(0, Math.ceil(matches.length / 12) - 1));
                     const start = page * 12;
                     return <TableRowGroup key={kind} title={`${kind} (${matches.length})`}>
-                        {matches.slice(start, start + 12).map(entry => <TableRow key={entry.name} label={entry.name} subLabel={entry.description} onPress={() => {
+                        {matches.slice(start, start + 12).map(entry => <TableRow key={entry.name} label={entry.name}
+                            subLabel={isActive(entry) ? ["Active", entry.description].filter(Boolean).join(" · ") : entry.description} onPress={() => {
                             setShowCatalog(false);
                             setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");
                             review(entry.source);

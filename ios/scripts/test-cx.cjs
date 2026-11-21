@@ -939,6 +939,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             if (desktop) find(render(), item => item.props["aria-label"] === "CX catalog category").props.onChange({ currentTarget: { value } });
             else find(render(), item => item.props.accessibilityLabel === `Filter by ${value}`).props.onPress();
         };
+        const filterActive = value => {
+            const toggle = button(render(), "Active only");
+            if (desktop) {
+                if (toggle.props["aria-pressed"] !== value) toggle.props.onClick();
+            } else toggle.props.onValueChange(value);
+        };
         const selectCatalog = name => {
             if (!desktop) click(render(), "Browse catalog");
             searchFor(name);
@@ -4942,6 +4948,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             resolveCatalogEntry('theme "Lazy Wallpaper":\n  background: #101018');
             await new Promise(setImmediate);
             assert.match(find(render(), item => item.props["aria-label"] === "CX source").props.value, /theme "Blue Hour"/);
+            selectCatalog("Lazy Wallpaper");
+            resolveCatalogEntry('theme "Lazy Wallpaper":\n  background: #101018');
+            await new Promise(setImmediate);
+            click(render(), "Review CX");
+            click(render(), "Allow for this session");
+            filterActive(true);
+            assert.ok(button(render(), "Lazy Wallpaper"), "active browser asset stays visible in the active filter");
+            click(render(), "Disable Lazy Wallpaper");
+            assert.ok(!button(render(), "Lazy Wallpaper"));
+            filterActive(false);
         }
         searchFor("Blue Hour");
         click(render(), "Blue Hour");
@@ -4953,7 +4969,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(nativeTheme.semanticColors.BACKGROUND_SECONDARY[0], "#1c2746");
             assert.equal(nativeTheme.background.alpha, 0.75);
         }
+        if (!desktop) click(render(), "Browse catalog");
+        searchFor("");
+        filterActive(true);
+        assert.ok(button(render(), "Blue Hour"));
+        assert.ok(!button(render(), "Midnight"), "inactive catalog entries are filtered out");
+        if (desktop) assert.ok(button(render(), "Active"));
+        else assert.match(button(render(), "Blue Hour").props.subLabel, /^Active/);
         click(render(), "Disable Blue Hour");
+        assert.ok(!button(render(), "Blue Hour"));
+        filterActive(false);
+        if (!desktop) click(render(), "Hide catalog");
         assert.equal(stylesheet, undefined);
         assert.equal(nativeTheme, selectedTheme);
         selectCatalog("Blue Hour");
@@ -4965,6 +4991,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         click(render(), "Allow for this session");
         if (desktop) assert.match(stylesheet.textContent, /linear-gradient\(#12192d00, #12192d00\)/);
         else assert.equal(nativeTheme.background.alpha, 1);
+        if (!desktop) click(render(), "Browse catalog");
+        filterActive(true);
+        assert.ok(!button(render(), "Blue Hour"), "a modified copy does not mark the catalog item active");
+        filterActive(false);
+        if (!desktop) click(render(), "Hide catalog");
         click(render(), "Disable Blue Hour");
 
         for (const [name, background, text, mode] of [

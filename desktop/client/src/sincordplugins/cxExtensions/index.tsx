@@ -850,24 +850,27 @@ async function restoreRememberedAppearance(generation: number) {
     }
 }
 
+const activeCatalogLoaders = new Map<string, () => Promise<string>>();
+
 export function CxSettings() {
     const [source, setSource] = useState("");
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState<CxCatalogCategory>("All");
+    const [activeOnly, setActiveOnly] = useState(false);
     const [pages, setPages] = useState({ Plugins: 0, Themes: 0 });
-    const [candidate, setCandidate] = useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
+    const [candidate, setCandidate] = useState<{ source: string; loader?: () => Promise<string>; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
     const [, refreshOptions] = useState(0);
     const [status, setStatus] = useState("");
     const selection = useRef(0);
     React.useSyncExternalStore(subscribeAppearance, () => appearanceUpdates);
     const rememberId = candidate && bundledAppearanceId(candidate.source, candidate.review);
 
-    function review(next: string) {
+    function review(next: string, loader?: () => Promise<string>) {
         selection.current++;
         setCandidate(undefined);
         try {
             const preview = reviewCx(next);
-            setCandidate({ source: next, review: preview, selected: preview.appearanceOptions.filter(option => option.defaultOn).map(option => option.target) });
+            setCandidate({ source: next, loader, review: preview, selected: preview.appearanceOptions.filter(option => option.defaultOn).map(option => option.target) });
             setStatus("");
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));
@@ -879,7 +882,7 @@ export function CxSettings() {
         const show = (next: string) => {
             if (id !== selection.current) return;
             setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
-            review(next);
+            review(next, typeof source === "function" ? source : undefined);
         };
         if (typeof source === "string") {
             show(source);
@@ -1364,6 +1367,10 @@ export function CxSettings() {
                 toast: body => { void showNotification({ title: candidate.review.name, body }); },
                 applyTheme,
             }, candidate.review.permissions, candidate.selected);
+            if (candidate.loader) {
+                const id = candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name;
+                activeCatalogLoaders.set(id, candidate.loader);
+            }
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
             if (remember && rememberId) {
@@ -1397,16 +1404,27 @@ export function CxSettings() {
                     {CX_CATALOG_CATEGORIES.map(value => <option key={value} value={value}>{value}</option>)}
                 </select>
             </label>
+            <button type="button" aria-pressed={activeOnly} onClick={() => {
+                setActiveOnly(!activeOnly);
+                setPages({ Plugins: 0, Themes: 0 });
+            }}>Active only</button>
             {([["Plugins", cxCatalog.plugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
                 if (category !== "All" && (kind === "Themes") !== (category === "Themes")) return null;
-                const matches = searchCxCatalog(entries, search, category);
-                const page = pages[kind];
+                const isActive = (entry: (typeof entries)[number]) => {
+                    const id = kind === "Themes" ? "theme" : "plugin:" + entry.name;
+                    const activeSource = session.source(id);
+                    if (activeSource === undefined) return false;
+                    return typeof entry.source === "string" ? activeSource === entry.source : activeCatalogLoaders.get(id) === entry.source;
+                };
+                const matches = searchCxCatalog(activeOnly ? entries.filter(isActive) : entries, search, category);
+                const page = Math.min(pages[kind], Math.max(0, Math.ceil(matches.length / 12) - 1));
                 const start = page * 12;
                 return <div key={kind}>
                     <h3>{kind} ({matches.length})</h3>
                     <ul style={{ display: "grid", gap: 8, marginBlock: 8 }}>
                         {matches.slice(start, start + 12).map(entry => <li key={entry.name}>
                             <button title={entry.description} onClick={() => chooseSource(entry.source)}>{entry.name}</button>
+                            {isActive(entry) && <small style={{ marginInlineStart: 8 }}>Active</small>}
                             {entry.desktopOnly && <small style={{ marginInlineStart: 8 }}>Desktop only</small>}
                             {entry.description && <div style={{ color: "var(--text-muted)", marginBlockStart: 3 }}>{entry.description}</div>}
                         </li>)}
@@ -1446,7 +1464,7 @@ export function CxSettings() {
             setCandidate(undefined);
             setSource(event.currentTarget.value);
         }} />
-        <button onClick={() => review(source)}>Review CX</button>
+        <button onClick={() => review(source, candidate?.source === source ? candidate.loader : undefined)}>Review CX</button>
         {candidate && <div>
             <strong>{candidate.review.name}</strong>
             <ul>{candidate.review.effects.map(effect => <li key={effect}>{effect}</li>)}</ul>
@@ -1480,9 +1498,11 @@ export function CxSettings() {
                 <button disabled={rememberingAppearance.has(id)} onClick={() => {
                     if (rememberingAppearance.has(id)) return;
                     if (saved) return writeRememberedAppearance(id).then(() => {
+                        activeCatalogLoaders.delete(id);
                         session.disable(id);
                         setStatus(`${name} disabled.`);
                     }, () => setStatus("Couldn't remove the remembered appearance. Try disabling it again."));
+                    activeCatalogLoaders.delete(id);
                     session.disable(id);
                     setStatus(`${name} disabled.`);
                 }}>Disable {name}</button>
@@ -1845,6 +1865,7 @@ export default definePlugin({
     },
     stop() {
         appearanceGeneration++;
+        activeCatalogLoaders.clear();
         session.clear();
     },
 });
