@@ -39470,6 +39470,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        // PlainFolderIcon by botato (GPL-3.0-or-later).
+        "plain-folder-icon": {
+          plugin: "PlainFolderIcon",
+          label: "Replace the mini server icons in collapsed folders with a plain folder icon",
+          css: ".cc-cx-plain-folder-icon { transition: none !important; transform: translateZ(0); background-color: color-mix(in oklab, var(--custom-folder-color, var(--badge-background-default)) 40%, transparent); }",
+          desktopOnly: true,
+          style: {}
+        },
         // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
         "larger-chat-text": {
           plugin: "LargerChatText",
@@ -52483,6 +52491,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/plain-folder-icon.cx
+  var plain_folder_icon_default;
+  var init_plain_folder_icon = __esm({
+    "../examples/cx/catalog/plugins/plain-folder-icon.cx"() {
+      plain_folder_icon_default = 'plugin "PlainFolderIcon":\n  needs appearance.style\n  style plain-folder-icon\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/polish-wording.cx
   var polish_wording_default;
   var init_polish_wording = __esm({
@@ -54204,6 +54220,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_number_lines();
       init_open_steam_links_in_app();
       init_ping_notifications();
+      init_plain_folder_icon();
       init_polish_wording();
       init_profile_media();
       init_quick_mention();
@@ -56494,6 +56511,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Show message previews for the selected mentions, friends, and direct messages",
             categories: [
               "Chat"
+            ]
+          },
+          {
+            name: "PlainFolderIcon",
+            source: plain_folder_icon_default,
+            description: "Replace the mini server icons in collapsed folders with a plain folder icon",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
             ]
           },
           {
@@ -62245,7 +62271,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }, () => !settings.safeMode?.enabled);
         },
         styleAppearanceTarget(target) {
-          var style = cxAppearanceTargets[target].style;
+          var definition = cxAppearanceTargets[target];
+          if ("desktopOnly" in definition && definition.desktopOnly)
+            throw new Error("This appearance style is available on desktop and browser.");
+          var { style } = definition;
           if ("blurredMedia" in style)
             return registerBlurredMedia(style.blurredMedia);
           if ("reducedMotion" in style)
@@ -63759,7 +63788,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1efc0f12ef39d55a7ff19ec5c0998c199e381fe0";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "96692f0ac8465d583e666756493a02f54efdd8ec";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
