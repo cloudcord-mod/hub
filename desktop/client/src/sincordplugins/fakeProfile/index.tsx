@@ -22,6 +22,7 @@ import { installConnectionSettings } from "@utils/connectionSettings";
 import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
+import { profileMentionAliasScore } from "@utils/profileAppearance";
 
 import { CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, ProfileBadge } from "@api/Badges";
 import { applyBadgeLayout, badgeLayoutKey, defaultBadgeOrder, moveBadgeOrder } from "@api/BadgeLayout";
@@ -901,10 +902,6 @@ function cachedMentionProfile(userId: unknown) {
     if (isMe(userId)) return isEnabled ? storedData : undefined;
     if (!sharedProfiles.has(userId) && !localProfiles[userId]) return;
     return viewedSharedProfile(userId, false);
-}
-
-function foldMentionName(value: string) {
-    return value.normalize("NFKD").toLocaleLowerCase().replace(/\p{M}/gu, "");
 }
 
 function installProfileAvatarHooks(resolver: typeof IconUtils) {
@@ -2356,10 +2353,7 @@ export default definePlugin({
 
     matchesMentionAlias(userId: string, query: unknown) {
         if (typeof query !== "string" || !query || query.length > 128) return false;
-        const data = cachedMentionProfile(userId);
-        if (!data || (!data.username && !data.globalName)) return false;
-        const prefix = foldMentionName(query);
-        return !!prefix && [data.username, data.globalName].some(name => name && foldMentionName(name).startsWith(prefix));
+        return profileMentionAliasScore(cachedMentionProfile(userId), query) > 0;
     },
 
     mentionResultName<T>(userId: string, original: T) {

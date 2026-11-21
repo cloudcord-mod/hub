@@ -32,6 +32,63 @@ assert.equal(context.decorateMessageAuthor({ user, author: unrelated, nick: 'Rea
 profile = null;
 assert.equal(context.decorateMessageAuthor(author, []), author);
 assert.equal(context.decorateMessageAuthor(null, []), null);
+const memberId = '123456789012345678';
+const outsideId = '234567890123456789';
+const guildId = '345678901234567890';
+const channelId = '456789012345678901';
+const member = Object.freeze({ id: memberId, username: 'native' });
+const probes = [];
+const roleRows = Object.freeze([{ id: 'native-role' }]);
+const showMember = row => row.id === memberId;
+function queryUsers(options) {
+    assert.equal(this, searches);
+    if (options.allowSnowflake) {
+        probes.push(options);
+        if (options.query !== memberId || options.filter?.(member) === false) return [];
+        return [{ record: member, score: 10 }];
+    }
+    return options.query === 'native' && options.filter?.(member) !== false ? [{ record: member, score: 10 }] : [];
+}
+const searches = {
+    queryChannelUsers: queryUsers,
+    queryGuildUsers: queryUsers,
+    queryMentionResults(options) {
+        if (options.fail) throw new Error('native error');
+        const users = this.queryChannelUsers(options).map(({ record }) => Object.freeze({ user: record, nick: 'Native Nick' }));
+        return { users: Object.freeze(users), roles: roleRows };
+    },
+    queryGuildMentionResults(options) {
+        return { users: this.queryGuildUsers(options), roles: roleRows };
+    },
+};
+const aliases = new Map([[outsideId, { username: 'custom', globalName: 'Outside' }],
+    [memberId, { username: 'custom_user', globalName: 'Cústom Member' }]]);
+Object.assign(context, {
+    currentUserId: null, settings: {}, sharedProfiles: aliases, getProfileOverride: id => aliases.get(id),
+    addPatch(method, host, handler) {
+        const original = host[method].bind(host);
+        host[method] = (...args) => handler(args, original);
+    },
+});
+context.installMentionAliases(searches);
+const resultOnAlias = searches.queryMentionResults({ channelId, query: 'custom', filter: showMember });
+assert.equal(resultOnAlias.users.length, 1);
+assert.equal(resultOnAlias.users[0].user, member);
+assert.equal(resultOnAlias.users[0].nick, 'Cústom Member');
+assert.equal(resultOnAlias.roles, roleRows);
+assert.equal(probes.length, 2, 'the native resolver still checks each eligible alias candidate');
+assert.ok(probes.every(options => options.request === false && options.channelId === channelId && options.filter === showMember));
+assert.equal(searches.queryMentionResults({ channelId, query: 'custom', filter: () => false }).users.length, 0);
+assert.equal(searches.queryGuildMentionResults({ guildId, query: 'custom' }).users[0].record, member);
+const existingCount = probes.length;
+assert.equal(searches.queryMentionResults({ channelId, query: 'native' }).users[0].user, member);
+assert.equal(searches.queryMentionResults({ channelId, query: 'c' }).users.length, 0);
+assert.throws(() => searches.queryMentionResults({ channelId, query: 'custom', fail: true }), /native error/);
+assert.equal(searches.queryChannelUsers({ channelId, query: 'custom' }).length, 0);
+assert.equal(probes.length, existingCount, 'short and non-mention searches avoid extra work');
+for (let index = 0; index < 5; index++) aliases.set('56789012345678901' + index, { username: 'bounded' });
+assert.equal(searches.queryMentionResults({ channelId, query: 'bounded' }).users.length, 0);
+assert.equal(probes.length - existingCount, 3, 'alias searches probe at most three cached users');
 assert(page.includes('<NameStylePreview />'));
 assert(page.includes('findByProps("AVERAGE_FONT_WIDTH_RATIO")'));
 console.log('PASS: message names/styles update for own and synced users without mutating message records; removal restores originals; native preview wired.');

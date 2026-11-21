@@ -1,6 +1,9 @@
 const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
 const esbuild = require('esbuild');
 const source = fs.readFileSync('src/sincordplugins/fakeProfile/index.tsx', 'utf8');
+const appearance = { exports: {} };
+vm.runInNewContext(esbuild.transformSync(fs.readFileSync('src/utils/profileAppearance.ts', 'utf8'), { loader: 'ts', format: 'cjs' }).code,
+    { module: appearance });
 const own = Object.freeze({ id: 'own', username: 'real-own' });
 const other = Object.freeze({ id: 'other', username: 'real-other' });
 const knownUserId = '123456789012345678';
@@ -20,6 +23,7 @@ const plugin = { fakeCurrentUser: user => { transforms++; return { ...user, user
     fakeOtherUser: user => { transforms++; return { ...user, username: 'custom-other' }; },
     hookUserProfile: value => ({ ...value, bio: 'custom-bio' }) };
 const ctx = vm.createContext({ profileRuntimeActive: true, profileRuntimeGeneration: 1, UserStore: users,
+    profileMentionAliasScore: appearance.exports.profileMentionAliasScore,
     otherUserCache: new WeakMap(), cachedFakeUser: null, cachedOriginalUser: null,
     Vencord: { Webpack: { findByProps: () => profiles } }, realGetUserProfile: null, realGetCurrentUser: null, realGetUserAvatarURL: undefined,
     isEnabled: true, profileVersion: 1, _realUsername: '', _realGlobalName: '', isMe: id => id === 'own',

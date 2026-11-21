@@ -245,6 +245,21 @@ export function profilePreviewTagIcon(tag: ProfileAppearance["serverTag"]): stri
     return serverTagCustomIcon(tag?.icon) || serverTagIconURL(tag);
 }
 
+export function profileMentionAliasScore(data: { username?: unknown; globalName?: unknown; displayName?: unknown; } | undefined, query: unknown) {
+    if (!data || typeof query !== "string" || !query || query.length > 128) return 0;
+    const fold = (value: string) => value.normalize("NFKD").toLocaleLowerCase().replace(/\p{M}/gu, "");
+    const prefix = fold(query);
+    if (!prefix) return 0;
+    let score = 0;
+    for (const name of [data.username, data.globalName, data.displayName]) {
+        if (typeof name !== "string" || !name || name.length > 128) continue;
+        const alias = fold(name);
+        if (alias === prefix) return 2;
+        if (alias.startsWith(prefix)) score = 1;
+    }
+    return score;
+}
+
 export function profilePreviewStatus(data: Pick<ProfileAppearance, "presenceStatus" | "customActivity">, nativeStatus?: unknown) {
     if (nativeStatus === "offline" || nativeStatus === "invisible") return "invisible";
     if (data.customActivity?.type === 1 && streamURL(data.customActivity.url)) return "streaming";

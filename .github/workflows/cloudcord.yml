@@ -439,7 +439,7 @@ jobs:
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
           import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
-          import { profilePreviewStatus, profilePreviewTagIcon } from "@lib/api/profileAppearance";
+          import { profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -3030,9 +3030,78 @@ jobs:
               return copyProfilePresentation(result, fields);
           }
 
+          function installMentionAliases(resolver: any) {
+              if (!resolver) return;
+              let mentionDepth = 0;
+              const profile = (id: string) => isCurrentUser(id) ? (preview.enabled ? preview : undefined) : getProfileOverride(id);
+              for (const method of ["queryMentionResults", "queryGuildMentionResults"]) {
+                  addPatch(method, resolver, (args, original) => {
+                      let result;
+                      mentionDepth++;
+                      try { result = original(...args); } finally { mentionDepth--; }
+                      if (!Array.isArray(result?.users)) return result;
+                      let changed = false;
+                      const users = result.users.map((row: any) => {
+                          const id = row?.user?.id ?? row?.record?.id;
+                          if (!isProfileViewUserId(id)) return row;
+                          const data = profile(id);
+                          const name = data?.globalName || data?.displayName || data?.username;
+                          if (typeof name !== "string" || !name || name.length > 128 || name === row.nick) return row;
+                          changed = true;
+                          return { ...row, nick: name };
+                      });
+                      return changed ? { ...result, users } : result;
+                  });
+              }
+              for (const method of ["queryChannelUsers", "queryGuildUsers"]) {
+                  addPatch(method, resolver, (args, original) => {
+                      const result = original(...args);
+                      const options = args[0];
+                      const query = options?.query;
+                      const scope = method === "queryChannelUsers" ? options?.channelId : options?.guildId;
+                      if (!mentionDepth || !Array.isArray(result) || !isProfileViewUserId(scope) || typeof query !== "string"
+                          || query.length < 2 || query.length > 128) return result;
+                      const limit = options.limit ?? 10;
+                      if (!Number.isInteger(limit) || limit <= result.length || limit > 50) return result;
+
+                      const seen = new Set(result.map(row => row?.record?.id));
+                      const local = (settings as any).cloudcordLocalProfiles;
+                      const candidates = new Set<string>([...Object.keys(local || {}), ...sharedProfiles.keys()]);
+                      if (currentUserId && preview.enabled) candidates.add(currentUserId);
+                      const matches: { id: string; score: number }[] = [];
+                      for (const id of candidates) {
+                          if (!isProfileViewUserId(id) || seen.has(id)) continue;
+                          const score = profileMentionAliasScore(profile(id), query);
+                          if (score) matches.push({ id, score });
+                      }
+                      if (!matches.length) return result;
+                      const combined = [...result];
+                      for (const { id } of matches.sort((a, b) => b.score - a.score).slice(0, 3)) {
+                          if (combined.length >= limit) break;
+                          try {
+                              // The native query owns eligibility. This read stays local
+                              // and uses the original channel, server and filter options.
+                              const rows = original({
+                                  ...options, query: id, limit: 1, allowSnowflake: true, request: false,
+                                  checkRecentlyTalkedOnEmptyQuery: false,
+                              }, ...args.slice(1));
+                              const match = Array.isArray(rows) && rows.find(row => row?.record?.id === id);
+                              if (match) combined.push(match);
+                          } catch { break; }
+                      }
+                      return combined.length === result.length ? result : combined;
+                  });
+              }
+          }
+
           function ensurePatches() {
               if (initialized) return;
               initialized = true;
+              try {
+                  installMentionAliases(findByProps("queryMentionResults", "queryChannelUsers", "queryGuildUsers"));
+              } catch (error: any) {
+                  diagnostics.last = error?.message || "Could not connect mention autocomplete";
+              }
               (globalThis as any).__CLOUDCORD_PRESENTATION_USER__ = (user: any) => {
                   if (!user?.id) return user;
                   if (isCurrentUser(String(user.id))) return preview.enabled ? cloneObject(user, "user") : user;
