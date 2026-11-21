@@ -43021,6 +43021,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Open the selected server role's icon in Discord's image viewer",
           desktopOnly: true
         },
+        "view-server-media": {
+          permission: "servers.mediaview",
+          label: "View the selected server's icon and banner",
+          desktopOnly: true
+        },
+        "copy-server-media-links": {
+          permission: "servers.mediacopy",
+          label: "Copy links to the selected server's icon and banner",
+          desktopOnly: true
+        },
+        "copy-server-details": {
+          permission: "servers.detailscopy",
+          label: "Copy the selected server's name or description",
+          desktopOnly: true
+        },
+        "view-group-dm-icon": {
+          permission: "channels.iconview",
+          label: "View the selected group DM's icon",
+          desktopOnly: true
+        },
         "hide-suggested-channels": {
           permission: "appearance.hide",
           label: "Hide the suggested channels section"
@@ -50315,6 +50335,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "friends.invites.revoke": "Revoke all your friend invites when you run the listed command",
         "spotify.activity": "Read your current Spotify track, album, or artist when the command runs",
         "servers.markread": "Mark unread server channels as read when you run the listed command",
+        "servers.mediaview": "Open an icon or banner from the selected server in Discord\u2019s image viewer",
+        "servers.mediacopy": "Copy the selected server's icon or banner link when you choose the corresponding menu action",
+        "servers.detailscopy": "Copy the selected server's name or description when you choose the corresponding menu action",
+        "channels.iconview": "Open the selected group DM's icon when you choose View Group Icon",
         "channels.markonopen": "Mark the channel you open as read through its newest known message",
         "channels.searchjump": "Look up the first or last matching Discord message in the selected channel when you choose a jump action",
         "messages.jumpblocked": "Jump to messages without changing your block or ignore list",
@@ -50864,6 +50888,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_server_bio = __esm({
     "../examples/cx/catalog/plugins/copy-server-bio.cx"() {
       copy_server_bio_default = 'plugin "CopyServerBio":\n  needs profilemenu.copy\n  on profile menu copy server-profile-bio\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-server-details.cx
+  var copy_server_details_default;
+  var init_copy_server_details = __esm({
+    "../examples/cx/catalog/plugins/copy-server-details.cx"() {
+      copy_server_details_default = 'plugin "Copy Server Details":\n  needs servers.detailscopy\n  use copy-server-details\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-server-media-links.cx
+  var copy_server_media_links_default;
+  var init_copy_server_media_links = __esm({
+    "../examples/cx/catalog/plugins/copy-server-media-links.cx"() {
+      copy_server_media_links_default = 'plugin "Copy Server Media Links":\n  needs servers.mediacopy\n  use copy-server-media-links\n';
     }
   });
 
@@ -53214,11 +53254,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/view-group-dm-icon.cx
+  var view_group_dm_icon_default;
+  var init_view_group_dm_icon = __esm({
+    "../examples/cx/catalog/plugins/view-group-dm-icon.cx"() {
+      view_group_dm_icon_default = 'plugin "View Group DM Icon":\n  needs channels.iconview\n  use view-group-dm-icon\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/view-role-icon.cx
   var view_role_icon_default;
   var init_view_role_icon = __esm({
     "../examples/cx/catalog/plugins/view-role-icon.cx"() {
       view_role_icon_default = 'plugin "ViewRoleIcon":\n  needs guild.rolemedia\n  use view-role-icon\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/view-server-media.cx
+  var view_server_media_default;
+  var init_view_server_media = __esm({
+    "../examples/cx/catalog/plugins/view-server-media.cx"() {
+      view_server_media_default = 'plugin "View Server Media":\n  needs servers.mediaview\n  use view-server-media\n';
     }
   });
 
@@ -54219,6 +54275,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_role_color();
       init_copy_role_mention();
       init_copy_server_bio();
+      init_copy_server_details();
+      init_copy_server_media_links();
       init_copy_server_nickname();
       init_copy_sticker_links();
       init_copy_user_mention();
@@ -54468,7 +54526,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_user_tags();
       init_utf_8_byte_count();
       init_vibe_check();
+      init_view_group_dm_icon();
       init_view_role_icon();
+      init_view_server_media();
       init_voice_count();
       init_voice_join_messages();
       init_vriska_s_typing_quirk();
@@ -55079,6 +55139,25 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy Server Bio",
             categories: [
               "Profiles"
+            ]
+          },
+          {
+            name: "Copy Server Details",
+            source: copy_server_details_default,
+            description: "Copy the selected server's name or description",
+            desktopOnly: true,
+            categories: [
+              "Servers & channels"
+            ]
+          },
+          {
+            name: "Copy Server Media Links",
+            source: copy_server_media_links_default,
+            description: "Copy links to the selected server's icon and banner",
+            desktopOnly: true,
+            categories: [
+              "Media",
+              "Servers & channels"
             ]
           },
           {
@@ -57426,11 +57505,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "View Group DM Icon",
+            source: view_group_dm_icon_default,
+            description: "View the selected group DM's icon",
+            desktopOnly: true,
+            categories: [
+              "Media",
+              "Servers & channels"
+            ]
+          },
+          {
             name: "ViewRoleIcon",
             source: view_role_icon_default,
             description: "Open the selected server role's icon in Discord's image viewer",
             desktopOnly: true,
             categories: [
+              "Media",
+              "Servers & channels"
+            ]
+          },
+          {
+            name: "View Server Media",
+            source: view_server_media_default,
+            description: "View the selected server's icon and banner",
+            desktopOnly: true,
+            categories: [
+              "Media",
               "Servers & channels"
             ]
           },
@@ -61306,6 +61406,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-role-mention":
           case "view-role-icon":
             throw new Error("Role menu actions are available on desktop and browser.");
+          case "view-server-media":
+          case "copy-server-media-links":
+          case "copy-server-details":
+          case "view-group-dm-icon":
+            throw new Error("These server and group menu actions are available on desktop and browser.");
           case "hide-suggested-channels": {
             var suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
             if (!suggested)
@@ -64057,7 +64162,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "600f843c39846c031034a3149bd5d0569827b017";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "475e0d016d0f4a233bcae8bef6343bf1866cfd84";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
