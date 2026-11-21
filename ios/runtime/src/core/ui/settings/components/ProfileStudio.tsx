@@ -427,7 +427,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                         {avatar ? <Image source={{ uri: avatar }} style={{ width: "100%", height: "100%" }} /> : null}
                     </View>
                     {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -10, left: -10, width: 104, height: 104 }} resizeMode="contain" /> : null}
-                    <View style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: card, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
+                    <View accessible accessibilityLabel={`Status: ${status || "online"}`} style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: card, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, borderRadius: 8, overflow: "hidden", paddingVertical: 2 }}>
                     {nameplate ? <PreviewNameplate uri={nameplate} /> : null}
@@ -489,10 +489,10 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
                 {avatar ? <Image source={{ uri: avatar }} style={{ width: "100%", height: "100%" }} /> : null}
             </View>
             {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
-            <View style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 5, borderColor: ring, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
+            <View accessible accessibilityLabel={`Status: ${status || "online"}`} style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 5, borderColor: ring, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
         </View>
         {badges.length ? <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "58%", marginTop: 8, marginRight: 10, paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.panel }}>
-            {badges.slice(0, 8).map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20, tintColor: icon === officialBadgeIcon ? (colors === LIGHT ? "#000000" : "#ffffff") : undefined }} resizeMode="contain" />)}
+            {badges.map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20, tintColor: icon === officialBadgeIcon ? (colors === LIGHT ? "#000000" : "#ffffff") : undefined }} resizeMode="contain" />)}
         </View> : null}
         <View style={{ paddingHorizontal: 14, paddingBottom: 14, paddingTop: badges.length ? 22 : 46, gap: 10 }}>
             <View style={{ gap: 2, borderRadius: 8, overflow: "hidden" }}>

@@ -439,6 +439,7 @@ jobs:
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
           import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
+          import { profilePreviewStatus, profilePreviewTagIcon } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -1100,6 +1101,7 @@ jobs:
           let currentUserId: string | null = null;
           let realCurrentUser: any = null;
           let readNativeProfile: ((id: string) => Parameters<typeof nativeProfilePreviewSurface>[1]) | undefined;
+          let readNativePresence: ((id: string) => unknown) | undefined;
           let userCache = new WeakMap<object, any>();
           let profileCache = new WeakMap<object, any>();
           const SHARED_PROFILE_API = "https://getcloudcord.com";
@@ -3104,6 +3106,7 @@ jobs:
               }
 
               const presenceStore = safeStore("PresenceStore");
+              readNativePresence = typeof presenceStore?.getStatus === "function" ? presenceStore.getStatus.bind(presenceStore) : undefined;
               const presenceData = (id: string) => {
                   if (!id) return null;
                   if (!isCurrentUser(id)) requestSharedProfile(id);
@@ -4579,7 +4582,9 @@ jobs:
           }
           function studioPreviewAppearance(data: Partial<PreviewSettings>, realUser: any) {
               let profile;
+              let nativeStatus;
               try { if (realUser?.id) profile = readNativeProfile?.(realUser.id); } catch {}
+              try { if (realUser?.id) nativeStatus = readNativePresence?.(realUser.id); } catch {}
               const fallback = nativeProfilePreviewSurface(realUser?.id || "", profile, realUser?.banner);
               const primary = data.profileColorsEnabled ? profilePreviewColor(data.primaryColor) : undefined;
               const accent = data.profileColorsEnabled ? profilePreviewColor(data.accentColor) : undefined;
@@ -4597,8 +4602,8 @@ jobs:
                   bannerColor: accent ?? fallback.bannerColor ?? primary ?? fallback.primary,
                   nameplate: data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined,
                   tagText: data.serverTag?.tag,
-                  tagIcon: data.serverTag ? serverTagIconURL(data.serverTag) || undefined : undefined,
-                  status: data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online",
+                  tagIcon: profilePreviewTagIcon(data.serverTag) || undefined,
+                  status: profilePreviewStatus(data, nativeStatus),
               };
           }
           function SavedProfiles({ ownerId, current, realUser, onUse }: { ownerId: string | null; current: any; realUser: any; onUse: (data: any) => void }) {

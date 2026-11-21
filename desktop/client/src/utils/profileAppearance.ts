@@ -241,6 +241,17 @@ export function serverTagIconURL(tag: ProfileAppearance["serverTag"]): string {
     return `https://cdn.discordapp.com/clan-badges/${tag.guildId}/${tag.badge}.png?size=64`;
 }
 
+export function profilePreviewTagIcon(tag: ProfileAppearance["serverTag"]): string {
+    return serverTagCustomIcon(tag?.icon) || serverTagIconURL(tag);
+}
+
+export function profilePreviewStatus(data: Pick<ProfileAppearance, "presenceStatus" | "customActivity">, nativeStatus?: unknown) {
+    if (nativeStatus === "offline" || nativeStatus === "invisible") return "invisible";
+    if (data.customActivity?.type === 1 && streamURL(data.customActivity.url)) return "streaming";
+    if (data.presenceStatus) return data.presenceStatus;
+    return nativeStatus === "idle" || nativeStatus === "dnd" ? nativeStatus : "online";
+}
+
 export function parseServerTagIcon(value: string): { guildId: string; badge: string } | null {
     try {
         const url = new URL(value);

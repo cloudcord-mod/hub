@@ -7,7 +7,7 @@
 // Building blocks for the Custom Profile editor. Every control uses the same
 // spacing tokens (see editor.css), so sections can't drift or overlap.
 
-import { ACTIVITY_TYPES, type nativeProfilePreviewSurface, profilePreviewColor, serverTagCustomIcon, serverTagIconURL, streamURL } from "@utils/profileAppearance";
+import { ACTIVITY_TYPES, type nativeProfilePreviewSurface, profilePreviewColor, profilePreviewStatus, profilePreviewTagIcon } from "@utils/profileAppearance";
 import { React } from "@webpack/common";
 
 let idCounter = 0;
@@ -174,7 +174,7 @@ export function TabList({ value, onChange }: { value: TabId; onChange: (tab: Tab
 
 const STATUS_COLORS: Record<string, string> = { online: "#23a55a", idle: "#f0b232", dnd: "#f23f43", invisible: "#80848e" };
 
-export type ProfilePreviewSurface = ReturnType<typeof nativeProfilePreviewSurface>;
+export type ProfilePreviewSurface = ReturnType<typeof nativeProfilePreviewSurface> & { presenceStatus?: unknown; };
 
 function previewSurface(data: { nitro?: boolean; banner?: string; accentColor?: number; accentColor2?: number; bio?: string; pronouns?: string; }, fallback?: ProfilePreviewSurface) {
     const primary = data.nitro ? profilePreviewColor(data.accentColor) : undefined;
@@ -201,8 +201,8 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     const avatar = data.avatar || fallbackAvatar;
     const { banner, primary, accent, bannerColor, bio, pronouns } = previewSurface(data, fallbackSurface);
     const tag = data.serverTag;
-    const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
-    const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
+    const tagIcon = profilePreviewTagIcon(tag);
+    const status = profilePreviewStatus(data, fallbackSurface?.presenceStatus);
     const activity = data.customActivity;
     const activityVerb = activity ? ACTIVITY_TYPES.find(type => type.value === activity.type)?.label : "";
     return <aside className={bare ? "cpx-preview cpx-preview-bare" : "cpx-preview"} aria-label="Preview">
@@ -256,9 +256,9 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
 }) {
     const { banner, primary, accent, bannerColor, bio, pronouns } = previewSurface(data, fallbackSurface);
     const themed = !!primary;
-    const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
+    const status = profilePreviewStatus(data, fallbackSurface?.presenceStatus);
     const tag = data.serverTag;
-    const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
+    const tagIcon = profilePreviewTagIcon(tag);
     const activity = data.customActivity;
     return <div className={`cpx-dc ${themed ? "cpx-dc-themed" : ""}`} style={themed ? { "--dc-primary": primary, "--dc-secondary": accent } as React.CSSProperties : undefined}>
         <div className="cpx-dc-inner">
@@ -266,9 +266,9 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
             <div className="cpx-dc-avatar">
                 <img className="cpx-dc-avatar-img" src={data.avatar || fallbackAvatar} alt="" />
                 {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}
-                <span className={`cpx-dc-status cpx-dc-status-${status}`} />
+                <span className={`cpx-dc-status cpx-dc-status-${status}`} aria-label={`Status: ${status}`} />
             </div>
-            {badges.length > 0 && <div className="cpx-dc-badges">{badges.slice(0, 8).map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}
+            {badges.length > 0 && <div className="cpx-dc-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}
             <div className="cpx-dc-body">
                 <div className="cpx-dc-names" style={nameplateUrl ? { backgroundImage: `url("${nameplateUrl}")`, backgroundSize: "cover", backgroundPosition: "center", borderRadius: 8 } : undefined}>
                     <div className="cpx-dc-display">{data.globalName || fallbackName}</div>

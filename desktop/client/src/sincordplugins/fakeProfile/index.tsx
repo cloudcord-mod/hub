@@ -15,7 +15,7 @@ import "./editor.css";
 import decorationCatalog from "./decorations.json";
 import { CustomSocialEditor, openSocialDetail } from "./CustomSocial";
 import { ColorField, DiscordProfileCard, Grid2, ImageField, ProfilePreview, type ProfilePreviewSurface, Section, SelectField, Switch, TabId, TabList, TextField } from "./editorUi";
-import { Current, installPresenceHooks, installTagIconSwap, loadCatalog, NameplateEditor, PickerGrid, onCatalogLoaded, ProfileEffectEditor, profileEffectFor, ProfileFrameEditor, refreshPresence, StatusEditor, TagIconEditor, uninstallPresenceHooks, uninstallTagIconSwap } from "./cosmetics";
+import { Current, installPresenceHooks, installTagIconSwap, loadCatalog, NameplateEditor, PickerGrid, onCatalogLoaded, ProfileEffectEditor, profileEffectFor, ProfileFrameEditor, readNativePresenceStatus, refreshPresence, StatusEditor, TagIconEditor, uninstallPresenceHooks, uninstallTagIconSwap } from "./cosmetics";
 import { popNotice, showNotice } from "@api/Notices";
 import { installNativeSocialHooks } from "@utils/nativeSocialHooks";
 import { installConnectionSettings } from "@utils/connectionSettings";
@@ -1942,7 +1942,10 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
     const selectedUser = (selectedAccountId === myId ? realGetCurrentUser?.() : undefined)
         ?? accounts.find(account => account.id === selectedAccountId) ?? UserStore.getUser(selectedAccountId);
     const fallbackAvatar = selectedUser ? (realGetUserAvatarURL ?? IconUtils.getUserAvatarURL)(selectedUser, true, 128) : "https://cdn.discordapp.com/embed/avatars/0.png";
-    const fallbackSurface = nativeProfilePreviewSurface(selectedAccountId, realGetUserProfile?.(selectedAccountId), selectedUser?.banner);
+    const fallbackSurface = {
+        ...nativeProfilePreviewSurface(selectedAccountId, realGetUserProfile?.(selectedAccountId), selectedUser?.banner),
+        presenceStatus: readNativePresenceStatus(selectedAccountId),
+    };
     const currentDecoration = decorations.find(item => item.id === data.decorationAsset) || ALL_DECORATIONS.find(item => item.id === data.decorationAsset) || liveDecorations.find(item => item.id === data.decorationAsset);
     const nameColors = [0, 1, 2].map(index => nameStyle.colors[index] ?? nameStyle.colors[0] ?? 0xffffff);
     const knownTags = availableServerTags(UserStore.getUsers());
@@ -3136,11 +3139,15 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
     const [name, setName] = React.useState("");
     const [renaming, setRenaming] = React.useState<string | null>(null);
     const [renameText, setRenameText] = React.useState("");
-    const commit = (next: SavedProfile[]) => { if (writeSavedProfiles(userId, next)) setItems(next); };
+    const commit = (next: SavedProfile[]) => {
+        if (!writeSavedProfiles(userId, next)) return false;
+        setItems(next);
+        return true;
+    };
     const currentJson = JSON.stringify(savedSnapshot(current));
     const saveCurrent = () => {
         const label = name.trim() || `Profile ${items.length + 1}`;
-        commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(current) }, ...items]);
+        if (!commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(current) }, ...items])) return;
         setName("");
         showToast(`Saved "${label}".`, Toasts.Type.SUCCESS);
     };
@@ -3163,7 +3170,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 const data = item.data;
                 const active = JSON.stringify(savedSnapshot(data)) === currentJson;
                 const badges = profilePreviewBadges(data, userId);
-                const rename = () => { commit(items.map(other => other.id === item.id ? { ...other, name: renameText.trim() || other.name } : other)); setRenaming(null); };
+                const rename = () => { if (commit(items.map(other => other.id === item.id ? { ...other, name: renameText.trim() || other.name } : other))) setRenaming(null); };
                 return <div key={item.id} className="cpx-saved-item">
                     <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
                         decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined}
@@ -3178,7 +3185,10 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                     </div>
                     <div className="cpx-saved-actions">
                         <button type="button" className="cpx-btn cpx-btn-primary" disabled={active} onClick={() => load(item)}>{active ? "In use" : "Use profile"}</button>
-                        <button type="button" className="cpx-icon-btn" aria-label="Update with current profile" title="Replace with your current profile" onClick={() => { commit(items.map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)); showToast(`Updated "${item.name}".`, Toasts.Type.SUCCESS); }}>
+                        <button type="button" className="cpx-icon-btn" aria-label="Update with current profile" title="Replace with your current profile" onClick={() => {
+                            if (commit(items.map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)))
+                                showToast(`Updated "${item.name}".`, Toasts.Type.SUCCESS);
+                        }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg>
                         </button>
                         <button type="button" className="cpx-icon-btn cpx-danger" aria-label="Delete saved profile" title="Delete" onClick={() => commit(items.filter(other => other.id !== item.id))}>

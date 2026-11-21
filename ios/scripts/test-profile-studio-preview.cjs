@@ -11,7 +11,7 @@ const requireMock = name => {
     if (name === "react/jsx-runtime") return { jsx, jsxs: jsx, Fragment: "Fragment" };
     if (name === "react") return react;
     if (name === "@webpack/common") return { React: react };
-    if (name === "@utils/profileAppearance") return { ...profileAppearance, serverTagCustomIcon: icon => icon };
+    if (name === "@utils/profileAppearance") return profileAppearance;
     if (name === "@metro") return { findByStoreName: () => ({ theme }) };
     if (name === "@lib/api/assets") return { findAssetId: () => undefined };
     if (name === "@metro/common/components") return { Text: "Text" };
@@ -23,7 +23,7 @@ function load(file) {
     const module = { exports: {} };
     const source = fs.readFileSync(file, "utf8");
     vm.runInNewContext(transformSync(source, { loader: "tsx", jsx: "automatic", format: "cjs" }).code,
-        { module, exports: module.exports, require: requireMock }, { filename: file });
+        { module, exports: module.exports, require: requireMock, URL }, { filename: file });
     return module.exports;
 }
 
@@ -36,7 +36,7 @@ function flatten(value) {
 
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
 const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
-const mobileProfile = { name: "Preview User", username: "preview", tagText: "CLOD", tagIcon: "https://cdn.example/tag.png",
+const mobileProfile = { name: "Preview User", username: "preview", tagText: "CLOD", tagIcon: "https://getcloudcord.com/tag.png",
     nameplate: "https://cdn.example/nameplate.png", bio: "My bio", badges: ["https://cdn.example/badge.png"] };
 const mobileRender = profile => flatten(PreviewCard(profile));
 const media = nodes => nodes.filter(node => node.type === "Image").map(node => node.props.source.uri);
@@ -48,6 +48,8 @@ theme = "light";
 const mobilePopout = mobileRender(mobileProfile);
 assert.equal(selectTab(mobilePopout, "Popout").props.accessibilityState.selected, true);
 assert.deepEqual(media(mobilePopout), [...mobileProfile.badges, mobileProfile.nameplate, mobileProfile.tagIcon]);
+const badgeIcons = Array.from({ length: 12 }, (_, i) => `https://cdn.example/badge-${i}.png`);
+assert.deepEqual(media(mobileRender({ ...mobileProfile, badges: badgeIcons })).slice(0, badgeIcons.length), badgeIcons);
 assert.equal(mobilePopout.find(node => node.props.children === mobileProfile.name).props.style.color, "#060607");
 theme = "dark";
 assert.equal(mobileRender(mobileProfile).find(node => node.props.children === mobileProfile.name).props.style.color, "#F2F3F5");
@@ -68,7 +70,7 @@ const id = "123456789012345678";
 const hash = "a_" + "1".repeat(32);
 const nativeProfile = { banner: hash, theme_colors: [0, 0x123456], accent_color: 0xabcdef, bio: "Native bio", pronouns: "they/them" };
 const nativeBanner = `https://cdn.discordapp.com/banners/${id}/${hash}.gif?size=512`;
-const fallbackSurface = profileAppearance.nativeProfilePreviewSurface(id, nativeProfile);
+const fallbackSurface = { ...profileAppearance.nativeProfilePreviewSurface(id, nativeProfile), presenceStatus: "idle" };
 assert.equal(fallbackSurface.banner, nativeBanner);
 assert.equal(fallbackSurface.primary, "#000000");
 assert.equal(fallbackSurface.accent, "#123456");
@@ -82,9 +84,16 @@ const frameColor = nodes => nodes.find(node => node.props.className === "cpx-car
 assert.equal(bannerStyle(previewDesktop({})).backgroundImage, `url("${nativeBanner}")`);
 assert.equal(frameColor(previewDesktop({ nitro: false, accentColor: 0xffffff })), "#000000");
 assert.equal(frameColor(previewDesktop({ nitro: true, accentColor: 0xffffff })), "#ffffff");
+assert.ok(previewDesktop({}).some(node => node.props["aria-label"] === "Status: idle"));
 assert.equal(previewDesktop({}).find(node => node.props.className === "cpx-card-bio").props.children, nativeProfile.bio);
 assert.equal(previewDesktop({ pronouns: "she/her" }).find(node => node.props.className === "cpx-card-username").props.children.at(-1), " · she/her");
 layout = "popout";
+const desktopBadgeRows = badgeIcons.map((icon, index) => ({ icon, id: String(index), label: "Badge " + index }));
+const desktopPopout = flatten(ProfilePreview({
+    data: {}, fallbackName: "Native", fallbackUsername: "native", fallbackAvatar: "avatar", fallbackSurface, badges: desktopBadgeRows,
+}));
+assert.deepEqual(flatten(desktopPopout.find(node => node.props.className === "cpx-dc-badges")).filter(node => node.type === "img")
+    .map(node => node.props.src), badgeIcons);
 assert.equal(bannerStyle(previewDesktop({ banner: "https://example.com/draft.png" })).backgroundImage, 'url("https://example.com/draft.png")');
 assert.equal(previewDesktop({ bio: "Draft bio" }).find(node => node.props.className === "cpx-dc-bio").props.children, "Draft bio");
 assert.ok(previewDesktop({}).some(node => node.props.children === nativeProfile.pronouns));
@@ -93,7 +102,8 @@ const workflow = fs.readFileSync(".github/workflows/cloudcord.yml", "utf8");
 const page = workflow.split("cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'")[1].split("\n          TSX")[0];
 const mobileSource = page.slice(page.indexOf("function studioPreviewAppearance("), page.indexOf("function SavedProfiles("));
 const mobileAppearance = vm.runInNewContext(transformSync(mobileSource + "\nstudioPreviewAppearance;", { loader: "ts" }).code,
-    { ...profileAppearance, readNativeProfile: userId => userId === id ? nativeProfile : undefined });
+    { ...profileAppearance, readNativeProfile: userId => userId === id ? nativeProfile : undefined,
+        readNativePresence: userId => userId === id ? "dnd" : undefined });
 assert.match(page, /<K\.PreviewCard \{\.\.\.appearance\}/);
 assert.match(page, /<S\.DiscordProfileCard \{\.\.\.appearance\}/);
 const account = { id, username: "real", getAvatarURL: () => "avatar" };
@@ -103,6 +113,14 @@ assert.equal(nativeLook.name, "real");
 assert.equal(nativeLook.primary, "#000000");
 assert.equal(nativeLook.bio, nativeProfile.bio);
 assert.equal(nativeLook.pronouns, nativeProfile.pronouns);
+assert.equal(nativeLook.status, "dnd");
+assert.equal(mobileAppearance({ presenceStatus: "idle" }, account).status, "idle");
+assert.equal(profileAppearance.profilePreviewStatus({ presenceStatus: "online" }, "offline"), "invisible");
+assert.equal(profileAppearance.profilePreviewStatus({ customActivity: { type: 1, url: "https://www.twitch.tv/cloudcord" } }, "idle"), "streaming");
+const serverTag = { tag: "CLOD", guildId: id, badge: "a".repeat(32), icon: mobileProfile.tagIcon };
+assert.equal(mobileAppearance({ serverTag }, account).tagIcon, mobileProfile.tagIcon);
+assert.equal(mobileAppearance({ serverTag: { ...serverTag, icon: "https://untrusted.example/tag.png" } }, account).tagIcon,
+    profileAppearance.serverTagIconURL(serverTag));
 assert.equal(mobileAppearance({ bio: "", pronouns: "" }, account).bio, "");
 assert.equal(mobileAppearance({ bio: "", pronouns: "" }, account).pronouns, "");
 const mobileDraft = mobileAppearance({ profileColorsEnabled: true, accentColor: "#987654", bannerMedia: { uri: "draft" } }, account);
@@ -110,6 +128,7 @@ assert.equal(mobileDraft.primary, "#987654");
 assert.equal(mobileDraft.bannerColor, "#987654");
 layout = "Popout";
 assert.ok(media(mobileRender(nativeLook)).includes(nativeBanner));
+assert.ok(mobileRender(nativeLook).some(node => node.props.accessibilityLabel === "Status: dnd"));
 assert.ok(media(mobileRender(mobileDraft)).includes("draft"));
 layout = "Profile";
 const twoToneDraft = mobileAppearance({ profileColorsEnabled: true, primaryColor: "#234567", accentColor: "#765432" }, account);
@@ -144,6 +163,34 @@ layout = "Popout";
 assert.equal(mobileRender(staffPreview).find(node => node.props.source?.uri === staffIcon).props.style.tintColor, "#000000");
 assert.match(page, /studioBadgeIcons\(data, ownerId \?\? ""\)/);
 assert.match(page, /badges=\{studioBadgeIcons\(preview\)\}/);
+
+const desktopEditor = fs.readFileSync("desktop/client/src/sincordplugins/fakeProfile/index.tsx", "utf8");
+const savedPanelSource = desktopEditor.slice(desktopEditor.indexOf("function SavedProfilesPanel("),
+    desktopEditor.indexOf("// ---- Copy someone's profile:"));
+let canSave = false;
+let savedRows;
+let lookName = "Main";
+const savedMessages = [];
+const savedPanel = vm.runInNewContext(transformSync(savedPanelSource + "\nSavedProfilesPanel;", { loader: "tsx" }).code, {
+    React: {
+        createElement: (type, props, ...children) => jsx(type, { ...props, children: children.flat() }),
+        useState: initial => typeof initial === "function" ? [initial(), rows => { savedRows = rows; }]
+            : [initial === "" ? lookName : initial, value => { if (initial === "") lookName = value; }],
+    },
+    Section: "Section", readSavedProfiles: () => [], writeSavedProfiles: () => canSave, savedSnapshot: data => data,
+    showToast: message => savedMessages.push(message), Toasts: { Type: { SUCCESS: "success" } },
+});
+const pressSave = () => flatten(savedPanel({ current: {}, userId: id })).find(node => node.type === "button").props.onClick();
+pressSave();
+assert.equal(savedRows, undefined);
+assert.equal(savedMessages.length, 0);
+assert.equal(lookName, "Main");
+canSave = true;
+pressSave();
+assert.equal(savedRows[0].name, "Main");
+assert.equal(lookName, "");
+assert.equal(savedMessages.length, 1);
+
 async function testMobilePreviewOpening() {
     const handoff = page.slice(page.indexOf("const openPreview = async"), page.indexOf("const K = require", page.indexOf("const openPreview = async")));
     const toasts = [];

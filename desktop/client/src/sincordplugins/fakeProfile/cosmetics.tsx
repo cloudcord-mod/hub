@@ -150,6 +150,15 @@ export function installPresenceHooks(lookup: DataLookup) {
     patchedStores = [hookStore(PresenceStore, true, lookup), hookStore(selfStore(), false, lookup)].filter(Boolean) as Patched[];
 }
 
+export function readNativePresenceStatus(userId: string): unknown {
+    if (!userId) return;
+    try {
+        const store = PresenceStore;
+        const original = patchedStores?.find(patch => patch.store === store)?.originals.getStatus;
+        return (original ?? store?.getStatus)?.call(store, userId);
+    } catch { return undefined; }
+}
+
 export function uninstallPresenceHooks() {
     for (const { store, originals, wrappers, state } of patchedStores || []) {
         // A later plugin may retain our wrapper. Make that closure inert without
