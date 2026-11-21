@@ -223,6 +223,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
     for (const platform of ["desktop", "mobile"]) {
         const desktop = platform === "desktop";
         let resolveCatalogEntry;
+        let resolveCxFile;
         const lazyEntry = { name: "Lazy Wallpaper", source: () => new Promise(resolve => { resolveCatalogEntry = resolve; }) };
         const states = [], registered = {}, delivered = [];
         const incomingHooks = [], notifications = [], pendingNotifications = [], desktopAlerts = [], alertRoutes = [];
@@ -801,7 +802,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 },
                 registerColorOverlay(value) { colorOverlays.add(value); return () => colorOverlays.delete(value); },
             },
-            "@lib/api/native/modules": {},
+            "@lib/api/native/modules": { NativeFileModule: {
+                readFile: () => new Promise(resolve => { resolveCxFile = resolve; }),
+            } },
             "@lib/api/native/loader": { isThemeSupported: () => true },
             "@lib/api/settings": { settings },
             "@lib/api/storage": { createStorageAsync: async () => localNotes },
@@ -873,7 +876,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 : path.includes("/defs/native/") ? { default: settingsEntrys.get(path.split("/").at(-1).replace(".tsx", "")) }
                 : { default: path.endsWith("/Spoiler.tsx") ? Spoiler : nativeHeaders.get(path.split("/").at(-1).replace(".tsx", "")) },
                 findByStoreName: name => stores[name], findByStoreNameLazy: name => stores[name], findByProps: name =>
-                name === "AlertModal" ? { AlertModal: "AlertModal", AlertActions: "AlertActions", AlertActionButton: "AlertActionButton" }
+                name === "pickSingle" ? { pickSingle: async () => ({ name: "old.cx", fileCopyUri: "file:///old.cx", size: 100 }) }
+                    : name === "AlertModal" ? { AlertModal: "AlertModal", AlertActions: "AlertActions", AlertActionButton: "AlertActionButton" }
                     : name === "ActionSheetRow" ? { ActionSheetRow: Object.assign(() => null, { Group: "ActionSheetRowGroup" }) }
                     : name === "openLazy" ? { hideActionSheet() { dismissedMentionSheets++; } }
                     : name === "HTTP" ? { HTTP: { get: getJump, patch: request => embedPatches.push(request) } }
@@ -889,7 +893,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                                 : name === "convertNameToSurrogate" ? emojiConverters : name in expressionSheets ? expressionSheets
                                     : name === "showSimpleActionSheet" ? linkSheet : name in headerIcons ? headerIcons : undefined },
             "@metro/common": { React: {
-                useState, useCallback: callback => callback, useSyncExternalStore: (subscribe, readSnapshot) => readSnapshot(),
+                useState, useRef: initial => useState({ current: initial })[0], useCallback: callback => callback,
+                useSyncExternalStore: (subscribe, readSnapshot) => readSnapshot(),
                 createContext: initial => ({ Provider: initial === false ? "MemberRowProvider" : initial === null ? "ExpressionProvider" : "ProfileUserProvider" }),
                 useContext: context => context.Provider === "MemberRowProvider" ? inMemberRow
                     : context.Provider === "ExpressionProvider" ? expressionSelection : profileUser,
@@ -1024,6 +1029,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), name);
         };
         if (desktop) {
+            const catalog = find(render(), item => item.type === "details" && item.props.onToggle);
+            assert.ok(!find(render(), item => item.props["aria-label"] === "Search CX catalog"), "closed catalog skips rendering its search controls");
+            catalog.props.onToggle({ currentTarget: { open: true } });
             const runtime = module.exports.default;
             const { replacement } = runtime.patches.find(patch => patch.find === ".selection,preventEmojiSurrogates:");
             const match = new RegExp(replacement.match.source.replaceAll("\\i", "[a-z]+"));
@@ -5284,6 +5292,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             { name: "Copy Notes" },
         ], "copy notes");
         assert.equal(searched[0].name, "Copy Notes", "name matches rank before feature descriptions");
+        const mutableEntry = { name: "Café Notes", keywords: "private mémoire" };
+        assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "cafenotes")[0], mutableEntry);
+        assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "memoire")[0], mutableEntry);
+        mutableEntry.keywords = "local records";
+        assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "memoire").length, 0);
+        assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "local records")[0], mutableEntry);
         searchFor("/!!!");
         assert.ok(!button(render(), "Color Converter"));
         if (!desktop) {
@@ -5291,6 +5305,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.ok(desktopPlugin, "desktop-only catalog fixture");
             searchFor(desktopPlugin.name);
             assert.ok(!button(render(), desktopPlugin.name));
+            const importFile = click(render(), "Open a .cx file");
+            await new Promise(setImmediate);
+            assert.equal(typeof resolveCxFile, "function", "the file read is pending when the editor changes");
+            const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
+            editor.props.onChangeText('theme "Newer Edit":\n  background: #101018');
+            click(render(), "Review CX");
+            resolveCxFile('theme "Stale Import":\n  background: #101018');
+            await importFile;
+            assert.match(find(render(), item => item.props.accessibilityLabel === "CX source").props.value, /Newer Edit/);
+            assert.ok(button(render(), "Newer Edit"));
         }
         if (desktop) {
             selectCatalog("Lazy Wallpaper");

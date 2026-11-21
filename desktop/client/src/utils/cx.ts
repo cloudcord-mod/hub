@@ -306,27 +306,57 @@ export function getCxCatalogCategories(document: CxDocument): CxCatalogCategory[
     ];
 }
 
-export function searchCxCatalog<T extends { name: string; description?: string; keywords?: string; commands?: readonly string[]; categories?: readonly CxCatalogCategory[]; }>(entries: readonly T[], search: string, category: CxCatalogCategory = "All"): readonly T[] {
+type CxSearchEntry = { name: string; description?: string; keywords?: string; commands?: readonly string[]; categories?: readonly CxCatalogCategory[]; };
+const cxSearchIndex = new WeakMap<CxSearchEntry, {
+    name: string;
+    description?: string;
+    keywords?: string;
+    lowerName: string;
+    compactName: string;
+    searchableText: string;
+}>();
+
+function normalizeCatalogSearch(value: string) {
+    return value.normalize("NFKD").toLowerCase().replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
+function catalogSearchFields(entry: CxSearchEntry) {
+    const { name, description, keywords } = entry;
+    const cached = cxSearchIndex.get(entry);
+    if (cached && cached.name === name && cached.description === description && cached.keywords === keywords) return cached;
+    const fields = {
+        name, description, keywords,
+        lowerName: name.toLowerCase(),
+        compactName: normalizeCatalogSearch(name).replaceAll(" ", ""),
+        searchableText: normalizeCatalogSearch(name + " " + (description ?? "") + " " + (keywords ?? "")),
+    };
+    cxSearchIndex.set(entry, fields);
+    return fields;
+}
+
+export function searchCxCatalog<T extends CxSearchEntry>(entries: readonly T[], search: string, category: CxCatalogCategory = "All"): readonly T[] {
     if (category !== "All") entries = entries.filter(entry => entry.categories?.includes(category));
     const query = search.trim().toLowerCase();
     if (!query) return entries;
-    const normalize = (value: string) => value.normalize("NFKD").toLowerCase().replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
-    const normalizedQuery = normalize(query);
+    const normalizedQuery = normalizeCatalogSearch(query);
     const compactQuery = normalizedQuery.replaceAll(" ", "");
     if (query.startsWith("/")) {
         if (!compactQuery && query !== "/") return [];
-        return entries.filter(entry => entry.commands?.some(command => normalize(command).replaceAll(" ", "").includes(compactQuery)));
+        return entries.filter(entry => entry.commands?.some(command => normalizeCatalogSearch(command).replaceAll(" ", "").includes(compactQuery)));
     }
     const terms = normalizedQuery ? normalizedQuery.split(" ") : [];
-    return entries.map(entry => {
-        const name = entry.name.toLowerCase();
-        if (name === query) return { entry, score: 4 };
-        const compactName = normalize(name).replaceAll(" ", "");
-        if (compactQuery && compactName === compactQuery) return { entry, score: 3 };
-        if (name.includes(query) || compactQuery && compactName.includes(compactQuery)) return { entry, score: 2 };
-        const description = normalize(name + " " + (entry.description ?? "") + " " + (entry.keywords ?? ""));
-        return { entry, score: terms.length && terms.every(term => description.includes(term)) ? 1 : 0 };
-    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score).map(item => item.entry);
+    const exact: T[] = [];
+    const normalized: T[] = [];
+    const partial: T[] = [];
+    const feature: T[] = [];
+    for (const entry of entries) {
+        const { lowerName, compactName, searchableText } = catalogSearchFields(entry);
+        if (lowerName === query) exact.push(entry);
+        else if (compactQuery && compactName === compactQuery) normalized.push(entry);
+        else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery)) partial.push(entry);
+        else if (terms.length && terms.every(term => searchableText.includes(term))) feature.push(entry);
+    }
+    return exact.concat(normalized, partial, feature);
 }
 
 export function parseCx(source: string): CxDocument {

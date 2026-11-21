@@ -1501,6 +1501,7 @@ const activeCatalogLoaders = new Map<string, () => Promise<string>>();
 
 export function CxSettings() {
     const [source, setSource] = useState("");
+    const [showCatalog, setShowCatalog] = useState(false);
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState<CxCatalogCategory>("All");
     const [activeOnly, setActiveOnly] = useState(false);
@@ -1571,51 +1572,53 @@ export function CxSettings() {
     const catalogPlugins = IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : cxCatalog.plugins.filter(entry => !entry.linuxOnly);
     return <section style={{ display: "grid", gap: 12 }}>
         <h2>CX Extensions</h2>
-        <details>
+        <details onToggle={event => setShowCatalog(event.currentTarget.open)}>
             <summary>CX catalog · {catalogPlugins.length} plugins · {cxCatalog.themes.length} themes</summary>
-            <input aria-label="Search CX catalog" placeholder="Search name, feature or /command" value={search} onChange={event => {
-                setSearch(event.currentTarget.value);
-                setPages({ Plugins: 0, Themes: 0 });
-            }} />
-            <label>
-                Category
-                <select aria-label="CX catalog category" value={category} onChange={event => {
-                    setCategory(event.currentTarget.value as CxCatalogCategory);
+            {showCatalog && <>
+                <input aria-label="Search CX catalog" placeholder="Search name, feature or /command" value={search} onChange={event => {
+                    setSearch(event.currentTarget.value);
                     setPages({ Plugins: 0, Themes: 0 });
-                }}>
-                    {CX_CATALOG_CATEGORIES.map(value => <option key={value} value={value}>{value}</option>)}
-                </select>
-            </label>
-            <button type="button" aria-pressed={activeOnly} onClick={() => {
-                setActiveOnly(!activeOnly);
-                setPages({ Plugins: 0, Themes: 0 });
-            }}>Active only</button>
-            {([["Plugins", catalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
-                if (category !== "All" && (kind === "Themes") !== (category === "Themes")) return null;
-                const isActive = (entry: (typeof entries)[number]) => {
-                    const id = kind === "Themes" ? "theme" : "plugin:" + entry.name;
-                    const activeSource = session.source(id);
-                    if (activeSource === undefined) return false;
-                    return typeof entry.source === "string" ? activeSource === entry.source : activeCatalogLoaders.get(id) === entry.source;
-                };
-                const matches = searchCxCatalog(activeOnly ? entries.filter(isActive) : entries, search, category);
-                const page = Math.min(pages[kind], Math.max(0, Math.ceil(matches.length / 12) - 1));
-                const start = page * 12;
-                return <div key={kind}>
-                    <h3>{kind} ({matches.length})</h3>
-                    <ul style={{ display: "grid", gap: 8, marginBlock: 8 }}>
-                        {matches.slice(start, start + 12).map(entry => <li key={entry.name}>
-                            <button title={entry.description} onClick={() => chooseSource(entry.source)}>{entry.name}</button>
-                            {isActive(entry) && <small style={{ marginInlineStart: 8 }}>Active</small>}
-                            {entry.desktopOnly && <small style={{ marginInlineStart: 8 }}>{entry.linuxOnly ? "Linux only" : "Desktop only"}</small>}
-                            {entry.description && <div style={{ color: "var(--text-muted)", marginBlockStart: 3 }}>{entry.description}</div>}
-                        </li>)}
-                    </ul>
-                    {page > 0 && <button onClick={() => setPages({ ...pages, [kind]: page - 1 })}>{`Previous ${kind.toLowerCase()} page`}</button>}
-                    {start + 12 < matches.length && <button onClick={() => setPages({ ...pages, [kind]: page + 1 })}>{`Next ${kind.toLowerCase()} page`}</button>}
-                    {!matches.length && <p>No matches</p>}
-                </div>;
-            })}
+                }} />
+                <label>
+                    Category
+                    <select aria-label="CX catalog category" value={category} onChange={event => {
+                        setCategory(event.currentTarget.value as CxCatalogCategory);
+                        setPages({ Plugins: 0, Themes: 0 });
+                    }}>
+                        {CX_CATALOG_CATEGORIES.map(value => <option key={value} value={value}>{value}</option>)}
+                    </select>
+                </label>
+                <button type="button" aria-pressed={activeOnly} onClick={() => {
+                    setActiveOnly(!activeOnly);
+                    setPages({ Plugins: 0, Themes: 0 });
+                }}>Active only</button>
+                {([["Plugins", catalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
+                    if (category !== "All" && (kind === "Themes") !== (category === "Themes")) return null;
+                    const isActive = (entry: (typeof entries)[number]) => {
+                        const id = kind === "Themes" ? "theme" : "plugin:" + entry.name;
+                        const activeSource = session.source(id);
+                        if (activeSource === undefined) return false;
+                        return typeof entry.source === "string" ? activeSource === entry.source : activeCatalogLoaders.get(id) === entry.source;
+                    };
+                    const matches = searchCxCatalog(activeOnly ? entries.filter(isActive) : entries, search, category);
+                    const page = Math.min(pages[kind], Math.max(0, Math.ceil(matches.length / 12) - 1));
+                    const start = page * 12;
+                    return <div key={kind}>
+                        <h3>{kind} ({matches.length})</h3>
+                        <ul style={{ display: "grid", gap: 8, marginBlock: 8 }}>
+                            {matches.slice(start, start + 12).map(entry => <li key={entry.name}>
+                                <button title={entry.description} onClick={() => chooseSource(entry.source)}>{entry.name}</button>
+                                {isActive(entry) && <small style={{ marginInlineStart: 8 }}>Active</small>}
+                                {entry.desktopOnly && <small style={{ marginInlineStart: 8 }}>{entry.linuxOnly ? "Linux only" : "Desktop only"}</small>}
+                                {entry.description && <div style={{ color: "var(--text-muted)", marginBlockStart: 3 }}>{entry.description}</div>}
+                            </li>)}
+                        </ul>
+                        {page > 0 && <button onClick={() => setPages({ ...pages, [kind]: page - 1 })}>{`Previous ${kind.toLowerCase()} page`}</button>}
+                        {start + 12 < matches.length && <button onClick={() => setPages({ ...pages, [kind]: page + 1 })}>{`Next ${kind.toLowerCase()} page`}</button>}
+                        {!matches.length && <p>No matches</p>}
+                    </div>;
+                })}
+            </>}
         </details>
         <label>
             Open a .cx file

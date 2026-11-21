@@ -2843,8 +2843,10 @@ export default function CxExtensions() {
     const [status, setStatus] = React.useState("");
     const [candidate, setCandidate] = React.useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
     const [, refreshOptions] = React.useState(0);
+    const selection = React.useRef(0);
 
     function review(next: string) {
+        selection.current++;
         setCandidate(undefined);
         try {
             const preview = reviewCx(next);
@@ -2857,6 +2859,7 @@ export default function CxExtensions() {
     }
 
     async function openFile() {
+        const id = ++selection.current;
         let picker: ReturnType<typeof findByProps> | undefined;
         setCandidate(undefined);
         try {
@@ -2868,14 +2871,16 @@ export default function CxExtensions() {
                 mode: "import",
                 copyTo: "cachesDirectory",
             });
+            if (id !== selection.current) return;
             if (!/\.cx$/i.test(file?.name ?? "") || !(file.size > 0 && file.size <= MAX_CX_SOURCE))
                 throw new Error("Choose a .cx file under 512 KB.");
             if (!file.fileCopyUri?.startsWith("file:///")) throw new Error("Could not copy the selected .cx file.");
             const next = await NativeFileModule.readFile(decodeURIComponent(file.fileCopyUri.slice(7)), "utf8");
+            if (id !== selection.current) return;
             setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
             review(next);
         } catch (error) {
-            if (!picker?.isCancel?.(error)) setStatus(String(error instanceof Error ? error.message : error));
+            if (id === selection.current && !picker?.isCancel?.(error)) setStatus(String(error instanceof Error ? error.message : error));
         }
     }
 
@@ -2954,7 +2959,7 @@ export default function CxExtensions() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 style={{ color: "#fff", backgroundColor: "#27282d", minHeight: 140, padding: 12 }}
-                onChangeText={value => { setCandidate(undefined); setSource(value); }}
+                onChangeText={value => { selection.current++; setCandidate(undefined); setSource(value); }}
             />
             <TableRowGroup title="CX Extensions">
                 <TableRow label="Open a .cx file" onPress={openFile} />
