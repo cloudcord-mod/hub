@@ -40287,7 +40287,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (Number.isSafeInteger(range) && range > 0)
       return low + Math.floor(Math.random() * range);
   }
-  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, cxCommandFunctions;
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
       "use strict";
@@ -40406,6 +40406,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "silver",
         "white"
       ];
+      codeFence = "```";
       cxCommandFunctions = {
         snowflakeTimestamp(input) {
           var text = input.trim();
@@ -40467,6 +40468,61 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           } catch (e) {
             return "Invalid JSON.";
           }
+        },
+        formatJson(text) {
+          try {
+            JSON.parse(text);
+          } catch (e) {
+            return "Invalid JSON.";
+          }
+          var tokens2 = text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
+          var depth = 0;
+          var result = "";
+          for (var index = 0; index < tokens2.length; index++) {
+            var token = tokens2[index];
+            var previous = tokens2[index - 1];
+            var closes = token === "}" || token === "]";
+            if (closes)
+              depth--;
+            var empty = closes && (previous === "{" || previous === "[");
+            if (!empty && (closes || previous === "{" || previous === "[" || previous === ",")) {
+              result += "\n" + "  ".repeat(depth);
+            }
+            result += token.startsWith('"') ? token.replaceAll("`", "\\u0060") : token;
+            if (token === ":")
+              result += " ";
+            if (token === "{" || token === "[")
+              depth++;
+            if (result.length > 3900)
+              return "Formatted JSON is too long for one reply.";
+          }
+          return codeFence + "json\n" + result + "\n" + codeFence;
+        },
+        compareLines(before3, after2) {
+          var lines = (value) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
+          var previous = lines(before3);
+          var current = lines(after2);
+          var unmatched = (source, other) => {
+            var counts = /* @__PURE__ */ new Map();
+            for (var line of other)
+              counts.set(line, (counts.get(line) ?? 0) + 1);
+            return source.filter((line2) => {
+              var count = counts.get(line2) ?? 0;
+              if (!count)
+                return true;
+              counts.set(line2, count - 1);
+              return false;
+            });
+          };
+          var removed = unmatched(previous, current);
+          var added = unmatched(current, previous);
+          if (!removed.length && !added.length)
+            return "Both inputs contain the same lines, ignoring order.";
+          var changes = [
+            ...removed.map((line) => "- " + line),
+            ...added.map((line) => "+ " + line)
+          ].join("\n").replaceAll(codeFence, "`\u200B``");
+          return changes.length <= 3900 ? codeFence + "diff\n" + changes + "\n" + codeFence : "Line changes are too long for one reply.";
         },
         wordFrequency(text) {
           var counts = /* @__PURE__ */ new Map();
@@ -49615,6 +49671,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/compare-lines.cx
+  var compare_lines_default;
+  var init_compare_lines = __esm({
+    "../examples/cx/catalog/plugins/compare-lines.cx"() {
+      compare_lines_default = 'plugin "Compare Lines":\n  needs commands.register\n  needs reply.local\n  on command "comparelines":\n    input "before" text optional\n    input "after" text optional\n    reply "${compareLines(before, after)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-bios.cx
   var copy_bios_default;
   var init_copy_bios = __esm({
@@ -50719,6 +50783,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_json_check = __esm({
     "../examples/cx/catalog/plugins/json-check.cx"() {
       json_check_default = 'plugin "JSON Check":\n  needs commands.register\n  needs reply.local\n  on command "jsoncheck" with text:\n    reply "${checkJson(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/json-format.cx
+  var json_format_default;
+  var init_json_format = __esm({
+    "../examples/cx/catalog/plugins/json-format.cx"() {
+      json_format_default = 'plugin "JSON Format":\n  needs commands.register\n  needs reply.local\n  on command "formatjson" with text:\n    reply "${formatJson(text)}"\n';
     }
   });
 
@@ -52672,6 +52744,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_compact_member_list();
       init_compact_messages();
       init_compact_server_list();
+      init_compare_lines();
       init_copy_bios();
       init_copy_emoji_markdown();
       init_copy_file_contents();
@@ -52787,6 +52860,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_in_role();
       init_ingtoninator();
       init_json_check();
+      init_json_format();
       init_jump_to_top();
       init_jump_to();
       init_keyword_notify();
@@ -53188,6 +53262,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             name: "CompactServerList",
             source: compact_server_list_default,
             desktopOnly: true
+          },
+          {
+            name: "Compare Lines",
+            source: compare_lines_default,
+            commands: [
+              "comparelines"
+            ]
           },
           {
             name: "CopyBios",
@@ -53683,6 +53764,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: json_check_default,
             commands: [
               "jsoncheck"
+            ]
+          },
+          {
+            name: "JSON Format",
+            source: json_format_default,
+            commands: [
+              "formatjson"
             ]
           },
           {
@@ -59938,7 +60026,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ea1d1a45f10341d474d6c60e8d30b57ce0d43137";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "03a27fdd04788d777695e2a31d57a1ef48336e6e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
