@@ -40652,7 +40652,31 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (Number.isSafeInteger(range) && range > 0)
       return low + Math.floor(Math.random() * range);
   }
-  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, cxCommandFunctions;
+  function hexChannels(input) {
+    var hex = input.trim().replace(/^#/, "");
+    if (/^[\da-f]{3}$/i.test(hex))
+      hex = [
+        ...hex
+      ].map((digit) => digit.repeat(2)).join("");
+    if (/^[\da-f]{6}$/i.test(hex))
+      return hex.match(/../g).map((value) => Number.parseInt(value, 16));
+  }
+  function utcMidnight(input) {
+    var date = input.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+      return;
+    var instant = /* @__PURE__ */ new Date(date + "T00:00:00Z");
+    if (Number.isFinite(instant.getTime()) && instant.toISOString().startsWith(date + "T"))
+      return instant.getTime();
+  }
+  function integerText(input) {
+    var text = input.trim();
+    if (!/^[+-]?\d+$/.test(text))
+      return;
+    var value = Number(text);
+    return Number.isSafeInteger(value) ? value : void 0;
+  }
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, dayMilliseconds, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
       "use strict";
@@ -40772,6 +40796,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "white"
       ];
       codeFence = "```";
+      dayMilliseconds = 864e5;
       cxCommandFunctions = {
         snowflakeTimestamp(input) {
           var text = input.trim();
@@ -40899,15 +40924,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ].sort(([, left], [, right]) => right - left).slice(0, 10).map(([word2, count]) => (word2.length > 80 ? word2.slice(0, 80) + "\u2026" : word2) + " \u2014 " + count).join("\n") || "No words found.";
         },
         hexToRgb(input) {
-          var hex = input.trim().replace(/^#/, "");
-          if (/^[\da-f]{3}$/i.test(hex))
-            hex = [
-              ...hex
-            ].map((digit) => digit.repeat(2)).join("");
-          if (!/^[\da-f]{6}$/i.test(hex))
+          var channels2 = hexChannels(input);
+          if (channels2)
+            return `\`rgb(${channels2.join(", ")})\``;
+        },
+        colorContrast(foreground, background) {
+          var colors = [
+            hexChannels(foreground),
+            hexChannels(background)
+          ];
+          var luminances = colors.map((channels2) => channels2?.map((channel) => {
+            var rgb = channel / 255;
+            return rgb <= 0.04045 ? rgb / 12.92 : ((rgb + 0.055) / 1.055) ** 2.4;
+          }));
+          var [text, surface] = luminances;
+          if (!text || !surface)
             return;
-          var channels2 = hex.match(/../g).map((value) => Number.parseInt(value, 16));
-          return `\`rgb(${channels2.join(", ")})\``;
+          var relativeLuminance = ([red, green, blue]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+          var a = relativeLuminance(text), b3 = relativeLuminance(surface);
+          var ratio = (Math.max(a, b3) + 0.05) / (Math.min(a, b3) + 0.05);
+          return `Contrast \u2248 ${ratio.toFixed(2)}:1
+WCAG AA normal text ${ratio >= 4.5 ? "passes" : "fails"}
+WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
         },
         rgbToHex(input) {
           var text = input.trim();
@@ -40920,17 +40958,106 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return "`#" + values.map((value) => value.toString(16).padStart(2, "0")).join("") + "`";
         },
         daysBetween(start, end) {
-          var dates = [
-            start,
-            end
-          ].map((value) => value.trim());
-          if (!dates.every((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)))
+          var first = utcMidnight(start), last = utcMidnight(end);
+          if (first === void 0 || last === void 0)
             return;
-          var midnights = dates.map((date) => /* @__PURE__ */ new Date(date + "T00:00:00Z"));
-          if (!midnights.every((date, index) => Number.isFinite(date.getTime()) && date.toISOString().startsWith(dates[index] + "T")))
-            return;
-          var days = (midnights[1].getTime() - midnights[0].getTime()) / 864e5;
+          var days = (last - first) / dayMilliseconds;
           return `${days} ${Math.abs(days) === 1 ? "day" : "days"}`;
+        },
+        offsetDate(input, dayOffset) {
+          var start = utcMidnight(input), days = integerText(dayOffset);
+          if (start === void 0 || days === void 0)
+            return;
+          var date = new Date(start + days * dayMilliseconds);
+          if (Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999)
+            return `\`${date.toISOString().slice(0, 10)}\``;
+        },
+        unixToIso(input, unit) {
+          var value = integerText(input);
+          if (value === void 0 || unit !== "seconds" && unit !== "milliseconds")
+            return;
+          var instant = new Date(unit === "seconds" ? value * 1e3 : value);
+          if (Number.isFinite(instant.getTime()))
+            return `\`${instant.toISOString()}\``;
+        },
+        isoToUnix(input) {
+          var parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
+          if (!parsed)
+            return;
+          var [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
+          var midnight = utcMidnight(date);
+          if (midnight === void 0 || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59)
+            return;
+          var offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
+          var ms = midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1e3 + Number(fraction.padEnd(3, "0"));
+          return `Seconds \`${ms / 1e3}\`
+Milliseconds \`${ms}\``;
+        },
+        convertNumberBase(input, from, to) {
+          var match = /^([+-]?)([0-9a-z]{1,256})$/i.exec(input.trim());
+          var source = integerText(from), destination = integerText(to);
+          if (!match || source === void 0 || destination === void 0 || source < 2 || source > 36 || destination < 2 || destination > 36)
+            return;
+          var base = BigInt(source);
+          var value = 0n;
+          for (var character of match[2]) {
+            var digit = Number.parseInt(character, 36);
+            if (digit >= source)
+              return;
+            value = value * base + BigInt(digit);
+          }
+          return `\`${(match[1] === "-" ? -value : value).toString(destination).toUpperCase()}\``;
+        },
+        aspectRatio(width, height) {
+          var w = integerText(width), h = integerText(height);
+          if (w === void 0 || h === void 0 || w < 1 || h < 1)
+            return;
+          var a = w, b3 = h;
+          while (b3)
+            [a, b3] = [
+              b3,
+              a % b3
+            ];
+          return `\`${w / a}:${h / a}\` \xB7 ${w} \xD7 ${h} px`;
+        },
+        utf8Size(text) {
+          var bytes = 0;
+          for (var character of text) {
+            var code = character.codePointAt(0);
+            bytes += code <= 127 ? 1 : code <= 2047 ? 2 : code <= 65535 ? 3 : 4;
+          }
+          return `${bytes} UTF-8 ${bytes === 1 ? "byte" : "bytes"}`;
+        },
+        inspectUrl(input) {
+          var text = input.trim();
+          if (!/^https?:\/\//i.test(text) || text.length > 3e3 || /[\s\\]/.test(text))
+            return;
+          try {
+            var url2 = new URL(text);
+            if (url2.username || url2.password)
+              return;
+            var count = url2.search.slice(1).split("&").filter(Boolean).length;
+            return `Scheme \`${url2.protocol.slice(0, -1)}\`
+Host \`${url2.host.replaceAll("`", "%60")}\`
+Query parameters ${count}
+Fragment ${url2.hash ? "present" : "absent"}`;
+          } catch (e) {
+          }
+        },
+        tsvToMarkdown(input) {
+          var rows = input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row2) => row2.split("	"));
+          var columns = rows[0].length;
+          if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
+            return;
+          var row = (cells) => "| " + cells.map((cell) => cell.replace(/[\\|]/g, "\\$&").replace(/`(?=``)/g, "`\u200B").trim()).join(" | ") + " |";
+          var output = [
+            row(rows[0]),
+            row(Array.from({
+              length: columns
+            }, () => "---")),
+            ...rows.slice(1).map(row)
+          ].join("\n");
+          return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
         },
         discordTimestamp(seconds, format) {
           var input = seconds.trim();
@@ -49918,6 +50045,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/aspect-ratio.cx
+  var aspect_ratio_default;
+  var init_aspect_ratio = __esm({
+    "../examples/cx/catalog/plugins/aspect-ratio.cx"() {
+      aspect_ratio_default = 'plugin "Aspect Ratio":\n  needs commands.register\n  needs reply.local\n  on command "aspectratio":\n    input "width" integer\n    input "height" integer\n    reply "${aspectRatio(width, height)}" else "Enter positive whole-number dimensions."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/at-someone.cx
   var at_someone_default;
   var init_at_someone = __esm({
@@ -50126,6 +50261,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/color-contrast.cx
+  var color_contrast_default;
+  var init_color_contrast = __esm({
+    "../examples/cx/catalog/plugins/color-contrast.cx"() {
+      color_contrast_default = 'plugin "Color Contrast":\n  needs commands.register\n  needs reply.local\n  on command "colorcontrast":\n    input "foreground" text\n    input "background" text\n    reply "${colorContrast(foreground, background)}" else "Enter foreground and background hex colors, like #fff and #222222."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/color-converter.cx
   var color_converter_default;
   var init_color_converter = __esm({
@@ -50307,6 +50450,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_dashless = __esm({
     "../examples/cx/catalog/plugins/dashless.cx"() {
       dashless_default = 'plugin "Dashless":\n  needs appearance.style\n  use dashless-channel-names\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/date-offset.cx
+  var date_offset_default;
+  var init_date_offset = __esm({
+    "../examples/cx/catalog/plugins/date-offset.cx"() {
+      date_offset_default = 'plugin "Date Offset":\n  needs commands.register\n  needs reply.local\n  on command "dateoffset":\n    input "date" text\n    input "days" integer\n    reply "${offsetDate(date, days)}" else "Enter a calendar date as YYYY-MM-DD and a whole number of days to add or subtract."\n';
     }
   });
 
@@ -51889,6 +52040,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/number-base-converter.cx
+  var number_base_converter_default;
+  var init_number_base_converter = __esm({
+    "../examples/cx/catalog/plugins/number-base-converter.cx"() {
+      number_base_converter_default = 'plugin "Number Base Converter":\n  needs commands.register\n  needs reply.local\n  on command "convertbase":\n    input "number" text\n    input "from" integer\n    input "to" integer\n    reply "${convertNumberBase(number, from, to)}" else "Enter up to 256 digits without prefixes and use bases from 2 to 36."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/number-lines.cx
   var number_lines_default;
   var init_number_lines = __esm({
@@ -52353,6 +52512,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/tsv-to-markdown.cx
+  var tsv_to_markdown_default;
+  var init_tsv_to_markdown = __esm({
+    "../examples/cx/catalog/plugins/tsv-to-markdown.cx"() {
+      tsv_to_markdown_default = 'plugin "TSV to Markdown":\n  needs commands.register\n  needs reply.local\n  on command "tsvtomarkdown" with text:\n    reply "${tsvToMarkdown(text)}" else "Paste tab-separated rows with a header and the same number of columns on every line."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/unicode-inspector.cx
   var unicode_inspector_default;
   var init_unicode_inspector = __esm({
@@ -52385,6 +52552,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/unix-date-converter.cx
+  var unix_date_converter_default;
+  var init_unix_date_converter = __esm({
+    "../examples/cx/catalog/plugins/unix-date-converter.cx"() {
+      unix_date_converter_default = 'plugin "Unix Date Converter":\n  needs commands.register\n  needs reply.local\n  on command "unixtoiso":\n    input "timestamp" text\n    input "unit" choice "seconds,milliseconds"\n    reply "${unixToIso(timestamp, unit)}" else "Enter a whole Unix timestamp within the supported date range."\n  on command "isotounix" with text:\n    reply "${isoToUnix(text)}" else "Enter an ISO date and time with seconds and a timezone, like 2026-01-01T12:30:00Z."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/unsuppress-embeds.cx
   var unsuppress_embeds_default;
   var init_unsuppress_embeds = __esm({
@@ -52401,6 +52576,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/url-inspector.cx
+  var url_inspector_default;
+  var init_url_inspector = __esm({
+    "../examples/cx/catalog/plugins/url-inspector.cx"() {
+      url_inspector_default = 'plugin "URL Inspector":\n  needs commands.register\n  needs reply.local\n  on command "inspecturl" with text:\n    reply "${inspectUrl(text)}" else "Enter an HTTP or HTTPS URL without embedded credentials."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/user-notes.cx
   var user_notes_default;
   var init_user_notes = __esm({
@@ -52414,6 +52597,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_user_tags = __esm({
     "../examples/cx/catalog/plugins/user-tags.cx"() {
       user_tags_default = 'plugin "UserTags":\n  needs profile.localtags\n  needs commands.register\n  needs reply.local\n  use user-tags\n  on command "find-user-tags":\n    input "query" text\n    find users tagged "query"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/utf-8-byte-count.cx
+  var utf_8_byte_count_default;
+  var init_utf_8_byte_count = __esm({
+    "../examples/cx/catalog/plugins/utf-8-byte-count.cx"() {
+      utf_8_byte_count_default = 'plugin "UTF-8 Byte Count":\n  needs commands.register\n  needs reply.local\n  on command "utf8size" with text:\n    reply "${utf8Size(text)}"\n';
     }
   });
 
@@ -53374,6 +53565,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_always_animate();
       init_amoled_mode();
       init_anonymise_file_names();
+      init_aspect_ratio();
       init_at_someone();
       init_auto_vaporwave();
       init_avatar_grabber();
@@ -53400,6 +53592,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_clear_urls();
       init_client_side_block();
       init_cloud_cord_accent();
+      init_color_contrast();
       init_color_converter();
       init_color_text();
       init_colorful_mentions();
@@ -53423,6 +53616,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_count_lines();
       init_custom_timestamps();
       init_dashless();
+      init_date_offset();
       init_days_between();
       init_declutter();
       init_decode_base64();
@@ -53576,6 +53770,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_no_unblock_to_jump();
       init_normalize_message_links();
       init_notify_when_muted();
+      init_number_base_converter();
       init_number_lines();
       init_open_steam_links_in_app();
       init_ping_notifications();
@@ -53634,14 +53829,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_translate();
       init_transparent_chat_bar();
       init_trim_lines();
+      init_tsv_to_markdown();
       init_unicode_inspector();
       init_unindent();
       init_unique_lines();
       init_unit_converter();
+      init_unix_date_converter();
       init_unsuppress_embeds();
       init_url_component_codec();
+      init_url_inspector();
       init_user_notes();
       init_user_tags();
+      init_utf_8_byte_count();
       init_vibe_check();
       init_voice_count();
       init_voice_join_messages();
@@ -53805,6 +54004,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Commands",
               "Media"
+            ]
+          },
+          {
+            name: "Aspect Ratio",
+            source: aspect_ratio_default,
+            description: "/aspectratio",
+            commands: [
+              "aspectratio"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -54054,6 +54264,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             appearanceRevision: "980c573677ccb78c99e84cb288cf401ae3ecd11dc5d5436b4cd0fc145c5e3780"
           },
           {
+            name: "Color Contrast",
+            source: color_contrast_default,
+            description: "/colorcontrast",
+            commands: [
+              "colorcontrast"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
             name: "Color Converter",
             source: color_converter_default,
             description: "/hextorgb \xB7 /rgbtohex",
@@ -54260,6 +54481,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               "Appearance"
             ],
             appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9"
+          },
+          {
+            name: "Date Offset",
+            source: date_offset_default,
+            description: "/dateoffset",
+            commands: [
+              "dateoffset"
+            ],
+            categories: [
+              "Commands"
+            ]
           },
           {
             name: "Days Between",
@@ -55683,6 +55915,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ]
           },
           {
+            name: "Number Base Converter",
+            source: number_base_converter_default,
+            description: "/convertbase",
+            commands: [
+              "convertbase"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
             name: "Number Lines",
             source: number_lines_default,
             description: "/numberlines",
@@ -56222,6 +56465,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ]
           },
           {
+            name: "TSV to Markdown",
+            source: tsv_to_markdown_default,
+            description: "/tsvtomarkdown",
+            commands: [
+              "tsvtomarkdown"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
             name: "Unicode Inspector",
             source: unicode_inspector_default,
             description: "/unicodeinfo",
@@ -56264,6 +56518,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ]
           },
           {
+            name: "Unix Date Converter",
+            source: unix_date_converter_default,
+            description: "/unixtoiso \xB7 /isotounix",
+            commands: [
+              "unixtoiso",
+              "isotounix"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
             name: "UnsuppressEmbeds",
             source: unsuppress_embeds_default,
             description: "Suppress or unsuppress embeds in the selected message",
@@ -56278,6 +56544,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             commands: [
               "urlencode",
               "urldecode"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
+            name: "URL Inspector",
+            source: url_inspector_default,
+            description: "/inspecturl",
+            commands: [
+              "inspecturl"
             ],
             categories: [
               "Commands"
@@ -56301,6 +56578,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Commands",
               "Profiles"
+            ]
+          },
+          {
+            name: "UTF-8 Byte Count",
+            source: utf_8_byte_count_default,
+            description: "/utf8size",
+            commands: [
+              "utf8size"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -62898,7 +63186,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f2e8ffd2cd7f04623b18e3c69d4a14587004ccc";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5ca9df770b6636fba3d73e26248b8a5c88aa27fc";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
