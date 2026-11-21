@@ -20957,11 +20957,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function Action({ label: label2, onPress, primary, danger, disabled, grow }) {
+  function Action({ label: label2, onPress, primary, danger, disabled, grow, selected }) {
     return /* @__PURE__ */ jsx(import_react_native24.Pressable, {
-      accessibilityRole: "button",
+      accessibilityRole: selected === void 0 ? "button" : "tab",
       accessibilityState: {
-        disabled: !!disabled
+        disabled: !!disabled,
+        selected
       },
       disabled,
       onPress,
@@ -20970,7 +20971,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         alignItems: "center",
         justifyContent: "center",
         minHeight: 40,
-        paddingHorizontal: GAP.lg,
+        paddingHorizontal: selected === void 0 ? GAP.lg : GAP.xs,
         borderRadius: R2.sm,
         backgroundColor: danger ? C3.red : primary ? C3.brand : C3.raised(),
         opacity: disabled ? 0.45 : pressed ? 0.8 : 1
@@ -22025,6 +22026,55 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }, index))
     });
   }
+  function PreviewTag({ label: label2, icon: icon3 }) {
+    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+      style: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        paddingHorizontal: 6,
+        paddingVertical: 1,
+        borderRadius: 4,
+        backgroundColor: C3.line()
+      },
+      children: [
+        icon3 ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+          source: {
+            uri: icon3
+          },
+          style: {
+            width: 12,
+            height: 12
+          },
+          resizeMode: "contain"
+        }) : null,
+        /* @__PURE__ */ jsx(Text, {
+          variant: "text-xs/bold",
+          numberOfLines: 1,
+          style: {
+            color: C3.text()
+          },
+          children: label2
+        })
+      ]
+    });
+  }
+  function PreviewNameplate({ uri }) {
+    return /* @__PURE__ */ jsx(import_react_native24.Image, {
+      source: {
+        uri
+      },
+      style: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        borderRadius: 8
+      },
+      resizeMode: "cover"
+    });
+  }
   function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }) {
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.brand;
@@ -22054,6 +22104,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             label: mode,
             grow: true,
             primary: layout === mode,
+            selected: layout === mode,
             onPress: () => setLayout(mode)
           }, mode))
         }),
@@ -22082,14 +22133,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 gap: 4
               },
               children: [
-                /* @__PURE__ */ jsxs(Text, {
-                  variant: "text-md/bold",
+                /* @__PURE__ */ jsxs(import_react_native24.View, {
                   style: {
-                    color: C3.text()
+                    flexDirection: "row",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: 6
                   },
                   children: [
-                    name,
-                    tagText ? ` \xB7 ${tagText}` : ""
+                    /* @__PURE__ */ jsx(Text, {
+                      variant: "text-md/bold",
+                      numberOfLines: 1,
+                      style: {
+                        flexShrink: 1,
+                        color: C3.text()
+                      },
+                      children: name
+                    }),
+                    tagText ? /* @__PURE__ */ jsx(PreviewTag, {
+                      label: tagText,
+                      icon: tagIcon
+                    }) : null
                   ]
                 }),
                 /* @__PURE__ */ jsx(Text, {
@@ -22111,11 +22175,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           primary,
           secondary: accent,
           decoration,
+          nameplate,
           status,
           customStatus,
           bio,
           activity,
           tagText,
+          tagIcon,
           badges
         }) : /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
@@ -22162,17 +22228,25 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     height: 84
                   },
                   children: [
-                    /* @__PURE__ */ jsx(import_react_native24.Image, {
-                      source: {
-                        uri: avatar
-                      },
+                    /* @__PURE__ */ jsx(import_react_native24.View, {
                       style: {
                         width: 84,
                         height: 84,
                         borderRadius: 42,
                         borderWidth: 6,
-                        borderColor: card
-                      }
+                        borderColor: card,
+                        backgroundColor: C3.raised(),
+                        overflow: "hidden"
+                      },
+                      children: avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+                        source: {
+                          uri: avatar
+                        },
+                        style: {
+                          width: "100%",
+                          height: "100%"
+                        }
+                      }) : null
                     }),
                     decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
                       source: {
@@ -22206,62 +22280,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
+                    flexWrap: "wrap",
                     gap: 6,
                     borderRadius: 8,
                     overflow: "hidden",
                     paddingVertical: 2
                   },
                   children: [
-                    nameplate ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-                      source: {
-                        uri: nameplate
-                      },
-                      style: {
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0
-                      },
-                      resizeMode: "cover"
+                    nameplate ? /* @__PURE__ */ jsx(PreviewNameplate, {
+                      uri: nameplate
                     }) : null,
                     /* @__PURE__ */ jsx(Text, {
                       variant: "heading-lg/bold",
                       numberOfLines: 1,
                       style: {
+                        flexShrink: 1,
                         color: C3.text()
                       },
                       children: name
                     }),
-                    tagText ? /* @__PURE__ */ jsxs(import_react_native24.View, {
-                      style: {
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 4,
-                        paddingHorizontal: 6,
-                        paddingVertical: 1,
-                        borderRadius: 4,
-                        backgroundColor: "rgba(0,0,0,0.35)"
-                      },
-                      children: [
-                        tagIcon ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-                          source: {
-                            uri: tagIcon
-                          },
-                          style: {
-                            width: 12,
-                            height: 12
-                          },
-                          resizeMode: "contain"
-                        }) : null,
-                        /* @__PURE__ */ jsx(Text, {
-                          variant: "text-xs/bold",
-                          style: {
-                            color: C3.text()
-                          },
-                          children: tagText
-                        })
-                      ]
+                    tagText ? /* @__PURE__ */ jsx(PreviewTag, {
+                      label: tagText,
+                      icon: tagIcon
                     }) : null
                   ]
                 }),
@@ -22433,15 +22473,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, decoration, status, customStatus, bio, activity, tagText, badges = [] }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }) {
     var themed = !!primary;
-    var base = "#111214";
-    var ring = themed ? "#1A1B1E" : base;
+    var colors = palette();
+    var ring = themed ? colors.panel : colors.page;
+    var themedSurface = colors === LIGHT ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.55)";
     var inner = /* @__PURE__ */ jsxs(import_react_native24.View, {
       style: {
         borderRadius: themed ? 6 : 10,
         overflow: "hidden",
-        backgroundColor: themed ? "rgba(0,0,0,0.5)" : base
+        backgroundColor: themed ? themedSurface : colors.page
       },
       children: [
         /* @__PURE__ */ jsx(import_react_native24.View, {
@@ -22530,7 +22571,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             paddingHorizontal: 4,
             paddingVertical: 3,
             borderRadius: 8,
-            backgroundColor: "rgba(0,0,0,0.35)"
+            backgroundColor: colors.panel
           },
           children: badges.slice(0, 8).map((icon3, index) => /* @__PURE__ */ jsx(import_react_native24.Image, {
             source: {
@@ -22553,14 +22594,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           children: [
             /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
-                gap: 2
+                gap: 2,
+                borderRadius: 8,
+                overflow: "hidden"
               },
               children: [
+                nameplate ? /* @__PURE__ */ jsx(PreviewNameplate, {
+                  uri: nameplate
+                }) : null,
                 /* @__PURE__ */ jsx(Text, {
                   variant: "heading-lg/extrabold",
                   numberOfLines: 1,
                   style: {
-                    color: "#FFFFFF"
+                    color: colors.text
                   },
                   children: name
                 }),
@@ -22576,30 +22622,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       variant: "text-sm/medium",
                       numberOfLines: 1,
                       style: {
-                        color: "#DBDEE1"
+                        flexShrink: 1,
+                        color: colors.text
                       },
                       children: username
                     }),
-                    tagText ? /* @__PURE__ */ jsx(import_react_native24.View, {
-                      style: {
-                        paddingHorizontal: 5,
-                        borderRadius: 4,
-                        backgroundColor: "rgba(0,0,0,0.35)"
-                      },
-                      children: /* @__PURE__ */ jsx(Text, {
-                        variant: "text-xs/bold",
-                        style: {
-                          color: "#DBDEE1"
-                        },
-                        children: tagText
-                      })
+                    tagText ? /* @__PURE__ */ jsx(PreviewTag, {
+                      label: tagText,
+                      icon: tagIcon
                     }) : null,
                     pronouns ? /* @__PURE__ */ jsxs(Text, {
                       variant: "text-sm/medium",
                       numberOfLines: 1,
                       style: {
-                        color: "#DBDEE1",
-                        opacity: 0.8
+                        flexShrink: 1,
+                        color: colors.muted
                       },
                       children: [
                         "\u2022 ",
@@ -22617,13 +22654,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 paddingHorizontal: 10,
                 paddingVertical: 6,
                 borderRadius: 12,
-                backgroundColor: "rgba(255,255,255,0.08)"
+                backgroundColor: colors.line
               },
               children: /* @__PURE__ */ jsx(Text, {
                 variant: "text-sm/medium",
                 numberOfLines: 1,
                 style: {
-                  color: "#DBDEE1"
+                  color: colors.text
                 },
                 children: customStatus
               })
@@ -22633,14 +22670,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 gap: 8,
                 padding: 10,
                 borderRadius: 8,
-                backgroundColor: "rgba(255,255,255,0.05)"
+                backgroundColor: colors.line
               },
               children: [
                 bio ? /* @__PURE__ */ jsx(Text, {
                   variant: "text-sm/medium",
                   numberOfLines: 3,
                   style: {
-                    color: "#DBDEE1"
+                    color: colors.text
                   },
                   children: bio
                 }) : null,
@@ -22652,7 +22689,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     /* @__PURE__ */ jsx(Text, {
                       variant: "text-xs/bold",
                       style: {
-                        color: "#B5BAC1"
+                        color: colors.muted
                       },
                       children: (activity.verb || "Playing").toUpperCase()
                     }),
@@ -22660,7 +22697,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       variant: "text-sm/bold",
                       numberOfLines: 1,
                       style: {
-                        color: "#F2F3F5"
+                        color: colors.text
                       },
                       children: activity.name
                     }),
@@ -22668,7 +22705,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       variant: "text-xs/medium",
                       numberOfLines: 1,
                       style: {
-                        color: "#B5BAC1"
+                        color: colors.muted
                       },
                       children: activity.details
                     }) : null
@@ -60026,7 +60063,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "03a27fdd04788d777695e2a31d57a1ef48336e6e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2cc4e96cceb290b20dd084b101844e9ae251d00b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
