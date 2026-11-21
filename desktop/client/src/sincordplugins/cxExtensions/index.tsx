@@ -19,6 +19,7 @@ import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccesso
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@utils/cx";
 import { CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
+import { IS_LINUX, IS_MOBILE } from "@utils/constants";
 import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "@utils/cx";
 import { openImageModal } from "@utils/discord";
@@ -468,6 +469,12 @@ let imageLinkUsers = 0;
 let roleHeaderUsers = 0;
 let reactionSortUsers = 0;
 let plainUrlPasteUsers = 0;
+let noMiddleClickPasteUsers = 0;
+
+// NoMiddleClickPaste by Darxoon (GPL-3.0-or-later).
+function preventMiddleClickPaste(event: MouseEvent) {
+    if (event.button === 1) event.preventDefault();
+}
 const avatarCropZoomLimits = new Map<symbol, number>();
 let bypassPinPromptUsers = 0;
 let longDraftUsers = 0;
@@ -1224,6 +1231,13 @@ export function CxSettings() {
                         case "plain-url-paste":
                             plainUrlPasteUsers++;
                             return () => { plainUrlPasteUsers--; };
+                        case "no-middle-click-paste":
+                            if (!IS_LINUX || IS_MOBILE) throw new Error("Middle-click paste control is available on Linux.");
+                            if (noMiddleClickPasteUsers === 0) window.addEventListener("mouseup", preventMiddleClickPaste);
+                            noMiddleClickPasteUsers++;
+                            return () => {
+                                if (--noMiddleClickPasteUsers === 0) window.removeEventListener("mouseup", preventMiddleClickPaste);
+                            };
                         case "hide-role-headers":
                             roleHeaderUsers++;
                             return () => { roleHeaderUsers--; };
@@ -1406,10 +1420,11 @@ export function CxSettings() {
         }
     }
 
+    const catalogPlugins = IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : cxCatalog.plugins.filter(entry => !entry.linuxOnly);
     return <section style={{ display: "grid", gap: 12 }}>
         <h2>CX Extensions</h2>
         <details>
-            <summary>CX catalog · {cxCatalog.plugins.length} plugins · {cxCatalog.themes.length} themes</summary>
+            <summary>CX catalog · {catalogPlugins.length} plugins · {cxCatalog.themes.length} themes</summary>
             <input aria-label="Search CX catalog" placeholder="Search name, feature or /command" value={search} onChange={event => {
                 setSearch(event.currentTarget.value);
                 setPages({ Plugins: 0, Themes: 0 });
@@ -1427,7 +1442,7 @@ export function CxSettings() {
                 setActiveOnly(!activeOnly);
                 setPages({ Plugins: 0, Themes: 0 });
             }}>Active only</button>
-            {([["Plugins", cxCatalog.plugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
+            {([["Plugins", catalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
                 if (category !== "All" && (kind === "Themes") !== (category === "Themes")) return null;
                 const isActive = (entry: (typeof entries)[number]) => {
                     const id = kind === "Themes" ? "theme" : "plugin:" + entry.name;
@@ -1444,7 +1459,7 @@ export function CxSettings() {
                         {matches.slice(start, start + 12).map(entry => <li key={entry.name}>
                             <button title={entry.description} onClick={() => chooseSource(entry.source)}>{entry.name}</button>
                             {isActive(entry) && <small style={{ marginInlineStart: 8 }}>Active</small>}
-                            {entry.desktopOnly && <small style={{ marginInlineStart: 8 }}>Desktop only</small>}
+                            {entry.desktopOnly && <small style={{ marginInlineStart: 8 }}>{entry.linuxOnly ? "Linux only" : "Desktop only"}</small>}
                             {entry.description && <div style={{ color: "var(--text-muted)", marginBlockStart: 3 }}>{entry.description}</div>}
                         </li>)}
                     </ul>

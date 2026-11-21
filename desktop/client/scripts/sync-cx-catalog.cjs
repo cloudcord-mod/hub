@@ -77,6 +77,7 @@ function buildCatalog(additions = new Map()) {
                 [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.desktopOnly)
                 || parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.desktopOnly)
             );
+            const linuxOnly = parsed.kind === "plugin" && parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.linuxOnly);
             const review = parsed.kind === "plugin" ? reviewCx(document) : undefined;
             const specific = review?.effects.slice(parsed.permissions?.length ?? 0) ?? [];
             const commandNames = declaredCommands?.map(command => command.name) ?? [];
@@ -86,7 +87,7 @@ function buildCatalog(additions = new Map()) {
             const keywords = [...new Set([...specific.slice(1), ...(review?.appearanceOptions ?? []).map(option => option.label)])].join(" ").slice(0, 520);
             const appearanceRevision = !desktopOnly && canRememberCxAppearance(parsed)
                 ? createHash("sha256").update(document.replaceAll("\r\n", "\n")).digest("hex") : undefined;
-            return { name, binding, description, keywords, desktopOnly, commandNames, categories: getCxCatalogCategories(parsed), appearanceRevision };
+            return { name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories: getCxCatalogCategories(parsed), appearanceRevision };
         });
     }
     const source = [
@@ -95,14 +96,14 @@ function buildCatalog(additions = new Map()) {
         "",
         'import type { CxCatalogCategory } from "./cx";',
         "",
-        "type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; };",
+        "type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; linuxOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; };",
         "",
         "export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {",
         ...Object.entries(groups).flatMap(([kind, entries]) => [
             `    ${kind}: [`,
-            ...entries.map(({ name, binding, description, keywords, desktopOnly, commandNames, categories, appearanceRevision }) => {
+            ...entries.map(({ name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories, appearanceRevision }) => {
                 const data = { description: description || undefined, keywords: keywords || undefined,
-                    desktopOnly: desktopOnly || undefined, commands: commandNames.length ? commandNames : undefined, categories, appearanceRevision };
+                    desktopOnly: desktopOnly || undefined, linuxOnly: linuxOnly || undefined, commands: commandNames.length ? commandNames : undefined, categories, appearanceRevision };
                 const fields = Object.entries(data).filter(([, value]) => value !== undefined)
                     .map(([key, value]) => `${key}: ${JSON.stringify(value)}`);
                 return `        { name: ${JSON.stringify(name)}, source: ${[binding, ...fields].join(", ")} },`;

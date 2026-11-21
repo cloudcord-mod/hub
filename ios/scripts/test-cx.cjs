@@ -294,6 +294,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             [other, { id: other, author: { id: sender }, type: 0, flags: 64, channel_id: gestureChannel }],
         ]);
         const documentListeners = new Map();
+        const windowListeners = new Map();
+        let isLinux = true;
         const stockSteamClick = options => options.href;
         const nativeSteamLinks = { handleClick: stockSteamClick };
         function NativeMessages(props) { return props.output; }
@@ -889,6 +891,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         vm.runInNewContext(transformSync(read(adapter), { loader: "tsx", format: "cjs", jsx: "automatic" }).code, {
             module,
             IS_WEB: false,
+            window: {
+                addEventListener(name, handler) {
+                    assert.ok(!windowListeners.has(name), "window listener is registered only once");
+                    windowListeners.set(name, handler);
+                },
+                removeEventListener(name, handler) {
+                    assert.equal(windowListeners.get(name), handler);
+                    windowListeners.delete(name);
+                },
+            },
             Element: GestureElement,
             MutationObserver: class {
                 constructor(callback) { this.callback = callback; }
@@ -916,6 +928,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 },
             },
             require(name) {
+                if (name === "@utils/constants") return { get IS_LINUX() { return isLinux; }, IS_MOBILE: false };
                 assert.ok(name in mocks, "Unmocked adapter dependency: " + name);
                 return mocks[name];
             },
@@ -997,6 +1010,31 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.match(stylesheet.textContent, /\.cc-cx-plain-folder-icon.*translateZ\(0\)/);
             click(render(), "Disable PlainFolderIcon");
             assert.equal(stylesheet, undefined);
+
+            isLinux = false;
+            searchFor("NoMiddleClickPaste");
+            assert.ok(!button(render(), "NoMiddleClickPaste"));
+            const pasteEditor = find(render(), item => item.props["aria-label"] === "CX source");
+            pasteEditor.props.onChange({ currentTarget: { value: read("examples/cx/catalog/plugins/no-middle-click-paste.cx") } });
+            click(render(), "Review CX");
+            click(render(), "Allow for this session");
+            assert.ok(button(render(), "Middle-click paste control is available on Linux."));
+            assert.equal(windowListeners.size, 0);
+            isLinux = true;
+            selectCatalog("NoMiddleClickPaste");
+            click(render(), "Allow for this session");
+            const onMouseUp = windowListeners.get("mouseup");
+            let prevented = 0;
+            for (const button of [0, 1, 2]) onMouseUp({ button, preventDefault: () => { prevented++; } });
+            assert.equal(prevented, 1);
+            pasteEditor.props.onChange({ currentTarget: { value: read("examples/cx/catalog/plugins/no-middle-click-paste.cx").replace("NoMiddleClickPaste", "Second Paste Control") } });
+            click(render(), "Review CX");
+            click(render(), "Allow for this session");
+            assert.equal(windowListeners.get("mouseup"), onMouseUp);
+            click(render(), "Disable NoMiddleClickPaste");
+            assert.equal(windowListeners.get("mouseup"), onMouseUp);
+            click(render(), "Disable Second Paste Control");
+            assert.equal(windowListeners.size, 0);
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));
@@ -5234,6 +5272,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             colors: colorOverlays.size,
             pendingEmojiPicker: emojiPickerWaiters.size,
             document: documentListeners.size,
+            window: windowListeners.size,
             stylesheet,
         });
         for (const entry of cxCatalog.plugins) {

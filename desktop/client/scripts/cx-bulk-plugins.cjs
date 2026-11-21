@@ -1092,6 +1092,10 @@ const desktopEffectRecipes = {
         effect: "avatar-crop-zoom",
         sha256: "79d758d98fdafd27b0ba1178f14c5c7a4773ae74dbcaa735ad31d242bbc1d413",
     },
+    NoMiddleClickPaste: {
+        effect: "no-middle-click-paste",
+        sha256: "9a681e749029652f7e89997e4289387102a5c43fdea024ba7dab9b6290b7b610",
+    },
 };
 
 function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {

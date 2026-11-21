@@ -1,0 +1,3 @@
+plugin "NoMiddleClickPaste":
+  needs messages.paste
+  use no-middle-click-paste

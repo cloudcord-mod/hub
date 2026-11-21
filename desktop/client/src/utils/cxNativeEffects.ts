@@ -42,6 +42,7 @@ export const cxNativeEffects = {
     "double-click-reply": { permission: "messages.openreply", label: "Open a reply to another user's message on double-click or double-tap" },
     "quick-mention": { permission: "messages.insertmention", label: "Insert the selected message author's mention into the current draft" },
     "plain-url-paste": { permission: "messages.paste", label: "Paste URLs as plain text when replacing selected text in chat", desktopOnly: true },
+    "no-middle-click-paste": { permission: "messages.paste", label: "Disable Linux middle-click paste", desktopOnly: true, linuxOnly: true },
     "hide-profile-banner-images": { permission: "appearance.hide", label: "Hide Discord-hosted profile banner images except your own and those of friends" },
     "decode-base64": { permission: "messages.decode", label: "Decode Base64 in the selected message and copy the result on request" },
     "copy-raw-text": { permission: "messages.copytext", label: "Add Copy Raw Text to message menus" },

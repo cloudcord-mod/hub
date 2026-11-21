@@ -208,6 +208,7 @@ import plugin_catalog_no_confirm_pin from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_no_draft_length_limit from "../../../../examples/cx/catalog/plugins/no-draft-length-limit.cx";
 import plugin_catalog_no_masked_url_paste from "../../../../examples/cx/catalog/plugins/no-masked-url-paste.cx";
 import plugin_catalog_no_message_hover_bar from "../../../../examples/cx/catalog/plugins/no-message-hover-bar.cx";
+import plugin_catalog_no_middle_click_paste from "../../../../examples/cx/catalog/plugins/no-middle-click-paste.cx";
 import plugin_catalog_no_mosaic from "../../../../examples/cx/catalog/plugins/no-mosaic.cx";
 import plugin_catalog_no_pending_count from "../../../../examples/cx/catalog/plugins/no-pending-count.cx";
 import plugin_catalog_no_profile_themes from "../../../../examples/cx/catalog/plugins/no-profile-themes.cx";
@@ -409,7 +410,7 @@ import theme_catalog_wizzy_vulcan from "../../../../examples/cx/catalog/themes/w
 
 import type { CxCatalogCategory } from "./cx";
 
-type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; };
+type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; linuxOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; };
 
 export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
     plugins: [
@@ -622,6 +623,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "NoDraftLengthLimit", source: plugin_catalog_no_draft_length_limit, description: "Preserve long drafts in Discord’s local draft store", categories: ["Chat"] },
         { name: "NoMaskedUrlPaste", source: plugin_catalog_no_masked_url_paste, description: "Paste URLs as plain text when replacing selected text in chat", desktopOnly: true, categories: ["Chat"] },
         { name: "NoMessageHoverBar", source: plugin_catalog_no_message_hover_bar, description: "Hides the buttons that appear when hovering a message", desktopOnly: true, categories: ["Appearance"] },
+        { name: "NoMiddleClickPaste", source: plugin_catalog_no_middle_click_paste, description: "Disable Linux middle-click paste", desktopOnly: true, linuxOnly: true, categories: ["Chat"] },
         { name: "NoMosaic", source: plugin_catalog_no_mosaic, description: "Show chat attachments individually without the media grid", categories: ["Appearance"], appearanceRevision: "8307a41cf1c546ccf7519ef83129026d7b49680012112e359bf30b2f3fbb4d74" },
         { name: "NoPendingCount", source: plugin_catalog_no_pending_count, description: "Hide the pending friend request count", categories: ["Appearance"], appearanceRevision: "e96b70311d701d8abd7cb2852a61de587e08d74d7ffe3590a2d589219c38f8b0" },
         { name: "NoProfileThemes", source: plugin_catalog_no_profile_themes, description: "Hide other users’ theme colors when their profiles load", categories: ["Appearance"], appearanceRevision: "9972b70c1d03c430f47e9f9ffeb71d1838ac8d0a88f54a7d6bd79864705fe341" },
