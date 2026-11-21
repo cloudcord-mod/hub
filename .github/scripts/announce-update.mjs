@@ -1,5 +1,8 @@
+import { appendFile } from "node:fs/promises";
+
 const { GITHUB_REPOSITORY = "cloudcord-mod/hub", GITHUB_TOKEN, RELEASE_PLATFORM = "desktop",
-    RELEASE_SOURCE_SHA, GEMINI_API_KEY, DISCORD_UPDATE_CHANNEL_ID, DISCORD_BOT_TOKEN } = process.env;
+    RELEASE_SOURCE_SHA, GEMINI_API_KEY, GEMINI_MODEL, DISCORD_UPDATE_CHANNEL_ID, DISCORD_BOT_TOKEN,
+    GITHUB_STEP_SUMMARY } = process.env;
 const dryRun = process.argv.includes("--dry-run");
 const githubPrefix = `https://api.github.com/repos/${GITHUB_REPOSITORY}`;
 const githubHeaders = {
@@ -16,6 +19,14 @@ async function request(url, options) {
 const github = (route, accept) => request(githubPrefix + route, {
     headers: { ...githubHeaders, ...(accept ? { Accept: accept } : {}) },
 });
+
+async function report(status, source) {
+    console.log(status);
+    if (GITHUB_STEP_SUMMARY) {
+        const lines = ["### CloudCord Discord announcement", status, source].filter(Boolean);
+        await appendFile(GITHUB_STEP_SUMMARY, lines.join("\n\n") + "\n");
+    }
+}
 
 async function publication() {
     if (RELEASE_PLATFORM === "desktop") {
@@ -39,7 +50,7 @@ async function publication() {
 async function summarize(evidence) {
     if (!GEMINI_API_KEY) return;
     try {
-        const model = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite";
+        const model = GEMINI_MODEL || "gemini-3.1-flash-lite";
         if (!/^[\w.-]+$/.test(model)) throw new Error("Invalid Gemini model");
         const result = await request(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
             method: "POST",
@@ -59,21 +70,32 @@ async function summarize(evidence) {
 async function main() {
     const published = await publication();
     if (RELEASE_SOURCE_SHA && published.sha !== RELEASE_SOURCE_SHA) {
-        console.log("The triggering build is not the current publication. Skipping.");
+        await report("Skipped because the triggering build is no longer the current publication.");
         return;
     }
     const commit = await github(`/commits/${published.sha}`);
     const message = commit.commit.message.slice(0, 2_000);
     const files = commit.files?.slice(0, 24).map(file => file.filename) ?? [];
     const summary = await summarize({ platform: published.label, message, files });
+    const source = summary ? "Summary generated from public GitHub commit details by Gemini."
+        : GEMINI_API_KEY ? "Gemini did not return a summary. Used the GitHub commit title."
+            : "Gemini key is missing. Used the GitHub commit title.";
     const content = [
         `**CloudCord update · ${published.label}**`,
         (summary || message.split("\n")[0] || "A new build is available.").slice(0, 950),
         `[Build and source](${published.url}) · [${published.sha.slice(0, 9)}](https://github.com/${GITHUB_REPOSITORY}/commit/${published.sha})`,
     ].join("\n\n");
-    if (dryRun || !DISCORD_BOT_TOKEN || !DISCORD_UPDATE_CHANNEL_ID) {
+    if (dryRun) {
         console.log(content);
-        if (!dryRun) console.log("Discord announcement credentials are missing. Preview only.");
+        await report("Preview only. No Discord message was sent.", source);
+        return;
+    }
+    const missing = [];
+    if (!DISCORD_BOT_TOKEN) missing.push("DISCORD_BOT_TOKEN secret");
+    if (!DISCORD_UPDATE_CHANNEL_ID) missing.push("DISCORD_UPDATE_CHANNEL_ID variable");
+    if (missing.length) {
+        console.log(content);
+        await report("Skipped Discord posting. Configure the " + missing.join(" and ") + ".", source);
         return;
     }
     if (!/^\d{17,22}$/.test(DISCORD_UPDATE_CHANNEL_ID)) throw new Error("Invalid Discord announcement channel ID");
@@ -82,7 +104,7 @@ async function main() {
         headers: { Authorization: `Bot ${DISCORD_BOT_TOKEN}`, "Content-Type": "application/json" },
         body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
     });
-    console.log("Discord update posted.");
+    await report("Discord update posted.", source);
 }
 
 main().catch(error => {
