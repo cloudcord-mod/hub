@@ -42957,6 +42957,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "notifications.preventautoupgrade",
           label: "Keep your chosen channel notification settings"
         },
+        "notification-volume": {
+          permission: "notifications.volume",
+          label: "Adjust the volume of Discord notifications and in-app sounds",
+          desktopOnly: true
+        },
         "flat-attachments": {
           permission: "appearance.style",
           label: "Show chat attachments individually without the media grid"
@@ -49010,6 +49015,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           avatarCropOptions = {
             maxAvatarCropZoom: Number(zoom)
           };
+        } else if (name3 === "notification-volume") {
+          var volume = effect2[2] ?? "100";
+          if (!/^(?:100|[1-9]?\d)$/.test(volume))
+            throw new Error("Choose a notification volume from 0 to 100");
+          notificationVolumeOptions = {
+            notificationVolume: Number(volume)
+          };
         } else if (name3 === "all-call-time-counter") {
           var flags = effect2[2]?.split(" ") ?? [];
           if (flags.some((flag) => ![
@@ -49433,6 +49445,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var hasTimestampSurface = false;
     var avatarResolution;
     var avatarCropOptions;
+    var notificationVolumeOptions;
     var voiceMemberOptions;
     var voiceQueueOptions;
     var mutedVoiceOptions;
@@ -49529,6 +49542,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ],
       avatarResolution,
       avatarCropOptions,
+      notificationVolumeOptions,
       voiceMemberOptions,
       voiceQueueOptions,
       cameraToneOptions,
@@ -49545,6 +49559,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   }
   function reviewCx(source) {
     var document = parseCx(source);
+    var numberOptions = [];
     if (document.kind === "theme")
       return {
         kind: document.kind,
@@ -49553,12 +49568,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         effects: [
           "Change the app colors and background"
         ],
-        appearanceOptions: []
+        appearanceOptions: [],
+        numberOptions
       };
+    if (document.avatarCropOptions)
+      numberOptions.push({
+        effect: "avatar-crop-zoom",
+        label: "Avatar crop zoom",
+        value: document.avatarCropOptions.maxAvatarCropZoom,
+        min: 2,
+        max: 16,
+        unit: "\xD7"
+      });
+    if (document.notificationVolumeOptions)
+      numberOptions.push({
+        effect: "notification-volume",
+        label: "Notification volume",
+        value: document.notificationVolumeOptions.notificationVolume,
+        min: 0,
+        max: 100,
+        unit: "%"
+      });
     return {
       kind: document.kind,
       name: document.name,
       permissions: document.permissions,
+      numberOptions,
       appearanceOptions: [
         ...document.optionalHides
       ].map(([target, defaultOn]) => ({
@@ -49572,6 +49607,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           return label2 + " (" + document.avatarResolution + " px)";
         if (effect === "avatar-crop-zoom")
           return label2 + " (" + document.avatarCropOptions.maxAvatarCropZoom + "\xD7)";
+        if (effect === "notification-volume")
+          return label2 + " (" + document.notificationVolumeOptions.notificationVolume + "%)";
         if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
           return "Automatically join the selected voice channel when its slot opens";
         return label2;
@@ -50011,6 +50048,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
       var nativeOptions = {
         "avatar-crop-zoom": document.avatarCropOptions,
+        "notification-volume": document.notificationVolumeOptions,
         "all-call-time-counter": document.voiceMemberOptions,
         "wait-for-slot": document.voiceQueueOptions,
         "webcam-start-notifier": document.cameraToneOptions,
@@ -50247,6 +50285,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.filterlocal": "Hide matching incoming messages and history on this device",
         "typing.suppress": "Suppress your outgoing typing indicator",
         "notifications.preventautoupgrade": "Prevent Discord from automatically changing a channel to All Messages notifications",
+        "notifications.volume": "Adjust how loud Discord notifications and in-app sounds play on this device",
         "lookup.wikipedia": "Send the title you enter to English Wikipedia when you run the lookup command",
         "lookup.translate": "Send the text and language you enter to Google Translate when you run the translate command",
         "profile.localnotes": "Read and edit your private user notes stored on this device",
@@ -52465,6 +52504,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/notification-volume.cx
+  var notification_volume_default;
+  var init_notification_volume = __esm({
+    "../examples/cx/catalog/plugins/notification-volume.cx"() {
+      notification_volume_default = 'plugin "NotificationVolume":\n  needs notifications.volume\n  use notification-volume\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/notify-when-muted.cx
   var notify_when_muted_default;
   var init_notify_when_muted = __esm({
@@ -54230,6 +54277,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_no_typing_animation();
       init_no_unblock_to_jump();
       init_normalize_message_links();
+      init_notification_volume();
       init_notify_when_muted();
       init_number_base_converter();
       init_number_lines();
@@ -56488,6 +56536,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "NormalizeMessageLinks",
             source: normalize_message_links_default,
             description: "Change text before Discord sends messages you compose",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "NotificationVolume",
+            source: notification_volume_default,
+            description: "Adjust the volume of Discord notifications and in-app sounds (100%)",
+            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -61494,6 +61551,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 throw new Error("Middle-click paste control is available on Linux.");
               case "avatar-crop-zoom":
                 throw new Error("Avatar crop zoom is available on desktop and browser.");
+              case "notification-volume":
+                throw new Error("Notification volume control is available on desktop and browser.");
               case "animated-assets":
                 return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
               case "floor-relative-time":
@@ -63815,7 +63874,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5970bf9a40952ce8ad69df25d8d4c256fd6a5c43";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0edb90860df195c432f4df5e15a4a1aeee521423";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
