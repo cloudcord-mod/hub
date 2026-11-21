@@ -37,6 +37,33 @@ class BroadcastCapabilitiesTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             check.verify_capabilities(self.host, self.extension, self.info)
 
+    def test_standalone_bundle_identity_ignores_unrelated_plist_values(self):
+        discord_id = "com.hammerandchisel.discord"
+        cloudcord_id = "app.cloudcord.ios"
+        with tempfile.TemporaryDirectory() as directory:
+            app = Path(directory) / "Discord.app"
+            broadcast = app / "PlugIns" / "BroadcastUpload.appex"
+            broadcast.mkdir(parents=True)
+            (app / "Info.plist").write_bytes(plistlib.dumps({
+                "CFBundleIdentifier": discord_id,
+                "CFBundleURLTypes": [{"CFBundleURLName": discord_id}],
+            }))
+            broadcast_info = broadcast / "Info.plist"
+            broadcast_info.write_bytes(plistlib.dumps({"CFBundleIdentifier": discord_id + ".BroadcastUpload"}))
+            with self.assertRaisesRegex(ValueError, "App CFBundleIdentifier"):
+                check.verify_bundle_identity(app, cloudcord_id)
+
+            check.packager.rebrand_bundle_ids(app, cloudcord_id, "CloudCord")
+            check.verify_bundle_identity(app, cloudcord_id)
+            info = plistlib.loads((app / "Info.plist").read_bytes())
+            self.assertEqual(info["CFBundleURLTypes"][0]["CFBundleURLName"], discord_id)
+
+            for wrong_id in (discord_id + ".BroadcastUpload", cloudcord_id + ".", cloudcord_id + "-other.BroadcastUpload"):
+                with self.subTest(wrong_id=wrong_id):
+                    broadcast_info.write_bytes(plistlib.dumps({"CFBundleIdentifier": wrong_id}))
+                    with self.assertRaisesRegex(ValueError, "BroadcastUpload.appex CFBundleIdentifier"):
+                        check.verify_bundle_identity(app, cloudcord_id)
+
     def test_final_signer_must_authorize_group_and_identity(self):
         signed = {**self.host, "com.apple.developer.team-identifier": "TEAM", "application-identifier": "TEAM.example.app"}
         profile = {"TeamIdentifier": ["TEAM"], "Entitlements": {**self.host, "application-identifier": "TEAM.example.*"}}

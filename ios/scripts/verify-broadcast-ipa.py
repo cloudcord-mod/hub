@@ -76,7 +76,19 @@ def verify_provisioning(entitlements, profile, label):
         raise ValueError(f"{label} application identifier is not authorized by its provisioning profile")
 
 
-def verify_ipa(ipa, signed=False):
+def verify_bundle_identity(app, expected_id):
+    app_id = plistlib.loads((app / "Info.plist").read_bytes()).get("CFBundleIdentifier")
+    if app_id != expected_id:
+        raise ValueError(f"App CFBundleIdentifier is {app_id!r}, expected {expected_id!r}")
+
+    prefix = expected_id + "."
+    for extension in sorted((app / "PlugIns").glob("*.appex")):
+        identifier = plistlib.loads((extension / "Info.plist").read_bytes()).get("CFBundleIdentifier")
+        if not isinstance(identifier, str) or not identifier.startswith(prefix) or identifier == prefix:
+            raise ValueError(f"{extension.name} CFBundleIdentifier {identifier!r} must start with {prefix!r} and include an extension name")
+
+
+def verify_ipa(ipa, signed=False, bundle_id=None):
     with tempfile.TemporaryDirectory(prefix="cloudcord-broadcast-check-") as directory:
         root = Path(directory)
         with zipfile.ZipFile(ipa) as archive:
@@ -89,6 +101,8 @@ def verify_ipa(ipa, signed=False):
         if len(apps) != 1:
             raise ValueError("IPA must contain one app")
         app = apps[0]
+        if bundle_id is not None:
+            verify_bundle_identity(app, bundle_id)
         broadcast = app / "PlugIns" / "BroadcastUpload.appex"
         info = plistlib.loads((broadcast / "Info.plist").read_bytes())
         host_executable, extension_executable = packager.bundle_executable(app), packager.bundle_executable(broadcast)
@@ -107,5 +121,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("ipa", type=Path)
     parser.add_argument("--signed", action="store_true", help="Also audit the final ESign/KSign provisioning profiles")
+    parser.add_argument("--bundle-id", help="Verify the app uses this bundle ID and each extension uses it as a prefix")
     args = parser.parse_args()
-    verify_ipa(args.ipa, signed=args.signed)
+    verify_ipa(args.ipa, signed=args.signed, bundle_id=args.bundle_id)
