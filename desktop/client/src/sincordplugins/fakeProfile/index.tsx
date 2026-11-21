@@ -536,12 +536,12 @@ function badgesHiddenFor(userId: string): boolean {
     if (isMe(userId) || !isPrivateProfile(userId)) return false;
     try { return !RelationshipStore.isFriend(userId); } catch { return true; }
 }
-function viewedSharedProfile(userId: string, _forBadges?: boolean) {
+function viewedSharedProfile(userId: string, trackView = true) {
     if (isRealProfileView(userId, activeUserId())) return undefined;
     const local = localProfileFor(userId);
     // Hide other profiles hides synced ones; your own local edits still show.
     const profile = storedData?.hideOtherProfiles ? undefined : sharedProfiles.get(userId);
-    if (profile) sharedViewedAt.set(userId, Date.now());
+    if (profile && trackView) sharedViewedAt.set(userId, Date.now());
     return local ? { ...(profile || {}), ...local } : profile;
 }
 const sharedProfileFetchedAt = new Map<string, number>();
@@ -894,6 +894,17 @@ function presentationProfileFor(userId: unknown) {
     if (isMe(userId)) return isEnabled ? storedData : undefined;
     requestSharedProfile(userId);
     return viewedSharedProfile(userId);
+}
+
+function cachedMentionProfile(userId: unknown) {
+    if (!profileRuntimeActive || !isProfileViewUserId(userId)) return;
+    if (isMe(userId)) return isEnabled ? storedData : undefined;
+    if (!sharedProfiles.has(userId) && !localProfiles[userId]) return;
+    return viewedSharedProfile(userId, false);
+}
+
+function foldMentionName(value: string) {
+    return value.normalize("NFKD").toLocaleLowerCase().replace(/\p{M}/gu, "");
 }
 
 function installProfileAvatarHooks(resolver: typeof IconUtils) {
@@ -2227,6 +2238,21 @@ export default definePlugin({
 
     patches: [
         {
+            // Add a local alias match inside Discord's existing eligible-user check.
+            find: ",queryMentionResults(",
+            noWarn: true,
+            replacement: [
+                {
+                    match: /(\i&&(\i)===(\i\.id)\|\|)(?=\i\.substring\(0,\i\.length\)===\i)/,
+                    replace: "$1$self.matchesMentionAlias($3,$2)||",
+                },
+                {
+                    match: /(return\{user:(\i),score:\i,comparator:\i,nick:)(\i\.\i\.getNick\(\i\.guild_id,\2\.id\))(?=,status:)/,
+                    replace: "$1$self.mentionResultName($2.id,$3)",
+                },
+            ],
+        },
+        {
             // Discord applies the Nitro type override only for staff. Apply it while Fake Nitro is on.
             find: ".getPremiumTypeActual();return ",
             replacement: {
@@ -2327,6 +2353,19 @@ export default definePlugin({
             ]
         },
     ],
+
+    matchesMentionAlias(userId: string, query: unknown) {
+        if (typeof query !== "string" || !query || query.length > 128) return false;
+        const data = cachedMentionProfile(userId);
+        if (!data || (!data.username && !data.globalName)) return false;
+        const prefix = foldMentionName(query);
+        return !!prefix && [data.username, data.globalName].some(name => name && foldMentionName(name).startsWith(prefix));
+    },
+
+    mentionResultName<T>(userId: string, original: T) {
+        const data = cachedMentionProfile(userId);
+        return data?.globalName || data?.username || original;
+    },
 
     badgesHiddenFor(userId: string) {
         return profileRuntimeActive && badgesHiddenFor(userId);

@@ -8,6 +8,7 @@ const unrelatedGuildId = '234567890123456789';
 const syncedUser = Object.freeze({ id: knownUserId, username: 'real-synced' });
 const sharedAvatar = 'https://cdn.discordapp.com/avatars/123456789012345678/a.png';
 let realView = false;
+let requests = 0;
 const profile = Object.freeze({ userId: 'own', bio: 'real-bio' });
 const listeners = new Set();
 const users = { getCurrentUser() { assert.equal(this, users); return own; }, getUser(id) { assert.equal(this, users); return id === 'own' ? own : other; },
@@ -23,9 +24,10 @@ const ctx = vm.createContext({ profileRuntimeActive: true, profileRuntimeGenerat
     Vencord: { Webpack: { findByProps: () => profiles } }, realGetUserProfile: null, realGetCurrentUser: null, realGetUserAvatarURL: undefined,
     isEnabled: true, profileVersion: 1, _realUsername: '', _realGlobalName: '', isMe: id => id === 'own',
     invalidateOwnUser() {},
-    resolveProfileUserId: id => id, requestSharedProfile() {}, viewedSharedProfile: id => realView ? undefined : {
-        bio: 'shared-bio', ...(id === knownUserId ? { globalName: 'Synced Nick', avatar: sharedAvatar } : {}),
+    resolveProfileUserId: id => id, requestSharedProfile() { requests++; }, viewedSharedProfile: id => realView ? undefined : {
+        bio: 'shared-bio', ...(id === knownUserId ? { username: 'custom_alias', globalName: 'Sýnc Nick', avatar: sharedAvatar } : {}),
     },
+    sharedProfiles: new Map([[knownUserId, true]]), localProfiles: {},
     isProfileViewUserId: id => typeof id === 'string' && /^\d{15,22}$/.test(id),
     decorateSharedProfile: (value, data) => ({ ...value, ...data }) });
 vm.runInContext(esbuild.transformSync(source.slice(source.indexOf('const profileStoreCleanups:'), source.indexOf('// Discord\'s Edit Profile')), { loader: 'ts' }).code, ctx);
@@ -53,14 +55,47 @@ assert.equal(avatars.getUserAvatarURL(syncedUser), sharedAvatar);
 assert.equal(avatars.getGuildMemberAvatarURL({ userId: knownUserId, guildId: unrelatedGuildId }), sharedAvatar);
 assert.equal(avatars.getGuildMemberAvatarURLSimple({ guildId: knownUserId, userId: unrelatedGuildId }), 'simple');
 assert.equal(ctx.realGetUserAvatarURL(syncedUser), 'native');
-assert.equal(names.getName(unrelatedGuildId, syncedUser), '@Synced Nick');
-assert.equal(names.useName({ userId: knownUserId }), 'Synced Nick');
+assert.equal(names.getName(unrelatedGuildId, syncedUser), '@Sýnc Nick');
+assert.equal(names.useName({ userId: knownUserId }), 'Sýnc Nick');
 assert.equal(names.useName(unrelatedGuildId, knownUserId), 'Native');
 assert.equal(names.getNickname(syncedUser), null);
 realView = true;
 assert.equal(avatars.getGuildMemberAvatarURL({ userId: knownUserId }), 'guild');
 assert.equal(names.getName(unrelatedGuildId, syncedUser), '@Native');
 realView = false;
+const mentionMethods = source.slice(source.indexOf('    matchesMentionAlias(userId:'), source.indexOf('    badgesHiddenFor(userId:'));
+vm.runInContext(esbuild.transformSync('globalThis.mention = {' + mentionMethods + '};', { loader: 'ts' }).code, ctx);
+const searchStart = requests;
+assert.equal(ctx.mention.matchesMentionAlias(knownUserId, 'CUSTOM'), true);
+assert.equal(ctx.mention.matchesMentionAlias(knownUserId, 'sync ni'), true);
+assert.equal(ctx.mention.matchesMentionAlias(knownUserId, 'Nickname'), false);
+assert.equal(ctx.mention.matchesMentionAlias(knownUserId, ''), false);
+assert.equal(ctx.mention.matchesMentionAlias(unrelatedGuildId, 'custom'), false);
+assert.equal(ctx.mention.mentionResultName(knownUserId, 'Native'), 'Sýnc Nick');
+assert.equal(requests, searchStart, 'alias matching does not fetch profiles while typing');
+realView = true;
+assert.equal(ctx.mention.mentionResultName(knownUserId, 'Native'), 'Native');
+assert.equal(ctx.mention.matchesMentionAlias(knownUserId, 'CUSTOM'), false);
+realView = false;
+const mentionPatch = source.slice(source.indexOf('find: ",queryMentionResults("'), source.indexOf('// Discord applies the Nitro type'));
+const matchers = [...mentionPatch.matchAll(/match: \/(.+)\/,/g)].map(([, pattern]) =>
+    new RegExp(pattern.replaceAll('\\i', '[A-Za-z_$][\\w$]*')));
+const replacements = [...mentionPatch.matchAll(/replace: "([^"]+)",/g)].map(([, replacement]) => replacement);
+assert.equal(matchers.length, 2);
+const nativeMatch = 'if(allowed(record)){return includeId&&query===record.id||name.substring(0,query.length)===query;}return false;';
+assert.match(nativeMatch, matchers[0]);
+const eligibleMatch = new Function('$self', 'allowed', 'record', 'query', 'name', 'includeId',
+    nativeMatch.replace(matchers[0], replacements[0]));
+assert.equal(eligibleMatch(ctx.mention, () => true, syncedUser, 'custom', 'real-synced', false), true);
+assert.equal(eligibleMatch(ctx.mention, () => false, syncedUser, 'custom', 'real-synced', false), false, 'Discord still controls mention eligibility');
+assert.equal(eligibleMatch(ctx.mention, () => true, syncedUser, 'real', 'real-synced', false), true);
+const nativeRow = 'return{user:record,score:score,comparator:name,nick:store.members.getNick(channel.guild_id,record.id),status:"online"};';
+assert.match(nativeRow, matchers[1]);
+const buildMentionRow = new Function('$self', 'record', 'score', 'name', 'store', 'channel',
+    nativeRow.replace(matchers[1], replacements[1]));
+const mentionRow = buildMentionRow(ctx.mention, syncedUser, 7, 'real-synced', { members: { getNick: () => 'Native' } }, { guild_id: unrelatedGuildId });
+assert.equal(mentionRow.nick, 'Sýnc Nick');
+assert.equal(mentionRow.user, syncedUser, 'selection retains Discord’s original user and ID');
 const staleCurrent = users.getCurrentUser;
 ctx.profileRuntimeActive = false; ctx.profileRuntimeGeneration++;
 ctx.uninstallProfileStoreHooks();
