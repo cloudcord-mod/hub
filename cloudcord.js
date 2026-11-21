@@ -55617,6 +55617,32 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         cleanup();
     };
   }
+  function registerHiddenAppearancePaths(paths) {
+    var targets = new Map(paths.map((path2) => [
+      path2,
+      path2.slice(path2.lastIndexOf("/") + 1).replace(/\.tsx$/, "")
+    ]));
+    if (metroModules)
+      for (var id in metroModules) {
+        var module = metroModules[Number(id)];
+        var path = module?.__filePath;
+        if (!module?.isInitialized || module.hasError || !path)
+          continue;
+        var name = targets.get(path);
+        if (typeof name !== "string")
+          continue;
+        try {
+          var exports = module.publicModule?.exports;
+          var component = exports?.default ?? exports?.[name] ?? exports;
+          if (typeof component === "function" || component?.$$typeof === Symbol.for("react.memo") || component?.$$typeof === Symbol.for("react.forward_ref"))
+            targets.set(path, component);
+        } catch (e) {
+        }
+      }
+    return registerJsxAppearance([
+      ...new Set(targets.values())
+    ], () => null);
+  }
   function bindExpressionSheets() {
     var bottomSheet = findByProps("BottomSheet")?.BottomSheet;
     var actionSheet3 = findByProps("ActionSheet")?.ActionSheet;
@@ -57697,12 +57723,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               return registerExpressionPickerTab(mobile.expressionPickerTab);
             if ("settingsEntry" in mobile)
               return hideSettingsEntry(mobile.settingsEntry);
-            if ("hideComponentPaths" in mobile) {
-              var components = mobile.hideComponentPaths.map((path) => findByFilePath(path)?.default);
-              if (components.some((component) => !component))
-                throw new Error("Discord's appearance components are unavailable");
-              return registerJsxAppearance(components, () => null);
-            }
+            if ("hideComponentPaths" in mobile)
+              return registerHiddenAppearancePaths(mobile.hideComponentPaths);
             if ("scrollIndicators" in mobile) {
               var scrollViews = /* @__PURE__ */ new Set([
                 import_react_native43.ScrollView,
@@ -57712,10 +57734,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 import_react_native43.Animated?.FlatList,
                 import_react_native43.Animated?.SectionList
               ]);
-              var components1 = [
+              var components = [
                 ...scrollViews
               ].filter((component) => component != null);
-              return registerJsxAppearance(components1, (element) => React2.cloneElement(element, {
+              return registerJsxAppearance(components, (element) => React2.cloneElement(element, {
                 showsHorizontalScrollIndicator: false,
                 showsVerticalScrollIndicator: false
               }));
@@ -58925,6 +58947,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_color();
       init_toasts();
       init_metro();
+      init_modules2();
       init_cx();
       init_cx();
       init_cx();
@@ -60263,7 +60286,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b77209d3dba1a021a80aafa524a7b01e3049d42";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "46db71fa509a4868c801f4369272ba656f0bd52c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
