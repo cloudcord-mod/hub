@@ -12,7 +12,7 @@ const account = vm.createContext({ rootSettings: { fakeProfile: original, fakePr
     defaultPreview: () => ({ enabled: false, selectedBadges: {} }), publishTimer: 1, clearTimeout: () => canceled++,
     suppressOwnPullUntil: 1, mediaSelections: new Map(), userCache: new WeakMap(), profileCache: new WeakMap(),
     bindSavedPreview: () => { account.preview = account.rootSettings.fakeProfile; account.configReady = true; } });
-vm.runInContext(compile(block('function adoptProfileAccount(', 'function mediaClearPending(')), account);
+vm.runInContext(compile(block('function ownedTemplateBackup(', 'function mediaClearPending(')), account);
 account.adoptProfileAccount({ id: 'a' });
 assert.equal(account.rootSettings.fakeProfileOwnerId, 'a');
 assert.equal(account.rootSettings.fakeProfileShare.ownerId, 'a');
@@ -34,13 +34,34 @@ assert.equal(account.preview.bio, 'Account B', 'account settings restore across 
 assert.equal(account.rootSettings.fakeProfileLocalOnly, false);
 const legacyViewer = '123456789012345678';
 const mutedProfile = '223456789012345678';
+const alternateViewer = '323456789012345678';
+const legacyLook = { id: 'legacy', data: { bio: 'legacy saved look' } };
 account.rootSettings.cloudcordRealProfileUsers = [mutedProfile, legacyViewer, mutedProfile, 'invalid'];
+account.rootSettings.fakeProfileSaved = [legacyLook];
 account.adoptProfileAccount({ id: legacyViewer });
 assert.deepEqual(Array.from(account.rootSettings.cloudcordRealProfileUsersByAccount[legacyViewer]), [mutedProfile]);
-account.adoptProfileAccount({ id: '323456789012345678' });
+assert.equal(account.rootSettings.fakeProfileSaved[legacyViewer][0], legacyLook);
+account.rootSettings.fakeProfile = account.preview = { enabled: true, bio: 'temporary preview' };
+account.rootSettings.fakeProfilePreviewOwner = legacyViewer;
+account.rootSettings.fakeProfilePreviewBackup = { enabled: true, bio: 'saved profile' };
+account.adoptProfileAccount({ id: alternateViewer });
+assert.equal(account.rootSettings.fakeProfileAccounts[legacyViewer].profile.bio, 'saved profile');
+assert.equal(account.rootSettings.fakeProfilePreviewBackup, undefined);
 assert.equal(Object.keys(account.rootSettings.cloudcordRealProfileUsersByAccount).length, 1, 'legacy device choices are adopted once');
 assert(source.includes('editorOwner.current !== currentUserId'), 'stale editors cannot edit another account');
 (async () => {
+    vm.runInContext(compile(block('async function publishShare(', 'function savedSnapshot(')), account);
+    assert.equal(account.readSavedProfiles(alternateViewer).length, 0);
+    account.writeSavedProfiles(alternateViewer, [{ id: 'alternate', data: { bio: 'alternate saved look' } }]);
+    assert.equal(account.readSavedProfiles(legacyViewer)[0].id, 'legacy');
+    let finishShare;
+    account.ownSharedProfile = () => new Promise(resolve => { finishShare = resolve; });
+    account.shareRequest = () => { throw new Error('An account switch must stop an unsent share request'); };
+    const openingShare = account.publishShare(alternateViewer, account.readSavedProfiles(alternateViewer)[0], 'unlisted');
+    account.adoptProfileAccount({ id: legacyViewer });
+    finishShare({ bio: 'alternate saved look' });
+    await assert.rejects(openingShare, /Discord account changed/);
+    assert.equal(account.preview.bio, 'saved profile');
     let finishFirst, writes = [];
     let now = Date.now(), retryCallback, retryDelay;
     class TestDate extends Date { static now() { return now; } }

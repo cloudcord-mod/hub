@@ -19,7 +19,7 @@ import { Current, installPresenceHooks, installTagIconSwap, loadCatalog, Namepla
 import { popNotice, showNotice } from "@api/Notices";
 import { installNativeSocialHooks } from "@utils/nativeSocialHooks";
 import { installConnectionSettings } from "@utils/connectionSettings";
-import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
+import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
 
@@ -714,7 +714,7 @@ let profileRuntimeActive = false;
 let profileRuntimeGeneration = 0;
 // Device-only settings that never belong in the shared profile.
 // Set while a template is previewed on your profile.
-let templatePreview: { data: CustomProfileData; enabled: boolean; pullUntil: number; name: string; } | null = null;
+let templatePreview: { ownerId: string; data: CustomProfileData; enabled: boolean; pullUntil: number; name: string; } | null = null;
 const LOCAL_ONLY_FIELDS = ["localOnly", "hideOtherProfiles", "nativeEditorImages", "hideBadgesWhenSyncOff", "copiedUserId"];
 const DESKTOP_PROFILE_FIELDS = new Set([
     ...LOCAL_ONLY_FIELDS, "username", "globalName", "displayName", "avatar", "banner", "bio", "pronouns",
@@ -1284,6 +1284,7 @@ function loadDataSync() {
 }
 // Discord fires CONNECTION_OPEN after login and after every account switch.
 function onAccountSwitch() {
+    stopTemplatePreview();
     lastRemoteProfile = null;
     _cachedMyId = null;
     _realUsername = "";
@@ -2043,7 +2044,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
             </Section>
         </>,
         others: <OtherProfilesPanel />,
-        templates: <TemplatesPanel current={data} onApply={value => setData({ ...data, ...value })} />,
+        templates: <TemplatesPanel ownerId={selectedAccountId} current={data} onApply={value => setData({ ...data, ...value })} />,
         saved: <SavedProfilesPanel current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
             decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
             effectFor={skuId => catalogData?.effects.find(item => item.skuId === skuId)?.title} frameFor={skuId => catalogData?.frames.find(item => item.skuId === skuId)?.label} />,
@@ -2092,7 +2093,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
         <ModalContent className="cpx-content" scrollerClassName="cpx-scroller">
             <div className={previewExpanded ? "cpx-layout cpx-layout-preview" : "cpx-layout"}>
                 <TabList value={tab} onChange={value => { setTab(value); setPreviewExpanded(false); }} />
-                <div className="cpx-panel" id="cpx-panel" role="tabpanel" aria-labelledby={`cpx-tab-${tab}`} key={tab}>{panels[tab]}</div>
+                <div className="cpx-panel" id="cpx-panel" role="tabpanel" aria-labelledby={`cpx-tab-${tab}`} key={`${selectedAccountId}:${tab}`}>{panels[tab]}</div>
                 <ProfilePreview data={data} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
                     badges={profilePreviewBadges(data, selectedAccountId)}
                     onBadges={() => { setTab("badges"); setPreviewExpanded(false); }}
@@ -3081,22 +3082,37 @@ async function shareRequest(path: string, init: RequestInit & { token?: string; 
     return body;
 }
 const TEMPLATE_CATEGORIES = ["Aesthetic", "Anime", "Gaming", "Minimal", "Dark", "Cute", "Funny", "Other"];
-async function publishShare(item: SavedProfile, visibility: ShareVisibility, extra: { category?: string; description?: string; } = {}): Promise<ProfileShare> {
+async function publishShare(ownerId: string, item: SavedProfile, visibility: ShareVisibility, extra: { category?: string; description?: string; } = {}): Promise<ProfileShare> {
+    if (!isProfileViewUserId(ownerId) || activeUserId() !== ownerId) throw new Error("Switch to this Discord account to publish its profile.");
     const profile = toSharedProfile(item.data);
     if (item.share) {
         await shareRequest(`/${item.share.id}`, { method: "PUT", token: item.share.token, body: JSON.stringify({ name: item.name, visibility, profile, ...extra }) });
         return { ...item.share, visibility };
     }
-    const ownerId = UserStore.getCurrentUser()?.id;
-    if (!ownerId) throw new Error("Sign in to Discord first.");
     const created = await shareRequest("", { method: "POST", body: JSON.stringify({ ownerId, name: item.name, visibility, profile, ...extra }) });
     return { id: created.id, token: created.editToken, visibility };
 }
-function readSavedProfiles(): SavedProfile[] {
-    try { const value = JSON.parse(profileStorage.get("savedProfiles") || "[]"); return Array.isArray(value) ? value.filter(item => item?.id && item?.data) : []; } catch { return []; }
+let legacySavedProfilesOwner: string | undefined;
+function savedProfilesByAccount(): Record<string, SavedProfile[]> {
+    const value = readMirror<unknown>("savedProfiles", {});
+    if (Array.isArray(value)) {
+        const ownerId = legacySavedProfilesOwner ?? activeUserId();
+        if (!isProfileViewUserId(ownerId)) return {};
+        legacySavedProfilesOwner = ownerId;
+        const scoped = { [ownerId]: value };
+        try { profileStorage.set("savedProfiles", JSON.stringify(scoped)); }
+        catch { /* The currently signed-in account can still display the original list. */ }
+        return scoped;
+    }
+    return value && typeof value === "object" ? value as Record<string, SavedProfile[]> : {};
 }
-function writeSavedProfiles(next: SavedProfile[]) {
-    try { profileStorage.set("savedProfiles", JSON.stringify(next)); return true; }
+function readSavedProfiles(ownerId: string): SavedProfile[] {
+    const list = isProfileViewUserId(ownerId) ? savedProfilesByAccount()[ownerId] : undefined;
+    return Array.isArray(list) ? list.filter(item => item?.id && item?.data) : [];
+}
+function writeSavedProfiles(ownerId: string, next: SavedProfile[]) {
+    if (!isProfileViewUserId(ownerId)) return false;
+    try { profileStorage.set("savedProfiles", JSON.stringify({ ...savedProfilesByAccount(), [ownerId]: next })); return true; }
     catch { showToast("Couldn't save: storage is full. Remove a saved profile or use image links instead of uploads.", Toasts.Type.FAILURE); return false; }
 }
 // Only the look is saved; sync bookkeeping stays with the live profile.
@@ -3116,11 +3132,11 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
     fallbackSurface: ProfilePreviewSurface;
     decorationFor: (asset: string) => string | undefined; effectFor: (skuId: string) => string | undefined; frameFor: (skuId: string) => string | undefined;
 }) {
-    const [items, setItems] = React.useState<SavedProfile[]>(readSavedProfiles);
+    const [items, setItems] = React.useState(() => readSavedProfiles(userId));
     const [name, setName] = React.useState("");
     const [renaming, setRenaming] = React.useState<string | null>(null);
     const [renameText, setRenameText] = React.useState("");
-    const commit = (next: SavedProfile[]) => { if (writeSavedProfiles(next)) setItems(next); };
+    const commit = (next: SavedProfile[]) => { if (writeSavedProfiles(userId, next)) setItems(next); };
     const currentJson = JSON.stringify(savedSnapshot(current));
     const saveCurrent = () => {
         const label = name.trim() || `Profile ${items.length + 1}`;
@@ -3128,10 +3144,14 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
         setName("");
         showToast(`Saved "${label}".`, Toasts.Type.SUCCESS);
     };
-    const load = (item: SavedProfile) => { onLoad(loadSavedLook(current, item.data)); showToast(`Loaded "${item.name}". Press Save to use it.`, Toasts.Type.SUCCESS); };
+    const load = (item: SavedProfile) => {
+        if (templatePreview?.ownerId === userId && activeUserId() === userId) stopTemplatePreview();
+        onLoad(loadSavedLook(current, item.data));
+        showToast(`Loaded "${item.name}". Press Save to use it.`, Toasts.Type.SUCCESS);
+    };
     const date = (time: number) => new Date(time).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
     return <>
-        <Section title="Saved profiles" description="Keep copies of your custom profile and switch between them. Saved on this device.">
+        <Section title="Saved profiles" description="Keep copies of this account’s custom profile on this device.">
             <div className="cpx-inline">
                 <input className="cpx-input" value={name} maxLength={40} placeholder={`Name, like "Main" or "Profile ${items.length + 1}"`} onChange={event => setName(event.currentTarget.value)} onKeyDown={event => { if (event.key === "Enter") saveCurrent(); }} />
                 <button type="button" className="cpx-btn cpx-btn-primary" onClick={saveCurrent}>Save current look</button>
@@ -3165,7 +3185,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>
                         </button>
                     </div>
-                    <ShareControls item={item} onChange={share => commit(readSavedProfiles().map(other => other.id === item.id ? { ...other, share } : other))} />
+                    {activeUserId() === userId && <ShareControls ownerId={userId} item={item} onChange={share => commit(readSavedProfiles(userId).map(other => other.id === item.id ? { ...other, share } : other))} />}
                 </div>;
             })}
         </div>
@@ -3313,15 +3333,15 @@ function LocalTagSection() {
 }
 
 
-function ShareControls({ item, onChange }: { item: SavedProfile; onChange: (share: ProfileShare | undefined) => void; }) {
+function ShareControls({ ownerId, item, onChange }: { ownerId: string; item: SavedProfile; onChange: (share: ProfileShare | undefined) => void; }) {
     const [open, setOpen] = React.useState(false);
     const [visibility, setVisibility] = React.useState<ShareVisibility>(item.share?.visibility ?? "unlisted");
     const [busy, setBusy] = React.useState(false);
     const [error, setError] = React.useState("");
-    const run = async (task: () => Promise<void>) => { setBusy(true); setError(""); try { await task(); } catch (problem: any) { setError(problem?.message || "Sharing failed."); } finally { setBusy(false); } };
-    const share = () => run(async () => { const next = await publishShare(item, visibility); onChange(next); showToast(item.share ? "Share updated." : "Profile shared.", Toasts.Type.SUCCESS); });
+    const run = async (task: () => Promise<void>) => { if (activeUserId() !== ownerId) return; setBusy(true); setError(""); try { await task(); } catch (problem: any) { setError(problem?.message || "Sharing failed."); } finally { setBusy(false); } };
+    const share = () => run(async () => { const next = await publishShare(ownerId, item, visibility); onChange(next); showToast(item.share ? "Share updated." : "Profile shared.", Toasts.Type.SUCCESS); });
     const stop = () => run(async () => { if (item.share) await shareRequest(`/${item.share.id}`, { method: "DELETE", token: item.share.token }).catch(problem => { if (!/not found|401/i.test(String(problem?.message))) throw problem; }); onChange(undefined); setOpen(false); });
-    const copy = () => { if (!item.share) return; navigator.clipboard?.writeText(shareLink(item.share.id)).then(() => showToast("Link copied.", Toasts.Type.SUCCESS), () => { }); };
+    const copy = () => { if (!item.share || activeUserId() !== ownerId) return; navigator.clipboard?.writeText(shareLink(item.share.id)).then(() => showToast("Link copied.", Toasts.Type.SUCCESS), () => { }); };
     if (!open) return <button type="button" className="cpx-btn cpx-btn-ghost" onClick={() => setOpen(true)}>{item.share ? `Shared · ${item.share.visibility}` : "Share"}</button>;
     return <div className="cpx-field" style={{ padding: 10, borderRadius: 10, background: "var(--cpx-surface)" }}>
         <SelectField label="Who can see it" options={SHARE_VISIBILITIES} value={visibility} onChange={value => setVisibility(value as ShareVisibility)} />
@@ -3340,8 +3360,8 @@ function ShareControls({ item, onChange }: { item: SavedProfile; onChange: (shar
 // ---- Templates: community profiles from getcloudcord.com/templates ----
 interface TemplateSummary { id: string; name: string; category?: string; description?: string; uses?: number; preview?: { name?: string; avatar?: string; banner?: string; bio?: string; accent?: string; }; }
 const countTemplateUse = (id: string) => { void fetch(`${SHARED_PROFILE_API}/v1/shares/${id}/use`, { method: "POST" }).catch(() => { }); };
-async function fetchTemplate(id: string) {
-    const own = readSavedProfiles().find(item => item.share?.id === id);
+async function fetchTemplate(id: string, ownerId: string) {
+    const own = activeUserId() === ownerId ? readSavedProfiles(ownerId).find(item => item.share?.id === id) : undefined;
     const share = await shareRequest(`/${id}`, { method: "GET", token: own?.share?.token });
     // Blank fields in a template (name, bio, picture) keep your own instead of clearing them.
     const data = Object.fromEntries(Object.entries(fromSharedProfile(share.profile)).filter(([, value]) => value !== "" && value !== undefined)) as CustomProfileData;
@@ -3356,8 +3376,9 @@ function refreshOwnProfile() {
     forceAccountPanelRerender();
     reloadDiscordProfile(activeUserId());
 }
-function startTemplatePreview(name: string, data: CustomProfileData) {
-    if (!templatePreview) templatePreview = { data: storedData, enabled: isEnabled, pullUntil: suppressOwnPullUntil, name };
+function startTemplatePreview(ownerId: string, name: string, data: CustomProfileData) {
+    if (activeUserId() !== ownerId) throw new Error("Switch to this Discord account to preview its profile.");
+    if (templatePreview?.ownerId !== ownerId) templatePreview = { ownerId, data: storedData, enabled: isEnabled, pullUntil: suppressOwnPullUntil, name };
     templatePreview.name = name;
     // Keep your own settings; take the template's whole look (colors, banner and cosmetics).
     // Cosmetics the template doesn't have are cleared so the preview matches it exactly.
@@ -3370,10 +3391,16 @@ function startTemplatePreview(name: string, data: CustomProfileData) {
     try { popNotice(); showNotice(`Previewing the "${name}" template on your profile. Only you can see it.`, "Stop preview", () => stopTemplatePreview()); } catch (e) { logger.warn("Showing the preview notice failed", e); }
 }
 function stopTemplatePreview() {
-    if (!templatePreview) return;
-    storedData = templatePreview.data; isEnabled = templatePreview.enabled; suppressOwnPullUntil = templatePreview.pullUntil;
+    const previous = templatePreview;
+    if (!previous) return;
     templatePreview = null;
-    refreshOwnProfile();
+    suppressOwnPullUntil = 0;
+    if (activeUserId() === previous.ownerId) {
+        storedData = previous.data;
+        isEnabled = previous.enabled;
+        suppressOwnPullUntil = previous.pullUntil;
+        refreshOwnProfile();
+    }
     try { popNotice(); } catch { /* the notice may already be closed */ }
 }
 
@@ -3395,7 +3422,7 @@ function TemplateCard({ template, busy, previewing, onPreview, onUse, onSave }: 
     </div>;
 }
 
-function TemplatesPanel({ current, onApply }: { current: CustomProfileData; onApply: (data: CustomProfileData) => void; }) {
+function TemplatesPanel({ ownerId, current, onApply }: { ownerId: string; current: CustomProfileData; onApply: (data: CustomProfileData) => void; }) {
     const [query, setQuery] = React.useState("");
     const [category, setCategory] = React.useState("");
     const [sort, setSort] = React.useState<"popular" | "new">("popular");
@@ -3410,7 +3437,10 @@ function TemplatesPanel({ current, onApply }: { current: CustomProfileData; onAp
     const [published, setPublished] = React.useState<ProfileShare | null>(null);
     const [previewing, setPreviewing] = React.useState<{ id: string; name: string; data: CustomProfileData; } | null>(null);
     // Pick up a preview that's still running from before the editor was reopened.
-    React.useEffect(() => { if (templatePreview) setPreviewing(current => current ?? { id: "", name: templatePreview!.name, data: templatePreview!.data }); }, []);
+    React.useEffect(() => {
+        const existing = templatePreview;
+        if (existing?.ownerId === ownerId) setPreviewing(value => value ?? { id: "", name: existing.name, data: existing.data });
+    }, [ownerId]);
 
     React.useEffect(() => {
         let cancelled = false;
@@ -3427,23 +3457,25 @@ function TemplatesPanel({ current, onApply }: { current: CustomProfileData; onAp
 
     const run = async (task: () => Promise<void>) => { setBusy(true); setError(""); try { await task(); } catch (problem: any) { setError(/not found/i.test(String(problem?.message)) ? "That template doesn't exist or is private." : problem?.message || "Something went wrong."); } finally { setBusy(false); } };
     const preview = (id: string) => run(async () => {
+        if (activeUserId() !== ownerId) throw new Error("Switch to this Discord account to preview its profile.");
         if (previewing?.id === id) { stopTemplatePreview(); setPreviewing(null); return; }
-        const template = await fetchTemplate(id);
-        startTemplatePreview(template.name, template.data);
+        const template = await fetchTemplate(id, ownerId);
+        startTemplatePreview(ownerId, template.name, template.data);
         setPreviewing({ id, ...template });
         showToast(`Previewing "${template.name}". Close the editor and open your profile to see it.`, Toasts.Type.SUCCESS);
     });
-    const stopPreview = () => { stopTemplatePreview(); setPreviewing(null); showToast("Preview stopped. Your profile is back.", Toasts.Type.SUCCESS); };
+    const stopPreview = () => { if (activeUserId() !== ownerId) return; stopTemplatePreview(); setPreviewing(null); showToast("Preview stopped. Your profile is back.", Toasts.Type.SUCCESS); };
     const use = (id: string) => run(async () => {
-        const template = previewing?.id === id ? previewing : await fetchTemplate(id);
+        const template = previewing?.id === id ? previewing : await fetchTemplate(id, ownerId);
+        if (activeUserId() !== ownerId) throw new Error("Switch to this Discord account to use the template.");
         stopTemplatePreview(); setPreviewing(null);
         onApply(template.data);
         countTemplateUse(id);
         showToast(`Applied "${template.name}". Press Save to keep it.`, Toasts.Type.SUCCESS);
     });
     const save = (id: string) => run(async () => {
-        const template = await fetchTemplate(id);
-        if (writeSavedProfiles([{ id: newSavedId(), name: template.name.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(template.data) }, ...readSavedProfiles()])) {
+        const template = await fetchTemplate(id, ownerId);
+        if (writeSavedProfiles(ownerId, [{ id: newSavedId(), name: template.name.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(template.data) }, ...readSavedProfiles(ownerId)])) {
             countTemplateUse(id);
             showToast(`Added "${template.name}" to Saved profiles.`, Toasts.Type.SUCCESS);
         }
@@ -3452,9 +3484,9 @@ function TemplatesPanel({ current, onApply }: { current: CustomProfileData; onAp
         const name = pubName.trim();
         if (!name) throw new Error("Give your template a name.");
         const item: SavedProfile = { id: newSavedId(), name: name.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(current) };
-        const share = await publishShare(item, pubVisibility, { category: pubCategory, description: pubDescription.trim() });
+        const share = await publishShare(ownerId, item, pubVisibility, { category: pubCategory, description: pubDescription.trim() });
         // Also kept in Saved profiles, where it can be updated or unshared later.
-        writeSavedProfiles([{ ...item, share }, ...readSavedProfiles()]);
+        writeSavedProfiles(ownerId, [{ ...item, share }, ...readSavedProfiles(ownerId)]);
         setPublished(share);
         showToast(pubVisibility === "public" ? "Published to the template gallery." : "Template link created.", Toasts.Type.SUCCESS);
     });
