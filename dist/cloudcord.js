@@ -43006,6 +43006,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "channels.clipboard",
           label: "Add Copy Channel Name and Copy Category Name actions"
         },
+        "copy-role-color": {
+          permission: "guild.roleclipboard",
+          label: "Copy the selected server role's hex color",
+          desktopOnly: true
+        },
+        "copy-role-mention": {
+          permission: "guild.roleclipboard",
+          label: "Copy mention markup for the selected server role",
+          desktopOnly: true
+        },
+        "view-role-icon": {
+          permission: "guild.rolemedia",
+          label: "Open the selected server role's icon in Discord's image viewer",
+          desktopOnly: true
+        },
         "hide-suggested-channels": {
           permission: "appearance.hide",
           label: "Hide the suggested channels section"
@@ -50292,6 +50307,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "replies.suppressping": "Send replies without pinging the person you reply to",
         "profile.avatar": "Read the avatar URL of the selected Discord user or your own avatar when the command runs",
         "guild.members": "Read loaded members with the role you select in the current server",
+        "guild.roleclipboard": "Copy a loaded role's color or mention markup when you choose the corresponding menu action",
+        "guild.rolemedia": "Open the selected role's Discord-hosted icon when you choose View Role Icon",
         "guild.randommember": "Pick a loaded member of the current server to mention",
         "friends.invites.create": "Create a friend invite when you run the listed command",
         "friends.invites.list": "List your friend invites privately when you run the listed command",
@@ -50823,6 +50840,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_raw_text = __esm({
     "../examples/cx/catalog/plugins/copy-raw-text.cx"() {
       copy_raw_text_default = 'plugin "Copy Raw Text":\n  needs messages.copytext\n  use copy-raw-text\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-role-color.cx
+  var copy_role_color_default;
+  var init_copy_role_color = __esm({
+    "../examples/cx/catalog/plugins/copy-role-color.cx"() {
+      copy_role_color_default = 'plugin "CopyRoleColor":\n  needs guild.roleclipboard\n  use copy-role-color\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-role-mention.cx
+  var copy_role_mention_default;
+  var init_copy_role_mention = __esm({
+    "../examples/cx/catalog/plugins/copy-role-mention.cx"() {
+      copy_role_mention_default = 'plugin "CopyRoleMention":\n  needs guild.roleclipboard\n  use copy-role-mention\n';
     }
   });
 
@@ -53181,6 +53214,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/view-role-icon.cx
+  var view_role_icon_default;
+  var init_view_role_icon = __esm({
+    "../examples/cx/catalog/plugins/view-role-icon.cx"() {
+      view_role_icon_default = 'plugin "ViewRoleIcon":\n  needs guild.rolemedia\n  use view-role-icon\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/voice-count.cx
   var voice_count_default;
   var init_voice_count = __esm({
@@ -54175,6 +54216,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_profile_names();
       init_copy_pronouns();
       init_copy_raw_text();
+      init_copy_role_color();
+      init_copy_role_mention();
       init_copy_server_bio();
       init_copy_server_nickname();
       init_copy_sticker_links();
@@ -54425,6 +54468,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_user_tags();
       init_utf_8_byte_count();
       init_vibe_check();
+      init_view_role_icon();
       init_voice_count();
       init_voice_join_messages();
       init_vriska_s_typing_quirk();
@@ -55009,6 +55053,24 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Add Copy Raw Text to message menus",
             categories: [
               "Chat"
+            ]
+          },
+          {
+            name: "CopyRoleColor",
+            source: copy_role_color_default,
+            description: "Copy the selected server role's hex color",
+            desktopOnly: true,
+            categories: [
+              "Servers & channels"
+            ]
+          },
+          {
+            name: "CopyRoleMention",
+            source: copy_role_mention_default,
+            description: "Copy mention markup for the selected server role",
+            desktopOnly: true,
+            categories: [
+              "Servers & channels"
             ]
           },
           {
@@ -57361,6 +57423,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat",
               "Commands"
+            ]
+          },
+          {
+            name: "ViewRoleIcon",
+            source: view_role_icon_default,
+            description: "Open the selected server role's icon in Discord's image viewer",
+            desktopOnly: true,
+            categories: [
+              "Servers & channels"
             ]
           },
           {
@@ -61231,6 +61302,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerLocalText("channels");
           case "copy-channel-name":
             return registerCopyChannelName(enabled);
+          case "copy-role-color":
+          case "copy-role-mention":
+          case "view-role-icon":
+            throw new Error("Role menu actions are available on desktop and browser.");
           case "hide-suggested-channels": {
             var suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
             if (!suggested)
@@ -63982,7 +64057,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "dc77bc14dcc92d3c5d968719fb8d9de7ddb66607";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "600f843c39846c031034a3149bd5d0569827b017";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
