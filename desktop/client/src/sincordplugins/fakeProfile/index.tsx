@@ -515,7 +515,9 @@ const SHARED_PROFILE_TTL_MS = 2 * 60_000;
 const SHARED_MISSING_TTL_MS = 15 * 60_000;
 const SHARED_VIEWED_WINDOW_MS = 2 * 60_000;
 const SHARED_MAX_IN_FLIGHT = 4;
-const sharedQueued = new Set<string>();
+const SHARED_PROFILE_CACHE_LIMIT = 1024;
+const SHARED_QUEUE_LIMIT = 200;
+const sharedQueued = new Map<string, boolean>();
 const discordReloadedAt = new Map<string, number>();
 const SHARED_REFRESH_PER_TICK = 5;
 const sharedMissingUntil = new Map<string, number>();
@@ -1040,25 +1042,54 @@ async function pullOwnSharedProfile() {
     } catch (e) { logger.warn("Pulling profile from the cloud failed", e); }
 }
 
+function queueSharedProfileRequest(userId: string, force: boolean) {
+    const queued = sharedQueued.get(userId);
+    if (queued !== undefined || sharedQueued.size < SHARED_QUEUE_LIMIT) sharedQueued.set(userId, force || queued === true);
+}
+
+function drainSharedProfileQueue() {
+    if (!profileRuntimeActive || Date.now() < sharedBackoffUntil) return;
+    for (const [userId, force] of sharedQueued) {
+        if (sharedRequests.size >= SHARED_MAX_IN_FLIGHT) break;
+        sharedQueued.delete(userId);
+        requestSharedProfile(userId, force);
+    }
+}
+
+function recordSharedProfile(userId: string, profile: CustomProfileData) {
+    sharedProfileFetchedAt.delete(userId);
+    sharedProfileFetchedAt.set(userId, Date.now());
+    sharedProfiles.set(userId, profile);
+    for (const oldest of sharedProfileFetchedAt.keys()) {
+        if (sharedProfileFetchedAt.size <= SHARED_PROFILE_CACHE_LIMIT) break;
+        if (sharedRequests.has(oldest)) continue;
+        sharedProfileFetchedAt.delete(oldest);
+        sharedProfiles.delete(oldest);
+        sharedViewedAt.delete(oldest);
+        discordReloadedAt.delete(oldest);
+    }
+}
+
 function requestSharedProfile(userId: string, force = false) {
     if (!profileRuntimeActive || !/^\d{15,22}$/.test(userId) || isMe(userId) || sharedRequests.has(userId)) return;
     const generation = profileRuntimeGeneration;
     const now = Date.now();
-    if (now < sharedBackoffUntil) { if (sharedQueued.size < 200) sharedQueued.add(userId); return; }
-    // Busy: queue it instead of dropping it, so the profile still loads (and its badges replace the real ones).
-    if (sharedRequests.size >= SHARED_MAX_IN_FLIGHT) { if (sharedQueued.size < 200) sharedQueued.add(userId); return; }
     // "No profile" is remembered, but only for a minute when the profile is actually opened.
     const missingUntil = sharedMissingUntil.get(userId) ?? 0;
     if (missingUntil > now && (!force || missingUntil - SHARED_MISSING_TTL_MS + 60_000 > now)) return;
     const fetchedAt = sharedProfileFetchedAt.get(userId) ?? 0;
     // Even forced refreshes wait a little, so one user is never fetched in a loop.
     if (sharedProfiles.has(userId) && now - fetchedAt < (force ? 30_000 : SHARED_PROFILE_TTL_MS)) return;
+    if (now < sharedBackoffUntil || sharedRequests.size >= SHARED_MAX_IN_FLIGHT) {
+        queueSharedProfileRequest(userId, force);
+        return;
+    }
+    sharedQueued.delete(userId);
     sharedRequests.add(userId);
     void fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(userId)}`)
         .then(r => {
             if (!profileRuntimeActive || generation !== profileRuntimeGeneration) return null;
             if (r.status === 404) {
-                sharedQueued.delete(userId);
                 // No CloudCord profile: remember that instead of asking again.
                 sharedMissingUntil.set(userId, Date.now() + SHARED_MISSING_TTL_MS);
                 if (sharedMissingUntil.size > 5000) sharedMissingUntil.delete(sharedMissingUntil.keys().next().value!);
@@ -1066,6 +1097,7 @@ function requestSharedProfile(userId: string, force = false) {
                 // Keep transient failures separate: only a confirmed 404 removes it.
                 if (sharedProfiles.delete(userId)) {
                     sharedProfileFetchedAt.delete(userId);
+                    discordReloadedAt.delete(userId);
                     try {
                         (Vencord.Webpack as WebpackWithStoreName).findByStoreName?.("UserProfileStore")?.emitChange?.();
                         (Vencord.Webpack as WebpackWithStoreName).findByStoreName?.("UserStore")?.emitChange?.();
@@ -1077,7 +1109,7 @@ function requestSharedProfile(userId: string, force = false) {
             if (r.status === 429 || r.status >= 500) {
                 const retryAfter = Number(r.headers.get("retry-after")) * 1000;
                 sharedBackoffUntil = Date.now() + (Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter, 5 * 60_000) : 60_000);
-                if (sharedQueued.size < 200) sharedQueued.add(userId);
+                queueSharedProfileRequest(userId, force);
                 return null;
             }
             return r.ok ? r.json() : null;
@@ -1089,9 +1121,7 @@ function requestSharedProfile(userId: string, force = false) {
             const previous = sharedProfiles.get(userId);
             const changed = JSON.stringify(previous ?? null) !== JSON.stringify(next);
             sharedMissingUntil.delete(userId);
-            sharedQueued.delete(userId);
-            if (changed) sharedProfiles.set(userId, next);
-            sharedProfileFetchedAt.set(userId, Date.now());
+            recordSharedProfile(userId, changed ? next : previous ?? next);
             if (!changed) return;
             // Discord may already hold this user's badge info: apply the fake data to it now.
             reapplyBadgeDirectory(userId);
@@ -1109,13 +1139,11 @@ function requestSharedProfile(userId: string, force = false) {
         }).catch(() => {
             if (!profileRuntimeActive || generation !== profileRuntimeGeneration) return;
             sharedBackoffUntil = Math.max(sharedBackoffUntil, Date.now() + 30_000);
-            if (sharedQueued.size < 200) sharedQueued.add(userId);
+            queueSharedProfileRequest(userId, force);
         }).finally(() => {
             if (!profileRuntimeActive || generation !== profileRuntimeGeneration) return;
             sharedRequests.delete(userId);
-            if (Date.now() < sharedBackoffUntil) return;
-            const next = sharedQueued.values().next().value;
-            if (next) { sharedQueued.delete(next); requestSharedProfile(next); }
+            drainSharedProfileQueue();
         });
 }
 
@@ -1124,11 +1152,7 @@ function refreshVisibleSharedProfiles() {
     // device appear), a few per tick, oldest first. Nobody else is re-fetched.
     const now = Date.now();
     if (!profileRuntimeActive || now < sharedBackoffUntil) return;
-    for (const userId of [...sharedQueued]) {
-        if (sharedRequests.size >= SHARED_MAX_IN_FLIGHT) break;
-        sharedQueued.delete(userId);
-        requestSharedProfile(userId, true);
-    }
+    drainSharedProfileQueue();
     const due = [...sharedViewedAt]
         .filter(([userId, viewedAt]) => now - viewedAt < SHARED_VIEWED_WINDOW_MS && now - (sharedProfileFetchedAt.get(userId) ?? 0) > 30_000)
         .sort((a, b) => (sharedProfileFetchedAt.get(a[0]) ?? 0) - (sharedProfileFetchedAt.get(b[0]) ?? 0))
@@ -2031,7 +2055,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                     if (!shared && !isMe(userId)) {
                         try {
                             const response = await fetch(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(userId)}`, { signal: AbortSignal.timeout(10000) });
-                            if (response.ok) { const payload = await response.json(); shared = fromSharedProfile(payload?.profile ?? payload); sharedProfiles.set(userId, shared); sharedProfileFetchedAt.set(userId, Date.now()); }
+                            if (response.ok) { const payload = await response.json(); shared = fromSharedProfile(payload?.profile ?? payload); recordSharedProfile(userId, shared); }
                         } catch { /* Cached Discord user data remains usable offline. */ }
                     }
                     if (isMe(userId) && isEnabled) shared = storedData;

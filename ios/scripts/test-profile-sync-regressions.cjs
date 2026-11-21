@@ -199,14 +199,16 @@ assert.equal(nativeSave.storedData.syncRevision, undefined, 'device-only saves n
     let refreshes = 0;
     const otherId = '987654321098765';
     const viewer = testContext({ ...runtime, Date, JSON, isMe: () => false,
-        sharedRequests: new Set(), sharedQueued: new Set(), sharedMissingUntil: new Map(),
+        sharedRequests: new Set(), sharedQueued: new Map(), sharedMissingUntil: new Map(),
         sharedViewedAt: new Map(), SHARED_VIEWED_WINDOW_MS: 120000, SHARED_REFRESH_PER_TICK: 5,
         sharedProfiles: new Map([[otherId, { badgeFlags: 8 }]]), sharedProfileFetchedAt: new Map(),
         sharedBackoffUntil: 0, SHARED_MAX_IN_FLIGHT: 4, SHARED_MISSING_TTL_MS: 900000, SHARED_PROFILE_TTL_MS: 120000,
+        SHARED_PROFILE_CACHE_LIMIT: 3, SHARED_QUEUE_LIMIT: 4, discordReloadedAt: new Map(),
+        realGetUserProfile: null, reapplyBadgeDirectory() {},
         SHARED_PROFILE_API: 'https://example.test', fromSharedProfile: value => value,
         fetch: async () => ({ status: responseStatus, ok: responseStatus === 200, headers: { get: () => null }, json: async () => ({ profile: { badgeFlags: 2 } }) }),
         Vencord: { Webpack: { findByStoreName: () => ({ emitChange: () => refreshes++ }) } }, refreshPresence() {} });
-    vm.runInContext(compile(block(desktop, 'function requestSharedProfile(', 'const socialLookupAt')), viewer);
+    vm.runInContext(compile(block(desktop, 'function queueSharedProfileRequest(', 'const socialLookupAt')), viewer);
     const settle = async () => { for (let turn = 0; turn < 8; turn++) await Promise.resolve(); };
     viewer.requestSharedProfile(otherId); await settle();
     assert.equal(viewer.sharedProfiles.get(otherId).badgeFlags, 8, 'server outages keep the last valid shared badges');
@@ -238,6 +240,29 @@ assert.equal(nativeSave.storedData.syncRevision, undefined, 'device-only saves n
     finishes[1]({ ok: true, status: 200, json: async () => ({ profile: { badgeFlags: 4 } }) }); await settle();
     assert.equal(viewer.sharedRequests.size, 0);
     assert.equal(viewer.sharedProfiles.get(otherId).badgeFlags, 4);
+    const cachedId = '223456789012345';
+    viewer.recordSharedProfile(cachedId, { badgeFlags: 1 });
+    viewer.sharedProfileFetchedAt.set(otherId, Date.now() - 31_000);
+    viewer.sharedBackoffUntil = Date.now() + 1000;
+    viewer.requestSharedProfile(cachedId);
+    assert.equal(viewer.sharedQueued.has(cachedId), false, 'fresh profiles do not crowd the queue during backoff');
+    viewer.requestSharedProfile(otherId, true);
+    assert.equal(viewer.sharedQueued.get(otherId), true, 'a deferred refresh retains its shorter TTL');
+    viewer.sharedBackoffUntil = 0;
+    viewer.drainSharedProfileQueue();
+    assert.equal(finishes.length, 3, 'the deferred refresh dispatches when backoff clears');
+    finishes[2]({ ok: true, status: 200, json: async () => ({ profile: { badgeFlags: 4 } }) });
+    await settle();
+    const firstExtra = '323456789012345';
+    const lastExtra = '423456789012345';
+    viewer.sharedViewedAt.set(cachedId, Date.now());
+    viewer.discordReloadedAt.set(cachedId, Date.now());
+    viewer.recordSharedProfile(firstExtra, {});
+    viewer.recordSharedProfile(lastExtra, {});
+    assert.equal(viewer.sharedProfiles.size, 3);
+    assert.equal(viewer.sharedProfileFetchedAt.size, 3);
+    assert.equal(viewer.sharedProfiles.has(cachedId), false, 'old cached profiles are evicted after the cap');
+    assert.equal(viewer.sharedViewedAt.has(cachedId) || viewer.discordReloadedAt.has(cachedId), false);
     let pending = host.pullOwnSharedProfile();
     host.storedData = { bio: 'edited during request', syncRevision: 4 };
     resolveResponse(); await pending;
