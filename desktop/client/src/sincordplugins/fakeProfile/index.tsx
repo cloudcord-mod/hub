@@ -500,7 +500,6 @@ let otherUserCache = new WeakMap<object, { profile: CustomProfileData; user: any
 let _cachedMyId: string | null = null;
 let _realUsername = "";
 let _realGlobalName = "";
-let _avatarPatchApplied = false;
 
 function invalidateOwnUser(forgetRealUser = false) {
     ownUserCache = null;
@@ -880,14 +879,52 @@ function installProfileReadHook(store: any, method: string, handler: (original: 
         if (!profileRuntimeActive || generation !== profileRuntimeGeneration) return original.apply(this, args);
         return handler(original.bind(this), args);
     };
-    store[method] = wrapped;
-    profileStoreCleanups.push(() => { if (store[method] === wrapped) store[method] = original; });
+    if (!Reflect.set(store, method, wrapped)) return;
+    profileStoreCleanups.push(() => { if (store[method] === wrapped) Reflect.set(store, method, original); });
 }
 function uninstallProfileStoreHooks() {
     for (const cleanup of profileStoreCleanups.splice(0).reverse()) cleanup();
     realGetUserProfile = null;
     realGetCurrentUser = null;
+    realGetUserAvatarURL = undefined;
 }
+
+function presentationProfileFor(userId: unknown) {
+    if (!isProfileViewUserId(userId)) return;
+    if (isMe(userId)) return isEnabled ? storedData : undefined;
+    requestSharedProfile(userId);
+    return viewedSharedProfile(userId);
+}
+
+function installProfileAvatarHooks(resolver: typeof IconUtils) {
+    if (!resolver) return;
+    if (typeof resolver.getUserAvatarURL === "function") realGetUserAvatarURL = resolver.getUserAvatarURL.bind(resolver);
+    for (const method of ["getUserAvatarURL", "getGuildMemberAvatarURL", "getGuildMemberAvatarURLSimple"] as const) {
+        installProfileReadHook(resolver, method, (original, args) => {
+            const subject = args[0];
+            const userId = method === "getUserAvatarURL" ? subject?.id : subject?.userId;
+            const avatar = presentationProfileFor(userId)?.avatar;
+            return isImageUri(avatar) ? avatar : original(...args);
+        });
+    }
+}
+
+function installProfileNameHooks(resolver: unknown) {
+    for (const method of ["getName", "getNickname", "useName"]) {
+        installProfileReadHook(resolver, method, (original, args) => {
+            const result = original(...args);
+            if (typeof result !== "string" || !result) return result;
+            const user = args.map(arg => arg?.user ?? arg).find(value =>
+                typeof value?.username === "string" && isProfileViewUserId(value.id));
+            const userId = user?.id ?? args.find(value => isProfileViewUserId(value?.userId))?.userId;
+            const profile = presentationProfileFor(userId);
+            const name = profile?.globalName || profile?.username;
+            if (!name) return result;
+            return result.startsWith("@") ? "@" + name : name;
+        });
+    }
+}
+
 function installProfileStoreHooks(plugin: any) {
     const owner = {};
     try {
@@ -2497,18 +2534,10 @@ export default definePlugin({
         FluxDispatcher.subscribe("USER_PROFILE_SETTINGS_SET_PENDING_CHANGES", onPendingProfileChange);
 
         installProfileStoreHooks(this);
-
-        // Avatars: yours from your profile, everyone else's from their shared CloudCord profile.
-        if (IconUtils?.getUserAvatarURL && !_avatarPatchApplied) {
-            const realAvatarUrl: (...args: any[]) => string = realGetUserAvatarURL = IconUtils.getUserAvatarURL;
-            const avatarFor = (userId: string): string | undefined => {
-                if (isMe(userId)) return isEnabled ? storedData.avatar : undefined;
-                requestSharedProfile(userId);
-                return viewedSharedProfile(userId)?.avatar;
-            };
-            (IconUtils as any).getUserAvatarURL = (user: any, ...args: unknown[]) => (user?.id && avatarFor(user.id)) || realAvatarUrl(user, ...args);
-            _avatarPatchApplied = true;
-        }
+        installProfileAvatarHooks(IconUtils);
+        waitFor(["getName", "getNickname", "useName"], resolver => {
+            if (profileRuntimeActive && generation === profileRuntimeGeneration) installProfileNameHooks(resolver);
+        });
 
         // Your own id encodes your real sign-up time; answer with the chosen date instead.
         if (SnowflakeUtils?.extractTimestamp && !this._origExtractTimestamp) {
@@ -2595,11 +2624,6 @@ export default definePlugin({
         if (SnowflakeUtils && this._origExtractTimestamp) {
             (SnowflakeUtils as any).extractTimestamp = this._origExtractTimestamp;
             this._origExtractTimestamp = null;
-        }
-        if (IconUtils && realGetUserAvatarURL) {
-            IconUtils.getUserAvatarURL = realGetUserAvatarURL;
-            realGetUserAvatarURL = undefined;
-            _avatarPatchApplied = false;
         }
         if (this._origGetAvatarDecorationURL && IconUtils) { (IconUtils as any).getAvatarDecorationURL = this._origGetAvatarDecorationURL; this._origGetAvatarDecorationURL = null; }
     },

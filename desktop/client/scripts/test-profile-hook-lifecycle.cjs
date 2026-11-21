@@ -3,6 +3,11 @@ const esbuild = require('esbuild');
 const source = fs.readFileSync('src/sincordplugins/fakeProfile/index.tsx', 'utf8');
 const own = Object.freeze({ id: 'own', username: 'real-own' });
 const other = Object.freeze({ id: 'other', username: 'real-other' });
+const knownUserId = '123456789012345678';
+const unrelatedGuildId = '234567890123456789';
+const syncedUser = Object.freeze({ id: knownUserId, username: 'real-synced' });
+const sharedAvatar = 'https://cdn.discordapp.com/avatars/123456789012345678/a.png';
+let realView = false;
 const profile = Object.freeze({ userId: 'own', bio: 'real-bio' });
 const listeners = new Set();
 const users = { getCurrentUser() { assert.equal(this, users); return own; }, getUser(id) { assert.equal(this, users); return id === 'own' ? own : other; },
@@ -15,12 +20,15 @@ const plugin = { fakeCurrentUser: user => { transforms++; return { ...user, user
     hookUserProfile: value => ({ ...value, bio: 'custom-bio' }) };
 const ctx = vm.createContext({ profileRuntimeActive: true, profileRuntimeGeneration: 1, UserStore: users,
     otherUserCache: new WeakMap(), cachedFakeUser: null, cachedOriginalUser: null,
-    Vencord: { Webpack: { findByProps: () => profiles } }, realGetUserProfile: null, realGetCurrentUser: null,
+    Vencord: { Webpack: { findByProps: () => profiles } }, realGetUserProfile: null, realGetCurrentUser: null, realGetUserAvatarURL: undefined,
     isEnabled: true, profileVersion: 1, _realUsername: '', _realGlobalName: '', isMe: id => id === 'own',
     invalidateOwnUser() {},
-    resolveProfileUserId: id => id, requestSharedProfile() {}, viewedSharedProfile: () => ({ bio: 'shared-bio' }),
+    resolveProfileUserId: id => id, requestSharedProfile() {}, viewedSharedProfile: id => realView ? undefined : {
+        bio: 'shared-bio', ...(id === knownUserId ? { globalName: 'Synced Nick', avatar: sharedAvatar } : {}),
+    },
+    isProfileViewUserId: id => typeof id === 'string' && /^\d{15,22}$/.test(id),
     decorateSharedProfile: (value, data) => ({ ...value, ...data }) });
-vm.runInContext(esbuild.transformSync(source.slice(source.indexOf('const profileStoreCleanups:'), source.indexOf('const isImageUri')), { loader: 'ts' }).code, ctx);
+vm.runInContext(esbuild.transformSync(source.slice(source.indexOf('const profileStoreCleanups:'), source.indexOf('// Discord\'s Edit Profile')), { loader: 'ts' }).code, ctx);
 ctx.installProfileStoreHooks(plugin);
 assert.equal(listeners.size, 1);
 const beforeInvalidation = ctx.otherUserCache;
@@ -30,6 +38,29 @@ assert.equal(users.getCurrentUser().username, 'custom-own');
 assert.equal(users.getUser('other').username, 'custom-other');
 assert.equal(profiles.getUserProfile('own').bio, 'custom-bio');
 assert.equal(profiles.getGuildMemberProfile('other').bio, 'shared-bio');
+const names = { getName(guildId, user) { assert.equal(this, names); assert.equal(user, syncedUser); return '@Native'; },
+    getNickname() { return null; }, useName() { return 'Native'; } };
+const avatars = { getUserAvatarURL() { assert.equal(this, avatars); return 'native'; },
+    getGuildMemberAvatarURL() { return 'guild'; }, getGuildMemberAvatarURLSimple() { return 'simple'; } };
+const nativeAvatar = avatars.getGuildMemberAvatarURL;
+const nativeName = names.getName;
+ctx.installProfileAvatarHooks(avatars);
+ctx.installProfileNameHooks(names);
+const frozenNames = Object.freeze({ getName: () => 'Native' });
+ctx.installProfileNameHooks(frozenNames);
+assert.equal(frozenNames.getName(syncedUser), 'Native');
+assert.equal(avatars.getUserAvatarURL(syncedUser), sharedAvatar);
+assert.equal(avatars.getGuildMemberAvatarURL({ userId: knownUserId, guildId: unrelatedGuildId }), sharedAvatar);
+assert.equal(avatars.getGuildMemberAvatarURLSimple({ guildId: knownUserId, userId: unrelatedGuildId }), 'simple');
+assert.equal(ctx.realGetUserAvatarURL(syncedUser), 'native');
+assert.equal(names.getName(unrelatedGuildId, syncedUser), '@Synced Nick');
+assert.equal(names.useName({ userId: knownUserId }), 'Synced Nick');
+assert.equal(names.useName(unrelatedGuildId, knownUserId), 'Native');
+assert.equal(names.getNickname(syncedUser), null);
+realView = true;
+assert.equal(avatars.getGuildMemberAvatarURL({ userId: knownUserId }), 'guild');
+assert.equal(names.getName(unrelatedGuildId, syncedUser), '@Native');
+realView = false;
 const staleCurrent = users.getCurrentUser;
 ctx.profileRuntimeActive = false; ctx.profileRuntimeGeneration++;
 ctx.uninstallProfileStoreHooks();
@@ -42,6 +73,9 @@ assert.equal(users._cp_hook, undefined);
 assert.equal(profiles._cp_hook, undefined);
 assert.equal(ctx.realGetUserProfile, null);
 assert.equal(ctx.realGetCurrentUser, null);
+assert.equal(ctx.realGetUserAvatarURL, undefined);
+assert.equal(names.getName, nativeName);
+assert.equal(avatars.getGuildMemberAvatarURL, nativeAvatar);
 ctx.profileRuntimeActive = true; ctx.profileRuntimeGeneration++;
 ctx.installProfileStoreHooks(plugin);
 assert.equal(staleCurrent.call(users).username, 'real-own', 'old wrappers cannot reactivate after restart');
