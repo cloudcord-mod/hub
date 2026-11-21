@@ -48988,45 +48988,57 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var permissions = document.permissions ?? [];
     return document.kind === "theme" || isPrivateCxCommand(permissions) || permissions.length > 0 && permissions.every((permission) => permission === "appearance.hide" || permission === "appearance.style");
   }
+  function normalizeCatalogSearch(value) {
+    return value.normalize("NFKD").toLowerCase().replace(RegExp("\\p{M}", "gu"), "").replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), " ").trim();
+  }
+  function catalogSearchFields(entry) {
+    var { name, description, keywords } = entry;
+    var cached = cxSearchIndex.get(entry);
+    if (cached && cached.name === name && cached.description === description && cached.keywords === keywords)
+      return cached;
+    var fields = {
+      name,
+      description,
+      keywords,
+      lowerName: name.toLowerCase(),
+      compactName: normalizeCatalogSearch(name).replaceAll(" ", ""),
+      searchableText: normalizeCatalogSearch(name + " " + (description ?? "") + " " + (keywords ?? ""))
+    };
+    cxSearchIndex.set(entry, fields);
+    return fields;
+  }
   function searchCxCatalog(entries2, search, category = "All") {
+    var _loop2 = function(entry2) {
+      var { lowerName, compactName, searchableText } = catalogSearchFields(entry2);
+      if (lowerName === query)
+        exact.push(entry2);
+      else if (compactQuery && compactName === compactQuery)
+        normalized.push(entry2);
+      else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery))
+        partial.push(entry2);
+      else if (terms.length && terms.every((term) => searchableText.includes(term)))
+        feature.push(entry2);
+    };
     if (category !== "All")
-      entries2 = entries2.filter((entry) => entry.categories?.includes(category));
+      entries2 = entries2.filter((entry2) => entry2.categories?.includes(category));
     var query = search.trim().toLowerCase();
     if (!query)
       return entries2;
-    var normalize = (value) => value.normalize("NFKD").toLowerCase().replace(RegExp("\\p{M}", "gu"), "").replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), " ").trim();
-    var normalizedQuery = normalize(query);
+    var normalizedQuery = normalizeCatalogSearch(query);
     var compactQuery = normalizedQuery.replaceAll(" ", "");
     if (query.startsWith("/")) {
       if (!compactQuery && query !== "/")
         return [];
-      return entries2.filter((entry) => entry.commands?.some((command) => normalize(command).replaceAll(" ", "").includes(compactQuery)));
+      return entries2.filter((entry2) => entry2.commands?.some((command) => normalizeCatalogSearch(command).replaceAll(" ", "").includes(compactQuery)));
     }
     var terms = normalizedQuery ? normalizedQuery.split(" ") : [];
-    return entries2.map((entry) => {
-      var name = entry.name.toLowerCase();
-      if (name === query)
-        return {
-          entry,
-          score: 4
-        };
-      var compactName = normalize(name).replaceAll(" ", "");
-      if (compactQuery && compactName === compactQuery)
-        return {
-          entry,
-          score: 3
-        };
-      if (name.includes(query) || compactQuery && compactName.includes(compactQuery))
-        return {
-          entry,
-          score: 2
-        };
-      var description = normalize(name + " " + (entry.description ?? "") + " " + (entry.keywords ?? ""));
-      return {
-        entry,
-        score: terms.length && terms.every((term) => description.includes(term)) ? 1 : 0
-      };
-    }).filter((item) => item.score > 0).sort((a, b3) => b3.score - a.score).map((item) => item.entry);
+    var exact = [];
+    var normalized = [];
+    var partial = [];
+    var feature = [];
+    for (var entry of entries2)
+      _loop2(entry);
+    return exact.concat(normalized, partial, feature);
   }
   function parseCx(source) {
     var _loop2 = function(line12) {
@@ -50308,7 +50320,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     };
   }
-  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES, maxPrivateCxCommandPlugins, maxOtherCxExtensions, MAX_REMEMBERED_CX_EXTENSIONS;
+  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES, maxPrivateCxCommandPlugins, maxOtherCxExtensions, MAX_REMEMBERED_CX_EXTENSIONS, cxSearchIndex;
   var init_cx = __esm({
     "src/lib/api/cx.ts"() {
       "use strict";
@@ -50538,6 +50550,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       maxPrivateCxCommandPlugins = 64;
       maxOtherCxExtensions = 16;
       MAX_REMEMBERED_CX_EXTENSIONS = maxPrivateCxCommandPlugins + maxOtherCxExtensions;
+      cxSearchIndex = /* @__PURE__ */ new WeakMap();
     }
   });
 
@@ -62257,7 +62270,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var [status, setStatus] = React2.useState("");
     var [candidate, setCandidate] = React2.useState();
     var [, refreshOptions] = React2.useState(0);
+    var selection = React2.useRef(0);
     function review(next) {
+      selection.current++;
       setCandidate(void 0);
       try {
         var preview2 = reviewCx(next);
@@ -62273,6 +62288,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
     function openFile() {
       return _async_to_generator(function* () {
+        var id = ++selection.current;
         var picker;
         setCandidate(void 0);
         try {
@@ -62284,15 +62300,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             mode: "import",
             copyTo: "cachesDirectory"
           });
+          if (id !== selection.current)
+            return;
           if (!/\.cx$/i.test(file?.name ?? "") || !(file.size > 0 && file.size <= MAX_CX_SOURCE))
             throw new Error("Choose a .cx file under 512 KB.");
           if (!file.fileCopyUri?.startsWith("file:///"))
             throw new Error("Could not copy the selected .cx file.");
           var next = yield NativeFileModule.readFile(decodeURIComponent(file.fileCopyUri.slice(7)), "utf8");
+          if (id !== selection.current)
+            return;
           setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
           review(next);
         } catch (error) {
-          if (!picker?.isCancel?.(error))
+          if (id === selection.current && !picker?.isCancel?.(error))
             setStatus(String(error instanceof Error ? error.message : error));
         }
       })();
@@ -62482,6 +62502,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               padding: 12
             },
             onChangeText: (value) => {
+              selection.current++;
               setCandidate(void 0);
               setSource(value);
             }
@@ -64396,7 +64417,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2ebf7ba5299a0a92e146ba88a958a53674f84d78";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f2793826059e172a2c21952b60aea244078ec47b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
