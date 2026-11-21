@@ -11,6 +11,14 @@ export function getCxChannelNameCopy(channel: CxChannelLabel & { recipients?: re
     return { label, name };
 }
 
+export function getCxChannelNoteLabel(id: string, channel: Parameters<typeof getCxChannelNameCopy>[0] | undefined,
+    username: (id: string) => string | undefined, guildName: (id: string) => string | undefined) {
+    if (!channel) return "Unavailable channel · " + id;
+    const name = getCxChannelNameCopy(channel, username)?.name ?? id;
+    const server = channel.guild_id && guildName(channel.guild_id);
+    return server ? server + " · " + name : name;
+}
+
 // CleanChannelName by AutumnVN (GPL-3.0-or-later).
 const smallCaps = Object.fromEntries([..."ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ"].map((letter, index) => [letter, "abcdefghijklmnopqrstuvwxyz"[index]]));
 

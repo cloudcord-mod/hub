@@ -3,7 +3,7 @@
 import { isCxProfileUserId } from "./cxProfileMenu";
 
 type Notes = Record<string, string>;
-type EditNote = (initial: string, save: (value: string) => Promise<void>) => void;
+export type CxNoteEditor = (initial: string, save: (value: string) => Promise<void>) => void;
 
 export const CX_USER_NOTE_LIMIT = 2000;
 const tagPattern = /^[a-z0-9_]{1,32}$/i;
@@ -45,25 +45,38 @@ export function createCxUserNotes(
 ) {
     let active = true;
     const current = (id: string) => active && enabled() && account() === id;
-    return {
-        async open(subject: string, edit: EditNote) {
-            const owner = account();
-            if (!isCxProfileUserId(owner) || !isCxProfileUserId(subject) || !current(owner)) return;
-            const saved = (await read(owner))?.[subject];
+    async function openForOwner(owner: string, subject: string, edit: CxNoteEditor) {
+        if (!isCxProfileUserId(subject) || !current(owner)) return;
+        const saved = (await read(owner))?.[subject];
+        if (!current(owner)) return;
+        edit(typeof saved === "string" ? saved.slice(0, CX_USER_NOTE_LIMIT) : "", async value => {
             if (!current(owner)) return;
-            edit(typeof saved === "string" ? saved.slice(0, CX_USER_NOTE_LIMIT) : "", async value => {
-                if (!current(owner)) return;
-                if (value.length > CX_USER_NOTE_LIMIT) throw new Error("Notes can have up to 2,000 characters.");
-                const text = kind === "tags" ? normalizeTags(value) : value;
-                await update(owner, notes => {
-                    if (!current(owner)) return notes ?? {};
-                    const next = { ...notes };
-                    if (text.trim()) {
-                        if (!Object.hasOwn(next, subject) && Object.keys(next).length >= 500) throw new Error("Clear an entry before adding another.");
-                        next[subject] = text;
-                    } else delete next[subject];
-                    return next;
-                });
+            if (value.length > CX_USER_NOTE_LIMIT) throw new Error("Notes can have up to 2,000 characters.");
+            const text = kind === "tags" ? normalizeTags(value) : value;
+            await update(owner, notes => {
+                if (!current(owner)) return notes ?? {};
+                const next = { ...notes };
+                if (text.trim()) {
+                    if (!Object.hasOwn(next, subject) && Object.keys(next).length >= 500) throw new Error("Clear an entry before adding another.");
+                    next[subject] = text;
+                } else delete next[subject];
+                return next;
+            });
+        });
+    }
+    return {
+        async open(subject: string, edit: CxNoteEditor) {
+            const owner = account();
+            if (isCxProfileUserId(owner)) await openForOwner(owner, subject, edit);
+        },
+        async browse(show: (ids: readonly string[], open: (id: string, edit: CxNoteEditor) => Promise<void>) => void) {
+            const owner = account();
+            if (kind !== "channels" || !isCxProfileUserId(owner) || !current(owner)) return;
+            const saved = await read(owner);
+            if (!current(owner)) return;
+            const ids = Object.entries(saved ?? {}).filter(([id, text]) => isCxProfileUserId(id) && typeof text === "string" && text.trim()).map(([id]) => id);
+            show(ids, async (id, edit) => {
+                if (ids.includes(id)) await openForOwner(owner, id, edit);
             });
         },
         async search(query: string) {

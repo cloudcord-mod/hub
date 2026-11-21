@@ -20,7 +20,7 @@ import { validateCxWallpaper } from "./cxWallpaper";
 import { cxProfileMenuActions, isCxProfileUserId, type CxProfileMenuAction } from "./cxProfileMenu";
 
 export { cxProfileMenuActions, getCxProfileMedia, getCxProfileMenuCopy, isCxProfileUserId, type CxProfileMenuAction } from "./cxProfileMenu";
-export { formatCxChannelName, getCxChannelNameCopy, type CxChannelLabel } from "./cxChannelNames";
+export { formatCxChannelName, getCxChannelNameCopy, getCxChannelNoteLabel, type CxChannelLabel } from "./cxChannelNames";
 export { isCxNotificationMuted, type CxMessageAlert } from "./cxIncoming";
 export { bindCxChannelOpenRead, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, markCxServersRead, markCxServersReadAndWait, runCxFriendInvites } from "./cxClientCommands";
 export { animateCxAssets, buildCxMessageQuote, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxWordCount, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
@@ -37,7 +37,7 @@ export { getCxGifDescription, getCxImageTitle } from "./cxMediaLabels";
 export { createCxTimestampRegistry, type CxTimestampFormats, type CxTimestampSurface } from "./cxTimestamps";
 export { createCxVoicePing } from "./cxVoicePing";
 export { bindCxMutedVoice } from "./cxMutedVoice";
-export { createCxUserNotes, CX_USER_NOTE_LIMIT } from "./cxUserNotes";
+export { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "./cxUserNotes";
 export { createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "./cxVoiceCount";
 export { bindCxCameraTone, type CxCameraToneOptions } from "./cxCameraTone";
 export { createCxVoiceQueue, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "./cxVoiceQueue";

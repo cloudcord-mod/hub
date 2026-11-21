@@ -30,8 +30,8 @@ import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
 import { metroModules } from "@metro/internals/modules";
 import { getCxMessageGesture } from "@lib/api/cx";
-import { getCxChannelNameCopy, getCxProfileMedia } from "@lib/api/cx";
-import { createCxUserNotes, CX_USER_NOTE_LIMIT, runCxCleanups } from "@lib/api/cx";
+import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@lib/api/cx";
+import { createCxUserNotes, CX_USER_NOTE_LIMIT, runCxCleanups, type CxNoteEditor } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
 import type { ComponentType, Context, ReactElement, ReactNode } from "react";
@@ -1854,8 +1854,32 @@ function registerProfileMenuAction(action: CxProfileMenuAction) {
 }
 
 const clearLocalNotes: Partial<Record<"notes" | "channels", () => void>> = {};
+let browseLocalChannelNotes: (() => void) | undefined;
 let findLocalUserTags: ((query: string) => Promise<string | undefined>) | undefined;
 let localUserNotesStorage: Promise<Record<string, Record<string, string>>> | undefined;
+
+function ChannelNotesPicker({ items, open }: { items: readonly { id: string; name: string; }[]; open: (id: string) => void; }) {
+    const [query, setQuery] = React.useState("");
+    const [page, setPage] = React.useState(0);
+    const pageSize = 8;
+    const search = query.trim().toLowerCase();
+    const matches = items.filter(item => item.name.toLowerCase().includes(search));
+    return <View>
+        <TextInput accessibilityLabel="Search saved channels" placeholder="Search saved channels" value={query} onChangeText={value => {
+            setQuery(value);
+            setPage(0);
+        }} style={{ padding: 10, color: resolveSemanticColor(semanticColors.TEXT_DEFAULT) }} />
+        <ScrollView style={{ maxHeight: 270 }} keyboardShouldPersistTaps="handled">
+            <TableRowGroup>
+                {matches.slice(page * pageSize, (page + 1) * pageSize).map(item =>
+                    <TableRow label={item.name} key={item.id} onPress={() => open(item.id)} />)}
+                {!matches.length && <TableRow label="No matching channels" />}
+                {page > 0 && <TableRow label="Previous notes" onPress={() => setPage(page - 1)} />}
+                {(page + 1) * pageSize < matches.length && <TableRow label="Next notes" onPress={() => setPage(page + 1)} />}
+            </TableRowGroup>
+        </ScrollView>
+    </View>;
+}
 
 function registerLocalText(kind: "notes" | "tags" | "channels") {
     const tags = kind === "tags";
@@ -1873,26 +1897,41 @@ function registerLocalText(kind: "notes" | "tags" | "channels") {
         }, () => !settings.safeMode?.enabled, kind);
     const failed = (error: unknown) => showToast(error instanceof Error ? error.message : "Couldn’t update " + label.toLowerCase() + ".");
     const alertKey = tags ? "cloudcord-cx-user-tags" : channel ? "cloudcord-cx-channel-note" : "cloudcord-cx-user-note";
-    const action = (id: string) => {
-        void notes.open(id, (initial, save) => {
-            let draft = initial;
-            openAlert(alertKey, <AlertModal title={label}
-                extraContent={<TextInput accessibilityLabel={tags ? "Private tags" : "Private note"} defaultValue={initial} multiline maxLength={CX_USER_NOTE_LIMIT}
-                    placeholder={tags ? "One tag per line" : undefined}
-                    style={{ minHeight: 100, padding: 10, color: resolveSemanticColor(semanticColors.TEXT_DEFAULT) }}
-                    onChangeText={value => { draft = value; }} />}
-                actions={<AlertActions>
-                    <AlertActionButton text="Cancel" variant="secondary" onPress={() => dismissAlert(alertKey)} />
-                    <AlertActionButton text="Save" variant="primary" onPress={() => {
-                        void save(draft).then(() => dismissAlert(alertKey), failed);
-                    }} />
-                </AlertActions>} />);
-        }).catch(failed);
+    const edit: CxNoteEditor = (initial, save) => {
+        let draft = initial;
+        openAlert(alertKey, <AlertModal title={label}
+            extraContent={<TextInput accessibilityLabel={tags ? "Private tags" : "Private note"} defaultValue={initial} multiline maxLength={CX_USER_NOTE_LIMIT}
+                placeholder={tags ? "One tag per line" : undefined}
+                style={{ minHeight: 100, padding: 10, color: resolveSemanticColor(semanticColors.TEXT_DEFAULT) }}
+                onChangeText={value => { draft = value; }} />}
+            actions={<AlertActions>
+                <AlertActionButton text="Cancel" variant="secondary" onPress={() => dismissAlert(alertKey)} />
+                <AlertActionButton text="Save" variant="primary" onPress={() => {
+                    void save(draft).then(() => dismissAlert(alertKey), failed);
+                }} />
+            </AlertActions>} />);
     };
+    const action = (id: string) => { void notes.open(id, edit).catch(failed); };
     const stopMenu = channel
         ? registerChannelSheetEntry(alertKey, () => !settings.safeMode?.enabled, ({ id }) =>
             isCxProfileUserId(id) ? { label, action: () => action(id) } : undefined)
         : registerProfileMenuEntry({ key: tags ? "user-tags" : "user-notes", getItems: id => [{ label, action: () => action(id) }] });
+    const browseKey = "cloudcord-cx-channel-notes-picker";
+    if (channel) browseLocalChannelNotes = () => {
+        void notes.browse((ids, open) => {
+            if (!ids.length) { showToast("No channel notes saved on this device."); return; }
+            const items = ids.map(id => ({ id, name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id),
+                user => UserStore?.getUser?.(user)?.username, guild => GuildStore?.getGuild?.(guild)?.name) }))
+                .sort((a, b) => a.name.localeCompare(b.name));
+            openAlert(browseKey, <AlertModal title="Saved channel notes"
+                extraContent={<ChannelNotesPicker items={items} open={id => {
+                    dismissAlert(browseKey);
+                    void open(id, edit).catch(failed);
+                }} />} actions={<AlertActions>
+                    <AlertActionButton text="Close" variant="secondary" onPress={() => dismissAlert(browseKey)} />
+                </AlertActions>} />);
+        }).catch(failed);
+    };
     if (tags) findLocalUserTags = notes.search;
     else clearLocalNotes[kind] = () => {
         void notes.clear(() => new Promise<boolean>(resolve => Alert.alert(
@@ -1905,6 +1944,7 @@ function registerLocalText(kind: "notes" | "tags" | "channels") {
     };
     return () => {
         notes.stop();
+        if (channel) browseLocalChannelNotes = undefined;
         if (tags) findLocalUserTags = undefined;
         else delete clearLocalNotes[kind];
         stopMenu();
@@ -2827,6 +2867,7 @@ export default function CxExtensions() {
                     }} />,
                 ])}
                 {clearLocalNotes.notes && <TableRow label="Clear local user notes" onPress={clearLocalNotes.notes} />}
+                {browseLocalChannelNotes && <TableRow label="Browse channel notes" onPress={browseLocalChannelNotes} />}
                 {clearLocalNotes.channels && <TableRow label="Clear local channel notes" onPress={clearLocalNotes.channels} />}
             </TableRowGroup>
             <Text accessibilityLiveRegion="polite" style={{ color: "#b5bac1" }}>{status}</Text>

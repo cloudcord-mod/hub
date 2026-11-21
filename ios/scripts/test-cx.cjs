@@ -717,7 +717,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                         : key === "convertNameToSurrogate" ? emojiConverters : undefined },
             "@webpack/common": {
                 Alerts: { confirm: () => new Promise(resolve => { confirmNotes = resolve; }), show(props) {
-                    if (["Local User Note", "Local User Tags", "Local Channel Note"].includes(props.title)) { noteAlert = props; return; }
+                    if (["Local User Note", "Local User Tags", "Local Channel Note", "Saved channel notes"].includes(props.title)) { noteAlert = props; return; }
                     const target = props.title === "Confirm message" ? nativeConfirmations : queuePrompts;
                     target.push({ props, resolve: value => value ? props.onConfirm() : props.onCancel() });
                 } },
@@ -2079,13 +2079,38 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         await new Promise(setImmediate);
         await openChannelNote(category, "Read the welcome guides");
         await openChannelNote({ id: other, name: "Another channel" }, "");
+        const browseNotes = async () => {
+            click(render(), "Browse channel notes");
+            await new Promise(setImmediate);
+            assert.equal(noteAlert.title, "Saved channel notes");
+            if (desktop) {
+                assert.ok(find(noteAlert.body, element => element.type === "option" && element.props.value === guildId));
+                return noteAlert.onConfirm;
+            }
+            const picker = noteAlert.extraContent;
+            assert.ok(picker.props.items.some(item => item.id === guildId));
+            return () => picker.props.open(guildId);
+        };
+        const stalePickerSelection = await browseNotes();
         activeAccount = other;
+        noteAlert = undefined;
+        stalePickerSelection();
+        await new Promise(setImmediate);
+        assert.equal(noteAlert, undefined, "a saved notes picker from another account cannot open an editor");
         await openChannelNote(category, "");
         activeAccount = me;
+        const openFromPicker = await browseNotes();
+        openFromPicker();
+        await new Promise(setImmediate);
+        assert.equal(noteAlert.title, "Local Channel Note");
+        assert.equal((desktop ? noteAlert.body : noteAlert.extraContent).props.defaultValue, "Read the welcome guides");
         click(render(), "Clear local channel notes");
         confirmNotes(true);
         await new Promise(setImmediate);
         await openChannelNote(category, "");
+        click(render(), "Browse channel notes");
+        await new Promise(setImmediate);
+        assert.equal(notifications.pop(), "No channel notes saved on this device.");
         const heldNoteAction = channelNote(category);
         click(render(), "Disable LocalChannelNotes");
         noteAlert = undefined;

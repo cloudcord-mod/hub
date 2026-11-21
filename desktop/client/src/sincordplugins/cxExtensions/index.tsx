@@ -19,8 +19,8 @@ import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccesso
 import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@utils/cx";
 import { formatCxWordCount, matchesCxCatalogEntry } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
-import { getCxChannelNameCopy, getCxProfileMedia } from "@utils/cx";
-import { createCxUserNotes, CX_USER_NOTE_LIMIT } from "@utils/cx";
+import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@utils/cx";
+import { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "@utils/cx";
 import { openImageModal } from "@utils/discord";
 import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
@@ -156,6 +156,7 @@ function registerCopyChannelName() {
 }
 
 const clearLocalNotes: Partial<Record<"notes" | "channels", () => void>> = {};
+let browseLocalChannelNotes: (() => void) | undefined;
 let findLocalUserTags: ((query: string) => Promise<string | undefined>) | undefined;
 
 function registerLocalText(kind: "notes" | "tags" | "channels") {
@@ -168,26 +169,42 @@ function registerLocalText(kind: "notes" | "tags" | "channels") {
     const notes = createCxUserNotes(() => UserStore.getCurrentUser()?.id,
         account => DataStore.get(key(account)), (account, mutate) => DataStore.update(key(account), mutate), undefined, kind);
     const failed = (error: unknown) => showToast(error instanceof Error ? error.message : "Couldn’t update " + label.toLowerCase() + ".");
+    const edit: CxNoteEditor = (initial, save) => {
+        let draft = initial;
+        Alerts.show({
+            title: label,
+            body: <textarea aria-label={tags ? "Private tags" : "Private note"} defaultValue={initial} maxLength={CX_USER_NOTE_LIMIT}
+                placeholder={tags ? "One tag per line" : undefined}
+                rows={5} style={{ width: "100%", boxSizing: "border-box" }}
+                onChange={event => { draft = event.currentTarget.value; }} />,
+            cancelText: "Cancel", confirmText: "Save", onConfirm: () => { void save(draft).catch(failed); },
+        });
+    };
     const menus = channel ? ["channel-context", "thread-context", "user-context", "gdm-context"]
         : ["user-context", "user-profile-actions", "user-profile-overflow-menu"];
     const patch: NavContextMenuPatchCallback = (children, props) => {
         const id = channel ? props?.channel?.id : props?.user?.id ?? props?.userId;
         if (!isCxProfileUserId(id) || children.some(child => child?.props?.id === itemId)) return;
-        children.push(<Menu.MenuItem id={itemId} label={label} action={() => {
-            void notes.open(id, (initial, save) => {
-                let draft = initial;
-                Alerts.show({
-                    title: label,
-                    body: <textarea aria-label={tags ? "Private tags" : "Private note"} defaultValue={initial} maxLength={CX_USER_NOTE_LIMIT}
-                        placeholder={tags ? "One tag per line" : undefined}
-                        rows={5} style={{ width: "100%", boxSizing: "border-box" }}
-                        onChange={event => { draft = event.currentTarget.value; }} />,
-                    cancelText: "Cancel", confirmText: "Save", onConfirm: () => { void save(draft).catch(failed); },
-                });
-            }).catch(failed);
-        }} />);
+        children.push(<Menu.MenuItem id={itemId} label={label} action={() => { void notes.open(id, edit).catch(failed); }} />);
     };
     addContextMenuPatch(menus, patch);
+    if (channel) browseLocalChannelNotes = () => {
+        void notes.browse((ids, open) => {
+            if (!ids.length) { showToast("No channel notes saved on this device."); return; }
+            const items = ids.map(id => ({ id, name: getCxChannelNoteLabel(id, ChannelStore.getChannel(id),
+                user => UserStore.getUser(user)?.username, guild => GuildStore.getGuild(guild)?.name) }))
+                .sort((a, b) => a.name.localeCompare(b.name));
+            let selected = items[0].id;
+            Alerts.show({
+                title: "Saved channel notes",
+                body: <select aria-label="Saved channels" size={Math.min(items.length, 8)} defaultValue={selected}
+                    style={{ width: "100%" }} onChange={event => { selected = event.currentTarget.value; }}>
+                    {items.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+                </select>,
+                cancelText: "Cancel", confirmText: "Open note", onConfirm: () => { void open(selected, edit).catch(failed); },
+            });
+        }).catch(failed);
+    };
     if (tags) findLocalUserTags = notes.search;
     else clearLocalNotes[kind] = () => {
         void notes.clear(() => Alerts.confirm({
@@ -198,6 +215,7 @@ function registerLocalText(kind: "notes" | "tags" | "channels") {
     };
     return () => {
         notes.stop();
+        if (channel) browseLocalChannelNotes = undefined;
         if (tags) findLocalUserTags = undefined;
         else delete clearLocalNotes[kind];
         removeContextMenuPatch(menus, patch);
@@ -1350,6 +1368,7 @@ export function CxSettings() {
             }}>Disable {name}</button>
         </div>)}
         {clearLocalNotes.notes && <button onClick={clearLocalNotes.notes}>Clear local user notes</button>}
+        {browseLocalChannelNotes && <button onClick={browseLocalChannelNotes}>Browse channel notes</button>}
         {clearLocalNotes.channels && <button onClick={clearLocalNotes.channels}>Clear local channel notes</button>}
         <p role="status">{status}</p>
     </section>;
