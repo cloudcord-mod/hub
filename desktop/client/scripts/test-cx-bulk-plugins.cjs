@@ -291,8 +291,16 @@ for (const name of ["ReverseText", "ClapText", "SpaceOut", "Starify", "VibeCheck
     assert.ok(port, name + " should compile");
     assert.equal(parseCx(port.cx).name, name);
 }
+const originalCxAppearance = new Set(["profile-notes", "profile-connections", "profile-mutuals"]);
 for (const [key, rule] of Object.entries(cxAppearanceTargets)) {
     if (rule.desktopOnly) continue;
+    if (originalCxAppearance.has(key)) {
+        const file = require("node:path").resolve(__dirname, "../../../examples/cx/catalog/plugins/hide-" + key + ".cx");
+        const document = parseCx(require("node:fs").readFileSync(file, "utf8"));
+        assert.equal(document.name, rule.plugin);
+        assert.deepEqual([...document.hiddenTargets], [key]);
+        continue;
+    }
     const port = matches.find(record => record.name === rule.plugin);
     assert.ok(port, rule.plugin + " should compile from the original stylesheet");
     const document = parseCx(port.cx);
