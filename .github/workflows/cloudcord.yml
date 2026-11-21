@@ -2117,6 +2117,7 @@ jobs:
               if (!original) return original;
               if (!isCurrentUser(userId)) {
                   const id = String(userId || "");
+                  if (isRealProfileView(id)) return restoreNativeProfileBadges(original, id);
                   requestSharedProfile(id);
                   const shared = getProfileOverride(id);
                   return shared && Object.keys(shared).length ? decorateSharedProfile(original, id, shared) : original;
@@ -2328,17 +2329,65 @@ jobs:
               return list.filter((badge: any) => !src.hidden.includes(directoryBadgeId(String(badge.id)) ?? -1)).map((badge: any, i: number) => ({ badge, i }))
                   .sort((a: any, b: any) => rank(a.badge) - rank(b.badge) || a.i - b.i).map((item: any) => item.badge);
           }
+          type NativeProfileBadges = { badges: any[]; nitro?: { type: number; since: any }; boost?: { since: any } };
+          const originalProfileBadges = new Map<string, NativeProfileBadges>();
+          const restoredProfileBadges = new WeakMap<object, { native: NativeProfileBadges; depth: number; profile: any }>();
+          function restoreNativeProfileBadges(original: any, id: string, depth = 0): any {
+              const native = originalProfileBadges.get(id);
+              if (!native || !original || typeof original !== "object" || Array.isArray(original)) return original;
+              const cached = restoredProfileBadges.get(original);
+              if (cached?.native === native && cached.depth === depth) return cached.profile;
+              const fields: Record<string, any> = {};
+              if (!original.guildId && !original.guild_id) {
+                  if (Array.isArray(original.badges)) fields.badges = native.badges;
+                  const nativeDate = (value: any, previous: any) => value && previous instanceof Date ? new Date(value) : value;
+                  if (native.nitro) {
+                      if ("premium_type" in original) fields.premium_type = native.nitro.type;
+                      if ("premiumType" in original) fields.premiumType = native.nitro.type;
+                      if ("premium_since" in original) fields.premium_since = native.nitro.since;
+                      if ("premiumSince" in original) fields.premiumSince = nativeDate(native.nitro.since, original.premiumSince);
+                  }
+                  if (native.boost) {
+                      if ("premium_guild_since" in original) fields.premium_guild_since = native.boost.since;
+                      if ("premiumGuildSince" in original) fields.premiumGuildSince = nativeDate(native.boost.since, original.premiumGuildSince);
+                  }
+              }
+              if (depth < 3) for (const key of ["userProfile", "displayProfile", "profile"]) {
+                  const nested = original[key];
+                  if (!nested || nested === original) continue;
+                  const restored = restoreNativeProfileBadges(nested, id, depth + 1);
+                  if (restored !== nested) fields[key] = restored;
+              }
+              const keys = Object.keys(fields);
+              if (!keys.length) return original;
+              const descriptors = Object.getOwnPropertyDescriptors(original);
+              for (const key of keys) delete descriptors[key];
+              const profile = Object.create(Object.getPrototypeOf(original), descriptors);
+              for (const key of keys) setOwnValue(profile, key, fields[key]);
+              restoredProfileBadges.set(original, { native, depth, profile });
+              return profile;
+          }
           // Discord loads every profile through USER_PROFILE_FETCH_SUCCESS with the raw API body:
           // edit it the way Discord's server would have sent it.
           function rewriteFetchedProfile(action: any) {
               if (action?.type !== "USER_PROFILE_FETCH_SUCCESS") return false;
               const raw = action.userProfile, id = String(raw?.user?.id || "");
               const src = id ? badgeSourceFor(id) : undefined;
+              if (id) originalProfileBadges.delete(id);
               if (!src) return false;
               try {
+                  const hasBoost = src.boostIndex >= 0 && src.boostIndex < BOOST_MONTHS.length;
+                  if (!isCurrentUser(id)) {
+                      originalProfileBadges.set(id, {
+                          badges: Array.isArray(raw.badges) ? raw.badges.map((badge: any) => ({ ...badge })) : [],
+                          nitro: src.nitroMonths >= 0 ? { type: raw.premium_type ?? raw.premiumType ?? 0, since: raw.premium_since ?? raw.premiumSince ?? null } : undefined,
+                          boost: hasBoost ? { since: raw.premium_guild_since ?? raw.premiumGuildSince ?? null } : undefined,
+                      });
+                      if (originalProfileBadges.size > 100) originalProfileBadges.delete(originalProfileBadges.keys().next().value!);
+                  }
                   raw.badges = discordBadgesFor(src, raw.badges);
                   if (src.nitroMonths >= 0) { raw.premium_type = 2; raw.premium_since = nitroSinceFor(src.nitroMonths, src.nitroSince).toISOString(); }
-                  if (src.boostIndex >= 0 && src.boostIndex < BOOST_MONTHS.length) raw.premium_guild_since = monthsAgo(BOOST_MONTHS[src.boostIndex]).toISOString();
+                  if (hasBoost) raw.premium_guild_since = monthsAgo(BOOST_MONTHS[src.boostIndex]).toISOString();
               } catch {}
               return false;
           }
@@ -2960,6 +3009,7 @@ jobs:
                   const result = original(...args);
                   const id = String(args?.[0]?.id || args?.[0]?.userId || args?.[0] || "");
                   if (isCurrentUser(id)) return decorateProfileResult(result, id);
+                  if (isRealProfileView(id)) return restoreNativeProfileBadges(result, id);
                   requestSharedProfile(id);
                   const shared = getProfileOverride(id);
                   return shared && Object.keys(shared).length ? decorateSharedProfile(result, id, shared) : result;
@@ -2985,6 +3035,7 @@ jobs:
                       const subject = args?.[0];
                       const id = profileResultUserId(subject, result);
                       if (isCurrentUser(id)) return preview.enabled ? cloneObject(result, "profile") : result;
+                      if (isRealProfileView(id)) return restoreNativeProfileBadges(result, id);
                       requestSharedProfile(id);
                       const shared = getProfileOverride(id);
                       return shared && Object.keys(shared).length ? decorateSharedProfile(result, id, shared) : result;

@@ -123,6 +123,45 @@ cosmetic = false;
 scheduled.shift()();
 assert.equal(JSON.stringify(catalogs.get(id)), '[{"badge_id":12,"owned":true}]', 'a replay after a new fetch uses the newest native data');
 
+const profiles = vm.createContext({
+    Date,
+    badgeSourceFor: uid => cosmetic && uid === id ? { nitroMonths: 12, boostIndex: -1 } : undefined,
+    isCurrentUser: uid => uid === other,
+    discordBadgesFor: () => [{ id: 'premium_tenure_12_month_v2' }],
+    nitroSinceFor: () => new Date('2025-01-01T00:00:00Z'),
+    BOOST_MONTHS: [1],
+    setOwnValue: (target, key, value) => Object.defineProperty(target, key, { value, enumerable: true }),
+});
+vm.runInContext(compile(source.slice(source.indexOf('type NativeProfileBadges ='), source.indexOf('// The line under a badge'))), profiles);
+cosmetic = true;
+const rawProfile = { user: { id }, badges: [{ id: 'partner' }], premium_type: 0 };
+profiles.rewriteFetchedProfile({ type: 'USER_PROFILE_FETCH_SUCCESS', userProfile: rawProfile });
+assert.equal(rawProfile.badges[0].id, 'premium_tenure_12_month_v2');
+assert.equal(rawProfile.premium_type, 2);
+const realBoost = new Date('2020-03-01T00:00:00Z');
+class DiscordProfile {
+    getUserId() { return id; }
+}
+const cachedProfile = Object.freeze(Object.assign(new DiscordProfile(), {
+    badges: rawProfile.badges, premiumSince: new Date(rawProfile.premium_since), premiumType: 2, premiumGuildSince: realBoost,
+}));
+const guild = { guildId: 'test-guild', badges: [{ id: 'guild-badge' }] };
+const wrapper = { displayProfile: cachedProfile, guildMemberProfile: guild };
+const real = profiles.restoreNativeProfileBadges(wrapper, id);
+assert.equal(real.displayProfile.getUserId(), id, 'restoration preserves the Discord profile prototype');
+assert.equal(real.displayProfile.badges[0].id, 'partner');
+assert.equal(real.displayProfile.premiumSince, null);
+assert.equal(real.displayProfile.premiumType, 0);
+assert.equal(real.displayProfile.premiumGuildSince, realBoost, 'untouched boost data retains its original value');
+assert.equal(real.guildMemberProfile, guild);
+assert.equal(cachedProfile.badges[0].id, 'premium_tenure_12_month_v2', 'the cached Discord object is not edited on read');
+assert.equal(profiles.restoreNativeProfileBadges(wrapper, id), real, 'repeat reads do not create new objects');
+assert.equal(profiles.restoreNativeProfileBadges(wrapper, other), wrapper);
+cosmetic = false;
+const refreshedProfile = { user: { id }, badges: [{ id: 'new-native-badge' }] };
+profiles.rewriteFetchedProfile({ type: 'USER_PROFILE_FETCH_SUCCESS', userProfile: refreshedProfile });
+assert.equal(profiles.restoreNativeProfileBadges(refreshedProfile, id), refreshedProfile, 'a fresh native fetch already contains the correct badges');
+
 const desktopSource = fs.readFileSync('desktop/client/src/sincordplugins/fakeProfile/index.tsx', 'utf8');
 const badgeViewer = vm.createContext({ realGetUserProfile: () => ({ private: true }), storedData: {},
     isRealProfileView: () => false, localProfileFor: () => undefined, sharedProfiles: new Map([[id, profile]]), sharedViewedAt: new Map(), Date });
