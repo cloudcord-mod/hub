@@ -1813,6 +1813,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
     const [selectedAccountId, setSelectedAccountId] = React.useState(myId);
     const [data, setData] = React.useState<CustomProfileData>(() => ({ ...(allAccountsData[myId] || storedData || {}) }));
     const [saving, setSaving] = React.useState(false);
+    const [previewExpanded, setPreviewExpanded] = React.useState(false);
     const [saveError, setSaveError] = React.useState("");
     const [decorationLimit, setDecorationLimit] = React.useState(24);
     const [decorationSearch, setDecorationSearch] = React.useState("");
@@ -2044,15 +2045,20 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                     renderOptionValue={(selected: any[]) => { const option = selected[0]; if (!option) return <span>Select account</span>; return <div className="cpx-account-option"><img src={IconUtils.getUserAvatarURL(accounts.find((a: any) => a.id === option.value), false, 20)} alt="" />{option.label}</div>; }}
                 />
             </div>}
+            <button type="button" className="cpx-btn cpx-btn-ghost cpx-preview-toggle" aria-pressed={previewExpanded} onClick={() => setPreviewExpanded(value => !value)}>
+                {previewExpanded ? "Back to editor" : "Live preview"}
+            </button>
             <button type="button" className="cpx-close" aria-label="Close" title="Close" onClick={rootProps.onClose}><CloseIcon /></button>
         </ModalHeader>
 
         <ModalContent className="cpx-content" scrollerClassName="cpx-scroller">
-            <div className="cpx-layout">
-                <TabList value={tab} onChange={setTab} />
+            <div className={previewExpanded ? "cpx-layout cpx-layout-preview" : "cpx-layout"}>
+                <TabList value={tab} onChange={value => { setTab(value); setPreviewExpanded(false); }} />
                 <div className="cpx-panel" id="cpx-panel" role="tabpanel" aria-labelledby={`cpx-tab-${tab}`} key={tab}>{panels[tab]}</div>
                 <ProfilePreview data={data} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar}
-                    badges={profilePreviewBadges(data, selectedAccountId)} onBadges={() => setTab("badges")} onSaved={() => setTab("saved")}
+                    badges={profilePreviewBadges(data, selectedAccountId)}
+                    onBadges={() => { setTab("badges"); setPreviewExpanded(false); }}
+                    onSaved={() => { setTab("saved"); setPreviewExpanded(false); }}
                     decorationUrl={currentDecoration?.url} nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined}
                     effectName={data.profileEffect ? catalogData?.effects.find(item => item.skuId === data.profileEffect?.skuId)?.title || "Selected" : undefined}
                     frameName={data.profileFrame ? catalogData?.frames.find(item => item.skuId === data.profileFrame?.skuId)?.label || "Selected" : undefined} />
