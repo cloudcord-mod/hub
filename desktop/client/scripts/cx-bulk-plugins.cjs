@@ -1100,6 +1100,10 @@ const desktopEffectRecipes = {
         effect: "notification-volume",
         sha256: "03b833d1b2115083ec2663f1f4f942becf0361fc433e6ca24c6f7bcbd51e6f37",
     },
+    RevealAllSpoilers: {
+        effect: "reveal-spoilers-shortcut",
+        sha256: "88b4433b6994c4666d9813787a68423ebd54eee7d08c7680c07ed525c77487fa",
+    },
 };
 
 function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {

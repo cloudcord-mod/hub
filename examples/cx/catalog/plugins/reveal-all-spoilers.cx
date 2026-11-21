@@ -1,0 +1,3 @@
+plugin "RevealAllSpoilers":
+  needs messages.revealspoilers
+  use reveal-spoilers-shortcut

@@ -19,7 +19,7 @@ import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccesso
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@utils/cx";
 import { CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
-import { IS_LINUX, IS_MOBILE } from "@utils/constants";
+import { IS_LINUX, IS_MAC, IS_MOBILE } from "@utils/constants";
 import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "@utils/cx";
 import { openImageModal } from "@utils/discord";
@@ -33,7 +33,7 @@ import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
 import type { Channel, Message } from "@vencord/discord-types";
 import definePlugin from "@utils/types";
-import { findByProps, findComponentByCodeLazy, findStore, waitFor, waitForSubscriptions, wreq } from "@webpack";
+import { findByProps, findComponentByCodeLazy, findCssClassesLazy, findStore, waitFor, waitForSubscriptions, wreq } from "@webpack";
 import { ActiveJoinedThreadsStore, ChannelActions, ChannelStore, ComponentDispatch, Constants, EmojiStore, FluxDispatcher, GuildChannelStore, GuildMemberStore, GuildStore, IconUtils, Menu, MessageActions, MessageStore, NavigationRouter, PermissionsBits, PermissionStore, PinActions, PresenceStore, React, ReadStateStore, RelationshipStore, RestAPI, RTCConnectionStore, SelectedChannelStore, SelectedGuildStore, showToast, SpotifyStore, UserProfileStore, UserStore, VoiceStateStore, useRef, useState } from "@webpack/common";
 import type { ReactNode } from "react";
 import { Alerts, MediaEngineStore } from "@webpack/common";
@@ -469,6 +469,7 @@ let imageLinkUsers = 0;
 let roleHeaderUsers = 0;
 let reactionSortUsers = 0;
 let plainUrlPasteUsers = 0;
+let revealSpoilerUsers = 0;
 let noMiddleClickPasteUsers = 0;
 
 // NoMiddleClickPaste by Darxoon (GPL-3.0-or-later).
@@ -477,6 +478,8 @@ function preventMiddleClickPaste(event: MouseEvent) {
 }
 const avatarCropZoomLimits = new Map<symbol, number>();
 const notificationVolumeLimits = new Map<symbol, number>();
+const spoilerClasses = findCssClassesLazy("spoilerContent", "hidden");
+const spoilerChatClasses = findCssClassesLazy("messagesWrapper", "navigationDescription");
 let bypassPinPromptUsers = 0;
 let longDraftUsers = 0;
 let ownerCrownUsers = 0;
@@ -1232,6 +1235,9 @@ export function CxSettings() {
                         case "plain-url-paste":
                             plainUrlPasteUsers++;
                             return () => { plainUrlPasteUsers--; };
+                        case "reveal-spoilers-shortcut":
+                            revealSpoilerUsers++;
+                            return () => { revealSpoilerUsers--; };
                         case "no-middle-click-paste":
                             if (!IS_LINUX || IS_MOBILE) throw new Error("Middle-click paste control is available on Linux.");
                             if (noMiddleClickPasteUsers === 0) window.addEventListener("mouseup", preventMiddleClickPaste);
@@ -1593,6 +1599,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // RevealAllSpoilers by whqwert, GPL-3.0-or-later.
+        find: ".removeObscurity,",
+        replacement: {
+            match: /(?<=removeObscurity(?:",|=)(\i)=>{)/,
+            replace: (_, event) => "$self.revealSpoilers(" + event + ");",
+        },
+    }, {
         // NotificationVolume by philipbry, GPL-3.0-or-later.
         find: "ensureAudio(){",
         replacement: {
@@ -1880,6 +1893,27 @@ export default definePlugin({
     usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
     avatarCropZoom(original: number) { return Math.max(original, ...avatarCropZoomLimits.values()); },
     notificationVolumeFactor() { return Math.min(100, ...notificationVolumeLimits.values()) / 100; },
+    revealSpoilers(event: MouseEvent) {
+        if (!revealSpoilerUsers || !(IS_MAC ? event.metaKey : event.ctrlKey) || !(event.target instanceof Element)) return;
+        try {
+            const { spoilerContent, hidden } = spoilerClasses;
+            if (![spoilerContent, hidden].every(name => typeof name === "string" && /^[\w-]+$/.test(name))) return;
+            const selector = "span." + spoilerContent + "." + hidden;
+            const selected = event.target.closest(selector);
+            let scope: Element | null | undefined;
+            if (event.shiftKey) {
+                const { messagesWrapper } = spoilerChatClasses;
+                if (typeof messagesWrapper !== "string" || !/^[\w-]+$/.test(messagesWrapper)) return;
+                scope = event.target.closest("." + messagesWrapper);
+            } else {
+                scope = event.target.closest('[id^="message-content-"]') ?? selected?.parentElement;
+            }
+            if (!scope) return;
+            for (const spoiler of scope.querySelectorAll<HTMLElement>(selector)) {
+                if (spoiler !== selected) spoiler.click();
+            }
+        } catch { /* Let the original spoiler click continue. */ }
+    },
     sortMessageReactions<T extends { count: number; }>(reactions: readonly T[]) {
         return reactionSortUsers > 0 ? sortCxReactions(reactions) : reactions;
     },

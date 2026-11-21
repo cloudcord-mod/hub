@@ -78,6 +78,7 @@ const permissionLabels = {
     "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
     "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
     "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
+    "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
     "messages.wordcount": "Count words and characters in displayed messages on this device",
     "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
     "drafts.long": "Keep the full text of your local drafts",

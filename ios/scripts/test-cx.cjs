@@ -296,6 +296,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const documentListeners = new Map();
         const windowListeners = new Map();
         let isLinux = true;
+        let isMac = false;
         const stockSteamClick = options => options.href;
         const nativeSteamLinks = { handleClick: stockSteamClick };
         function NativeMessages(props) { return props.output; }
@@ -719,6 +720,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "@utils/cx": moduleBox.exports,
             "@utils/types": { __esModule: true, default: value => value },
             "@webpack": { wreq: { c: diagnosticCache }, findStore: name => stores[name],
+                findCssClassesLazy: key => key === "spoilerContent" ? { spoilerContent: "spoiler", hidden: "hidden" } : { messagesWrapper: "chat" },
                 findComponentByCodeLazy: () => "ChannelToolbarIcon",
                 waitFor: (filter, callback) => emojiPickerWaiters.set(filter, callback),
                 waitForSubscriptions: emojiPickerWaiters, findByProps: key => key === "startTyping" ? typing : key === "getUserAvatarURL" ? icons
@@ -928,7 +930,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 },
             },
             require(name) {
-                if (name === "@utils/constants") return { get IS_LINUX() { return isLinux; }, IS_MOBILE: false };
+                if (name === "@utils/constants") return { get IS_LINUX() { return isLinux; }, get IS_MAC() { return isMac; }, IS_MOBILE: false };
                 assert.ok(name in mocks, "Unmocked adapter dependency: " + name);
                 return mocks[name];
             },
@@ -1054,6 +1056,35 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(volume(), 0.2);
             click(render(), "Disable NotificationVolume");
             assert.equal(volume(), 0.8);
+
+            const spoilerClicks = [];
+            const spoiler = id => ({ click: () => spoilerClicks.push(id) });
+            const selected = spoiler("selected");
+            const sameMessage = spoiler("same message");
+            const nextMessage = spoiler("next message");
+            const target = new GestureElement("selected");
+            target.closest = selector => ({
+                "span.spoiler.hidden": selected,
+                '[id^="message-content-"]': { querySelectorAll: () => [selected, sameMessage] },
+                ".chat": { querySelectorAll: () => [selected, sameMessage, nextMessage] },
+            })[selector];
+            runtime.revealSpoilers({ target, ctrlKey: true });
+            assert.deepEqual(spoilerClicks, []);
+            selectCatalog("RevealAllSpoilers");
+            click(render(), "Allow for this session");
+            runtime.revealSpoilers({ target });
+            assert.deepEqual(spoilerClicks, []);
+            runtime.revealSpoilers({ target, ctrlKey: true });
+            assert.deepEqual(spoilerClicks.splice(0), ["same message"]);
+            isMac = true;
+            runtime.revealSpoilers({ target, ctrlKey: true, shiftKey: true });
+            assert.deepEqual(spoilerClicks, []);
+            runtime.revealSpoilers({ target, metaKey: true, shiftKey: true });
+            assert.deepEqual(spoilerClicks.splice(0), ["same message", "next message"]);
+            isMac = false;
+            click(render(), "Disable RevealAllSpoilers");
+            runtime.revealSpoilers({ target, ctrlKey: true });
+            assert.deepEqual(spoilerClicks, []);
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));

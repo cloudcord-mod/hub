@@ -2715,6 +2715,8 @@ export default function CxExtensions() {
                             throw new Error("Avatar crop zoom is available on desktop and browser.");
                         case "notification-volume":
                             throw new Error("Notification volume control is available on desktop and browser.");
+                        case "reveal-spoilers-shortcut":
+                            throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
                         case "animated-assets":
                             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                         case "floor-relative-time":
