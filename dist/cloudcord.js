@@ -41901,6 +41901,50 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       label: suppressed ? "Unsuppress Embeds" : "Suppress Embeds"
     };
   }
+  function getCxMessageClipboard(effect, message, channel) {
+    if (effect === "copy-raw-text") {
+      var text = message?.content;
+      return typeof text === "string" && text.length ? [
+        {
+          key: "raw-text",
+          label: "Copy Raw Text",
+          text
+        }
+      ] : [];
+    }
+    if (!message || !isCxProfileUserId(message.id))
+      return [];
+    var snowflake3 = BigInt(message.id);
+    if (snowflake3 > 0xffffffffffffffffn || message.id[0] === "0")
+      return [];
+    var seconds = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
+    var items = [
+      {
+        key: "message-timestamp",
+        label: "Copy Message Timestamp",
+        text: "<t:" + seconds + ":F>"
+      }
+    ];
+    var author = message.author?.id;
+    if (isCxProfileUserId(author)) {
+      items.push({
+        key: "message-author",
+        label: "Copy Message Author Mention",
+        text: "<@" + author + ">"
+      });
+    }
+    if (channel && channel.id === message.channel_id && isCxProfileUserId(channel.id)) {
+      var guild = channel.guild_id == null ? "@me" : channel.guild_id;
+      if (guild === "@me" || isCxProfileUserId(guild)) {
+        items.unshift({
+          key: "markdown-message-link",
+          label: "Copy Markdown Message Link",
+          text: "[Discord message](https://discord.com/channels/" + guild + "/" + channel.id + "/" + message.id + ")"
+        });
+      }
+    }
+    return items;
+  }
   function buildCxMessageQuote(message, guildId, nickname, includeLink) {
     if (!message.author || !isCxProfileUserId(message.id) || !isCxProfileUserId(message.channel_id))
       return;
@@ -42387,6 +42431,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "copy-raw-text": {
           permission: "messages.copytext",
           label: "Add Copy Raw Text to message menus"
+        },
+        "copy-message-reference": {
+          permission: "messages.copyreference",
+          label: "Copy the selected message\u2019s Markdown link, timestamp, or author mention"
         },
         "message-word-count": {
           permission: "messages.wordcount",
@@ -49466,6 +49514,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
         "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
         "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
+        "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
         "messages.wordcount": "Count words and characters in displayed messages on this device",
         "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
         "drafts.long": "Keep the full text of your local drafts",
@@ -49939,6 +49988,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_copy_media_link = __esm({
     "../examples/cx/catalog/plugins/copy-media-link.cx"() {
       copy_media_link_default = 'plugin "CopyMediaLink":\n  needs media.clipboard\n  use copy-media-link\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-message-reference.cx
+  var copy_message_reference_default;
+  var init_copy_message_reference = __esm({
+    "../examples/cx/catalog/plugins/copy-message-reference.cx"() {
+      copy_message_reference_default = 'plugin "CopyMessageReference":\n  needs messages.copyreference\n  use copy-message-reference\n';
     }
   });
 
@@ -53012,6 +53069,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_copy_emoji_markdown();
       init_copy_file_contents();
       init_copy_media_link();
+      init_copy_message_reference();
       init_copy_profile_colors();
       init_copy_raw_text();
       init_copy_sticker_links();
@@ -53552,6 +53610,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "CopyMediaLink",
             source: copy_media_link_default
+          },
+          {
+            name: "CopyMessageReference",
+            source: copy_message_reference_default
           },
           {
             name: "CopyProfileColors",
@@ -58378,25 +58440,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               case "quick-mention":
                 return registerQuickMention(enabled);
               case "copy-raw-text":
-                return registerMessageMenuActions(enabled, ({ message }, close) => {
-                  var text = message?.content;
-                  if (typeof text !== "string" || !text.length)
-                    return [];
-                  return [
-                    {
-                      label: "Copy Raw Text",
-                      run() {
-                        try {
-                          clipboard.setString(text);
-                          showToast.showCopyToClipboard?.();
-                          close();
-                        } catch (e) {
-                          showToast("Couldn't copy message text.");
-                        }
-                      }
+              case "copy-message-reference":
+                return registerMessageMenuActions(enabled, ({ message, channel }, close) => getCxMessageClipboard(effect, message, channel).map(({ label: label2, text }) => ({
+                  label: label2,
+                  run() {
+                    try {
+                      clipboard.setString(text);
+                      showToast.showCopyToClipboard?.();
+                      close();
+                    } catch (e) {
+                      showToast("Couldn't copy to clipboard.");
                     }
-                  ];
-                }, false);
+                  }
+                })), false);
               case "message-word-count": {
                 var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
                 return overrideCxMethods(renderer, {
@@ -60444,7 +60500,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "119b1a6f39198ef8059c29204c24d26ee888bef9";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cf51b4927d053a2125acceef785c8d90b12c9717";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
