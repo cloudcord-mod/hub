@@ -40856,7 +40856,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return rows;
   }
-  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, dayMilliseconds, durationUnits, cxCommandFunctions;
+  function parsePublicHttpUrl(text) {
+    if (!/^https?:\/\//i.test(text) || text.length > 3e3 || /[\s\\]/.test(text))
+      return;
+    try {
+      var url2 = new URL(text);
+      if (!url2.username && !url2.password)
+        return url2;
+    } catch (e) {
+    }
+  }
+  var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, base64Alphabet, dayMilliseconds, durationUnits, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
       "use strict";
@@ -40976,6 +40986,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "white"
       ];
       codeFence = "```";
+      base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
       dayMilliseconds = 864e5;
       durationUnits = /* @__PURE__ */ new Map([
         [
@@ -41090,6 +41101,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var result = tokens2.join("").replaceAll("`", "\\u0060");
           return result.length <= 3900 ? codeFence + "json\n" + result + "\n" + codeFence : "Compacted JSON is too long for one reply.";
         },
+        jsonKeys(text) {
+          try {
+            var value = JSON.parse(text);
+            if (!value || Array.isArray(value) || typeof value !== "object")
+              return "Enter a JSON object.";
+            var keys = JSON.stringify(Object.keys(value), null, 2).replaceAll("`", "\\u0060");
+            return keys.length <= 3900 ? codeFence + "json\n" + keys + "\n" + codeFence : "The key list is too long for one reply.";
+          } catch (e) {
+            return "Invalid JSON.";
+          }
+        },
+        commonLines(first, second) {
+          var otherLines = new Set(second.split(/\r\n|\r|\n/));
+          var common = [
+            ...new Set(first.split(/\r\n|\r|\n/).filter((line) => line && otherLines.has(line)))
+          ];
+          if (!common.length)
+            return "No matching nonempty lines.";
+          var result = common.join("\n").replace(/`(?=``)/g, "`\u200B");
+          return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Matching lines are too long for one reply.";
+        },
         compareLines(before3, after2) {
           var lines = (value) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
           var previous = lines(before3);
@@ -41158,6 +41190,29 @@ WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
           if (values.some((value) => value > 255))
             return;
           return "`#" + values.map((value) => value.toString(16).padStart(2, "0")).join("") + "`";
+        },
+        hslToHex(input) {
+          var text = input.trim().replace(/^hsl\((.*)\)$/i, "$1").trim();
+          var parts = text.includes(",") ? text.split(",").map((part) => part.trim()) : text.split(/\s+/);
+          var match = /^([+-]?\d+(?:\.\d+)?)(?:deg)? (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)%$/i.exec(parts.join(" "));
+          if (!match)
+            return;
+          var [angle, saturation, lightness] = match.slice(1).map(Number);
+          if (!Number.isFinite(angle) || saturation > 100 || lightness > 100)
+            return;
+          var hue = (angle % 360 + 360) % 360;
+          var light = lightness / 100;
+          var amplitude = saturation / 100 * Math.min(light, 1 - light);
+          var component = (offset) => {
+            var sector = (offset + hue / 30) % 12;
+            var value = light - amplitude * Math.max(-1, Math.min(sector - 3, 9 - sector, 1));
+            return Math.round(255 * value).toString(16).padStart(2, "0");
+          };
+          return "`#" + [
+            0,
+            8,
+            4
+          ].map(component).join("") + "`";
         },
         daysBetween(start, end) {
           var first = utcMidnight(start), last = utcMidnight(end);
@@ -41286,19 +41341,55 @@ Copy \`<t:${timestamp}:F>\``;
         },
         inspectUrl(input) {
           var text = input.trim();
-          if (!/^https?:\/\//i.test(text) || text.length > 3e3 || /[\s\\]/.test(text))
+          var url2 = parsePublicHttpUrl(text);
+          if (!url2)
             return;
-          try {
-            var url2 = new URL(text);
-            if (url2.username || url2.password)
-              return;
-            var count = url2.search.slice(1).split("&").filter(Boolean).length;
-            return `Scheme \`${url2.protocol.slice(0, -1)}\`
+          var count = url2.search.slice(1).split("&").filter(Boolean).length;
+          return `Scheme \`${url2.protocol.slice(0, -1)}\`
 Host \`${url2.host.replaceAll("`", "%60")}\`
 Query parameters ${count}
 Fragment ${url2.hash ? "present" : "absent"}`;
+        },
+        stripTracking(input) {
+          var text = input.trim();
+          if (!parsePublicHttpUrl(text))
+            return;
+          var match = /^([^?#]+)\?([^#]*)(#.*)?$/.exec(text);
+          if (!match)
+            return "No known tracking parameters found.";
+          var fields = match[2].split("&");
+          var kept = fields.filter((field) => {
+            try {
+              var name = decodeURIComponent(field.split("=", 1)[0]).toLowerCase();
+              return !/^(?:utm_(?:source|medium|campaign|term|content|id|source_platform|creative_format|marketing_tactic)|fbclid|gclid|dclid|msclkid)$/.test(name);
+            } catch (e) {
+              return true;
+            }
+          });
+          if (fields.length === kept.length)
+            return "No known tracking parameters found.";
+          var query = kept.some(Boolean) ? "?" + kept.join("&") : "";
+          var result = match[1] + query + (match[3] ?? "");
+          return codeFence + "\n" + result.replace(/`(?=``)/g, "`\u200B") + "\n" + codeFence;
+        },
+        encodeBase64(text) {
+          var encoded;
+          try {
+            encoded = encodeURIComponent(text);
           } catch (e) {
+            return "This text contains invalid Unicode.";
           }
+          var bytes = encoded.replace(/%([a-f0-9]{2})/gi, (_2, hex) => String.fromCharCode(Number.parseInt(hex, 16)));
+          if (Math.ceil(bytes.length / 3) * 4 > 3900)
+            return "Encoded text is too long for one reply.";
+          var output = "";
+          for (var index = 0; index < bytes.length; index += 3) {
+            var a = bytes.charCodeAt(index);
+            var b3 = bytes.charCodeAt(index + 1) || 0;
+            var c2 = bytes.charCodeAt(index + 2) || 0;
+            output += base64Alphabet[a >> 2] + base64Alphabet[(a & 3) << 4 | b3 >> 4] + (index + 1 < bytes.length ? base64Alphabet[(b3 & 15) << 2 | c2 >> 6] : "=") + (index + 2 < bytes.length ? base64Alphabet[c2 & 63] : "=");
+          }
+          return codeFence + "\n" + output + "\n" + codeFence;
         },
         tsvToMarkdown(input) {
           return markdownTable(input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row) => row.split("	")));
@@ -41312,6 +41403,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return;
           var checklist = lines.map((line) => /^- \[[ xX]\]\s/.test(line) ? line : "- [ ] " + line.replace(/^[-*+]\s+/, "")).join("\n").replace(/`(?=``)/g, "`\u200B");
           return checklist.length <= 3900 ? codeFence + "markdown\n" + checklist + "\n" + codeFence : "The checklist is too long for one reply.";
+        },
+        checklistProgress(input) {
+          var items = [
+            ...input.matchAll(/^[ \t]*(?:[-*+]|\d+\.)[ \t]+\[([ xX])\](?:[ \t]+|$)/gm)
+          ];
+          if (!items.length)
+            return "No Markdown checklist items found.";
+          var completed = items.filter(([, state2]) => state2 !== " ").length;
+          return `${completed} of ${items.length} complete \xB7 ${Math.round(100 * completed / items.length)}% \xB7 ${items.length - completed} remaining`;
         },
         discordTimestamp(seconds, format) {
           var input = seconds.trim();
@@ -42797,7 +42897,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var buffer = 0;
       var bytes = "";
       for (var character of encoded) {
-        buffer = buffer << 6 | base64Alphabet.indexOf(character);
+        buffer = buffer << 6 | base64Alphabet2.indexOf(character);
         bits += 6;
         if (bits >= 8) {
           bits -= 8;
@@ -42837,7 +42937,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     if (words > 5)
       return `${words} words, ${content.length} characters`;
   }
-  var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers, base64Alphabet;
+  var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers, base64Alphabet2;
   var init_cxNativeEffects = __esm({
     "src/lib/api/cxNativeEffects.ts"() {
       "use strict";
@@ -43245,7 +43345,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ])));
       roundingUsers = /* @__PURE__ */ new WeakMap();
       overrideLayers = /* @__PURE__ */ new WeakMap();
-      base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      base64Alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     }
   });
 
@@ -50657,6 +50757,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/checklist-progress.cx
+  var checklist_progress_default;
+  var init_checklist_progress = __esm({
+    "../examples/cx/catalog/plugins/checklist-progress.cx"() {
+      checklist_progress_default = 'plugin "Checklist Progress":\n  needs commands.register\n  needs reply.local\n  on command "checklistprogress" with text:\n    reply "${checklistProgress(text)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/clap-text.cx
   var clap_text_default;
   var init_clap_text = __esm({
@@ -50726,6 +50834,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_colorful_mentions = __esm({
     "../examples/cx/catalog/plugins/colorful-mentions.cx"() {
       colorful_mentions_default = 'plugin "ColorfulMentions":\n  needs appearance.style\n  style colorful-mentions\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/common-lines.cx
+  var common_lines_default;
+  var init_common_lines = __esm({
+    "../examples/cx/catalog/plugins/common-lines.cx"() {
+      common_lines_default = 'plugin "Common Lines":\n  needs commands.register\n  needs reply.local\n  on command "commonlines":\n    input "first" text\n    input "second" text\n    reply "${commonLines(first, second)}"\n';
     }
   });
 
@@ -51046,6 +51162,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_embedded_urls = __esm({
     "../examples/cx/catalog/plugins/embedded-urls.cx"() {
       embedded_urls_default = 'plugin "EmbeddedURLs":\n  needs messages.transform\n  needs messages.redirectlinks\n  before send rewrite-origin "https://www.tiktok.com" with "https://www.tnktok.com"\n  before send rewrite-origin "https://vt.tiktok.com" with "https://www.tnktok.com"\n  before send rewrite-origin "https://x.com" with "https://www.fxtwitter.com"\n  before send rewrite-origin "https://www.twitter.com" with "https://www.fxtwitter.com"\n  before send rewrite-origin "https://www.instagram.com" with "https://www.kkinstagram.com"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/encode-base64.cx
+  var encode_base64_default;
+  var init_encode_base64 = __esm({
+    "../examples/cx/catalog/plugins/encode-base64.cx"() {
+      encode_base64_default = 'plugin "Encode Base64":\n  needs commands.register\n  needs reply.local\n  on command "encodebase64" with text:\n    reply "${encodeBase64(text)}"\n';
     }
   });
 
@@ -52060,6 +52184,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hsl-color-converter.cx
+  var hsl_color_converter_default;
+  var init_hsl_color_converter = __esm({
+    "../examples/cx/catalog/plugins/hsl-color-converter.cx"() {
+      hsl_color_converter_default = 'plugin "HSL Color Converter":\n  needs commands.register\n  needs reply.local\n  on command "hsltohex" with text:\n    reply "${hslToHex(text)}" else "Enter an HSL color like hsl(120, 100%, 50%)."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/ignore-calls.cx
   var ignore_calls_default;
   var init_ignore_calls = __esm({
@@ -52129,6 +52261,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_json_format = __esm({
     "../examples/cx/catalog/plugins/json-format.cx"() {
       json_format_default = 'plugin "JSON Format":\n  needs commands.register\n  needs reply.local\n  on command "formatjson" with text:\n    reply "${formatJson(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/json-keys.cx
+  var json_keys_default;
+  var init_json_keys = __esm({
+    "../examples/cx/catalog/plugins/json-keys.cx"() {
+      json_keys_default = 'plugin "JSON Keys":\n  needs commands.register\n  needs reply.local\n  on command "jsonkeys" with text:\n    reply "${jsonKeys(text)}"\n';
     }
   });
 
@@ -53057,6 +53197,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_stop_auto_unread = __esm({
     "../examples/cx/catalog/plugins/stop-auto-unread.cx"() {
       stop_auto_unread_default = 'plugin "StopAutoUnread":\n  needs notifications.preventautoupgrade\n  use stop-auto-unread\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/strip-url-tracking.cx
+  var strip_url_tracking_default;
+  var init_strip_url_tracking = __esm({
+    "../examples/cx/catalog/plugins/strip-url-tracking.cx"() {
+      strip_url_tracking_default = 'plugin "Strip URL Tracking":\n  needs commands.register\n  needs reply.local\n  on command "striptracking" with text:\n    reply "${stripTracking(text)}" else "Enter an HTTP or HTTPS URL without embedded credentials."\n';
     }
   });
 
@@ -54223,6 +54371,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_call_time_counter();
       init_centered_chat();
       init_chat_buttons_begone();
+      init_checklist_progress();
       init_clap_text();
       init_clean_channel_name();
       init_clear_urls();
@@ -54232,6 +54381,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_color_converter();
       init_color_text();
       init_colorful_mentions();
+      init_common_lines();
       init_compact_compose();
       init_compact_member_list();
       init_compact_messages();
@@ -54272,6 +54422,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_double_click_to_reply();
       init_duration_converter();
       init_embedded_urls();
+      init_encode_base64();
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
       init_fake_profile_themes();
@@ -54375,6 +54526,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hold_your_tongue();
       init_hop_on();
       init_hover_highlight_messages();
+      init_hsl_color_converter();
       init_ignore_calls();
       init_image_filename();
       init_image_link();
@@ -54384,6 +54536,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_json_check();
       init_json_compact();
       init_json_format();
+      init_json_keys();
       init_jump_to_top();
       init_jump_to();
       init_keyword_notify();
@@ -54479,6 +54632,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_sticker_blocker();
       init_sticky_date_dividers();
       init_stop_auto_unread();
+      init_strip_url_tracking();
       init_talk_in_reverse();
       init_terezi_typing_quirk();
       init_text_replace();
@@ -54880,6 +55034,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433"
           },
           {
+            name: "Checklist Progress",
+            source: checklist_progress_default,
+            description: "/checklistprogress",
+            commands: [
+              "checklistprogress"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "edaaa6c353ed5ae0b1226b53fa0768367fd5e83c8f293c765142041ef542216d"
+          },
+          {
             name: "ClapText",
             source: clap_text_default,
             description: "/clap",
@@ -54970,6 +55136,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "84ed334d7bbfa85c7c10f1ce59c128908e80a62f7442539ba51f0dfb0c24fa16"
+          },
+          {
+            name: "Common Lines",
+            source: common_lines_default,
+            description: "/commonlines",
+            commands: [
+              "commonlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "8a6571a5f25c6dd9a6ce6dc6fb05b9bd0028e003f3dd9eb48ff4227fdc593d40"
           },
           {
             name: "CompactCompose",
@@ -55347,6 +55525,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Encode Base64",
+            source: encode_base64_default,
+            description: "/encodebase64",
+            commands: [
+              "encodebase64"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "d695cbf61031f6f60e1492fcc9e387c435f14933328eab0416384d9fa7d3ab7c"
           },
           {
             name: "Equius'sTypingQuirk",
@@ -56283,6 +56473,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "HSL Color Converter",
+            source: hsl_color_converter_default,
+            description: "/hsltohex",
+            commands: [
+              "hsltohex"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "824ea2d52eb31cc78fa7f8c0adf6709f71e12f0c529f7fbd60c9545fb18dc7de"
+          },
+          {
             name: "IgnoreCalls",
             source: ignore_calls_default,
             description: "Edit the source to enter Discord IDs",
@@ -56373,6 +56575,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c"
+          },
+          {
+            name: "JSON Keys",
+            source: json_keys_default,
+            description: "/jsonkeys",
+            commands: [
+              "jsonkeys"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d"
           },
           {
             name: "JumpToTop",
@@ -57290,6 +57504,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Strip URL Tracking",
+            source: strip_url_tracking_default,
+            description: "/striptracking",
+            commands: [
+              "striptracking"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40"
           },
           {
             name: "TalkInReverse",
@@ -64170,7 +64396,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "16d8832b4bbae7e137ac7e2aca7ee0b56ec59914";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2ebf7ba5299a0a92e146ba88a958a53674f84d78";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
