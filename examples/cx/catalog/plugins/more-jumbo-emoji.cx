@@ -1,0 +1,3 @@
+plugin "MoreJumboEmoji":
+  needs appearance.style
+  use jumbo-emoji-limit

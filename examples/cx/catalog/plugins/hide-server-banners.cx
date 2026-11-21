@@ -1,0 +1,3 @@
+plugin "HideServerBanners":
+  needs appearance.hide
+  hide server-banners

@@ -26,8 +26,10 @@ const page = { module: { exports: {} }, React, require: name => {
 vm.runInNewContext(compile('ios/runtime/src/core/ui/settings/pages/Addons/index.tsx'), page);
 const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.props?.children || []).flat(Infinity).flatMap(walk)];
 (async () => {
-    const installed = walk(page.module.exports.default()).find(n => n.props?.label === 'Installed plugins');
-    assert(installed, 'installed plugins row must exist');
+    const rows = walk(page.module.exports.default());
+    const installed = rows.find(n => n.props?.label === 'Plugins');
+    assert(installed, 'Plugins row must exist');
+    assert.equal(rows.some(n => n.props?.label === 'CX Extensions'), false);
     await installed.props.onPress();
     assert.equal(navigations.length, 0, 'a failed import must not navigate into a crashing screen');
     assert.equal(alerts.length, 1, 'load failure offers the existing error/retry alert');

@@ -575,6 +575,7 @@ function preventMiddleClickPaste(event: MouseEvent) {
     if (event.button === 1) event.preventDefault();
 }
 const avatarCropZoomLimits = new Map<symbol, number>();
+const jumboEmojiLimits = new Map<symbol, number>();
 const notificationVolumeLimits = new Map<symbol, number>();
 const spoilerClasses = findCssClassesLazy("spoilerContent", "hidden");
 const spoilerChatClasses = findCssClassesLazy("messagesWrapper", "navigationDescription");
@@ -1302,6 +1303,12 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                     avatarCropZoomLimits.set(grant, effectOptions.maxAvatarCropZoom);
                     return () => { avatarCropZoomLimits.delete(grant); };
                 }
+                case "jumbo-emoji-limit": {
+                    if (!effectOptions || !("jumboEmojiLimit" in effectOptions)) throw new Error("Missing jumbo emoji limit");
+                    const grant = Symbol();
+                    jumboEmojiLimits.set(grant, effectOptions.jumboEmojiLimit);
+                    return () => { jumboEmojiLimits.delete(grant); };
+                }
                 case "notification-volume": {
                     if (!effectOptions || !("notificationVolume" in effectOptions)) throw new Error("Missing notification volume");
                     const grant = Symbol();
@@ -1499,7 +1506,38 @@ async function restoreRememberedAppearance(generation: number) {
 
 const activeCatalogLoaders = new Map<string, () => Promise<string>>();
 
-export function CxSettings() {
+export type CxAddonKind = "plugin" | "theme";
+type CxAddonSource = string | (() => Promise<string>);
+export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; };
+const desktopCatalogPlugins = cxCatalog.plugins.filter(entry => !entry.linuxOnly);
+
+export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
+    const revision = React.useSyncExternalStore(subscribeAppearance, () => appearanceUpdates);
+    const rows = React.useMemo(() => {
+        const entries = kind === "theme" ? cxCatalog.themes : IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : desktopCatalogPlugins;
+        const catalog = entries.map(entry => {
+            const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
+            const current = session.source(id);
+            const active = current !== undefined && (current === entry.source || activeCatalogLoaders.get(id) === entry.source
+                || kind === "plugin");
+            return { ...entry, id, active };
+        });
+        const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
+            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({ id, name, source: session.source(id)!, active: true }));
+        return [...catalog, ...imported];
+    }, [kind, revision]);
+    return React.useMemo(() => [...searchCxCatalog(rows, query)], [rows, query]);
+}
+
+export async function disableCxAddon(id: string) {
+    if (rememberingAppearance.has(id)) throw new Error("Wait for the saved approval to finish, then try again.");
+    if (rememberedAppearance.some(entry => entry.id === id)) await writeRememberedAppearance(id);
+    activeCatalogLoaders.delete(id);
+    session.disable(id);
+    refreshRememberedAppearance();
+}
+
+export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddonRow; } = {}) {
     const [source, setSource] = useState("");
     const [showCatalog, setShowCatalog] = useState(false);
     const [search, setSearch] = useState("");
@@ -1520,6 +1558,7 @@ export function CxSettings() {
         setCandidate(undefined);
         try {
             const preview = reviewCx(next);
+            if (kind && preview.kind !== kind) throw new Error(`Open this file from ${preview.kind === "theme" ? "Themes" : "Plugins"}.`);
             setCandidate({ source: next, loader, review: preview, selected: preview.appearanceOptions.filter(option => option.defaultOn).map(option => option.target) });
             setStatus("");
         } catch (error) {
@@ -1545,6 +1584,10 @@ export function CxSettings() {
         });
     }
 
+    React.useEffect(() => {
+        if (entry && !entry.active) chooseSource(entry.source);
+    }, [entry]);
+
     function enable(remember = false) {
         if (!candidate) return;
         try {
@@ -1552,7 +1595,8 @@ export function CxSettings() {
             if (candidate.loader) {
                 const id = candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name;
                 activeCatalogLoaders.set(id, candidate.loader);
-            }
+            } else activeCatalogLoaders.delete(candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name);
+            refreshRememberedAppearance();
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
             if (remember && rememberId) {
@@ -1571,7 +1615,7 @@ export function CxSettings() {
 
     const catalogPlugins = IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : cxCatalog.plugins.filter(entry => !entry.linuxOnly);
     return <section style={{ display: "grid", gap: 12 }}>
-        <h2>CX Extensions</h2>
+        {!kind && <><h2>CX Extensions</h2>
         <details onToggle={event => setShowCatalog(event.currentTarget.open)}>
             <summary>CX catalog · {catalogPlugins.length} plugins · {cxCatalog.themes.length} themes</summary>
             {showCatalog && <>
@@ -1619,8 +1663,8 @@ export function CxSettings() {
                     </div>;
                 })}
             </>}
-        </details>
-        <label>
+        </details></>}
+        {!entry && <label>
             Open a .cx file
             <input type="file" accept=".cx" onChange={async event => {
                 const file = event.currentTarget.files?.[0];
@@ -1641,15 +1685,15 @@ export function CxSettings() {
                     if (id === selection.current) setStatus("Could not read the CX file.");
                 }
             }} />
-        </label>
-        <textarea aria-label="CX source" value={source} maxLength={MAX_CX_SOURCE} rows={8} style={{
+        </label>}
+        {!entry && <textarea aria-label="CX source" value={source} maxLength={MAX_CX_SOURCE} rows={8} style={{
             background: "var(--background-secondary, #2b2d31)", color: "var(--text-normal, #f2f3f5)", padding: 12, fontFamily: "monospace",
         }} onChange={event => {
             selection.current++;
             setCandidate(undefined);
             setSource(event.currentTarget.value);
-        }} />
-        <button onClick={() => review(source, candidate?.source === source ? candidate.loader : undefined)}>Review CX</button>
+        }} />}
+        {!entry && <button onClick={() => review(source, candidate?.source === source ? candidate.loader : undefined)}>{kind ? "Review" : "Review CX"}</button>}
         {candidate && <div>
             <strong>{candidate.review.name}</strong>
             <ul>{candidate.review.effects.map(effect => <li key={effect}>{effect}</li>)}</ul>
@@ -1672,9 +1716,9 @@ export function CxSettings() {
             </div>)}
             <button onClick={() => enable()}>Allow for this session</button>
             {rememberId && <button onClick={() => enable(true)}>Allow and remember on this device</button>}
-            {!source && <button onClick={() => setSource(candidate.source)}>Edit CX source</button>}
+            {!entry && !source && <button onClick={() => setSource(candidate.source)}>Edit source</button>}
         </div>}
-        {session.list().map(({ id, name }) => {
+        {session.list().filter(({ id, name }) => !kind || (entry?.id === id && entry.name === name)).map(({ id, name }) => {
             const saved = rememberedAppearance.find(entry => entry.id === id && entry.source === session.source(id));
             return <div key={id}>
                 {saved && <small>Remembered on this device</small>}
@@ -1691,27 +1735,21 @@ export function CxSettings() {
                         } catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
                     }} /> {label}</label>
                 </div>)}
-                <button disabled={rememberingAppearance.has(id)} onClick={() => {
-                    if (rememberingAppearance.has(id)) return;
-                    if (saved) return writeRememberedAppearance(id).then(() => {
-                        activeCatalogLoaders.delete(id);
-                        session.disable(id);
-                        setStatus(`${name} disabled.`);
-                    }, () => setStatus("Couldn't remove the saved approval. Try disabling it again."));
-                    activeCatalogLoaders.delete(id);
-                    session.disable(id);
-                    setStatus(`${name} disabled.`);
-                }}>Disable {name}</button>
+                <button disabled={rememberingAppearance.has(id)} onClick={() => disableCxAddon(id).then(
+                    () => setStatus(`${name} disabled.`),
+                    error => setStatus(String(error instanceof Error ? error.message : error)),
+                )}>Disable {name}</button>
             </div>;
         })}
-        {rememberedAppearance.filter(entry => session.source(entry.id) !== entry.source).map(({ id }) => <div key={id}>
+        {rememberedAppearance.filter(entry => (!kind || ((entry.id === "theme") === (kind === "theme")))
+            && session.source(entry.id) !== entry.source).map(({ id }) => <div key={id}>
             <span>Remembered extension is inactive</span>
             <button onClick={() => writeRememberedAppearance(id).catch(() => setStatus("Couldn't remove the saved approval."))}>Forget {id === "theme" ? "theme" : id.slice(7)}</button>
         </div>)}
         {appearanceRestoreNotice && <p>{appearanceRestoreNotice}</p>}
-        {clearLocalNotes.notes && <button onClick={clearLocalNotes.notes}>Clear local user notes</button>}
-        {browseLocalChannelNotes && <button onClick={browseLocalChannelNotes}>Browse channel notes</button>}
-        {clearLocalNotes.channels && <button onClick={clearLocalNotes.channels}>Clear local channel notes</button>}
+        {kind !== "theme" && !entry && clearLocalNotes.notes && <button onClick={clearLocalNotes.notes}>Clear local user notes</button>}
+        {kind !== "theme" && !entry && browseLocalChannelNotes && <button onClick={browseLocalChannelNotes}>Browse channel notes</button>}
+        {kind !== "theme" && !entry && clearLocalNotes.channels && <button onClick={clearLocalNotes.channels}>Clear local channel notes</button>}
         <p role="status">{status}</p>
     </section>;
 }
@@ -1777,6 +1815,13 @@ export default definePlugin({
         replacement: {
             match: /maxValue:(\d+(?:\.\d+)?)(?=[,}])/,
             replace: "maxValue:$self.avatarCropZoom($1)",
+        },
+    }, {
+        // MoreJumboEmoji by rootpoi, kraethis, and ewlle (GPL-3.0-or-later).
+        find: ".jumboable=",
+        replacement: {
+            match: /(\i)>((?:\i\.MAX_EMOJI_TO_BE_JUMBO|\d+))\|\|(?=\i\.forEach\(\i=>\{\i\.jumboable=)/g,
+            replace: "$self.exceedsJumboEmojiLimit($1,$2)||",
         },
     }, {
         // NoMaskedUrlPaste by CatNoir, GPL-3.0-or-later.
@@ -2044,6 +2089,9 @@ export default definePlugin({
     shouldSkipPinPrompt() { return bypassPinPromptUsers > 0; },
     usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
     avatarCropZoom(original: number) { return Math.max(original, ...avatarCropZoomLimits.values()); },
+    exceedsJumboEmojiLimit(count: number, original: number) {
+        return count > (jumboEmojiLimits.size ? Math.max(...jumboEmojiLimits.values()) : original);
+    },
     notificationVolumeFactor() { return Math.min(100, ...notificationVolumeLimits.values()) / 100; },
     renderMessageLatency(message: Message) {
         return messageLatencyOptions ? <MessageLatencyTooltip message={message} options={messageLatencyOptions} /> : null;

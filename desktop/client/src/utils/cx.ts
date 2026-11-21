@@ -219,10 +219,11 @@ export type CxTheme = {
 };
 type CxQuoteOptions = { includeLink: boolean; };
 type CxAvatarCropOptions = { maxAvatarCropZoom: number; };
+type CxJumboEmojiOptions = { jumboEmojiLimit: number; };
 type CxNotificationVolumeOptions = { notificationVolume: number; };
 export type CxMessageLatencyOptions = { latency: number; detectDiscordKotlin: boolean; showMillis: boolean; ignoreSelf: boolean; };
-type CxNumberOption = { effect: "avatar-crop-zoom" | "notification-volume" | "message-latency"; label: string; value: number; min: number; max: number; unit: string; };
-type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
+type CxNumberOption = { effect: "avatar-crop-zoom" | "jumbo-emoji-limit" | "notification-volume" | "message-latency"; label: string; value: number; min: number; max: number; unit: string; };
+type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxJumboEmojiOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
 
 type CxPlugin = {
     kind: "plugin";
@@ -239,6 +240,7 @@ type CxPlugin = {
     nativeEffects: CxNativeEffect[];
     avatarResolution?: CxAvatarResolution;
     avatarCropOptions?: CxAvatarCropOptions;
+    jumboEmojiOptions?: CxJumboEmojiOptions;
     notificationVolumeOptions?: CxNotificationVolumeOptions;
     messageLatencyOptions?: CxMessageLatencyOptions;
     voiceMemberOptions?: CxVoiceMemberOptions;
@@ -421,6 +423,7 @@ export function parseCx(source: string): CxDocument {
     let hasTimestampSurface = false;
     let avatarResolution: CxAvatarResolution | undefined;
     let avatarCropOptions: CxAvatarCropOptions | undefined;
+    let jumboEmojiOptions: CxJumboEmojiOptions | undefined;
     let notificationVolumeOptions: CxNotificationVolumeOptions | undefined;
     let messageLatencyOptions: CxMessageLatencyOptions | undefined;
     let voiceMemberOptions: CxVoiceMemberOptions | undefined;
@@ -528,6 +531,11 @@ export function parseCx(source: string): CxDocument {
                 const zoom = effect[2] ?? "4";
                 if (!/^(?:[2-9]|1[0-6])$/.test(zoom)) throw new Error("Choose an avatar crop zoom from 2 to 16");
                 avatarCropOptions = { maxAvatarCropZoom: Number(zoom) };
+            } else if (name === "jumbo-emoji-limit") {
+                const limit = effect[2] ?? "50";
+                if (limit !== "unlimited" && (!/^(?:0|[1-9]\d{0,2})$/.test(limit) || Number(limit) > 200))
+                    throw new Error("Choose a jumbo emoji limit from 0 to 200, or unlimited");
+                jumboEmojiOptions = { jumboEmojiLimit: limit === "unlimited" ? Infinity : Number(limit) };
             } else if (name === "notification-volume") {
                 const volume = effect[2] ?? "100";
                 if (!/^(?:100|[1-9]?\d)$/.test(volume)) throw new Error("Choose a notification volume from 0 to 100");
@@ -817,7 +825,7 @@ export function parseCx(source: string): CxDocument {
         throw new Error("Remove unused CX permissions");
     return {
         kind: "plugin", name, commands, permissions: [...permissions], messageTransforms: transforms, sendConfirmation, suppressReplyPing,
-        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, notificationVolumeOptions, messageLatencyOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
+        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, jumboEmojiOptions, notificationVolumeOptions, messageLatencyOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
     };
 }
 
@@ -827,6 +835,9 @@ export function reviewCx(source: string) {
     if (document.kind === "theme") return { kind: document.kind, name: document.name, permissions: [] as CxPermission[], effects: ["Change the app colors and background"], appearanceOptions: [] as CxAppearanceOption[], numberOptions };
     if (document.avatarCropOptions) numberOptions.push({
         effect: "avatar-crop-zoom", label: "Avatar crop zoom", value: document.avatarCropOptions.maxAvatarCropZoom, min: 2, max: 16, unit: "×",
+    });
+    if (document.jumboEmojiOptions && Number.isFinite(document.jumboEmojiOptions.jumboEmojiLimit)) numberOptions.push({
+        effect: "jumbo-emoji-limit", label: "Jumbo emoji limit", value: document.jumboEmojiOptions.jumboEmojiLimit, min: 0, max: 200, unit: "",
     });
     if (document.notificationVolumeOptions) numberOptions.push({
         effect: "notification-volume", label: "Notification volume", value: document.notificationVolumeOptions.notificationVolume, min: 0, max: 100, unit: "%",
@@ -849,6 +860,10 @@ export function reviewCx(source: string) {
                 const label = cxNativeEffects[effect].label;
                 if (effect === "avatar-resolution") return label + " (" + document.avatarResolution + " px)";
                 if (effect === "avatar-crop-zoom") return label + " (" + document.avatarCropOptions!.maxAvatarCropZoom + "×)";
+                if (effect === "jumbo-emoji-limit") {
+                    const limit = document.jumboEmojiOptions!.jumboEmojiLimit;
+                    return label + " (" + (Number.isFinite(limit) ? limit : "unlimited") + ")";
+                }
                 if (effect === "notification-volume") return label + " (" + document.notificationVolumeOptions!.notificationVolume + "%)";
                 if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
                     return "Automatically join the selected voice channel when its slot opens";
@@ -1018,6 +1033,7 @@ function bindCx(source: string, host: CxHost, approved: readonly CxPermission[],
         }
         const nativeOptions: Partial<Record<CxNativeEffect, CxNativeOptions>> = {
             "avatar-crop-zoom": document.avatarCropOptions,
+            "jumbo-emoji-limit": document.jumboEmojiOptions,
             "notification-volume": document.notificationVolumeOptions,
             "message-latency": document.messageLatencyOptions,
             "all-call-time-counter": document.voiceMemberOptions,

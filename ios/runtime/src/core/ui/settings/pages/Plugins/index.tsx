@@ -1,5 +1,8 @@
 import { Strings } from "@core/i18n";
+import type { CardWrapper } from "@core/ui/components/AddonCard";
 import AddonPage from "@core/ui/components/AddonPage";
+import { type CxAddonRow, useCxAddonRows } from "@core/ui/settings/pages/CxExtensions";
+import { CxAddonCard, ImportCxAddonButton } from "@core/ui/settings/pages/CxExtensions/AddonCard";
 import PluginCard from "@core/ui/settings/pages/Plugins/components/PluginCard";
 import { VdPluginManager } from "@core/vendetta/plugins";
 import { useProxy } from "@core/vendetta/storage";
@@ -34,25 +37,29 @@ const { AlertModal, AlertActions, AlertActionButton } = lazyDestructure(() =>
   findByProps("AlertModal", "AlertActions"),
 );
 
-interface PluginPageProps
-  extends Partial<ComponentProps<typeof AddonPage<UnifiedPluginModel>>> {
-  useItems: () => unknown[];
+type PluginRow = UnifiedPluginModel | CxAddonRow;
+type PluginPageProps = Partial<ComponentProps<typeof AddonPage<PluginRow>>> & { useItems: () => PluginRow[]; };
+
+function PluginListCard({ item, result }: CardWrapper<PluginRow>) {
+  return "source" in item
+    ? <CxAddonCard kind="plugin" entry={item} />
+    : <PluginCard item={item} result={result as Fuzzysort.KeysResult<UnifiedPluginModel>} />;
 }
 
 function PluginPage(props: PluginPageProps) {
   const items = props.useItems();
 
   return (
-    <AddonPage<UnifiedPluginModel>
-      CardComponent={PluginCard}
+    <AddonPage<PluginRow>
+      CardComponent={PluginListCard}
       title={Strings.PLUGINS}
       searchKeywords={[
         "name",
         "description",
         (p) =>
-          p.authors
+          ("source" in p ? [p.keywords, ...(p.commands ?? []).map(command => "/" + command)].filter(Boolean).join(" ") : p.authors
             ?.map((a: Author | string) => (typeof a === "string" ? a : a.name))
-            .join() || "",
+            .join()) || "",
       ]}
       sortOptions={{
         "Name (A-Z)": (a, b) => a.name.localeCompare(b.name),
@@ -78,15 +85,18 @@ export default function Plugins() {
             const corePlugins = [...registeredPlugins.values()].filter(p => isPluginInstalled(p.id) && isCorePlugin(p.id)).map(unifyBunnyPlugin);
             const vdPlugins = Object.values(VdPluginManager.plugins).map(unifyVdPlugin);
             const bnPlugins = [...registeredPlugins.values()].filter(p => isPluginInstalled(p.id) && !isCorePlugin(p.id)).map(unifyBunnyPlugin);
-
-            return [...corePlugins, ...vdPlugins, ...bnPlugins];
+            const catalog = useCxAddonRows("plugin");
+            const native = [...corePlugins, ...vdPlugins, ...bnPlugins];
+            const nativeNames = new Set(native.map(plugin => plugin.name.toLowerCase()));
+            return [...native, ...catalog.filter(plugin => plugin.active || !nativeNames.has(plugin.name.toLowerCase()))];
         }}
         ListHeaderComponent={() => {
             const unproxiedPlugins = Object.values(VdPluginManager.plugins).filter(p => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));
-            if (!unproxiedPlugins.length) return null;
+            if (!unproxiedPlugins.length) return <ImportCxAddonButton kind="plugin" />;
 
         return (
           <View style={{ marginVertical: 12, marginHorizontal: 10 }}>
+            <ImportCxAddonButton kind="plugin" />
             <Card border="strong">
               <View
                 style={{

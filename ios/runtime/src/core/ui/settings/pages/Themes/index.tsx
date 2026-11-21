@@ -1,5 +1,7 @@
 import { formatString, Strings } from "@core/i18n";
 import AddonPage from "@core/ui/components/AddonPage";
+import { type CxAddonRow, disableCxAddon, useCxAddonRows } from "@core/ui/settings/pages/CxExtensions";
+import { CxAddonCard, ImportCxAddonButton } from "@core/ui/settings/pages/CxExtensions/AddonCard";
 import ThemeCard from "@core/ui/settings/pages/Themes/ThemeCard";
 import { useProxy } from "@core/vendetta/storage";
 import {
@@ -33,24 +35,28 @@ import { View } from "react-native";
 export default function Themes() {
   useProxy(settings);
   useProxy(themes);
+  const cxThemes = useCxAddonRows("theme");
+  const activeCxTheme = cxThemes.find(theme => theme.active);
+  const themeName = (theme: VdThemeInfo | CxAddonRow) => "source" in theme ? theme.name : theme.data.name;
 
   return (
-    <AddonPage<VdThemeInfo>
+    <AddonPage<VdThemeInfo | CxAddonRow>
       title={Strings.THEMES}
       searchKeywords={[
-        "data.name",
-        "data.description",
-        (p) => p.data.authors?.map((a: Author) => a.name).join(", ") ?? "",
+        themeName,
+        (p) => ("source" in p ? p.description : p.data.description) ?? "",
+        (p) => "source" in p ? p.keywords ?? "" : p.data.authors?.map((a: Author) => a.name).join(", ") ?? "",
       ]}
       sortOptions={{
-        "Name (A-Z)": (a, b) => a.data.name.localeCompare(b.data.name),
-        "Name (Z-A)": (a, b) => b.data.name.localeCompare(a.data.name),
+        "Name (A-Z)": (a, b) => themeName(a).localeCompare(themeName(b)),
+        "Name (Z-A)": (a, b) => themeName(b).localeCompare(themeName(a)),
       }}
       installAction={{
         label: "Install a theme",
         fetchFn: installTheme,
       }}
-      items={Object.values(themes)}
+      items={[...Object.values(themes), ...cxThemes]}
+      ListHeaderComponent={() => <ImportCxAddonButton kind="theme" />}
       safeModeHint={{
         message: formatString("SAFE_MODE_NOTICE_THEMES", {
           enabled: Boolean(settings.safeMode?.currentThemeId),
@@ -64,7 +70,10 @@ export default function Themes() {
           />
         ),
       }}
-      CardComponent={ThemeCard}
+      CardComponent={({ item, result }) => "source" in item
+        ? <CxAddonCard kind="theme" entry={item} />
+        : <ThemeCard item={item} result={result as Fuzzysort.KeysResult<VdThemeInfo>} overridden={!!activeCxTheme}
+            beforeSelect={() => { if (activeCxTheme) disableCxAddon(activeCxTheme.id, activeCxTheme.name); }} />}
       OptionsActionSheetComponent={() => {
         useObservable([colorsPref]);
 

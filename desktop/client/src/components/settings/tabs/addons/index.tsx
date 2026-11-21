@@ -24,7 +24,6 @@ const cl = classNameFactory("cc-addons-");
 // Resolve these only when opened, so a failing optional page can't break Add-ons.
 function CloudPage() { const Page = require("../sync/CloudTab").default; return <Page />; }
 function ExtrasPage() { const Page = require("../extras").default; return <Page />; }
-function CxPage() { const Page = require("@sincordplugins/cxExtensions").CxSettings; return <Page />; }
 function TestingPage() { const Page = require("./TestingPlugins").default; return <Page />; }
 
 const TweakIcon = ({ width = 16, height = 16, className }: IconProps) => (
@@ -37,7 +36,6 @@ const PAGES: Page[] = [
     { name: "Plugins", Icon: PluginsIcon, Tab: PluginsPage, count: () => listablePlugins().length, show: v => v.showPluginsTab !== false },
     { name: "Tweaks", Icon: TweakIcon, Tab: TweaksPage, count: () => tweakPlugins().length },
     { name: "Themes", Icon: PaintbrushIcon, Tab: ThemesPage, show: v => v.showThemesTab !== false },
-    { name: "CX Extensions", Icon: PluginIcon, Tab: CxPage },
     { name: "Testing Plugins", Icon: PluginIcon, Tab: TestingPage },
     { name: "Sync", Icon: CloudIcon, Tab: CloudPage, show: v => v.showCloudSyncTab !== false },
     { name: "Extras", Icon: PluginIcon, Tab: ExtrasPage },

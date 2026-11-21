@@ -16,6 +16,7 @@ import { FolderIcon, SearchIcon } from "@components/Icons";
 import { AddonCard } from "@components/settings/AddonCard";
 import { openSettingsTabModal } from "@components/settings/tabs/BaseTab";
 import { getThemeInfo, stripBOM, type UserThemeHeader } from "@utils/themes/bd";
+import type { CxAddonKind, CxAddonRow } from "@sincordplugins/cxExtensions";
 import { SettingsTab } from "@components/settings/tabs/BaseTab";
 import { classNameFactory } from "@utils/css";
 import { promptToRestart } from "@utils/promptToRestart";
@@ -26,6 +27,21 @@ import { PluginCard } from "../plugins/PluginCard";
 import ThemesTab from "../../../ThemeSettings/ThemesTab";
 
 const cl = classNameFactory("cc-store-");
+const cxAddons = () => require("@sincordplugins/cxExtensions") as typeof import("@sincordplugins/cxExtensions");
+
+function reviewAddon(kind: CxAddonKind, entry?: CxAddonRow) {
+    const { CxSettings } = cxAddons();
+    const Review = () => <CxSettings kind={kind} entry={entry} />;
+    Review.displayName = entry?.name ?? `Import ${kind}`;
+    openSettingsTabModal(Review);
+}
+
+function toggleCxAddon(kind: CxAddonKind, entry: CxAddonRow, on: boolean) {
+    if (on) return reviewAddon(kind, entry);
+    void cxAddons().disableCxAddon(entry.id).catch(error => showToast({
+        text: error instanceof Error ? error.message : String(error), variant: "critical",
+    }));
+}
 
 type Sort = "name" | "enabled";
 
@@ -78,19 +94,30 @@ export function PluginsPage() {
     useEffect(() => setLimit(PAGE), [query, sort]);
 
     const visible = useMemo(listablePlugins, []);
+    const cxRows = cxAddons().useCxAddonRows("plugin", query);
+    const allCxRows = cxAddons().useCxAddonRows("plugin", "");
+    const cxByName = new Map(allCxRows.map(entry => [entry.name.toLowerCase(), entry]));
+    const nativeByName = new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin]));
 
     const q = query.trim().toLowerCase();
-    const shown = visible
-        .filter(p => !q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags?.some(t => t.toLowerCase().includes(q)))
-        .sort((a, b) => sort === "enabled"
-            ? Number(isPluginEnabled(b.name)) - Number(isPluginEnabled(a.name)) || a.name.localeCompare(b.name)
-            : a.name.localeCompare(b.name));
+    const shownNative = visible.filter(p => (!cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name))
+        && (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags?.some(t => t.toLowerCase().includes(q))));
+    const shownNames = new Set(shownNative.map(plugin => plugin.name.toLowerCase()));
+    const shown = [
+        ...shownNative.map(plugin => ({ name: plugin.name, active: isPluginEnabled(plugin.name), plugin, extension: undefined })),
+        ...cxRows.filter(entry => {
+            const name = entry.name.toLowerCase();
+            const native = nativeByName.get(name);
+            return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
+        }).map(extension => ({ name: extension.name, active: extension.active, plugin: undefined, extension })),
+    ].sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0) || a.name.localeCompare(b.name));
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
 
     const disableAll = () => {
         let changed = false;
         for (const p of visible) if (Settings.plugins[p.name]?.enabled) { Settings.plugins[p.name].enabled = false; changed = true; }
+        for (const entry of allCxRows) if (entry.active) toggleCxAddon("plugin", entry, false);
         force(n => n + 1);
         if (changed) promptToRestart("reload", { subtitle: "Reload Discord to turn all plugins off." });
     };
@@ -104,6 +131,7 @@ export function PluginsPage() {
                         <button className={cl("icon-btn")} title="Open settings folder" onClick={() => VencordNative.settings.openFolder()}><FolderIcon width={20} height={20} /></button>
                     )}
                     <button className={cl("icon-btn")} title="Disable all" onClick={disableAll}><OffIcon /></button>
+                    <button className={cl("mode")} onClick={() => reviewAddon("plugin")}>Import plugin</button>
                 </div>
                 <div className={cl("advanced")}>
                     <label className={cl("select")}>
@@ -124,7 +152,17 @@ export function PluginsPage() {
                 ? <div className={cl("empty")}>No plugins match “{query}”.</div>
                 : (
                     <div className={cl("list", { grid })}>
-                        {shown.slice(0, limit).map(p => <PluginCard key={p.name} plugin={p} disabled={false} onRestartNeeded={onRestartNeeded} />)}
+                        {shown.slice(0, limit).map(({ plugin, extension }) => {
+                            if (plugin) {
+                                const alternate = cxByName.get(plugin.name.toLowerCase());
+                                return <PluginCard key={plugin.name} plugin={plugin} disabled={false} onRestartNeeded={onRestartNeeded}
+                                    footer={alternate && !alternate.active && !isPluginEnabled(plugin.name)
+                                        && <button className={cl("mode")} onClick={() => reviewAddon("plugin", alternate)}>Catalog version</button>} />;
+                            }
+                            return <AddonCard key={extension.id} name={extension.name} description={extension.description}
+                                enabled={extension.active} setEnabled={on => toggleCxAddon("plugin", extension, on)}
+                                infoButton={extension.active && <button className={cl("mode")} onClick={() => reviewAddon("plugin", extension)}>Options</button>} />;
+                        })}
                     </div>
                 )}
             {shown.length > limit && <LoadMore onVisible={() => setLimit(l => l + PAGE)} />}
@@ -199,6 +237,7 @@ interface Row {
     on: boolean;
     set(on: boolean): void;
     remove?(): void;
+    options?(): void;
 }
 
 export function ThemesPage() {
@@ -210,6 +249,9 @@ export function ThemesPage() {
     const [query, setQuery] = useState("");
     const [sort, setSort] = useState<Sort>("name");
     const [grid, setGrid] = useState(false);
+    const [limit, setLimit] = useState(PAGE);
+    const cxRows = cxAddons().useCxAddonRows("theme", query);
+    useEffect(() => setLimit(PAGE), [query, sort]);
 
     const refresh = () => VencordNative.themes.getThemesList().then(list => setThemes(list.map(t => getThemeInfo(stripBOM(t.content), t.fileName))));
     useEffect(() => { refresh(); fetchStore().then(setStore, () => { }); }, []);
@@ -261,9 +303,13 @@ export function ThemesPage() {
         ...settings.themeLinks.map(url => ({
             key: url, name: linkName(url), author: undefined, version: undefined, description: url,
             on: linkOn(url), set: (on: boolean) => setLinkOn(url, on), remove: () => removeLink(url)
-        }))
-    ]
-        .filter(r => match(r.name, r.author, r.description))
+        })),
+    ].filter(r => match(r.name, r.author, r.description));
+    installed.push(...cxRows.map(entry => ({
+        key: "cx:" + entry.name, name: entry.name, description: entry.description, on: entry.active,
+        set: on => toggleCxAddon("theme", entry, on), options: entry.active ? () => reviewAddon("theme", entry) : undefined,
+    })));
+    installed
         .sort((a, b) => sort === "enabled" ? Number(b.on) - Number(a.on) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name));
 
     const browse = (store ?? [])
@@ -286,6 +332,7 @@ export function ThemesPage() {
                     )}
                     <button className={cl("icon-btn")} title="Reload themes" onClick={refresh}><RefreshIcon /></button>
                     <button className={cl("icon-btn")} title="Theme links and advanced options" onClick={() => openSettingsTabModal(ThemesTab)}><LinkIcon /></button>
+                    <button className={cl("mode")} onClick={() => reviewAddon("theme")}>Import theme</button>
                 </div>
                 <div className={cl("advanced")}>
                     <label className={cl("select")}>
@@ -312,7 +359,7 @@ export function ThemesPage() {
                 )
                 : (
                     <div className={cl("list", { grid })}>
-                        {installed.map(r => (
+                        {installed.slice(0, limit).map(r => (
                             <AddonCard
                                 key={r.key}
                                 name={r.name}
@@ -320,6 +367,7 @@ export function ThemesPage() {
                                 description={r.description}
                                 enabled={r.on}
                                 setEnabled={r.set}
+                                infoButton={r.options && <button className={cl("mode")} onClick={r.options}>Options</button>}
                                 footer={(r.version || r.remove) && (
                                     <div className={cl("card-foot")}>
                                         <span className={cl("version")}>{r.version ? "v" + r.version : ""}</span>
@@ -330,6 +378,7 @@ export function ThemesPage() {
                         ))}
                     </div>
                 ))}
+            {mode === "installed" && installed.length > limit && <LoadMore onVisible={() => setLimit(l => l + PAGE)} />}
 
             {mode === "browse" && (storeError
                 ? <div className={cl("empty")}>Couldn't load the theme store: {storeError}</div>

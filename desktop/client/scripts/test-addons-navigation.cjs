@@ -31,12 +31,11 @@ vm.runInNewContext(esbuild.transformSync(fs.readFileSync("src/components/setting
 const { default: Addons, setNextAddonsTab } = moduleObject.exports;
 
 const labels = tree => Array.from(tree.props.children[0].props.children[0], button => button.props.children[1].props.children[0]);
-const tabs = ["Plugins", "Tweaks", "Themes", "CX Extensions", "Sync", "Extras"];
+const tabs = ["Plugins", "Tweaks", "Themes", "Sync", "Extras"];
 assert.deepEqual(labels(Addons()), tabs);
 assert.equal(imported.length, 0);
 
 for (const [name, path] of [
-    ["CX Extensions", "@sincordplugins/cxExtensions"],
     ["Sync", "../sync/CloudTab"],
     ["Extras", "../extras"],
 ]) {
@@ -51,17 +50,17 @@ for (const [name, path] of [
     assert.throws(() => boundary.props.children[0].type(), /broken optional page/);
     assert.equal(imported.at(-1), path);
 }
-setNextAddonsTab("CX Extensions");
+setNextAddonsTab("Themes");
 active = undefined;
-assert.equal(Addons().props.children[0].props.children[0][3].props["aria-selected"], true);
+assert.equal(Addons().props.children[0].props.children[0][2].props["aria-selected"], true);
 
 visibility = { showPluginsTab: false, showThemesTab: false, showCloudSyncTab: false };
-assert.deepEqual(labels(Addons()), ["Tweaks", "CX Extensions", "Extras"]);
+assert.deepEqual(labels(Addons()), ["Tweaks", "Extras"]);
 tester = { label: "Desktop 2" };
 const importsBeforeTesting = imported.length;
 const testingTabs = Addons();
-assert.deepEqual(labels(testingTabs), ["Tweaks", "CX Extensions", "Testing Plugins", "Extras"]);
-testingTabs.props.children[0].props.children[0][2].props.onClick();
+assert.deepEqual(labels(testingTabs), ["Tweaks", "Testing Plugins", "Extras"]);
+testingTabs.props.children[0].props.children[0][1].props.onClick();
 const testingPage = Addons().props.children[1].props.children[0];
 assert.equal(imported.length, importsBeforeTesting);
 assert.throws(() => testingPage.props.children[0].type(), /broken optional page/);

@@ -1092,6 +1092,11 @@ const desktopEffectRecipes = {
         effect: "avatar-crop-zoom",
         sha256: "79d758d98fdafd27b0ba1178f14c5c7a4773ae74dbcaa735ad31d242bbc1d413",
     },
+    MoreJumboEmoji: {
+        effect: "jumbo-emoji-limit",
+        sha256: "9807067cd6ac6504d0be9a795e47be1cf39d5f14e3baa44d492ae903efb481e1",
+        alternateSha256: "16d525d89b9a8ad61525f8fb1b9fe4b9723c46350249c687040a58b55b9a80fa",
+    },
     NoMiddleClickPaste: {
         effect: "no-middle-click-paste",
         sha256: "9a681e749029652f7e89997e4289387102a5c43fdea024ba7dab9b6290b7b610",
@@ -1123,7 +1128,7 @@ function compileDesktopEffect(name, plugin, source, entry, nativeEffects) {
     const compiled = { capability: "native-effect", lines: ["  needs " + effect.permission, "  use " + recipe.effect] };
     if (recipe.sha256) {
         const sha256 = createHash("sha256").update(source.text.replaceAll("\r\n", "\n"), "utf8").digest("hex");
-        return sha256 === recipe.sha256 ? compiled : undefined;
+        return [recipe.sha256, recipe.alternateSha256].includes(sha256) ? compiled : undefined;
     }
     if (!fieldsAre(plugin, ["name", "description", "authors", "tags", "patches"])
         || !source.statements.every(node => node === entry || ts.isImportDeclaration(node)
@@ -1384,7 +1389,8 @@ function inspectPlugin(file, code, platform, appearance = {}, nativeEffects = {}
         const name = literal(call.arguments[0]);
         if (!name) return;
         const css = literal(call.arguments[2]);
-        const targets = matchAppearanceStyles(css, appearance);
+        const exactDesktopRule = Object.entries(appearance).find(([, rule]) => rule.desktopOnly && rule.plugin === name && rule.css === css);
+        const targets = exactDesktopRule ? [exactDesktopRule] : matchAppearanceStyles(css, appearance);
         const hideSystem = name === "HideSystemMessages" && css === '[class*="systemMessage"] { display: none !important; }';
         const supported = (targets || hideSystem) && platform === "desktop" && !entry.isExportEquals && !source.parseDiagnostics.length
             && safeText(name) && name.length <= 64

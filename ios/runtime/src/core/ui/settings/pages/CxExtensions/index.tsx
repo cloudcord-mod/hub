@@ -2833,7 +2833,31 @@ export function restoreRememberedCxAppearance() {
     };
 }
 
-export default function CxExtensions() {
+export type CxAddonKind = "plugin" | "theme";
+export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; active: boolean; };
+
+export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
+    const revision = React.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
+    return React.useMemo(() => {
+        const entries = kind === "plugin" ? mobileCatalogPlugins : cxCatalog.themes;
+        const catalog = entries.map(entry => {
+            const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
+            const current = session.source(id);
+            return { ...entry, id, active: current !== undefined && (kind === "plugin" || current === entry.source) };
+        });
+        const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
+            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({ id, name, source: session.source(id)!, active: true }));
+        return [...catalog, ...imported];
+    }, [kind, revision]);
+}
+
+export function disableCxAddon(id: string, name: string) {
+    forgetRememberedAppearance(name);
+    session.disable(id);
+    refreshRememberedAppearance();
+}
+
+export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddonRow; } = {}) {
     const [source, setSource] = React.useState("");
     const [showCatalog, setShowCatalog] = React.useState(false);
     const [search, setSearch] = React.useState("");
@@ -2850,6 +2874,7 @@ export default function CxExtensions() {
         setCandidate(undefined);
         try {
             const preview = reviewCx(next);
+            if (kind && preview.kind !== kind) throw new Error(`Open this file from ${preview.kind === "theme" ? "Themes" : "Plugins"}.`);
             setCandidate({ source: next, review: preview, selected: preview.appearanceOptions
                 .filter(option => option.defaultOn && supportsMobileHide(option)).map(option => option.target) });
             setStatus("");
@@ -2857,6 +2882,12 @@ export default function CxExtensions() {
             setStatus(String(error instanceof Error ? error.message : error));
         }
     }
+
+    React.useEffect(() => {
+        if (!entry || entry.active) return;
+        setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");
+        review(entry.source);
+    }, [entry]);
 
     async function openFile() {
         const id = ++selection.current;
@@ -2902,16 +2933,18 @@ export default function CxExtensions() {
             }
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));
+        } finally {
+            refreshRememberedAppearance();
         }
     }
 
     return <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ padding: 16 }}>
         <Stack spacing={16}>
-            <TableRowGroup title="CX catalog">
+            {!kind && <TableRowGroup title="CX catalog">
                 <TableRow label={showCatalog ? "Hide catalog" : "Browse catalog"} subLabel={`${mobileCatalogPlugins.length} plugins · ${cxCatalog.themes.length} themes`}
                     onPress={() => setShowCatalog(!showCatalog)} />
-            </TableRowGroup>
-            {showCatalog && <>
+            </TableRowGroup>}
+            {!kind && showCatalog && <>
                 <TextInput accessibilityLabel="Search CX catalog" placeholder="Search name, feature or /command" placeholderTextColor="#b5bac1"
                     value={search} onChangeText={value => { setSearch(value); setPages({ Plugins: 0, Themes: 0 }); }}
                     autoCorrect={false} style={{ color: "#fff", backgroundColor: "#27282d", padding: 12 }} />
@@ -2948,8 +2981,8 @@ export default function CxExtensions() {
                     </TableRowGroup>;
                 })}
             </>}
-            <Text style={{ color: "#b5bac1" }}>Paste the contents of a .cx file to review it.</Text>
-            <TextInput
+            {!entry && <Text style={{ color: "#b5bac1" }}>Paste the contents of a .cx file to review it.</Text>}
+            {!entry && <TextInput
                 accessibilityLabel="CX source"
                 placeholder={'theme "Midnight":'}
                 placeholderTextColor="#b5bac1"
@@ -2960,10 +2993,10 @@ export default function CxExtensions() {
                 autoCorrect={false}
                 style={{ color: "#fff", backgroundColor: "#27282d", minHeight: 140, padding: 12 }}
                 onChangeText={value => { selection.current++; setCandidate(undefined); setSource(value); }}
-            />
-            <TableRowGroup title="CX Extensions">
-                <TableRow label="Open a .cx file" onPress={openFile} />
-                <TableRow label="Review CX" onPress={() => review(source)} />
+            />}
+            <TableRowGroup title={kind ? (entry?.name ?? `Import ${kind}`) : "CX Extensions"}>
+                {!entry && <TableRow label="Open a .cx file" onPress={openFile} />}
+                {!entry && <TableRow label={kind ? "Review" : "Review CX"} onPress={() => review(source)} />}
                 {candidate && <TableRow
                     label={candidate.review.name}
                     subLabel={[...candidate.review.effects, ...(candidate.review.commands ?? [])].join("\n")}
@@ -2974,8 +3007,8 @@ export default function CxExtensions() {
                     }} />)}
                 {candidate && <TableRow label="Allow for this session" onPress={() => enable()} />}
                 {candidate && rememberRevision && <TableRow label="Allow and remember on this device" onPress={() => enable(true)} />}
-                {candidate && !source && <TableRow label="Edit CX source" onPress={() => setSource(candidate.source)} />}
-                {session.list().flatMap(({ id, name }) => {
+                {candidate && !entry && !source && <TableRow label="Edit source" onPress={() => setSource(candidate.source)} />}
+                {session.list().filter(({ id, name }) => !kind || (entry?.id === id && entry.name === name)).flatMap(({ id, name }) => {
                     const entry = rememberedCatalog.get(name);
                     const saved = entry?.source === session.source(id) ? remembered.find(item => item.name === name && item.revision === entry?.appearanceRevision) : undefined;
                     return [
@@ -2990,8 +3023,7 @@ export default function CxExtensions() {
                             }} />),
                         <TableRow key={id} label={`Disable ${name}`} subLabel={saved ? "Remembered on this device" : undefined} onPress={() => {
                             try {
-                                if (saved) forgetRememberedAppearance(name);
-                                session.disable(id);
+                                disableCxAddon(id, name);
                                 setStatus(`${name} disabled.`);
                             } catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
                         }} />,
@@ -2999,14 +3031,15 @@ export default function CxExtensions() {
                 })}
                 {remembered.filter(saved => {
                     const entry = rememberedCatalog.get(saved.name);
+                    if (kind && ((entry?.id === "theme") !== (kind === "theme"))) return false;
                     return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
                 }).map(saved => <TableRow key={saved.name} label={`Forget ${saved.name}`} subLabel={settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered extension is inactive"} onPress={() => {
                     try { forgetRememberedAppearance(saved.name); refreshRememberedAppearance(); }
                     catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
                 }} />)}
-                {clearLocalNotes.notes && <TableRow label="Clear local user notes" onPress={clearLocalNotes.notes} />}
-                {browseLocalChannelNotes && <TableRow label="Browse channel notes" onPress={browseLocalChannelNotes} />}
-                {clearLocalNotes.channels && <TableRow label="Clear local channel notes" onPress={clearLocalNotes.channels} />}
+                {kind !== "theme" && !entry && clearLocalNotes.notes && <TableRow label="Clear local user notes" onPress={clearLocalNotes.notes} />}
+                {kind !== "theme" && !entry && browseLocalChannelNotes && <TableRow label="Browse channel notes" onPress={browseLocalChannelNotes} />}
+                {kind !== "theme" && !entry && clearLocalNotes.channels && <TableRow label="Clear local channel notes" onPress={clearLocalNotes.channels} />}
             </TableRowGroup>
             <Text accessibilityLiveRegion="polite" style={{ color: "#b5bac1" }}>{status}</Text>
         </Stack>

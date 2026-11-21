@@ -153,6 +153,7 @@ import plugin_catalog_hide_role_icons from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_scrollbars from "../../../../examples/cx/catalog/plugins/hide-scrollbars.cx";
 import plugin_catalog_hide_send_button from "../../../../examples/cx/catalog/plugins/hide-send-button.cx";
 import plugin_catalog_hide_server_banner from "../../../../examples/cx/catalog/plugins/hide-server-banner.cx";
+import plugin_catalog_hide_server_banners from "../../../../examples/cx/catalog/plugins/hide-server-banners.cx";
 import plugin_catalog_hide_shop_tab from "../../../../examples/cx/catalog/plugins/hide-shop-tab.cx";
 import plugin_catalog_hide_soundboard_nitro_banner from "../../../../examples/cx/catalog/plugins/hide-soundboard-nitro-banner.cx";
 import plugin_catalog_hide_spoiler_warnings from "../../../../examples/cx/catalog/plugins/hide-spoiler-warnings.cx";
@@ -208,6 +209,7 @@ import plugin_catalog_message_latency from "../../../../examples/cx/catalog/plug
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
 import plugin_catalog_monospace_chat from "../../../../examples/cx/catalog/plugins/monospace-chat.cx";
 import plugin_catalog_more_commands from "../../../../examples/cx/catalog/plugins/more-commands.cx";
+import plugin_catalog_more_jumbo_emoji from "../../../../examples/cx/catalog/plugins/more-jumbo-emoji.cx";
 import plugin_catalog_muted_channels_faded from "../../../../examples/cx/catalog/plugins/muted-channels-faded.cx";
 import plugin_catalog_narrow_channel_list from "../../../../examples/cx/catalog/plugins/narrow-channel-list.cx";
 import plugin_catalog_nepeta_s_typing_quirk from "../../../../examples/cx/catalog/plugins/nepeta-s-typing-quirk.cx";
@@ -585,6 +587,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideScrollbars", source: plugin_catalog_hide_scrollbars, description: "Hide scroll indicators", categories: ["Appearance"], appearanceRevision: "1e5b73d640f3b1547ed99a62cdd5f416c1750649ee6e41f534ffa024888bcc6f" },
         { name: "HideSendButton", source: plugin_catalog_hide_send_button, description: "Hide the chat send button", categories: ["Appearance"], appearanceRevision: "2c963173d276b2197c7e2228e8e884b0561a6b26b52b219408a2369030346419" },
         { name: "HideServerBanner", source: plugin_catalog_hide_server_banner, description: "Hide the channel list server banner", categories: ["Appearance"], appearanceRevision: "825488db0fc80c0d1087857297d001e600e4f5a1d5df8f6d3c3c683800448993" },
+        { name: "HideServerBanners", source: plugin_catalog_hide_server_banners, description: "Hide Hides banners at the top of server channel lists", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideShopTab", source: plugin_catalog_hide_shop_tab, description: "Hide the Shop entry", categories: ["Appearance"], appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d" },
         { name: "HideSoundboardNitroBanner", source: plugin_catalog_hide_soundboard_nitro_banner, description: "Hide the Nitro promotion banner in the soundboard", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideSpoilerWarnings", source: plugin_catalog_hide_spoiler_warnings, description: "Hide the spoiler label on images", categories: ["Appearance"], appearanceRevision: "5319d784ea12ca01dd954473ebb2feee7755dea7b5714f7dfaa4c7026e9e46f6" },
@@ -640,6 +643,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "MessageNotifier", source: plugin_catalog_message_notifier, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },
         { name: "MonospaceChat", source: plugin_catalog_monospace_chat, description: "Shows chat text in a monospace font", desktopOnly: true, categories: ["Appearance"] },
         { name: "MoreCommands", source: plugin_catalog_more_commands, description: "/choose · /flipcoin · /rolldice", commands: ["choose","flipcoin","rolldice","randomnumber","wordcount","transform","ask","gettime","echo","lenny","mock","morse","dissatisfaction","smug","happy","crying","angry","anger","joy","blush","confused","sleeping","laughing","giving","peace","ending1","uwu","comfy","lovehappy","loveee","give","lovegive","music","stars","lovegiving"], categories: ["Chat","Commands"] },
+        { name: "MoreJumboEmoji", source: plugin_catalog_more_jumbo_emoji, description: "Change how many emoji can appear at jumbo size in an emoji-only message (50)", desktopOnly: true, categories: ["Appearance"] },
         { name: "MutedChannelsFaded", source: plugin_catalog_muted_channels_faded, description: "fade muted channels", categories: ["Appearance"], appearanceRevision: "f166437a88049bb693e0cca5b500a3a004e91e52460f39e365fd75852a9c043c" },
         { name: "NarrowChannelList", source: plugin_catalog_narrow_channel_list, description: "make the channel list narrower", categories: ["Appearance"], appearanceRevision: "fdbcac8355b73639ee9b16590905b1c4167ab73837d064b157a4a6c58327ee2c" },
         { name: "Nepeta'sTypingQuirk", source: plugin_catalog_nepeta_s_typing_quirk, description: "Apply 165 text rules to message sends and preserve links", categories: ["Chat"] },

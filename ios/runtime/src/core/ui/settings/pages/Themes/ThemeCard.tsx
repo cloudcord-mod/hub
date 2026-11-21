@@ -6,7 +6,10 @@ import { showToast } from "@lib/ui/toasts";
 import { showSheet } from "@lib/ui/sheets";
 import { NavigationNative, React } from "@metro/common";
 
-export default function ThemeCard({ item: theme }: CardWrapper<VdThemeInfo>) {
+export default function ThemeCard({ item: theme, overridden, beforeSelect }: CardWrapper<VdThemeInfo> & {
+  overridden?: boolean;
+  beforeSelect?(): void;
+}) {
   const navigation = NavigationNative.useNavigation();
   const [removed, setRemoved] = React.useState(false);
 
@@ -23,9 +26,10 @@ export default function ThemeCard({ item: theme }: CardWrapper<VdThemeInfo>) {
       }
       descriptionLabel={theme.data.description ?? "No description."}
       toggleType={!settings.safeMode?.enabled ? "radio" : undefined}
-      toggleValue={() => themes[theme.id].selected}
+      toggleValue={() => !overridden && themes[theme.id].selected}
       onToggleChange={async (v: boolean) => {
         try {
+          if (v) beforeSelect?.();
           await selectTheme(v ? theme : null);
           showToast(v ? `Applied ${theme.data.name}` : "Theme disabled", findAssetId("Check"));
         } catch (e: any) {

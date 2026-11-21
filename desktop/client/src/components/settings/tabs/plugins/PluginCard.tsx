@@ -26,11 +26,12 @@ interface PluginCardProps extends React.HTMLProps<HTMLDivElement> {
     disabled?: boolean;
     onRestartNeeded(name: string, key: string): void;
     isNew?: boolean;
+    footer?: React.ReactNode;
     onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
     onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
 }
 
-export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, onMouseLeave, isNew }: PluginCardProps) {
+export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, onMouseLeave, isNew, footer }: PluginCardProps) {
     const settings = Settings.plugins[plugin.name];
     const pluginMeta = PluginMeta[plugin.name];
     const isUserPlugin = pluginMeta?.userPlugin ?? false;
@@ -128,6 +129,7 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
             disabled={disabled}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            footer={footer}
             infoButton={
                 <button
                     role="switch"

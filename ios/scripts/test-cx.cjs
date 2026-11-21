@@ -662,6 +662,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
             return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
         };
+        const useEffect = (callback, dependencies) => {
+            const [previous, setPrevious] = useState();
+            if (!previous || dependencies.some((value, index) => value !== previous[index])) {
+                setPrevious(dependencies);
+                callback();
+            }
+        };
         const jsx = (type, props) => ({ type, props });
         let commandRegistryReady = true;
         const commandReadyListeners = new Set();
@@ -769,7 +776,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 PermissionsBits: embedPermissions, PinActions: pinActions,
                 React: { isValidElement: element => !!element?.type && !!element?.props,
                 cloneElement: (element, props) => jsx(element.type, { ...element.props, ...props }),
-                useCallback: callback => callback,
+                useCallback: callback => callback, useEffect, useMemo: factory => factory(),
                 useSyncExternalStore: (subscribe, read) => {
                 if (typeof read() === "boolean") subscribe(() => typingSubscribers.add(read()));
                 return read();
@@ -893,7 +900,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                                 : name === "convertNameToSurrogate" ? emojiConverters : name in expressionSheets ? expressionSheets
                                     : name === "showSimpleActionSheet" ? linkSheet : name in headerIcons ? headerIcons : undefined },
             "@metro/common": { React: {
-                useState, useRef: initial => useState({ current: initial })[0], useCallback: callback => callback,
+                useState, useRef: initial => useState({ current: initial })[0], useCallback: callback => callback, useEffect,
+                useMemo: factory => factory(),
                 useSyncExternalStore: (subscribe, readSnapshot) => readSnapshot(),
                 createContext: initial => ({ Provider: initial === false ? "MemberRowProvider" : initial === null ? "ExpressionProvider" : "ProfileUserProvider" }),
                 useContext: context => context.Provider === "MemberRowProvider" ? inMemberRow
@@ -1004,7 +1012,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             if (!tree?.props) return;
             return predicate(tree) ? tree : find(tree.props.children, predicate);
         }
-        const render = () => { cursor = 0; return page(); };
+        const render = props => { cursor = 0; return page(props); };
         const button = (tree, label) => find(tree, item => item.props.label === label || [].concat(item.props.children).every(part => typeof part === "string")
             && [].concat(item.props.children).join("") === label);
         const click = (tree, label) => button(tree, label).props[desktop ? "onClick" : "onPress"]();
@@ -1066,6 +1074,33 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(avatarCrop(runtime).maxValue, 4);
             click(render(), "Disable UnlockedAvatarZoom");
             assert.equal(avatarCrop(runtime).maxValue, 1.5);
+
+            const jumboPatch = runtime.patches.find(patch => patch.find === ".jumboable=").replacement;
+            const jumboMatch = new RegExp(jumboPatch.match.source.replaceAll("\\i", "[a-z]+"), jumboPatch.match.flags);
+            const makeJumboRenderer = limit => Function("$self", "a", "q", "items",
+                ("return a>" + limit + "||items.forEach(i=>{i.jumboable=true});").replace(jumboMatch, jumboPatch.replace));
+            for (const limit of ["3", "q.MAX_EMOJI_TO_BE_JUMBO"]) {
+                const execute = makeJumboRenderer(limit);
+                const rendersJumbo = count => {
+                    const emoji = {};
+                    execute(runtime, count, { MAX_EMOJI_TO_BE_JUMBO: 3 }, [emoji]);
+                    return Boolean(emoji.jumboable);
+                };
+                assert.equal(rendersJumbo(4), false, "default keeps Discord's own threshold");
+                selectCatalog("MoreJumboEmoji");
+                const slider = find(render(), item => item.props["aria-label"] === "Jumbo emoji limit");
+                assert.equal(slider.props.value, 50);
+                slider.props.onChange({ currentTarget: { valueAsNumber: 60 } });
+                click(render(), "Allow for this session");
+                assert.equal(rendersJumbo(60), true);
+                assert.equal(rendersJumbo(61), false);
+                click(render(), "Disable MoreJumboEmoji");
+                assert.equal(rendersJumbo(4), false);
+            }
+            const jumbo = read("examples/cx/catalog/plugins/more-jumbo-emoji.cx");
+            const unlimited = jumbo.trimEnd().replace("use jumbo-emoji-limit", "use jumbo-emoji-limit unlimited");
+            assert.match(reviewCx(unlimited).effects.join(" "), /unlimited/);
+            assert.throws(() => parseCx(unlimited.replace("unlimited", "201")), /0 to 200/);
 
             const folderPatch = runtime.patches.find(patch => patch.find === "#{intl::GUILD_FOLDER_TOOLTIP_A11Y_LABEL}").replacement;
             const folderMatch = new RegExp(folderPatch.match.source.replaceAll("\\i", "[a-z]+"));
@@ -5406,7 +5441,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         selectCatalog("Futuristic - Orbit");
         const themeSource = find(render(), item => item.props[desktop ? "aria-label" : "accessibilityLabel"] === "CX source");
         assert.equal(themeSource.props.value, "");
-        click(render(), "Edit CX source");
+        click(render(), "Edit source");
         assert.ok(find(render(), item => item.props[desktop ? "aria-label" : "accessibilityLabel"] === "CX source").props.value.length > 300000);
         click(render(), "Allow for this session");
         if (desktop) assert.match(stylesheet.textContent, /url\("data:image\/jpeg;base64,/);
@@ -5820,6 +5855,31 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         }
         assert.equal(Object.keys(registered).length, 0);
         unloadCatalogCommands();
+
+        const { useCxAddonRows, disableCxAddon } = module.exports;
+        const sample = useCxAddonRows("plugin", "JSON Compact").find(row => row.name === "JSON Compact");
+        const theme = useCxAddonRows("theme", "Blue Hour").find(row => row.name === "Blue Hour");
+        assert.ok(sample && theme, "regular add-on lists offer catalog entries in their respective sections");
+        assert.equal(useCxAddonRows("theme", "").some(row => row.name === sample.name), false);
+        assert.equal(sample.active, false);
+        const props = { kind: "plugin", entry: sample };
+        render(props);
+        const review = render(props);
+        assert.equal(button(review, "Browse catalog"), undefined);
+        assert.equal(registered.compactjson, undefined, "opening the review does not activate the plugin");
+        click(review, "Allow for this session");
+        assert.ok(registered.compactjson);
+        assert.equal(useCxAddonRows("plugin", "").find(row => row.name === sample.name).active, true);
+        await disableCxAddon(sample.id, sample.name);
+        assert.equal(registered.compactjson, undefined);
+        assert.equal(useCxAddonRows("plugin", "").find(row => row.name === sample.name).active, false);
+
+        const importPlugin = { kind: "plugin" };
+        const sourceEditor = find(render(importPlugin), item => (desktop ? item.props["aria-label"] : item.props.accessibilityLabel) === "CX source");
+        if (desktop) sourceEditor.props.onChange({ currentTarget: { value: theme.source } });
+        else sourceEditor.props.onChangeText(theme.source);
+        click(render(importPlugin), "Review");
+        assert.equal(button(render(importPlugin), "Allow for this session"), undefined, "theme files are reviewed from Themes");
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
     assert.equal(parseCx(migrateCxPalette(":root { --background-primary: #123; --brand-500: #8765ab; }", "Test")).background, "#112233");
