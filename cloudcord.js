@@ -39018,6 +39018,63 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        // Ported from CloudCord's original GPL-3.0-or-later appearance tweaks.
+        "larger-chat-text": {
+          plugin: "LargerChatText",
+          label: "Makes chat text larger",
+          css: '[class*="messageContent"] { font-size: 17px !important; line-height: 1.45 !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "bigger-chat-text": {
+          plugin: "BiggerChatText",
+          label: "Slightly larger message text",
+          css: '[class*="markup"][class*="messageContent"] { font-size: 1.08rem !important; line-height: 1.45 !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "smaller-chat-text": {
+          plugin: "SmallerChatText",
+          label: "Makes chat text smaller",
+          css: '[class*="messageContent"] { font-size: 14px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "compact-messages": {
+          plugin: "CompactMessages",
+          label: "Tighter spacing between messages",
+          css: '[class*="messageListItem"] [class*="cozy"] { padding-top: 1px !important; padding-bottom: 1px !important; } [class*="groupStart"] { margin-top: 8px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "monospace-chat": {
+          plugin: "MonospaceChat",
+          label: "Shows chat text in a monospace font",
+          css: '[class*="messageContent"] { font-family: var(--font-code) !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "square-avatars": {
+          plugin: "SquareAvatars",
+          label: "give avatars round-square corners",
+          css: 'img[class*="avatar"], [class*="avatar"] foreignObject { border-radius: 22% !important; mask: none !important; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "rounded-square-avatars": {
+          plugin: "RoundedAvatarsSquare",
+          label: "give avatars softer square corners",
+          css: '[class*="avatar"] img, img[class*="avatar"] { border-radius: 28% !important; } [class*="avatar"] svg mask rect, mask[id*="avatar"] circle { rx: 28%; }',
+          desktopOnly: true,
+          style: {}
+        },
+        "spacious-message-groups": {
+          plugin: "SpaciousMessages",
+          label: "increase spacing between message groups",
+          css: '[class*="groupStart"] { margin-top: 22px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
         "bigger-avatars-in-chat": {
           plugin: "BiggerAvatarsInChat",
           label: "Makes avatars in chat larger",
@@ -49228,6 +49285,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/bigger-chat-text.cx
+  var bigger_chat_text_default;
+  var init_bigger_chat_text = __esm({
+    "../examples/cx/catalog/plugins/bigger-chat-text.cx"() {
+      bigger_chat_text_default = 'plugin "BiggerChatText":\n  needs appearance.style\n  style bigger-chat-text\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/bigger-code-blocks.cx
   var bigger_code_blocks_default;
   var init_bigger_code_blocks = __esm({
@@ -49409,6 +49474,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_compact_member_list = __esm({
     "../examples/cx/catalog/plugins/compact-member-list.cx"() {
       compact_member_list_default = 'plugin "CompactMemberList":\n  needs appearance.style\n  style compact-member-list\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/compact-messages.cx
+  var compact_messages_default;
+  var init_compact_messages = __esm({
+    "../examples/cx/catalog/plugins/compact-messages.cx"() {
+      compact_messages_default = 'plugin "CompactMessages":\n  needs appearance.style\n  style compact-messages\n';
     }
   });
 
@@ -50111,6 +50184,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-join-messages.cx
+  var hide_join_messages_default;
+  var init_hide_join_messages = __esm({
+    "../examples/cx/catalog/plugins/hide-join-messages.cx"() {
+      hide_join_messages_default = 'plugin "HideJoinMessages":\n  needs messages.filterlocal\n  on incoming hide-system "joins"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-jump-to-present.cx
   var hide_jump_to_present_default;
   var init_hide_jump_to_present = __esm({
@@ -50511,6 +50592,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/larger-chat-text.cx
+  var larger_chat_text_default;
+  var init_larger_chat_text = __esm({
+    "../examples/cx/catalog/plugins/larger-chat-text.cx"() {
+      larger_chat_text_default = 'plugin "LargerChatText":\n  needs appearance.style\n  style larger-chat-text\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/leet-text.cx
   var leet_text_default;
   var init_leet_text = __esm({
@@ -50556,6 +50645,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_message_notifier = __esm({
     "../examples/cx/catalog/plugins/message-notifier.cx"() {
       message_notifier_default = 'plugin "MessageNotifier":\n  needs messages.watchlocal\n  on incoming users ""\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/monospace-chat.cx
+  var monospace_chat_default;
+  var init_monospace_chat = __esm({
+    "../examples/cx/catalog/plugins/monospace-chat.cx"() {
+      monospace_chat_default = 'plugin "MonospaceChat":\n  needs appearance.style\n  style monospace-chat\n';
     }
   });
 
@@ -51055,6 +51152,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/rounded-avatars-square.cx
+  var rounded_avatars_square_default;
+  var init_rounded_avatars_square = __esm({
+    "../examples/cx/catalog/plugins/rounded-avatars-square.cx"() {
+      rounded_avatars_square_default = 'plugin "RoundedAvatarsSquare":\n  needs appearance.style\n  style rounded-square-avatars\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/rounded-chat-bar.cx
   var rounded_chat_bar_default;
   var init_rounded_chat_bar = __esm({
@@ -51175,6 +51280,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/smaller-chat-text.cx
+  var smaller_chat_text_default;
+  var init_smaller_chat_text = __esm({
+    "../examples/cx/catalog/plugins/smaller-chat-text.cx"() {
+      smaller_chat_text_default = 'plugin "SmallerChatText":\n  needs appearance.style\n  style smaller-chat-text\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/smooth-scrolling.cx
   var smooth_scrolling_default;
   var init_smooth_scrolling = __esm({
@@ -51231,6 +51344,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/spacious-messages.cx
+  var spacious_messages_default;
+  var init_spacious_messages = __esm({
+    "../examples/cx/catalog/plugins/spacious-messages.cx"() {
+      spacious_messages_default = 'plugin "SpaciousMessages":\n  needs appearance.style\n  style spacious-message-groups\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/split-large-messages.cx
   var split_large_messages_default;
   var init_split_large_messages = __esm({
@@ -51244,6 +51365,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_spotify_share_commands = __esm({
     "../examples/cx/catalog/plugins/spotify-share-commands.cx"() {
       spotify_share_commands_default = 'plugin "SpotifyShareCommands":\n  needs commands.register\n  needs spotify.activity\n  needs messages.send\n  needs reply.local\n  on command "track":\n    input "message" text optional\n    send "${spotifyTrack(message)}" else "No Spotify track to share."\n  on command "album":\n    input "message" text optional\n    send "${spotifyAlbum(message)}" else "No Spotify album to share."\n  on command "artist":\n    input "message" text optional\n    send "${spotifyArtist(message)}" else "No Spotify artist to share."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/square-avatars.cx
+  var square_avatars_default;
+  var init_square_avatars = __esm({
+    "../examples/cx/catalog/plugins/square-avatars.cx"() {
+      square_avatars_default = 'plugin "SquareAvatars":\n  needs appearance.style\n  style square-avatars\n';
     }
   });
 
@@ -52355,6 +52484,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_better_gif_alt_text();
       init_better_plus_reacts();
       init_bigger_avatars_in_chat();
+      init_bigger_chat_text();
       init_bigger_code_blocks();
       init_bigger_jumbo_emojis();
       init_bigger_server_icons();
@@ -52378,6 +52508,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_colorful_mentions();
       init_compact_compose();
       init_compact_member_list();
+      init_compact_messages();
       init_compact_server_list();
       init_copy_bios();
       init_copy_emoji_markdown();
@@ -52442,6 +52573,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_help_button();
       init_hide_image_alt_text();
       init_hide_inbox_button();
+      init_hide_join_messages();
       init_hide_jump_to_present();
       init_hide_keyboard_tips();
       init_hide_member_activities();
@@ -52492,12 +52624,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_jump_to_top();
       init_jump_to();
       init_keyword_notify();
+      init_larger_chat_text();
       init_leet_text();
       init_lines_to_csv();
       init_link_converter();
       init_markdown_escape();
       init_message_burst();
       init_message_notifier();
+      init_monospace_chat();
       init_more_commands();
       init_muted_channels_faded();
       init_narrow_channel_list();
@@ -52539,6 +52673,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_reverse_text();
       init_rot13_text();
       init_round_server_icons();
+      init_rounded_avatars_square();
       init_rounded_chat_bar();
       init_rounded_images();
       init_scheduled_messages();
@@ -52554,6 +52689,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_silent_typing();
       init_slugify_text();
       init_smaller_avatars_in_chat();
+      init_smaller_chat_text();
       init_smooth_scrolling();
       init_snowflake_created_at();
       init_soft_corners();
@@ -52561,8 +52697,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_sort_lines();
       init_sort_reactions();
       init_space_out();
+      init_spacious_messages();
       init_split_large_messages();
       init_spotify_share_commands();
+      init_square_avatars();
       init_starify();
       init_sticker_blocker();
       init_sticky_date_dividers();
@@ -52746,6 +52884,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             desktopOnly: true
           },
           {
+            name: "BiggerChatText",
+            source: bigger_chat_text_default,
+            desktopOnly: true
+          },
+          {
             name: "BiggerCodeBlocks",
             source: bigger_code_blocks_default
           },
@@ -52839,6 +52982,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "CompactMemberList",
             source: compact_member_list_default
+          },
+          {
+            name: "CompactMessages",
+            source: compact_messages_default,
+            desktopOnly: true
           },
           {
             name: "CompactServerList",
@@ -53102,6 +53250,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: hide_inbox_button_default
           },
           {
+            name: "HideJoinMessages",
+            source: hide_join_messages_default
+          },
+          {
             name: "HideJumpToPresent",
             source: hide_jump_to_present_default
           },
@@ -53307,6 +53459,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: keyword_notify_default
           },
           {
+            name: "LargerChatText",
+            source: larger_chat_text_default,
+            desktopOnly: true
+          },
+          {
             name: "LeetText",
             source: leet_text_default
           },
@@ -53329,6 +53486,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "MessageNotifier",
             source: message_notifier_default
+          },
+          {
+            name: "MonospaceChat",
+            source: monospace_chat_default,
+            desktopOnly: true
           },
           {
             name: "MoreCommands",
@@ -53497,6 +53659,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: round_server_icons_default
           },
           {
+            name: "RoundedAvatarsSquare",
+            source: rounded_avatars_square_default,
+            desktopOnly: true
+          },
+          {
             name: "RoundedChatBar",
             source: rounded_chat_bar_default
           },
@@ -53559,6 +53726,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             desktopOnly: true
           },
           {
+            name: "SmallerChatText",
+            source: smaller_chat_text_default,
+            desktopOnly: true
+          },
+          {
             name: "SmoothScrolling",
             source: smooth_scrolling_default,
             desktopOnly: true
@@ -53589,12 +53761,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: space_out_default
           },
           {
+            name: "SpaciousMessages",
+            source: spacious_messages_default,
+            desktopOnly: true
+          },
+          {
             name: "SplitLargeMessages",
             source: split_large_messages_default
           },
           {
             name: "SpotifyShareCommands",
             source: spotify_share_commands_default
+          },
+          {
+            name: "SquareAvatars",
+            source: square_avatars_default,
+            desktopOnly: true
           },
           {
             name: "Starify",
@@ -59324,7 +59506,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8cfd3a69f9601ab87f14b239f050a4de2f4313b2";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c198e76d79c5793fbc98f0083d880a46e1f88c78";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
