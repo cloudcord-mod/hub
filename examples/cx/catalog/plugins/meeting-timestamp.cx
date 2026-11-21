@@ -1,0 +1,5 @@
+plugin "Meeting Timestamp":
+  needs commands.register
+  needs reply.local
+  on command "meetingtimestamp" with text:
+    reply "${meetingTimestamp(text)}" else "Enter an ISO date with a time zone, like 2026-11-21T18:00:00+03:00."

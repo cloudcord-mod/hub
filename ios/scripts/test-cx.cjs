@@ -2305,6 +2305,23 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             ["Markdown Checklist", [
                 ["markdownchecklist", { text: " Ship \n\n- [x] Build\n* Publish" }, /- \[ \] Ship\n- \[x\] Build\n- \[ \] Publish/],
             ]],
+            ["Duration Converter", [
+                ["convertduration", { text: "1d 2h30m5s" }, /^1d 2h 30m 5s · 95405 seconds$/],
+                ["convertduration", { text: "1h 2h" }, /^Enter a duration/],
+            ]],
+            ["Discord Countdown", [
+                ["countdowntimestamp", { text: "5m" }, /^<t:(\d+):R> · \x60<t:\1:R>\x60$/],
+                ["countdowntimestamp", { text: "0s" }, /^Enter a positive duration/],
+            ]],
+            ["Meeting Timestamp", [
+                ["meetingtimestamp", { text: "1970-01-01T04:00:00+03:00" }, /^<t:3600:F> \(<t:3600:R>\)/],
+                ["meetingtimestamp", { text: "2026-11-21T18:00:00" }, /^Enter an ISO date/],
+            ]],
+            ["Discord Link Details", [
+                ["discordlinkdetails", { text: "<https://canary.discord.com/channels/123456789012345678/234567890123456789/345678901234567890>" }, /^Server \x60123456789012345678\x60\nChannel \x60234567890123456789\x60\nMessage \x60345678901234567890\x60$/],
+                ["discordlinkdetails", { text: "https://discord.com/channels/@me/234567890123456789" }, /^Direct message\nChannel \x60234567890123456789\x60$/],
+                ["discordlinkdetails", { text: "https://discord.com.example.com/channels/@me/234567890123456789" }, /^Paste a Discord/],
+            ]],
         ]) {
             selectCatalog(plugin);
             click(render(), "Allow for this session");

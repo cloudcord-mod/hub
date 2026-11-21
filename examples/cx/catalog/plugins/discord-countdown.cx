@@ -1,0 +1,5 @@
+plugin "Discord Countdown":
+  needs commands.register
+  needs reply.local
+  on command "countdowntimestamp" with text:
+    reply "${countdownTimestamp(text)}" else "Enter a positive duration such as 2h 30m."

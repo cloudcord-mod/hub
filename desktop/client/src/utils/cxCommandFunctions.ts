@@ -57,6 +57,30 @@ function integerText(input: string) {
 }
 
 const dayMilliseconds = 86_400_000;
+const durationUnits = new Map([["d", 86_400], ["h", 3_600], ["m", 60], ["s", 1]]);
+
+function durationSeconds(input: string) {
+    const text = input.trim();
+    if (!/^(?:\d{1,10}[dhms] *){1,4}$/i.test(text)) return;
+    const seen = new Set<string>();
+    let seconds = 0;
+    for (const [, digits, unit] of text.toLowerCase().matchAll(/(\d+)([dhms])/g)) {
+        if (seen.has(unit)) return;
+        seen.add(unit);
+        seconds += Number(digits) * durationUnits.get(unit)!;
+    }
+    return seconds;
+}
+
+function isoUnixMilliseconds(input: string) {
+    const parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
+    if (!parsed) return;
+    const [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
+    const midnight = utcMidnight(date);
+    if (midnight === undefined || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59) return;
+    const offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
+    return midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1000 + Number(fraction.padEnd(3, "0"));
+}
 
 function jsonTokens(text: string) {
     try { JSON.parse(text); }
@@ -257,14 +281,39 @@ export const cxCommandFunctions = {
         if (Number.isFinite(instant.getTime())) return `\`${instant.toISOString()}\``;
     },
     isoToUnix(input: string) {
-        const parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
-        if (!parsed) return;
-        const [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
-        const midnight = utcMidnight(date);
-        if (midnight === undefined || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59) return;
-        const offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
-        const ms = midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1000 + Number(fraction.padEnd(3, "0"));
-        return `Seconds \`${ms / 1000}\`\nMilliseconds \`${ms}\``;
+        const ms = isoUnixMilliseconds(input);
+        if (ms !== undefined) return `Seconds \`${ms / 1000}\`\nMilliseconds \`${ms}\``;
+    },
+    convertDuration(input: string) {
+        const seconds = durationSeconds(input);
+        if (seconds === undefined) return;
+        const days = Math.floor(seconds / 86_400);
+        const hours = Math.floor(seconds % 86_400 / 3_600);
+        const minutes = Math.floor(seconds % 3_600 / 60);
+        return `${days}d ${hours}h ${minutes}m ${seconds % 60}s · ${seconds} seconds`;
+    },
+    countdownTimestamp(input: string) {
+        const duration = durationSeconds(input);
+        if (!duration) return;
+        const timestamp = Math.ceil(Date.now() / 1000) + duration;
+        if (timestamp <= 8_640_000_000_000) return `<t:${timestamp}:R> · \`<t:${timestamp}:R>\``;
+    },
+    meetingTimestamp(input: string) {
+        const ms = isoUnixMilliseconds(input);
+        if (ms === undefined) return;
+        const timestamp = Math.floor(ms / 1000);
+        return `<t:${timestamp}:F> (<t:${timestamp}:R>)\nCopy \`<t:${timestamp}:F>\``;
+    },
+    discordLinkDetails(input: string) {
+        const text = input.trim().replace(/^<([^<>]+)>$/, "$1");
+        const match = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/channels\/(@me|\d{17,20})\/(\d{17,20})(?:\/(\d{17,20}))?\/?$/i.exec(text);
+        if (!match) return;
+        const [, guild, channel, message] = match;
+        const direct = guild.toLowerCase() === "@me";
+        const ids = [direct ? undefined : guild, channel, message];
+        if (ids.some(id => id && (id.startsWith("0") || BigInt(id) > 0xffffffffffffffffn))) return;
+        return [direct ? "Direct message" : `Server \`${guild}\``, `Channel \`${channel}\``,
+            ...(message ? [`Message \`${message}\``] : [])].join("\n");
     },
     convertNumberBase(input: string, from: string, to: string) {
         const match = /^([+-]?)([0-9a-z]{1,256})$/i.exec(input.trim());

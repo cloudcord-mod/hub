@@ -1,0 +1,5 @@
+plugin "Discord Link Details":
+  needs commands.register
+  needs reply.local
+  on command "discordlinkdetails" with text:
+    reply "${discordLinkDetails(text)}" else "Paste a Discord channel or message link."

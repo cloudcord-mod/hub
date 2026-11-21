@@ -63,10 +63,13 @@ import plugin_catalog_days_between from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
 import plugin_catalog_decode_base64 from "../../../../examples/cx/catalog/plugins/decode-base64.cx";
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
+import plugin_catalog_discord_countdown from "../../../../examples/cx/catalog/plugins/discord-countdown.cx";
+import plugin_catalog_discord_link_details from "../../../../examples/cx/catalog/plugins/discord-link-details.cx";
 import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/plugins/discord-timestamp.cx";
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
 import plugin_catalog_double_click_edit from "../../../../examples/cx/catalog/plugins/double-click-edit.cx";
 import plugin_catalog_double_click_to_reply from "../../../../examples/cx/catalog/plugins/double-click-to-reply.cx";
+import plugin_catalog_duration_converter from "../../../../examples/cx/catalog/plugins/duration-converter.cx";
 import plugin_catalog_embedded_urls from "../../../../examples/cx/catalog/plugins/embedded-urls.cx";
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
@@ -190,6 +193,7 @@ import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/plugins/local-channel-notes.cx";
 import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/plugins/markdown-checklist.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
+import plugin_catalog_meeting_timestamp from "../../../../examples/cx/catalog/plugins/meeting-timestamp.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
 import plugin_catalog_monospace_chat from "../../../../examples/cx/catalog/plugins/monospace-chat.cx";
@@ -470,10 +474,13 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Declutter", source: plugin_catalog_declutter, description: "Hide the listed interface elements on this device", keywords: "Hide avatar decorations Hide nameplates Hide profile effects Hide server tags Hide the Shop entry Hide the Nitro entry Hide the Quests entry Hide the server boost progress bar Hide the chat gift button", categories: ["Appearance","Profiles"], appearanceRevision: "581e52ce690890cda2febcff0b8afdc8a7b8e45496f33d3d3dad1e1952d71b8d" },
         { name: "DecodeBase64", source: plugin_catalog_decode_base64, description: "Decode Base64 in the selected message and copy the result on request", categories: ["Chat"] },
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels, description: "dim channel names without unread messages", categories: ["Appearance"], appearanceRevision: "160f84b67cdbe906ff267e13c45e81408f856278e15e24e2286e5b66e88c0663" },
+        { name: "Discord Countdown", source: plugin_catalog_discord_countdown, description: "/countdowntimestamp", commands: ["countdowntimestamp"], categories: ["Commands"] },
+        { name: "Discord Link Details", source: plugin_catalog_discord_link_details, description: "/discordlinkdetails", commands: ["discordlinkdetails"], categories: ["Commands"] },
         { name: "Discord Timestamp", source: plugin_catalog_discord_timestamp, description: "/discordtimestamp · /discordlocaltimestamp", commands: ["discordtimestamp","discordlocaltimestamp"], categories: ["Commands"] },
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps, description: "Round relative timestamps down", categories: ["Appearance"], appearanceRevision: "fb96d0a8d75d3d356b8fd7a704d9e33da540ec46dcf55ff268f2de79ae842880" },
         { name: "DoubleClickEdit", source: plugin_catalog_double_click_edit, description: "Open the editor for your own message on double-click or double-tap", categories: ["Chat"] },
         { name: "DoubleClickToReply", source: plugin_catalog_double_click_to_reply, description: "Open a reply to another user's message on double-click or double-tap", categories: ["Chat"] },
+        { name: "Duration Converter", source: plugin_catalog_duration_converter, description: "/convertduration", commands: ["convertduration"], categories: ["Commands"] },
         { name: "EmbeddedURLs", source: plugin_catalog_embedded_urls, description: "https://www.tiktok.com → https://www.tnktok.com", keywords: "https://vt.tiktok.com → https://www.tnktok.com https://x.com → https://www.fxtwitter.com https://www.twitter.com → https://www.fxtwitter.com https://www.instagram.com → https://www.kkinstagram.com", categories: ["Chat"] },
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
@@ -597,6 +604,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "LocalChannelNotes", source: plugin_catalog_local_channel_notes, description: "Add a local note editor to channel menus", categories: ["Servers & channels"] },
         { name: "Markdown Checklist", source: plugin_catalog_markdown_checklist, description: "/markdownchecklist", commands: ["markdownchecklist"], categories: ["Commands"] },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"] },
+        { name: "Meeting Timestamp", source: plugin_catalog_meeting_timestamp, description: "/meetingtimestamp", commands: ["meetingtimestamp"], categories: ["Commands"] },
         { name: "MessageBurst", source: plugin_catalog_message_burst, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },
         { name: "MonospaceChat", source: plugin_catalog_monospace_chat, description: "Shows chat text in a monospace font", desktopOnly: true, categories: ["Appearance"] },

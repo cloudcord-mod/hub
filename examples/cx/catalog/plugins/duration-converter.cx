@@ -1,0 +1,5 @@
+plugin "Duration Converter":
+  needs commands.register
+  needs reply.local
+  on command "convertduration" with text:
+    reply "${convertDuration(text)}" else "Enter a duration such as 1d 2h 30m 5s. Use each unit once."
