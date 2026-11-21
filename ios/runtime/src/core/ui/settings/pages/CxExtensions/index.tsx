@@ -4,7 +4,7 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
-import { formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
+import { CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
@@ -2007,6 +2007,7 @@ export default function CxExtensions() {
     const [showCatalog, setShowCatalog] = React.useState(false);
     const [search, setSearch] = React.useState("");
     const [pages, setPages] = React.useState({ Plugins: 0, Themes: 0 });
+    const [category, setCategory] = React.useState<CxCatalogCategory>("All");
     const [status, setStatus] = React.useState("");
     const [candidate, setCandidate] = React.useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
     const [, refreshOptions] = React.useState(0);
@@ -2810,11 +2811,22 @@ export default function CxExtensions() {
                 <TextInput accessibilityLabel="Search CX catalog" placeholder="Search name, feature or /command" placeholderTextColor="#b5bac1"
                     value={search} onChangeText={value => { setSearch(value); setPages({ Plugins: 0, Themes: 0 }); }}
                     autoCorrect={false} style={{ color: "#fff", backgroundColor: "#27282d", padding: 12 }} />
+                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                    {CX_CATALOG_CATEGORIES.map(value => <Pressable key={value} accessibilityRole="button"
+                        accessibilityLabel={`Filter by ${value}`} accessibilityState={{ selected: category === value }}
+                        onPress={() => { setCategory(value); setPages({ Plugins: 0, Themes: 0 }); }}
+                        style={{ paddingHorizontal: 12, minHeight: 44, justifyContent: "center", borderRadius: 16, borderWidth: 1,
+                            borderColor: resolveSemanticColor(category === value ? semanticColors.INTERACTIVE_TEXT_DEFAULT : semanticColors.BORDER_SUBTLE),
+                            backgroundColor: resolveSemanticColor(semanticColors.CARD_BACKGROUND_DEFAULT) }}>
+                        <Text style={{ color: resolveSemanticColor(semanticColors.TEXT_DEFAULT), fontWeight: category === value ? "700" : "400" }}>{value}</Text>
+                    </Pressable>)}
+                </View>
                 {([["Plugins", mobileCatalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
-                    const matches = searchCxCatalog(entries, search);
+                    if (category !== "All" && (kind === "Themes") !== (category === "Themes")) return null;
+                    const matches = searchCxCatalog(entries, search, category);
                     const page = pages[kind];
                     const start = page * 12;
-                    return <TableRowGroup key={kind} title={kind}>
+                    return <TableRowGroup key={kind} title={`${kind} (${matches.length})`}>
                         {matches.slice(start, start + 12).map(entry => <TableRow key={entry.name} label={entry.name} subLabel={entry.description} onPress={() => {
                             setShowCatalog(false);
                             setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");

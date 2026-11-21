@@ -931,6 +931,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             if (desktop) search.props.onChange({ currentTarget: { value } });
             else search.props.onChangeText(value);
         };
+        const filterBy = value => {
+            if (desktop) find(render(), item => item.props["aria-label"] === "CX catalog category").props.onChange({ currentTarget: { value } });
+            else find(render(), item => item.props.accessibilityLabel === `Filter by ${value}`).props.onPress();
+        };
         const selectCatalog = name => {
             if (!desktop) click(render(), "Browse catalog");
             searchFor(name);
@@ -4834,8 +4838,19 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const referenceResult = button(render(), "CopyMessageReference");
         assert.ok(referenceResult, "search can find a plugin by its actions instead of its name");
         assert.match(referenceResult.props[desktop ? "title" : "subLabel"], /Markdown link/);
+        filterBy("Voice & calls");
+        assert.ok(!button(render(), "CopyMessageReference"), "search results respect the active category");
+        filterBy("Chat");
+        assert.ok(button(render(), "CopyMessageReference"));
+        filterBy("Themes");
+        searchFor("Blue Hour");
+        assert.ok(button(render(), "Blue Hour"));
+        assert.ok(!button(render(), "Next plugins page"));
+        filterBy("All");
         searchFor("local notes in profile cards");
+        filterBy("Profiles");
         assert.ok(button(render(), "HideProfileNotes"));
+        filterBy("All");
         const searched = moduleBox.exports.searchCxCatalog([
             { name: "History manager", description: "Copy notes for your history tab" },
             { name: "Copy Notes" },

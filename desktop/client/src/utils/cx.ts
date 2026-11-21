@@ -253,7 +253,28 @@ function quoted(value: string, limit: number, allowEmpty = false) {
     return decoded;
 }
 
-export function searchCxCatalog<T extends { name: string; description?: string; keywords?: string; commands?: readonly string[]; }>(entries: readonly T[], search: string): readonly T[] {
+export const CX_CATALOG_CATEGORIES = ["All", "Appearance", "Chat", "Commands", "Media", "Profiles", "Servers & channels", "Voice & calls", "Themes"] as const;
+export type CxCatalogCategory = typeof CX_CATALOG_CATEGORIES[number];
+
+export function getCxCatalogCategories(document: CxDocument): CxCatalogCategory[] {
+    if (document.kind === "theme") return ["Themes"];
+    const permissions = document.permissions;
+    const hasPermission = (pattern: RegExp) => permissions.some(permission => pattern.test(permission));
+    const appearance = [...document.hiddenTargets, ...document.optionalHides.keys(), ...document.styledTargets];
+    const hasAppearanceTarget = (pattern: RegExp) => appearance.some(target => pattern.test(target));
+    return [
+        ...(hasPermission(/^appearance\./) ? ["Appearance"] as const : []),
+        ...(hasPermission(/^(messages|replies|typing|notifications|drafts)\.|^links\.openonmessage$/) ? ["Chat"] as const : []),
+        ...(document.commands.length ? ["Commands"] as const : []),
+        ...(hasPermission(/^(media|emoji|attachments|stickers|uploads|spotify)\.|^profile(menu)?\.(avatar|media)$|^links\.steam$/) ? ["Media"] as const : []),
+        ...(hasPermission(/^(profile|profilemenu|friends)\./) || hasAppearanceTarget(/^profile-|^avatar-decorations$/) ? ["Profiles"] as const : []),
+        ...(hasPermission(/^(channels|servers|guild)\./) ? ["Servers & channels"] as const : []),
+        ...(hasPermission(/^(voice|calls)\./) || hasAppearanceTarget(/^(hide-)?voice-|^dm-call-buttons$/) ? ["Voice & calls"] as const : []),
+    ];
+}
+
+export function searchCxCatalog<T extends { name: string; description?: string; keywords?: string; commands?: readonly string[]; categories?: readonly CxCatalogCategory[]; }>(entries: readonly T[], search: string, category: CxCatalogCategory = "All"): readonly T[] {
+    if (category !== "All") entries = entries.filter(entry => entry.categories?.includes(category));
     const query = search.trim().toLowerCase();
     if (!query) return entries;
     const normalize = (value: string) => value.normalize("NFKD").toLowerCase().replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
