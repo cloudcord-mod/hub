@@ -1842,7 +1842,7 @@ function registerProfileMenuAction(action: CxProfileMenuAction) {
     return registerProfileMenuEntry({
         key: action,
         getItems(id, guildId) {
-            const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore);
+            const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore, GuildMemberStore);
             if ((scope === "server" || scope === "identity") && !getCopy()) return [];
             return [{ label, action: () => {
                 const text = getCopy();

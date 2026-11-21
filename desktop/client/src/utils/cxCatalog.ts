@@ -47,8 +47,10 @@ import plugin_catalog_copy_media_link from "../../../../examples/cx/catalog/plug
 import plugin_catalog_copy_message_reference from "../../../../examples/cx/catalog/plugins/copy-message-reference.cx";
 import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/plugins/copy-profile-colors.cx";
 import plugin_catalog_copy_profile_names from "../../../../examples/cx/catalog/plugins/copy-profile-names.cx";
+import plugin_catalog_copy_pronouns from "../../../../examples/cx/catalog/plugins/copy-pronouns.cx";
 import plugin_catalog_copy_raw_text from "../../../../examples/cx/catalog/plugins/copy-raw-text.cx";
 import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plugins/copy-server-bio.cx";
+import plugin_catalog_copy_server_nickname from "../../../../examples/cx/catalog/plugins/copy-server-nickname.cx";
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
@@ -448,8 +450,10 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyMessageReference", source: plugin_catalog_copy_message_reference, description: "Copy the selected message’s Markdown link, timestamp, or author mention", categories: ["Chat"] },
         { name: "CopyProfileColors", source: plugin_catalog_copy_profile_colors, description: "Copy Profile Colors", keywords: "Copy Server Profile Colors", categories: ["Profiles"] },
         { name: "CopyProfileNames", source: plugin_catalog_copy_profile_names, description: "Copy Username", keywords: "Copy Display Name", categories: ["Profiles"] },
+        { name: "CopyPronouns", source: plugin_catalog_copy_pronouns, description: "Copy Pronouns", categories: ["Profiles"] },
         { name: "Copy Raw Text", source: plugin_catalog_copy_raw_text, description: "Add Copy Raw Text to message menus", categories: ["Chat"] },
         { name: "CopyServerBio", source: plugin_catalog_copy_server_bio, description: "Copy Server Bio", categories: ["Profiles"] },
+        { name: "CopyServerNickname", source: plugin_catalog_copy_server_nickname, description: "Copy Server Nickname", categories: ["Profiles"] },
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links, description: "Add Copy Sticker Link and Open Sticker Link actions", categories: ["Media"] },
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention, description: "Copy User Mention", categories: ["Profiles"] },
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls, description: "Copy User URL", categories: ["Profiles"] },

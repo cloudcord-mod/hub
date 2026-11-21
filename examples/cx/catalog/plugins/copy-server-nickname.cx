@@ -1,0 +1,3 @@
+plugin "CopyServerNickname":
+  needs profilemenu.copy
+  on profile menu copy server-nickname

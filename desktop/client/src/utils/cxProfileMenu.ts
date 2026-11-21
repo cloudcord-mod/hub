@@ -5,6 +5,8 @@ export const cxProfileMenuActions = {
     "display-name": { label: "Copy Display Name", scope: "identity" },
     "profile-bio": { label: "Copy Bio", scope: "user", unavailable: "No profile bio found." },
     "server-profile-bio": { label: "Copy Server Bio", scope: "server" },
+    "profile-pronouns": { label: "Copy Pronouns", scope: "user", unavailable: "No profile pronouns found." },
+    "server-nickname": { label: "Copy Server Nickname", scope: "server" },
     "profile-colors": { label: "Copy Profile Colors", scope: "user", unavailable: "No profile colors found." },
     "server-profile-colors": { label: "Copy Server Profile Colors", scope: "server" },
 } as const;
@@ -36,18 +38,21 @@ export function getCxProfileMedia(id: string, user: { avatar?: unknown; discrimi
     return assets;
 }
 
-type Profile = { themeColors?: unknown; bio?: unknown; };
+type Profile = { themeColors?: unknown; bio?: unknown; pronouns?: unknown; };
 type ProfileStore = {
     getUserProfile?: (id: string) => Profile | null | undefined;
     getGuildMemberProfile?: (id: string, guildId: string) => Profile | null | undefined;
 };
 type UserStore = { getUser?: (id: string) => { username?: unknown; globalName?: unknown; } | null | undefined; };
+type MemberStore = {
+    getMember?: (guildId: string, id: string) => { nick?: unknown; } | null | undefined;
+};
 
 function nonBlankText(value: unknown) {
     return typeof value === "string" && value.trim() ? value : undefined;
 }
 
-export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, profiles?: ProfileStore, guildId?: string, users?: UserStore) {
+export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, profiles?: ProfileStore, guildId?: string, users?: UserStore, members?: MemberStore) {
     const entry = cxProfileMenuActions[action];
     if (entry.scope === "none") return entry.format(id);
     if (entry.scope === "server" && !guildId) return;
@@ -56,9 +61,13 @@ export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, pr
             const user = users?.getUser?.(id);
             return nonBlankText(action === "username" ? user?.username : user?.globalName);
         }
+        if (action === "server-nickname" && guildId) {
+            return nonBlankText(members?.getMember?.(guildId, id)?.nick);
+        }
         const profile = entry.scope === "server"
             ? profiles?.getGuildMemberProfile?.(id, guildId!) : profiles?.getUserProfile?.(id);
         if (action === "profile-bio" || action === "server-profile-bio") return nonBlankText(profile?.bio);
+        if (action === "profile-pronouns") return nonBlankText(profile?.pronouns);
         const colors = profile?.themeColors;
         if (!Array.isArray(colors) || colors.length < 2) return;
         const hex = colors.slice(0, 2).map(color =>

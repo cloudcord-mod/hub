@@ -975,7 +975,7 @@ export function CxSettings() {
                             ?? props?.channel?.guild_id ?? (action === "server-profile-colors" && !props?.channel
                                 ? SelectedGuildStore?.getGuildId() : undefined) : undefined;
                         const guildId = isCxProfileUserId(selectedGuild) ? selectedGuild : undefined;
-                        const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore);
+                        const getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore, GuildMemberStore);
                         if ((scope === "server" || scope === "identity") && !getCopy()) return;
                         children.push(<Menu.MenuItem id={itemId} label={label} action={() => {
                             if (!active) return;

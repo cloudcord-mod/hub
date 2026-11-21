@@ -407,7 +407,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 if ([me, sender, other].includes(id)) return { id };
             } },
             UserProfileStore: {
-                getUserProfile: id => id === sender ? { bio: "Hello from the **profile**", themeColors: Object.freeze([0, 0x12abcd]), banner: "a_" + "a".repeat(32) } : undefined,
+                getUserProfile: id => id === sender ? { bio: "Hello from the **profile**", pronouns: "they/them", themeColors: Object.freeze([0, 0x12abcd]), banner: "a_" + "a".repeat(32) } : undefined,
                 getGuildMemberProfile: (id, guild) => id === sender && guild === guildId
                     ? { themeColors: [0x123, 0xffffff], bio: "Hello from the **server profile**" } : undefined,
             },
@@ -416,7 +416,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             PermissionStore: { can: (bit, channel) => channel?.id === queueChannel.id
                 ? bit === embedPermissions.MOVE_MEMBERS ? canBypassQueue : canJoinQueue
                 : canSend },
-            GuildMemberStore: { getMemberIds: () => [me, sender], getMembers: () => [{ userId: sender, roles: [roleId], nick: "Tester@everyone" }] },
+            GuildMemberStore: {
+                getMember: (guild, id) => guild === guildId && id === sender ? { nick: "Server nickname" } : undefined,
+                getMemberIds: () => [me, sender],
+                getMembers: () => [{ userId: sender, roles: [roleId], nick: "Tester@everyone" }],
+            },
             GuildStore: { getGuilds: () => ({ [guildId]: { id: guildId } }),
                 getGuild: id => id === guildId ? { id, ownerId: me } : undefined },
             GuildChannelStore: { getChannels: () => ({
@@ -1969,6 +1973,21 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         click(render(), "Disable CopyProfileNames");
         click(render(), "Disable CopyServerBio");
         includeProfileNames = false;
+        assert.equal(menuPatches.size + appearanceHooks.size, 0);
+        for (const name of ["CopyPronouns", "CopyServerNickname"]) {
+            selectCatalog(name);
+            click(render(), "Allow for this session");
+        }
+        assert.deepEqual(Array.from(actionList(sender), item => item.label), ["Copy Pronouns"]);
+        assert.deepEqual(Array.from(actionList(sender, other), item => item.label), ["Copy Pronouns"]);
+        const profileDetails = actionList(sender, guildId);
+        assert.deepEqual(Array.from(profileDetails, item => item.label), ["Copy Pronouns", "Copy Server Nickname"]);
+        for (const action of profileDetails) action.action();
+        assert.deepEqual(clipboardWrites.slice(-2), ["they/them", "Server nickname"]);
+        actionList(other, guildId)[0].action();
+        assert.equal(notifications.pop(), "No profile pronouns found.");
+        click(render(), "Disable CopyPronouns");
+        click(render(), "Disable CopyServerNickname");
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
         {
             const port = cxCatalog.plugins.find(entry => entry.name === "UserNotes").source;
