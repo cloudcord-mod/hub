@@ -40980,8 +40980,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
     }
     if (kind === "hide-blocked") {
-      if (!values1.length || values1.some((value) => value !== "blocked" && value !== "ignored"))
-        throw new Error("Choose blocked, ignored, or both");
+      if (!values1.some((value) => value === "blocked" || value === "ignored") || values1.some((value) => value !== "blocked" && value !== "ignored" && value !== "replies"))
+        throw new Error("Choose blocked, ignored, or both, with optional replies");
     } else if (!textual && !(kind === "stickers" && input === "*") && values1.some((value) => !/^\d{17,20}$/.test(value))) {
       throw new Error("Incoming rules need Discord IDs");
     }
@@ -41116,6 +41116,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       var me1 = rule.kind === "hide-system" ? void 0 : context.currentUser();
       if (!me1 && rule.kind !== "hide-system")
         return;
+      var excludedAuthor = (user2) => typeof user2 === "string" && user2 !== me1 && (rule.values.includes("blocked") && context.blocked?.(user2) === true || rule.values.includes("ignored") && context.ignored?.(user2) === true);
       var hide = (item) => {
         if (!item)
           return false;
@@ -41123,12 +41124,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return rule.messageTypes?.has(item.type) === true;
         var channel3 = item.channel_id ?? item.channelId ?? payload.channelId ?? payload.channel_id;
         var user2 = item.author?.id ?? (type === "MESSAGE_UPDATE" && typeof channel3 === "string" && typeof item.id === "string" ? context.replyAuthor(channel3, item.id)?.id : void 0);
+        if (rule.kind === "hide-blocked") {
+          if (excludedAuthor(user2))
+            return true;
+          if (!rule.values.includes("replies"))
+            return false;
+          var reference = item.message_reference ?? item.messageReference;
+          var replyChannel = reference?.channel_id ?? reference?.channelId ?? channel3;
+          var replyId = reference?.message_id ?? reference?.messageId;
+          var repliedTo = (item.referenced_message ?? item.referencedMessage)?.author?.id ?? (typeof replyChannel === "string" && typeof replyId === "string" ? context.replyAuthor(replyChannel, replyId)?.id : void 0);
+          return excludedAuthor(repliedTo);
+        }
         if (typeof user2 !== "string" || user2 === me1)
           return false;
         if (rule.kind === "hide-users")
           return rule.values.includes(user2);
-        if (rule.kind === "hide-blocked")
-          return rule.values.includes("blocked") && context.blocked?.(user2) === true || rule.values.includes("ignored") && context.ignored?.(user2) === true;
         var fields = [
           item.content
         ];
@@ -50105,6 +50115,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-blocked-and-ignored-messages.cx
+  var hide_blocked_and_ignored_messages_default;
+  var init_hide_blocked_and_ignored_messages = __esm({
+    "../examples/cx/catalog/plugins/hide-blocked-and-ignored-messages.cx"() {
+      hide_blocked_and_ignored_messages_default = 'plugin "HideBlockedAndIgnoredMessages":\n  needs messages.filterlocal\n  on incoming hide-blocked "blocked,ignored,replies"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-boost-goal.cx
   var hide_boost_goal_default;
   var init_hide_boost_goal = __esm({
@@ -52666,6 +52684,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_hide_apps_button();
       init_hide_avatar_decorations();
       init_hide_badges();
+      init_hide_blocked_and_ignored_messages();
       init_hide_boost_goal();
       init_hide_bot_tags();
       init_hide_call_buttons();
@@ -53283,6 +53302,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "HideBadges",
             source: hide_badges_default
+          },
+          {
+            name: "HideBlockedAndIgnoredMessages",
+            source: hide_blocked_and_ignored_messages_default
           },
           {
             name: "HideBoostGoal",
@@ -59714,7 +59737,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0cfc879d31db7f181ded0960c7a2d56c76b9598b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "04120480f47ce10e65d4f5f2e1eec62d3f70462a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
