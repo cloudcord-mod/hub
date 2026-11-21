@@ -37928,6 +37928,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       base ** exponent
     ]));
   }
+  function planningRows(text) {
+    return text.split(/\r\n|\r|\n/).map((row) => row.trim()).filter(Boolean);
+  }
+  function planningBlock(text) {
+    var result = text.replace(/`(?=``)/g, "`\u200B");
+    return result.length <= 3800 ? codeFence + "\n" + result + "\n" + codeFence : "The result is too long for one reply.";
+  }
+  function discordId(value) {
+    return /^[1-9]\d{16,19}$/.test(value) && BigInt(value) <= 0xffffffffffffffffn;
+  }
   function markdownTable(rows) {
     var columns = rows[0]?.length ?? 0;
     if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
@@ -38519,6 +38529,117 @@ Milliseconds \`${ms}\``;
           return `<t:${timestamp}:F> (<t:${timestamp}:R>)
 Copy \`<t:${timestamp}:F>\``;
         },
+        timestampStyles(input) {
+          var ms = isoUnixMilliseconds(input);
+          if (ms === void 0 || ms < 0)
+            return;
+          var seconds = Math.floor(ms / 1e3);
+          return [
+            [
+              "t",
+              "Short time"
+            ],
+            [
+              "T",
+              "Time with seconds"
+            ],
+            [
+              "d",
+              "Short date"
+            ],
+            [
+              "D",
+              "Long date"
+            ],
+            [
+              "f",
+              "Date and time"
+            ],
+            [
+              "F",
+              "Full date and time"
+            ],
+            [
+              "R",
+              "Relative"
+            ]
+          ].map(([style, label2]) => {
+            var markup = `<t:${seconds}:${style}>`;
+            return `${label2} \xB7 ${markup} \xB7 \`${markup}\``;
+          }).join("\n");
+        },
+        recurringTimestamps(start, interval, count) {
+          var ms = isoUnixMilliseconds(start);
+          var step = durationSeconds(interval), occurrences = integerText(count);
+          if (ms === void 0 || ms < 0 || !step || occurrences === void 0 || occurrences < 2 || occurrences > 20)
+            return;
+          var seconds = Math.floor(ms / 1e3);
+          if (seconds + step * (occurrences - 1) > 253402300799)
+            return;
+          var times = Array.from({
+            length: occurrences
+          }, (_2, index) => `<t:${seconds + index * step}:F>`);
+          return times.map((timestamp, index) => `${index + 1}. ${timestamp} \xB7 \`${timestamp}\``).join("\n");
+        },
+        buildMessageLink(server, channel, message) {
+          var scope = server.trim(), channelId = channel.trim(), messageId = message.trim();
+          if (scope !== "@me" && !discordId(scope) || !discordId(channelId) || messageId && !discordId(messageId))
+            return;
+          return `<https://discord.com/channels/${scope}/${channelId}${messageId ? "/" + messageId : ""}>`;
+        },
+        balanceGroups(text, count) {
+          var rows = planningRows(text);
+          var groups = integerText(count);
+          if (groups === void 0 || groups < 2 || groups > 20 || rows.length < groups || rows.length > 100)
+            return;
+          var lists = Array.from({
+            length: groups
+          }, (_2, index) => [
+            `Group ${index + 1}`
+          ]);
+          rows.forEach((row, index) => lists[index % groups].push("- " + row));
+          return planningBlock(lists.map((group) => group.join("\n")).join("\n\n"));
+        },
+        testResultSummary(text) {
+          var rows = planningRows(text);
+          if (!rows.length || rows.length > 150)
+            return;
+          var counts = {
+            pass: 0,
+            fail: 0,
+            blocked: 0,
+            unclassified: 0
+          };
+          for (var row of rows) {
+            var match = /^(pass|fail|blocked)(?:\s|:|$)/i.exec(row);
+            var status = match ? match[1].toLowerCase() : "unclassified";
+            counts[status]++;
+          }
+          return `Passed ${counts.pass} \xB7 Failed ${counts.fail} \xB7 Blocked ${counts.blocked} \xB7 Unclassified ${counts.unclassified} \xB7 Total ${rows.length}`;
+        },
+        totalTime(text) {
+          var rows = planningRows(text);
+          if (!rows.length || rows.length > 100)
+            return;
+          var total = 0;
+          for (var [index, row] of rows.entries()) {
+            var duration = durationSeconds(row);
+            if (duration === void 0)
+              return `Line ${index + 1} needs a duration such as 2h 30m.`;
+            total += duration;
+          }
+          if (!Number.isSafeInteger(total))
+            return "The total is too large.";
+          var hours = Math.floor(total / 3600);
+          return `${hours}h ${Math.floor(total % 3600 / 60)}m ${total % 60}s \xB7 ${total} seconds across ${rows.length} entries`;
+        },
+        messageBudget(text, limit) {
+          var cap = integerText(limit);
+          if (cap !== 2e3 && cap !== 4e3)
+            return;
+          var difference = cap - text.length;
+          return `${text.length}/${cap} UTF-16 units \xB7 ${Math.abs(difference)} ${difference < 0 ? "over" : "remaining"}`;
+        },
         discordLinkDetails(input) {
           var text = input.trim().replace(/^<([^<>]+)>$/, "$1");
           var match = /^https:\/\/(?:(?:canary|ptb)\.)?discord(?:app)?\.com\/channels\/(@me|\d{17,20})\/(\d{17,20})(?:\/(\d{17,20}))?\/?$/i.exec(text);
@@ -38531,7 +38652,7 @@ Copy \`<t:${timestamp}:F>\``;
             channel,
             message
           ];
-          if (ids.some((id) => id && (id.startsWith("0") || BigInt(id) > 0xffffffffffffffffn)))
+          if (ids.some((id) => id && !discordId(id)))
             return;
           return [
             direct ? "Direct message" : `Server \`${guild}\``,
@@ -47891,6 +48012,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/balanced-groups.cx
+  var balanced_groups_default;
+  var init_balanced_groups = __esm({
+    "../examples/cx/catalog/plugins/balanced-groups.cx"() {
+      balanced_groups_default = 'plugin "Balanced Groups":\n  needs commands.register\n  needs reply.local\n  on command "balancegroups":\n    input "text" text\n    input "count" text\n    reply "${balanceGroups(text, count)}" else "Enter one participant or item per line, then choose 2 to 20 groups."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/better-chat-names.cx
   var better_chat_names_default;
   var init_better_chat_names = __esm({
@@ -47992,6 +48121,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_bold_usernames = __esm({
     "../examples/cx/catalog/plugins/bold-usernames.cx"() {
       bold_usernames_default = 'plugin "BoldUsernames":\n  needs appearance.style\n  style bold-usernames\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/build-discord-link.cx
+  var build_discord_link_default;
+  var init_build_discord_link = __esm({
+    "../examples/cx/catalog/plugins/build-discord-link.cx"() {
+      build_discord_link_default = 'plugin "Build Discord Link":\n  needs commands.register\n  needs reply.local\n  on command "builddiscordlink":\n    input "server" text\n    input "channel" text\n    input "message" text optional\n    reply "${buildMessageLink(server, channel, message)}" else "Enter Discord IDs, or use @me for a direct-message channel. The message ID is optional."\n';
     }
   });
 
@@ -49678,6 +49815,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/message-budget.cx
+  var message_budget_default;
+  var init_message_budget = __esm({
+    "../examples/cx/catalog/plugins/message-budget.cx"() {
+      message_budget_default = 'plugin "Message Budget":\n  needs commands.register\n  needs reply.local\n  on command "messagebudget":\n    input "text" text\n    input "limit" choice "2000,4000"\n    reply "${messageBudget(text, limit)}" else "Choose a character limit of 2000 or 4000."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/message-burst.cx
   var message_burst_default;
   var init_message_burst = __esm({
@@ -50214,6 +50359,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/recurring-timestamps.cx
+  var recurring_timestamps_default;
+  var init_recurring_timestamps = __esm({
+    "../examples/cx/catalog/plugins/recurring-timestamps.cx"() {
+      recurring_timestamps_default = 'plugin "Recurring Timestamps":\n  needs commands.register\n  needs reply.local\n  on command "recurringtimes":\n    input "start" text\n    input "interval" text\n    input "count" text\n    reply "${recurringTimestamps(start, interval, count)}" else "Enter an ISO date and timezone, an interval such as 7d, and a count from 2 to 20."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/relationship-notifier.cx
   var relationship_notifier_default;
   var init_relationship_notifier = __esm({
@@ -50566,6 +50719,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/test-result-summary.cx
+  var test_result_summary_default;
+  var init_test_result_summary = __esm({
+    "../examples/cx/catalog/plugins/test-result-summary.cx"() {
+      test_result_summary_default = 'plugin "Test Result Summary":\n  needs commands.register\n  needs reply.local\n  on command "testresultsummary" with text:\n    reply "${testResultSummary(text)}" else "Paste up to 150 results with Pass, Fail, or Blocked at the start of each line."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/text-replace.cx
   var text_replace_default;
   var init_text_replace = __esm({
@@ -50579,6 +50740,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_thin_scrollbars = __esm({
     "../examples/cx/catalog/plugins/thin-scrollbars.cx"() {
       thin_scrollbars_default = 'plugin "ThinScrollbars":\n  needs appearance.style\n  style thin-scrollbars\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/timestamp-styles.cx
+  var timestamp_styles_default;
+  var init_timestamp_styles = __esm({
+    "../examples/cx/catalog/plugins/timestamp-styles.cx"() {
+      timestamp_styles_default = 'plugin "Timestamp Styles":\n  needs commands.register\n  needs reply.local\n  on command "timestampstyles" with text:\n    reply "${timestampStyles(text)}" else "Enter a date and time with a timezone, such as 2026-11-22T20:00:00+03:00."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/total-time.cx
+  var total_time_default;
+  var init_total_time = __esm({
+    "../examples/cx/catalog/plugins/total-time.cx"() {
+      total_time_default = 'plugin "Total Time":\n  needs commands.register\n  needs reply.local\n  on command "totaltime" with text:\n    reply "${totalTime(text)}" else "Enter up to 100 durations, one per line, such as 2h 30m."\n';
     }
   });
 
@@ -51695,6 +51872,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_at_someone();
       init_auto_vaporwave();
       init_avatar_grabber();
+      init_balanced_groups();
       init_better_chat_names();
       init_better_gif_alt_text();
       init_better_plus_reacts();
@@ -51708,6 +51886,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_blur_nsfw();
       init_bold_text();
       init_bold_usernames();
+      init_build_discord_link();
       init_bypass_pin_prompt();
       init_calculator();
       init_call_time_counter();
@@ -51895,6 +52074,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_markdown_checklist();
       init_markdown_escape();
       init_meeting_timestamp();
+      init_message_budget();
       init_message_burst();
       init_message_latency();
       init_message_notifier();
@@ -51941,6 +52121,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_readable_line_length();
       init_readable_spoilers();
       init_realtime_timestamps();
+      init_recurring_timestamps();
       init_relationship_notifier();
       init_repeat_messages();
       init_reply_ping_control();
@@ -51985,8 +52166,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_strip_url_tracking();
       init_talk_in_reverse();
       init_terezi_typing_quirk();
+      init_test_result_summary();
       init_text_replace();
       init_thin_scrollbars();
+      init_timestamp_styles();
+      init_total_time();
       init_translate();
       init_transparent_chat_bar();
       init_trim_lines();
@@ -52219,6 +52403,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Balanced Groups",
+            source: balanced_groups_default,
+            description: "/balancegroups",
+            commands: [
+              "balancegroups"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "9f44d571612fa60f9dfcfedb1cb7ec791b3c58422f07e9f2c7fa260477f74f6e"
+          },
+          {
             name: "BetterChatNames",
             source: better_chat_names_default,
             description: "Format displayed server channel names as titles",
@@ -52334,6 +52530,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Build Discord Link",
+            source: build_discord_link_default,
+            description: "/builddiscordlink",
+            commands: [
+              "builddiscordlink"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fe5e0c4e8428a16dbec7380657ff718ba561b9ba9a5806b840aa7608ff03d1c8"
           },
           {
             name: "BypassPinPrompt",
@@ -54107,6 +54315,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce"
           },
           {
+            name: "Message Budget",
+            source: message_budget_default,
+            description: "/messagebudget",
+            commands: [
+              "messagebudget"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "871e9aef7a49228b859b27c889d33df5db666dd2a0e986542f90450951cb301f"
+          },
+          {
             name: "MessageBurst",
             source: message_burst_default,
             description: "Edit your own previous text message when you send a correction or quick follow-up",
@@ -54558,6 +54778,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "f1714e6be55c954394bb91974ab838b366e4cc70f0428848bfcef46a51aca753"
           },
           {
+            name: "Recurring Timestamps",
+            source: recurring_timestamps_default,
+            description: "/recurringtimes",
+            commands: [
+              "recurringtimes"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7"
+          },
+          {
             name: "RelationshipNotifier",
             source: relationship_notifier_default,
             description: "Show a local notification when a friend removes you",
@@ -54974,6 +55206,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Test Result Summary",
+            source: test_result_summary_default,
+            description: "/testresultsummary",
+            commands: [
+              "testresultsummary"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "af2bfbac3d600fd166703c4a2c13b91075a9fb497c568c7d400048bcf1fe1f9a"
+          },
+          {
             name: "TextReplace",
             source: text_replace_default,
             description: "Change text before Discord sends messages you compose",
@@ -54989,6 +55233,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Timestamp Styles",
+            source: timestamp_styles_default,
+            description: "/timestampstyles",
+            commands: [
+              "timestampstyles"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4"
+          },
+          {
+            name: "Total Time",
+            source: total_time_default,
+            description: "/totaltime",
+            commands: [
+              "totaltime"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca"
           },
           {
             name: "Translate",
@@ -65142,7 +65410,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a9beed78f38dffc39277043f2c4ce63c0ec811f8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "06d728543d60215826de76b20bf61801aeb82e58";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
