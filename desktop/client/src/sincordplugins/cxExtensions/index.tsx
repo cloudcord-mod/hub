@@ -1518,8 +1518,9 @@ export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
         const catalog = entries.map(entry => {
             const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
             const current = session.source(id);
-            const active = current !== undefined && (current === entry.source || activeCatalogLoaders.get(id) === entry.source
-                || kind === "plugin");
+            const source = entry.source as CxAddonSource;
+            const active = current !== undefined && (kind === "plugin"
+                || (typeof source === "string" ? current === source : activeCatalogLoaders.get(id) === source));
             return { ...entry, id, active };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
