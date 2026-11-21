@@ -58,6 +58,38 @@ function integerText(input: string) {
 
 const dayMilliseconds = 86_400_000;
 
+function jsonTokens(text: string) {
+    try { JSON.parse(text); }
+    catch { return; }
+    return text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
+}
+
+function markdownTable(rows: string[][]) {
+    const columns = rows[0]?.length ?? 0;
+    if (columns < 2 || columns > 16 || rows.length > 64 || rows.some(row => row.length !== columns)) return;
+    const row = (cells: string[]) => "| " + cells.map(cell => cell.trim().replace(/[\\|]/g, "\\$&")
+        .replace(/\r\n|\r|\n/g, "<br>").replace(/`(?=``)/g, "`\u200b")).join(" | ") + " |";
+    const output = [row(rows[0]), row(Array.from({ length: columns }, () => "---")), ...rows.slice(1).map(row)].join("\n");
+    return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
+}
+
+function csvRows(input: string) {
+    const rows: string[][] = [];
+    const field = /(?:"((?:[^"]|"")*)"|([^",\r\n]*))(,|\r\n|\r|\n|$)/y;
+    let cells: string[] = [];
+    while (field.lastIndex <= input.length) {
+        const match = field.exec(input);
+        if (!match) return [];
+        const [, quoted, plain, separator] = match;
+        cells.push(quoted === undefined ? plain : quoted.replaceAll('""', '"'));
+        if (separator === ",") continue;
+        rows.push(cells);
+        if (!separator || field.lastIndex === input.length) break;
+        cells = [];
+    }
+    return rows;
+}
+
 export const cxCommandFunctions = {
     snowflakeTimestamp(input: string) {
         const text = input.trim();
@@ -110,11 +142,9 @@ export const cxCommandFunctions = {
         catch { return "Invalid JSON."; }
     },
     formatJson(text: string) {
-        try { JSON.parse(text); }
-        catch { return "Invalid JSON."; }
-
         // Keep the original number tokens, duplicate keys and property order.
-        const tokens = text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
+        const tokens = jsonTokens(text);
+        if (!tokens) return "Invalid JSON.";
         let depth = 0;
         let result = "";
         for (let index = 0; index < tokens.length; index++) {
@@ -132,6 +162,12 @@ export const cxCommandFunctions = {
             if (result.length > 3900) return "Formatted JSON is too long for one reply.";
         }
         return codeFence + "json\n" + result + "\n" + codeFence;
+    },
+    compactJson(text: string) {
+        const tokens = jsonTokens(text);
+        if (!tokens) return "Invalid JSON.";
+        const result = tokens.join("").replaceAll("`", "\\u0060");
+        return result.length <= 3900 ? codeFence + "json\n" + result + "\n" + codeFence : "Compacted JSON is too long for one reply.";
     },
     compareLines(before: string, after: string) {
         const lines = (value: string) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
@@ -201,6 +237,19 @@ export const cxCommandFunctions = {
         if (Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999)
             return `\`${date.toISOString().slice(0, 10)}\``;
     },
+    isoWeek(input: string) {
+        const start = utcMidnight(input);
+        if (start === undefined) return;
+        const thursday = new Date(start);
+        const weekday = thursday.getUTCDay() || 7;
+        thursday.setUTCDate(thursday.getUTCDate() + 4 - weekday);
+        const year = thursday.getUTCFullYear();
+        const firstDay = new Date(thursday);
+        firstDay.setUTCMonth(0, 1);
+        const week = Math.floor((thursday.getTime() - firstDay.getTime()) / (7 * dayMilliseconds)) + 1;
+        const yearLabel = (year < 0 ? "-" : "") + String(Math.abs(year)).padStart(4, "0");
+        return yearLabel + "-W" + String(week).padStart(2, "0") + "-" + weekday;
+    },
     unixToIso(input: string, unit: string) {
         const value = integerText(input);
         if (value === undefined || (unit !== "seconds" && unit !== "milliseconds")) return;
@@ -256,12 +305,17 @@ export const cxCommandFunctions = {
         } catch { /* Invalid URL. */ }
     },
     tsvToMarkdown(input: string) {
-        const rows = input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(row => row.split("\t"));
-        const columns = rows[0].length;
-        if (columns < 2 || columns > 16 || rows.length > 64 || rows.some(row => row.length !== columns)) return;
-        const row = (cells: string[]) => "| " + cells.map(cell => cell.replace(/[\\|]/g, "\\$&").replace(/`(?=``)/g, "`\u200b").trim()).join(" | ") + " |";
-        const output = [row(rows[0]), row(Array.from({ length: columns }, () => "---")), ...rows.slice(1).map(row)].join("\n");
-        return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
+        return markdownTable(input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(row => row.split("\t")));
+    },
+    csvToMarkdown(input: string) {
+        return markdownTable(csvRows(input));
+    },
+    markdownChecklist(input: string) {
+        const lines = input.split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);
+        if (!lines.length) return;
+        const checklist = lines.map(line => /^- \[[ xX]\]\s/.test(line)
+            ? line : "- [ ] " + line.replace(/^[-*+]\s+/, "")).join("\n").replace(/`(?=``)/g, "`\u200b");
+        return checklist.length <= 3900 ? codeFence + "markdown\n" + checklist + "\n" + codeFence : "The checklist is too long for one reply.";
     },
     discordTimestamp(seconds: string, format: string) {
         const input = seconds.trim();

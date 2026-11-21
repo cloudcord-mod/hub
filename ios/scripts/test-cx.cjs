@@ -2287,6 +2287,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["inspecturl", { text: "https://guest:private@example.com/" }, /without embedded credentials/],
             ]],
             ["TSV to Markdown", [["tsvtomarkdown", { text: "Name\tValue\nA|B\t3" }, /\| Name \| Value \|\n\| --- \| --- \|\n\| A\\\|B \| 3 \|/]]],
+            ["CSV to Markdown", [
+                ["csvtomarkdown", { text: 'Name,Value\r\n"A,B","C""D"\r\n"two\nlines",\r\n' }, /\| A,B \| C"D \|\n\| two<br>lines \|  \|/],
+                ["csvtomarkdown", { text: 'Name,Value\n"unterminated,5' }, /^Paste comma-separated/],
+            ]],
+            ["ISO Week", [
+                ["isoweek", { text: "2021-01-01" }, /^2020-W53-5$/],
+                ["isoweek", { text: "2018-12-31" }, /^2019-W01-1$/],
+                ["isoweek", { text: "2021-02-29" }, /^Enter a calendar date/],
+            ]],
+            ["Markdown Checklist", [
+                ["markdownchecklist", { text: " Ship \n\n- [x] Build\n* Publish" }, /- \[ \] Ship\n- \[x\] Build\n- \[ \] Publish/],
+            ]],
         ]) {
             selectCatalog(plugin);
             click(render(), "Allow for this session");
@@ -4688,6 +4700,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                     '```json\n{\n  "x": 9007199254740993,\n  "x": [\n    {},\n    "\\u0060\\u0060\\u0060"\n  ]\n}\n```'],
                 [{ text: '{"x":1,}' }, "Invalid JSON."],
                 [{ text: "[".repeat(100) + "0" + "]".repeat(100) }, "Formatted JSON is too long for one reply."],
+            ]],
+            ["JSON Compact", "compactjson", [
+                [{ text: '{ "x": 9007199254740993,\n "x": "keep spaces ```" }' },
+                    '```json\n{"x":9007199254740993,"x":"keep spaces \\u0060\\u0060\\u0060"}\n```'],
+                [{ text: '[1,]' }, "Invalid JSON."],
             ]],
             ["Compare Lines", "comparelines", [
                 [{ before: "a\r\na\nb", after: "b\ra\nc" }, "```diff\n- a\n+ c\n```"],

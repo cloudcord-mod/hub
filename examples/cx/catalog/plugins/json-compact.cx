@@ -1,0 +1,5 @@
+plugin "JSON Compact":
+  needs commands.register
+  needs reply.local
+  on command "compactjson" with text:
+    reply "${compactJson(text)}"

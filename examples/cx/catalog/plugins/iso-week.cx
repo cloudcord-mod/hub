@@ -1,0 +1,5 @@
+plugin "ISO Week":
+  needs commands.register
+  needs reply.local
+  on command "isoweek" with text:
+    reply "${isoWeek(text)}" else "Enter a calendar date like 2026-01-01."

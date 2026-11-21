@@ -55,6 +55,7 @@ import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/p
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
 import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
+import plugin_catalog_csv_to_markdown from "../../../../examples/cx/catalog/plugins/csv-to-markdown.cx";
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
 import plugin_catalog_date_offset from "../../../../examples/cx/catalog/plugins/date-offset.cx";
@@ -175,7 +176,9 @@ import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
+import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso-week.cx";
 import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
+import plugin_catalog_json_compact from "../../../../examples/cx/catalog/plugins/json-compact.cx";
 import plugin_catalog_json_format from "../../../../examples/cx/catalog/plugins/json-format.cx";
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
@@ -185,6 +188,7 @@ import plugin_catalog_leet_text from "../../../../examples/cx/catalog/plugins/le
 import plugin_catalog_lines_to_csv from "../../../../examples/cx/catalog/plugins/lines-to-csv.cx";
 import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugins/link-converter.cx";
 import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/plugins/local-channel-notes.cx";
+import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/plugins/markdown-checklist.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
@@ -458,6 +462,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention, description: "Copy User Mention", categories: ["Profiles"] },
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls, description: "Copy User URL", categories: ["Profiles"] },
         { name: "Count Lines", source: plugin_catalog_count_lines, description: "/countlines", commands: ["countlines"], categories: ["Commands"] },
+        { name: "CSV to Markdown", source: plugin_catalog_csv_to_markdown, description: "/csvtomarkdown", commands: ["csvtomarkdown"], categories: ["Commands"] },
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps, description: "Format cozy timestamps as [calendar]", keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL • [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL • [relative]", categories: ["Appearance"], appearanceRevision: "5f19c067a66226d3e35e1a88bbdffa11e01b993a315630ad0e5c9c18de0e803e" },
         { name: "Dashless", source: plugin_catalog_dashless, description: "Replace hyphens with spaces in text channel names", categories: ["Appearance"], appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9" },
         { name: "Date Offset", source: plugin_catalog_date_offset, description: "/dateoffset", commands: ["dateoffset"], categories: ["Commands"] },
@@ -578,7 +583,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
+        { name: "ISO Week", source: plugin_catalog_iso_week, description: "/isoweek", commands: ["isoweek"], categories: ["Commands"] },
         { name: "JSON Check", source: plugin_catalog_json_check, description: "/jsoncheck", commands: ["jsoncheck"], categories: ["Commands"] },
+        { name: "JSON Compact", source: plugin_catalog_json_compact, description: "/compactjson", commands: ["compactjson"], categories: ["Commands"] },
         { name: "JSON Format", source: plugin_catalog_json_format, description: "/formatjson", commands: ["formatjson"], categories: ["Commands"] },
         { name: "JumpToTop", source: plugin_catalog_jump_to_top, description: "Add a channel header button to jump to the first message", categories: ["Servers & channels"] },
         { name: "JumpTo", source: plugin_catalog_jump_to, description: "Jump to the first or last message from channel and message menus", categories: ["Servers & channels"] },
@@ -588,6 +595,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Lines to CSV", source: plugin_catalog_lines_to_csv, description: "/linestocsv", commands: ["linestocsv"], categories: ["Commands"] },
         { name: "LinkConverter", source: plugin_catalog_link_converter, description: "send · https://reddit.com → https://rxddit.com", keywords: "profile · https://reddit.com → https://rxddit.com send · https://www.reddit.com → https://rxddit.com profile · https://www.reddit.com → https://rxddit.com send · https://old.reddit.com → https://rxddit.com profile · https://old.reddit.com → https://rxddit.com send · https://x.com → https://fxtwitter.com profile · https://x.com → https://fxtwitter.com send · https://www.x.com → https://fxtwitter.com profile · https://www.x.com → https://fxtwitter.com send · https://instagram.com → https://vxinstagram.com profile · h", categories: ["Chat","Profiles"] },
         { name: "LocalChannelNotes", source: plugin_catalog_local_channel_notes, description: "Add a local note editor to channel menus", categories: ["Servers & channels"] },
+        { name: "Markdown Checklist", source: plugin_catalog_markdown_checklist, description: "/markdownchecklist", commands: ["markdownchecklist"], categories: ["Commands"] },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"] },
         { name: "MessageBurst", source: plugin_catalog_message_burst, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },

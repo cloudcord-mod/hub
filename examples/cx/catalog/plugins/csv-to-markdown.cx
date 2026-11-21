@@ -1,0 +1,5 @@
+plugin "CSV to Markdown":
+  needs commands.register
+  needs reply.local
+  on command "csvtomarkdown" with text:
+    reply "${csvToMarkdown(text)}" else "Paste comma-separated rows with headers, matching columns and double quotes around fields that contain commas."

@@ -1,0 +1,5 @@
+plugin "Markdown Checklist":
+  needs commands.register
+  needs reply.local
+  on command "markdownchecklist" with text:
+    reply "${markdownChecklist(text)}" else "Enter one task per line."
