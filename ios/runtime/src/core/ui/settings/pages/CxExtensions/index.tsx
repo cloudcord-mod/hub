@@ -2717,6 +2717,8 @@ export default function CxExtensions() {
                             throw new Error("Notification volume control is available on desktop and browser.");
                         case "reveal-spoilers-shortcut":
                             throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
+                        case "reply-timestamp":
+                            throw new Error("Reply timestamps are available on desktop and browser.");
                         case "animated-assets":
                             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                         case "floor-relative-time":

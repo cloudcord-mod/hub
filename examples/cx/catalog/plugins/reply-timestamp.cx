@@ -1,0 +1,3 @@
+plugin "ReplyTimestamp":
+  needs messages.replytimestamp
+  use reply-timestamp

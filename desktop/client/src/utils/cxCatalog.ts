@@ -239,6 +239,7 @@ import plugin_catalog_realtime_timestamps from "../../../../examples/cx/catalog/
 import plugin_catalog_relationship_notifier from "../../../../examples/cx/catalog/plugins/relationship-notifier.cx";
 import plugin_catalog_repeat_messages from "../../../../examples/cx/catalog/plugins/repeat-messages.cx";
 import plugin_catalog_reply_ping_control from "../../../../examples/cx/catalog/plugins/reply-ping-control.cx";
+import plugin_catalog_reply_timestamp from "../../../../examples/cx/catalog/plugins/reply-timestamp.cx";
 import plugin_catalog_reveal_all_spoilers from "../../../../examples/cx/catalog/plugins/reveal-all-spoilers.cx";
 import plugin_catalog_reverse_image_search from "../../../../examples/cx/catalog/plugins/reverse-image-search.cx";
 import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins/reverse-text.cx";
@@ -656,6 +657,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "RelationshipNotifier", source: plugin_catalog_relationship_notifier, description: "Show a local notification when a friend removes you", categories: ["Profiles"] },
         { name: "RepeatMessages", source: plugin_catalog_repeat_messages, description: "Send the selected message again with its attachments and stickers", categories: ["Chat"] },
         { name: "ReplyPingControl", source: plugin_catalog_reply_ping_control, description: "Choose whether incoming replies ping you on this device", categories: ["Chat"] },
+        { name: "ReplyTimestamp", source: plugin_catalog_reply_timestamp, description: "Show the original message's timestamp on loaded reply previews", desktopOnly: true, categories: ["Chat"] },
         { name: "RevealAllSpoilers", source: plugin_catalog_reveal_all_spoilers, description: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true, categories: ["Chat"] },
         { name: "ReverseImageSearch", source: plugin_catalog_reverse_image_search, description: "Add a Search Image action with a choice of search engines", categories: ["Media"] },
         { name: "ReverseText", source: plugin_catalog_reverse_text, description: "/reverse", commands: ["reverse"], categories: ["Chat","Commands"] },

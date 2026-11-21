@@ -890,6 +890,24 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 Animated: { ScrollView: animatedScrollView }, Text: "Text", TextInput: "TextInput", View: "View", Pressable: "Pressable",
             },
         };
+        if (desktop) {
+            const replyView = { exports: {} };
+            const source = read("desktop/client/src/plugins/replyTimestamp/ReplyTimestamp.tsx");
+            const replyMocks = {
+                "react/jsx-runtime": { jsx, jsxs: jsx },
+                "./style.css": {},
+                "@components/ErrorBoundary": { __esModule: true, default: { wrap: view => view } },
+                "@webpack": { findCssClassesLazy: () => ({ separator: "separator" }) },
+                "@webpack/common": { Timestamp: "NativeTimestamp", DateUtils: {
+                    isSameDay: (ref, base) => ref.slice(0, 10) === base.slice(0, 10),
+                    dateFormat: timestamp => timestamp.slice(11),
+                    calendarFormat: timestamp => timestamp.slice(0, 10),
+                } },
+            };
+            vm.runInNewContext(transformSync(source, { loader: "tsx", format: "cjs", jsx: "automatic" }).code,
+                { module: replyView, require: name => replyMocks[name] });
+            mocks["@plugins/replyTimestamp/ReplyTimestamp"] = replyView.exports;
+        }
         vm.runInNewContext(transformSync(read(adapter), { loader: "tsx", format: "cjs", jsx: "automatic" }).code, {
             module,
             IS_WEB: false,
@@ -1085,6 +1103,27 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Disable RevealAllSpoilers");
             runtime.revealSpoilers({ target, ctrlKey: true });
             assert.deepEqual(spoilerClicks, []);
+
+            const replied = { state: 0, message: { timestamp: "2026-11-21T12:34" } };
+            const baseMessage = { timestamp: "2026-11-21T17:12" };
+            assert.equal(runtime.renderReplyTimestamp({ referencedMessage: replied, baseMessage }), null);
+            selectCatalog("ReplyTimestamp");
+            click(render(), "Allow for this session");
+            const renderReply = (referencedMessage, base = baseMessage) => {
+                const component = runtime.renderReplyTimestamp({ referencedMessage, baseMessage: base });
+                return component.type(component.props);
+            };
+            const sameDay = renderReply(replied);
+            assert.equal(sameDay.type, "NativeTimestamp");
+            assert.equal(sameDay.props.compact, true);
+            assert.equal(sameDay.props.children[1], "12:34");
+            const otherDay = renderReply(replied, { timestamp: "2026-11-22T00:00" });
+            assert.equal(otherDay.props.compact, false);
+            assert.equal(otherDay.props.children[1], "2026-11-21");
+            assert.equal(renderReply({ state: 1 }), null);
+            assert.equal(renderReply({ state: 2 }), null);
+            click(render(), "Disable ReplyTimestamp");
+            assert.equal(runtime.renderReplyTimestamp({ referencedMessage: replied, baseMessage }), null);
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));

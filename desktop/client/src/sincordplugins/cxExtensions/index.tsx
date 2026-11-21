@@ -9,6 +9,7 @@ import { Settings } from "@api/Settings";
 import { addServerListElement, removeServerListElement, ServerListRenderPosition } from "@api/ServerList";
 import { TextButton } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
+import ReplyTimestamp, { type ReplyTimestampProps } from "@plugins/replyTimestamp/ReplyTimestamp";
 import { CopyIcon, UpArrowIcon } from "@components/Icons";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxUploadAnonymiser } from "@utils/cx";
@@ -470,6 +471,7 @@ let roleHeaderUsers = 0;
 let reactionSortUsers = 0;
 let plainUrlPasteUsers = 0;
 let revealSpoilerUsers = 0;
+let replyTimestampUsers = 0;
 let noMiddleClickPasteUsers = 0;
 
 // NoMiddleClickPaste by Darxoon (GPL-3.0-or-later).
@@ -1238,6 +1240,9 @@ export function CxSettings() {
                         case "reveal-spoilers-shortcut":
                             revealSpoilerUsers++;
                             return () => { revealSpoilerUsers--; };
+                        case "reply-timestamp":
+                            replyTimestampUsers++;
+                            return () => { replyTimestampUsers--; };
                         case "no-middle-click-paste":
                             if (!IS_LINUX || IS_MOBILE) throw new Error("Middle-click paste control is available on Linux.");
                             if (noMiddleClickPasteUsers === 0) window.addEventListener("mouseup", preventMiddleClickPaste);
@@ -1599,6 +1604,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // ReplyTimestamp by Kyuuhachi, GPL-3.0-or-later.
+        find: "#{intl::REPLY_QUOTE_MESSAGE_NOT_LOADED}",
+        replacement: {
+            match: /\.onClickReply,.+?}\),(?=\i,\i,\i\])/,
+            replace: "$&$self.renderReplyTimestamp(arguments[0]),",
+        },
+    }, {
         // RevealAllSpoilers by whqwert, GPL-3.0-or-later.
         find: ".removeObscurity,",
         replacement: {
@@ -1893,6 +1905,10 @@ export default definePlugin({
     usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
     avatarCropZoom(original: number) { return Math.max(original, ...avatarCropZoomLimits.values()); },
     notificationVolumeFactor() { return Math.min(100, ...notificationVolumeLimits.values()) / 100; },
+    renderReplyTimestamp(props?: ReplyTimestampProps) {
+        if (!replyTimestampUsers || !props) return null;
+        return <ReplyTimestamp key="cx-reply-timestamp" {...props} />;
+    },
     revealSpoilers(event: MouseEvent) {
         if (!revealSpoilerUsers || !(IS_MAC ? event.metaKey : event.ctrlKey) || !(event.target instanceof Element)) return;
         try {

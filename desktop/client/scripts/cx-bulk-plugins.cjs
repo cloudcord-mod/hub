@@ -1187,6 +1187,17 @@ function compileMobileSocialEvents(file, plugin, source) {
 
 const sharedSourceRecipes = [
     {
+        capability: "native-effect",
+        sources: {
+            "desktop/client/src/plugins/replyTimestamp/index.tsx": "065a088485a2fe9734b87688e94e3e6d2386fd75ceae098e00ae91b9d90af933",
+        },
+        companions: {
+            "ReplyTimestamp.tsx": "f9e07819734c6363b414187965baa7d7c106b8e839ea5708fc362ad1910043c3",
+            "style.css": "19df8202d7366a998e0dac3408d36757a830661e446fed2bdbc95eeb4107fc52",
+        },
+        lines: ["  needs messages.replytimestamp", "  use reply-timestamp"],
+    },
+    {
         capability: "appearance",
         sources: {
             "desktop/client/src/plugins/plainFolderIcon/index.ts": "d052b3a09acfe05e3408f1ca51d3dfef6291962e130cdd901ff05e8b232b957a",

@@ -1,0 +1,52 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2024 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+import "./style.css";
+
+import ErrorBoundary from "@components/ErrorBoundary";
+import type { Message } from "@vencord/discord-types";
+import { findCssClassesLazy } from "@webpack";
+import { DateUtils, Timestamp } from "@webpack/common";
+import type { HTMLAttributes } from "react";
+
+const MessageClasses = findCssClassesLazy("separator", "latin24CompactTimeStamp");
+
+function Sep(props: HTMLAttributes<HTMLElement>) {
+    return <i className={MessageClasses.separator} aria-hidden={true} {...props} />;
+}
+
+const enum ReferencedMessageState {
+    LOADED = 0,
+    NOT_LOADED = 1,
+    DELETED = 2,
+}
+
+type ReferencedMessage = { state: ReferencedMessageState.LOADED; message: Message; } | { state: ReferencedMessageState.NOT_LOADED | ReferencedMessageState.DELETED; };
+
+export type ReplyTimestampProps = { referencedMessage: ReferencedMessage; baseMessage: Message; };
+
+function ReplyTimestamp({ referencedMessage, baseMessage }: ReplyTimestampProps) {
+    if (referencedMessage?.state !== ReferencedMessageState.LOADED || !referencedMessage.message || !baseMessage) return null;
+    const refTimestamp = referencedMessage.message.timestamp as any;
+    const baseTimestamp = baseMessage.timestamp as any;
+    return (
+        <Timestamp
+            className="vc-reply-timestamp"
+            compact={DateUtils.isSameDay(refTimestamp, baseTimestamp)}
+            timestamp={refTimestamp}
+            isInline={false}
+        >
+            <Sep>[</Sep>
+            {DateUtils.isSameDay(refTimestamp, baseTimestamp)
+                ? DateUtils.dateFormat(refTimestamp, "LT")
+                : DateUtils.calendarFormat(refTimestamp)
+            }
+            <Sep>]</Sep>
+        </Timestamp>
+    );
+}
+
+export default ErrorBoundary.wrap(ReplyTimestamp, { noop: true });
