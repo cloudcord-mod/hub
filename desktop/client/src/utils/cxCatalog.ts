@@ -42,6 +42,7 @@ import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/co
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
 import plugin_catalog_copy_media_link from "../../../../examples/cx/catalog/plugins/copy-media-link.cx";
+import plugin_catalog_copy_message_reference from "../../../../examples/cx/catalog/plugins/copy-message-reference.cx";
 import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/plugins/copy-profile-colors.cx";
 import plugin_catalog_copy_raw_text from "../../../../examples/cx/catalog/plugins/copy-raw-text.cx";
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
@@ -416,6 +417,7 @@ export const cxCatalog = {
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown },
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents },
         { name: "CopyMediaLink", source: plugin_catalog_copy_media_link },
+        { name: "CopyMessageReference", source: plugin_catalog_copy_message_reference },
         { name: "CopyProfileColors", source: plugin_catalog_copy_profile_colors },
         { name: "Copy Raw Text", source: plugin_catalog_copy_raw_text },
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links },

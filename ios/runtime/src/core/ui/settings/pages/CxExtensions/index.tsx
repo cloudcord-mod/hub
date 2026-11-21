@@ -3,7 +3,7 @@ import { instead } from "@lib/api/patcher";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxProfileMenuAction, type CxUploadAnonymiser } from "@lib/api/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
-import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@lib/api/cx";
+import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
 import { formatCxWordCount, matchesCxCatalogEntry } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
@@ -2472,17 +2472,15 @@ export default function CxExtensions() {
                         case "quick-mention":
                             return registerQuickMention(enabled);
                         case "copy-raw-text":
-                            return registerMessageMenuActions(enabled, ({ message }, close) => {
-                                const text = message?.content;
-                                if (typeof text !== "string" || !text.length) return [];
-                                return [{ label: "Copy Raw Text", run() {
+                        case "copy-message-reference":
+                            return registerMessageMenuActions(enabled, ({ message, channel }, close) =>
+                                getCxMessageClipboard(effect, message, channel).map(({ label, text }) => ({ label, run() {
                                     try {
                                         clipboard.setString(text);
                                         showToast.showCopyToClipboard?.();
                                         close();
-                                    } catch { showToast("Couldn't copy message text."); }
-                                } }];
-                            }, false);
+                                    } catch { showToast("Couldn't copy to clipboard."); }
+                                } })), false);
                         case "message-word-count": {
                             const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
                             return overrideCxMethods(renderer, {

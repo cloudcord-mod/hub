@@ -1,0 +1,3 @@
+plugin "CopyMessageReference":
+  needs messages.copyreference
+  use copy-message-reference

@@ -16,7 +16,7 @@ import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoice
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
-import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@utils/cx";
+import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@utils/cx";
 import { formatCxWordCount, matchesCxCatalogEntry } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
 import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@utils/cx";
@@ -284,14 +284,18 @@ function registerQuickMention() {
 
 let wordCountSequence = 0;
 
-function registerCopyRawText() {
+function registerMessageClipboard(effect: Parameters<typeof getCxMessageClipboard>[0]) {
     let active = true;
-    const patch: NavContextMenuPatchCallback = (children, { message }: { message?: Message; }) => {
-        const text = message?.content;
-        if (!active || typeof text !== "string" || !text.length) return;
-        children.push(<Menu.MenuItem id="cx-copy-raw-text" label="Copy Raw Text" action={() => {
-            if (active) void copyToClipboard(text).then(() => showToast("Message text copied"), () => showToast("Couldn't copy message text."));
-        }} />);
+    const patch: NavContextMenuPatchCallback = (children, { message, channel }) => {
+        if (!active || !message) return;
+        const selectedChannel = effect === "copy-message-reference" ? channel ?? ChannelStore.getChannel(message.channel_id) : undefined;
+        const items = getCxMessageClipboard(effect, message, selectedChannel);
+        for (const { key, label, text } of items) {
+            const id = "cx-copy-" + key;
+            children.push(<Menu.MenuItem key={id} id={id} label={label} action={() => {
+                if (active) void copyToClipboard(text).then(() => showToast("Copied to clipboard"), () => showToast("Couldn't copy to clipboard."));
+            }} />);
+        }
     };
     addContextMenuPatch("message", patch);
     return () => { active = false; removeContextMenuPatch("message", patch); };
@@ -986,7 +990,8 @@ export function CxSettings() {
                         case "quick-mention":
                             return registerQuickMention();
                         case "copy-raw-text":
-                            return registerCopyRawText();
+                        case "copy-message-reference":
+                            return registerMessageClipboard(effect);
                         case "message-word-count": {
                             const id = "cx-word-count-" + ++wordCountSequence;
                             addMessageAccessory(id, ({ message }) => {

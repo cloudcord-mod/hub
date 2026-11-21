@@ -1037,6 +1037,29 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             copyRaw();
             assert.equal(clipboardWrites.length, afterDisable, "stale copy action is disabled");
 
+            const reference = cxCatalog.plugins.find(entry => entry.name === "CopyMessageReference").source;
+            assert.throws(() => activateCx(reference, host, ["messages.copytext"]), /approval/);
+            selectCatalog("CopyMessageReference");
+            click(render(), "Allow for this session");
+            canSend = false;
+            const referenceMenu = menu();
+            const invoke = label => button(referenceMenu, label).props[desktop ? "action" : "onPress"]();
+            invoke("Copy Markdown Message Link");
+            assert.equal(clipboardWrites.pop(), "[Discord message](https://discord.com/channels/" + guildId + "/" + repeatChannel + "/" + sender + ")");
+            invoke("Copy Message Timestamp");
+            assert.equal(clipboardWrites.pop(), "<t:" + Math.floor((Number(BigInt(sender) >> 22n) + 1420070400000) / 1000) + ":F>");
+            invoke("Copy Message Author Mention");
+            assert.equal(clipboardWrites.pop(), "<@" + other + ">");
+            canSend = true;
+            const { getCxMessageClipboard } = moduleBox.exports;
+            const dmCopies = getCxMessageClipboard("copy-message-reference", message, { id: repeatChannel });
+            assert.equal(dmCopies[0].text, "[Discord message](https://discord.com/channels/@me/" + repeatChannel + "/" + sender + ")");
+            assert.equal(getCxMessageClipboard("copy-message-reference", { ...message, id: "9".repeat(20) }).length, 0);
+            assert.ok(getCxMessageClipboard("copy-message-reference", message, { id: other }).every(item => item.key !== "markdown-message-link"));
+            click(render(), "Disable CopyMessageReference");
+            invoke("Copy Markdown Message Link");
+            assert.equal(clipboardWrites.length, afterDisable);
+
             selectCatalog("WordCount");
             click(render(), "Allow for this session");
             const longMessage = { content: "one two three four five six" };

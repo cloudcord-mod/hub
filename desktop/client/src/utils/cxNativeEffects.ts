@@ -43,6 +43,7 @@ export const cxNativeEffects = {
     "hide-profile-banner-images": { permission: "appearance.hide", label: "Hide Discord-hosted profile banner images except your own and those of friends" },
     "decode-base64": { permission: "messages.decode", label: "Decode Base64 in the selected message and copy the result on request" },
     "copy-raw-text": { permission: "messages.copytext", label: "Add Copy Raw Text to message menus" },
+    "copy-message-reference": { permission: "messages.copyreference", label: "Copy the selected message’s Markdown link, timestamp, or author mention" },
     "message-word-count": { permission: "messages.wordcount", label: "Show word and character counts below messages longer than five words" },
     "quote-message": { permission: "messages.quote", label: "Add Quote and Copy as Quote actions to message menus" },
     "keep-long-drafts": { permission: "drafts.long", label: "Preserve long drafts in Discord’s local draft store" },
@@ -123,6 +124,31 @@ export type CxQuoteMessage = {
     attachments?: readonly { filename?: string; }[];
     author?: { id?: string; username?: string; globalName?: string | null; global_name?: string | null; };
 };
+
+export function getCxMessageClipboard(effect: "copy-raw-text" | "copy-message-reference", message?: CxQuoteMessage,
+    channel?: { id: string; guild_id?: string | null }) {
+    if (effect === "copy-raw-text") {
+        const text = message?.content;
+        return typeof text === "string" && text.length ? [{ key: "raw-text", label: "Copy Raw Text", text }] : [];
+    }
+    if (!message || !isCxProfileUserId(message.id)) return [];
+    const snowflake = BigInt(message.id);
+    if (snowflake > 0xffffffffffffffffn || message.id[0] === "0") return [];
+    const seconds = Math.floor((Number(snowflake >> 22n) + 1_420_070_400_000) / 1000);
+    const items = [{ key: "message-timestamp", label: "Copy Message Timestamp", text: "<t:" + seconds + ":F>" }];
+    const author = message.author?.id;
+    if (isCxProfileUserId(author)) {
+        items.push({ key: "message-author", label: "Copy Message Author Mention", text: "<@" + author + ">" });
+    }
+    if (channel && channel.id === message.channel_id && isCxProfileUserId(channel.id)) {
+        const guild = channel.guild_id == null ? "@me" : channel.guild_id;
+        if (guild === "@me" || isCxProfileUserId(guild)) {
+            items.unshift({ key: "markdown-message-link", label: "Copy Markdown Message Link",
+                text: "[Discord message](https://discord.com/channels/" + guild + "/" + channel.id + "/" + message.id + ")" });
+        }
+    }
+    return items;
+}
 
 export function buildCxMessageQuote(message: CxQuoteMessage, guildId: string | null | undefined, nickname: string | undefined, includeLink: boolean) {
     if (!message.author || !isCxProfileUserId(message.id) || !isCxProfileUserId(message.channel_id)) return;
