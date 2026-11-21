@@ -146,6 +146,7 @@ jobs:
           cp "../ios/runtime/src/core/ui/settings/pages/Addons/index.tsx" "src/core/ui/settings/pages/Addons/index.tsx"
           mkdir -p src/core/ui/settings/pages/CxExtensions
           cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/index.tsx" "src/core/ui/settings/pages/CxExtensions/index.tsx"
+          cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/AddonCard.tsx" "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"
           mkdir -p src/core/ui/settings/pages/TestingPlugins src/lib/api/cxTesting
           cp "../ios/runtime/src/core/ui/settings/pages/TestingPlugins/index.tsx" "src/core/ui/settings/pages/TestingPlugins/index.tsx"
           cp "../ios/runtime/src/lib/api/pluginTesting.ts" "src/lib/api/pluginTesting.ts"
@@ -169,9 +170,11 @@ jobs:
           cp "../ios/runtime/src/core/ui/settings/pages/Diagnostics/index.tsx" "src/core/ui/settings/pages/Diagnostics/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/Customization/index.tsx" "src/core/ui/settings/pages/Customization/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/General/index.tsx" "src/core/ui/settings/pages/General/index.tsx"
+          cp "../ios/runtime/src/core/ui/settings/pages/Plugins/index.tsx" "src/core/ui/settings/pages/Plugins/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/Plugins/components/PluginCard.tsx" "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/Plugins/models/index.ts" "src/core/ui/settings/pages/Plugins/models/index.ts"
           cp "../ios/runtime/src/core/ui/settings/pages/Plugins/models/vendetta.ts" "src/core/ui/settings/pages/Plugins/models/vendetta.ts"
+          cp "../ios/runtime/src/core/ui/settings/pages/Themes/index.tsx" "src/core/ui/settings/pages/Themes/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/Themes/ThemeCard.tsx" "src/core/ui/settings/pages/Themes/ThemeCard.tsx"
           cp "../ios/runtime/src/core/ui/settings/index.ts" "src/core/ui/settings/index.ts"
           cp "../ios/runtime/src/core/vendetta/plugins.ts" "src/core/vendetta/plugins.ts"
@@ -6172,7 +6175,12 @@ jobs:
           node --check ../dist/cc.js
           grep -q 'CloudSync' ../dist/cc.js
           grep -q 'BotCord' ../dist/cc.js
-          grep -q 'CX Extensions' ../dist/cc.js
+          grep -F -q 'Import plugin file' ../dist/cc.js
+          grep -F -q 'Import theme file' ../dist/cc.js
+          if grep -Eq 'label:[[:space:]]*"CX Extensions"' ../dist/cc.js; then
+            echo "CX add-ons must use the Plugins and Themes pages"
+            exit 1
+          fi
           grep -q 'CloudCord section registration failed' ../dist/cc.js
           grep -q 'CloudCord settings renderer patch failed' ../dist/cc.js
           grep -q 'CloudCord settings module could not be attached' ../dist/cc.js

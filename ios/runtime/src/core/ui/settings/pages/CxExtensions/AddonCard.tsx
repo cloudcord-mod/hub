@@ -16,7 +16,8 @@ function useAddonReview(kind: CxAddonKind, entry?: CxAddonRow) {
 
 export function ImportCxAddonButton({ kind }: { kind: CxAddonKind; }) {
     const review = useAddonReview(kind);
-    return <Button text={`Import ${kind} file`} variant="secondary" size="small" onPress={review} />;
+    const label = kind === "plugin" ? "Import plugin file" : "Import theme file";
+    return <Button text={label} variant="secondary" size="small" onPress={review} />;
 }
 
 export function CxAddonCard({ kind, entry }: { kind: CxAddonKind; entry: CxAddonRow; }) {
