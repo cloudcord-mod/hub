@@ -24,11 +24,10 @@ export function usesModernSettings() {
     } catch { return true; }
 }
 
-function usesCachedSettingsList() {
+function getSettingsVersion() {
     try {
-        const version = parseInt(String(NativeClientInfoModule?.getConstants?.()?.Version ?? ""), 10);
-        return Number.isFinite(version) && version >= 352;
-    } catch { return false; }
+        return parseInt(String(NativeClientInfoModule?.getConstants?.()?.Version ?? ""), 10);
+    } catch { return NaN; }
 }
 
 export function patchTabsUI(unpatches: (() => void | boolean)[]) {
@@ -218,16 +217,19 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
     // Android 352 renders a cached createList node through this component.
     // Work on a copy: React Compiler can retain/freeze the original node, and
     // the overview function itself may already have been captured by navigation.
-    const prepareListProps = (props: any) => {
-        const node = props?.node;
+    const prepareRootList = (node: any) => {
         const sections = node?.sections;
-        if (!Array.isArray(sections) || !sections.some(section => section?.settings?.includes?.("ACCOUNT"))) return props;
-        if (sections.some(section => section?.label === "CloudCord")) return props;
+        if (!Array.isArray(sections) || !sections.some(section => section?.settings?.includes?.("ACCOUNT"))) return node;
+        if (sections.some(section => section?.label === "CloudCord")) return node;
         const copy = sections.map(section => ({ ...section,
             ...(Array.isArray(section?.settings) ? { settings: [...section.settings] } : {})
         }));
         insertCloudCordSections(copy);
-        return { ...props, node: { ...node, sections: copy } };
+        return { ...node, sections: copy };
+    };
+    const prepareListProps = (props: any) => {
+        const node = prepareRootList(props?.node);
+        return node === props?.node ? props : { ...props, node };
     };
     const listJsx = (_component: any, element: any) => ({ ...element, props: prepareListProps(element.props) });
     onJsxCreate("SearchableSettingsList", listJsx);
@@ -308,8 +310,18 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
         });
     };
 
-    const patchCreateListModule = (module: any) => {
+    const patchCreateListModule = (module: any, rootOnly: boolean) => {
         if (patchedLists.has(module)) return;
+        if (rootOnly) {
+            // Settings renderers can lose their detectable names in release builds.
+            // Prepare the root list before Discord caches it without touching subpages.
+            unpatches.push(before("createList", module, args => {
+                args[0] = prepareRootList(args[0]);
+                return args;
+            }));
+            patchedLists.add(module);
+            return;
+        }
         // Discord 344 materializes a new list from this config. Insert our rows
         // before that copy is created; the after-hook below remains a fallback
         // for builds that expose their sections only in the returned tree.
@@ -351,7 +363,9 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
         patchedScreens.add(parent);
     };
 
-    const cachedSettingsList = usesCachedSettingsList();
+    const settingsVersion = getSettingsVersion();
+    const cachedSettingsList = settingsVersion >= 352;
+    const patchRootList = settingsVersion >= 354;
     unpatches.push(observeSettingsModules((exports, path) => {
         // Match exports only after their factory succeeded. Each hook is
         // independent, so a frozen namespace cannot disable the other hooks.
@@ -359,9 +373,9 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
             if (!module || (typeof module !== "object" && typeof module !== "function")) continue;
             try { if (Object.getOwnPropertyNames(module).includes("SETTING_RENDERER_CONFIG")) patchRendererConfig(module); }
             catch (error) { console.warn("CloudCord settings renderer patch failed", error); }
-            if (!cachedSettingsList) {
+            if (!cachedSettingsList || patchRootList) {
                 try {
-                    if (Object.getOwnPropertyNames(module).includes("createList") && typeof module.createList === "function") patchCreateListModule(module);
+                    if (Object.getOwnPropertyNames(module).includes("createList") && typeof module.createList === "function") patchCreateListModule(module, patchRootList);
                 } catch (error) { console.warn("CloudCord settings list patch failed", error?.stack ?? error); }
             }
         }
@@ -371,9 +385,7 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
             try { patchSearchList(exports); }
             catch (error) { console.warn("CloudCord direct settings list patch failed", error); }
         }
-        // Android 352 passes a cached list node through SearchableSettingsList.
-        // The JSX and direct list hooks cover cached component references;
-        // recursive createList/overview tree hooks only repeat work on renders.
+        // Cached settings lists use the direct root hooks above.
         if (cachedSettingsList) return;
         const screen = exports?.SettingsOverviewScreen ?? exports?.default;
         if (path?.endsWith("/SettingsOverviewScreen.tsx") ||

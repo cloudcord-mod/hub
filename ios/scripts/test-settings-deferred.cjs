@@ -9,7 +9,7 @@ const patcher = require('spitroast');
 
 // Execute real settings code with modules that become available only when
 // Discord opens settings. A startup-only finder can never pass this fixture.
-for (const platform of ['android', 'ios']) for (const delayed of [false, true]) {
+for (const platform of ['android', 'ios']) for (const version of ['352.17', '354.12']) for (const delayed of [false, true]) {
   for (const screenKind of ['memo-sections', 'default-node', 'named-node']) {
     for (const readonlyNamespace of [false, true]) {
         const rows = { CloudCord: [{ key: 'CLOUDCORD', title: () => 'Overview', render: async () => ({ default: () => null }) }] };
@@ -67,7 +67,7 @@ for (const platform of ['android', 'ios']) for (const delayed of [false, true]) 
                 };
                 if (name === '@ui/settings') return { registeredSections: rows };
                 if (name === '@lib/api/settings') return { settings: {} };
-                if (name === '@lib/api/native/modules') return { NativeClientInfoModule: { getConstants: () => ({ Version: '352.17' }) } };
+                if (name === '@lib/api/native/modules') return { NativeClientInfoModule: { getConstants: () => ({ Version: version }) } };
                 if (name === '@metro/wrappers') {
                     const lazy = () => new Proxy({}, { get() { lookupCalls++; throw Error('module not ready'); } });
                     return { findByPropsLazy: lazy, findByFilePathLazy: lazy, findByNameLazy: lazy, findByPropsAll: () => [], findByNameAll: () => [] };
@@ -110,11 +110,14 @@ for (const platform of ['android', 'ios']) for (const delayed of [false, true]) 
         const nested = { node: { sections: [{ settings: ['PRIVACY'] }] } };
         assert.equal(searchList.SearchableSettingsList(nested), nested.node, 'subpages do not receive root settings');
         for (const list of lists) {
-            const config = { sections: [{ settings: ['ACCOUNT'] }] };
+            const config = Object.freeze({ sections: frozenNode.sections });
             for (let repeat = 0; repeat < 3; repeat++) {
                 const result = list.createList(config);
-                assert.equal(result.sections.filter(s => s.label === 'CloudCord').length, 0, '352 avoids redundant createList hooks');
+                assert.equal(result.sections.filter(s => s.label === 'CloudCord').length, version === '354.12' ? 1 : 0,
+                    '354 has a root fallback for renamed renderers while 352 keeps its lightweight list hooks');
             }
+            assert.equal(config.sections.length, 1, 'the root fallback leaves native configs untouched');
+            assert.deepEqual(list.createList({ sections: nested.node.sections }), nested.node, 'the fallback leaves subpages alone');
         }
         for (let render = 0; render < 3; render++) {
             const output = screenParent[screenKey]();
