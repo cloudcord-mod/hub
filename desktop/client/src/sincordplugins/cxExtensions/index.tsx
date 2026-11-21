@@ -1508,20 +1508,23 @@ const activeCatalogLoaders = new Map<string, () => Promise<string>>();
 
 export type CxAddonKind = "plugin" | "theme";
 type CxAddonSource = string | (() => Promise<string>);
-export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; };
+export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
 const desktopCatalogPlugins = cxCatalog.plugins.filter(entry => !entry.linuxOnly);
 
 export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
     const revision = React.useSyncExternalStore(subscribeAppearance, () => appearanceUpdates);
     const rows = React.useMemo(() => {
         const entries = kind === "theme" ? cxCatalog.themes : IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : desktopCatalogPlugins;
+        const approvals = new Map(rememberedAppearance.map(entry => [entry.id, entry.source]));
         const catalog = entries.map(entry => {
             const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
             const current = session.source(id);
             const source = entry.source as CxAddonSource;
             const active = current !== undefined && (kind === "plugin"
                 || (typeof source === "string" ? current === source : activeCatalogLoaders.get(id) === source));
-            return { ...entry, id, active };
+            const saved = approvals.get(id);
+            const needsReview = kind === "plugin" && !active && saved !== undefined && typeof source === "string" && saved !== source;
+            return { ...entry, id, active, needsReview };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
             && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({ id, name, source: session.source(id)!, active: true }));

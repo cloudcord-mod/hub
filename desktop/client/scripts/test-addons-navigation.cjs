@@ -82,7 +82,8 @@ const nativePlugins = {
 const catalog = {
     plugin: [
         { id: "plugin:Shared", name: "Shared", description: "Catalog version", active: true },
-        { id: "plugin:Local", name: "Local", description: "Off", active: false },
+        { id: "plugin:Local", name: "Local", description: "Off", active: false, privateCommands: true },
+        { id: "plugin:Disabled", name: "Disabled", description: "Changed after approval", active: false, needsReview: true },
     ],
     theme: [{ id: "theme", name: "Palette", active: true }],
 };
@@ -106,8 +107,64 @@ const walk = tree => Array.isArray(tree) ? tree.flatMap(walk) : tree?.props ? [t
 const renderList = () => { cursor = 0; return walk(PluginsPage()); };
 const beforeFiltering = renderList();
 assert.ok(beforeFiltering.some(node => node.type === "CatalogCard" && node.props.name === "Local"));
+const selectFilter = value => renderList().find(node => node.props["aria-label"] === "Filter plugins").props.onChange({ currentTarget: { value } });
+const shownCards = () => renderList().filter(node => node.type === "CatalogCard" || node.type === "NativeCard");
+selectFilter("private");
+assert.deepEqual(shownCards().map(node => node.props.name), ["Local"]);
+selectFilter("review");
+assert.deepEqual(shownCards().map(node => node.props.name), ["Disabled"]);
+assert.match(shownCards()[0].props.infoButton.props.children.join(""), /Review update/);
+selectFilter("all");
 const toggle = beforeFiltering.find(node => node.type?.name === "EnabledOnly");
 toggle.props.onChange(true);
 assert.ok(!renderList().some(node => node.props.name === "Local" || node.props.plugin?.name === "Disabled"));
 assert.ok(renderList().some(node => node.props.name === "Shared" || node.props.plugin?.name === "Shared"));
-console.log("PASS Add-ons tabs, keyboard navigation, visibility and CX list filtering");
+
+const mobileModule = { exports: {} };
+let filterSheet;
+const mobileMocks = {
+    react: { ...commonHooks, useCallback: callback => callback },
+    "react-native": { View: "View", Image: "Image" },
+    "@lib/api/settings": { settings: {} },
+    "@lib/api/assets": { findAssetId: () => 1 },
+    "@lib/utils/lazy": { lazyDestructure: factory => factory() },
+    "@metro": { findByProps: () => ({ showSimpleActionSheet: args => { filterSheet = args; } }) },
+    "@metro/common": { NavigationNative: { useNavigation: () => ({}) } },
+    "@metro/common/components": {
+        FlashList: "FlashList", Text: "Text", Button: "Button", TableSwitchRow: "Switch", useSafeAreaInsets: () => ({ bottom: 0 }),
+    },
+    "@ui/components": { ErrorBoundary: "Boundary", Search: "Search" },
+    "es-toolkit": { isNotNil: value => value != null },
+    fuzzysort: { go: (_, rows) => rows.map(obj => ({ obj })) },
+};
+vm.runInNewContext(esbuild.transformSync(fs.readFileSync("../../ios/runtime/src/core/ui/components/AddonPage.tsx", "utf8"),
+    { loader: "tsx", format: "cjs" }).code, {
+    module: mobileModule, React, require: name => mobileMocks[name] ?? {},
+});
+states.length = 0;
+const MobileAddonPage = mobileModule.exports.default;
+const mobileItems = [{ name: "Native" }, { name: "Command", privateCommands: true, alternate: true }, { name: "Changed", needsReview: true }];
+const mobileList = () => {
+    cursor = 0;
+    return walk(MobileAddonPage({
+        CardComponent: "Card", title: "Plugins", items: mobileItems, searchKeywords: ["name"],
+        filterOptions: { "Private commands": row => row.privateCommands, "Needs review": row => row.needsReview },
+        defaultFilter: row => !row.alternate,
+    })).find(node => node.type === "FlashList");
+};
+const mobileRows = () => Array.from(mobileList().props.data, entry => entry.obj.name);
+const selectMobileFilter = label => {
+    const header = mobileList().props.ListHeaderComponent;
+    walk(header).find(node => node.type === "Button").props.onPress();
+    filterSheet.options.find(option => option.label === label).onPress();
+};
+assert.deepEqual(mobileRows(), ["Native", "Changed"]);
+selectMobileFilter("Private commands");
+assert.deepEqual(mobileRows(), ["Command"]);
+selectMobileFilter("Needs review");
+assert.deepEqual(mobileRows(), ["Changed"]);
+mobileItems.length = 0;
+assert.deepEqual(mobileRows(), [], "an empty filter must leave the filter controls available");
+selectMobileFilter("All plugins");
+assert.equal(filterSheet.header.title, "Filter plugins");
+console.log("PASS desktop and mobile Add-ons navigation, private command filtering and review visibility");

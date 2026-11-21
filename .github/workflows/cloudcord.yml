@@ -144,6 +144,7 @@ jobs:
           cp "../ios/runtime/src/core/ui/settings/components/LocalProfiles.tsx" "src/core/ui/settings/components/LocalProfiles.tsx"
           mkdir -p src/core/ui/settings/pages/Addons
           cp "../ios/runtime/src/core/ui/settings/pages/Addons/index.tsx" "src/core/ui/settings/pages/Addons/index.tsx"
+          cp "../ios/runtime/src/core/ui/components/AddonPage.tsx" "src/core/ui/components/AddonPage.tsx"
           mkdir -p src/core/ui/settings/pages/CxExtensions
           cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/index.tsx" "src/core/ui/settings/pages/CxExtensions/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/AddonCard.tsx" "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"

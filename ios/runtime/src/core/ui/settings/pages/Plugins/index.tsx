@@ -37,9 +37,14 @@ const { AlertModal, AlertActions, AlertActionButton } = lazyDestructure(() =>
   findByProps("AlertModal", "AlertActions"),
 );
 
-type PluginRow = UnifiedPluginModel | CxAddonRow;
+type PluginRow = UnifiedPluginModel | (CxAddonRow & { alternate?: boolean });
 type PluginPageProps = Partial<ComponentProps<typeof AddonPage<PluginRow>>> & { useItems: () => PluginRow[]; };
 const isPluginRowEnabled = (item: PluginRow) => "source" in item ? item.active : item.isEnabled();
+const pluginFilters = {
+  "Private commands": (item: PluginRow) => "source" in item && item.privateCommands === true,
+  "Needs review": (item: PluginRow) => "source" in item && item.needsReview === true,
+};
+const showDefaultRow = (item: PluginRow) => !("source" in item && item.alternate);
 
 function PluginListCard({ item, result }: CardWrapper<PluginRow>) {
   return "source" in item
@@ -55,6 +60,8 @@ function PluginPage(props: PluginPageProps) {
       CardComponent={PluginListCard}
       isEnabled={isPluginRowEnabled}
       title={Strings.PLUGINS}
+      filterOptions={pluginFilters}
+      defaultFilter={showDefaultRow}
       searchKeywords={[
         "name",
         "description",
@@ -90,7 +97,9 @@ export default function Plugins() {
             const catalog = useCxAddonRows("plugin");
             const native = [...corePlugins, ...vdPlugins, ...bnPlugins];
             const nativeNames = new Set(native.map(plugin => plugin.name.toLowerCase()));
-            return [...native, ...catalog.filter(plugin => plugin.active || !nativeNames.has(plugin.name.toLowerCase()))];
+            const entries = catalog.map(plugin => !plugin.active && nativeNames.has(plugin.name.toLowerCase())
+              ? { ...plugin, alternate: true } : plugin);
+            return [...native, ...entries];
         }}
         ListHeaderComponent={() => {
             const unproxiedPlugins = Object.values(VdPluginManager.plugins).filter(p => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));

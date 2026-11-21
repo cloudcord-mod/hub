@@ -2834,16 +2834,20 @@ export function restoreRememberedCxAppearance() {
 }
 
 export type CxAddonKind = "plugin" | "theme";
-export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; active: boolean; };
+export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
 
 export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
     const revision = React.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
     return React.useMemo(() => {
         const entries = kind === "plugin" ? mobileCatalogPlugins : cxCatalog.themes;
+        const approvals = new Map(readRememberedAppearance().map(entry => [entry.name, entry.revision]));
         const catalog = entries.map(entry => {
             const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
             const current = session.source(id);
-            return { ...entry, id, active: current !== undefined && (kind === "plugin" || current === entry.source) };
+            const active = current !== undefined && (kind === "plugin" || current === entry.source);
+            const saved = approvals.get(entry.name);
+            const needsReview = kind === "plugin" && !active && saved !== undefined && saved !== entry.appearanceRevision;
+            return { ...entry, id, active, needsReview };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
             && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({ id, name, source: session.source(id)!, active: true }));

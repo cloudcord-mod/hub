@@ -5849,6 +5849,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(registered.compactjson, undefined);
             assert.equal(localNotes[storageKey].length, 0);
             plugin.stop();
+            selectCatalog("JSON Compact");
+            await click(render(), "Allow and remember on this device");
+            plugin.stop();
+            localNotes[storageKey][0].source += "\n";
+            plugin.start();
+            await new Promise(setImmediate);
+            const changedRow = module.exports.useCxAddonRows("plugin", "JSON Compact").find(row => row.name === "JSON Compact");
+            assert.equal(changedRow.privateCommands, true);
+            assert.equal(changedRow.needsReview, true);
+            assert.equal(registered.compactjson, undefined, "the outdated approval never registers the command");
+            await click(render(), "Forget JSON Compact");
+            plugin.stop();
         } else {
             const restore = module.exports.restoreRememberedCxAppearance;
             selectCatalog("QuickMention");
@@ -5916,6 +5928,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(registered.compactjson, undefined);
             assert.equal(settings.cxRememberedAppearance.length, 0);
             unloadCommands();
+            selectCatalog("JSON Compact");
+            click(render(), "Allow and remember on this device");
+            restore()();
+            settings.cxRememberedAppearance[0].revision = "previous-revision";
+            const cleanup = restore();
+            const changedRow = module.exports.useCxAddonRows("plugin").find(row => row.name === "JSON Compact");
+            assert.equal(changedRow.privateCommands, true);
+            assert.equal(changedRow.needsReview, true);
+            assert.equal(registered.compactjson, undefined, "the outdated approval never registers the command");
+            click(render(), "Forget JSON Compact");
+            cleanup();
         }
 
         // Confirm that a saved catalog library can exceed the old combined limit

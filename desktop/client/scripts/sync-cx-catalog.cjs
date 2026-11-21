@@ -28,7 +28,7 @@ function pluginBody(source) {
 }
 
 function buildCatalog(additions = new Map()) {
-    const { parseCx, reviewCx, cxAppearanceTargets, cxNativeEffects, getCxCatalogCategories, canRememberCxExtension } = loadCxRuntime();
+    const { parseCx, reviewCx, cxAppearanceTargets, cxNativeEffects, getCxCatalogCategories, canRememberCxExtension, isPrivateCxCommand } = loadCxRuntime();
     const names = new Set();
     const commands = new Set();
     const groups = {};
@@ -87,7 +87,8 @@ function buildCatalog(additions = new Map()) {
             const keywords = [...new Set([...specific.slice(1), ...(review?.appearanceOptions ?? []).map(option => option.label)])].join(" ").slice(0, 520);
             const appearanceRevision = !desktopOnly && canRememberCxExtension(parsed)
                 ? createHash("sha256").update(document.replaceAll("\r\n", "\n")).digest("hex") : undefined;
-            return { name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories: getCxCatalogCategories(parsed), appearanceRevision };
+            const privateCommands = parsed.kind === "plugin" && isPrivateCxCommand(parsed.permissions);
+            return { name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories: getCxCatalogCategories(parsed), appearanceRevision, privateCommands };
         });
     }
     const source = [
@@ -96,14 +97,15 @@ function buildCatalog(additions = new Map()) {
         "",
         'import type { CxCatalogCategory } from "./cx";',
         "",
-        "type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; linuxOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; };",
+        "type CatalogEntry = { name: string; source: string; description?: string; keywords?: string; desktopOnly?: boolean; linuxOnly?: boolean; commands?: readonly string[]; categories: readonly CxCatalogCategory[]; appearanceRevision?: string; privateCommands?: boolean; };",
         "",
         "export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {",
         ...Object.entries(groups).flatMap(([kind, entries]) => [
             `    ${kind}: [`,
-            ...entries.map(({ name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories, appearanceRevision }) => {
+            ...entries.map(({ name, binding, description, keywords, desktopOnly, linuxOnly, commandNames, categories, appearanceRevision, privateCommands }) => {
                 const data = { description: description || undefined, keywords: keywords || undefined,
-                    desktopOnly: desktopOnly || undefined, linuxOnly: linuxOnly || undefined, commands: commandNames.length ? commandNames : undefined, categories, appearanceRevision };
+                    desktopOnly: desktopOnly || undefined, linuxOnly: linuxOnly || undefined, commands: commandNames.length ? commandNames : undefined,
+                    categories, appearanceRevision, privateCommands: privateCommands || undefined };
                 const fields = Object.entries(data).filter(([, value]) => value !== undefined)
                     .map(([key, value]) => `${key}: ${JSON.stringify(value)}`);
                 return `        { name: ${JSON.stringify(name)}, source: ${[binding, ...fields].join(", ")} },`;

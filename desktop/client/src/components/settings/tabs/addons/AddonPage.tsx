@@ -44,6 +44,7 @@ function toggleCxAddon(kind: CxAddonKind, entry: CxAddonRow, on: boolean) {
 }
 
 type Sort = "name" | "enabled";
+type PluginFilter = "all" | "private" | "review";
 
 const ListIcon = () => (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /></svg>
@@ -111,9 +112,10 @@ export function PluginsPage() {
     const [sort, setSort] = useState<Sort>("name");
     const [grid, setGrid] = useState(false);
     const [enabledOnly, setEnabledOnly] = useState(false);
+    const [filter, setFilter] = useState<PluginFilter>("all");
     const [, force] = useState(0);
     const [limit, setLimit] = useState(PAGE);
-    useEffect(() => setLimit(PAGE), [query, sort, enabledOnly]);
+    useEffect(() => setLimit(PAGE), [query, sort, enabledOnly, filter]);
 
     const visible = useMemo(listablePlugins, []);
     const cxRows = cxAddons().useCxAddonRows("plugin", query);
@@ -122,12 +124,14 @@ export function PluginsPage() {
     const nativeByName = new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin]));
 
     const q = query.trim().toLowerCase();
-    const shownNative = visible.filter(p => (!cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name))
-        && (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags?.some(t => t.toLowerCase().includes(q))));
+    const shownNative = filter === "all" ? visible.filter(p => (!cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name))
+        && (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags?.some(t => t.toLowerCase().includes(q)))) : [];
     const shownNames = new Set(shownNative.map(plugin => plugin.name.toLowerCase()));
     const shown = [
         ...shownNative.map(plugin => ({ name: plugin.name, active: isPluginEnabled(plugin.name), plugin, extension: undefined })),
         ...cxRows.filter(entry => {
+            if (filter === "private") return entry.privateCommands;
+            if (filter === "review") return entry.needsReview;
             const name = entry.name.toLowerCase();
             const native = nativeByName.get(name);
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
@@ -159,6 +163,13 @@ export function PluginsPage() {
                 <div className={cl("advanced")}>
                     <EnabledOnly value={enabledOnly} onChange={setEnabledOnly} />
                     <label className={cl("select")}>
+                        <select aria-label="Filter plugins" value={filter} onChange={event => setFilter(event.currentTarget.value as PluginFilter)}>
+                            <option value="all">All plugins</option>
+                            <option value="private">Private commands</option>
+                            <option value="review">Needs review</option>
+                        </select>
+                    </label>
+                    <label className={cl("select")}>
                         Sort by:
                         <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
                             <option value="name">Name</option>
@@ -173,7 +184,7 @@ export function PluginsPage() {
             </div>
 
             {shown.length === 0
-                ? <div className={cl("empty")}>{enabledOnly && !q ? "No plugins are enabled." : `No plugins match “${query}”.`}</div>
+                ? <div className={cl("empty")}>{q ? `No plugins match “${query}”.` : filter === "all" && enabledOnly ? "No plugins are enabled." : "No plugins match these filters."}</div>
                 : (
                     <div className={cl("list", { grid })}>
                         {shown.slice(0, limit).map(({ plugin, extension }) => {
@@ -181,11 +192,13 @@ export function PluginsPage() {
                                 const alternate = cxByName.get(plugin.name.toLowerCase());
                                 return <PluginCard key={plugin.name} plugin={plugin} disabled={false} onRestartNeeded={onRestartNeeded}
                                     footer={alternate && !alternate.active && !isPluginEnabled(plugin.name)
-                                        && <button className={cl("mode")} onClick={() => reviewAddon("plugin", alternate)}>Catalog version</button>} />;
+                                        && <button className={cl("mode")} onClick={() => reviewAddon("plugin", alternate)}>{alternate.needsReview ? "Review update" : "Catalog version"}</button>} />;
                             }
                             return <AddonCard key={extension.id} name={extension.name} description={extension.description}
                                 enabled={extension.active} setEnabled={on => toggleCxAddon("plugin", extension, on)}
-                                infoButton={extension.active && <button className={cl("mode")} onClick={() => reviewAddon("plugin", extension)}>Options</button>} />;
+                                infoButton={(extension.active || extension.needsReview) && <button className={cl("mode")} onClick={() => reviewAddon("plugin", extension)}>
+                                    {extension.needsReview ? "Review update" : "Options"}
+                                </button>} />;
                         })}
                     </div>
                 )}

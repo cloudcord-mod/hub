@@ -23,6 +23,8 @@ interface AddonPageProps<T extends object, I = any> {
     items: I[];
     searchKeywords: SearchKeywords<T>;
     sortOptions?: Record<string, (a: T, b: T) => number>;
+    filterOptions?: Record<string, (item: T) => boolean>;
+    defaultFilter?: (item: T) => boolean;
     resolveItem?: (value: I) => T | undefined;
     isEnabled?: (item: T) => boolean;
     safeModeHint?: {
@@ -114,8 +116,10 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     const [search, setSearch] = useState("");
     const [enabledOnly, setEnabledOnly] = useState(false);
     const [sortFn, setSortFn] = useState<((a: T, b: T) => number) | null>(() => null);
+    const [filter, setFilter] = useState("");
     const { bottom: bottomInset } = useSafeAreaInsets();
     const navigation = NavigationNative.useNavigation();
+    const matchesFilter = props.filterOptions?.[filter] ?? props.defaultFilter;
 
     useEffect(() => {
         if (props.OptionsActionSheetComponent) {
@@ -134,11 +138,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         let values = props.items;
         if (props.resolveItem) values = values.map(props.resolveItem).filter(isNotNil);
         const items = values.filter(item => isNotNil(item) && typeof item === "object"
+            && (!matchesFilter || matchesFilter(item))
             && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
         if (!search && sortFn) items.sort(sortFn);
 
         return fuzzysort.go(search, items, { keys: props.searchKeywords, all: true });
-    }, [props.items, props.isEnabled, sortFn, search, enabledOnly]);
+    }, [props.items, props.isEnabled, sortFn, search, enabledOnly, matchesFilter]);
 
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };
@@ -150,7 +155,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         }
     }, []);
 
-    if (results.length === 0 && !search && !enabledOnly) {
+    if (results.length === 0 && !search && !enabledOnly && !filter && !props.ListHeaderComponent) {
         return <View style={{ gap: 32, flexGrow: 1, justifyContent: "center", alignItems: "center" }}>
             <View style={{ gap: 8, alignItems: "center" }}>
                 <Image source={findAssetId("empty_quick_switcher")!} />
@@ -195,6 +200,15 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 />}
             </View>
             {props.isEnabled && <TableSwitchRow label="Enabled only" value={enabledOnly} onValueChange={setEnabledOnly} />}
+            {props.filterOptions && <Button variant="secondary" size="sm" text={filter || "All plugins"}
+                onPress={() => showSimpleActionSheet({
+                    key: "AddonListFilters",
+                    header: { title: "Filter plugins", onClose: () => hideActionSheet("AddonListFilters") },
+                    options: ["", ...Object.keys(props.filterOptions!)].map(name => ({
+                        label: name || "All plugins",
+                        onPress: () => setFilter(name),
+                    })),
+                })} />}
             {props.ListHeaderComponent && <props.ListHeaderComponent />}
         </View>
     );
@@ -209,7 +223,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>
                     <Image source={findAssetId("devices_not_found")!} />
                     <Text variant="text-lg/semibold" color="text-default">
-                        {enabledOnly && !search ? "No add-ons are enabled." : "Hmmm... could not find that!"}
+                        {filter ? "No plugins match these filters." : enabledOnly && !search ? "No add-ons are enabled." : "No add-ons found."}
                     </Text>
                 </View>}
                 contentContainerStyle={{ padding: 8, paddingHorizontal: 12, paddingBottom: 90 }}
