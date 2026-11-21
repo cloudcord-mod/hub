@@ -48397,6 +48397,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       throw new Error("Invalid text or length");
     return decoded;
   }
+  function canRememberCxAppearance(document) {
+    return document.kind === "theme" || Boolean(document.permissions?.length && document.permissions.every((permission) => permission === "appearance.hide" || permission === "appearance.style"));
+  }
   function searchCxCatalog(entries2, search, category = "All") {
     if (category !== "All")
       entries2 = entries2.filter((entry) => entry.categories?.includes(category));
@@ -53699,7 +53702,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Animate avatars, banners, and server icons",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "6ca0d83b5f1187005ec249c75c2bb955b5ab0bfacb66607ab148b6648dd40139"
           },
           {
             name: "AmoledMode",
@@ -53707,7 +53711,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "use black backgrounds in dark mode",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "bf99224c4afbbf358e4d46d6c6ab292bbde63d4d7188452e02dde9fbab2ba125"
           },
           {
             name: "AnonymiseFileNames",
@@ -53762,7 +53767,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Format displayed server channel names as titles",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "435eb8c7dfa38e86a016810782e3bc2cd1879beedbd5095c9da1a6e56bbd4801"
           },
           {
             name: "BetterGifAltText",
@@ -53804,7 +53810,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "increase code block text size",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "efb77c30e8dd184ced6e1426a7834003f56516d087dbec5e777d8e1b0b594b9b"
           },
           {
             name: "BiggerJumboEmojis",
@@ -53821,7 +53828,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "make server icons larger",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f8130f30395716696cf844097fad053f7be44394cbf888bc1188bdd1e30e2432"
           },
           {
             name: "BlockKeywords",
@@ -53837,7 +53845,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "conceal chat images and videos until you reveal them",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "cc7408046bf4b402423ea2b0819358ff2ab9c3da9848a1e514985907aaca0598"
           },
           {
             name: "BlurNSFW",
@@ -53845,7 +53854,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "conceal attachments in age-restricted channels until you reveal them",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "e3edcc2c4aa6e765b04dcb42f0c57c97847f458f856da79368398f677b71b128"
           },
           {
             name: "BoldText",
@@ -53902,7 +53912,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "center the message list on wide screens",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "b83a7ec1531049c64d41b5b2401a77ad421f81966abb0957703cbb3757b96d71"
           },
           {
             name: "ChatButtonsBegone",
@@ -53912,7 +53923,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433"
           },
           {
             name: "ClapText",
@@ -53932,7 +53944,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Remove decorations from displayed channel names",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "c8c232817b30c0a5dd3cd694d9a1da0fbb7156039cdf59dbb1b932a124c004cc"
           },
           {
             name: "ClearURLs",
@@ -53956,7 +53969,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "apply the CloudCord accent",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "980c573677ccb78c99e84cb288cf401ae3ecd11dc5d5436b4cd0fc145c5e3780"
           },
           {
             name: "Color Converter",
@@ -53988,7 +54002,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "tint inline mentions purple",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "84ed334d7bbfa85c7c10f1ce59c128908e80a62f7442539ba51f0dfb0c24fa16"
           },
           {
             name: "CompactCompose",
@@ -54005,7 +54020,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "reduce the spacing in the server member list",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "21cb8ff0a28cec1a5d7a550d3ac698ae54d2cdcea9824ab27c8767945fea0eba"
           },
           {
             name: "CompactMessages",
@@ -54152,7 +54168,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL \u2022 [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL \u2022 [relative]",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "5f19c067a66226d3e35e1a88bbdffa11e01b993a315630ad0e5c9c18de0e803e"
           },
           {
             name: "Dashless",
@@ -54160,7 +54177,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Replace hyphens with spaces in text channel names",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9"
           },
           {
             name: "Days Between",
@@ -54181,7 +54199,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "581e52ce690890cda2febcff0b8afdc8a7b8e45496f33d3d3dad1e1952d71b8d"
           },
           {
             name: "DecodeBase64",
@@ -54197,7 +54216,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "dim channel names without unread messages",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "160f84b67cdbe906ff267e13c45e81408f856278e15e24e2286e5b66e88c0663"
           },
           {
             name: "Discord Timestamp",
@@ -54217,7 +54237,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Round relative timestamps down",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "fb96d0a8d75d3d356b8fd7a704d9e33da540ec46dcf55ff268f2de79ae842880"
           },
           {
             name: "DoubleClickEdit",
@@ -54294,7 +54315,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Remove the extra blank line after fenced code blocks",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "38be5817842b779d1c8c9dcd688ef0755dbc9370e7832efbbe90c72399c1074b"
           },
           {
             name: "FixFileExtensions",
@@ -54318,7 +54340,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "lift the chat bar above the bottom edge",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "b4b49e60f8315c58d1ad9a85a7fffb53dfc8a06111c395ad419f6b5ab12a23b9"
           },
           {
             name: "FocusMode",
@@ -54343,7 +54366,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Show the server owner\u2019s native crown in the member list",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "edc36d4471c31f6f755970457bfc7cfbb465664f77dc2974bdf19b287052ce0a"
           },
           {
             name: "foreignCopyHandler",
@@ -54402,7 +54426,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the active friends panel",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "3ea10b3241ba84c918d96f0c98c1b365c4e0f2c9a3014fa429ed7a3b2c5d4361"
           },
           {
             name: "HideAddFriendHint",
@@ -54419,7 +54444,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the add-a-server button",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f"
           },
           {
             name: "HideAppsButton",
@@ -54427,7 +54453,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the chat apps button",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "fb41efeee2bee264d504b42efa8f3db918e48e61a9db15519f3c180eeebbbae6"
           },
           {
             name: "HideAvatarDecorations",
@@ -54436,7 +54463,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "af04631611ed161cb774835f80057bedb39a04a347cc9c7862a25db7ec22af1f"
           },
           {
             name: "HideBadges",
@@ -54445,7 +54473,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "7534988c55ea4ec909649c757c024e770e0257e7fbb301c010fce5cd98f3d9a2"
           },
           {
             name: "HideBlockedAndIgnoredMessages",
@@ -54461,7 +54490,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the server boost progress bar",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "812688497568203e8e885e392fdfce9b4797a09ad2ceaf1d970a7b863f9e9b03"
           },
           {
             name: "HideBotTags",
@@ -54469,7 +54499,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide APP and BOT tags",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e"
           },
           {
             name: "HideCallButtons",
@@ -54478,7 +54509,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Voice & calls"
-            ]
+            ],
+            appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4"
           },
           {
             name: "HideChannelTopic",
@@ -54486,7 +54518,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide channel topics",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "79414d895258b347a6dc13cba58453948a75bb443e8bdc7ddc54f40e94b5a3c4"
           },
           {
             name: "HideCharacterCount",
@@ -54494,7 +54527,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the chat character counter",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113"
           },
           {
             name: "HideClanTags",
@@ -54502,7 +54536,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide server tags",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "6d2231275be6c0e73ae8d96c0540194b7f13e1b24703a1ae7b979a930091d921"
           },
           {
             name: "HideCustomStatuses",
@@ -54510,7 +54545,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide custom statuses in the member list",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "549b5cc6629e0f3cc22555035bb96816d9308806a2bf71f2c320eee04f82dc7d"
           },
           {
             name: "HideDisabledEmojis",
@@ -54518,7 +54554,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide unavailable emoji in Discord\u2019s emoji picker",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "0e8e0b52055839b1fb48d75d078ff2945b3b7cc483df10b1939c0ebcd189785d"
           },
           {
             name: "HideDiscoverButton",
@@ -54535,7 +54572,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the search button in the DM list",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "79f297b8d184eb4122607ece68a542b4d27faf21f99acf347627bf7a223de877"
           },
           {
             name: "HideDownloadAppsButton",
@@ -54552,7 +54590,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the edited label in chat",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "be1701f3faa67f91bd4235618a65a9b18df050c0f6650334a2c71687fecee447"
           },
           {
             name: "HideEmbeds",
@@ -54560,7 +54599,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide link embeds in chat",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "2abec10ac8fe9ee6a8e8c6c66263ca400056ef1f2227dcd7dd259f9d25a17fde"
           },
           {
             name: "HideEmojiButton",
@@ -54568,7 +54608,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the composer expression picker shortcut",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "14be6bcbbb139ddab33206f05050697b5d9c13b8b0047356a96c56ef88e5cd20"
           },
           {
             name: "HideEmptyFolders",
@@ -54576,7 +54617,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide empty expanded server folders",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "1724bea813368f7e907c921f341adf457f98769eb360c0a9be46deef5e0bd9a7"
           },
           {
             name: "HideFriendRequestsBadge",
@@ -54584,7 +54626,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the pending friend requests counter",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "111bc312069e6c29234d3675d597cd7c35bae9f8d2f21868e4a806ce23ab1e36"
           },
           {
             name: "HideGifButton",
@@ -54592,7 +54635,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the GIF picker shortcut",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "d7af74fc801892989cd4bed7856bf4f73b673f8e14548316368442fd81e166cf"
           },
           {
             name: "HideGiftButton",
@@ -54600,7 +54644,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the chat gift button",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "d1392300974c2c311c2ba67e55d4dd5340d720455db58c084beb4e7a867e46b0"
           },
           {
             name: "HideGuildBoostTag",
@@ -54608,7 +54653,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the server boost gem",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "cfa92d873cfda042a72a953595c6f4a12855f7a4c62838e76d5e9436aa533eff"
           },
           {
             name: "HideHelpButton",
@@ -54616,7 +54662,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the Help entry",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "e8ed06f3a9370cfa1b44db2ee4ba4deb0e406c48e524f1870b8d84f03936666f"
           },
           {
             name: "HideImageAltText",
@@ -54624,7 +54671,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the image description control",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "d27a5ece853912fb32212eac8041d3481610ca40de40187d47643652183fe017"
           },
           {
             name: "HideInboxButton",
@@ -54632,7 +54680,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the notifications entry",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "bb7b7b3ae1cc8d09f3bc0ae5a2fa0a60658f118f5eb4fea73772e8a9f1f8fad5"
           },
           {
             name: "HideJoinMessages",
@@ -54648,7 +54697,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the jump-to-present bar",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "25897139625060ef49ccc528560da8c0ddb33ff1db9b774e757ba40650703a7d"
           },
           {
             name: "HideKeyboardTips",
@@ -54665,7 +54715,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide game and music activity text in the member list",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "efcbd78248bb6f5d22c117a37c14dbf80295b01a55761aee8866dbba3a7f0dda"
           },
           {
             name: "HideMemberListButton",
@@ -54682,7 +54733,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide mention count badges",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "71ff42f973686ad65b32085da67363ea82e0ddace83c2b3f3091f855bce2eaef"
           },
           {
             name: "HideNameplates",
@@ -54690,7 +54742,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide nameplates",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "a1a4921ec50253e74f70cee18c4210151654b56ab3af47085be01cb56028aa58"
           },
           {
             name: "HideNewMessagesBar",
@@ -54698,7 +54751,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the new messages bar",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "ef764695aecc37b3f4bb92bddd58eb030ea64d1afe8dc32b1c4c00281bec0b70"
           },
           {
             name: "HideNitroTab",
@@ -54706,7 +54760,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the Nitro entry",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "77819d3881314900b8285f3145480dda07dbb4dd98a136765979e14f1e2d2706"
           },
           {
             name: "HideNotificationBell",
@@ -54714,7 +54769,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the channel notification settings shortcut",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "7ba7ebf67f69bf87b478780c25dc22ee79e44f0f381e0339fbc78c50ace61320"
           },
           {
             name: "HidePinsButton",
@@ -54722,7 +54778,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the pinned messages shortcut",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67"
           },
           {
             name: "Hide Profile Banner Images",
@@ -54730,7 +54787,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide Discord-hosted profile banner images except your own and those of friends",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "c2654ca55ea9bf9aa21d8bb1cef13879d1c933a0c6c9ed27d5917ef051ec10db"
           },
           {
             name: "HideProfileConnections",
@@ -54739,7 +54797,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "67db92b87e8fbbb17a52ec3362fdc70a6e0954b7d12788a893e4c5ceb0f70770"
           },
           {
             name: "HideProfileEffects",
@@ -54748,7 +54807,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "8110c30799aff6431793b0a0c777fdda3acf3eea1ece8723bf08b4d08124acd3"
           },
           {
             name: "HideProfileFriendRequestBanner",
@@ -54767,7 +54827,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "679a2cd8c5a444c7897181afbcd449254c80d87cfe5025194459bc8bba4f1904"
           },
           {
             name: "HideProfileNotes",
@@ -54776,7 +54837,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "44621fb025c00ea1584c339676b98267d76beef6faba3d1da94312ab63b15e83"
           },
           {
             name: "HideQuestsTab",
@@ -54784,7 +54846,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the Quests entry",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe"
           },
           {
             name: "HideReactions",
@@ -54792,7 +54855,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide message reactions",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58"
           },
           {
             name: "HideReplyPreviews",
@@ -54800,7 +54864,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide reply previews in chat",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "52b8a30f8c997d36d491a0ba44775a6c8245f58d14b93596a19138806198994c"
           },
           {
             name: "HideRoleIcons",
@@ -54808,7 +54873,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide role icons",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "cc6561a15d7e0cbffb8b492de879e458ca8cfa52510a8081e8614e9f589037fa"
           },
           {
             name: "HideScrollbars",
@@ -54816,7 +54882,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide scroll indicators",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "1e5b73d640f3b1547ed99a62cdd5f416c1750649ee6e41f534ffa024888bcc6f"
           },
           {
             name: "HideSendButton",
@@ -54824,7 +54891,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the chat send button",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "2c963173d276b2197c7e2228e8e884b0561a6b26b52b219408a2369030346419"
           },
           {
             name: "HideServerBanner",
@@ -54832,7 +54900,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the channel list server banner",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "825488db0fc80c0d1087857297d001e600e4f5a1d5df8f6d3c3c683800448993"
           },
           {
             name: "HideShopTab",
@@ -54840,7 +54909,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the Shop entry",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d"
           },
           {
             name: "HideSpoilerWarnings",
@@ -54848,7 +54918,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the spoiler label on images",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "5319d784ea12ca01dd954473ebb2feee7755dea7b5714f7dfaa4c7026e9e46f6"
           },
           {
             name: "HideStatusEmojis",
@@ -54856,7 +54927,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide emojis in custom status bubbles",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "863bbb51f3b1d5c1c32cd6c8bbf52e32b16f9a6bd64f94a36d06f32eea77fea3"
           },
           {
             name: "HideStickerButton",
@@ -54864,7 +54936,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the sticker picker shortcut",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "7aa0a5bdf382195bf48b3579640eb8a1ab819a0b8e480fe8b34f6a571e2542db"
           },
           {
             name: "HideStickerPickerPromotions",
@@ -54890,7 +54963,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide stickers in chat",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "26af7d108cb384ee165e988d7d79c0f6c341bcf0682b782d8f811e6c4ce4362f"
           },
           {
             name: "HideStreamPreviews",
@@ -54899,7 +54973,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Voice & calls"
-            ]
+            ],
+            appearanceRevision: "39126a76c6a90f2543527630c56c35b8cd483983a7e67791f500282771082792"
           },
           {
             name: "HideSuggestedChannels",
@@ -54907,7 +54982,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the suggested channels section",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "3f1a5c689eb15245e51159b852079aa18b3d56764577b8d55489097b53b47523"
           },
           {
             name: "HideSystemMessages",
@@ -54932,7 +55008,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the threads shortcut in the channel header",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "918d45b9050ba06227cf5eed87a6476f74f2a309de65e50aca40f081e744ddc6"
           },
           {
             name: "HideTimestamps",
@@ -54940,7 +55017,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide timestamps next to chat messages",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "b584410226ed8ce4eb10775147be265d2aad4d6012abd6c537babfad719e0225"
           },
           {
             name: "HideTypingIndicator",
@@ -54948,7 +55026,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the typing indicator",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "035f5b85de90d37291a4b4d18e5b93fad7fd1573a7c79c817cb385c63fbeefd4"
           },
           {
             name: "HideUnreadPills",
@@ -54956,7 +55035,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the server sidebar unread pills",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "56e95404c1b3e0a231fad41928c51b64335d1d860b05c6be59dc011565e6c67b"
           },
           {
             name: "HideUploadButton",
@@ -54964,7 +55044,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the chat attachment button",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "db36f02eba4a10f9e178f62ad8e1fc3e1c4dc9dfe6ad1bf6035b8865c4f75a50"
           },
           {
             name: "HideUserPanelActivity",
@@ -54992,7 +55073,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             categories: [
               "Appearance",
               "Voice & calls"
-            ]
+            ],
+            appearanceRevision: "208bcea2901031db1d7d2886d1fd0f43d98dcfc3582575a4f0730e8dd1ff9703"
           },
           {
             name: "HighContrastText",
@@ -55000,7 +55082,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "increase text contrast",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "450fe577d86be53325a97156868b1f133e40e2b4ee7c6af192af6088ed8d1332"
           },
           {
             name: "High-Res Profile Images",
@@ -55016,7 +55099,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "underline message links",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "a2e2fcce45df9c3e2de2a515e855253a8f6ae628eb47bced7183b6d28decd47b"
           },
           {
             name: "HighlightMentions",
@@ -55024,7 +55108,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "highlight messages that mention you in purple",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "b00cc04f69a6004ac674f5cbb07e97d89a63d30edc401603a1fe32a84fc1338e"
           },
           {
             name: "HoldYourTongue",
@@ -55279,7 +55364,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "fade muted channels",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f166437a88049bb693e0cca5b500a3a004e91e52460f39e365fd75852a9c043c"
           },
           {
             name: "NarrowChannelList",
@@ -55287,7 +55373,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "make the channel list narrower",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "fdbcac8355b73639ee9b16590905b1c4167ab73837d064b157a4a6c58327ee2c"
           },
           {
             name: "Nepeta'sTypingQuirk",
@@ -55303,7 +55390,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "reduce interface animations and transitions",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f8ebaab96f09ceb0e1b13020777a22a92237d0cba2f937fdd047213d92818d6d"
           },
           {
             name: "NoBlockedMessages",
@@ -55319,7 +55407,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "remove the chat bar border and shadow",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "89679b574b204ad7982449213caaa672c6d2f25239384b7cec57a77c31cc1e41"
           },
           {
             name: "NoConfirmPin",
@@ -55352,7 +55441,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Show chat attachments individually without the media grid",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "8307a41cf1c546ccf7519ef83129026d7b49680012112e359bf30b2f3fbb4d74"
           },
           {
             name: "NoPendingCount",
@@ -55360,7 +55450,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide the pending friend request count",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "e96b70311d701d8abd7cb2852a61de587e08d74d7ffe3590a2d589219c38f8b0"
           },
           {
             name: "NoProfileThemes",
@@ -55368,7 +55459,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide other users\u2019 theme colors when their profiles load",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "9972b70c1d03c430f47e9f9ffeb71d1838ac8d0a88f54a7d6bd79864705fe341"
           },
           {
             name: "NoReplyMention",
@@ -55392,7 +55484,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Hide role section headers in the server member list",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f1ce7ba52e681796b04ab7f8deea39c636a835ad41a5edefea848015480d79e3"
           },
           {
             name: "NoServerEmojis",
@@ -55400,7 +55493,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Show only standard Unicode emoji in chat autocomplete",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "84d354572e2b0444401fdec60efad09b85d564890fd509153c89d7a84775095f"
           },
           {
             name: "NoShadows",
@@ -55417,7 +55511,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Keep Discord's typing dots still",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "33ca72b51483126bf3dd4f9e40adb8ef725d2b01edc0beafcf567cd84e6f5f9a"
           },
           {
             name: "NoUnblockToJump",
@@ -55529,7 +55624,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "limit the width of long message lines",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "e30b087d4786298624d546ab6a0b4832e6091f12cd6ff3ce0b48d5386144f214"
           },
           {
             name: "ReadableSpoilers",
@@ -55537,7 +55633,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "outline concealed spoilers",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "47032e939cf4992d24d2cebdf4ffb7e2d8afe49fffa2dcba7d9a08921cf75853"
           },
           {
             name: "RealtimeTimestamps",
@@ -55546,7 +55643,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             keywords: "Format compact timestamps as HH:mm:ss Format tooltip timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss Format markdown timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "f1714e6be55c954394bb91974ab838b366e4cc70f0428848bfcef46a51aca753"
           },
           {
             name: "RelationshipNotifier",
@@ -55609,7 +55707,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "round server icons",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "22777f8ac8216a937b033f1fdbf1c3d48c985ac2f75a6d1a6d5593ff180ff3fe"
           },
           {
             name: "RoundedAvatarsSquare",
@@ -55626,7 +55725,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "round the chat bar",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "a1b819ce91635dd9353e95423d84f0334072934369d4d60635ba720593976761"
           },
           {
             name: "RoundedImages",
@@ -55701,7 +55801,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Show the song title in Spotify activity status",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "a1198a0081e2aa6e20ff9ef087da55aa322a18eb8009cd406f2a0bafc7a3fa8d"
           },
           {
             name: "Signature",
@@ -55818,7 +55919,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Show the most-used reactions first under each message",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "b8d8985cd6abc4573eb4451047e4824fa844e2adc576e5a7e2427a0d2e506ff8"
           },
           {
             name: "SpaceOut",
@@ -55961,7 +56063,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "make the chat input background translucent",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e"
           },
           {
             name: "Trim Lines",
@@ -56114,7 +56217,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "make the channel list wider",
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "fde7b45ab2285ac096cbcf3aca158b346ce52df7503790fcb09291ed9ee63fd2"
           },
           {
             name: "WiderChat",
@@ -56178,7 +56282,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: midnight_default,
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "4e9907287b797ad8e3135b4ef457108b283cdf321a01c088a81464f980d0d9d3"
           },
           {
             name: "BasicBackground (Chat)",
@@ -56186,7 +56291,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "054f8d51b0fc89d53944035c8ca6f94e091c4c360d9258acbcafb8a45f302e2f"
           },
           {
             name: "Blue Hour",
@@ -56194,7 +56300,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "0386299737d6d00e094ce5350b6cff918935443254c52a361d1dfbf13033ece6"
           },
           {
             name: "Catppuccin Frapp\xE9",
@@ -56202,7 +56309,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "0d8378b2ec457390fe9a0ba6f18db95294cfb2aabdc5d64aea7b50f18426b100"
           },
           {
             name: "Catppuccin Latte",
@@ -56210,7 +56318,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "d0056ad86011ef8e9f4cd47b8be7a33e0d41bc7f84f298d16ddc19df86fd304a"
           },
           {
             name: "Catppuccin Macchiato",
@@ -56218,7 +56327,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "a63892c09b4cb05dac9f3d62fa4210383ba0cd17977e97fbf1d5bb78d00605c4"
           },
           {
             name: "Catppuccin Mocha",
@@ -56226,7 +56336,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "dea8e5985299a840feaee9aaf865dbb24b434f4306ad91d00d4d1e7422ad0b58"
           },
           {
             name: "Moss",
@@ -56234,7 +56345,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "c6e25dea4ec16cdf828e2dc41d89ef279ee4679fa5924dd414de98cea3036bd9"
           },
           {
             name: "Dracula for BetterDiscord",
@@ -56242,7 +56354,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "61facaae4dbc56a40c510dba098b91f22b3c5cc8e67150624b2565be66e4a650"
           },
           {
             name: "Dreamy",
@@ -56250,7 +56363,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "54c2d353923f273ee070f29c37ccae073f7aa49fc6fda127ef61d7ead118588c"
           },
           {
             name: "Edgerunners - Night City Gradient",
@@ -56258,7 +56372,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "bd34b139f2df5d8222c1091382a2d55a1d20f92923658ed18b8e390fbffde450"
           },
           {
             name: "Lotus",
@@ -56266,7 +56381,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "2378296e299cec80f563de5767f0074064d01e0894c6edbec92bf6aaaa653a68"
           },
           {
             name: "Mars",
@@ -56274,7 +56390,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "064955f279050b8f9e05c6a6ac1b92ba5e5b05f83f1fbf0f76c8100f01bf00dd"
           },
           {
             name: "Mist",
@@ -56282,7 +56399,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "5eda3d13f7cd685b5d9a926ef54c7b4fdc3a6797521eae2adb40077672e31a7e"
           },
           {
             name: "Nord for Enmity",
@@ -56290,7 +56408,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8d1fa639ec7ab53ce9e7108621d189c52cb08e62fdaa6fed6f4c1c56928ee693"
           },
           {
             name: "Futuristic - Aurora",
@@ -56298,7 +56417,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "5dd507878b56afb7d305b27416bf211957d99a6165a15a944af66d2c27b9a572"
           },
           {
             name: "Futuristic - Ice",
@@ -56306,7 +56426,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "ec5f1d1e22dcea298b0b9c282b2abd7b39ff3da8c00de02f0aa07151a379efe7"
           },
           {
             name: "Futuristic - Nebula",
@@ -56314,7 +56435,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "97ec98070234e873cd50b986ddd2184034d1931e0bef7638cb4069f0ddb1f069"
           },
           {
             name: "Futuristic - Orbit",
@@ -56322,7 +56444,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "4eae2c88dd40aafabbe9a17c550ac456c27bdbb3cd4ad10a0664dcc8f50f5444"
           },
           {
             name: "Futuristic - Void",
@@ -56330,7 +56453,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "15b29781a0caa1dae8bdcfaa285f4e896918b7776369e55d43d65ee72069f45d"
           },
           {
             name: "Glorious Sunset",
@@ -56338,7 +56462,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8a70d3ad2417131c3b4cfd0082523649664758d0bbb3d75516243b8dc2626497"
           },
           {
             name: "Midnight - Catppuccin Macchiato",
@@ -56346,7 +56471,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "43bf4f4279158655f8cda0d1c9a295998ff7012d0d9d92229e3d47854b975471"
           },
           {
             name: "Midnight - Catppuccin Mocha",
@@ -56354,7 +56480,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "38bf70e0cc06f2237c9cc89a62757444a349d51f92db9f7843878ecbb10898ac"
           },
           {
             name: "Midnight - Default",
@@ -56362,7 +56489,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "894510140f58a0e5f491697f63fa9ef4eee95878bbb2968b09cde212d116f5b0"
           },
           {
             name: "Midnight - Light",
@@ -56370,7 +56498,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "34a14233074f55738303c55888c084270ae55ce5c903861ddd5e52b8b05c4195"
           },
           {
             name: "Midnight - Lilypichu",
@@ -56378,7 +56507,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "711136f234daf2470d6803e68e5b54cc2e34480803f8ac41d02ff3aaa5fc665f"
           },
           {
             name: "Midnight - Nord",
@@ -56386,7 +56516,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "04993720c50a3536b29c172b96ff6431ca888344e05acfb7c5d7ffdd5e43032a"
           },
           {
             name: "Midnight - Ros\xE9 Pine Moon",
@@ -56394,7 +56525,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "fc10d89c6815c8f5fcbc2cf43cca98b65b200d4079950b6368861793de82061f"
           },
           {
             name: "Midnight - Ros\xE9 Pine",
@@ -56402,7 +56534,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "a5f039662949280534daddda0ca42602927ee9542fa64818e4ff95ed3f9316ec"
           },
           {
             name: "Midnight - Tokyo Night",
@@ -56410,7 +56543,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "c39cf63fad06a256b35535681bfcb992e1233d8304c569d6a0cf9b053304b38c"
           },
           {
             name: "Midnight - Vencord",
@@ -56418,7 +56552,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "4aa6604b3d7814c65c97b4a0ddaf9daa298c7f3be5891fc3a741777468a2de62"
           },
           {
             name: "Cream Yellow v1.3.4",
@@ -56426,7 +56561,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "26624e037a063447b3d886dcb1a8ece07557749f8c334b400668db156f951d68"
           },
           {
             name: "Gruv Yellow v3.3.4",
@@ -56434,7 +56570,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "3016b574adb893548ca506feae0a9025ac35765856f1c0dc9ca32687632079cd"
           },
           {
             name: "Ratio Redesigned v1.1.3",
@@ -56442,7 +56579,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "072d08d50ec89112bfdcdc5fb778c53772bd131ffb6ceee8cbbf731aeedfb846"
           },
           {
             name: "Ratio v1.1.3",
@@ -56450,7 +56588,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "c6dda6e92ac76fff072ae38b2906b285be7864f7c021e1e9ea3f246e74f069cb"
           },
           {
             name: "Scarlet Love v1.0.5",
@@ -56458,7 +56597,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "36a48b6bf3dc2596d3c7fc8ac724a83a40040a94c3f3696ead96974605a46c5b"
           },
           {
             name: "Vendetta Teal v1.2.3",
@@ -56466,7 +56606,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "42da0e4673acb2e00b3adf43c79559fc1a79b68c5f120b578016a1b27baad25e"
           },
           {
             name: "Catppuccin Frapp\xE9 - Flamingo",
@@ -56474,7 +56615,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "f08d6ea467ef0166e94b4c3af64a8c33156b0b765d6fdc0bc1dd567ed9541e2f"
           },
           {
             name: "Catppuccin Frapp\xE9 - Green",
@@ -56482,7 +56624,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "a87e865490afc529ba7eecb0bb91477fd5d04022419e02a0d09712aea3ac8fd0"
           },
           {
             name: "Catppuccin Frapp\xE9 - Lavender",
@@ -56490,7 +56633,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "a17c446147b870aac25df0affc5067e6649bb5415d2b28af39ceb424b08521b4"
           },
           {
             name: "Catppuccin Frapp\xE9 - Maroon",
@@ -56498,7 +56642,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "90d511574f3499c8bec53c532114b57b78758f7c6be554ee2384eb8580570f68"
           },
           {
             name: "Catppuccin Frapp\xE9 - Mauve",
@@ -56506,7 +56651,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "cf4a46db9f13ebb3bbc5b71719612e021d6f491ac02e0199d1179d9511ebe1d7"
           },
           {
             name: "Catppuccin Frapp\xE9 - Peach",
@@ -56514,7 +56660,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "05e94f878ceab7930a83e665615dad67c18bcdb0641a317eb102d593f700bc02"
           },
           {
             name: "Catppuccin Frapp\xE9 - Pink",
@@ -56522,7 +56669,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "3afbf6d781be04ad6338f2b562ead2c5b8a0b4d705617755379d2826b8676697"
           },
           {
             name: "Catppuccin Frapp\xE9 - Red",
@@ -56530,7 +56678,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "14fdfc12e7bbc427d0937629450a99f6fba3acdc144ecbb46704f17e15ccf0e2"
           },
           {
             name: "Catppuccin Frapp\xE9 - Rosewater",
@@ -56538,7 +56687,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "758ce613c4bcf83d8be8ae44942403394d697df7c2ab13e342a942461a2f8991"
           },
           {
             name: "Catppuccin Frapp\xE9 - Sapphire",
@@ -56546,7 +56696,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "cbb481c19dd1a73ac072a32e0820ffdc2d2e5ac139dd00180e71e82bc6c26df3"
           },
           {
             name: "Catppuccin Frapp\xE9 - Sky",
@@ -56554,7 +56705,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "800c725c8f895a5e32566bae5c97427bdd193660ea69c300d09ca2d044719683"
           },
           {
             name: "Catppuccin Frapp\xE9 - Teal",
@@ -56562,7 +56714,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "6f8c8caf0de1d33c0e35ea5c1c0189cc93387a90c8a5537909dbcc5487eeca77"
           },
           {
             name: "Catppuccin Frapp\xE9 - Yellow",
@@ -56570,7 +56723,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "9fa20e67f5bd3c83a55024a50be2718cfe17ae9e010e7a699eb528739d3ac98f"
           },
           {
             name: "Catppuccin Latte - Flamingo",
@@ -56578,7 +56732,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "feeacc16c93bb0b4a9952b9015cc067361ce2d629ecd915216cd15798aae1c07"
           },
           {
             name: "Catppuccin Latte - Green",
@@ -56586,7 +56741,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "0681294cd9936516f075b969186fc480f5fa01ea69250d31a4d4d5eee544385b"
           },
           {
             name: "Catppuccin Latte - Lavender",
@@ -56594,7 +56750,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "bb4dbeeafccce0dec29e722bd1de26b986c5dc2b3cc3d17041b838da93dbc8b5"
           },
           {
             name: "Catppuccin Latte - Maroon",
@@ -56602,7 +56759,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8e95d5b7e5e1d0a882f9f9a243b6b844cc266fee73b05f6661642ebfaded0c1b"
           },
           {
             name: "Catppuccin Latte - Mauve",
@@ -56610,7 +56768,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "79f092314e77e22f6a6cd1a5f72cc4271523758a395e322240a328bf4d437ad6"
           },
           {
             name: "Catppuccin Latte - Peach",
@@ -56618,7 +56777,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "e58826e4f7f4d34fbc8a55a1211521c54b504501f03180be5f8465437d188e9f"
           },
           {
             name: "Catppuccin Latte - Pink",
@@ -56626,7 +56786,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8bff43c5a187c1b39a84590eb8910d7aab1657645f9edfcea292a9ce453d40d1"
           },
           {
             name: "Catppuccin Latte - Red",
@@ -56634,7 +56795,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "e3bb58586e5cf720b47b1a58c5572175ce2c60825cf20b0e3899caa2e867ef1f"
           },
           {
             name: "Catppuccin Latte - Rosewater",
@@ -56642,7 +56804,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "531382030af0bf27e0aaf16dcd88207f3e86302d2f97fb21f430e01712265445"
           },
           {
             name: "Catppuccin Latte - Sapphire",
@@ -56650,7 +56813,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "4b42a35235c6f37ea4a163b90d8e6c70e43c855d9fbad7fd43542f9bfe7f3d96"
           },
           {
             name: "Catppuccin Latte - Sky",
@@ -56658,7 +56822,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "cc8e6df1f373b871051286008fa27fa0eaf6d23aed6aeeeb370e05f7ad361bce"
           },
           {
             name: "Catppuccin Latte - Teal",
@@ -56666,7 +56831,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "06716932cc389c844c668d1aedfe4eba6e36b88ad9815198917450963313bf6e"
           },
           {
             name: "Catppuccin Latte - Yellow",
@@ -56674,7 +56840,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8528372a085dbc04243d2b0c5021d433eb524322aba3fc60cbcf6be1a15e3af0"
           },
           {
             name: "Catppuccin Macchiato - Flamingo",
@@ -56682,7 +56849,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "7e4e7f750e1999a2752b9b2bb91bec642bbec153589f1f1145aee47fbecd18d9"
           },
           {
             name: "Catppuccin Macchiato - Green",
@@ -56690,7 +56858,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "1afa801091501ced3b5f136761366bdefefb84e7e6aced366bbcae2a75c3baaa"
           },
           {
             name: "Catppuccin Macchiato - Lavender",
@@ -56698,7 +56867,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "02814d473aea192e79eca9d61d5b8f9ac407bedcbf15de72e543d0c017122ff4"
           },
           {
             name: "Catppuccin Macchiato - Maroon",
@@ -56706,7 +56876,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "0901ba439868759ad2d18817d21a8dff799b17221bb9a520c73f70fbf1237d48"
           },
           {
             name: "Catppuccin Macchiato - Mauve",
@@ -56714,7 +56885,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "b25eca5d6a33493ce235f1aade9f7e1cca2937263824ed20304d37930b79fda9"
           },
           {
             name: "Catppuccin Macchiato - Peach",
@@ -56722,7 +56894,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "b6e48f74f3872d3c3f5a62502022a94db298c4cab8078c4319f6b22a71b08850"
           },
           {
             name: "Catppuccin Macchiato - Pink",
@@ -56730,7 +56903,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "6a24c87411cea824b3bc373a4565ca41d0d4516228fbe9c5a6c799991a2e42c1"
           },
           {
             name: "Catppuccin Macchiato - Red",
@@ -56738,7 +56912,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "b992130f27e1a832d48acedc0afd9ec88eb1813ee09f9a4789b0e78654eb3459"
           },
           {
             name: "Catppuccin Macchiato - Rosewater",
@@ -56746,7 +56921,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "aef96835051958a70be865258b94b3816fc83632d86f67c9965d186f540f5e90"
           },
           {
             name: "Catppuccin Macchiato - Sapphire",
@@ -56754,7 +56930,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8a5c1fef254b1a9c1494e162e52fed8b21a85ad0ae9f4579139ead8564ca8506"
           },
           {
             name: "Catppuccin Macchiato - Sky",
@@ -56762,7 +56939,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "73fc65d919f6a13759b22fd851b596bc88b6a4fc40a99c78fde26c83bd952203"
           },
           {
             name: "Catppuccin Macchiato - Teal",
@@ -56770,7 +56948,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "bf5c83a884476e3e707807b92feaa441796209729cdf759427fae325a8401434"
           },
           {
             name: "Catppuccin Macchiato - Yellow",
@@ -56778,7 +56957,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "450f76aca2c5927dcb13bf15afe755fe171c4dc3b2501280482952a065ec1327"
           },
           {
             name: "Catppuccin Mocha - Flamingo",
@@ -56786,7 +56966,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "0e57272a319f6a59412c0810c73635703f701b26a5dd3d24d8757aff5bc14938"
           },
           {
             name: "Catppuccin Mocha - Green",
@@ -56794,7 +56975,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "ec0a930877e4593a1544752b56ef39f629563270c7998c0317200665ba596752"
           },
           {
             name: "Catppuccin Mocha - Lavender",
@@ -56802,7 +56984,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "64f677eb9f8b20b47c06c87080b5a3bbbcc735981e219049ca890e11b80d7e74"
           },
           {
             name: "Catppuccin Mocha - Maroon",
@@ -56810,7 +56993,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "706601358d51251698e732a5fc45e5ebe24a113b4d2b4e5c50b7ef37b5598b9b"
           },
           {
             name: "Catppuccin Mocha - Mauve",
@@ -56818,7 +57002,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "9e298f90797f8aa47e7187ab5352d45d1e013ef7a4def956a1390589c3ff4677"
           },
           {
             name: "Catppuccin Mocha - Peach",
@@ -56826,7 +57011,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "3021e74309339b390426ff03c0d3b44f4b91029596b05feb1f8adbbb43c8d7c4"
           },
           {
             name: "Catppuccin Mocha - Pink",
@@ -56834,7 +57020,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "c2cba467a5ee42d5a3bd679738cf65d950370e436d20cf8b575bd678a1a27dee"
           },
           {
             name: "Catppuccin Mocha - Red",
@@ -56842,7 +57029,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "a0de7d3f4295123098554e3c8ad228c68b5eb4c9478cb005fe7312ccc6f4adfc"
           },
           {
             name: "Catppuccin Mocha - Rosewater",
@@ -56850,7 +57038,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "fbc9e2040157c8dbda654e961c725b5c99a4aed69051d89ea88483e3ab72cd9f"
           },
           {
             name: "Catppuccin Mocha - Sapphire",
@@ -56858,7 +57047,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "4ed1c1c9e08c642f9e8ea8cadf9d1384a221b9097dd349cf4a3cff6524f05204"
           },
           {
             name: "Catppuccin Mocha - Sky",
@@ -56866,7 +57056,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "cd5207da73ee7cbcc8f5f7c6f844e9f83964a05d7890451ac30bba1971f5fe50"
           },
           {
             name: "Catppuccin Mocha - Teal",
@@ -56874,7 +57065,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "f4b324aeec448f5b5917ab38bc94fabd709b2c3114646eaccc6179b12cd1c5f0"
           },
           {
             name: "Catppuccin Mocha - Yellow",
@@ -56882,7 +57074,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "b8eff6e286e87f97b4a2e8f675add92d976713fbc624442bbf6d42b46f8767fe"
           },
           {
             name: "Ros\xE9 Pine - No Wallpaper",
@@ -56890,7 +57083,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "7bf54ab70c4b700dc37ab68141be23553a4d9bce7bada493e3bd567d5074d416"
           },
           {
             name: "Ros\xE9 Pine",
@@ -56898,7 +57092,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "c5bbe1880d9eda4db6f0a3ecb4a495064f65b7c6369c4d448ba66ebbbbff7a21"
           },
           {
             name: "Ros\xE9 Pine Dawn",
@@ -56906,7 +57101,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Light theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "97511fefd79524aab6d6f3d6a8908ad327ab00c8c9060d436292051080db5b03"
           },
           {
             name: "Ros\xE9 Pine Moon",
@@ -56914,7 +57110,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "d82031119b74df3a0100e743edb02cb38072a062aa5706ac0df6ac997b6eaa16"
           },
           {
             name: "Amoled Orange Mountains",
@@ -56922,7 +57119,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "4c2b60c61c82015179ba317341f2b104d6380b14563fba12f835780690052b34"
           },
           {
             name: "OneColor",
@@ -56930,7 +57128,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "b6b84c7a2ab9edb635b1fe1cc8891a318267b861fa6ff693d70c19f4bcd96996"
           },
           {
             name: "Orange Mountains",
@@ -56938,7 +57137,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "f2348d5ded18a972ba68ce68a61ce5c03567e610c3ab10050d5861df9cd53ff5"
           },
           {
             name: "OrangeOLED",
@@ -56946,7 +57146,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "c72abb0d2e6cf1399c59eff260bc75948f699768f53daf94b58243f815d34b25"
           },
           {
             name: "Pixel City Lite",
@@ -56954,7 +57155,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "20bc30f7d26f8efe63c6cda743a4b5bee41383b18fb2770f2b6105676e551f88"
           },
           {
             name: "Purple Mountains",
@@ -56962,7 +57164,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme \xB7 Wallpaper",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "149b0ff7bef07d592069886284785b97a2f6c21a4df54f254edb86a55cd3dc01"
           },
           {
             name: "Vulcan",
@@ -56970,7 +57173,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             description: "Dark theme",
             categories: [
               "Themes"
-            ]
+            ],
+            appearanceRevision: "8df836c77b9925e1b4f62df058e3bdcf0cf12b191af9e306631f4823fbd32b48"
           }
         ]
       };
@@ -56980,7 +57184,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   // src/core/ui/settings/pages/CxExtensions/index.tsx
   var CxExtensions_exports = {};
   __export(CxExtensions_exports, {
-    default: () => CxExtensions
+    default: () => CxExtensions,
+    restoreRememberedCxAppearance: () => restoreRememberedCxAppearance
   });
   function registerTimestampFormats(formats) {
     if (!stopTimestamps) {
@@ -59645,6 +59850,60 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function supportsMobileHide({ target }) {
     return !("desktopOnly" in cxAppearanceTargets[target]);
   }
+  function readRememberedAppearance() {
+    var records = settings.cxRememberedAppearance;
+    if (!Array.isArray(records))
+      return [];
+    return records.slice(0, 16).filter((entry) => typeof entry?.name === "string" && typeof entry.revision === "string" && Array.isArray(entry.selected) && entry.selected.every((target) => typeof target === "string"));
+  }
+  function forgetRememberedAppearance(name) {
+    settings.cxRememberedAppearance = readRememberedAppearance().filter((entry) => entry.name !== name);
+  }
+  function rememberAppearance(entry, replaceTheme = false) {
+    var remaining = readRememberedAppearance().filter((saved) => saved.name !== entry.name && (!replaceTheme || rememberedCatalog.get(saved.name)?.id !== "theme"));
+    settings.cxRememberedAppearance = [
+      entry,
+      ...remaining
+    ].slice(0, 16);
+  }
+  function subscribeRememberedAppearance(listener) {
+    rememberedAppearanceListeners.add(listener);
+    return () => {
+      rememberedAppearanceListeners.delete(listener);
+    };
+  }
+  function refreshRememberedAppearance() {
+    rememberedAppearanceUpdates++;
+    rememberedAppearanceListeners.forEach((listener) => listener());
+  }
+  function restoreRememberedCxAppearance() {
+    if (settings.safeMode?.enabled)
+      return;
+    for (var saved of readRememberedAppearance()) {
+      var entry = rememberedCatalog.get(saved.name);
+      if (!entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== void 0)
+        continue;
+      try {
+        var review = reviewCx(entry.source);
+        if (!canRememberCxAppearance(review))
+          continue;
+        session.enable(entry.source, {
+          ...appearanceHost,
+          toast() {
+          },
+          registerCommand() {
+            throw new Error("Saved appearance cannot register commands");
+          }
+        }, review.permissions, saved.selected);
+      } catch (e) {
+      }
+    }
+    refreshRememberedAppearance();
+    return () => {
+      session.clear();
+      refreshRememberedAppearance();
+    };
+  }
   function CxExtensions() {
     var [source, setSource] = React2.useState("");
     var [showCatalog, setShowCatalog] = React2.useState(false);
@@ -59697,13 +59956,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       })();
     }
-    function enable() {
+    React2.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
+    var remembered = readRememberedAppearance();
+    var catalogEntry = candidate && rememberedCatalog.get(candidate.review.name);
+    var rememberRevision = catalogEntry?.source === candidate?.source ? catalogEntry?.appearanceRevision : void 0;
+    function enable(remember = false) {
       if (!candidate)
         return;
       try {
         if (settings.safeMode?.enabled)
           throw new Error("CX is unavailable in Safe Mode");
         session.enable(candidate.source, {
+          ...appearanceHost,
           registerIncomingRules(rules) {
             var active = true;
             var context = {
@@ -59776,335 +60040,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           registerProfileMenuAction,
           registerSendConfirmation,
           registerTimestampFormats,
-          hideAppearanceTarget(target) {
-            if (!supportsMobileHide({
-              target
-            }))
-              return () => {
-              };
-            var mobile = cxAppearanceTargets[target].mobile;
-            if ("renderTree" in mobile || "renderComponent" in mobile)
-              return registerTreeAppearance(mobile);
-            if ("tableRow" in mobile) {
-              var tableRow = findByFilePath("design/components/TableRow/native/TableRow.native.tsx")?.TableRow;
-              if (!tableRow)
-                throw new Error("Discord's table row is unavailable");
-              var rule = mobile.tableRow;
-              if ("key" in rule)
-                return registerJsxAppearance([
-                  tableRow
-                ], (element) => element.key === rule.key ? null : element);
-              var translations = findByProps("intl", "t");
-              var message = translations?.t?.[rule.subLabelFor];
-              var label2 = message && translations?.intl?.string?.(message);
-              if (typeof label2 !== "string" || !label2)
-                throw new Error("Discord's table row label is unavailable");
-              return registerJsxAppearance([
-                tableRow
-              ], (element) => element.props.label === label2 && typeof element.props.subLabel === "string" ? React2.cloneElement(element, {
-                subLabel: void 0
-              }) : element);
-            }
-            if ("expressionPickerTab" in mobile)
-              return registerExpressionPickerTab(mobile.expressionPickerTab);
-            if ("settingsEntry" in mobile)
-              return hideSettingsEntry(mobile.settingsEntry);
-            if ("hideComponentPaths" in mobile)
-              return registerHiddenAppearancePaths(mobile.hideComponentPaths);
-            if ("scrollIndicators" in mobile) {
-              var scrollViews = /* @__PURE__ */ new Set([
-                import_react_native43.ScrollView,
-                import_react_native43.FlatList,
-                import_react_native43.SectionList,
-                import_react_native43.Animated?.ScrollView,
-                import_react_native43.Animated?.FlatList,
-                import_react_native43.Animated?.SectionList
-              ]);
-              var components = [
-                ...scrollViews
-              ].filter((component) => component != null);
-              return registerJsxAppearance(components, (element) => React2.cloneElement(element, {
-                showsHorizontalScrollIndicator: false,
-                showsVerticalScrollIndicator: false
-              }));
-            }
-            if ("customStatusEmojis" in mobile) {
-              var hideBubbleEmoji = registerJsxAppearance(mobile.customStatusEmojis, (element) => {
-                var { customStatusActivity } = element.props;
-                if (!customStatusActivity?.emoji)
-                  return element;
-                return React2.cloneElement(element, {
-                  customStatusActivity: {
-                    ...customStatusActivity,
-                    emoji: void 0
-                  }
-                });
-              });
-              var hideActivityEmoji = registerJsxAppearance([
-                "ActivityStatus"
-              ], (element) => React2.cloneElement(element, {
-                hideEmoji: true
-              }), true);
-              return () => {
-                hideActivityEmoji();
-                hideBubbleEmoji();
-              };
-            }
-            if ("memberActivityText" in mobile) {
-              var status2 = findByFilePath("modules/activity_status/native/PresenceActivityStatus.tsx")?.default;
-              if (!status2)
-                throw new Error("Discord's member activity renderer is unavailable");
-              return registerMemberRowAppearance(status2, (element) => {
-                var type = element.props.activity?.type;
-                return type === 0 || type === 2 ? React2.cloneElement(element, {
-                  hideText: true
-                }) : element;
-              });
-            }
-            if ("memberCustomStatus" in mobile) {
-              var WithoutCustomStatus2 = function({ originalProps }) {
-                var output = status1(originalProps);
-                if (settings.safeMode?.enabled || !React2.isValidElement(output))
-                  return output;
-                var { children } = output.props;
-                if (!Array.isArray(children) || children.length !== 3)
-                  return output;
-                var [activity, separator, custom] = children;
-                if (!React2.isValidElement(custom) || custom.type !== React2.Fragment || separator != null && (!React2.isValidElement(separator) || separator.props.accessibilityElementsHidden !== true))
-                  return output;
-                return React2.cloneElement(output, {
-                  children: [
-                    activity,
-                    null,
-                    null
-                  ]
-                });
-              };
-              var WithoutCustomStatus = WithoutCustomStatus2;
-              var status1 = findByFilePath("modules/activity_status/native/ActivityStatus.tsx")?.default;
-              if (typeof status1 !== "function" || status1.prototype?.isReactComponent) {
-                throw new Error("Discord's custom status renderer is unavailable");
-              }
-              return registerMemberRowAppearance("ActivityStatus", (element) => element.type === status1 ? /* @__PURE__ */ jsx(WithoutCustomStatus2, {
-                originalProps: element.props
-              }) : element);
-            }
-            if ("emptyServerFolders" in mobile) {
-              return registerJsxAppearance([
-                "GuildsBarGuildFolder"
-              ], (element) => {
-                var { expanded: expanded2, childNodes, isDragPreview, hideExpandedChildren } = element.props;
-                return expanded2 === true && !isDragPreview && !hideExpandedChildren && Array.isArray(childNodes) && childNodes.length === 0 ? null : element;
-              });
-            }
-            if ("mentionBadges" in mobile) {
-              var stopLegacy = registerJsxAppearance([
-                "MentionsBadge"
-              ], () => null);
-              var stopCount = registerJsxAppearance([
-                "Badge"
-              ], (element) => typeof element.props.value === "number" && element.props.value > 0 && "isMentionLowImportance" in element.props ? null : element);
-              return () => {
-                stopCount();
-                stopLegacy();
-              };
-            }
-            if (!("messagePresentation" in mobile))
-              return registerJsxAppearance(mobile, () => null);
-            var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-            return overrideCxMethods(renderer, {
-              default(args, invoke) {
-                var presentation = invoke(args);
-                if (!presentation || typeof presentation !== "object")
-                  return presentation;
-                if (mobile.messagePresentation === "edited") {
-                  if ("edited" in presentation && presentation.edited === true)
-                    return {
-                      ...presentation,
-                      edited: false
-                    };
-                } else if (mobile.messagePresentation === "timestamps") {
-                  if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
-                    return {
-                      ...presentation,
-                      timestamp: void 0,
-                      timestampTooltip: void 0,
-                      timestampAccessibilityLabel: void 0
-                    };
-                  }
-                } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
-                  return {
-                    ...presentation,
-                    stickers: []
-                  };
-                }
-                return presentation;
-              }
-            }, () => !settings.safeMode?.enabled);
-          },
-          styleAppearanceTarget(target) {
-            var style = cxAppearanceTargets[target].style;
-            if ("blurredMedia" in style)
-              return registerBlurredMedia(style.blurredMedia);
-            if ("reducedMotion" in style)
-              return registerReducedMotion();
-            if ("mentionHighlight" in style) {
-              var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-              var highlightColor = (0, import_react_native43.processColor)(style.mentionHighlight);
-              if (typeof highlightColor !== "number")
-                throw new Error("Discord's message highlight color is unavailable");
-              return overrideCxMethods(renderer, {
-                default(args, invoke) {
-                  var message = invoke(args);
-                  if (!message || typeof message !== "object" || !("mentioned" in message) || message.mentioned !== true || !("highlightColor" in message) || typeof message.highlightColor !== "number" || message.highlightColor === 0)
-                    return message;
-                  return {
-                    ...message,
-                    highlightColor
-                  };
-                }
-              }, () => !settings.safeMode?.enabled);
-            }
-            if ("centeredMessageList" in style) {
-              var messages = findByFilePath(style.centeredMessageList)?.default;
-              if (!messages)
-                throw new Error("Discord's message list is unavailable");
-              var centered = {
-                alignSelf: "center",
-                width: "100%",
-                maxWidth: style.width
-              };
-              return registerJsxAppearance([
-                messages
-              ], (tree) => mapAppearanceElements(tree, (element) => element.type === messages ? React2.cloneElement(element, {
-                style: [
-                  element.props.style,
-                  centered
-                ]
-              }) : element));
-            }
-            if ("messageWidthRenderer" in style) {
-              var renderer1 = findByFilePath(style.messageWidthRenderer);
-              return overrideCxMethods(renderer1, {
-                default(args, invoke) {
-                  var presentation = invoke(args);
-                  var input = args[0];
-                  if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number")
-                    return presentation;
-                  var width = style.width * import_react_native43.PixelRatio.getFontScale();
-                  return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width ? {
-                    ...presentation,
-                    constrainedWidth: width
-                  } : presentation;
-                }
-              }, () => !settings.safeMode?.enabled);
-            }
-            if ("drawerWidthDelta" in style)
-              return registerChannelDrawerWidth(style.drawerWidthDelta);
-            if ("compactMemberList" in style)
-              return registerCompactMemberList();
-            if ("renderedComponents" in style)
-              return registerRenderedChannelStyle(style);
-            if ("serverIconScale" in style) {
-              var iconStyle = {
-                transform: [
-                  {
-                    scale: style.serverIconScale
-                  }
-                ]
-              };
-              return registerJsxAppearance([
-                "GuildsBarAnimatedItemWrapper"
-              ], (element) => {
-                var { children, preventClipping, isDragPreview } = element.props;
-                if (preventClipping || isDragPreview || !React2.isValidElement(children))
-                  return element;
-                var icon3 = children.props;
-                if ("source" in icon3 && "style" in icon3) {
-                  return React2.cloneElement(element, {
-                    children: React2.cloneElement(children, {
-                      style: [
-                        icon3.style,
-                        iconStyle
-                      ]
-                    })
-                  });
-                }
-                if (typeof icon3.value === "string" && "size" in icon3 && typeof icon3.animate === "boolean") {
-                  return React2.cloneElement(element, {
-                    children: /* @__PURE__ */ jsx(import_react_native43.View, {
-                      style: iconStyle,
-                      children
-                    })
-                  });
-                }
-                return element;
-              });
-            }
-            if ("spoilerOutline" in style) {
-              var spoiler = findByFilePath("modules/markup/native/Spoiler.tsx")?.default?.prototype;
-              if (typeof spoiler?.render !== "function")
-                throw new Error("Discord's text spoiler is unavailable");
-              var outline = style.spoilerOutline;
-              var stopText = instead("render", spoiler, function(args, original) {
-                var rendered = original.apply(this, args);
-                if (settings.safeMode?.enabled || this.state?.revealed !== false || !React2.isValidElement(rendered))
-                  return rendered;
-                return React2.cloneElement(rendered, {
-                  style: [
-                    rendered.props.style,
-                    outline
-                  ]
-                });
-              });
-              try {
-                var stopMedia = registerJsxAppearance([
-                  "MediaModalSpoilerOverlay"
-                ], (element) => element.props.source?.obscure ? element : React2.cloneElement(element, {
-                  style: [
-                    element.props.style,
-                    outline
-                  ]
-                }));
-                return () => {
-                  stopMedia();
-                  stopText();
-                };
-              } catch (error) {
-                stopText();
-                throw error;
-              }
-            }
-            if ("component" in style) {
-              return registerJsxAppearance([
-                style.component
-              ], (element) => {
-                if ("props" in style) {
-                  return element.props[style.skipWhenTrue] === true ? element : React2.cloneElement(element, style.props);
-                }
-                if (!("key" in style))
-                  return React2.cloneElement(element, {
-                    style: [
-                      element.props.style,
-                      style.values
-                    ]
-                  });
-                var styles2 = element.props.styles;
-                return React2.cloneElement(element, {
-                  styles: {
-                    ...styles2,
-                    [style.key]: [
-                      styles2?.[style.key],
-                      style.values
-                    ]
-                  }
-                });
-              });
-            }
-            if (!isThemeSupported())
-              throw new Error("This loader does not support color overrides");
-            return registerColorOverlay(style);
-          },
           registerUploadAnonymiser,
           registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
             var enabled = () => !settings.safeMode?.enabled;
@@ -60747,62 +60682,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           toast: (message) => {
             showToast(message);
-          },
-          applyTheme(theme) {
-            if (!isThemeSupported())
-              throw new Error("This loader does not support themes");
-            var palette2 = (value) => [
-              value,
-              value
-            ];
-            var surface = theme.surface ?? theme.background;
-            var sidebar = theme.sidebar ?? surface;
-            return applyTemporaryTheme({
-              name: theme.name,
-              spec: 2,
-              semanticColors: {
-                BACKGROUND_PRIMARY: palette2(theme.background),
-                BACKGROUND_SECONDARY: palette2(surface),
-                BACKGROUND_TERTIARY: palette2(sidebar),
-                BACKGROUND_BASE_LOW: palette2(theme.background),
-                BACKGROUND_BASE_LOWER: palette2(surface),
-                BACKGROUND_BASE_LOWEST: palette2(sidebar),
-                ...theme.text ? {
-                  TEXT_NORMAL: palette2(theme.text),
-                  TEXT_PRIMARY: palette2(theme.text),
-                  TEXT_DEFAULT: palette2(theme.text),
-                  TEXT_STRONG: palette2(theme.text)
-                } : {},
-                ...theme.muted ? {
-                  TEXT_MUTED: palette2(theme.muted),
-                  TEXT_SECONDARY: palette2(theme.muted),
-                  TEXT_SUBTLE: palette2(theme.muted)
-                } : {},
-                ...theme.accent ? {
-                  TEXT_LINK: palette2(theme.accent)
-                } : {},
-                ...Object.fromEntries(Object.entries(theme.semanticColors ?? {}).map(([token, color]) => [
-                  token,
-                  palette2(color)
-                ]))
-              },
-              ...theme.rawColors ? {
-                rawColors: {
-                  ...theme.rawColors
-                }
-              } : {},
-              ...theme.wallpaper ? {
-                background: {
-                  url: theme.wallpaper,
-                  alpha: theme.wallpaperOpacity ?? 1,
-                  blur: theme.wallpaperBlur
-                }
-              } : {}
-            }, theme.mode);
           }
         }, candidate.review.permissions, candidate.selected);
         setStatus(`${candidate.review.name} is active for this session.`);
         setCandidate(void 0);
+        if (remember && rememberRevision) {
+          rememberAppearance({
+            name: candidate.review.name,
+            revision: rememberRevision,
+            selected: candidate.selected
+          }, candidate.review.kind === "theme");
+          setStatus(`${candidate.review.name} is active and will reopen with CloudCord.`);
+        }
       } catch (error) {
         setStatus(String(error instanceof Error ? error.message : error));
       }
@@ -60986,34 +60877,69 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }, target)),
               candidate && /* @__PURE__ */ jsx(TableRow, {
                 label: "Allow for this session",
-                onPress: enable
+                onPress: () => enable()
+              }),
+              candidate && rememberRevision && /* @__PURE__ */ jsx(TableRow, {
+                label: "Allow and remember on this device",
+                onPress: () => enable(true)
               }),
               candidate && !source && /* @__PURE__ */ jsx(TableRow, {
                 label: "Edit CX source",
                 onPress: () => setSource(candidate.source)
               }),
-              session.list().flatMap(({ id, name }) => [
-                ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label: label2, enabled }) => /* @__PURE__ */ jsx(TableSwitchRow, {
-                  label: `${name} \xB7 ${label2}`,
-                  value: enabled,
-                  onValueChange: (checked) => {
-                    try {
-                      session.setAppearanceOption(id, target, checked);
-                      setStatus("");
-                      refreshOptions((value) => value + 1);
-                    } catch (error) {
-                      setStatus(String(error instanceof Error ? error.message : error));
+              session.list().flatMap(({ id, name }) => {
+                var entry = rememberedCatalog.get(name);
+                var saved = entry?.source === session.source(id) ? remembered.find((item) => item.name === name && item.revision === entry?.appearanceRevision) : void 0;
+                return [
+                  ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label: label2, enabled }) => /* @__PURE__ */ jsx(TableSwitchRow, {
+                    label: `${name} \xB7 ${label2}`,
+                    value: enabled,
+                    onValueChange: (checked) => {
+                      try {
+                        session.setAppearanceOption(id, target, checked);
+                        if (saved)
+                          rememberAppearance({
+                            ...saved,
+                            selected: session.appearanceOptions(id).filter((option) => option.enabled && supportsMobileHide(option)).map((option) => option.target)
+                          });
+                        setStatus("");
+                        refreshOptions((value) => value + 1);
+                      } catch (error) {
+                        setStatus(String(error instanceof Error ? error.message : error));
+                      }
                     }
+                  }, `${id}:${target}`)),
+                  /* @__PURE__ */ jsx(TableRow, {
+                    label: `Disable ${name}`,
+                    subLabel: saved ? "Remembered on this device" : void 0,
+                    onPress: () => {
+                      try {
+                        if (saved)
+                          forgetRememberedAppearance(name);
+                        session.disable(id);
+                        setStatus(`${name} disabled.`);
+                      } catch (error) {
+                        setStatus(String(error instanceof Error ? error.message : error));
+                      }
+                    }
+                  }, id)
+                ];
+              }),
+              remembered.filter((saved) => {
+                var entry = rememberedCatalog.get(saved.name);
+                return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
+              }).map((saved) => /* @__PURE__ */ jsx(TableRow, {
+                label: `Forget ${saved.name}`,
+                subLabel: settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered appearance needs review",
+                onPress: () => {
+                  try {
+                    forgetRememberedAppearance(saved.name);
+                    refreshRememberedAppearance();
+                  } catch (error) {
+                    setStatus(String(error instanceof Error ? error.message : error));
                   }
-                }, `${id}:${target}`)),
-                /* @__PURE__ */ jsx(TableRow, {
-                  label: `Disable ${name}`,
-                  onPress: () => {
-                    session.disable(id);
-                    setStatus(`${name} disabled.`);
-                  }
-                }, id)
-              ]),
+                }
+              }, saved.name)),
               clearLocalNotes.notes && /* @__PURE__ */ jsx(TableRow, {
                 label: "Clear local user notes",
                 onPress: clearLocalNotes.notes
@@ -61039,7 +60965,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins;
+  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, rememberedAppearanceListeners, rememberedAppearanceUpdates;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -61146,6 +61072,407 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       profileMenuActions = /* @__PURE__ */ new Set();
       clearLocalNotes = {};
       mobileCatalogPlugins = cxCatalog.plugins.filter((entry) => !("desktopOnly" in entry && entry.desktopOnly));
+      appearanceHost = {
+        hideAppearanceTarget(target) {
+          if (!supportsMobileHide({
+            target
+          }))
+            return () => {
+            };
+          var mobile = cxAppearanceTargets[target].mobile;
+          if ("renderTree" in mobile || "renderComponent" in mobile)
+            return registerTreeAppearance(mobile);
+          if ("tableRow" in mobile) {
+            var tableRow = findByFilePath("design/components/TableRow/native/TableRow.native.tsx")?.TableRow;
+            if (!tableRow)
+              throw new Error("Discord's table row is unavailable");
+            var rule = mobile.tableRow;
+            if ("key" in rule)
+              return registerJsxAppearance([
+                tableRow
+              ], (element) => element.key === rule.key ? null : element);
+            var translations = findByProps("intl", "t");
+            var message = translations?.t?.[rule.subLabelFor];
+            var label2 = message && translations?.intl?.string?.(message);
+            if (typeof label2 !== "string" || !label2)
+              throw new Error("Discord's table row label is unavailable");
+            return registerJsxAppearance([
+              tableRow
+            ], (element) => element.props.label === label2 && typeof element.props.subLabel === "string" ? React2.cloneElement(element, {
+              subLabel: void 0
+            }) : element);
+          }
+          if ("expressionPickerTab" in mobile)
+            return registerExpressionPickerTab(mobile.expressionPickerTab);
+          if ("settingsEntry" in mobile)
+            return hideSettingsEntry(mobile.settingsEntry);
+          if ("hideComponentPaths" in mobile)
+            return registerHiddenAppearancePaths(mobile.hideComponentPaths);
+          if ("scrollIndicators" in mobile) {
+            var scrollViews = /* @__PURE__ */ new Set([
+              import_react_native43.ScrollView,
+              import_react_native43.FlatList,
+              import_react_native43.SectionList,
+              import_react_native43.Animated?.ScrollView,
+              import_react_native43.Animated?.FlatList,
+              import_react_native43.Animated?.SectionList
+            ]);
+            var components = [
+              ...scrollViews
+            ].filter((component) => component != null);
+            return registerJsxAppearance(components, (element) => React2.cloneElement(element, {
+              showsHorizontalScrollIndicator: false,
+              showsVerticalScrollIndicator: false
+            }));
+          }
+          if ("customStatusEmojis" in mobile) {
+            var hideBubbleEmoji = registerJsxAppearance(mobile.customStatusEmojis, (element) => {
+              var { customStatusActivity } = element.props;
+              if (!customStatusActivity?.emoji)
+                return element;
+              return React2.cloneElement(element, {
+                customStatusActivity: {
+                  ...customStatusActivity,
+                  emoji: void 0
+                }
+              });
+            });
+            var hideActivityEmoji = registerJsxAppearance([
+              "ActivityStatus"
+            ], (element) => React2.cloneElement(element, {
+              hideEmoji: true
+            }), true);
+            return () => {
+              hideActivityEmoji();
+              hideBubbleEmoji();
+            };
+          }
+          if ("memberActivityText" in mobile) {
+            var status = findByFilePath("modules/activity_status/native/PresenceActivityStatus.tsx")?.default;
+            if (!status)
+              throw new Error("Discord's member activity renderer is unavailable");
+            return registerMemberRowAppearance(status, (element) => {
+              var type = element.props.activity?.type;
+              return type === 0 || type === 2 ? React2.cloneElement(element, {
+                hideText: true
+              }) : element;
+            });
+          }
+          if ("memberCustomStatus" in mobile) {
+            var WithoutCustomStatus2 = function({ originalProps }) {
+              var output = status1(originalProps);
+              if (settings.safeMode?.enabled || !React2.isValidElement(output))
+                return output;
+              var { children } = output.props;
+              if (!Array.isArray(children) || children.length !== 3)
+                return output;
+              var [activity, separator, custom] = children;
+              if (!React2.isValidElement(custom) || custom.type !== React2.Fragment || separator != null && (!React2.isValidElement(separator) || separator.props.accessibilityElementsHidden !== true))
+                return output;
+              return React2.cloneElement(output, {
+                children: [
+                  activity,
+                  null,
+                  null
+                ]
+              });
+            };
+            var WithoutCustomStatus = WithoutCustomStatus2;
+            var status1 = findByFilePath("modules/activity_status/native/ActivityStatus.tsx")?.default;
+            if (typeof status1 !== "function" || status1.prototype?.isReactComponent) {
+              throw new Error("Discord's custom status renderer is unavailable");
+            }
+            return registerMemberRowAppearance("ActivityStatus", (element) => element.type === status1 ? /* @__PURE__ */ jsx(WithoutCustomStatus2, {
+              originalProps: element.props
+            }) : element);
+          }
+          if ("emptyServerFolders" in mobile) {
+            return registerJsxAppearance([
+              "GuildsBarGuildFolder"
+            ], (element) => {
+              var { expanded: expanded2, childNodes, isDragPreview, hideExpandedChildren } = element.props;
+              return expanded2 === true && !isDragPreview && !hideExpandedChildren && Array.isArray(childNodes) && childNodes.length === 0 ? null : element;
+            });
+          }
+          if ("mentionBadges" in mobile) {
+            var stopLegacy = registerJsxAppearance([
+              "MentionsBadge"
+            ], () => null);
+            var stopCount = registerJsxAppearance([
+              "Badge"
+            ], (element) => typeof element.props.value === "number" && element.props.value > 0 && "isMentionLowImportance" in element.props ? null : element);
+            return () => {
+              stopCount();
+              stopLegacy();
+            };
+          }
+          if (!("messagePresentation" in mobile))
+            return registerJsxAppearance(mobile, () => null);
+          var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+          return overrideCxMethods(renderer, {
+            default(args, invoke) {
+              var presentation = invoke(args);
+              if (!presentation || typeof presentation !== "object")
+                return presentation;
+              if (mobile.messagePresentation === "edited") {
+                if ("edited" in presentation && presentation.edited === true)
+                  return {
+                    ...presentation,
+                    edited: false
+                  };
+              } else if (mobile.messagePresentation === "timestamps") {
+                if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
+                  return {
+                    ...presentation,
+                    timestamp: void 0,
+                    timestampTooltip: void 0,
+                    timestampAccessibilityLabel: void 0
+                  };
+                }
+              } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
+                return {
+                  ...presentation,
+                  stickers: []
+                };
+              }
+              return presentation;
+            }
+          }, () => !settings.safeMode?.enabled);
+        },
+        styleAppearanceTarget(target) {
+          var style = cxAppearanceTargets[target].style;
+          if ("blurredMedia" in style)
+            return registerBlurredMedia(style.blurredMedia);
+          if ("reducedMotion" in style)
+            return registerReducedMotion();
+          if ("mentionHighlight" in style) {
+            var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+            var highlightColor = (0, import_react_native43.processColor)(style.mentionHighlight);
+            if (typeof highlightColor !== "number")
+              throw new Error("Discord's message highlight color is unavailable");
+            return overrideCxMethods(renderer, {
+              default(args, invoke) {
+                var message = invoke(args);
+                if (!message || typeof message !== "object" || !("mentioned" in message) || message.mentioned !== true || !("highlightColor" in message) || typeof message.highlightColor !== "number" || message.highlightColor === 0)
+                  return message;
+                return {
+                  ...message,
+                  highlightColor
+                };
+              }
+            }, () => !settings.safeMode?.enabled);
+          }
+          if ("centeredMessageList" in style) {
+            var messages = findByFilePath(style.centeredMessageList)?.default;
+            if (!messages)
+              throw new Error("Discord's message list is unavailable");
+            var centered = {
+              alignSelf: "center",
+              width: "100%",
+              maxWidth: style.width
+            };
+            return registerJsxAppearance([
+              messages
+            ], (tree) => mapAppearanceElements(tree, (element) => element.type === messages ? React2.cloneElement(element, {
+              style: [
+                element.props.style,
+                centered
+              ]
+            }) : element));
+          }
+          if ("messageWidthRenderer" in style) {
+            var renderer1 = findByFilePath(style.messageWidthRenderer);
+            return overrideCxMethods(renderer1, {
+              default(args, invoke) {
+                var presentation = invoke(args);
+                var input = args[0];
+                if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number")
+                  return presentation;
+                var width = style.width * import_react_native43.PixelRatio.getFontScale();
+                return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width ? {
+                  ...presentation,
+                  constrainedWidth: width
+                } : presentation;
+              }
+            }, () => !settings.safeMode?.enabled);
+          }
+          if ("drawerWidthDelta" in style)
+            return registerChannelDrawerWidth(style.drawerWidthDelta);
+          if ("compactMemberList" in style)
+            return registerCompactMemberList();
+          if ("renderedComponents" in style)
+            return registerRenderedChannelStyle(style);
+          if ("serverIconScale" in style) {
+            var iconStyle = {
+              transform: [
+                {
+                  scale: style.serverIconScale
+                }
+              ]
+            };
+            return registerJsxAppearance([
+              "GuildsBarAnimatedItemWrapper"
+            ], (element) => {
+              var { children, preventClipping, isDragPreview } = element.props;
+              if (preventClipping || isDragPreview || !React2.isValidElement(children))
+                return element;
+              var icon3 = children.props;
+              if ("source" in icon3 && "style" in icon3) {
+                return React2.cloneElement(element, {
+                  children: React2.cloneElement(children, {
+                    style: [
+                      icon3.style,
+                      iconStyle
+                    ]
+                  })
+                });
+              }
+              if (typeof icon3.value === "string" && "size" in icon3 && typeof icon3.animate === "boolean") {
+                return React2.cloneElement(element, {
+                  children: /* @__PURE__ */ jsx(import_react_native43.View, {
+                    style: iconStyle,
+                    children
+                  })
+                });
+              }
+              return element;
+            });
+          }
+          if ("spoilerOutline" in style) {
+            var spoiler = findByFilePath("modules/markup/native/Spoiler.tsx")?.default?.prototype;
+            if (typeof spoiler?.render !== "function")
+              throw new Error("Discord's text spoiler is unavailable");
+            var outline = style.spoilerOutline;
+            var stopText = instead("render", spoiler, function(args, original) {
+              var rendered = original.apply(this, args);
+              if (settings.safeMode?.enabled || this.state?.revealed !== false || !React2.isValidElement(rendered))
+                return rendered;
+              return React2.cloneElement(rendered, {
+                style: [
+                  rendered.props.style,
+                  outline
+                ]
+              });
+            });
+            try {
+              var stopMedia = registerJsxAppearance([
+                "MediaModalSpoilerOverlay"
+              ], (element) => element.props.source?.obscure ? element : React2.cloneElement(element, {
+                style: [
+                  element.props.style,
+                  outline
+                ]
+              }));
+              return () => {
+                stopMedia();
+                stopText();
+              };
+            } catch (error) {
+              stopText();
+              throw error;
+            }
+          }
+          if ("component" in style) {
+            return registerJsxAppearance([
+              style.component
+            ], (element) => {
+              if ("props" in style) {
+                return element.props[style.skipWhenTrue] === true ? element : React2.cloneElement(element, style.props);
+              }
+              if (!("key" in style))
+                return React2.cloneElement(element, {
+                  style: [
+                    element.props.style,
+                    style.values
+                  ]
+                });
+              var styles2 = element.props.styles;
+              return React2.cloneElement(element, {
+                styles: {
+                  ...styles2,
+                  [style.key]: [
+                    styles2?.[style.key],
+                    style.values
+                  ]
+                }
+              });
+            });
+          }
+          if (!isThemeSupported())
+            throw new Error("This loader does not support color overrides");
+          return registerColorOverlay(style);
+        },
+        applyTheme(theme) {
+          if (!isThemeSupported())
+            throw new Error("This loader does not support themes");
+          var palette2 = (value) => [
+            value,
+            value
+          ];
+          var surface = theme.surface ?? theme.background;
+          var sidebar = theme.sidebar ?? surface;
+          return applyTemporaryTheme({
+            name: theme.name,
+            spec: 2,
+            semanticColors: {
+              BACKGROUND_PRIMARY: palette2(theme.background),
+              BACKGROUND_SECONDARY: palette2(surface),
+              BACKGROUND_TERTIARY: palette2(sidebar),
+              BACKGROUND_BASE_LOW: palette2(theme.background),
+              BACKGROUND_BASE_LOWER: palette2(surface),
+              BACKGROUND_BASE_LOWEST: palette2(sidebar),
+              ...theme.text ? {
+                TEXT_NORMAL: palette2(theme.text),
+                TEXT_PRIMARY: palette2(theme.text),
+                TEXT_DEFAULT: palette2(theme.text),
+                TEXT_STRONG: palette2(theme.text)
+              } : {},
+              ...theme.muted ? {
+                TEXT_MUTED: palette2(theme.muted),
+                TEXT_SECONDARY: palette2(theme.muted),
+                TEXT_SUBTLE: palette2(theme.muted)
+              } : {},
+              ...theme.accent ? {
+                TEXT_LINK: palette2(theme.accent)
+              } : {},
+              ...Object.fromEntries(Object.entries(theme.semanticColors ?? {}).map(([token, color]) => [
+                token,
+                palette2(color)
+              ]))
+            },
+            ...theme.rawColors ? {
+              rawColors: {
+                ...theme.rawColors
+              }
+            } : {},
+            ...theme.wallpaper ? {
+              background: {
+                url: theme.wallpaper,
+                alpha: theme.wallpaperOpacity ?? 1,
+                blur: theme.wallpaperBlur
+              }
+            } : {}
+          }, theme.mode);
+        }
+      };
+      rememberedCatalog = new Map([
+        ...mobileCatalogPlugins.filter((entry) => entry.appearanceRevision).map((entry) => [
+          entry.name,
+          {
+            ...entry,
+            id: "plugin:" + entry.name
+          }
+        ]),
+        ...cxCatalog.themes.filter((entry) => entry.appearanceRevision).map((entry) => [
+          entry.name,
+          {
+            ...entry,
+            id: "theme"
+          }
+        ])
+      ]);
+      rememberedAppearanceListeners = /* @__PURE__ */ new Set();
+      rememberedAppearanceUpdates = 0;
     }
   });
 
@@ -62405,6 +62732,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ...cloudCordCoreUnloads,
           ...u
         ].forEach((f) => f && unload.push(f)));
+        void Promise.resolve().then(() => _async_to_generator(function* () {
+          var { settings: settings2 } = (init_settings(), __toCommonJS(settings_exports));
+          var { awaitStorage: awaitStorage3 } = (init_storage(), __toCommonJS(storage_exports));
+          yield awaitStorage3(settings2);
+          if (settings2.safeMode?.enabled || !settings2.cxRememberedAppearance?.length)
+            return;
+          var cleanup2 = yield runStartupTask("CX appearance", () => (init_CxExtensions(), __toCommonJS(CxExtensions_exports)).restoreRememberedCxAppearance());
+          if (cleanup2)
+            unload.push(cleanup2);
+        })()).catch((error) => console.warn("CloudCord could not restore CX appearance", error));
         initDebugger();
         globalThis.bunny = lib_exports;
         console.log("CloudCord is ready!");
@@ -62417,7 +62754,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c24f5d072540117b9f126f9d6393f6a39fba3466";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f23a71cd1cc72ab13bef52fd29c292a9b2df5f4a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
