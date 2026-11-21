@@ -43087,6 +43087,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Show the original message's timestamp on loaded reply previews",
           desktopOnly: true
         },
+        "message-latency": {
+          permission: "messages.senddelay",
+          label: "Show an estimated send-delay indicator on messages",
+          desktopOnly: true
+        },
         "message-word-count": {
           permission: "messages.wordcount",
           label: "Show word and character counts below messages longer than five words"
@@ -49032,29 +49037,44 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           notificationVolumeOptions = {
             notificationVolume: Number(volume)
           };
-        } else if (name3 === "all-call-time-counter") {
+        } else if (name3 === "message-latency") {
           var flags = effect2[2]?.split(" ") ?? [];
-          if (flags.some((flag) => ![
+          var threshold = /^\d+$/.test(flags[0] ?? "") ? Number(flags.shift()) : 2;
+          if (threshold > 600 || flags.some((flag) => ![
+            "milliseconds",
+            "ignore-self",
+            "no-legacy-android"
+          ].includes(flag)) || new Set(flags).size !== flags.length)
+            throw new Error("Use a latency threshold of 0 to 600 seconds and optional latency flags");
+          messageLatencyOptions = {
+            latency: threshold,
+            showMillis: flags.includes("milliseconds"),
+            ignoreSelf: flags.includes("ignore-self"),
+            detectDiscordKotlin: !flags.includes("no-legacy-android")
+          };
+        } else if (name3 === "all-call-time-counter") {
+          var flags1 = effect2[2]?.split(" ") ?? [];
+          if (flags1.some((flag) => ![
             "human",
             "minutes-only",
             "exclude-self"
-          ].includes(flag)) || new Set(flags).size !== flags.length)
+          ].includes(flag)) || new Set(flags1).size !== flags1.length)
             throw new Error("Voice member timer options are human, minutes-only, and exclude-self");
           voiceMemberOptions = {
-            human: flags.includes("human"),
-            minutesOnly: flags.includes("minutes-only"),
-            excludeSelf: flags.includes("exclude-self")
+            human: flags1.includes("human"),
+            minutesOnly: flags1.includes("minutes-only"),
+            excludeSelf: flags1.includes("exclude-self")
           };
         } else if (name3 === "wait-for-slot") {
-          var flags1 = effect2[2]?.split(" ") ?? [];
-          if (flags1.some((flag) => ![
+          var flags2 = effect2[2]?.split(" ") ?? [];
+          if (flags2.some((flag) => ![
             "auto-join",
             "quiet"
-          ].includes(flag)) || new Set(flags1).size !== flags1.length)
+          ].includes(flag)) || new Set(flags2).size !== flags2.length)
             throw new Error("Voice queue options are auto-join and quiet");
           voiceQueueOptions = {
-            autoJoin: flags1.includes("auto-join"),
-            quiet: flags1.includes("quiet")
+            autoJoin: flags2.includes("auto-join"),
+            quiet: flags2.includes("quiet")
           };
         } else if (name3 === "webcam-start-notifier") {
           var scope = effect2[2] ?? "all";
@@ -49064,25 +49084,25 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             scope
           };
         } else if (name3 === "notify-when-muted") {
-          var flags2 = effect2[2]?.split(" ") ?? [];
-          var delays = flags2.filter((flag) => /^cooldown-(?:[1-9]|[1-5]\d|60)$/.test(flag));
-          if (delays.length > 1 || new Set(flags2).size !== flags2.length || flags2.some((flag) => flag !== "server-mute" && flag !== "ignore-deafened" && !delays.includes(flag)))
+          var flags3 = effect2[2]?.split(" ") ?? [];
+          var delays = flags3.filter((flag) => /^cooldown-(?:[1-9]|[1-5]\d|60)$/.test(flag));
+          if (delays.length > 1 || new Set(flags3).size !== flags3.length || flags3.some((flag) => flag !== "server-mute" && flag !== "ignore-deafened" && !delays.includes(flag)))
             throw new Error("Mute alert options are server-mute, ignore-deafened, and cooldown-1 through cooldown-60");
           mutedVoiceOptions = {
-            serverMute: flags2.includes("server-mute"),
-            ignoreDeafened: flags2.includes("ignore-deafened"),
+            serverMute: flags3.includes("server-mute"),
+            ignoreDeafened: flags3.includes("ignore-deafened"),
             cooldownSeconds: delays.length ? Number(delays[0].slice(9)) : 5
           };
         } else if (name3 === "voice-channel-count") {
-          var flags3 = effect2[2]?.split(" ") ?? [];
-          if (flags3.some((flag) => ![
+          var flags4 = effect2[2]?.split(" ") ?? [];
+          if (flags4.some((flag) => ![
             "show-empty",
             "hide-limit"
-          ].includes(flag)) || new Set(flags3).size !== flags3.length)
+          ].includes(flag)) || new Set(flags4).size !== flags4.length)
             throw new Error("Voice count options are show-empty and hide-limit");
           voiceCountOptions = {
-            showEmpty: flags3.includes("show-empty"),
-            hideLimit: flags3.includes("hide-limit")
+            showEmpty: flags4.includes("show-empty"),
+            hideLimit: flags4.includes("hide-limit")
           };
         } else if (name3 === "quote-message") {
           if (effect2[2] && effect2[2] !== "without-link")
@@ -49456,6 +49476,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var avatarResolution;
     var avatarCropOptions;
     var notificationVolumeOptions;
+    var messageLatencyOptions;
     var voiceMemberOptions;
     var voiceQueueOptions;
     var mutedVoiceOptions;
@@ -49553,6 +49574,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       avatarResolution,
       avatarCropOptions,
       notificationVolumeOptions,
+      messageLatencyOptions,
       voiceMemberOptions,
       voiceQueueOptions,
       cameraToneOptions,
@@ -49598,6 +49620,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         min: 0,
         max: 100,
         unit: "%"
+      });
+    if (document.messageLatencyOptions)
+      numberOptions.push({
+        effect: "message-latency",
+        label: "Send-delay threshold",
+        value: document.messageLatencyOptions.latency,
+        min: 0,
+        max: 600,
+        unit: "s"
       });
     return {
       kind: document.kind,
@@ -50059,6 +50090,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var nativeOptions = {
         "avatar-crop-zoom": document.avatarCropOptions,
         "notification-volume": document.notificationVolumeOptions,
+        "message-latency": document.messageLatencyOptions,
         "all-call-time-counter": document.voiceMemberOptions,
         "wait-for-slot": document.voiceQueueOptions,
         "webcam-start-notifier": document.cameraToneOptions,
@@ -50248,6 +50280,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
         "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
         "messages.replytimestamp": "Read the timestamp of a loaded message to show it in a reply preview",
+        "messages.senddelay": "Compare timestamp metadata supplied with a visible message to estimate its send delay",
         "messages.wordcount": "Count words and characters in displayed messages on this device",
         "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
         "drafts.long": "Keep the full text of your local drafts",
@@ -52145,6 +52178,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_message_burst = __esm({
     "../examples/cx/catalog/plugins/message-burst.cx"() {
       message_burst_default = 'plugin "MessageBurst":\n  needs messages.editprevious\n  before send merge-previous 3\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/message-latency.cx
+  var message_latency_default;
+  var init_message_latency = __esm({
+    "../examples/cx/catalog/plugins/message-latency.cx"() {
+      message_latency_default = 'plugin "MessageLatency":\n  needs messages.senddelay\n  use message-latency\n';
     }
   });
 
@@ -54280,6 +54321,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_markdown_escape();
       init_meeting_timestamp();
       init_message_burst();
+      init_message_latency();
       init_message_notifier();
       init_monospace_chat();
       init_more_commands();
@@ -56312,6 +56354,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "MessageBurst",
             source: message_burst_default,
             description: "Edit your own previous text message when you send a correction or quick follow-up",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "MessageLatency",
+            source: message_latency_default,
+            description: "Show an estimated send-delay indicator on messages",
+            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -61515,6 +61566,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
           case "reply-timestamp":
             throw new Error("Reply timestamps are available on desktop and browser.");
+          case "message-latency":
+            throw new Error("The send-delay indicator is available on desktop and browser.");
           case "animated-assets":
             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
           case "floor-relative-time":
@@ -63929,7 +63982,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ae62976d3043ec21fa152c60ad1a400cdb441ffe";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "dc77bc14dcc92d3c5d968719fb8d9de7ddb66607";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
