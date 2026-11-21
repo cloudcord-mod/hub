@@ -4810,6 +4810,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.ok(button(render(), "AvatarGrabber"));
         searchFor("/HEX-to-RGB");
         assert.ok(button(render(), "Color Converter"));
+        searchFor("timestamp markdown link");
+        const referenceResult = button(render(), "CopyMessageReference");
+        assert.ok(referenceResult, "search can find a plugin by its actions instead of its name");
+        assert.match(referenceResult.props[desktop ? "title" : "subLabel"], /Markdown link/);
+        searchFor("local notes in profile cards");
+        assert.ok(button(render(), "HideProfileNotes"));
+        const searched = moduleBox.exports.searchCxCatalog([
+            { name: "History manager", description: "Copy notes for your history tab" },
+            { name: "Copy Notes" },
+        ], "copy notes");
+        assert.equal(searched[0].name, "Copy Notes", "name matches rank before feature descriptions");
         searchFor("/!!!");
         assert.ok(!button(render(), "Color Converter"));
         if (!desktop) {

@@ -17,7 +17,7 @@ import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearc
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@utils/cx";
-import { formatCxWordCount, matchesCxCatalogEntry } from "@utils/cx";
+import { formatCxWordCount, searchCxCatalog } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
 import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "@utils/cx";
@@ -1298,17 +1298,17 @@ export function CxSettings() {
         <h2>CX Extensions</h2>
         <details>
             <summary>CX catalog · {cxCatalog.plugins.length} plugins · {cxCatalog.themes.length} themes</summary>
-            <input aria-label="Search CX catalog" placeholder="Search name or /command" value={search} onChange={event => {
+            <input aria-label="Search CX catalog" placeholder="Search name, feature or /command" value={search} onChange={event => {
                 setSearch(event.currentTarget.value);
                 setPages({ Plugins: 0, Themes: 0 });
             }} />
             {([["Plugins", cxCatalog.plugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
-                const matches = entries.filter(entry => matchesCxCatalogEntry(entry, search));
+                const matches = searchCxCatalog(entries, search);
                 const page = pages[kind];
                 const start = page * 12;
                 return <div key={kind}>
                     <h3>{kind}</h3>
-                    {matches.slice(start, start + 12).map(entry => <button key={entry.name} onClick={() => chooseSource(entry.source)}>{entry.name}</button>)}
+                    {matches.slice(start, start + 12).map(entry => <button key={entry.name} title={entry.description} onClick={() => chooseSource(entry.source)}>{entry.name}</button>)}
                     {page > 0 && <button onClick={() => setPages({ ...pages, [kind]: page - 1 })}>{`Previous ${kind.toLowerCase()} page`}</button>}
                     {start + 12 < matches.length && <button onClick={() => setPages({ ...pages, [kind]: page + 1 })}>{`Next ${kind.toLowerCase()} page`}</button>}
                     {!matches.length && <p>No matches</p>}

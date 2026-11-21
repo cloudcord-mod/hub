@@ -253,15 +253,26 @@ function quoted(value: string, limit: number, allowEmpty = false) {
     return decoded;
 }
 
-export function matchesCxCatalogEntry(entry: { name: string; commands?: readonly string[]; }, search: string): boolean {
+export function searchCxCatalog<T extends { name: string; description?: string; keywords?: string; commands?: readonly string[]; }>(entries: readonly T[], search: string): readonly T[] {
     const query = search.trim().toLowerCase();
-    if (!query) return true;
-    const normalize = (value: string) => value.normalize("NFKD").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
-    const compactQuery = normalize(query);
+    if (!query) return entries;
+    const normalize = (value: string) => value.normalize("NFKD").toLowerCase().replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+    const normalizedQuery = normalize(query);
+    const compactQuery = normalizedQuery.replaceAll(" ", "");
     if (query.startsWith("/")) {
-        return Boolean((compactQuery || query === "/") && entry.commands?.some(command => normalize(command).includes(compactQuery)));
+        if (!compactQuery && query !== "/") return [];
+        return entries.filter(entry => entry.commands?.some(command => normalize(command).replaceAll(" ", "").includes(compactQuery)));
     }
-    return entry.name.toLowerCase().includes(query) || Boolean(compactQuery && normalize(entry.name).includes(compactQuery));
+    const terms = normalizedQuery ? normalizedQuery.split(" ") : [];
+    return entries.map(entry => {
+        const name = entry.name.toLowerCase();
+        if (name === query) return { entry, score: 4 };
+        const compactName = normalize(name).replaceAll(" ", "");
+        if (compactQuery && compactName === compactQuery) return { entry, score: 3 };
+        if (name.includes(query) || compactQuery && compactName.includes(compactQuery)) return { entry, score: 2 };
+        const description = normalize(name + " " + (entry.description ?? "") + " " + (entry.keywords ?? ""));
+        return { entry, score: terms.length && terms.every(term => description.includes(term)) ? 1 : 0 };
+    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score).map(item => item.entry);
 }
 
 export function parseCx(source: string): CxDocument {

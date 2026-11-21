@@ -4,7 +4,7 @@ import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, creat
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
-import { formatCxWordCount, matchesCxCatalogEntry } from "@lib/api/cx";
+import { formatCxWordCount, searchCxCatalog } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
@@ -2805,15 +2805,15 @@ export default function CxExtensions() {
                     onPress={() => setShowCatalog(!showCatalog)} />
             </TableRowGroup>
             {showCatalog && <>
-                <TextInput accessibilityLabel="Search CX catalog" placeholder="Search name or /command" placeholderTextColor="#b5bac1"
+                <TextInput accessibilityLabel="Search CX catalog" placeholder="Search name, feature or /command" placeholderTextColor="#b5bac1"
                     value={search} onChangeText={value => { setSearch(value); setPages({ Plugins: 0, Themes: 0 }); }}
                     autoCorrect={false} style={{ color: "#fff", backgroundColor: "#27282d", padding: 12 }} />
                 {([["Plugins", mobileCatalogPlugins], ["Themes", cxCatalog.themes]] as const).map(([kind, entries]) => {
-                    const matches = entries.filter(entry => matchesCxCatalogEntry(entry, search));
+                    const matches = searchCxCatalog(entries, search);
                     const page = pages[kind];
                     const start = page * 12;
                     return <TableRowGroup key={kind} title={kind}>
-                        {matches.slice(start, start + 12).map(entry => <TableRow key={entry.name} label={entry.name} onPress={() => {
+                        {matches.slice(start, start + 12).map(entry => <TableRow key={entry.name} label={entry.name} subLabel={entry.description} onPress={() => {
                             setShowCatalog(false);
                             setSource(entry.source.length <= CX_INLINE_EDITOR_LIMIT ? entry.source : "");
                             review(entry.source);
