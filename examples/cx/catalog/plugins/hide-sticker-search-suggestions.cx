@@ -1,0 +1,3 @@
+plugin "HideStickerSearchSuggestions":
+  needs appearance.hide
+  hide sticker-search-suggestions

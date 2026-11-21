@@ -1,0 +1,3 @@
+plugin "HideThreadSuggestions":
+  needs appearance.hide
+  hide thread-suggestions

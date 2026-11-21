@@ -78,6 +78,7 @@ import plugin_catalog_gamzee_s_typing_quirk from "../../../../examples/cx/catalo
 import plugin_catalog_google_that from "../../../../examples/cx/catalog/plugins/google-that.cx";
 import plugin_catalog_grayscale_images from "../../../../examples/cx/catalog/plugins/grayscale-images.cx";
 import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plugins/hide-active-now.cx";
+import plugin_catalog_hide_add_friend_hint from "../../../../examples/cx/catalog/plugins/hide-add-friend-hint.cx";
 import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catalog/plugins/hide-add-server-button.cx";
 import plugin_catalog_hide_apps_button from "../../../../examples/cx/catalog/plugins/hide-apps-button.cx";
 import plugin_catalog_hide_avatar_decorations from "../../../../examples/cx/catalog/plugins/hide-avatar-decorations.cx";
@@ -119,6 +120,7 @@ import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hide_profile_banner_images from "../../../../examples/cx/catalog/plugins/hide-profile-banner-images.cx";
 import plugin_catalog_hide_profile_connections from "../../../../examples/cx/catalog/plugins/hide-profile-connections.cx";
 import plugin_catalog_hide_profile_effects from "../../../../examples/cx/catalog/plugins/hide-profile-effects.cx";
+import plugin_catalog_hide_profile_friend_request_banner from "../../../../examples/cx/catalog/plugins/hide-profile-friend-request-banner.cx";
 import plugin_catalog_hide_profile_mutuals from "../../../../examples/cx/catalog/plugins/hide-profile-mutuals.cx";
 import plugin_catalog_hide_profile_notes from "../../../../examples/cx/catalog/plugins/hide-profile-notes.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
@@ -132,10 +134,13 @@ import plugin_catalog_hide_shop_tab from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_hide_spoiler_warnings from "../../../../examples/cx/catalog/plugins/hide-spoiler-warnings.cx";
 import plugin_catalog_hide_status_emojis from "../../../../examples/cx/catalog/plugins/hide-status-emojis.cx";
 import plugin_catalog_hide_sticker_button from "../../../../examples/cx/catalog/plugins/hide-sticker-button.cx";
+import plugin_catalog_hide_sticker_picker_promotions from "../../../../examples/cx/catalog/plugins/hide-sticker-picker-promotions.cx";
+import plugin_catalog_hide_sticker_search_suggestions from "../../../../examples/cx/catalog/plugins/hide-sticker-search-suggestions.cx";
 import plugin_catalog_hide_stickers from "../../../../examples/cx/catalog/plugins/hide-stickers.cx";
 import plugin_catalog_hide_stream_previews from "../../../../examples/cx/catalog/plugins/hide-stream-previews.cx";
 import plugin_catalog_hide_suggested_channels from "../../../../examples/cx/catalog/plugins/hide-suggested-channels.cx";
 import plugin_catalog_hide_system_messages from "../../../../examples/cx/catalog/plugins/hide-system-messages.cx";
+import plugin_catalog_hide_thread_suggestions from "../../../../examples/cx/catalog/plugins/hide-thread-suggestions.cx";
 import plugin_catalog_hide_threads_button from "../../../../examples/cx/catalog/plugins/hide-threads-button.cx";
 import plugin_catalog_hide_timestamps from "../../../../examples/cx/catalog/plugins/hide-timestamps.cx";
 import plugin_catalog_hide_typing_indicator from "../../../../examples/cx/catalog/plugins/hide-typing-indicator.cx";
@@ -455,6 +460,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "GoogleThat", source: plugin_catalog_google_that, description: "/googlethat", commands: ["googlethat"] },
         { name: "GrayscaleImages", source: plugin_catalog_grayscale_images, description: "Shows images in grayscale until hovered", desktopOnly: true },
         { name: "HideActiveNow", source: plugin_catalog_hide_active_now, description: "Hide the active friends panel" },
+        { name: "HideAddFriendHint", source: plugin_catalog_hide_add_friend_hint, description: "Hide the hint below the Add Friend field", desktopOnly: true },
         { name: "HideAddServerButton", source: plugin_catalog_hide_add_server_button, description: "Hide the add-a-server button" },
         { name: "HideAppsButton", source: plugin_catalog_hide_apps_button, description: "Hide the chat apps button" },
         { name: "HideAvatarDecorations", source: plugin_catalog_hide_avatar_decorations, description: "Hide avatar decorations" },
@@ -496,6 +502,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Hide Profile Banner Images", source: plugin_catalog_hide_profile_banner_images, description: "Hide Discord-hosted profile banner images except your own and those of friends" },
         { name: "HideProfileConnections", source: plugin_catalog_hide_profile_connections, description: "Hide connections in profile cards" },
         { name: "HideProfileEffects", source: plugin_catalog_hide_profile_effects, description: "Hide profile effects" },
+        { name: "HideProfileFriendRequestBanner", source: plugin_catalog_hide_profile_friend_request_banner, description: "Hide friend request banners in profiles", desktopOnly: true },
         { name: "HideProfileMutuals", source: plugin_catalog_hide_profile_mutuals, description: "Hide mutual friends and servers in profile cards" },
         { name: "HideProfileNotes", source: plugin_catalog_hide_profile_notes, description: "Hide local notes in profile cards" },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry" },
@@ -509,10 +516,13 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideSpoilerWarnings", source: plugin_catalog_hide_spoiler_warnings, description: "Hide the spoiler label on images" },
         { name: "HideStatusEmojis", source: plugin_catalog_hide_status_emojis, description: "Hide emojis in custom status bubbles" },
         { name: "HideStickerButton", source: plugin_catalog_hide_sticker_button, description: "Hide the sticker picker shortcut" },
+        { name: "HideStickerPickerPromotions", source: plugin_catalog_hide_sticker_picker_promotions, description: "Hide shop and promotional cards in the sticker picker", desktopOnly: true },
+        { name: "HideStickerSearchSuggestions", source: plugin_catalog_hide_sticker_search_suggestions, description: "Hide suggested searches in the sticker picker", desktopOnly: true },
         { name: "HideStickers", source: plugin_catalog_hide_stickers, description: "Hide stickers in chat" },
         { name: "HideStreamPreviews", source: plugin_catalog_hide_stream_previews, description: "Hide voice-channel stream previews" },
         { name: "HideSuggestedChannels", source: plugin_catalog_hide_suggested_channels, description: "Hide the suggested channels section" },
         { name: "HideSystemMessages", source: plugin_catalog_hide_system_messages, description: "Hide system messages for pins, joins, boosts" },
+        { name: "HideThreadSuggestions", source: plugin_catalog_hide_thread_suggestions, description: "Hide thread suggestions above the composer", desktopOnly: true },
         { name: "HideThreadsButton", source: plugin_catalog_hide_threads_button, description: "Hide the threads shortcut in the channel header" },
         { name: "HideTimestamps", source: plugin_catalog_hide_timestamps, description: "Hide timestamps next to chat messages" },
         { name: "HideTypingIndicator", source: plugin_catalog_hide_typing_indicator, description: "Hide the typing indicator" },

@@ -1,0 +1,3 @@
+plugin "HideAddFriendHint":
+  needs appearance.hide
+  hide add-friend-hint

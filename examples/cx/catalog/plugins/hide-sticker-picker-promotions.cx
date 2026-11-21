@@ -1,0 +1,3 @@
+plugin "HideStickerPickerPromotions":
+  needs appearance.hide
+  hide sticker-picker-promotions

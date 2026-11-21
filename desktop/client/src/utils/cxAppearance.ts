@@ -73,6 +73,31 @@ export const cxAppearanceTargets = {
     "sticky-date-dividers": { plugin: "StickyDateDividers", label: "Keeps the current day label at the top while scrolling", css: "[class*=\"divider\"][class*=\"hasContent\"] { position: sticky; top: 0; z-index: 2; background: var(--background-base-lower, var(--background-primary)); }", desktopOnly: true, style: {} },
     "thin-scrollbars": { plugin: "ThinScrollbars", label: "Thinner scrollbars", css: "::-webkit-scrollbar { width: 6px !important; height: 6px !important; } ::-webkit-scrollbar-thumb { border-radius: 6px !important; }", desktopOnly: true, style: {} },
     "wider-chat": { plugin: "WiderChat", label: "Lets messages use the full width of the window", css: "[class*=\"messageListItem\"] [class*=\"contents\"] { max-width: none !important; } [class*=\"chatContent\"] { max-width: none !important; }", desktopOnly: true, style: {} },
+    "thread-suggestions": {
+        plugin: "HideThreadSuggestions", label: "thread suggestions above the composer",
+        css: '[class^="threadSuggestionBar_"], [class*=" threadSuggestionBar_"] { display: none !important; }',
+        desktopOnly: true, mobile: [], catalogOriginal: true,
+    },
+    "sticker-search-suggestions": {
+        plugin: "HideStickerSearchSuggestions", label: "suggested searches in the sticker picker",
+        css: '[class^="searchSuggestions_"], [class*=" searchSuggestions_"] { display: none !important; }',
+        desktopOnly: true, mobile: [], catalogOriginal: true,
+    },
+    "sticker-picker-promotions": {
+        plugin: "HideStickerPickerPromotions", label: "shop and promotional cards in the sticker picker",
+        css: '[class^="packHeaderShopWrapper_"], [class*=" packHeaderShopWrapper_"], [class^="emptyGuildUpsell_"], [class*=" emptyGuildUpsell_"] { display: none !important; }',
+        desktopOnly: true, mobile: [], catalogOriginal: true,
+    },
+    "add-friend-hint": {
+        plugin: "HideAddFriendHint", label: "the hint below the Add Friend field",
+        css: '[class^="addFriendHint_"], [class*=" addFriendHint_"] { display: none !important; }',
+        desktopOnly: true, mobile: [], catalogOriginal: true,
+    },
+    "profile-friend-request-banner": {
+        plugin: "HideProfileFriendRequestBanner", label: "friend request banners in profiles",
+        css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
+        desktopOnly: true, mobile: [], catalogOriginal: true,
+    },
     "voice-krisp-button": {
         plugin: "ShowPing", label: "the desktop Krisp button beside the voice connection controls",
         css: '[class*="voiceButtonsContainer_"] > button[aria-label$="Krisp" i] { display: none !important; }',
@@ -188,17 +213,17 @@ export const cxAppearanceTargets = {
         mobile: ["ProfileBadgeRows"],
     },
     "profile-notes": {
-        plugin: "HideProfileNotes", label: "local notes in profile cards",
+        plugin: "HideProfileNotes", label: "local notes in profile cards", catalogOriginal: true,
         css: '[class*="noteText_"], [class*="notePreview_"] { display: none !important; }',
         mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileNote.tsx"] },
     },
     "profile-connections": {
-        plugin: "HideProfileConnections", label: "connections in profile cards",
+        plugin: "HideProfileConnections", label: "connections in profile cards", catalogOriginal: true,
         css: '[class*="connectedAccounts_"] { display: none !important; }',
         mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileConnections.tsx", "modules/user_profile/native/LegacyUserProfileConnections.tsx"] },
     },
     "profile-mutuals": {
-        plugin: "HideProfileMutuals", label: "mutual friends and servers in profile cards",
+        plugin: "HideProfileMutuals", label: "mutual friends and servers in profile cards", catalogOriginal: true,
         css: '[class*="mutuals_"], [class*="mutualGuilds_"] { display: none !important; }',
         mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileMutuals.tsx", "modules/user_profile/native/UserProfileMutualGuilds.tsx"] },
     },
