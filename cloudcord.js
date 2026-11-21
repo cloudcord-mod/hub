@@ -25295,7 +25295,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var users = rootSettings.cloudcordRealProfileUsersByAccount?.[currentUserId];
     return Array.isArray(users) && users.includes(id);
   }
-  function toggleRealProfileView(id, viewerId) {
+  function nativeProfileOpener() {
+    try {
+      var open = findByName("showUserProfileActionSheet");
+      if (typeof open === "function")
+        return open;
+    } catch (e) {
+    }
+    try {
+      var actions = findByProps("showUserProfileActionSheet");
+      if (typeof actions?.showUserProfileActionSheet === "function")
+        return (options) => actions.showUserProfileActionSheet(options);
+    } catch (e) {
+    }
+  }
+  function toggleRealProfileView(id, viewerId, guildId) {
     if (!isProfileViewUserId(id) || !isProfileViewUserId(viewerId) || viewerId !== currentUserId || id === viewerId)
       return;
     var accounts = {
@@ -25327,37 +25341,47 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (e) {
       }
     }
+    var open = nativeProfileOpener();
+    if (!open)
+      return;
     try {
       simpleSheets.hideActionSheet?.();
     } catch (e) {
     }
-    var open = findByName("showUserProfileActionSheet", false);
-    if (typeof open === "function")
-      setTimeout(() => {
+    setTimeout(() => _async_to_generator(function* () {
+      if (currentUserId !== viewerId)
+        return;
+      try {
+        yield open({
+          userId: id,
+          ...isProfileViewUserId(guildId) ? {
+            guildId
+          } : {}
+        });
+      } catch (e) {
         if (currentUserId === viewerId)
-          open({
-            userId: id
-          });
-      }, 0);
+          showToast("Profile view updated. Reopen the profile to see it.");
+      }
+    })(), 0);
   }
   function connectRealProfileMenu() {
     if (realProfileMenuConnected)
       return;
     realProfileMenuConnected = true;
-    var option = (id) => {
+    var option = (id, guildId) => {
       var viewerId = currentUserId;
       if (!isProfileViewUserId(viewerId) || !isProfileViewUserId(id) || id === viewerId)
         return;
       return {
         label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile",
-        onPress: () => toggleRealProfileView(id, viewerId)
+        onPress: () => toggleRealProfileView(id, viewerId, guildId)
       };
     };
     if (typeof simpleSheets?.showSimpleActionSheet === "function") {
       instead("showSimpleActionSheet", simpleSheets, (args, original) => {
         var sheet = args[0];
         var id = String(sheet?.userId || sheet?.user?.id || sheet?.props?.userId || sheet?.props?.user?.id || "");
-        var action = option(id);
+        var action = option(id, sheet?.guildId ?? sheet?.props?.guildId);
         if (!action || !/user|profile/i.test(String(sheet?.key || "")) || !Array.isArray(sheet?.options))
           return original(...args);
         return original({
@@ -25377,7 +25401,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       onJsxCreate(name, (_component, rendered) => {
         var props = rendered?.props;
         var id = String(props?.userId || props?.user?.id || props?.profile?.userId || "");
-        var action = option(id);
+        var action = option(id, props?.displayProfile?.guildId ?? props?.guildId ?? props?.channel?.guild_id);
         if (!action || props?.__cloudcordRealProfileMenu)
           return rendered;
         if (Array.isArray(props?.options))
@@ -32022,20 +32046,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ]
       });
     };
-    var openPreview = () => {
+    var openPreview = () => _async_to_generator(function* () {
+      var viewerId = currentUserId;
+      var userId = viewerId || realCurrentUser?.id;
+      if (!isProfileViewUserId(userId)) {
+        showToast("Your Discord account is still loading.");
+        return;
+      }
       try {
-        var userId = currentUserId || realCurrentUser?.id;
-        if (!userId)
-          throw new Error("Your Discord account is still loading.");
+        var open = nativeProfileOpener();
+        if (!open)
+          throw new Error("Discord's profile sheet is unavailable.");
         refreshPreview();
-        var showProfile = findByNameLazy("showUserProfileActionSheet");
-        showProfile({
+        yield open({
           userId
         });
-      } catch (error) {
-        import_react_native28.Alert.alert("Couldn't open preview", error?.message || "Try opening your profile from Discord.");
+      } catch (e) {
+        if (currentUserId !== viewerId)
+          return;
+        setShowPreview(true);
+        showToast("Discord's profile sheet is unavailable. Showing the live preview.");
       }
-    };
+    })();
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [showPreview, setShowPreview] = (0, import_react9.useState)(false);
     var [copyId, setCopyId] = (0, import_react9.useState)("");
@@ -63500,7 +63532,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8f4a54192ab3b92eeefe50353fb975488dc9d1a6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "726541f8aa7a2801ee80abddf56a81fab330b517";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
