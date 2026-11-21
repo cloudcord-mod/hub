@@ -112,7 +112,7 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 .cpx-preview { display: flex; flex-direction: column; gap: 12px; padding: 20px 16px; border-left: 1px solid var(--cpx-border); overflow-y: auto; }
 .cpx-preview-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; color: var(--header-secondary, #b5bac1); }
 .cpx-root .cpx-preview-toggle { display: none; }
-.cpx-card { position: relative; overflow: hidden; border-radius: 12px; background: linear-gradient(180deg, var(--cpx-accent) 0%, var(--cpx-accent2) 100%); padding: 3px; }
+.cpx-card { position: relative; overflow: hidden; border-radius: 12px; background: linear-gradient(180deg, var(--cpx-accent, var(--cpx-surface-2)) 0%, var(--cpx-accent2, var(--cpx-surface-2)) 100%); padding: 3px; }
 .cpx-card-framed { box-shadow: 0 0 0 3px #f0b232, 0 0 18px rgb(240 178 50 / 45%); }
 .cpx-card-banner { height: 84px; border-radius: 10px 10px 0 0; background: rgb(0 0 0 / 25%) center / cover no-repeat; }
 .cpx-card-avatar { position: absolute; top: 44px; left: 16px; width: 80px; height: 80px; }
@@ -243,7 +243,7 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 .cpx-dc-themed { padding: 4px; background: linear-gradient(var(--dc-primary), var(--dc-secondary)); }
 .cpx-dc-inner { position: relative; border-radius: 4px; overflow: hidden; }
 .cpx-dc-themed .cpx-dc-inner { background: linear-gradient(rgb(0 0 0 / 45%), rgb(0 0 0 / 55%)); }
-.cpx-dc-banner { height: 92px; background-size: cover; background-position: center; }
+.cpx-dc-banner { height: 92px; background: var(--background-base-lowest, var(--background-tertiary)) center / cover no-repeat; }
 .cpx-dc-avatar { position: absolute; top: 52px; left: 14px; width: 80px; height: 80px; }
 .cpx-dc-avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 6px var(--dc-bg); background: var(--dc-bg); }
 .cpx-dc-themed .cpx-dc-avatar-img { box-shadow: 0 0 0 6px color-mix(in srgb, var(--dc-primary) 55%, #000); }

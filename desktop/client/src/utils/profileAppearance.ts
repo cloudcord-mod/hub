@@ -112,6 +112,30 @@ export function customDiscordMediaURL(kind: "avatars" | "banners", userId: strin
     return `https://cdn.discordapp.com/${kind}/${userId}/${hash}.${hash.startsWith("a_") ? "gif" : "png"}?size=512`;
 }
 
+type DiscordProfileSurface = {
+    banner?: unknown;
+    themeColors?: unknown;
+    theme_colors?: unknown;
+    accentColor?: unknown;
+    accent_color?: unknown;
+};
+
+export function profilePreviewColor(value: unknown): string | undefined {
+    if (typeof value === "string" && /^#?[0-9a-f]{6}$/i.test(value.trim())) return "#" + value.trim().replace(/^#/, "");
+    if (typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 0xffffff)
+        return "#" + value.toString(16).padStart(6, "0");
+}
+
+export function nativeProfilePreviewSurface(userId: string, profile?: DiscordProfileSurface | null, userBanner?: unknown) {
+    const colors = profile?.themeColors ?? profile?.theme_colors;
+    return {
+        banner: customDiscordMediaURL("banners", userId, profile?.banner) || customDiscordMediaURL("banners", userId, userBanner) || undefined,
+        primary: Array.isArray(colors) ? profilePreviewColor(colors[0]) : undefined,
+        accent: Array.isArray(colors) ? profilePreviewColor(colors[1]) : undefined,
+        bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color),
+    };
+}
+
 /** Drafts stay editable locally, but invalid entries must not disappear silently on sharing. */
 export function customConnectionServiceName(service: string): string {
     const names: Record<string, string> = {steam:"Steam",youtube:"YouTube",roblox:"Roblox",github:"GitHub",twitch:"Twitch",spotify:"Spotify",x:"X",reddit:"Reddit",tiktok:"TikTok",instagram:"Instagram",domain:"Domain",other:"Other"};

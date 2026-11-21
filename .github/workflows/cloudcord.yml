@@ -436,7 +436,7 @@ jobs:
           import { onJsxCreate } from "@lib/api/react/jsx";
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
-          import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, normalizeProfileAppearance, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
+          import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -1097,6 +1097,7 @@ jobs:
           let initialized = false;
           let currentUserId: string | null = null;
           let realCurrentUser: any = null;
+          let readNativeProfile: ((id: string) => Parameters<typeof nativeProfilePreviewSurface>[1]) | undefined;
           let userCache = new WeakMap<object, any>();
           let profileCache = new WeakMap<object, any>();
           const SHARED_PROFILE_API = "https://getcloudcord.com";
@@ -3024,6 +3025,7 @@ jobs:
 
               const profileStore = safeStore("UserProfileStore") || findByProps("getUserProfile", "getGuildMemberProfile");
               diagnostics.profileStore = !!profileStore;
+              if (typeof profileStore?.getUserProfile === "function") readNativeProfile = profileStore.getUserProfile.bind(profileStore);
               addPatch("getUserProfile", profileStore, (args, original) => {
                   const result = original(...args);
                   const id = String(args?.[0]?.id || args?.[0]?.userId || args?.[0] || "");
@@ -4437,6 +4439,28 @@ jobs:
                   </S.Panel>
               </View>;
           }
+          function studioPreviewAppearance(data: Partial<PreviewSettings>, realUser: any) {
+              let profile;
+              try { if (realUser?.id) profile = readNativeProfile?.(realUser.id); } catch {}
+              const fallback = nativeProfilePreviewSurface(realUser?.id || "", profile, realUser?.banner);
+              const primary = data.profileColorsEnabled ? profilePreviewColor(data.primaryColor) : undefined;
+              const accent = data.profileColorsEnabled ? profilePreviewColor(data.accentColor) : undefined;
+              let realAvatar: string | undefined;
+              try { realAvatar = realUser?.getAvatarURL?.(undefined, 128); } catch {}
+              return {
+                  name: data.displayName || realUser?.globalName || realUser?.global_name || realUser?.username || "You",
+                  username: data.username || realUser?.username || "username",
+                  avatar: data.avatarMedia?.uri || realAvatar,
+                  banner: data.bannerMedia?.uri || fallback.banner,
+                  primary: primary ?? accent ?? fallback.primary,
+                  accent: accent ?? primary ?? fallback.accent,
+                  bannerColor: primary ?? accent ?? fallback.bannerColor ?? fallback.primary,
+                  nameplate: data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined,
+                  tagText: data.serverTag?.tag,
+                  tagIcon: data.serverTag ? serverTagIconURL(data.serverTag) || undefined : undefined,
+                  status: data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online",
+              };
+          }
           function SavedProfiles({ current, realUser, onUse }: { current: any; realUser: any; onUse: (data: any) => void }) {
               const S = require("@core/ui/settings/components/ProfileStudio");
               const [, redraw] = useReducer((x: number) => x + 1, 0);
@@ -4445,7 +4469,6 @@ jobs:
               const items: SavedProfile[] = Array.isArray((rootSettings as any).fakeProfileSaved) ? (rootSettings as any).fakeProfileSaved : [];
               const commit = (next: SavedProfile[]) => { (rootSettings as any).fakeProfileSaved = next; redraw(); };
               const currentJson = JSON.stringify(savedSnapshot(current));
-              const realAvatar = (() => { try { return realUser?.getAvatarURL?.(undefined, 128) || undefined; } catch { return undefined; } })();
               const saveCurrent = () => {
                   const label = (name.trim() || "Profile " + (items.length + 1)).slice(0, 40);
                   commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label, savedAt: Date.now(), data: savedSnapshot(current) }, ...items]);
@@ -4489,7 +4512,6 @@ jobs:
                   commit(items.map(item => item.id === renaming.id ? { ...item, name: value } : item));
                   setRenaming(null);
               };
-              const hex = (value: any) => typeof value === "string" && value ? value : typeof value === "number" ? "#" + value.toString(16).padStart(6, "0") : undefined;
               return <View style={{ gap: 20 }}>
                   <S.Panel>
                       <S.Section title="Save your profile" description="Keep copies of your custom profile and switch between them. Saved on this device.">
@@ -4501,7 +4523,7 @@ jobs:
                   {items.map(item => {
                       const data = item.data || {};
                       const active = JSON.stringify(savedSnapshot(data)) === currentJson;
-                      const colors = data.profileColorsEnabled;
+                      const appearance = studioPreviewAppearance(data, realUser);
                       const rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({ id, iconSrc }));
                       if (data.nitroEnabled) rows.push({ id: nitroBadgeId(data.nitroMonths), iconSrc: milestoneIcon(data.nitroMonths, NITRO_ICONS) });
                       if (data.boostMonths > 0) rows.push({ id: "boost", iconSrc: boosterIcon(data.boostMonths) });
@@ -4509,9 +4531,8 @@ jobs:
                       if (gift) rows.push({ id: "gifting", iconSrc: gift.icon });
                       const badges = [...new Set(applyBadgeLayout(rows, data).map(row => row.iconSrc).filter(Boolean))];
                       return <View key={item.id} style={{ gap: 10 }}>
-                          <S.DiscordProfileCard name={data.displayName || realUser?.globalName || realUser?.username || "You"} username={data.username || realUser?.username || "username"} pronouns={data.pronouns}
-                              avatar={data.avatarMedia?.uri || realAvatar} banner={data.bannerMedia?.uri} primary={colors ? hex(data.primaryColor) : undefined} secondary={colors ? hex(data.accentColor) : undefined}
-                              decoration={data.avatarDecoration || undefined} status={data.presenceStatus || "online"} tagText={data.serverTag?.tag} badges={badges}
+                          <S.DiscordProfileCard {...appearance} secondary={appearance.accent} pronouns={data.pronouns}
+                              decoration={data.avatarDecoration || undefined} badges={badges}
                               customStatus={data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : undefined} bio={data.bio}
                               activity={data.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === data.customActivity?.type)?.label || "", name: data.customActivity.name, details: data.customActivity.details } : null} />
                           <View style={{ flexDirection: "row", alignItems: "center", gap: 10, paddingHorizontal: 2 }}>
@@ -4952,12 +4973,11 @@ jobs:
               }, [activeTab]);
 
               if (editorOwner.current !== currentUserId) return <Text style={{ padding: 24 }}>Your Discord account changed. Go back and reopen the profile editor before making changes.</Text>;
+              const appearance = studioPreviewAppearance(preview, realCurrentUser);
               return (
                   <ScrollView style={{ flex: 1, width: "100%" }} contentContainerStyle={{ width: "100%", maxWidth: 640, alignSelf: "center", paddingHorizontal: 12, paddingTop: 24, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
                       <View style={{ width: "100%", gap: 24 }}>
-                          <K.StudioHero name={preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "You"} username={preview.username || realCurrentUser?.username || "username"}
-                              avatar={preview.avatarMedia?.uri || (() => { try { return realCurrentUser?.getAvatarURL?.() || undefined; } catch { return undefined; } })()} banner={preview.bannerMedia?.uri}
-                              accent={preview.profileColorsEnabled ? preview.primaryColor : undefined} status={preview.presenceStatus || "online"}
+                          <K.StudioHero {...appearance} accent={appearance.bannerColor}
                               enabled={preview.enabled} onToggle={() => update("enabled", !preview.enabled, true)} syncLabel={rootSettings.fakeProfileLocalOnly ? "This device" : "Synced"}
                               onPreview={openPreview} quickLook={showPreview} onQuickLook={() => setShowPreview(!showPreview)} />
                           <View style={{ flexDirection: "row", gap: 8 }}>
@@ -4965,11 +4985,7 @@ jobs:
                               <K.Button label="Saved looks" grow onPress={() => setActiveTab("saved")} />
                           </View>
                           {showPreview ? <Card><View style={{ padding: 16 }}>
-                              <K.PreviewCard name={preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "You"} username={preview.username || realCurrentUser?.username || "username"} pronouns={preview.pronouns}
-                                  avatar={preview.avatarMedia?.uri || (() => { try { return realCurrentUser?.getAvatarURL?.() || undefined; } catch { return undefined; } })()} banner={preview.bannerMedia?.uri}
-                                  primary={preview.profileColorsEnabled ? preview.primaryColor : undefined} accent={preview.profileColorsEnabled ? preview.accentColor : undefined} decoration={preview.avatarDecoration || undefined}
-                                  nameplate={preview.nameplate ? nameplateAssetURL(preview.nameplate.asset) : undefined} tagText={preview.serverTag?.tag} tagIcon={preview.serverTag ? serverTagIconURL(preview.serverTag) || undefined : undefined}
-                                  status={preview.customActivity?.type === 1 && preview.customActivity.url && streamURL(preview.customActivity.url) ? "streaming" : preview.presenceStatus || "online"}
+                              <K.PreviewCard {...appearance} pronouns={preview.pronouns} decoration={preview.avatarDecoration || undefined}
                                   customStatus={preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : undefined}
                                   activity={preview.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === preview.customActivity?.type)?.label || "", name: preview.customActivity.name, details: preview.customActivity.details } : null}
                                   badges={[...new Set(editableBadgeRows().filter(row => !preview.hiddenBadgeIds.includes(row.id)).map(row => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : undefined)).filter(Boolean))] as string[]}

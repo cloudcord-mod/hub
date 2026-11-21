@@ -14,12 +14,12 @@ import "./style.css";
 import "./editor.css";
 import decorationCatalog from "./decorations.json";
 import { CustomSocialEditor, openSocialDetail } from "./CustomSocial";
-import { ColorField, DiscordProfileCard, Grid2, ImageField, ProfilePreview, Section, SelectField, Switch, TabId, TabList, TextField } from "./editorUi";
+import { ColorField, DiscordProfileCard, Grid2, ImageField, ProfilePreview, type ProfilePreviewSurface, Section, SelectField, Switch, TabId, TabList, TextField } from "./editorUi";
 import { Current, installPresenceHooks, installTagIconSwap, loadCatalog, NameplateEditor, PickerGrid, onCatalogLoaded, ProfileEffectEditor, profileEffectFor, ProfileFrameEditor, refreshPresence, StatusEditor, TagIconEditor, uninstallPresenceHooks, uninstallTagIconSwap } from "./cosmetics";
 import { popNotice, showNotice } from "@api/Notices";
 import { installNativeSocialHooks } from "@utils/nativeSocialHooks";
 import { installConnectionSettings } from "@utils/connectionSettings";
-import { appearanceOptions, availableServerTags, Catalog, customDiscordMediaURL, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, normalizeProfileAppearance, ProfileAppearance } from "@utils/profileAppearance";
+import { appearanceOptions, availableServerTags, Catalog, customDiscordMediaURL, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
 
@@ -526,6 +526,7 @@ let sharedBackoffUntil = 0;
 const sharedProfiles = new Map<string, CustomProfileData>();
 let realGetUserProfile: ((...args: unknown[]) => any) | null = null;
 let realGetCurrentUser: (() => any) | null = null;
+let realGetUserAvatarURL: typeof IconUtils.getUserAvatarURL | undefined;
 /** Discord marks profiles the viewer isn't allowed to see as private; show those exactly as Discord does. */
 function isPrivateProfile(userId: string): boolean {
     try { return realGetUserProfile?.(userId)?.private === true; } catch { return false; }
@@ -1941,8 +1942,10 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
     const [catalogData, setCatalogData] = React.useState<Catalog | null>(null);
     React.useEffect(() => { loadCatalog().then(setCatalogData, () => { }); }, []);
     const [confirmReset, setConfirmReset] = React.useState(false);
-    const selectedUser: any = accounts.find((account: any) => account.id === selectedAccountId) || UserStore.getUser(selectedAccountId);
-    const fallbackAvatar = selectedUser ? IconUtils.getUserAvatarURL(selectedUser, false, 128) : "https://cdn.discordapp.com/embed/avatars/0.png";
+    const selectedUser = (selectedAccountId === myId ? realGetCurrentUser?.() : undefined)
+        ?? accounts.find(account => account.id === selectedAccountId) ?? UserStore.getUser(selectedAccountId);
+    const fallbackAvatar = selectedUser ? (realGetUserAvatarURL ?? IconUtils.getUserAvatarURL)(selectedUser, true, 128) : "https://cdn.discordapp.com/embed/avatars/0.png";
+    const fallbackSurface = nativeProfilePreviewSurface(selectedAccountId, realGetUserProfile?.(selectedAccountId), selectedUser?.banner);
     const currentDecoration = decorations.find(item => item.id === data.decorationAsset) || ALL_DECORATIONS.find(item => item.id === data.decorationAsset) || liveDecorations.find(item => item.id === data.decorationAsset);
     const nameColors = [0, 1, 2].map(index => nameStyle.colors[index] ?? nameStyle.colors[0] ?? 0xffffff);
     const knownTags = availableServerTags(UserStore.getUsers());
@@ -2045,7 +2048,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
         </>,
         others: <OtherProfilesPanel />,
         templates: <TemplatesPanel current={data} onApply={value => setData({ ...data, ...value })} />,
-        saved: <SavedProfilesPanel current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar}
+        saved: <SavedProfilesPanel current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
             decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
             effectFor={skuId => catalogData?.effects.find(item => item.skuId === skuId)?.title} frameFor={skuId => catalogData?.frames.find(item => item.skuId === skuId)?.label} />,
         connections: <>
@@ -2094,7 +2097,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
             <div className={previewExpanded ? "cpx-layout cpx-layout-preview" : "cpx-layout"}>
                 <TabList value={tab} onChange={value => { setTab(value); setPreviewExpanded(false); }} />
                 <div className="cpx-panel" id="cpx-panel" role="tabpanel" aria-labelledby={`cpx-tab-${tab}`} key={tab}>{panels[tab]}</div>
-                <ProfilePreview data={data} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar}
+                <ProfilePreview data={data} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
                     badges={profilePreviewBadges(data, selectedAccountId)}
                     onBadges={() => { setTab("badges"); setPreviewExpanded(false); }}
                     onSaved={() => { setTab("saved"); setPreviewExpanded(false); }}
@@ -2448,7 +2451,6 @@ export default definePlugin({
     },
 
     toolboxActions: { "Open Profile Spoofer": openProfileEditor },
-    _origGetUserAvatarURL: null as any,
     _catalogListener: null as null | (() => void),
     _origGetAvatarDecorationURL: null as any,
     _origExtractTimestamp: null as any,
@@ -2495,7 +2497,7 @@ export default definePlugin({
 
         // Avatars: yours from your profile, everyone else's from their shared CloudCord profile.
         if (IconUtils?.getUserAvatarURL && !_avatarPatchApplied) {
-            const realAvatarUrl: (...args: any[]) => string = this._origGetUserAvatarURL = IconUtils.getUserAvatarURL;
+            const realAvatarUrl: (...args: any[]) => string = realGetUserAvatarURL = IconUtils.getUserAvatarURL;
             const avatarFor = (userId: string): string | undefined => {
                 if (isMe(userId)) return isEnabled ? storedData.avatar : undefined;
                 requestSharedProfile(userId);
@@ -2591,9 +2593,9 @@ export default definePlugin({
             (SnowflakeUtils as any).extractTimestamp = this._origExtractTimestamp;
             this._origExtractTimestamp = null;
         }
-        if (IconUtils && this._origGetUserAvatarURL) {
-            (IconUtils as any).getUserAvatarURL = this._origGetUserAvatarURL;
-            this._origGetUserAvatarURL = null;
+        if (IconUtils && realGetUserAvatarURL) {
+            IconUtils.getUserAvatarURL = realGetUserAvatarURL;
+            realGetUserAvatarURL = undefined;
             _avatarPatchApplied = false;
         }
         if (this._origGetAvatarDecorationURL && IconUtils) { (IconUtils as any).getAvatarDecorationURL = this._origGetAvatarDecorationURL; this._origGetAvatarDecorationURL = null; }
@@ -3110,8 +3112,9 @@ function loadSavedLook(current: CustomProfileData, look: CustomProfileData): Cus
     return { ...savedSnapshot(look), syncRevision, localOnly, hideOtherProfiles, nativeEditorImages, hideBadgesWhenSyncOff };
 }
 
-function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUsername, fallbackAvatar, decorationFor, effectFor, frameFor }: {
+function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationFor, effectFor, frameFor }: {
     current: CustomProfileData; userId: string; onLoad: (data: CustomProfileData) => void; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
+    fallbackSurface: ProfilePreviewSurface;
     decorationFor: (asset: string) => string | undefined; effectFor: (skuId: string) => string | undefined; frameFor: (skuId: string) => string | undefined;
 }) {
     const [items, setItems] = React.useState<SavedProfile[]>(readSavedProfiles);
@@ -3143,7 +3146,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 const badges = profilePreviewBadges(data, userId);
                 const rename = () => { commit(items.map(other => other.id === item.id ? { ...other, name: renameText.trim() || other.name } : other)); setRenaming(null); };
                 return <div key={item.id} className="cpx-saved-item">
-                    <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar}
+                    <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
                         decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined}
                         nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined} badges={badges} />
                     <div className="cpx-saved-foot">

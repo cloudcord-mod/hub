@@ -7,7 +7,7 @@
 // Building blocks for the Custom Profile editor. Every control uses the same
 // spacing tokens (see editor.css), so sections can't drift or overlap.
 
-import { ACTIVITY_TYPES, serverTagCustomIcon, serverTagIconURL, streamURL } from "@utils/profileAppearance";
+import { ACTIVITY_TYPES, type nativeProfilePreviewSurface, profilePreviewColor, serverTagCustomIcon, serverTagIconURL, streamURL } from "@utils/profileAppearance";
 import { React } from "@webpack/common";
 
 let idCounter = 0;
@@ -174,9 +174,22 @@ export function TabList({ value, onChange }: { value: TabId; onChange: (tab: Tab
 
 const STATUS_COLORS: Record<string, string> = { online: "#23a55a", idle: "#f0b232", dnd: "#f23f43", invisible: "#80848e" };
 
+export type ProfilePreviewSurface = ReturnType<typeof nativeProfilePreviewSurface>;
+
+function previewSurface(data: { nitro?: boolean; banner?: string; accentColor?: number; accentColor2?: number; }, fallback?: ProfilePreviewSurface) {
+    const primary = data.nitro ? profilePreviewColor(data.accentColor) : undefined;
+    return {
+        banner: data.banner || fallback?.banner,
+        primary: primary ?? fallback?.primary,
+        accent: primary ? profilePreviewColor(data.accentColor2) ?? primary : fallback?.accent ?? fallback?.primary,
+        bannerColor: profilePreviewColor(data.accentColor) ?? fallback?.bannerColor ?? primary ?? fallback?.primary,
+    };
+}
+
 /** Approximation of how the profile will look; Discord draws the real thing. */
-export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackAvatar, decorationUrl, nameplateUrl, effectName, frameName, bare, badges = [], onBadges, onSaved }: {
+export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, effectName, frameName, bare, badges = [], onBadges, onSaved }: {
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
+    fallbackSurface?: ProfilePreviewSurface;
     decorationUrl?: string; nameplateUrl?: string; effectName?: string; frameName?: string; bare?: boolean;
     badges?: { id: string; icon: string; label: string }[]; onBadges?: () => void; onSaved?: () => void;
 }) {
@@ -184,9 +197,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     const name = data.globalName || fallbackName;
     const username = data.username || fallbackUsername;
     const avatar = data.avatar || fallbackAvatar;
-    const banner = data.banner || "";
-    const color = data.accentColor != null ? `#${Number(data.accentColor).toString(16).padStart(6, "0")}` : "#5865f2";
-    const color2 = data.accentColor2 != null ? `#${Number(data.accentColor2).toString(16).padStart(6, "0")}` : color;
+    const { banner, primary, accent, bannerColor } = previewSurface(data, fallbackSurface);
     const tag = data.serverTag;
     const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
     const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
@@ -206,8 +217,8 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 </div>
                 <p>Hey! This is how your profile looks in chat.</p>
             </div>
-        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={{ "--cpx-accent": color, "--cpx-accent2": color2 } as any}>
-            <div className="cpx-card-banner" style={banner ? { backgroundImage: `url("${banner.replace(/"/g, "%22")}")` } : undefined} />
+        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
+            <div className="cpx-card-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
             <div className="cpx-card-avatar">
                 <img className="cpx-card-avatar-img" src={avatar} alt="" />
                 {decorationUrl && <img className="cpx-card-decoration" src={decorationUrl} alt="" />}
@@ -237,21 +248,19 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
 }
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, decorationUrl, nameplateUrl, badges = [] }: {
+export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, badges = [] }: {
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
+    fallbackSurface?: ProfilePreviewSurface;
 }) {
-    const hexOf = (value: any) => value != null ? `#${Number(value).toString(16).padStart(6, "0")}` : null;
-    const primary = hexOf(data.accentColor);
-    const secondary = hexOf(data.accentColor2) || primary;
+    const { banner, primary, accent, bannerColor } = previewSurface(data, fallbackSurface);
     const themed = !!primary;
-    const banner = data.banner || "";
     const status = data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online";
     const tag = data.serverTag;
     const tagIcon = tag ? serverTagCustomIcon(tag.icon) || serverTagIconURL(tag) : "";
     const activity = data.customActivity;
-    return <div className={`cpx-dc ${themed ? "cpx-dc-themed" : ""}`} style={themed ? { "--dc-primary": primary, "--dc-secondary": secondary } as any : undefined}>
+    return <div className={`cpx-dc ${themed ? "cpx-dc-themed" : ""}`} style={themed ? { "--dc-primary": primary, "--dc-secondary": accent } as React.CSSProperties : undefined}>
         <div className="cpx-dc-inner">
-            <div className="cpx-dc-banner" style={banner ? { backgroundImage: `url("${banner.replace(/"/g, "%22")}")` } : { background: primary || "#5865f2" }} />
+            <div className="cpx-dc-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
             <div className="cpx-dc-avatar">
                 <img className="cpx-dc-avatar-img" src={data.avatar || fallbackAvatar} alt="" />
                 {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}

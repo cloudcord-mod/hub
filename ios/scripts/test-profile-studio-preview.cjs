@@ -11,12 +11,7 @@ const requireMock = name => {
     if (name === "react/jsx-runtime") return { jsx, jsxs: jsx, Fragment: "Fragment" };
     if (name === "react") return react;
     if (name === "@webpack/common") return { React: react };
-    if (name === "@utils/profileAppearance") return {
-        ACTIVITY_TYPES: [],
-        serverTagCustomIcon: icon => icon,
-        serverTagIconURL: () => "",
-        streamURL: () => undefined,
-    };
+    if (name === "@utils/profileAppearance") return { ...profileAppearance, serverTagCustomIcon: icon => icon };
     if (name === "@metro") return { findByStoreName: () => ({ theme }) };
     if (name === "@lib/api/assets") return { findAssetId: () => undefined };
     if (name === "@metro/common/components") return { Text: "Text" };
@@ -40,6 +35,7 @@ function flatten(value) {
 }
 
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
+const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
 const mobileProfile = { name: "Preview User", username: "preview", tagText: "CLOD", tagIcon: "https://cdn.example/tag.png",
     nameplate: "https://cdn.example/nameplate.png", bio: "My bio", badges: ["https://cdn.example/badge.png"] };
 const mobileRender = profile => flatten(PreviewCard(profile));
@@ -68,4 +64,43 @@ const desktop = flatten(ProfilePreview({
 const heading = desktop.find(node => node.props.className === "cpx-chat-preview-heading");
 assert.equal(flatten(heading).find(node => node.type === "strong").props.children, mobileProfile.name);
 assert.equal(flatten(heading).find(node => node.type === "img").props.src, mobileProfile.tagIcon);
-console.log("PASS Profile Studio preview modes, server-tag icons, nameplate rendering and theme contrast");
+const id = "123456789012345678";
+const hash = "a_" + "1".repeat(32);
+const nativeProfile = { banner: hash, theme_colors: [0, 0x123456], accent_color: 0xabcdef };
+const nativeBanner = `https://cdn.discordapp.com/banners/${id}/${hash}.gif?size=512`;
+const fallbackSurface = profileAppearance.nativeProfilePreviewSurface(id, nativeProfile);
+assert.equal(fallbackSurface.banner, nativeBanner);
+assert.equal(fallbackSurface.primary, "#000000");
+assert.equal(fallbackSurface.accent, "#123456");
+assert.equal(fallbackSurface.bannerColor, "#abcdef");
+assert.equal(profileAppearance.nativeProfilePreviewSurface(id, { banner: "https://example.com/draft.png" }).banner, undefined);
+
+layout = "profile";
+const previewDesktop = data => flatten(ProfilePreview({ data, fallbackName: "Native", fallbackUsername: "native", fallbackAvatar: "avatar", fallbackSurface }));
+const bannerStyle = nodes => nodes.find(node => /^(cpx-card|cpx-dc)-banner$/.test(node.props.className)).props.style;
+const frameColor = nodes => nodes.find(node => node.props.className === "cpx-card ").props.style["--cpx-accent"];
+assert.equal(bannerStyle(previewDesktop({})).backgroundImage, `url("${nativeBanner}")`);
+assert.equal(frameColor(previewDesktop({ nitro: false, accentColor: 0xffffff })), "#000000");
+assert.equal(frameColor(previewDesktop({ nitro: true, accentColor: 0xffffff })), "#ffffff");
+layout = "popout";
+assert.equal(bannerStyle(previewDesktop({ banner: "https://example.com/draft.png" })).backgroundImage, 'url("https://example.com/draft.png")');
+
+const workflow = fs.readFileSync(".github/workflows/cloudcord.yml", "utf8");
+const page = workflow.split("cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'")[1].split("\n          TSX")[0];
+const mobileSource = page.slice(page.indexOf("function studioPreviewAppearance("), page.indexOf("function SavedProfiles("));
+const mobileAppearance = vm.runInNewContext(transformSync(mobileSource + "\nstudioPreviewAppearance;", { loader: "ts" }).code,
+    { ...profileAppearance, readNativeProfile: userId => userId === id ? nativeProfile : undefined });
+assert.match(page, /<K\.PreviewCard \{\.\.\.appearance\}/);
+assert.match(page, /<S\.DiscordProfileCard \{\.\.\.appearance\}/);
+const account = { id, username: "real", getAvatarURL: () => "avatar" };
+const nativeLook = mobileAppearance({}, account);
+assert.equal(nativeLook.banner, nativeBanner);
+assert.equal(nativeLook.name, "real");
+assert.equal(nativeLook.primary, "#000000");
+const mobileDraft = mobileAppearance({ profileColorsEnabled: true, accentColor: "#987654", bannerMedia: { uri: "draft" } }, account);
+assert.equal(mobileDraft.primary, "#987654");
+assert.equal(mobileDraft.bannerColor, "#987654");
+layout = "Popout";
+assert.ok(media(mobileRender(nativeLook)).includes(nativeBanner));
+assert.ok(media(mobileRender(mobileDraft)).includes("draft"));
+console.log("PASS Profile Studio preview modes, native banner and color fallback, draft precedence and saved-look wiring");

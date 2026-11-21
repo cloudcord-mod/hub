@@ -72,7 +72,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
     name: string; username: string; avatar?: string; banner?: string; accent?: string; status?: string;
     enabled: boolean; onToggle: () => void; syncLabel: string; onPreview: () => void; quickLook: boolean; onQuickLook: () => void;
 }) {
-    const tint = accent || C.brand;
+    const tint = accent || C.raised();
     return <View style={{ borderRadius: R.lg, overflow: "hidden", backgroundColor: C.panel(), borderWidth: 1, borderColor: C.line() }}>
         <View style={{ height: 96, backgroundColor: tint }}>
             {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
@@ -393,13 +393,13 @@ function PreviewNameplate({ uri }: { uri: string }) {
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }: {
-    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; decoration?: string; nameplate?: string;
+export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }: {
+    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
     badges?: string[]; onBadges?: () => void; onSaved?: () => void;
 }) {
     const [layout, setLayout] = useState<"Profile" | "Popout" | "Chat">("Profile");
-    const edge = primary || C.brand;
+    const edge = primary || C.page();
     const card = C.page();
     return <View style={{ gap: GAP.sm }}>
         <Text variant="heading-md/bold" style={{ color: C.text() }}>Live preview</Text>
@@ -415,9 +415,9 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                 </View>
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
-        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent}
+        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent} bannerColor={bannerColor}
             decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
-            <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: accent || edge }}>
+            <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: bannerColor || primary || C.raised() }}>
                 {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
             </View>
             <View style={{ backgroundColor: card, borderBottomLeftRadius: R.lg - 3, borderBottomRightRadius: R.lg - 3, padding: GAP.md, paddingTop: 50, gap: 6 }}>
@@ -471,8 +471,8 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }: {
-    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; decoration?: string; nameplate?: string; status?: string;
+export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }: {
+    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
     customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[];
 }) {
     const themed = !!primary;
@@ -480,7 +480,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
     const ring = themed ? colors.panel : colors.page;
     const themedSurface = colors === LIGHT ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.55)";
     const inner = <View style={{ borderRadius: themed ? 6 : 10, overflow: "hidden", backgroundColor: themed ? themedSurface : colors.page }}>
-        <View style={{ height: 96, backgroundColor: primary || C.brand }}>
+        <View style={{ height: 96, backgroundColor: bannerColor || primary || colors.raised }}>
             {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
         </View>
         <View style={{ position: "absolute", top: 54, left: 14, width: 84, height: 84 }}>
