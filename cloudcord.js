@@ -22130,7 +22130,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       resizeMode: "cover"
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }) {
+  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
@@ -22238,7 +22238,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           activity,
           tagText,
           tagIcon,
-          badges
+          badges,
+          officialBadgeIcon
         }) : /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
             borderRadius: R2.lg,
@@ -22399,7 +22400,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     resizeMode: "contain",
                     style: {
                       width: 20,
-                      height: 20
+                      height: 20,
+                      tintColor: uri === officialBadgeIcon ? isLightTheme() ? "#000000" : "#ffffff" : void 0
                     }
                   }, uri))
                 }) : null,
@@ -22542,7 +22544,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [], officialBadgeIcon }) {
     var themed = !!primary;
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
@@ -22648,7 +22650,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             },
             style: {
               width: 20,
-              height: 20
+              height: 20,
+              tintColor: icon3 === officialBadgeIcon ? colors === LIGHT ? "#000000" : "#ffffff" : void 0
             },
             resizeMode: "contain"
           }, index))
@@ -24732,11 +24735,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function localBadgesHidden() {
     return rootSettings.fakeProfileLocalOnly && preview.hideBadgesWhenSyncOff === true;
   }
-  function localHasFakeBadges() {
-    return preview.nitroEnabled || preview.boostMonths > 0 || preview.giftLevel >= 0 || Object.values(preview.selectedBadges || {}).some(Boolean);
+  function localHasFakeBadges(data = preview) {
+    return data.nitroEnabled || (data.boostMonths ?? 0) > 0 || (data.giftLevel ?? -1) >= 0 || Object.values(data.selectedBadges || {}).some(Boolean);
   }
-  function shouldReplaceLocalBadges() {
-    return !localBadgesHidden() && preview.replaceBadges && localHasFakeBadges();
+  function shouldReplaceLocalBadges(data = preview) {
+    return !localBadgesHidden() && data.replaceBadges && localHasFakeBadges(data);
   }
   function remoteReplaceBadges(data) {
     return data?.replaceRealBadges === true || Array.isArray(data?.customBadgeIds) && data.customBadgeIds.includes(REPLACE_BADGES_SYNC_ID);
@@ -26108,13 +26111,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
     }
   }
-  function selectedBadgeObjects(existing, forEditor = false) {
+  function draftBadgeRows(data) {
     var _loop2 = function(id2, description2, icon23) {
-      if (!preview.selectedBadges?.[id2])
+      if (!data.selectedBadges?.[id2])
         return "continue";
       var badgeId = `fakeprofile-${id2}`;
       if (!result.some((item) => item?.id === badgeId)) {
-        var label2 = id2 === "oldname" && preview.oldName ? `Originally Known As: ${preview.oldName}` : description2;
+        var label2 = id2 === "oldname" && data.oldName ? `Originally Known As: ${data.oldName}` : description2;
         result.push({
           id: badgeId,
           description: label2,
@@ -26127,13 +26130,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     };
     var result = [];
-    if (!forEditor && rootSettings.fakeProfileLocalOnly && preview.hideBadgesWhenSyncOff)
-      return Array.isArray(existing) ? existing : result;
-    if (preview.nitroEnabled) {
-      var icon3 = milestoneIcon(preview.nitroMonths, NITRO_ICONS);
+    if (data.nitroEnabled) {
+      var months = data.nitroMonths ?? 0;
+      var icon3 = milestoneIcon(months, NITRO_ICONS);
       result.push({
-        id: nitroBadgeId(preview.nitroMonths),
-        description: nitroSubscriberLabel(preview.nitroMonths, preview.nitroSince),
+        id: nitroBadgeId(months),
+        description: nitroSubscriberLabel(months, data.nitroSince),
         icon: " _",
         iconSrc: icon3,
         source: {
@@ -26141,7 +26143,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       });
     }
-    var gift = GIFT_LEVELS[preview.giftLevel];
+    var gift = GIFT_LEVELS[data.giftLevel ?? -1];
     if (gift)
       result.push({
         id: "fakeprofile-gifting",
@@ -26152,11 +26154,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           uri: gift.icon
         }
       });
-    if (preview.boostMonths > 0) {
-      var icon1 = boosterIcon(preview.boostMonths);
+    if ((data.boostMonths ?? 0) > 0) {
+      var months1 = data.boostMonths ?? 0;
+      var icon1 = boosterIcon(months1);
       result.push({
         id: "fakeprofile-boost",
-        description: serverBoostingLabel(preview.boostMonths),
+        description: serverBoostingLabel(months1),
         icon: " _",
         iconSrc: icon1,
         source: {
@@ -26166,29 +26169,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     for (var [id, description, , icon22] of BADGES)
       _loop2(id, description, icon22);
-    if (!shouldReplaceLocalBadges() && Array.isArray(existing)) {
-      var _loop1 = function(badge2) {
-        if (!badge2 || result.some((item) => badgeLayoutKey(item) === badgeLayoutKey(badge2)))
-          return "continue";
-        result.push(badge2);
-      };
-      for (var badge of existing)
-        _loop1(badge);
-    }
-    for (var badge1 of result) {
-      if (badge1.iconSrc) {
-        badge1.icon = badge1.iconSrc;
-        badgeRenderProps.set(badge1.id, {
-          id: badge1.id,
-          source: badge1.source,
-          label: badge1.description
-        });
-      }
-    }
-    return forEditor ? result : applyBadgeLayout(result, {
-      ...preview,
-      badgeOrder: preview.badgeOrder?.length ? preview.badgeOrder : defaultBadgeOrder(Array.isArray(existing) ? existing : [])
-    });
+    return result;
   }
   function cloneObject(original, kind) {
     if (!original || !preview.enabled)
@@ -26385,18 +26366,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     })();
   }
-  function editableBadgeRows() {
-    var existing = nativeBadgeRows.get(currentUserId) || safeStore("UserProfileStore")?.getUserProfile?.(currentUserId)?.badges || [];
+  function editableBadgeRows(data = preview, userId = currentUserId) {
+    var existing = nativeBadgeRows.get(userId) || safeStore("UserProfileStore")?.getUserProfile?.(userId)?.badges || [];
     var native = Array.isArray(existing) ? existing.filter((badge2) => !/^(?:fakeprofile-|cloudcord-shared-)/.test(String(badge2?.id))) : [];
-    var rows = selectedBadgeObjects(native, true);
-    var gift = GIFT_LEVELS[preview.giftLevel];
-    if (gift)
-      rows.push({
-        id: "gifting",
-        description: gift.name,
-        iconSrc: gift.icon
-      });
-    var staff = cloudCordStaffBadge(currentUserId);
+    var rows = draftBadgeRows(data);
+    if (!shouldReplaceLocalBadges(data))
+      rows.push(...native);
+    var staff = cloudCordStaffBadge(userId);
     if (staff)
       rows.unshift({
         id: staff.id,
@@ -26404,7 +26380,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         iconSrc: CLOUDCORD_BADGE_ICON
       });
     for (var badge of publishedBadges)
-      if (badge.userId === currentUserId)
+      if (badge.userId === userId)
         rows.push({
           id: `cloudcord-custom-${badge.id}`,
           description: badge.name,
@@ -26419,7 +26395,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           id
         });
     }
-    for (var id1 of preview.hiddenBadgeIds)
+    for (var id1 of data.hiddenBadgeIds ?? [])
       if (!unique.has(id1))
         unique.set(id1, {
           id: id1,
@@ -26428,8 +26404,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return applyBadgeLayout([
       ...unique.values()
     ], {
-      badgeOrder: preview.badgeOrder.length ? preview.badgeOrder : defaultBadgeOrder(native)
+      badgeOrder: data.badgeOrder?.length ? data.badgeOrder : defaultBadgeOrder(native)
     });
+  }
+  function studioBadgeIcons(data, userId = currentUserId) {
+    var hidden = new Set(data.hiddenBadgeIds);
+    var icons = editableBadgeRows(data, userId).filter((row) => !hidden.has(row.id)).map((row) => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : void 0));
+    return [
+      ...new Set(icons.filter((icon3) => typeof icon3 === "string" && icon3))
+    ];
   }
   function appendPublishedBadges(result, userId) {
     if (isRealProfileView(userId))
@@ -31249,29 +31232,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var data = item.data || {};
           var active = JSON.stringify(savedSnapshot(data)) === currentJson;
           var appearance = studioPreviewAppearance(data, realUser);
-          var rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({
-            id,
-            iconSrc
-          }));
-          if (data.nitroEnabled)
-            rows.push({
-              id: nitroBadgeId(data.nitroMonths),
-              iconSrc: milestoneIcon(data.nitroMonths, NITRO_ICONS)
-            });
-          if (data.boostMonths > 0)
-            rows.push({
-              id: "boost",
-              iconSrc: boosterIcon(data.boostMonths)
-            });
-          var gift = GIFT_LEVELS[data.giftLevel];
-          if (gift)
-            rows.push({
-              id: "gifting",
-              iconSrc: gift.icon
-            });
-          var badges = [
-            ...new Set(applyBadgeLayout(rows, data).map((row) => row.iconSrc).filter(Boolean))
-          ];
+          var badges = studioBadgeIcons(data, ownerId ?? "");
           return /* @__PURE__ */ jsxs(import_react_native28.View, {
             style: {
               gap: 10
@@ -31282,6 +31243,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 secondary: appearance.accent,
                 decoration: data.avatarDecoration || void 0,
                 badges,
+                officialBadgeIcon: CLOUDCORD_BADGE_ICON,
                 customStatus: data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : void 0,
                 activity: data.customActivity ? {
                   verb: ACTIVITY_TYPES.find((type) => type.value === data.customActivity?.type)?.label || "",
@@ -32199,9 +32161,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   name: preview.customActivity.name,
                   details: preview.customActivity.details
                 } : null,
-                badges: [
-                  ...new Set(editableBadgeRows().filter((row) => !preview.hiddenBadgeIds.includes(row.id)).map((row) => row.source?.uri || row.iconSrc || (/^[a-f0-9]{32}$/i.test(row.icon || "") ? `https://cdn.discordapp.com/badge-icons/${row.icon}.png` : void 0)).filter(Boolean))
-                ],
+                badges: studioBadgeIcons(preview),
+                officialBadgeIcon: CLOUDCORD_BADGE_ICON,
                 onBadges: () => setActiveTab("badges"),
                 onSaved: () => setActiveTab("saved"),
                 frame: preview.profileFrame ? catalog?.frames.find((item) => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : void 0,
@@ -64209,7 +64170,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a53f9ad71f2ddd97d61a3902dcae95eba900ab90";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "16d8832b4bbae7e137ac7e2aca7ee0b56ec59914";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
