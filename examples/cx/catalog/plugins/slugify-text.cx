@@ -1,0 +1,5 @@
+plugin "Slugify Text":
+  needs commands.register
+  needs reply.local
+  on command "slugifytext" with text:
+    reply "${slugifyText(text)}" else "Enter text containing letters or numbers."

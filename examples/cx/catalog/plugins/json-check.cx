@@ -1,0 +1,5 @@
+plugin "JSON Check":
+  needs commands.register
+  needs reply.local
+  on command "jsoncheck" with text:
+    reply "${checkJson(text)}"

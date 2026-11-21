@@ -1,0 +1,5 @@
+plugin "Snowflake Created At":
+  needs commands.register
+  needs reply.local
+  on command "snowflakecreated" with text:
+    reply "${snowflakeTimestamp(text)}" else "Enter a valid Discord ID."

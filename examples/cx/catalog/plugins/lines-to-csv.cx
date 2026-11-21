@@ -1,0 +1,5 @@
+plugin "Lines to CSV":
+  needs commands.register
+  needs reply.local
+  on command "linestocsv" with text:
+    reply "${linesToCsv(text)}"

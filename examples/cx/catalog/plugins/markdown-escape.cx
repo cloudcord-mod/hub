@@ -1,0 +1,5 @@
+plugin "Markdown Escape":
+  needs commands.register
+  needs reply.local
+  on command "escapemarkdown" with text:
+    reply "${escapeMarkdown(text)}"

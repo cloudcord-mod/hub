@@ -1,0 +1,5 @@
+plugin "Trim Lines":
+  needs commands.register
+  needs reply.local
+  on command "trimlines" with text:
+    reply "${trimLines(text)}"

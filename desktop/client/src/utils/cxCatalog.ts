@@ -29,6 +29,7 @@ import plugin_catalog_clean_channel_name from "../../../../examples/cx/catalog/p
 import plugin_catalog_clear_urls from "../../../../examples/cx/catalog/plugins/clear-urls.cx";
 import plugin_catalog_client_side_block from "../../../../examples/cx/catalog/plugins/client-side-block.cx";
 import plugin_catalog_cloud_cord_accent from "../../../../examples/cx/catalog/plugins/cloud-cord-accent.cx";
+import plugin_catalog_color_converter from "../../../../examples/cx/catalog/plugins/color-converter.cx";
 import plugin_catalog_color_text from "../../../../examples/cx/catalog/plugins/color-text.cx";
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
 import plugin_catalog_compact_compose from "../../../../examples/cx/catalog/plugins/compact-compose.cx";
@@ -45,8 +46,10 @@ import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
+import plugin_catalog_days_between from "../../../../examples/cx/catalog/plugins/days-between.cx";
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
+import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/plugins/discord-timestamp.cx";
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
 import plugin_catalog_double_click_edit from "../../../../examples/cx/catalog/plugins/double-click-edit.cx";
 import plugin_catalog_double_click_to_reply from "../../../../examples/cx/catalog/plugins/double-click-to-reply.cx";
@@ -141,11 +144,14 @@ import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
+import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
 import plugin_catalog_keyword_notify from "../../../../examples/cx/catalog/plugins/keyword-notify.cx";
 import plugin_catalog_leet_text from "../../../../examples/cx/catalog/plugins/leet-text.cx";
+import plugin_catalog_lines_to_csv from "../../../../examples/cx/catalog/plugins/lines-to-csv.cx";
 import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugins/link-converter.cx";
+import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
 import plugin_catalog_more_commands from "../../../../examples/cx/catalog/plugins/more-commands.cx";
@@ -170,6 +176,7 @@ import plugin_catalog_no_typing_animation from "../../../../examples/cx/catalog/
 import plugin_catalog_no_unblock_to_jump from "../../../../examples/cx/catalog/plugins/no-unblock-to-jump.cx";
 import plugin_catalog_normalize_message_links from "../../../../examples/cx/catalog/plugins/normalize-message-links.cx";
 import plugin_catalog_notify_when_muted from "../../../../examples/cx/catalog/plugins/notify-when-muted.cx";
+import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
 import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugins/polish-wording.cx";
@@ -201,10 +208,13 @@ import plugin_catalog_signature from "../../../../examples/cx/catalog/plugins/si
 import plugin_catalog_silence_users from "../../../../examples/cx/catalog/plugins/silence-users.cx";
 import plugin_catalog_silent_message_toggle from "../../../../examples/cx/catalog/plugins/silent-message-toggle.cx";
 import plugin_catalog_silent_typing from "../../../../examples/cx/catalog/plugins/silent-typing.cx";
+import plugin_catalog_slugify_text from "../../../../examples/cx/catalog/plugins/slugify-text.cx";
 import plugin_catalog_smaller_avatars_in_chat from "../../../../examples/cx/catalog/plugins/smaller-avatars-in-chat.cx";
 import plugin_catalog_smooth_scrolling from "../../../../examples/cx/catalog/plugins/smooth-scrolling.cx";
+import plugin_catalog_snowflake_created_at from "../../../../examples/cx/catalog/plugins/snowflake-created-at.cx";
 import plugin_catalog_soft_corners from "../../../../examples/cx/catalog/plugins/soft-corners.cx";
 import plugin_catalog_sollux_typing_quirk from "../../../../examples/cx/catalog/plugins/sollux-typing-quirk.cx";
+import plugin_catalog_sort_lines from "../../../../examples/cx/catalog/plugins/sort-lines.cx";
 import plugin_catalog_sort_reactions from "../../../../examples/cx/catalog/plugins/sort-reactions.cx";
 import plugin_catalog_space_out from "../../../../examples/cx/catalog/plugins/space-out.cx";
 import plugin_catalog_split_large_messages from "../../../../examples/cx/catalog/plugins/split-large-messages.cx";
@@ -219,10 +229,13 @@ import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plugins/thin-scrollbars.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
+import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
+import plugin_catalog_unicode_inspector from "../../../../examples/cx/catalog/plugins/unicode-inspector.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
 import plugin_catalog_unique_lines from "../../../../examples/cx/catalog/plugins/unique-lines.cx";
 import plugin_catalog_unit_converter from "../../../../examples/cx/catalog/plugins/unit-converter.cx";
 import plugin_catalog_unsuppress_embeds from "../../../../examples/cx/catalog/plugins/unsuppress-embeds.cx";
+import plugin_catalog_url_component_codec from "../../../../examples/cx/catalog/plugins/url-component-codec.cx";
 import plugin_catalog_user_notes from "../../../../examples/cx/catalog/plugins/user-notes.cx";
 import plugin_catalog_user_tags from "../../../../examples/cx/catalog/plugins/user-tags.cx";
 import plugin_catalog_vibe_check from "../../../../examples/cx/catalog/plugins/vibe-check.cx";
@@ -234,6 +247,7 @@ import plugin_catalog_webcam_start_notifier from "../../../../examples/cx/catalo
 import plugin_catalog_wider_channel_list from "../../../../examples/cx/catalog/plugins/wider-channel-list.cx";
 import plugin_catalog_wider_chat from "../../../../examples/cx/catalog/plugins/wider-chat.cx";
 import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/wiki-lookup.cx";
+import plugin_catalog_word_frequency from "../../../../examples/cx/catalog/plugins/word-frequency.cx";
 import plugin_catalog_write_upper_case from "../../../../examples/cx/catalog/plugins/write-upper-case.cx";
 import plugin_catalog_zero_width_sanitizer from "../../../../examples/cx/catalog/plugins/zero-width-sanitizer.cx";
 import theme_base_midnight from "../../../../examples/cx/midnight.cx";
@@ -369,6 +383,7 @@ export const cxCatalog = {
         { name: "ClearURLs", source: plugin_catalog_clear_urls },
         { name: "ClientSideBlock", source: plugin_catalog_client_side_block },
         { name: "CloudCordAccent", source: plugin_catalog_cloud_cord_accent },
+        { name: "Color Converter", source: plugin_catalog_color_converter },
         { name: "ColorText", source: plugin_catalog_color_text },
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions },
         { name: "CompactCompose", source: plugin_catalog_compact_compose, desktopOnly: true },
@@ -385,8 +400,10 @@ export const cxCatalog = {
         { name: "Count Lines", source: plugin_catalog_count_lines },
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps },
         { name: "Dashless", source: plugin_catalog_dashless },
+        { name: "Days Between", source: plugin_catalog_days_between },
         { name: "Declutter", source: plugin_catalog_declutter },
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels },
+        { name: "Discord Timestamp", source: plugin_catalog_discord_timestamp },
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps },
         { name: "DoubleClickEdit", source: plugin_catalog_double_click_edit },
         { name: "DoubleClickToReply", source: plugin_catalog_double_click_to_reply },
@@ -481,11 +498,14 @@ export const cxCatalog = {
         { name: "ImageLink", source: plugin_catalog_image_link },
         { name: "InRole", source: plugin_catalog_in_role },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator },
+        { name: "JSON Check", source: plugin_catalog_json_check },
         { name: "JumpToTop", source: plugin_catalog_jump_to_top },
         { name: "JumpTo", source: plugin_catalog_jump_to },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify },
         { name: "LeetText", source: plugin_catalog_leet_text },
+        { name: "Lines to CSV", source: plugin_catalog_lines_to_csv },
         { name: "LinkConverter", source: plugin_catalog_link_converter },
+        { name: "Markdown Escape", source: plugin_catalog_markdown_escape },
         { name: "MessageBurst", source: plugin_catalog_message_burst },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier },
         { name: "MoreCommands", source: plugin_catalog_more_commands },
@@ -510,6 +530,7 @@ export const cxCatalog = {
         { name: "NoUnblockToJump", source: plugin_catalog_no_unblock_to_jump },
         { name: "NormalizeMessageLinks", source: plugin_catalog_normalize_message_links },
         { name: "NotifyWhenMuted", source: plugin_catalog_notify_when_muted },
+        { name: "Number Lines", source: plugin_catalog_number_lines },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications },
         { name: "PolishWording", source: plugin_catalog_polish_wording },
@@ -541,10 +562,13 @@ export const cxCatalog = {
         { name: "SilenceUsers", source: plugin_catalog_silence_users },
         { name: "SilentMessageToggle", source: plugin_catalog_silent_message_toggle },
         { name: "SilentTyping", source: plugin_catalog_silent_typing },
+        { name: "Slugify Text", source: plugin_catalog_slugify_text },
         { name: "SmallerAvatarsInChat", source: plugin_catalog_smaller_avatars_in_chat, desktopOnly: true },
         { name: "SmoothScrolling", source: plugin_catalog_smooth_scrolling, desktopOnly: true },
+        { name: "Snowflake Created At", source: plugin_catalog_snowflake_created_at },
         { name: "SoftCorners", source: plugin_catalog_soft_corners, desktopOnly: true },
         { name: "SolluxTypingQuirk", source: plugin_catalog_sollux_typing_quirk },
+        { name: "Sort Lines", source: plugin_catalog_sort_lines },
         { name: "SortReactions", source: plugin_catalog_sort_reactions },
         { name: "SpaceOut", source: plugin_catalog_space_out },
         { name: "SplitLargeMessages", source: plugin_catalog_split_large_messages },
@@ -559,10 +583,13 @@ export const cxCatalog = {
         { name: "ThinScrollbars", source: plugin_catalog_thin_scrollbars, desktopOnly: true },
         { name: "Translate", source: plugin_catalog_translate },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar },
+        { name: "Trim Lines", source: plugin_catalog_trim_lines },
+        { name: "Unicode Inspector", source: plugin_catalog_unicode_inspector },
         { name: "Unindent", source: plugin_catalog_unindent },
         { name: "Unique Lines", source: plugin_catalog_unique_lines },
         { name: "UnitConverter", source: plugin_catalog_unit_converter },
         { name: "UnsuppressEmbeds", source: plugin_catalog_unsuppress_embeds },
+        { name: "URL Component Codec", source: plugin_catalog_url_component_codec },
         { name: "UserNotes", source: plugin_catalog_user_notes },
         { name: "UserTags", source: plugin_catalog_user_tags },
         { name: "VibeCheck", source: plugin_catalog_vibe_check },
@@ -574,6 +601,7 @@ export const cxCatalog = {
         { name: "WiderChannelList", source: plugin_catalog_wider_channel_list },
         { name: "WiderChat", source: plugin_catalog_wider_chat, desktopOnly: true },
         { name: "WikiLookup", source: plugin_catalog_wiki_lookup },
+        { name: "Word Frequency", source: plugin_catalog_word_frequency },
         { name: "WriteUpperCase", source: plugin_catalog_write_upper_case },
         { name: "ZeroWidthSanitizer", source: plugin_catalog_zero_width_sanitizer },
     ],

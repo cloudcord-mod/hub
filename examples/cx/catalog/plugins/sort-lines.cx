@@ -1,0 +1,5 @@
+plugin "Sort Lines":
+  needs commands.register
+  needs reply.local
+  on command "sortlines" with text:
+    reply "${sortLines(text)}"

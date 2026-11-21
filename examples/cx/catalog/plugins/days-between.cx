@@ -1,0 +1,7 @@
+plugin "Days Between":
+  needs commands.register
+  needs reply.local
+  on command "daysbetween":
+    input "start" text
+    input "end" text
+    reply "${daysBetween(start, end)}" else "Enter two valid dates as YYYY-MM-DD."

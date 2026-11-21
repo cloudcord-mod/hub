@@ -1,0 +1,7 @@
+plugin "URL Component Codec":
+  needs commands.register
+  needs reply.local
+  on command "urlencode" with text:
+    reply "${encodeUrlComponent(text)}"
+  on command "urldecode" with text:
+    reply "${decodeUrlComponent(text)}"

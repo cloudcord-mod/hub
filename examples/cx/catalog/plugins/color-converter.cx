@@ -1,0 +1,7 @@
+plugin "Color Converter":
+  needs commands.register
+  needs reply.local
+  on command "hextorgb" with text:
+    reply "${hexToRgb(text)}" else "Enter a three- or six-digit hex color."
+  on command "rgbtohex" with text:
+    reply "${rgbToHex(text)}" else "Enter three comma-separated RGB values from 0 to 255."

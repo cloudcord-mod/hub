@@ -1,0 +1,5 @@
+plugin "Word Frequency":
+  needs commands.register
+  needs reply.local
+  on command "wordfrequency" with text:
+    reply "${wordFrequency(text)}"

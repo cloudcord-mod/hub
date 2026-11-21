@@ -1,0 +1,5 @@
+plugin "Number Lines":
+  needs commands.register
+  needs reply.local
+  on command "numberlines" with text:
+    reply "${numberLines(text)}" else "Enter text to number."

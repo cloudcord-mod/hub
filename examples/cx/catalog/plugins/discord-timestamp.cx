@@ -1,0 +1,12 @@
+plugin "Discord Timestamp":
+  needs commands.register
+  needs reply.local
+  on command "discordtimestamp":
+    input "seconds" text
+    input "format" choice "t,T,d,D,f,F,R"
+    reply "${discordTimestamp(seconds, format)}" else "Enter a Unix timestamp in whole seconds."
+  on command "discordlocaltimestamp":
+    input "date" text
+    input "time" text
+    input "format" choice "t,T,d,D,f,F,R"
+    reply "${discordLocalTimestamp(date, time, format)}" else "Enter a valid local date and time as YYYY-MM-DD and HH:MM."
