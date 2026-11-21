@@ -43032,6 +43032,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "messages.insertmention",
           label: "Insert the selected message author's mention into the current draft"
         },
+        "plain-url-paste": {
+          permission: "messages.paste",
+          label: "Paste URLs as plain text when replacing selected text in chat",
+          desktopOnly: true
+        },
         "hide-profile-banner-images": {
           permission: "appearance.hide",
           label: "Hide Discord-hosted profile banner images except your own and those of friends"
@@ -50158,6 +50163,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.openeditor": "Open Discord\u2019s editor for your own message when you double-click or double-tap it",
         "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user\u2019s message",
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+        "messages.paste": "Change how links you paste into the message composer are inserted",
         "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
         "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
         "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
@@ -52315,6 +52321,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/no-masked-url-paste.cx
+  var no_masked_url_paste_default;
+  var init_no_masked_url_paste = __esm({
+    "../examples/cx/catalog/plugins/no-masked-url-paste.cx"() {
+      no_masked_url_paste_default = 'plugin "NoMaskedUrlPaste":\n  needs messages.paste\n  use plain-url-paste\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/no-message-hover-bar.cx
   var no_message_hover_bar_default;
   var init_no_message_hover_bar = __esm({
@@ -54146,6 +54160,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_no_chat_bar_border();
       init_no_confirm_pin();
       init_no_draft_length_limit();
+      init_no_masked_url_paste();
       init_no_message_hover_bar();
       init_no_mosaic();
       init_no_pending_count();
@@ -56291,6 +56306,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "NoDraftLengthLimit",
             source: no_draft_length_limit_default,
             description: "Preserve long drafts in Discord\u2019s local draft store",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "NoMaskedUrlPaste",
+            source: no_masked_url_paste_default,
+            description: "Paste URLs as plain text when replacing selected text in chat",
+            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -61377,6 +61401,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   getPendingCount: () => 0,
                   getPendingIncomingCount: () => 0
                 }, enabled);
+              case "plain-url-paste":
+                throw new Error("Plain URL paste is available on desktop and browser.");
               case "animated-assets":
                 return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
               case "floor-relative-time":
@@ -63695,7 +63721,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7738c08889998600032d52b12e8dda6eb5feee6b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "280010c58c07eec1cc74edb462bc1671be07b308";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
