@@ -40789,6 +40789,47 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var value = Number(text);
     return Number.isSafeInteger(value) ? value : void 0;
   }
+  function jsonTokens(text) {
+    try {
+      JSON.parse(text);
+    } catch (e) {
+      return;
+    }
+    return text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
+  }
+  function markdownTable(rows) {
+    var columns = rows[0]?.length ?? 0;
+    if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
+      return;
+    var row = (cells) => "| " + cells.map((cell) => cell.trim().replace(/[\\|]/g, "\\$&").replace(/\r\n|\r|\n/g, "<br>").replace(/`(?=``)/g, "`\u200B")).join(" | ") + " |";
+    var output = [
+      row(rows[0]),
+      row(Array.from({
+        length: columns
+      }, () => "---")),
+      ...rows.slice(1).map(row)
+    ].join("\n");
+    return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
+  }
+  function csvRows(input) {
+    var rows = [];
+    var field = /(?:"((?:[^"]|"")*)"|([^",\r\n]*))(,|\r\n|\r|\n|$)/y;
+    var cells = [];
+    while (field.lastIndex <= input.length) {
+      var match = field.exec(input);
+      if (!match)
+        return [];
+      var [, quoted2, plain, separator] = match;
+      cells.push(quoted2 === void 0 ? plain : quoted2.replaceAll('""', '"'));
+      if (separator === ",")
+        continue;
+      rows.push(cells);
+      if (!separator || field.lastIndex === input.length)
+        break;
+      cells = [];
+    }
+    return rows;
+  }
   var searchEngines, morseCodes, morseLetters, normalizations, ansiForegrounds, ansiBackgrounds, codeFence, dayMilliseconds, cxCommandFunctions;
   var init_cxCommandFunctions = __esm({
     "src/lib/api/cxCommandFunctions.ts"() {
@@ -40973,12 +41014,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         },
         formatJson(text) {
-          try {
-            JSON.parse(text);
-          } catch (e) {
+          var tokens2 = jsonTokens(text);
+          if (!tokens2)
             return "Invalid JSON.";
-          }
-          var tokens2 = text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
           var depth = 0;
           var result = "";
           for (var index = 0; index < tokens2.length; index++) {
@@ -41000,6 +41038,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               return "Formatted JSON is too long for one reply.";
           }
           return codeFence + "json\n" + result + "\n" + codeFence;
+        },
+        compactJson(text) {
+          var tokens2 = jsonTokens(text);
+          if (!tokens2)
+            return "Invalid JSON.";
+          var result = tokens2.join("").replaceAll("`", "\\u0060");
+          return result.length <= 3900 ? codeFence + "json\n" + result + "\n" + codeFence : "Compacted JSON is too long for one reply.";
         },
         compareLines(before3, after2) {
           var lines = (value) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
@@ -41085,6 +41130,20 @@ WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
           if (Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999)
             return `\`${date.toISOString().slice(0, 10)}\``;
         },
+        isoWeek(input) {
+          var start = utcMidnight(input);
+          if (start === void 0)
+            return;
+          var thursday = new Date(start);
+          var weekday = thursday.getUTCDay() || 7;
+          thursday.setUTCDate(thursday.getUTCDate() + 4 - weekday);
+          var year = thursday.getUTCFullYear();
+          var firstDay = new Date(thursday);
+          firstDay.setUTCMonth(0, 1);
+          var week = Math.floor((thursday.getTime() - firstDay.getTime()) / (7 * dayMilliseconds)) + 1;
+          var yearLabel = (year < 0 ? "-" : "") + String(Math.abs(year)).padStart(4, "0");
+          return yearLabel + "-W" + String(week).padStart(2, "0") + "-" + weekday;
+        },
         unixToIso(input, unit) {
           var value = integerText(input);
           if (value === void 0 || unit !== "seconds" && unit !== "milliseconds")
@@ -41158,19 +41217,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }
         },
         tsvToMarkdown(input) {
-          var rows = input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row2) => row2.split("	"));
-          var columns = rows[0].length;
-          if (columns < 2 || columns > 16 || rows.length > 64 || rows.some((row2) => row2.length !== columns))
+          return markdownTable(input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row) => row.split("	")));
+        },
+        csvToMarkdown(input) {
+          return markdownTable(csvRows(input));
+        },
+        markdownChecklist(input) {
+          var lines = input.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+          if (!lines.length)
             return;
-          var row = (cells) => "| " + cells.map((cell) => cell.replace(/[\\|]/g, "\\$&").replace(/`(?=``)/g, "`\u200B").trim()).join(" | ") + " |";
-          var output = [
-            row(rows[0]),
-            row(Array.from({
-              length: columns
-            }, () => "---")),
-            ...rows.slice(1).map(row)
-          ].join("\n");
-          return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
+          var checklist = lines.map((line) => /^- \[[ xX]\]\s/.test(line) ? line : "- [ ] " + line.replace(/^[-*+]\s+/, "")).join("\n").replace(/`(?=``)/g, "`\u200B");
+          return checklist.length <= 3900 ? codeFence + "markdown\n" + checklist + "\n" + codeFence : "The checklist is too long for one reply.";
         },
         discordTimestamp(seconds, format) {
           var input = seconds.trim();
@@ -50580,6 +50637,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/csv-to-markdown.cx
+  var csv_to_markdown_default;
+  var init_csv_to_markdown = __esm({
+    "../examples/cx/catalog/plugins/csv-to-markdown.cx"() {
+      csv_to_markdown_default = 'plugin "CSV to Markdown":\n  needs commands.register\n  needs reply.local\n  on command "csvtomarkdown" with text:\n    reply "${csvToMarkdown(text)}" else "Paste comma-separated rows with headers, matching columns and double quotes around fields that contain commas."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/custom-timestamps.cx
   var custom_timestamps_default;
   var init_custom_timestamps = __esm({
@@ -51727,11 +51792,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/iso-week.cx
+  var iso_week_default;
+  var init_iso_week = __esm({
+    "../examples/cx/catalog/plugins/iso-week.cx"() {
+      iso_week_default = 'plugin "ISO Week":\n  needs commands.register\n  needs reply.local\n  on command "isoweek" with text:\n    reply "${isoWeek(text)}" else "Enter a calendar date like 2026-01-01."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/json-check.cx
   var json_check_default;
   var init_json_check = __esm({
     "../examples/cx/catalog/plugins/json-check.cx"() {
       json_check_default = 'plugin "JSON Check":\n  needs commands.register\n  needs reply.local\n  on command "jsoncheck" with text:\n    reply "${checkJson(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/json-compact.cx
+  var json_compact_default;
+  var init_json_compact = __esm({
+    "../examples/cx/catalog/plugins/json-compact.cx"() {
+      json_compact_default = 'plugin "JSON Compact":\n  needs commands.register\n  needs reply.local\n  on command "compactjson" with text:\n    reply "${compactJson(text)}"\n';
     }
   });
 
@@ -51804,6 +51885,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_local_channel_notes = __esm({
     "../examples/cx/catalog/plugins/local-channel-notes.cx"() {
       local_channel_notes_default = 'plugin "LocalChannelNotes":\n  needs channels.notes\n  use channel-notes\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/markdown-checklist.cx
+  var markdown_checklist_default;
+  var init_markdown_checklist = __esm({
+    "../examples/cx/catalog/plugins/markdown-checklist.cx"() {
+      markdown_checklist_default = 'plugin "Markdown Checklist":\n  needs commands.register\n  needs reply.local\n  on command "markdownchecklist" with text:\n    reply "${markdownChecklist(text)}" else "Enter one task per line."\n';
     }
   });
 
@@ -53759,6 +53848,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_user_mention();
       init_copy_user_urls();
       init_count_lines();
+      init_csv_to_markdown();
       init_custom_timestamps();
       init_dashless();
       init_date_offset();
@@ -53879,7 +53969,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_image_link();
       init_in_role();
       init_ingtoninator();
+      init_iso_week();
       init_json_check();
+      init_json_compact();
       init_json_format();
       init_jump_to_top();
       init_jump_to();
@@ -53889,6 +53981,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_lines_to_csv();
       init_link_converter();
       init_local_channel_notes();
+      init_markdown_checklist();
       init_markdown_escape();
       init_message_burst();
       init_message_notifier();
@@ -54619,6 +54712,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "/countlines",
             commands: [
               "countlines"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
+            name: "CSV to Markdown",
+            source: csv_to_markdown_default,
+            description: "/csvtomarkdown",
+            commands: [
+              "csvtomarkdown"
             ],
             categories: [
               "Commands"
@@ -55718,11 +55822,33 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "ISO Week",
+            source: iso_week_default,
+            description: "/isoweek",
+            commands: [
+              "isoweek"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
             name: "JSON Check",
             source: json_check_default,
             description: "/jsoncheck",
             commands: [
               "jsoncheck"
+            ],
+            categories: [
+              "Commands"
+            ]
+          },
+          {
+            name: "JSON Compact",
+            source: json_compact_default,
+            description: "/compactjson",
+            commands: [
+              "compactjson"
             ],
             categories: [
               "Commands"
@@ -55811,6 +55937,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Add a local note editor to channel menus",
             categories: [
               "Servers & channels"
+            ]
+          },
+          {
+            name: "Markdown Checklist",
+            source: markdown_checklist_default,
+            description: "/markdownchecklist",
+            commands: [
+              "markdownchecklist"
+            ],
+            categories: [
+              "Commands"
             ]
           },
           {
@@ -63347,7 +63484,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5ad2be22e6d8c58500d24c7a6212fa39586493b6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7164a453da8457c2e5b6db06cf60d2cad9dd7696";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
