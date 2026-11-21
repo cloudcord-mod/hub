@@ -17061,6 +17061,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return "";
     return `https://cdn.discordapp.com/${kind}/${userId}/${hash}.${hash.startsWith("a_") ? "gif" : "png"}?size=512`;
   }
+  function profilePreviewColor(value) {
+    if (typeof value === "string" && /^#?[0-9a-f]{6}$/i.test(value.trim()))
+      return "#" + value.trim().replace(/^#/, "");
+    if (typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 16777215)
+      return "#" + value.toString(16).padStart(6, "0");
+  }
+  function nativeProfilePreviewSurface(userId, profile, userBanner) {
+    var colors = profile?.themeColors ?? profile?.theme_colors;
+    return {
+      banner: customDiscordMediaURL("banners", userId, profile?.banner) || customDiscordMediaURL("banners", userId, userBanner) || void 0,
+      primary: Array.isArray(colors) ? profilePreviewColor(colors[0]) : void 0,
+      accent: Array.isArray(colors) ? profilePreviewColor(colors[1]) : void 0,
+      bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color)
+    };
+  }
   function customConnectionServiceName(service) {
     var names = {
       steam: "Steam",
@@ -20747,7 +20762,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }) : null;
   }
   function StudioHero({ name, username, avatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
-    var tint = accent || C3.brand;
+    var tint = accent || C3.raised();
     return /* @__PURE__ */ jsxs(import_react_native24.View, {
       style: {
         borderRadius: R2.lg,
@@ -22075,9 +22090,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       resizeMode: "cover"
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }) {
+  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], onBadges, onSaved }) {
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
-    var edge = primary || C3.brand;
+    var edge = primary || C3.page();
     var card = C3.page();
     return /* @__PURE__ */ jsxs(import_react_native24.View, {
       style: {
@@ -22174,6 +22189,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           banner,
           primary,
           secondary: accent,
+          bannerColor,
           decoration,
           nameplate,
           status,
@@ -22196,7 +22212,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 borderTopLeftRadius: R2.lg - 3,
                 borderTopRightRadius: R2.lg - 3,
                 overflow: "hidden",
-                backgroundColor: accent || edge
+                backgroundColor: bannerColor || primary || C3.raised()
               },
               children: banner ? /* @__PURE__ */ jsx(import_react_native24.Image, {
                 source: {
@@ -22473,7 +22489,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, badges = [] }) {
     var themed = !!primary;
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
@@ -22488,7 +22504,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         /* @__PURE__ */ jsx(import_react_native24.View, {
           style: {
             height: 96,
-            backgroundColor: primary || C3.brand
+            backgroundColor: bannerColor || primary || colors.raised
           },
           children: banner ? /* @__PURE__ */ jsx(import_react_native24.Image, {
             source: {
@@ -27348,6 +27364,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
     var profileStore = safeStore("UserProfileStore") || findByProps("getUserProfile", "getGuildMemberProfile");
     diagnostics.profileStore = !!profileStore;
+    if (typeof profileStore?.getUserProfile === "function")
+      readNativeProfile = profileStore.getUserProfile.bind(profileStore);
     addPatch("getUserProfile", profileStore, (args, original) => {
       var result = original(...args);
       var id = String(args?.[0]?.id || args?.[0]?.userId || args?.[0] || "");
@@ -30846,6 +30864,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
+  function studioPreviewAppearance(data, realUser) {
+    var profile;
+    try {
+      if (realUser?.id)
+        profile = readNativeProfile?.(realUser.id);
+    } catch (e) {
+    }
+    var fallback = nativeProfilePreviewSurface(realUser?.id || "", profile, realUser?.banner);
+    var primary = data.profileColorsEnabled ? profilePreviewColor(data.primaryColor) : void 0;
+    var accent = data.profileColorsEnabled ? profilePreviewColor(data.accentColor) : void 0;
+    var realAvatar;
+    try {
+      realAvatar = realUser?.getAvatarURL?.(void 0, 128);
+    } catch (e) {
+    }
+    return {
+      name: data.displayName || realUser?.globalName || realUser?.global_name || realUser?.username || "You",
+      username: data.username || realUser?.username || "username",
+      avatar: data.avatarMedia?.uri || realAvatar,
+      banner: data.bannerMedia?.uri || fallback.banner,
+      primary: primary ?? accent ?? fallback.primary,
+      accent: accent ?? primary ?? fallback.accent,
+      bannerColor: primary ?? accent ?? fallback.bannerColor ?? fallback.primary,
+      nameplate: data.nameplate ? nameplateAssetURL(data.nameplate.asset) : void 0,
+      tagText: data.serverTag?.tag,
+      tagIcon: data.serverTag ? serverTagIconURL(data.serverTag) || void 0 : void 0,
+      status: data.customActivity?.type === 1 && streamURL(data.customActivity.url) ? "streaming" : data.presenceStatus || "online"
+    };
+  }
   function SavedProfiles({ current, realUser, onUse }) {
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [, redraw] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
@@ -30857,13 +30904,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       redraw();
     };
     var currentJson = JSON.stringify(savedSnapshot(current));
-    var realAvatar = (() => {
-      try {
-        return realUser?.getAvatarURL?.(void 0, 128) || void 0;
-      } catch (e) {
-        return void 0;
-      }
-    })();
     var saveCurrent = () => {
       var label2 = (name.trim() || "Profile " + (items.length + 1)).slice(0, 40);
       commit([
@@ -30966,7 +31006,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } : item));
       setRenaming(null);
     };
-    var hex = (value) => typeof value === "string" && value ? value : typeof value === "number" ? "#" + value.toString(16).padStart(6, "0") : void 0;
     return /* @__PURE__ */ jsxs(import_react_native28.View, {
       style: {
         gap: 20
@@ -31002,7 +31041,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         items.map((item) => {
           var data = item.data || {};
           var active = JSON.stringify(savedSnapshot(data)) === currentJson;
-          var colors = data.profileColorsEnabled;
+          var appearance = studioPreviewAppearance(data, realUser);
           var rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({
             id,
             iconSrc
@@ -31032,16 +31071,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             },
             children: [
               /* @__PURE__ */ jsx(S2.DiscordProfileCard, {
-                name: data.displayName || realUser?.globalName || realUser?.username || "You",
-                username: data.username || realUser?.username || "username",
+                ...appearance,
+                secondary: appearance.accent,
                 pronouns: data.pronouns,
-                avatar: data.avatarMedia?.uri || realAvatar,
-                banner: data.bannerMedia?.uri,
-                primary: colors ? hex(data.primaryColor) : void 0,
-                secondary: colors ? hex(data.accentColor) : void 0,
                 decoration: data.avatarDecoration || void 0,
-                status: data.presenceStatus || "online",
-                tagText: data.serverTag?.tag,
                 badges,
                 customStatus: data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : void 0,
                 bio: data.bio,
@@ -31886,6 +31919,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         },
         children: "Your Discord account changed. Go back and reopen the profile editor before making changes."
       });
+    var appearance = studioPreviewAppearance(preview, realCurrentUser);
     return /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
       style: {
         flex: 1,
@@ -31907,18 +31941,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         },
         children: [
           /* @__PURE__ */ jsx(K2.StudioHero, {
-            name: preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "You",
-            username: preview.username || realCurrentUser?.username || "username",
-            avatar: preview.avatarMedia?.uri || (() => {
-              try {
-                return realCurrentUser?.getAvatarURL?.() || void 0;
-              } catch (e) {
-                return void 0;
-              }
-            })(),
-            banner: preview.bannerMedia?.uri,
-            accent: preview.profileColorsEnabled ? preview.primaryColor : void 0,
-            status: preview.presenceStatus || "online",
+            ...appearance,
+            accent: appearance.bannerColor,
             enabled: preview.enabled,
             onToggle: () => update("enabled", !preview.enabled, true),
             syncLabel: rootSettings.fakeProfileLocalOnly ? "This device" : "Synced",
@@ -31950,24 +31974,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 padding: 16
               },
               children: /* @__PURE__ */ jsx(K2.PreviewCard, {
-                name: preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "You",
-                username: preview.username || realCurrentUser?.username || "username",
+                ...appearance,
                 pronouns: preview.pronouns,
-                avatar: preview.avatarMedia?.uri || (() => {
-                  try {
-                    return realCurrentUser?.getAvatarURL?.() || void 0;
-                  } catch (e) {
-                    return void 0;
-                  }
-                })(),
-                banner: preview.bannerMedia?.uri,
-                primary: preview.profileColorsEnabled ? preview.primaryColor : void 0,
-                accent: preview.profileColorsEnabled ? preview.accentColor : void 0,
                 decoration: preview.avatarDecoration || void 0,
-                nameplate: preview.nameplate ? nameplateAssetURL(preview.nameplate.asset) : void 0,
-                tagText: preview.serverTag?.tag,
-                tagIcon: preview.serverTag ? serverTagIconURL(preview.serverTag) || void 0 : void 0,
-                status: preview.customActivity?.type === 1 && preview.customActivity.url && streamURL(preview.customActivity.url) ? "streaming" : preview.presenceStatus || "online",
                 customStatus: preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : void 0,
                 activity: preview.customActivity ? {
                   verb: ACTIVITY_TYPES.find((type) => type.value === preview.customActivity?.type)?.label || "",
@@ -33375,7 +33384,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -61075,7 +61084,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e77189ed2cc239bf6ed0dde4dc7d172475d8224a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7d77edb54603972d7d29fb6988b01ee80b60465d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
