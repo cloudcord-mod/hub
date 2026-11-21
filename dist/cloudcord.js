@@ -30278,8 +30278,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }).apply(this, arguments);
   }
   function savedSnapshot(data) {
-    var { syncRevision: _revision, enabled: _enabled, ...rest } = data || {};
+    var { syncRevision: _revision, enabled: _enabled, hideBadgesWhenSyncOff: _hideBadges, ...rest } = data || {};
     return JSON.parse(JSON.stringify(rest));
+  }
+  function loadSavedLook(current, look) {
+    return {
+      ...defaultPreview(),
+      ...savedSnapshot(look),
+      enabled: current.enabled,
+      hideBadgesWhenSyncOff: current.hideBadgesWhenSyncOff,
+      syncRevision: Date.now()
+    };
   }
   function ProfileTemplates({ current, onUse, onPreview }) {
     var [previewing, setPreviewing] = (0, import_react9.useState)(null);
@@ -30823,7 +30832,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }) : null,
         items.map((item) => {
           var data = item.data || {};
-          var active = JSON.stringify(data) === currentJson;
+          var active = JSON.stringify(savedSnapshot(data)) === currentJson;
           var colors = data.profileColorsEnabled;
           var rows = BADGES.filter(([key]) => data.selectedBadges?.[key]).map(([id, , , iconSrc]) => ({
             id,
@@ -31990,12 +31999,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             current: preview,
             realUser: realCurrentUser,
             onUse: (data) => {
-              rootSettings.fakeProfile = {
-                ...preview,
-                ...data,
-                enabled: preview.enabled,
-                syncRevision: Date.now()
-              };
+              rootSettings.fakeProfile = loadSavedLook(preview, data);
               preview = rootSettings.fakeProfile;
               queueSharedPublish();
               clearCache();
@@ -59506,7 +59510,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c198e76d79c5793fbc98f0083d880a46e1f88c78";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fa78b9ca0889f7a4bb4b199424b1633c515f4e4e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
