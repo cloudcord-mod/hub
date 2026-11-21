@@ -20,7 +20,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { TooltipContainer } from "@components/TooltipContainer";
 import globalBadges from "@sincordplugins/globalBadges";
 import BadgeAPIPlugin from "@plugins/_api/badges";
-import { React, Toasts, UserProfileStore } from "@webpack/common";
+import { AuthenticationStore, React, Toasts, UserProfileStore } from "@webpack/common";
 import { ComponentType, HTMLProps } from "react";
 import Plugins from "~plugins";
 import { isRealProfileView } from "@utils/realProfileView";
@@ -319,7 +319,7 @@ export function removeProfileBadge(badge: ProfileBadge) {
  * You probably don't need to use this.
  */
 export function _getBadges(args: BadgeUserArgs) {
-    if (isRealProfileView(args.userId)) return [];
+    if (isRealProfileView(args.userId, AuthenticationStore?.getId?.())) return [];
     // Private profiles: like Discord, badges are only shown to friends.
     const profilePlugin = Plugins.ProfileSpoofer as { started?: boolean; badgesHiddenFor?(userId: string): boolean; } | undefined;
     if (profilePlugin?.started && profilePlugin.badgesHiddenFor?.(args.userId)) return [];

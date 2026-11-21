@@ -4,26 +4,38 @@ const assert = require('node:assert/strict');
 const esbuild = require(process.env.CLOUDCORD_ESBUILD || require.resolve('esbuild', { paths: [require('node:path').resolve('desktop/client'), require('node:path').resolve('ios/runtime')] }));
 const id = '1394648991223779328';
 const other = '1169999011642605628';
+const alternate = '123456789012345678';
+const profileAppearance = require('./load-profile-appearance.cjs');
 const compile = (source, loader = 'ts') => esbuild.transformSync(source, { loader, format: 'cjs' }).code;
 const storage = new Map();
 function desktop() {
-    const ctx = vm.createContext({ module: { exports: {} }, exports: {}, require: () => ({ localStorage: {
+    const ctx = vm.createContext({ module: { exports: {} }, exports: {}, require: name => name === '@utils/profileAppearance' ? profileAppearance : ({ localStorage: {
         getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value)
     } }) });
     vm.runInContext(compile(fs.readFileSync('desktop/client/src/utils/realProfileView.ts', 'utf8')), ctx);
     return ctx.module.exports;
 }
 let saved = desktop();
-assert.equal(saved.isRealProfileView(id), false);
-saved.setRealProfileView(id, true);
-assert.equal(saved.isRealProfileView(id), true);
-assert.equal(saved.isRealProfileView(other), false);
+assert.equal(saved.isRealProfileView(id, other), false);
+saved.setRealProfileView(id, true, other);
+assert.equal(saved.isRealProfileView(id, other), true);
+assert.equal(saved.isRealProfileView(id, alternate), false);
+assert.equal(saved.isRealProfileView(id, null), false);
 saved = desktop();
-assert.equal(saved.isRealProfileView(id), true, 'viewer choice survives reload');
-saved.setRealProfileView(id, false);
-assert.equal(saved.isRealProfileView(id), false);
-saved.setRealProfileView('bad id', true);
-assert.equal(saved.isRealProfileView('bad id'), false);
+assert.equal(saved.isRealProfileView(id, other), true, 'viewer choice survives reload');
+saved.setRealProfileView(id, true, alternate);
+saved.setRealProfileView(id, false, other);
+assert.equal(saved.isRealProfileView(id, other), false);
+assert.equal(saved.isRealProfileView(id, alternate), true);
+saved.setRealProfileView('bad id', true, other);
+assert.equal(saved.isRealProfileView('bad id', other), false);
+storage.delete('CloudCord_realProfileUsersByAccount');
+storage.set('CloudCord_realProfileUsers', JSON.stringify([id, other, id, 'invalid']));
+saved = desktop();
+assert.equal(saved.isRealProfileView(id, null), false, 'logout cannot adopt device-wide legacy choices');
+assert.equal(saved.isRealProfileView(id, other), true, 'existing device choices transfer once to the first signed-in account');
+assert.equal(saved.isRealProfileView(other, other), false);
+assert.equal(desktop().isRealProfileView(id, alternate), false);
 
 const workflow = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
 const source = workflow.split("cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'")[1].split('\n          TSX')[0].replace(/^          /gm, '');
@@ -34,8 +46,8 @@ const hooks = new Map();
 const badgeRefreshes = [];
 let intercept;
 let lastSheet;
-const mobile = vm.createContext({ rootSettings: root, settings: {}, sharedProfiles: new Map([[id, profile]]),
-    isCurrentUser: uid => uid === other, clearCache() {}, identityRefreshers: new Set(),
+const mobile = vm.createContext({ ...profileAppearance, rootSettings: root, settings: {}, sharedProfiles: new Map([[id, profile]]),
+    currentUserId: other, isCurrentUser: uid => uid === mobile.currentUserId, clearCache() {}, identityRefreshers: new Set(),
     reapplyBadgeDirectory: uid => badgeRefreshes.push(uid),
     safeStore: () => ({ emitChange() {} }), simpleSheets: { showSimpleActionSheet() {}, hideActionSheet() {} },
     findByName: () => () => {}, setTimeout: fn => fn(),
@@ -50,7 +62,16 @@ const original = { key: 'UserProfileOverflow', userId: id, options: [{ label: 'B
 intercept([original], sheet => { lastSheet = sheet; });
 assert.equal(original.options.length, 1, 'native menu stays immutable');
 assert.equal(lastSheet.options.at(-1).label, 'Show real profile');
+const previousAccountAction = lastSheet.options.at(-1);
+mobile.currentUserId = alternate;
+previousAccountAction.onPress();
+assert.equal(mobile.getProfileOverride(id), profile, 'a menu left open across account switching cannot mutate the new account');
+mobile.currentUserId = other;
 lastSheet.options.at(-1).onPress();
+assert.equal(mobile.getProfileOverride(id), undefined);
+mobile.currentUserId = alternate;
+assert.equal(mobile.getProfileOverride(id), profile);
+mobile.currentUserId = other;
 assert.equal(mobile.getProfileOverride(id), undefined);
 assert.equal(root.fakeProfile, profile, 'viewing real profiles cannot edit or publish the owner snapshot');
 intercept([original], sheet => { lastSheet = sheet; });
@@ -75,7 +96,7 @@ mobile.safeStore = () => ({ getUserProfile: () => ({ private: true }) });
 // Private profiles keep the CloudCord identity; only their badges are limited to friends.
 assert.equal(mobile.getProfileOverride(id), profile, 'private profiles still show the CloudCord identity');
 assert.equal(mobile.getProfileOverride(id, true), profile, 'public CloudCord badges do not depend on Discord friendship/privacy');
-root.cloudcordRealProfileUsers = [id];
+root.cloudcordRealProfileUsersByAccount = { [other]: [id] };
 assert.equal(mobile.getProfileOverride(id, true), undefined, 'real-profile viewer choice also hides public cosmetic badges');
 
 const scheduled = [];
@@ -164,7 +185,7 @@ assert.equal(profiles.restoreNativeProfileBadges(refreshedProfile, id), refreshe
 
 const desktopSource = fs.readFileSync('desktop/client/src/sincordplugins/fakeProfile/index.tsx', 'utf8');
 const badgeViewer = vm.createContext({ realGetUserProfile: () => ({ private: true }), storedData: {},
-    isRealProfileView: () => false, localProfileFor: () => undefined, sharedProfiles: new Map([[id, profile]]), sharedViewedAt: new Map(), Date });
+    activeUserId: () => other, isRealProfileView: () => false, localProfileFor: () => undefined, sharedProfiles: new Map([[id, profile]]), sharedViewedAt: new Map(), Date });
 vm.runInContext(compile(desktopSource.slice(desktopSource.indexOf('function isPrivateProfile('), desktopSource.indexOf('const sharedProfileFetchedAt'))), badgeViewer);
 assert.equal(badgeViewer.viewedSharedProfile(id), profile, 'private profiles still show the CloudCord identity');
 assert.equal(badgeViewer.viewedSharedProfile(id, true), profile);
@@ -175,4 +196,4 @@ badgeViewer.storedData.hideOtherProfiles = true;
 assert.equal(badgeViewer.viewedSharedProfile(id, true), undefined);
 assert.match(source, /const data = getProfileOverride\(id, true\)/);
 assert.match(desktopSource, /function badgesHiddenFor\(/);
-console.log('PASS real-profile preference persistence, per-user isolation, reversible mobile menu actions, private Discord details separated from public CloudCord badges and native menu immutability');
+console.log('PASS account-scoped real-profile choices, legacy migration, stale menu isolation and reversible native profile badges');

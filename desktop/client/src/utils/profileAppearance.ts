@@ -159,6 +159,14 @@ export function profileAvatarPresentation(avatar: unknown): Record<string, unkno
     } : {};
 }
 
+export function isProfileViewUserId(value: unknown): value is string {
+    return typeof value === "string" && /^\d{15,22}$/.test(value);
+}
+
+export function normalizeProfileViewUsers(values: unknown): string[] {
+    return Array.isArray(values) ? [...new Set(values.filter(isProfileViewUserId))] : [];
+}
+
 /** Drafts stay editable locally, but invalid entries must not disappear silently on sharing. */
 export function customConnectionServiceName(service: string): string {
     const names: Record<string, string> = {steam:"Steam",youtube:"YouTube",roblox:"Roblox",github:"GitHub",twitch:"Twitch",spotify:"Spotify",x:"X",reddit:"Reddit",tiktok:"TikTok",instagram:"Instagram",domain:"Domain",other:"Other"};

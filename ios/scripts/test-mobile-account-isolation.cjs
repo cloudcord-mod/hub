@@ -7,6 +7,7 @@ const compile = code => esbuild.transformSync(code, { loader: 'tsx' }).code;
 let canceled = 0;
 const original = { enabled: true, bio: 'Account A', selectedBadges: { staff: true } };
 const account = vm.createContext({ rootSettings: { fakeProfile: original, fakeProfileLocalOnly: true, fakeProfileShare: { id: 'legacy', editToken: 'test-only' } },
+    ...require('./load-profile-appearance.cjs'),
     preview: original, configReady: true, currentUserId: null, realCurrentUser: null,
     defaultPreview: () => ({ enabled: false, selectedBadges: {} }), publishTimer: 1, clearTimeout: () => canceled++,
     suppressOwnPullUntil: 1, mediaSelections: new Map(), userCache: new WeakMap(), profileCache: new WeakMap(),
@@ -31,6 +32,13 @@ assert.equal(account.preview.enabled, false);
 account.adoptProfileAccount({ id: 'b' });
 assert.equal(account.preview.bio, 'Account B', 'account settings restore across logout and login');
 assert.equal(account.rootSettings.fakeProfileLocalOnly, false);
+const legacyViewer = '123456789012345678';
+const mutedProfile = '223456789012345678';
+account.rootSettings.cloudcordRealProfileUsers = [mutedProfile, legacyViewer, mutedProfile, 'invalid'];
+account.adoptProfileAccount({ id: legacyViewer });
+assert.deepEqual(Array.from(account.rootSettings.cloudcordRealProfileUsersByAccount[legacyViewer]), [mutedProfile]);
+account.adoptProfileAccount({ id: '323456789012345678' });
+assert.equal(Object.keys(account.rootSettings.cloudcordRealProfileUsersByAccount).length, 1, 'legacy device choices are adopted once');
 assert(source.includes('editorOwner.current !== currentUserId'), 'stale editors cannot edit another account');
 (async () => {
     let finishFirst, writes = [];

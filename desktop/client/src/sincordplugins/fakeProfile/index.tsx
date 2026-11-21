@@ -538,7 +538,7 @@ function badgesHiddenFor(userId: string): boolean {
     try { return !RelationshipStore.isFriend(userId); } catch { return true; }
 }
 function viewedSharedProfile(userId: string, _forBadges?: boolean) {
-    if (isRealProfileView(userId)) return undefined;
+    if (isRealProfileView(userId, activeUserId())) return undefined;
     const local = localProfileFor(userId);
     // Hide other profiles hides synced ones; your own local edits still show.
     const profile = storedData?.hideOtherProfiles ? undefined : sharedProfiles.get(userId);
@@ -1498,16 +1498,22 @@ async function loadData() {
 }
 
 function realProfileMenuItem(userId: string) {
-    const viewingReal = isRealProfileView(userId);
+    const viewerId = activeUserId();
+    if (!viewerId || userId === viewerId) return null;
+    const viewingReal = isRealProfileView(userId, viewerId);
     if (!viewingReal && (!sharedProfiles.has(userId) || storedData.hideOtherProfiles)) return null;
     return <Menu.MenuItem id="cloudcord-profile-view" label={viewingReal ? "Return to CloudCord profile" : "Show real profile"} action={() => {
-        setRealProfileView(userId, !viewingReal);
+        if (activeUserId() !== viewerId) return;
+        setRealProfileView(userId, !isRealProfileView(userId, viewerId), viewerId);
         invalidateOwnUser();
         try { UserProfileStore.emitChange?.(); } catch (e) { logger.warn("Refreshing UserProfileStore failed", e); }
         try { UserStore.emitChange?.(); } catch (e) { logger.warn("Refreshing UserStore failed", e); }
         forceAccountPanelRerender();
         // Let the menu close first so Discord does not stack modals on a closing layer.
-        setTimeout(() => { try { UserProfileActions.openUserProfileModal({ userId }); } catch (e) { logger.warn("Opening profile modal failed", e); } }, 50);
+        setTimeout(() => {
+            if (activeUserId() !== viewerId) return;
+            try { UserProfileActions.openUserProfileModal({ userId }); } catch (e) { logger.warn("Opening profile modal failed", e); }
+        }, 50);
     }} />;
 }
 
@@ -2355,8 +2361,9 @@ export default definePlugin({
 
     fakeOtherUser(user: any) {
         const original = user?.__cp_original || user;
-        if (!profileRuntimeActive || isRealProfileView(user?.id)) return original;
+        if (!profileRuntimeActive) return original;
         if (!user || isMe(user.id)) return user;
+        if (isRealProfileView(user.id, activeUserId())) return original;
         const shared = viewedSharedProfile(user.id);
         if (!shared) {
             requestSharedProfile(user.id);
@@ -2459,7 +2466,7 @@ export default definePlugin({
     async start() {
         profileRuntimeActive = true;
         const generation = ++profileRuntimeGeneration;
-        installPresenceHooks(userId => isMe(userId) ? (isEnabled ? storedData : undefined) : isRealProfileView(userId) ? undefined : viewedSharedProfile(userId));
+        installPresenceHooks(userId => isMe(userId) ? (isEnabled ? storedData : undefined) : viewedSharedProfile(userId));
         installTagIconSwap();
         try { installSwitcherHook(); } catch (e) { logger.warn("Installing account switcher hook failed", e); }
         this._catalogListener = onCatalogLoaded(() => { invalidateOwnUser(); forceAccountPanelRerender(); });

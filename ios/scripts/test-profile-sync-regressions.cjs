@@ -83,7 +83,7 @@ const sharedIdentity = { username: 'shared', avatar: 'https://example.com/shared
 const identity = testContext({ ...profileAppearance, ...runtime, otherUserCache: new WeakMap(), nativeProfileAppearance: () => ({}), nativeCollectibles: value => value,
     isEnabled: true, storedData: { username: 'custom', badgeFlags: 8, replaceRealBadges: true },
     viewedSharedProfile: () => sharedIdentity,
-    isRealProfileView: () => false, isMe: () => false,
+    activeUserId: () => '123456789012345678', isRealProfileView: () => false, isMe: () => false,
     cachedOriginalUser: null, cachedFakeUser: null, cachedDataHash: -1, _dataVersion: 0, _trueOriginalUser: null,
     ownUserCache: null, ownRealUser: null, profileVersion: 0, profileRuntimeActive: true,
     GIFT_LEVELS: [], Date, Object, Reflect });

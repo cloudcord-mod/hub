@@ -438,7 +438,7 @@ jobs:
           import { onJsxCreate } from "@lib/api/react/jsx";
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
-          import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
+          import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -1118,6 +1118,11 @@ jobs:
               realCurrentUser = user || null;
               const previousId = rootSettings.fakeProfileOwnerId || currentUserId;
               currentUserId = nextId;
+              if (configReady && isProfileViewUserId(nextId) && rootSettings.cloudcordRealProfileUsersByAccount == null
+                  && Array.isArray(rootSettings.cloudcordRealProfileUsers)) {
+                  const users = normalizeProfileViewUsers(rootSettings.cloudcordRealProfileUsers).filter(id => id !== nextId);
+                  rootSettings.cloudcordRealProfileUsersByAccount = { [nextId]: users };
+              }
               if (!configReady || previousId === nextId) return;
               if (!previousId && nextId && rootSettings.fakeProfileOwnerId === undefined) {
                   // Adopt an existing single-account installation once.
@@ -1577,13 +1582,17 @@ jobs:
           }
 
           function isRealProfileView(id: string) {
-              return Array.isArray(rootSettings.cloudcordRealProfileUsers) && rootSettings.cloudcordRealProfileUsers.includes(id);
+              if (!isProfileViewUserId(currentUserId) || id === currentUserId) return false;
+              const users = rootSettings.cloudcordRealProfileUsersByAccount?.[currentUserId];
+              return Array.isArray(users) && users.includes(id);
           }
-          function toggleRealProfileView(id: string) {
-              if (!/^\d{15,22}$/.test(id) || isCurrentUser(id)) return;
-              const users = new Set<string>(Array.isArray(rootSettings.cloudcordRealProfileUsers) ? rootSettings.cloudcordRealProfileUsers : []);
+          function toggleRealProfileView(id: string, viewerId: string | null) {
+              if (!isProfileViewUserId(id) || !isProfileViewUserId(viewerId) || viewerId !== currentUserId || id === viewerId) return;
+              const accounts = { ...rootSettings.cloudcordRealProfileUsersByAccount };
+              const users = new Set(normalizeProfileViewUsers(accounts[viewerId]));
               if (users.has(id)) users.delete(id); else users.add(id);
-              rootSettings.cloudcordRealProfileUsers = [...users];
+              if (users.size) accounts[viewerId] = [...users]; else delete accounts[viewerId];
+              rootSettings.cloudcordRealProfileUsersByAccount = accounts;
               clearCache();
               reapplyBadgeDirectory(id);
               for (const refresh of identityRefreshers) refresh();
@@ -1592,29 +1601,35 @@ jobs:
               }
               try { simpleSheets.hideActionSheet?.(); } catch {}
               const open = findByName("showUserProfileActionSheet", false) as any;
-              if (typeof open === "function") setTimeout(() => open({ userId: id }), 0);
+              if (typeof open === "function") setTimeout(() => { if (currentUserId === viewerId) open({ userId: id }); }, 0);
           }
           let realProfileMenuConnected = false;
           function connectRealProfileMenu() {
               if (realProfileMenuConnected) return;
               realProfileMenuConnected = true;
-              const option = (id: string) => ({ label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile", onPress: () => toggleRealProfileView(id) });
+              const option = (id: string) => {
+                  const viewerId = currentUserId;
+                  if (!isProfileViewUserId(viewerId) || !isProfileViewUserId(id) || id === viewerId) return;
+                  return { label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile", onPress: () => toggleRealProfileView(id, viewerId) };
+              };
               if (typeof simpleSheets?.showSimpleActionSheet === "function") {
                   instead("showSimpleActionSheet", simpleSheets, (args: any[], original: Function) => {
                       const sheet = args[0];
                       const id = String(sheet?.userId || sheet?.user?.id || sheet?.props?.userId || sheet?.props?.user?.id || "");
-                      if (!/^\d{15,22}$/.test(id) || isCurrentUser(id) || !/user|profile/i.test(String(sheet?.key || "")) || !Array.isArray(sheet?.options)) return original(...args);
-                      return original({ ...sheet, options: [...sheet.options, option(id)] }, ...args.slice(1));
+                      const action = option(id);
+                      if (!action || !/user|profile/i.test(String(sheet?.key || "")) || !Array.isArray(sheet?.options)) return original(...args);
+                      return original({ ...sheet, options: [...sheet.options, action] }, ...args.slice(1));
                   });
               }
               for (const name of ["UserProfileOverflowMenu", "UserProfileOverflowActionSheet", "UserProfileMoreActionSheet"]) {
                   onJsxCreate(name, (_component, rendered) => {
                       const props: any = rendered?.props;
                       const id = String(props?.userId || props?.user?.id || props?.profile?.userId || "");
-                      if (!/^\d{15,22}$/.test(id) || isCurrentUser(id) || props?.__cloudcordRealProfileMenu) return rendered;
-                      if (Array.isArray(props?.options)) return cloneElement(rendered, { __cloudcordRealProfileMenu: true, options: [...props.options, option(id)] });
+                      const action = option(id);
+                      if (!action || props?.__cloudcordRealProfileMenu) return rendered;
+                      if (Array.isArray(props?.options)) return cloneElement(rendered, { __cloudcordRealProfileMenu: true, options: [...props.options, action] });
                       if (!props?.children) return rendered;
-                      return cloneElement(rendered, { __cloudcordRealProfileMenu: true, children: [props.children, createElement(NativeTableRow, { key: "cloudcord-profile-view", label: option(id).label, onPress: option(id).onPress })] });
+                      return cloneElement(rendered, { __cloudcordRealProfileMenu: true, children: [props.children, createElement(NativeTableRow, { key: "cloudcord-profile-view", label: action.label, onPress: action.onPress })] });
                   });
               }
           }
