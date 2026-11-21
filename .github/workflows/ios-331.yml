@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
 
       - name: Download the completed runtime build
         if: github.event_name == 'workflow_run'
@@ -44,10 +45,23 @@ jobs:
             python3 ios/scripts/verify-runtime-artifact.py dist
           fi
 
-      - name: Install build tools
+      - name: Install signing tool
+        run: brew install ldid
+
+      - name: Fetch Theos build tools
         run: |
-          brew install ldid
-          git clone --recursive --depth 1 https://github.com/theos/theos.git "$RUNNER_TEMP/theos"
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            candidate="$RUNNER_TEMP/theos-attempt-$attempt"
+            if git -C "$RUNNER_TEMP" clone --recursive --depth 1 https://github.com/theos/theos.git "$candidate" \
+              && test -f "$candidate/makefiles/common.mk"; then
+              mv "$candidate" "$RUNNER_TEMP/theos"
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then sleep "$((5 * attempt))"; fi
+          done
+          echo "::error::Could not clone Theos and initialize its submodules after three attempts."
+          exit 1
 
       - name: Download Discord 331 CloudCord base
         env:
@@ -67,7 +81,7 @@ jobs:
           clone_ok=false
           for attempt in 1 2 3; do
             loader_headers="$RUNNER_TEMP/unbound-loader-ios-$attempt"
-            if git clone --depth 1 https://github.com/unbound-app/loader-ios.git "$loader_headers"; then
+            if git -C "$RUNNER_TEMP" clone --depth 1 https://github.com/unbound-app/loader-ios.git "$loader_headers"; then
               clone_ok=true
               break
             fi
