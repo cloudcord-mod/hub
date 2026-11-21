@@ -50218,13 +50218,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         var id = review.kind === "theme" ? "theme" : "plugin:" + review.name;
         if (active.has(id))
           throw new Error(review.kind === "theme" ? "Disable the active CX theme first" : "This CX plugin is already active");
-        if (active.size >= 16)
-          throw new Error("Disable an extension before adding another");
+        var privateCommand = isPrivateCxCommand(review.permissions);
+        var activeSameType = [
+          ...active.values()
+        ].filter((entry) => entry.privateCommand === privateCommand).length;
+        if (activeSameType >= (privateCommand ? maxPrivateCxCommandPlugins : maxOtherCxExtensions)) {
+          throw new Error(privateCommand ? "Disable a private command plugin before adding another" : "Disable an active theme or plugin with effects before adding another");
+        }
         active.set(id, {
           name: review.name,
           source,
           options: review.appearanceOptions,
-          binding: bindCx(source, host, approved, selected)
+          binding: bindCx(source, host, approved, selected),
+          privateCommand
         });
       },
       disable(id) {
@@ -50241,7 +50247,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     };
   }
-  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES;
+  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES, maxPrivateCxCommandPlugins, maxOtherCxExtensions, MAX_REMEMBERED_CX_EXTENSIONS;
   var init_cx = __esm({
     "src/lib/api/cx.ts"() {
       "use strict";
@@ -50468,6 +50474,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "Voice & calls",
         "Themes"
       ];
+      maxPrivateCxCommandPlugins = 64;
+      maxOtherCxExtensions = 16;
+      MAX_REMEMBERED_CX_EXTENSIONS = maxPrivateCxCommandPlugins + maxOtherCxExtensions;
     }
   });
 
@@ -61256,17 +61265,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var records = settings.cxRememberedAppearance;
     if (!Array.isArray(records))
       return [];
-    return records.slice(0, 16).filter((entry) => typeof entry?.name === "string" && typeof entry.revision === "string" && Array.isArray(entry.selected) && entry.selected.every((target) => typeof target === "string"));
+    return records.slice(0, MAX_REMEMBERED_CX_EXTENSIONS).filter((entry) => typeof entry?.name === "string" && typeof entry.revision === "string" && Array.isArray(entry.selected) && entry.selected.every((target) => typeof target === "string"));
   }
   function forgetRememberedAppearance(name) {
     settings.cxRememberedAppearance = readRememberedAppearance().filter((entry) => entry.name !== name);
   }
   function rememberAppearance(entry, replaceTheme = false) {
     var remaining = readRememberedAppearance().filter((saved) => saved.name !== entry.name && (!replaceTheme || rememberedCatalog.get(saved.name)?.id !== "theme"));
+    if (remaining.length >= MAX_REMEMBERED_CX_EXTENSIONS)
+      throw new Error("Remove a saved CX approval before saving another. Active for this session.");
     settings.cxRememberedAppearance = [
       entry,
       ...remaining
-    ].slice(0, 16);
+    ];
   }
   function subscribeRememberedAppearance(listener) {
     rememberedAppearanceListeners.add(listener);
@@ -64198,7 +64209,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ccdb9abc2fd8e3f170a80b855e05ecf010486f3e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a53f9ad71f2ddd97d61a3902dcae95eba900ab90";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
