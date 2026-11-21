@@ -38,10 +38,16 @@ const dispatcher = {
     subscribe(event, callback) { dispatchSubscriptions.set(callback, event); },
     unsubscribe(_event, callback) { dispatchSubscriptions.delete(callback); },
 };
+const styles = new Set();
+const head = {
+    appendChild(element) { styles.add(element); return element; },
+    removeChild(element) { styles.delete(element); return element; },
+};
 globalThis.document = {
-    documentElement: {}, head: {}, addEventListener() {}, removeEventListener() {},
+    documentElement: {}, head, addEventListener() {}, removeEventListener() {},
+    getElementById(id) { return [...styles].find(element => element.id === id) ?? null; },
     createElement(tag) {
-        const element = { style: { transform: "", transition: "" } };
+        const element = { style: { transform: "", transition: "" }, remove() { head.removeChild(element); } };
         if (tag === "canvas") element.getContext = kind => kind === "2d" ? { canvas: element } : null;
         return element;
     },
@@ -100,7 +106,7 @@ const lifecycleProbe = `
 const lifecycleErrors = [];
 let unfinished = 0;
 let dispose;
-const resources = () => intervals.size + subscriptions.size + dispatchSubscriptions.size;
+const resources = () => intervals.size + subscriptions.size + dispatchSubscriptions.size + styles.size;
 const resourceBaseline = resources();
 for (const target of new Set([rec.def, rec.plugin])) {
     for (const method of ["start", "stop"]) {
@@ -193,7 +199,8 @@ async function main() {
     for (const entry of pack.entries) {
         const code = pack.scripts[entry.id.replace(/^gpl\//, "")];
         if (typeof code !== "string") {
-            rows.push({ id: entry.id, loaded: false, error: "Pack script is missing" });
+            if (entry.script) rows.push({ id: entry.id, loaded: false, error: "Pack script is missing" });
+            else rows.push({ id: entry.id, loaded: false, blocked: true, error: "Declarative entry has no script to load" });
             continue;
         }
         const runtime = engine.newRuntime();
@@ -216,7 +223,8 @@ JSON.stringify({ loaded: !rec.error, error: rec.error?.message ?? "", stack: rec
             const value = checked.error ?? checked.value;
             try {
                 const returned = context.dump(value);
-                if (checked.error) rows.push({ id: entry.id, loaded: false, phase: "sandbox", error: returned.message ?? String(returned) });
+                if (checked.error) rows.push({ id: entry.id, loaded: false, phase: "sandbox", error: returned.message ?? String(returned),
+                    stack: returned.stack?.split("\n").slice(0, 4).join("\n") });
                 else {
                     const row = { id: entry.id, ...JSON.parse(returned) };
                     if (row.loaded) row.lifecycle = lifecycleResult(context, runtime, () => { deadline = Date.now() + 250; });
@@ -234,7 +242,8 @@ JSON.stringify({ loaded: !rec.error, error: rec.error?.message ?? "", stack: rec
         checked: rows.length,
         loaded: rows.filter(row => row.loaded).length,
         loadedWithWarnings: rows.filter(row => row.loaded && row.warnings.length).length,
-        failed: rows.filter(row => !row.loaded).length,
+        failed: rows.filter(row => !row.loaded && !row.blocked).length,
+        blocked: rows.filter(row => row.blocked).length,
         preparedPatches: rows.reduce((count, row) => count + (row.patches ?? 0), 0),
         lifecycle: Object.fromEntries(["Pass", "Fail", "Blocked"].map(status => [status,
             rows.filter(row => (row.lifecycle?.status ?? "Blocked") === status).length])),

@@ -9,6 +9,14 @@ const { pathToFileURL } = require("node:url");
 const queues = require("../../desktop/client/src/utils/cxTesting/cx-testing-queues.json");
 
 const root = path.resolve(__dirname, "../..");
+const testEnvironment = {
+    ...process.env,
+    NODE_PATH: [
+        process.env.NODE_PATH,
+        path.join(root, "desktop/client/node_modules"),
+        path.join(root, "ios/runtime/node_modules"),
+    ].filter(Boolean).join(path.delimiter),
+};
 const sourceFiles = {
     "Desktop CX pack": "examples/cx/catalog-gpl/dist/cloudcord-gpl-pack.json",
     "Shared declarative CX": "ios/dist/cloudcord-mobile-cx.json",
@@ -43,10 +51,9 @@ function runAdapterTests() {
     const temp = fs.mkdtempSync(path.join(os.tmpdir(), "cloudcord-cx-tests-"));
     const output = path.join(temp, "results.json");
     try {
-        const deps = [process.env.NODE_PATH, path.join(root, "desktop/client/node_modules"), path.join(root, "ios/runtime/node_modules")];
         const run = spawnSync(process.execPath, [path.join(__dirname, "test-cx.cjs"), "--catalog-results", output], {
             cwd: root, encoding: "utf8", timeout: 120_000, maxBuffer: 2 ** 22,
-            env: { ...process.env, NODE_PATH: deps.filter(Boolean).join(path.delimiter) },
+            env: testEnvironment,
         });
         const rows = fs.existsSync(output) ? JSON.parse(fs.readFileSync(output, "utf8")) : [];
         return {
@@ -64,7 +71,7 @@ async function runPackTest(script, sourceRoot, enginePath) {
     const file = path.join(temp, "result.json");
     try {
         await new Promise((resolve, reject) => {
-            execFile(process.execPath, [path.join(__dirname, script), sourceRoot, enginePath, file], { timeout: 120_000 }, (error, _stdout, stderr) => {
+            execFile(process.execPath, [path.join(__dirname, script), sourceRoot, enginePath, file], { timeout: 120_000, env: testEnvironment }, (error, _stdout, stderr) => {
                 // Exit 1 can be a valid report containing failing plugins.
                 if (error && (error.code !== 1 || !fs.existsSync(file))) reject(new Error(script + ": " + (stderr.trim() || error.message)));
                 else resolve();
@@ -241,9 +248,9 @@ async function main(args) {
         for (const entry of candidates.filter(candidate => candidate.group === "Desktop CX pack")) {
             const row = loaded.get(entry.id);
             if (row && typeof row.loaded !== "boolean") throw new Error("Invalid desktop module status: " + entry.id);
-            const status = row ? row.loaded ? "Pass" : "Fail" : "Blocked";
+            const status = !row || row.blocked ? "Blocked" : row.loaded ? "Pass" : "Fail";
             counts[status]++;
-            entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [],
+            entry.moduleLoad = { status, error: row?.error ?? (row ? "" : "Missing module load result"), warnings: row?.warnings ?? [], stack: row?.stack,
                 settingsFields: row?.settingsFields };
             if (lifecycleCounts) {
                 const lifecycle = row?.lifecycle;
@@ -253,7 +260,7 @@ async function main(args) {
                 const details = lifecycle ? [
                     ...lifecycle.errors,
                     lifecycle.started && "Still marked started after cleanup",
-                    lifecycle.unsettledResources && lifecycle.unsettledResources + " intervals or subscriptions retained",
+                    lifecycle.unsettledResources && lifecycle.unsettledResources + " intervals, subscriptions or styles retained",
                     lifecycle.unfinished && lifecycle.unfinished + " pending lifecycle promises",
                 ].filter(Boolean) : [row?.error || "No lifecycle result"];
                 entry.desktopLifecycle = { ...result(lifecycleStatus, details.join("; ")), traces: lifecycle?.traces };
