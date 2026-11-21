@@ -2,7 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const { buildBatchPlan, buildPlan, checkAppearancePaths, classifyPorts, fetchReviewedBetterDiscordSources, inspectPlugin, portFiles, scan, selectReadyPorts, verifyPorts } = require("./cx-bulk-plugins.cjs");
-const { buildCatalog, loadCxRuntime } = require("./sync-cx-catalog.cjs");
+const { buildCatalog, desktopPluginTarget, loadCxRuntime } = require("./sync-cx-catalog.cjs");
 
 const source = [
     '/* SPDX-License-Identifier: GPL-3.0-or-later */',
@@ -76,7 +76,8 @@ const batchPorts = selectReadyPorts([
 assert.deepEqual([...batchPorts.files.keys()], ["literal-replace.cx"]);
 assert.deepEqual(batchPorts.skipped.map(({ file }) => file), ["existing", "invalid", "duplicate"]);
 assert.match(batchPorts.skipped[2].reason, /duplicate CX command/);
-assert.deepEqual([...selectReadyPorts([candidate], { ...catalog, plugins: 600 }, runtime).files], []);
+assert.deepEqual([...selectReadyPorts([candidate], { ...catalog, plugins: desktopPluginTarget }, runtime).files], []);
+assert.equal(selectReadyPorts([candidate], { ...catalog, plugins: desktopPluginTarget - 1 }, runtime).files.size, 1);
 
 const silentMessageAlias = {
     name: "AutoSilentMessage", file: "upstream-alias",

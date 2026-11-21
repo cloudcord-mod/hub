@@ -5,6 +5,7 @@ const { buildSync } = require("esbuild");
 
 const root = path.resolve(__dirname, "../../..");
 const catalogPath = path.join(root, "desktop/client/src/utils/cxCatalog.ts");
+const desktopPluginTarget = 700;
 
 function loadCxRuntime() {
     const interpreter = { exports: {} };
@@ -34,7 +35,7 @@ function buildCatalog(additions = new Map()) {
     const pluginBodies = new Map();
     const imports = [];
     for (const [kind, target, original] of [
-        ["plugin", 600, "examples/cx/pilot/character-counter.cx"],
+        ["plugin", desktopPluginTarget, "examples/cx/pilot/character-counter.cx"],
         ["theme", 100, "examples/cx/midnight.cx"],
     ]) {
         const folder = `examples/cx/catalog/${kind}s`;
@@ -93,18 +94,18 @@ if (require.main === module) {
     try {
         const { source, plugins, themes } = buildCatalog();
         const mode = process.argv[2];
-        if (mode === "--release" && (plugins !== 600 || themes !== 100)) {
-            throw new Error(`Complete CX release requires 600 plugins and 100 themes. Found ${plugins} plugins and ${themes} themes.`);
+        if (mode === "--release" && (plugins !== desktopPluginTarget || themes !== 100)) {
+            throw new Error(`Complete desktop CX release requires ${desktopPluginTarget} plugins and 100 themes. Found ${plugins} plugins and ${themes} themes.`);
         }
         if (mode === "--check" || mode === "--release") {
             if (fs.readFileSync(catalogPath, "utf8").replaceAll("\r\n", "\n") !== source) throw new Error("Shared CX catalog needs regeneration");
         } else if (mode === undefined) fs.writeFileSync(catalogPath, source);
         else throw new Error("Use --check, --release, or no flag to regenerate");
-        console.log(`CX catalog has ${plugins}/600 plugins and ${themes}/100 themes`);
+        console.log(`Desktop CX catalog has ${plugins}/${desktopPluginTarget} plugins and ${themes}/100 themes`);
     } catch (error) {
         console.error(error.message);
         process.exitCode = 1;
     }
 }
 
-module.exports = { buildCatalog, catalogPath, loadCxParser, loadCxRuntime, pluginBody };
+module.exports = { buildCatalog, catalogPath, desktopPluginTarget, loadCxParser, loadCxRuntime, pluginBody };
