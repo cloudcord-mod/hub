@@ -17106,6 +17106,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     } : {};
   }
+  function isProfileViewUserId(value) {
+    return typeof value === "string" && /^\d{15,22}$/.test(value);
+  }
+  function normalizeProfileViewUsers(values) {
+    return Array.isArray(values) ? [
+      ...new Set(values.filter(isProfileViewUserId))
+    ] : [];
+  }
   function customConnectionServiceName(service) {
     var names = {
       steam: "Steam",
@@ -24630,6 +24638,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     realCurrentUser = user || null;
     var previousId = rootSettings.fakeProfileOwnerId || currentUserId;
     currentUserId = nextId;
+    if (configReady && isProfileViewUserId(nextId) && rootSettings.cloudcordRealProfileUsersByAccount == null && Array.isArray(rootSettings.cloudcordRealProfileUsers)) {
+      var users = normalizeProfileViewUsers(rootSettings.cloudcordRealProfileUsers).filter((id) => id !== nextId);
+      rootSettings.cloudcordRealProfileUsersByAccount = {
+        [nextId]: users
+      };
+    }
     if (!configReady || previousId === nextId)
       return;
     if (!previousId && nextId && rootSettings.fakeProfileOwnerId === void 0) {
@@ -25245,19 +25259,29 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return true;
   }
   function isRealProfileView(id) {
-    return Array.isArray(rootSettings.cloudcordRealProfileUsers) && rootSettings.cloudcordRealProfileUsers.includes(id);
+    if (!isProfileViewUserId(currentUserId) || id === currentUserId)
+      return false;
+    var users = rootSettings.cloudcordRealProfileUsersByAccount?.[currentUserId];
+    return Array.isArray(users) && users.includes(id);
   }
-  function toggleRealProfileView(id) {
-    if (!/^\d{15,22}$/.test(id) || isCurrentUser(id))
+  function toggleRealProfileView(id, viewerId) {
+    if (!isProfileViewUserId(id) || !isProfileViewUserId(viewerId) || viewerId !== currentUserId || id === viewerId)
       return;
-    var users = new Set(Array.isArray(rootSettings.cloudcordRealProfileUsers) ? rootSettings.cloudcordRealProfileUsers : []);
+    var accounts = {
+      ...rootSettings.cloudcordRealProfileUsersByAccount
+    };
+    var users = new Set(normalizeProfileViewUsers(accounts[viewerId]));
     if (users.has(id))
       users.delete(id);
     else
       users.add(id);
-    rootSettings.cloudcordRealProfileUsers = [
-      ...users
-    ];
+    if (users.size)
+      accounts[viewerId] = [
+        ...users
+      ];
+    else
+      delete accounts[viewerId];
+    rootSettings.cloudcordRealProfileUsersByAccount = accounts;
     clearCache();
     reapplyBadgeDirectory(id);
     for (var refresh of identityRefreshers)
@@ -25278,29 +25302,38 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     var open = findByName("showUserProfileActionSheet", false);
     if (typeof open === "function")
-      setTimeout(() => open({
-        userId: id
-      }), 0);
+      setTimeout(() => {
+        if (currentUserId === viewerId)
+          open({
+            userId: id
+          });
+      }, 0);
   }
   function connectRealProfileMenu() {
     if (realProfileMenuConnected)
       return;
     realProfileMenuConnected = true;
-    var option = (id) => ({
-      label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile",
-      onPress: () => toggleRealProfileView(id)
-    });
+    var option = (id) => {
+      var viewerId = currentUserId;
+      if (!isProfileViewUserId(viewerId) || !isProfileViewUserId(id) || id === viewerId)
+        return;
+      return {
+        label: isRealProfileView(id) ? "Show CloudCord profile" : "Show real profile",
+        onPress: () => toggleRealProfileView(id, viewerId)
+      };
+    };
     if (typeof simpleSheets?.showSimpleActionSheet === "function") {
       instead("showSimpleActionSheet", simpleSheets, (args, original) => {
         var sheet = args[0];
         var id = String(sheet?.userId || sheet?.user?.id || sheet?.props?.userId || sheet?.props?.user?.id || "");
-        if (!/^\d{15,22}$/.test(id) || isCurrentUser(id) || !/user|profile/i.test(String(sheet?.key || "")) || !Array.isArray(sheet?.options))
+        var action = option(id);
+        if (!action || !/user|profile/i.test(String(sheet?.key || "")) || !Array.isArray(sheet?.options))
           return original(...args);
         return original({
           ...sheet,
           options: [
             ...sheet.options,
-            option(id)
+            action
           ]
         }, ...args.slice(1));
       });
@@ -25313,14 +25346,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       onJsxCreate(name, (_component, rendered) => {
         var props = rendered?.props;
         var id = String(props?.userId || props?.user?.id || props?.profile?.userId || "");
-        if (!/^\d{15,22}$/.test(id) || isCurrentUser(id) || props?.__cloudcordRealProfileMenu)
+        var action = option(id);
+        if (!action || props?.__cloudcordRealProfileMenu)
           return rendered;
         if (Array.isArray(props?.options))
           return /* @__PURE__ */ (0, import_react9.cloneElement)(rendered, {
             __cloudcordRealProfileMenu: true,
             options: [
               ...props.options,
-              option(id)
+              action
             ]
           });
         if (!props?.children)
@@ -25331,8 +25365,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             props.children,
             /* @__PURE__ */ (0, import_react9.createElement)(TableRow, {
               key: "cloudcord-profile-view",
-              label: option(id).label,
-              onPress: option(id).onPress
+              label: action.label,
+              onPress: action.onPress
             })
           ]
         });
@@ -63196,7 +63230,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e8b59cf624242589d61a21728fb0c05594f1d00e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "06a3f383ddeb8723e65c6b4d7611e1c7c18b9d80";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
