@@ -1,0 +1,7 @@
+plugin "Compare Lines":
+  needs commands.register
+  needs reply.local
+  on command "comparelines":
+    input "before" text optional
+    input "after" text optional
+    reply "${compareLines(before, after)}"

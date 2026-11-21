@@ -1,0 +1,5 @@
+plugin "JSON Format":
+  needs commands.register
+  needs reply.local
+  on command "formatjson" with text:
+    reply "${formatJson(text)}"

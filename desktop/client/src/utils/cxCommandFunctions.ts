@@ -29,6 +29,7 @@ const morseLetters = new Map([...morseCodes].map(([letter, code]) => [code, lett
 const normalizations = ["NFC", "NFD", "NFKC", "NFKD"];
 const ansiForegrounds = ["gray", "red", "green", "yellow", "blue", "pink", "cyan", "white"];
 const ansiBackgrounds = ["navy", "orange", "slate", "teal", "gray", "indigo", "silver", "white"];
+const codeFence = "```";
 
 function randomInteger(low: number, high: number) {
     const range = high - low + 1;
@@ -85,6 +86,51 @@ export const cxCommandFunctions = {
     checkJson(text: string) {
         try { JSON.parse(text); return "Valid JSON."; }
         catch { return "Invalid JSON."; }
+    },
+    formatJson(text: string) {
+        try { JSON.parse(text); }
+        catch { return "Invalid JSON."; }
+
+        // Keep the original number tokens, duplicate keys and property order.
+        const tokens = text.match(/"(?:\\.|[^"\\])*"|[{}\[\],:]|[^\s{}\[\],:]+/g) ?? [];
+        let depth = 0;
+        let result = "";
+        for (let index = 0; index < tokens.length; index++) {
+            const token = tokens[index];
+            const previous = tokens[index - 1];
+            const closes = token === "}" || token === "]";
+            if (closes) depth--;
+            const empty = closes && (previous === "{" || previous === "[");
+            if (!empty && (closes || previous === "{" || previous === "[" || previous === ",")) {
+                result += "\n" + "  ".repeat(depth);
+            }
+            result += token.startsWith('"') ? token.replaceAll("`", "\\u0060") : token;
+            if (token === ":") result += " ";
+            if (token === "{" || token === "[") depth++;
+            if (result.length > 3900) return "Formatted JSON is too long for one reply.";
+        }
+        return codeFence + "json\n" + result + "\n" + codeFence;
+    },
+    compareLines(before: string, after: string) {
+        const lines = (value: string) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
+        const previous = lines(before);
+        const current = lines(after);
+        const unmatched = (source: string[], other: string[]) => {
+            const counts = new Map<string, number>();
+            for (const line of other) counts.set(line, (counts.get(line) ?? 0) + 1);
+            return source.filter(line => {
+                const count = counts.get(line) ?? 0;
+                if (!count) return true;
+                counts.set(line, count - 1);
+                return false;
+            });
+        };
+        const removed = unmatched(previous, current);
+        const added = unmatched(current, previous);
+        if (!removed.length && !added.length) return "Both inputs contain the same lines, ignoring order.";
+        const changes = [...removed.map(line => "- " + line), ...added.map(line => "+ " + line)]
+            .join("\n").replaceAll(codeFence, "`\u200b``");
+        return changes.length <= 3900 ? codeFence + "diff\n" + changes + "\n" + codeFence : "Line changes are too long for one reply.";
     },
     wordFrequency(text: string) {
         const counts = new Map<string, number>();

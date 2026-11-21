@@ -37,6 +37,7 @@ import plugin_catalog_compact_compose from "../../../../examples/cx/catalog/plug
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
 import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
+import plugin_catalog_compare_lines from "../../../../examples/cx/catalog/plugins/compare-lines.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
@@ -152,6 +153,7 @@ import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/i
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
 import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
+import plugin_catalog_json_format from "../../../../examples/cx/catalog/plugins/json-format.cx";
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
 import plugin_catalog_keyword_notify from "../../../../examples/cx/catalog/plugins/keyword-notify.cx";
@@ -405,6 +407,7 @@ export const cxCatalog = {
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list },
         { name: "CompactMessages", source: plugin_catalog_compact_messages, desktopOnly: true },
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, desktopOnly: true },
+        { name: "Compare Lines", source: plugin_catalog_compare_lines, commands: ["comparelines"] },
         { name: "CopyBios", source: plugin_catalog_copy_bios },
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown },
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents },
@@ -520,6 +523,7 @@ export const cxCatalog = {
         { name: "InRole", source: plugin_catalog_in_role, commands: ["inrole"] },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator },
         { name: "JSON Check", source: plugin_catalog_json_check, commands: ["jsoncheck"] },
+        { name: "JSON Format", source: plugin_catalog_json_format, commands: ["formatjson"] },
         { name: "JumpToTop", source: plugin_catalog_jump_to_top },
         { name: "JumpTo", source: plugin_catalog_jump_to },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify },

@@ -4497,6 +4497,29 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const invokeNamed = (name, values = {}) => registered[name].execute(
             Object.entries(values).map(([name, value]) => ({ name, value })), { channel: { id: "test-channel" } }
         )?.content;
+        for (const [plugin, command, examples] of [
+            ["JSON Format", "formatjson", [
+                [{ text: '{"x":9007199254740993,"x":[{},"```"]}' },
+                    '```json\n{\n  "x": 9007199254740993,\n  "x": [\n    {},\n    "\\u0060\\u0060\\u0060"\n  ]\n}\n```'],
+                [{ text: '{"x":1,}' }, "Invalid JSON."],
+                [{ text: "[".repeat(100) + "0" + "]".repeat(100) }, "Formatted JSON is too long for one reply."],
+            ]],
+            ["Compare Lines", "comparelines", [
+                [{ before: "a\r\na\nb", after: "b\ra\nc" }, "```diff\n- a\n+ c\n```"],
+                [{ before: "a\nb", after: "b\na\n" }, "Both inputs contain the same lines, ignoring order."],
+                [{ after: "```" }, "```diff\n+ `\u200b``\n```"],
+            ]],
+        ]) {
+            selectCatalog(plugin);
+            assert.equal(registered[command], undefined);
+            click(render(), "Allow for this session");
+            for (const [inputs, expected] of examples) {
+                assert.equal(invokeNamed(command, inputs), undefined);
+                assert.equal(delivered.pop()[1], expected);
+            }
+            click(render(), "Disable " + plugin);
+            assert.equal(registered[command], undefined);
+        }
         selectCatalog("ColorText");
         click(render(), "Allow for this session");
         assert.equal(registered.color.options.find(option => option.name === "color").choices.length, 8);
