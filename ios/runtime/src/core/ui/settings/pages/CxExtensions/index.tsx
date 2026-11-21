@@ -3,6 +3,7 @@ import { instead } from "@lib/api/patcher";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxProfileMenuAction, type CxUploadAnonymiser } from "@lib/api/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
+import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@lib/api/cx";
 import { formatCxWordCount } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
@@ -2427,6 +2428,21 @@ export default function CxExtensions() {
                                 },
                             }, enabled);
                         }
+                        case "decode-base64":
+                            return registerMessageMenuActions(enabled, ({ message }, close, stillActive) => {
+                                const decoded = decodeCxMessageBase64(message?.content);
+                                if (!decoded) return [];
+                                return [{ label: "Decode Base64", run() {
+                                    close();
+                                    Alert.alert("Decoded Base64", decoded, [
+                                        { text: "Close", style: "cancel" },
+                                        { text: "Copy", onPress: () => { if (stillActive(false)) clipboard.setString(decoded); } },
+                                    ]);
+                                } }];
+                            }, false);
+                        case "hide-profile-banner-images":
+                            return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"),
+                                id => id === UserStore?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
                         case "quote-message":
                             if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
                             return registerQuoteMessage(enabled, effectOptions.includeLink);

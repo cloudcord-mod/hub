@@ -51,6 +51,7 @@ import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/pl
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
 import plugin_catalog_days_between from "../../../../examples/cx/catalog/plugins/days-between.cx";
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
+import plugin_catalog_decode_base64 from "../../../../examples/cx/catalog/plugins/decode-base64.cx";
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
 import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/plugins/discord-timestamp.cx";
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
@@ -112,6 +113,7 @@ import plugin_catalog_hide_new_messages_bar from "../../../../examples/cx/catalo
 import plugin_catalog_hide_nitro_tab from "../../../../examples/cx/catalog/plugins/hide-nitro-tab.cx";
 import plugin_catalog_hide_notification_bell from "../../../../examples/cx/catalog/plugins/hide-notification-bell.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
+import plugin_catalog_hide_profile_banner_images from "../../../../examples/cx/catalog/plugins/hide-profile-banner-images.cx";
 import plugin_catalog_hide_profile_effects from "../../../../examples/cx/catalog/plugins/hide-profile-effects.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
 import plugin_catalog_hide_reactions from "../../../../examples/cx/catalog/plugins/hide-reactions.cx";
@@ -416,6 +418,7 @@ export const cxCatalog = {
         { name: "Dashless", source: plugin_catalog_dashless },
         { name: "Days Between", source: plugin_catalog_days_between },
         { name: "Declutter", source: plugin_catalog_declutter },
+        { name: "DecodeBase64", source: plugin_catalog_decode_base64 },
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels },
         { name: "Discord Timestamp", source: plugin_catalog_discord_timestamp },
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps },
@@ -477,6 +480,7 @@ export const cxCatalog = {
         { name: "HideNitroTab", source: plugin_catalog_hide_nitro_tab },
         { name: "HideNotificationBell", source: plugin_catalog_hide_notification_bell },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button },
+        { name: "Hide Profile Banner Images", source: plugin_catalog_hide_profile_banner_images },
         { name: "HideProfileEffects", source: plugin_catalog_hide_profile_effects },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab },
         { name: "HideReactions", source: plugin_catalog_hide_reactions },

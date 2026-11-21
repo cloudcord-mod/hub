@@ -362,7 +362,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             if (user.id === other) return "https://evil.example/avatars/" + user.id + "/" + avatarHash + ".gif";
             return user.id === me ? "//cdn.discordapp.com/embed/avatars/0.png"
                 : "https://cdn.discordapp.com/avatars/" + user.id + "/" + avatarHash + ".gif?size=" + size;
-        }, getGuildIconURL(options) { return options.canAnimate; } };
+        }, getGuildIconURL(options) { return options.canAnimate; },
+        getUserBannerURL(user) { return "https://cdn.discordapp.com/banners/" + user.id + "/test.png"; } };
         let autoUpgrades = 0;
         const splitLimit = { getMaxMessageLength: () => 2000 };
         const composerSends = [];
@@ -1036,6 +1037,19 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Disable WordCount");
             assert.equal(messageAccessories.size, 0);
             assert.equal(messageRenderer.default, createMessageContent);
+            const originalBanner = icons.getUserBannerURL;
+            selectCatalog("Hide Profile Banner Images");
+            click(render(), "Allow for this session");
+            assert.equal(icons.getUserBannerURL({ id: other }), undefined);
+            assert.equal(icons.getUserBannerURL({ id: sender }), originalBanner({ id: sender }));
+            assert.equal(icons.getUserBannerURL({ id: me }), originalBanner({ id: me }));
+            click(render(), "Disable Hide Profile Banner Images");
+            assert.equal(icons.getUserBannerURL, originalBanner);
+
+            const { decodeCxMessageBase64 } = moduleBox.exports;
+            assert.equal(decodeCxMessageBase64("SGVsbG8= 8J+YgA== SGVsbG8="), "Hello\n\n😀");
+            assert.equal(decodeCxMessageBase64("/w== AA=="), "", "skip invalid UTF-8 and control characters");
+            assert.equal(decodeCxMessageBase64("A".repeat(4001)), "");
             selectedChannel = "test-channel";
         }
         {

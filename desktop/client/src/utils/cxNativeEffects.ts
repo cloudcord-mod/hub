@@ -39,6 +39,8 @@ export const cxNativeEffects = {
     "double-click-edit": { permission: "messages.openeditor", label: "Open the editor for your own message on double-click or double-tap" },
     "double-click-reply": { permission: "messages.openreply", label: "Open a reply to another user's message on double-click or double-tap" },
     "quick-mention": { permission: "messages.insertmention", label: "Insert the selected message author's mention into the current draft" },
+    "hide-profile-banner-images": { permission: "appearance.hide", label: "Hide Discord-hosted profile banner images except your own and those of friends" },
+    "decode-base64": { permission: "messages.decode", label: "Decode Base64 in the selected message and copy the result on request" },
     "copy-raw-text": { permission: "messages.copytext", label: "Add Copy Raw Text to message menus" },
     "message-word-count": { permission: "messages.wordcount", label: "Show word and character counts below messages longer than five words" },
     "quote-message": { permission: "messages.quote", label: "Add Quote and Copy as Quote actions to message menus" },
@@ -349,6 +351,50 @@ export function raiseCxAvatarResolution(target: object | undefined, size: CxAvat
             if (existing >= size) return url;
             if (existingSize.test(url)) return url.replace(existingSize, "$1size=" + size);
             return url + (/[?&]$/.test(url) ? "" : match[2] ? "&" : "?") + "size=" + size;
+        },
+    }, enabled);
+}
+
+const base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+export function decodeCxMessageBase64(content: unknown) {
+    if (typeof content !== "string" || content.length > 4000) return "";
+    const results = new Set<string>();
+    for (const match of content.matchAll(/[A-Za-z0-9+/]{4,}={0,2}/g)) {
+        const [token] = match;
+        const offset = match.index;
+        if (/[\w+/=]/.test(content.charAt(offset - 1)) || /[\w+/=]/.test(content.charAt(offset + token.length))) continue;
+        const encoded = token.replace(/=+$/, "");
+        if (encoded.length % 4 === 1 || encoded !== token && token.length % 4 !== 0) continue;
+        let bits = 0;
+        let buffer = 0;
+        let bytes = "";
+        for (const character of encoded) {
+            buffer = buffer << 6 | base64Alphabet.indexOf(character);
+            bits += 6;
+            if (bits >= 8) {
+                bits -= 8;
+                bytes += "%" + ((buffer >> bits) & 255).toString(16).padStart(2, "0");
+            }
+        }
+        if (bits && (buffer & ((1 << bits) - 1))) continue;
+        try {
+            const decoded = decodeURIComponent(bytes);
+            if (decoded.trim() && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/u.test(decoded)) results.add(decoded);
+        } catch { /* Skip invalid UTF-8. */ }
+        if (results.size === 10) break;
+    }
+    return [...results].join("\n\n");
+}
+
+export function hideCxProfileBannerImages(target: object | undefined, keepBanner: (userId: string) => boolean, enabled?: () => boolean) {
+    const officialBanner = /^(?:https:)?\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/(?:banners\/(\d{17,20})\/|guilds\/\d+\/users\/(\d{17,20})\/banners\/)/i;
+    return overrideCxMethods(target, {
+        getUserBannerURL(args, invoke) {
+            const url = invoke(args);
+            const match = typeof url === "string" ? officialBanner.exec(url) : null;
+            const owner = match?.[1] ?? match?.[2];
+            return owner && !keepBanner(owner) ? undefined : url;
         },
     }, enabled);
 }

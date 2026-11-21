@@ -1,0 +1,3 @@
+plugin "Hide Profile Banner Images":
+  needs appearance.hide
+  use hide-profile-banner-images

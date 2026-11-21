@@ -24,6 +24,7 @@ export { formatCxChannelName, getCxChannelNameCopy, type CxChannelLabel } from "
 export { isCxNotificationMuted, type CxMessageAlert } from "./cxIncoming";
 export { bindCxChannelOpenRead, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, markCxServersRead, markCxServersReadAndWait, runCxFriendInvites } from "./cxClientCommands";
 export { animateCxAssets, buildCxMessageQuote, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxWordCount, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
+export { decodeCxMessageBase64, hideCxProfileBannerImages } from "./cxNativeEffects";
 export { createCxPreviousSendHandler, planCxPreviousEdit } from "./cxPreviousMessage";
 export { bindCxSocialEvents } from "./cxSocialEvents";
 export { createCxPlusReactionHandler } from "./cxPlusReactions";
@@ -73,6 +74,7 @@ const permissionLabels = {
     "messages.openeditor": "Open Discord’s editor for your own message when you double-click or double-tap it",
     "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user’s message",
     "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+    "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
     "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
     "messages.wordcount": "Count words and characters in displayed messages on this device",
     "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
@@ -402,7 +404,7 @@ export function parseCx(source: string): CxDocument {
             current = undefined;
             continue;
         }
-        const effect = /^  use ([a-z-]+)(?: ([a-z0-9 -]+))?$/.exec(line);
+        const effect = /^  use ([a-z][a-z0-9-]*)(?: ([a-z0-9 -]+))?$/.exec(line);
         if (effect) {
             const name = effect[1] as CxNativeEffect;
             if (!Object.prototype.hasOwnProperty.call(cxNativeEffects, name) || nativeEffects.has(name))

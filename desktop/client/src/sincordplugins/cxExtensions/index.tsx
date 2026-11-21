@@ -16,6 +16,7 @@ import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoice
 import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
+import { decodeCxMessageBase64, hideCxProfileBannerImages } from "@utils/cx";
 import { formatCxWordCount } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
 import { getCxChannelNameCopy, getCxProfileMedia } from "@utils/cx";
@@ -269,6 +270,24 @@ function registerCopyRawText() {
         if (!active || typeof text !== "string" || !text.length) return;
         children.push(<Menu.MenuItem id="cx-copy-raw-text" label="Copy Raw Text" action={() => {
             if (active) void copyToClipboard(text).then(() => showToast("Message text copied"), () => showToast("Couldn't copy message text."));
+        }} />);
+    };
+    addContextMenuPatch("message", patch);
+    return () => { active = false; removeContextMenuPatch("message", patch); };
+}
+
+function registerDecodeBase64() {
+    let active = true;
+    const patch: NavContextMenuPatchCallback = (children, { message }) => {
+        const decoded = decodeCxMessageBase64(message?.content);
+        if (!decoded) return;
+        children.push(<Menu.MenuItem id="cx-decode-base64" label="Decode Base64" action={() => {
+            if (!active) return;
+            Alerts.show({ title: "Decoded Base64", body: <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{decoded}</pre>,
+                cancelText: "Close", confirmText: "Copy", onConfirm: () => {
+                    if (active) void copyToClipboard(decoded).catch(() => showToast("Couldn’t copy decoded text."));
+                },
+            });
         }} />);
     };
     addContextMenuPatch("message", patch);
@@ -954,6 +973,10 @@ export function CxSettings() {
                             }, 2);
                             return () => removeMessageAccessory(id);
                         }
+                        case "decode-base64":
+                            return registerDecodeBase64();
+                        case "hide-profile-banner-images":
+                            return hideCxProfileBannerImages(IconUtils, id => id === UserStore.getCurrentUser()?.id || RelationshipStore?.isFriend?.(id) === true);
                         case "quote-message":
                             if (!effectOptions || !("includeLink" in effectOptions)) throw new Error("Missing quote options");
                             return registerQuoteMessage(effectOptions.includeLink);
