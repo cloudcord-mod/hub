@@ -52489,7 +52489,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "BiggerAvatarsInChat",
-            source: bigger_avatars_in_chat_default
+            source: bigger_avatars_in_chat_default,
+            desktopOnly: true
           },
           {
             name: "BiggerCodeBlocks",
@@ -52497,7 +52498,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "BiggerJumboEmojis",
-            source: bigger_jumbo_emojis_default
+            source: bigger_jumbo_emojis_default,
+            desktopOnly: true
           },
           {
             name: "BiggerServerIcons",
@@ -52521,7 +52523,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "BoldUsernames",
-            source: bold_usernames_default
+            source: bold_usernames_default,
+            desktopOnly: true
           },
           {
             name: "BypassPinPrompt",
@@ -52573,7 +52576,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "CompactCompose",
-            source: compact_compose_default
+            source: compact_compose_default,
+            desktopOnly: true
           },
           {
             name: "CompactMemberList",
@@ -52581,7 +52585,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "CompactServerList",
-            source: compact_server_list_default
+            source: compact_server_list_default,
+            desktopOnly: true
           },
           {
             name: "CopyBios",
@@ -52689,7 +52694,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "FocusMode",
-            source: focus_mode_default
+            source: focus_mode_default,
+            desktopOnly: true
           },
           {
             name: "FollowVoiceUser",
@@ -52717,7 +52723,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "GrayscaleImages",
-            source: grayscale_images_default
+            source: grayscale_images_default,
+            desktopOnly: true
           },
           {
             name: "HideActiveNow",
@@ -52773,7 +52780,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "HideDiscoverButton",
-            source: hide_discover_button_default
+            source: hide_discover_button_default,
+            desktopOnly: true
           },
           {
             name: "HideDmSearch",
@@ -52781,7 +52789,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "HideDownloadAppsButton",
-            source: hide_download_apps_button_default
+            source: hide_download_apps_button_default,
+            desktopOnly: true
           },
           {
             name: "HideEditedLabel",
@@ -52833,7 +52842,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "HideKeyboardTips",
-            source: hide_keyboard_tips_default
+            source: hide_keyboard_tips_default,
+            desktopOnly: true
           },
           {
             name: "HideMemberActivities",
@@ -52841,7 +52851,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "HideMemberListButton",
-            source: hide_member_list_button_default
+            source: hide_member_list_button_default,
+            desktopOnly: true
           },
           {
             name: "HideMentionBadges",
@@ -52953,11 +52964,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "HideUserPanelActivity",
-            source: hide_user_panel_activity_default
+            source: hide_user_panel_activity_default,
+            desktopOnly: true
           },
           {
             name: "HideVoicePanelTips",
-            source: hide_voice_panel_tips_default
+            source: hide_voice_panel_tips_default,
+            desktopOnly: true
           },
           {
             name: "HideVoiceUserAvatars",
@@ -52989,7 +53002,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "HoverHighlightMessages",
-            source: hover_highlight_messages_default
+            source: hover_highlight_messages_default,
+            desktopOnly: true
           },
           {
             name: "IgnoreCalls",
@@ -53077,7 +53091,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "NoMessageHoverBar",
-            source: no_message_hover_bar_default
+            source: no_message_hover_bar_default,
+            desktopOnly: true
           },
           {
             name: "NoMosaic",
@@ -53109,7 +53124,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "NoShadows",
-            source: no_shadows_default
+            source: no_shadows_default,
+            desktopOnly: true
           },
           {
             name: "NoTypingAnimation",
@@ -53205,7 +53221,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "RoundedImages",
-            source: rounded_images_default
+            source: rounded_images_default,
+            desktopOnly: true
           },
           {
             name: "ScheduledMessages",
@@ -53253,15 +53270,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "SmallerAvatarsInChat",
-            source: smaller_avatars_in_chat_default
+            source: smaller_avatars_in_chat_default,
+            desktopOnly: true
           },
           {
             name: "SmoothScrolling",
-            source: smooth_scrolling_default
+            source: smooth_scrolling_default,
+            desktopOnly: true
           },
           {
             name: "SoftCorners",
-            source: soft_corners_default
+            source: soft_corners_default,
+            desktopOnly: true
           },
           {
             name: "SolluxTypingQuirk",
@@ -53293,7 +53313,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "StickyDateDividers",
-            source: sticky_date_dividers_default
+            source: sticky_date_dividers_default,
+            desktopOnly: true
           },
           {
             name: "StopAutoUnread",
@@ -53313,7 +53334,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "ThinScrollbars",
-            source: thin_scrollbars_default
+            source: thin_scrollbars_default,
+            desktopOnly: true
           },
           {
             name: "Translate",
@@ -53377,7 +53399,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           {
             name: "WiderChat",
-            source: wider_chat_default
+            source: wider_chat_default,
+            desktopOnly: true
           },
           {
             name: "WikiLookup",
@@ -57446,7 +57469,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             title: "CX catalog",
             children: /* @__PURE__ */ jsx(TableRow, {
               label: showCatalog ? "Hide catalog" : "Browse catalog",
-              subLabel: `${cxCatalog.plugins.length} plugins \xB7 ${cxCatalog.themes.length} themes`,
+              subLabel: `${mobileCatalogPlugins.length} plugins \xB7 ${cxCatalog.themes.length} themes`,
               onPress: () => setShowCatalog(!showCatalog)
             })
           }),
@@ -57474,7 +57497,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               [
                 [
                   "Plugins",
-                  cxCatalog.plugins
+                  mobileCatalogPlugins
                 ],
                 [
                   "Themes",
@@ -57618,7 +57641,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalUserNotes, findLocalUserTags, localUserNotesStorage;
+  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalUserNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -57720,6 +57743,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       maxTextAttachmentBytes = 256 * 1024;
       settingsEntryVisibility = /* @__PURE__ */ new WeakMap();
       profileMenuActions = /* @__PURE__ */ new Set();
+      mobileCatalogPlugins = cxCatalog.plugins.filter((entry) => !("desktopOnly" in entry && entry.desktopOnly));
     }
   });
 
@@ -58991,7 +59015,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2861bd66add223f04011e3164cf7331e7602ba1b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6ac40fe8dc43c415acf6b8b2d0c58b67196ca396";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
