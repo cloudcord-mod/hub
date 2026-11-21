@@ -13651,6 +13651,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         [
           "BUNNY_PLUGINS",
           "Add-ons"
+        ],
+        [
+          "CLOUDCORD_PREVIEWS",
+          "Previews"
+        ],
+        [
+          "CLOUDCORD_ACCOUNT_TOOLS",
+          "Account Tools"
+        ],
+        [
+          "STORE_CLOUD",
+          "CloudSync"
         ]
       ];
     }
@@ -24387,7 +24399,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   // src/core/ui/settings/pages/FakeProfile/index.tsx
   var FakeProfile_exports = {};
   __export(FakeProfile_exports, {
-    ExtrasPage: () => ExtrasPage,
+    AccountToolsPage: () => AccountToolsPage,
+    PreviewsPage: () => PreviewsPage,
     default: () => FakeProfile,
     initializeFakeProfile: () => initializeFakeProfile
   });
@@ -29842,7 +29855,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function ExtrasCard({ onReset }) {
+  function ExtrasCard({ section, onReset }) {
     var [, force] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var [friendId, setFriendId] = (0, import_react9.useState)("");
@@ -29861,233 +29874,238 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       applyFakeNitro();
       force();
     };
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsx(import_react_native28.View, {
       style: {
         padding: 16,
         gap: 24
       },
-      children: [
-        /* @__PURE__ */ jsx(K2.Section, {
-          title: "Fake Nitro",
-          description: "Only on this device. Nothing changes for other people.",
-          children: /* @__PURE__ */ jsx(ToggleRow, {
-            label: "Act like I have Nitro",
-            subLabel: "Removes Nitro previews and upsells. Real Nitro features still need Nitro",
-            value: state2.fakeNitro === true,
-            onPress: () => save({
-              ...state2,
-              fakeNitro: !state2.fakeNitro
-            })
-          })
-        }),
-        /* @__PURE__ */ jsx(K2.Section, {
-          title: "Fake orbs",
-          description: "Shows this many orbs in your wallet, only on this device. You can't spend them.",
-          children: /* @__PURE__ */ jsx(K2.Field, {
-            label: "Orbs",
-            hint: "Leave empty for your real balance",
-            children: /* @__PURE__ */ jsx(TextInput4, {
-              defaultValue: state2.fakeOrbs == null ? "" : String(state2.fakeOrbs),
-              placeholder: "1000",
-              keyboardType: "number-pad",
-              onChangeText: (text) => {
-                var clean = text.replace(/\D/g, "");
-                try {
-                  installOrbHooks();
-                } catch (e) {
-                }
-                save({
-                  ...extrasState(),
-                  fakeOrbs: clean ? Math.min(Number(clean), 999999999) : void 0
-                });
-                refreshOrbs();
-              },
-              placeholderTextColor: "#777"
-            })
-          })
-        }),
-        /* @__PURE__ */ jsxs(K2.Section, {
-          title: "Fake Nitro gift",
-          description: "Shows as a Nitro gift only on your device. Everyone else sees an invalid link, and it can't be redeemed.",
-          children: [
-            /* @__PURE__ */ jsx(K2.Field, {
-              label: "Gift",
-              children: /* @__PURE__ */ jsx(K2.Chips, {
-                options: GIFT_PLANS.map((item) => ({
-                  value: item.id,
-                  label: item.label
-                })),
-                value: state2.giftPlan ?? GIFT_PLANS[0].id,
-                onChange: (value) => save({
-                  ...state2,
-                  giftPlan: value,
-                  giftCode: state2.giftCode && newGiftCode()
-                })
+      children: section === "previews" ? /* @__PURE__ */ jsxs(Fragment, {
+        children: [
+          /* @__PURE__ */ jsx(K2.Section, {
+            title: "Fake Nitro",
+            description: "Only on this device. Nothing changes for other people.",
+            children: /* @__PURE__ */ jsx(ToggleRow, {
+              label: "Act like I have Nitro",
+              subLabel: "Removes Nitro previews and upsells. Real Nitro features still need Nitro",
+              value: state2.fakeNitro === true,
+              onPress: () => save({
+                ...state2,
+                fakeNitro: !state2.fakeNitro
               })
-            }),
-            /* @__PURE__ */ jsx(K2.Field, {
-              label: "Design",
-              children: /* @__PURE__ */ jsx(K2.Chips, {
-                options: GIFT_STYLES,
-                value: state2.giftStyle ?? 4,
-                onChange: (value) => save({
-                  ...state2,
-                  giftStyle: value,
-                  giftCode: state2.giftCode && newGiftCode()
-                })
-              })
-            }),
-            link ? /* @__PURE__ */ jsx(Text, {
-              variant: "text-xs/medium",
-              color: "text-muted",
-              children: "Changing the gift or design makes a new link, because Discord remembers each link once it's shown."
-            }) : null,
-            link ? /* @__PURE__ */ jsx(Text, {
-              variant: "text-sm/semibold",
-              selectable: true,
-              children: link
-            }) : null,
-            /* @__PURE__ */ jsxs(import_react_native28.View, {
-              style: {
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 8
-              },
-              children: [
-                /* @__PURE__ */ jsx(Button2, {
-                  text: link ? "Refresh link" : "Make link",
-                  variant: "primary",
-                  size: "sm",
-                  onPress: () => save({
-                    ...state2,
-                    giftCode: newGiftCode()
-                  })
-                }),
-                link ? /* @__PURE__ */ jsx(Button2, {
-                  text: "Copy",
-                  variant: "secondary",
-                  size: "sm",
-                  onPress: () => {
-                    try {
-                      findByProps("setString", "getString")?.setString?.(link);
-                      showToast("Copied gift link.");
-                    } catch (e) {
-                      import_react_native28.Alert.alert("Gift link", link);
-                    }
-                  }
-                }) : null,
-                link ? /* @__PURE__ */ jsx(Button2, {
-                  text: "Remove",
-                  variant: "secondary",
-                  size: "sm",
-                  onPress: () => save({
-                    ...state2,
-                    giftCode: void 0
-                  })
-                }) : null
-              ]
             })
-          ]
-        }),
-        /* @__PURE__ */ jsx(BoostSection, {
-          refresh: force
-        }),
-        /* @__PURE__ */ jsxs(K2.Section, {
-          title: "Fake friend request",
-          description: "Device-only preview. Accept is blocked; Ignore removes it without contacting Discord.",
-          children: [
-            /* @__PURE__ */ jsx(K2.Field, {
-              label: "User ID, mention or profile link",
+          }),
+          /* @__PURE__ */ jsx(K2.Section, {
+            title: "Fake orbs",
+            description: "Shows this many orbs in your wallet, only on this device. You can't spend them.",
+            children: /* @__PURE__ */ jsx(K2.Field, {
+              label: "Orbs",
+              hint: "Leave empty for your real balance",
               children: /* @__PURE__ */ jsx(TextInput4, {
-                defaultValue: friendId,
-                placeholder: "Paste here",
-                autoCapitalize: "none",
-                autoCorrect: false,
-                returnKeyType: "done",
-                onChangeText: setFriendId,
-                onSubmitEditing: () => void add(),
-                placeholderTextColor: "#777"
-              }, inputKey)
-            }),
-            /* @__PURE__ */ jsxs(import_react_native28.View, {
-              style: {
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 8
-              },
-              children: [
-                /* @__PURE__ */ jsx(Button2, {
-                  text: "Paste",
-                  variant: "secondary",
-                  size: "sm",
-                  onPress: () => _async_to_generator(function* () {
-                    try {
-                      var text = yield findByProps("setString", "getString")?.getString?.();
-                      if (text) {
-                        setFriendId(String(text));
-                        setInputKey((key) => key + 1);
-                      } else
-                        showToast("Clipboard is empty.");
-                    } catch (e) {
-                      showToast("Couldn't read the clipboard.");
-                    }
-                  })()
-                }),
-                /* @__PURE__ */ jsx(Button2, {
-                  text: "Add request",
-                  variant: "primary",
-                  size: "sm",
-                  onPress: () => void add()
-                }),
-                savedFakeRequests().length ? /* @__PURE__ */ jsx(Button2, {
-                  text: "Remove all (" + savedFakeRequests().length + ")",
-                  variant: "secondary",
-                  size: "sm",
-                  onPress: () => {
-                    clearFakeFriendRequests();
-                    force();
+                defaultValue: state2.fakeOrbs == null ? "" : String(state2.fakeOrbs),
+                placeholder: "1000",
+                keyboardType: "number-pad",
+                onChangeText: (text) => {
+                  var clean = text.replace(/\D/g, "");
+                  try {
+                    installOrbHooks();
+                  } catch (e) {
                   }
-                }) : null
-              ]
-            }),
-            parseUserId(friendId) ? /* @__PURE__ */ jsx(Text, {
-              variant: "text-xs/medium",
-              color: "text-muted",
-              children: "User ID: " + parseUserId(friendId)
-            }) : null
-          ]
-        }),
-        /* @__PURE__ */ jsx(FakeMessagesSection, {}),
-        /* @__PURE__ */ jsx(FakeConversationsList, {}),
-        /* @__PURE__ */ jsx(ServerCloneSection, {}),
-        /* @__PURE__ */ jsx(K2.Section, {
-          title: "Account tools",
-          children: /* @__PURE__ */ jsxs(import_react_native28.View, {
-            style: {
-              flexDirection: "row",
-              flexWrap: "wrap",
-              gap: 8
-            },
+                  save({
+                    ...extrasState(),
+                    fakeOrbs: clean ? Math.min(Number(clean), 999999999) : void 0
+                  });
+                  refreshOrbs();
+                },
+                placeholderTextColor: "#777"
+              })
+            })
+          }),
+          /* @__PURE__ */ jsxs(K2.Section, {
+            title: "Fake Nitro gift",
+            description: "Shows as a Nitro gift only on your device. Everyone else sees an invalid link, and it can't be redeemed.",
             children: [
-              /* @__PURE__ */ jsx(Button2, {
-                text: "Leave all servers",
-                variant: "destructive",
-                size: "sm",
-                onPress: confirmLeaveAllServers
+              /* @__PURE__ */ jsx(K2.Field, {
+                label: "Gift",
+                children: /* @__PURE__ */ jsx(K2.Chips, {
+                  options: GIFT_PLANS.map((item) => ({
+                    value: item.id,
+                    label: item.label
+                  })),
+                  value: state2.giftPlan ?? GIFT_PLANS[0].id,
+                  onChange: (value) => save({
+                    ...state2,
+                    giftPlan: value,
+                    giftCode: state2.giftCode && newGiftCode()
+                  })
+                })
               }),
-              /* @__PURE__ */ jsx(Button2, {
-                text: "Reset CloudCord",
-                variant: "destructive",
-                size: "sm",
-                onPress: () => confirmResetCloudCordProfile(onReset)
+              /* @__PURE__ */ jsx(K2.Field, {
+                label: "Design",
+                children: /* @__PURE__ */ jsx(K2.Chips, {
+                  options: GIFT_STYLES,
+                  value: state2.giftStyle ?? 4,
+                  onChange: (value) => save({
+                    ...state2,
+                    giftStyle: value,
+                    giftCode: state2.giftCode && newGiftCode()
+                  })
+                })
+              }),
+              link ? /* @__PURE__ */ jsx(Text, {
+                variant: "text-xs/medium",
+                color: "text-muted",
+                children: "Changing the gift or design makes a new link, because Discord remembers each link once it's shown."
+              }) : null,
+              link ? /* @__PURE__ */ jsx(Text, {
+                variant: "text-sm/semibold",
+                selectable: true,
+                children: link
+              }) : null,
+              /* @__PURE__ */ jsxs(import_react_native28.View, {
+                style: {
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Button2, {
+                    text: link ? "Refresh link" : "Make link",
+                    variant: "primary",
+                    size: "sm",
+                    onPress: () => save({
+                      ...state2,
+                      giftCode: newGiftCode()
+                    })
+                  }),
+                  link ? /* @__PURE__ */ jsx(Button2, {
+                    text: "Copy",
+                    variant: "secondary",
+                    size: "sm",
+                    onPress: () => {
+                      try {
+                        findByProps("setString", "getString")?.setString?.(link);
+                        showToast("Copied gift link.");
+                      } catch (e) {
+                        import_react_native28.Alert.alert("Gift link", link);
+                      }
+                    }
+                  }) : null,
+                  link ? /* @__PURE__ */ jsx(Button2, {
+                    text: "Remove",
+                    variant: "secondary",
+                    size: "sm",
+                    onPress: () => save({
+                      ...state2,
+                      giftCode: void 0
+                    })
+                  }) : null
+                ]
               })
             ]
+          }),
+          /* @__PURE__ */ jsx(BoostSection, {
+            refresh: force
+          }),
+          /* @__PURE__ */ jsxs(K2.Section, {
+            title: "Fake friend request",
+            description: "Device-only preview. Accept is blocked; Ignore removes it without contacting Discord.",
+            children: [
+              /* @__PURE__ */ jsx(K2.Field, {
+                label: "User ID, mention or profile link",
+                children: /* @__PURE__ */ jsx(TextInput4, {
+                  defaultValue: friendId,
+                  placeholder: "Paste here",
+                  autoCapitalize: "none",
+                  autoCorrect: false,
+                  returnKeyType: "done",
+                  onChangeText: setFriendId,
+                  onSubmitEditing: () => void add(),
+                  placeholderTextColor: "#777"
+                }, inputKey)
+              }),
+              /* @__PURE__ */ jsxs(import_react_native28.View, {
+                style: {
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 8
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Button2, {
+                    text: "Paste",
+                    variant: "secondary",
+                    size: "sm",
+                    onPress: () => _async_to_generator(function* () {
+                      try {
+                        var text = yield findByProps("setString", "getString")?.getString?.();
+                        if (text) {
+                          setFriendId(String(text));
+                          setInputKey((key) => key + 1);
+                        } else
+                          showToast("Clipboard is empty.");
+                      } catch (e) {
+                        showToast("Couldn't read the clipboard.");
+                      }
+                    })()
+                  }),
+                  /* @__PURE__ */ jsx(Button2, {
+                    text: "Add request",
+                    variant: "primary",
+                    size: "sm",
+                    onPress: () => void add()
+                  }),
+                  savedFakeRequests().length ? /* @__PURE__ */ jsx(Button2, {
+                    text: "Remove all (" + savedFakeRequests().length + ")",
+                    variant: "secondary",
+                    size: "sm",
+                    onPress: () => {
+                      clearFakeFriendRequests();
+                      force();
+                    }
+                  }) : null
+                ]
+              }),
+              parseUserId(friendId) ? /* @__PURE__ */ jsx(Text, {
+                variant: "text-xs/medium",
+                color: "text-muted",
+                children: "User ID: " + parseUserId(friendId)
+              }) : null
+            ]
+          }),
+          /* @__PURE__ */ jsx(FakeMessagesSection, {}),
+          /* @__PURE__ */ jsx(FakeConversationsList, {})
+        ]
+      }) : /* @__PURE__ */ jsxs(Fragment, {
+        children: [
+          /* @__PURE__ */ jsx(ServerCloneSection, {}),
+          /* @__PURE__ */ jsx(K2.Section, {
+            title: "Account tools",
+            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+              style: {
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 8
+              },
+              children: [
+                /* @__PURE__ */ jsx(Button2, {
+                  text: "Leave all servers",
+                  variant: "destructive",
+                  size: "sm",
+                  onPress: confirmLeaveAllServers
+                }),
+                /* @__PURE__ */ jsx(Button2, {
+                  text: "Reset CloudCord",
+                  variant: "destructive",
+                  size: "sm",
+                  onPress: () => confirmResetCloudCordProfile(onReset)
+                })
+              ]
+            })
           })
-        })
-      ]
+        ]
+      })
     });
   }
-  function ExtrasPage() {
+  function ExtrasPage({ section }) {
     return /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       keyboardDismissMode: "on-drag",
@@ -30099,6 +30117,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       children: /* @__PURE__ */ jsx(Card2, {
         border: "strong",
         children: /* @__PURE__ */ jsx(ExtrasCard, {
+          section,
           onReset: () => {
             try {
               bindSavedPreview();
@@ -30109,6 +30128,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         })
       })
+    });
+  }
+  function PreviewsPage() {
+    return /* @__PURE__ */ jsx(ExtrasPage, {
+      section: "previews"
+    });
+  }
+  function AccountToolsPage() {
+    return /* @__PURE__ */ jsx(ExtrasPage, {
+      section: "tools"
     });
   }
   function initializeFakeProfile() {
@@ -60744,970 +60773,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
-  // src/core/ui/settings/pages/CxExtensions/AddonCard.tsx
-  function useAddonReview(kind, entry) {
-    var navigation2 = NavigationNative.useNavigation();
-    return () => navigation2.push("PUPU_CUSTOM_PAGE", {
-      title: entry?.name ?? `Import ${kind}`,
-      render: () => /* @__PURE__ */ jsx(CxExtensions, {
-        kind,
-        entry
-      })
-    });
-  }
-  function ImportCxAddonButton({ kind }) {
-    var review = useAddonReview(kind);
-    var label2 = kind === "plugin" ? "Import plugin file" : "Import theme file";
-    return /* @__PURE__ */ jsx(Button, {
-      text: label2,
-      variant: "secondary",
-      size: "small",
-      onPress: review
-    });
-  }
-  function CxAddonCard({ kind, entry }) {
-    var review = useAddonReview(kind, entry);
-    return /* @__PURE__ */ jsx(AddonCard, {
-      headerLabel: entry.name,
-      descriptionLabel: entry.description,
-      toggleType: kind === "theme" ? "radio" : "switch",
-      toggleValue: () => entry.active,
-      actions: entry.active ? [
-        {
-          icon: "SettingsIcon",
-          onPress: review
-        }
-      ] : void 0,
-      onToggleChange: (enabled) => {
-        if (enabled) {
-          if (settings.safeMode?.enabled)
-            return showToast("Add-ons are paused in Safe Mode.");
-          return review();
-        }
-        try {
-          disableCxAddon(entry.id, entry.name);
-        } catch (error) {
-          showToast(error instanceof Error ? error.message : String(error));
-        }
-      }
-    });
-  }
-  var init_AddonCard2 = __esm({
-    "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_AddonCard();
-      init_settings();
-      init_toasts();
-      init_common();
-      init_components();
-      init_CxExtensions();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts
-  var usePluginCardStyles;
-  var init_usePluginCardStyles = __esm({
-    "src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_common();
-      init_styles();
-      usePluginCardStyles = createStyles({
-        smallIcon: {
-          tintColor: tokens.colors.LOGO_PRIMARY,
-          height: 18,
-          width: 18
-        },
-        badgeIcon: {
-          tintColor: tokens.colors.LOGO_PRIMARY,
-          height: 12,
-          width: 12
-        },
-        badgesContainer: {
-          flexWrap: "wrap",
-          flexDirection: "row",
-          gap: 6,
-          borderRadius: 6,
-          padding: 4
-        }
-      });
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/components/PluginCard.tsx
-  function getHighlightColor() {
-    return (0, import_chroma_js4.default)(tokens.unsafe_rawColors.YELLOW_300).alpha(0.3).hex();
-  }
-  function Title() {
-    var styles2 = usePluginCardStyles();
-    var { plugin: plugin2, result } = useCardContext();
-    var highlightedNode = result[0].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
-      style: {
-        backgroundColor: getHighlightColor()
-      },
-      children: m2
-    }, i));
-    var icon3 = plugin2.icon && findAssetId(plugin2.icon);
-    var textNode = /* @__PURE__ */ jsx(Text, {
-      numberOfLines: 1,
-      variant: "heading-lg/semibold",
-      children: highlightedNode.length ? highlightedNode : plugin2.name
-    });
-    return /* @__PURE__ */ jsxs(import_react_native34.View, {
-      style: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6
-      },
-      children: [
-        icon3 && /* @__PURE__ */ jsx(import_react_native34.Image, {
-          style: styles2.smallIcon,
-          source: icon3
-        }),
-        textNode
-      ]
-    });
-  }
-  function Authors() {
-    var { plugin: plugin2, result } = useCardContext();
-    var styles2 = usePluginCardStyles();
-    if (!plugin2.authors)
-      return null;
-    var highlightedNode = result[2].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
-      style: {
-        backgroundColor: getHighlightColor()
-      },
-      children: m2
-    }, i));
-    var badges = plugin2.getBadges();
-    var authorText = highlightedNode.length > 0 ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
-    return /* @__PURE__ */ jsxs(import_react_native34.View, {
-      style: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        flexShrink: 1,
-        gap: 4
-      },
-      children: [
-        /* @__PURE__ */ jsxs(Text, {
-          variant: "text-sm/semibold",
-          color: "text-muted",
-          children: [
-            "by ",
-            authorText
-          ]
-        }),
-        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native34.View, {
-          style: styles2.badgesContainer,
-          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native34.Image, {
-            source: b3.source,
-            style: styles2.badgeIcon
-          }, i))
-        })
-      ]
-    });
-  }
-  function Description() {
-    var { plugin: plugin2, result } = useCardContext();
-    var highlightedNode = result[1].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
-      style: {
-        backgroundColor: getHighlightColor()
-      },
-      children: m2
-    }, i));
-    return /* @__PURE__ */ jsx(Text, {
-      variant: "text-md/medium",
-      children: highlightedNode.length ? highlightedNode : plugin2.description
-    });
-  }
-  function PluginCard({ result, item: plugin2 }) {
-    plugin2.usePluginState();
-    var [toggling, setToggling] = (0, import_react12.useState)(false);
-    var cardContextValue = (0, import_react12.useMemo)(() => ({
-      plugin: plugin2,
-      result
-    }), [
-      plugin2,
-      result
-    ]);
-    var core = isCorePlugin(plugin2.id);
-    return /* @__PURE__ */ jsx(CardContext.Provider, {
-      value: cardContextValue,
-      children: /* @__PURE__ */ jsx(Card, {
-        children: /* @__PURE__ */ jsxs(Stack, {
-          spacing: 16,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native34.View, {
-              style: {
-                flexDirection: "row",
-                justifyContent: "space-between"
-              },
-              children: [
-                /* @__PURE__ */ jsxs(import_react_native34.View, {
-                  style: {
-                    flexShrink: 1
-                  },
-                  children: [
-                    /* @__PURE__ */ jsx(Title, {}),
-                    /* @__PURE__ */ jsx(Authors, {})
-                  ]
-                }),
-                /* @__PURE__ */ jsx(import_react_native34.View, {
-                  children: /* @__PURE__ */ jsxs(Stack, {
-                    spacing: 12,
-                    direction: "horizontal",
-                    children: [
-                      /* @__PURE__ */ jsx(Actions, {}),
-                      /* @__PURE__ */ jsx(import_react_native34.View, {
-                        style: core ? {
-                          opacity: 0.5
-                        } : void 0,
-                        children: /* @__PURE__ */ jsx(TableSwitch, {
-                          value: core ? true : plugin2.isEnabled(),
-                          disabled: core || toggling,
-                          onValueChange: (v2) => _async_to_generator(function* () {
-                            if (!core) {
-                              setToggling(true);
-                              try {
-                                yield plugin2.toggle(v2);
-                              } catch (error) {
-                                showToast(error instanceof Error ? error.message : String(error), findAssetId("CircleXIcon-primary"));
-                              } finally {
-                                setToggling(false);
-                              }
-                            }
-                          })()
-                        })
-                      })
-                    ]
-                  })
-                })
-              ]
-            }),
-            /* @__PURE__ */ jsx(Description, {})
-          ]
-        })
-      })
-    });
-  }
-  var import_chroma_js4, import_react12, import_react_native34, CardContext, useCardContext, Actions;
-  var init_PluginCard = __esm({
-    "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_usePluginCardStyles();
-      init_assets();
-      init_toasts();
-      init_common();
-      init_components();
-      init_sheets();
-      import_chroma_js4 = __toESM(require_chroma());
-      import_react12 = __toESM(require_react());
-      import_react_native34 = __toESM(require_react_native());
-      init_plugins4();
-      CardContext = /* @__PURE__ */ (0, import_react12.createContext)(null);
-      useCardContext = () => (0, import_react12.useContext)(CardContext);
-      Actions = () => {
-        var { plugin: plugin2 } = useCardContext();
-        var navigation2 = NavigationNative.useNavigation();
-        return /* @__PURE__ */ jsxs(import_react_native34.View, {
-          style: {
-            flexDirection: "row",
-            gap: 6
-          },
-          children: [
-            /* @__PURE__ */ jsx(IconButton, {
-              size: "sm",
-              variant: "secondary",
-              icon: findAssetId("WrenchIcon"),
-              disabled: !plugin2.getPluginSettingsComponent(),
-              onPress: () => navigation2.push("PUPU_CUSTOM_PAGE", {
-                title: plugin2.name,
-                render: plugin2.getPluginSettingsComponent()
-              })
-            }),
-            /* @__PURE__ */ jsx(IconButton, {
-              size: "sm",
-              variant: "secondary",
-              icon: findAssetId("CircleInformationIcon-primary"),
-              onPress: () => void showSheet("PluginInfoActionSheet", plugin2.resolveSheetComponent(), {
-                plugin: plugin2,
-                navigation: navigation2
-              })
-            })
-          ]
-        });
-      };
-    }
-  });
-
-  // src/metro/common/stores.ts
-  var UserStore3;
-  var init_stores = __esm({
-    "src/metro/common/stores.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_wrappers();
-      UserStore3 = findByStoreNameLazy("UserStore");
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx
-  function TitleComponent({ plugin: plugin2 }) {
-    var users = FluxUtils.useStateFromStoresArray([
-      UserStore3
-    ], () => {
-      plugin2.authors?.forEach((a) => a.id && maybeFetchUser(a.id));
-      return plugin2.authors?.map((a) => UserStore3.getUser(a.id));
-    });
-    var { authors } = plugin2;
-    var authorTextNode = [];
-    if (authors) {
-      var _loop2 = function(author2) {
-        authorTextNode.push(/* @__PURE__ */ jsx(Text, {
-          onPress: () => showUserProfileActionSheet({
-            userId: author2.id
-          }),
-          variant: "text-md/medium",
-          children: author2.name
-        }));
-        authorTextNode.push(", ");
-      };
-      for (var author of authors)
-        _loop2(author);
-      authorTextNode.pop();
-    }
-    return /* @__PURE__ */ jsxs(import_react_native35.View, {
-      style: {
-        gap: 4
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native35.View, {
-          children: /* @__PURE__ */ jsx(Text, {
-            variant: "heading-xl/semibold",
-            children: plugin2.name
-          })
-        }),
-        /* @__PURE__ */ jsx(import_react_native35.View, {
-          style: {
-            flexDirection: "row",
-            flexShrink: 1
-          },
-          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native35.View, {
-            style: {
-              flexDirection: "row",
-              gap: 8,
-              alignItems: "center",
-              paddingVertical: 4,
-              paddingHorizontal: 8,
-              backgroundColor: "#00000016",
-              borderRadius: 32
-            },
-            children: [
-              users.length && /* @__PURE__ */ jsx(AvatarPile, {
-                size: "xxsmall",
-                names: plugin2.authors?.map((a) => a.name),
-                totalCount: plugin2.authors?.length,
-                children: users.map((a) => /* @__PURE__ */ jsx(Avatar, {
-                  size: "xxsmall",
-                  user: a
-                }))
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/medium",
-                children: authorTextNode
-              })
-            ]
-          })
-        })
-      ]
-    });
-  }
-  var import_react_native35, showUserProfileActionSheet, maybeFetchUser;
-  var init_TitleComponent = __esm({
-    "src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_lazy();
-      init_metro();
-      init_common();
-      init_components();
-      init_stores();
-      import_react_native35 = __toESM(require_react_native());
-      showUserProfileActionSheet = findByNameLazy("showUserProfileActionSheet");
-      ({ getUser: maybeFetchUser } = lazyDestructure(() => findByProps("getUser", "fetchProfile")));
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx
-  var PluginInfoActionSheet_exports = {};
-  __export(PluginInfoActionSheet_exports, {
-    default: () => PluginInfoActionSheet
-  });
-  function PluginInfoIconButton(props) {
-    var { onPress } = props;
-    props.onPress &&= () => {
-      hideSheet("PluginInfoActionSheet");
-      onPress?.();
-    };
-    return /* @__PURE__ */ jsx(IconButton, {
-      ...props
-    });
-  }
-  function PluginInfoActionSheet({ plugin: plugin2, navigation: navigation2 }) {
-    plugin2.usePluginState();
-    var [loading, setLoading] = (0, import_react13.useState)(false);
-    var isVendettaPlugin = plugin2.id.includes("/");
-    var isCorePlugin2 = plugin2.id.startsWith("bunny.") || plugin2.id.startsWith("vendetta.");
-    var copyPluginUrl = () => {
-      var url2 = plugin2.id;
-      if (isVendettaPlugin) {
-        url2 = plugin2.id;
-      } else {
-        try {
-          var pluginAny = plugin2;
-          var repoUrl = (
-            //@ts-expect-error
-            pluginAny._manifest?.parentRepository || //@ts-expect-error
-            pluginAny.manifest?.parentRepository
-          );
-          url2 = repoUrl ? `${repoUrl}/builds/${plugin2.id}` : plugin2.id;
-        } catch (e) {
-          url2 = plugin2.id;
-        }
-      }
-      clipboard.setString(url2);
-      showToast("Copied to clipboard!", findAssetId("toast_copy_link"));
-    };
-    var refetchPlugin = () => _async_to_generator(function* () {
-      setLoading(true);
-      try {
-        if (isVendettaPlugin) {
-          var vdPlugin = VdPluginManager.plugins[plugin2.id];
-          if (vdPlugin.enabled)
-            VdPluginManager.stopPlugin(plugin2.id, false);
-          yield VdPluginManager.fetchPlugin(plugin2.id);
-          if (vdPlugin.enabled)
-            yield VdPluginManager.startPlugin(plugin2.id);
-          showToast("Plugin refreshed successfully");
-        } else {
-          showToast("Plugin refreshed successfully");
-        }
-      } catch (e) {
-        showToast("Failed to refresh plugin");
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var clearPluginData = () => {
-      showConfirmationAlert({
-        title: "Clear Data",
-        content: "Are you sure you want to clear all data for this plugin? This action cannot be undone.",
-        confirmText: "Clear",
-        confirmColor: "red",
-        cancelText: "Cancel",
-        onConfirm: () => _async_to_generator(function* () {
-          hideSheet("PluginInfoActionSheet");
-          try {
-            if (isVendettaPlugin) {
-              var vdPlugin = VdPluginManager.plugins[plugin2.id];
-              if (vdPlugin.enabled)
-                VdPluginManager.stopPlugin(plugin2.id, false);
-              yield purgeStorage(plugin2.id);
-              if (vdPlugin.enabled)
-                yield VdPluginManager.startPlugin(plugin2.id);
-            } else {
-              yield purgeStorage2(`plugins/storage/${plugin2.id}.json`);
-            }
-            showToast("Plugin data cleared successfully");
-          } catch (e) {
-            showToast("Failed to clear plugin data");
-          }
-        })()
-      });
-    };
-    var uninstallPluginHandler = () => {
-      if (isCorePlugin2) {
-        showToast("Core plugins cannot be uninstalled");
-        return;
-      }
-      showConfirmationAlert({
-        title: "Uninstall Plugin",
-        content: "Are you sure you want to uninstall this plugin? This action cannot be undone.",
-        confirmText: "Uninstall",
-        confirmColor: "red",
-        cancelText: "Cancel",
-        onConfirm: () => _async_to_generator(function* () {
-          hideSheet("PluginInfoActionSheet");
-          try {
-            if (isVendettaPlugin) {
-              yield VdPluginManager.removePlugin(plugin2.id);
-            } else {
-            }
-            showToast("Plugin uninstalled successfully");
-          } catch (e) {
-            showToast(`Failed to uninstall plugin: ${e instanceof Error ? e.message : String(e)}`);
-          }
-        })()
-      });
-    };
-    return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native36.ScrollView, {
-        contentContainerStyle: {
-          gap: 12,
-          marginBottom: 12
-        },
-        children: [
-          /* @__PURE__ */ jsx(import_react_native36.View, {
-            style: {
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              paddingVertical: 24,
-              justifyContent: "space-between",
-              width: "100%"
-            },
-            children: /* @__PURE__ */ jsx(TitleComponent, {
-              plugin: plugin2
-            })
-          }),
-          /* @__PURE__ */ jsxs(import_react_native36.View, {
-            style: {
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 22,
-              paddingHorizontal: 4
-            },
-            children: [
-              /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Configure",
-                variant: "secondary",
-                disabled: !plugin2.getPluginSettingsComponent(),
-                icon: findAssetId("WrenchIcon"),
-                onPress: () => {
-                  navigation2.push("PUPU_CUSTOM_PAGE", {
-                    title: plugin2.name,
-                    render: () => /* @__PURE__ */ jsx(ScaledPluginSettings, {
-                      component: plugin2.getPluginSettingsComponent()
-                    })
-                  });
-                }
-              }),
-              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Refetch",
-                variant: "secondary",
-                icon: findAssetId("RetryIcon"),
-                onPress: refetchPlugin,
-                disabled: loading
-              }),
-              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Copy URL",
-                variant: "secondary",
-                icon: findAssetId("LinkIcon"),
-                onPress: copyPluginUrl
-              }),
-              /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Clear Data",
-                variant: "secondary",
-                icon: findAssetId("FileIcon"),
-                onPress: clearPluginData
-              }),
-              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
-                label: "Uninstall",
-                variant: "secondary",
-                icon: findAssetId("TrashIcon"),
-                onPress: uninstallPluginHandler
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsxs(Card, {
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/semibold",
-                color: "text-primary",
-                style: {
-                  marginBottom: 4,
-                  color: "text-strong"
-                },
-                children: "Description"
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/medium",
-                children: plugin2.description
-              })
-            ]
-          })
-        ]
-      })
-    });
-  }
-  var import_react13, import_react_native36;
-  var init_PluginInfoActionSheet = __esm({
-    "src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_sheets();
-      init_components();
-      init_common();
-      init_toasts();
-      init_alerts2();
-      init_plugins();
-      init_storage();
-      init_storage2();
-      init_assets();
-      import_react13 = __toESM(require_react());
-      import_react_native36 = __toESM(require_react_native());
-      init_TitleComponent();
-      init_ScaledPluginSettings();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/models/bunny.ts
-  function unifyBunnyPlugin(manifest) {
-    return {
-      id: manifest.id,
-      name: manifest.display.name,
-      description: manifest.display.description,
-      authors: manifest.display.authors,
-      getBadges() {
-        return [
-          {
-            source: {
-              uri: cloudcord_default
-            }
-          }
-        ];
-      },
-      isEnabled: () => isPluginEnabled(manifest.id),
-      isInstalled: () => manifest.id in pluginSettings,
-      usePluginState() {
-        useObservable([
-          pluginSettings
-        ]);
-      },
-      toggle(start) {
-        try {
-          start ? enablePlugin(manifest.id, true) : disablePlugin(manifest.id);
-        } catch (e) {
-          console.error(e);
-        }
-      },
-      resolveSheetComponent() {
-        return Promise.resolve({
-          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
-        });
-      },
-      getPluginSettingsComponent() {
-        return getPluginSettingsComponent(manifest.id);
-      }
-    };
-  }
-  var init_bunny = __esm({
-    "src/core/ui/settings/pages/Plugins/models/bunny.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_settings3();
-      init_plugins4();
-      init_storage2();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/models/vendetta.ts
-  function unifyVdPlugin(vdPlugin) {
-    return {
-      id: vdPlugin.id,
-      name: vdPlugin.manifest.name,
-      description: vdPlugin.manifest.description,
-      authors: vdPlugin.manifest.authors,
-      icon: vdPlugin.manifest.vendetta?.icon,
-      getBadges() {
-        return [];
-      },
-      isEnabled: () => vdPlugin.enabled,
-      isInstalled: () => Boolean(vdPlugin && VdPluginManager.plugins[vdPlugin.id]),
-      usePluginState() {
-        useProxy(VdPluginManager.plugins[vdPlugin.id]);
-      },
-      toggle(start) {
-        return _async_to_generator(function* () {
-          if (start)
-            yield VdPluginManager.startPlugin(vdPlugin.id);
-          else
-            VdPluginManager.stopPlugin(vdPlugin.id);
-        })();
-      },
-      resolveSheetComponent() {
-        return Promise.resolve({
-          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
-        });
-      },
-      getPluginSettingsComponent() {
-        return VdPluginManager.getSettings(vdPlugin.id);
-      }
-    };
-  }
-  var init_vendetta = __esm({
-    "src/core/ui/settings/pages/Plugins/models/vendetta.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_plugins();
-      init_storage();
-    }
-  });
-
-  // src/core/ui/settings/pages/Plugins/index.tsx
-  var Plugins_exports = {};
-  __export(Plugins_exports, {
-    default: () => Plugins
-  });
-  function PluginListCard({ item, result }) {
-    return "source" in item ? /* @__PURE__ */ jsx(CxAddonCard, {
-      kind: "plugin",
-      entry: item
-    }) : /* @__PURE__ */ jsx(PluginCard, {
-      item,
-      result
-    });
-  }
-  function PluginPage(props) {
-    var items = props.useItems();
-    return /* @__PURE__ */ jsx(AddonPage, {
-      CardComponent: PluginListCard,
-      isEnabled: isPluginRowEnabled,
-      title: Strings.PLUGINS,
-      searchKeywords: [
-        "name",
-        "description",
-        (p) => ("source" in p ? [
-          p.keywords,
-          ...(p.commands ?? []).map((command) => "/" + command)
-        ].filter(Boolean).join(" ") : p.authors?.map((a) => typeof a === "string" ? a : a.name).join()) || ""
-      ],
-      sortOptions: {
-        "Name (A-Z)": (a, b3) => a.name.localeCompare(b3.name),
-        "Name (Z-A)": (a, b3) => b3.name.localeCompare(a.name)
-      },
-      safeModeHint: {
-        message: Strings.SAFE_MODE_NOTICE_PLUGINS
-      },
-      items,
-      ...props
-    });
-  }
-  function Plugins() {
-    useProxy(settings);
-    var navigation2 = NavigationNative.useNavigation();
-    return /* @__PURE__ */ jsx(PluginPage, {
-      useItems: () => {
-        useProxy(VdPluginManager.plugins);
-        useObservable([
-          pluginSettings
-        ]);
-        var corePlugins = [
-          ...registeredPlugins.values()
-        ].filter((p) => isPluginInstalled(p.id) && isCorePlugin(p.id)).map(unifyBunnyPlugin);
-        var vdPlugins = Object.values(VdPluginManager.plugins).map(unifyVdPlugin);
-        var bnPlugins = [
-          ...registeredPlugins.values()
-        ].filter((p) => isPluginInstalled(p.id) && !isCorePlugin(p.id)).map(unifyBunnyPlugin);
-        var catalog = useCxAddonRows("plugin");
-        var native = [
-          ...corePlugins,
-          ...vdPlugins,
-          ...bnPlugins
-        ];
-        var nativeNames = new Set(native.map((plugin2) => plugin2.name.toLowerCase()));
-        return [
-          ...native,
-          ...catalog.filter((plugin2) => plugin2.active || !nativeNames.has(plugin2.name.toLowerCase()))
-        ];
-      },
-      ListHeaderComponent: () => {
-        var unproxiedPlugins = Object.values(VdPluginManager.plugins).filter((p) => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));
-        if (!unproxiedPlugins.length)
-          return /* @__PURE__ */ jsx(ImportCxAddonButton, {
-            kind: "plugin"
-          });
-        return /* @__PURE__ */ jsxs(import_react_native37.View, {
-          style: {
-            marginVertical: 12,
-            marginHorizontal: 10
-          },
-          children: [
-            /* @__PURE__ */ jsx(ImportCxAddonButton, {
-              kind: "plugin"
-            }),
-            /* @__PURE__ */ jsx(Card, {
-              border: "strong",
-              children: /* @__PURE__ */ jsxs(import_react_native37.View, {
-                style: {
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "row"
-                },
-                children: [
-                  /* @__PURE__ */ jsxs(import_react_native37.View, {
-                    style: {
-                      gap: 6,
-                      flexShrink: 1
-                    },
-                    children: [
-                      /* @__PURE__ */ jsx(Text, {
-                        variant: "heading-md/bold",
-                        children: "Unproxied Plugins Found"
-                      }),
-                      /* @__PURE__ */ jsx(Text, {
-                        variant: "text-sm/medium",
-                        color: "text-muted",
-                        children: "Plugins installed from unproxied sources may run unverified code in this app without your awareness."
-                      })
-                    ]
-                  }),
-                  /* @__PURE__ */ jsx(import_react_native37.View, {
-                    style: {
-                      marginLeft: "auto"
-                    },
-                    children: /* @__PURE__ */ jsx(IconButton, {
-                      size: "sm",
-                      variant: "secondary",
-                      icon: findAssetId("CircleInformationIcon-primary"),
-                      style: {
-                        marginLeft: 8
-                      },
-                      onPress: () => {
-                        navigation2.push("PUPU_CUSTOM_PAGE", {
-                          title: "Unproxied Plugins",
-                          render: () => {
-                            return /* @__PURE__ */ jsx(FlashList, {
-                              data: unproxiedPlugins,
-                              contentContainerStyle: {
-                                padding: 8
-                              },
-                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native37.View, {
-                                style: {
-                                  height: 8
-                                }
-                              }),
-                              renderItem: ({ item: p }) => /* @__PURE__ */ jsx(Card, {
-                                children: /* @__PURE__ */ jsx(Text, {
-                                  variant: "heading-md/semibold",
-                                  children: p.id
-                                })
-                              })
-                            });
-                          }
-                        });
-                      }
-                    })
-                  })
-                ]
-              })
-            })
-          ]
-        });
-      },
-      installAction: {
-        label: "Install a plugin",
-        fetchFn: (url2) => _async_to_generator(function* () {
-          if (!url2.startsWith(VD_PROXY_PREFIX) && !url2.startsWith(BUNNY_PROXY_PREFIX) && !settings.developerSettings) {
-            openAlert2("bunny-plugin-unproxied-confirmation", /* @__PURE__ */ jsx(AlertModal3, {
-              title: "Hold On!",
-              content: "You're trying to install a plugin from an unproxied external source. This means you're trusting the creator to run their code in this app without your knowledge. Are you sure you want to continue?",
-              extraContent: /* @__PURE__ */ jsx(Card, {
-                children: /* @__PURE__ */ jsx(Text, {
-                  variant: "text-md/bold",
-                  children: url2
-                })
-              }),
-              actions: /* @__PURE__ */ jsxs(AlertActions2, {
-                children: [
-                  /* @__PURE__ */ jsx(AlertActionButton3, {
-                    text: "Continue",
-                    variant: "primary",
-                    onPress: () => {
-                      VdPluginManager.installPlugin(url2).then(() => showToast(Strings.TOASTS_INSTALLED_PLUGIN, findAssetId("Check"))).catch((e) => openAlert2("bunny-plugin-install-failed", /* @__PURE__ */ jsx(AlertModal3, {
-                        title: "Install Failed",
-                        content: `Unable to install plugin from '${url2}':`,
-                        extraContent: /* @__PURE__ */ jsx(Card, {
-                          children: /* @__PURE__ */ jsx(Text, {
-                            variant: "text-md/normal",
-                            children: e instanceof Error ? e.message : String(e)
-                          })
-                        }),
-                        actions: /* @__PURE__ */ jsx(AlertActionButton3, {
-                          text: "Okay",
-                          variant: "primary"
-                        })
-                      })));
-                    }
-                  }),
-                  /* @__PURE__ */ jsx(AlertActionButton3, {
-                    text: "Cancel",
-                    variant: "secondary"
-                  })
-                ]
-              })
-            }));
-          } else {
-            return yield VdPluginManager.installPlugin(url2);
-          }
-        })()
-      }
-    });
-  }
-  var import_react_native37, openAlert2, AlertModal3, AlertActions2, AlertActionButton3, isPluginRowEnabled;
-  var init_Plugins = __esm({
-    "src/core/ui/settings/pages/Plugins/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_i18n();
-      init_AddonPage();
-      init_CxExtensions();
-      init_AddonCard2();
-      init_PluginCard();
-      init_plugins();
-      init_storage();
-      init_plugins4();
-      init_assets();
-      init_settings();
-      init_storage2();
-      init_toasts();
-      init_constants();
-      init_lazy();
-      init_metro();
-      init_common();
-      init_components();
-      import_react_native37 = __toESM(require_react_native());
-      init_bunny();
-      init_vendetta();
-      ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
-      ({ AlertModal: AlertModal3, AlertActions: AlertActions2, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
-      isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
-    }
-  });
-
   // src/core/ui/settings/pages/PluginBrowser/index.tsx
   var PluginBrowser_exports = {};
   __export(PluginBrowser_exports, {
@@ -61897,14 +60962,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 16,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native38.View, {
+          /* @__PURE__ */ jsxs(import_react_native34.View, {
             style: {
               flexDirection: "row",
               justifyContent: "space-between",
               alignItems: "center"
             },
             children: [
-              /* @__PURE__ */ jsxs(import_react_native38.View, {
+              /* @__PURE__ */ jsxs(import_react_native34.View, {
                 style: {
                   flexShrink: 1
                 },
@@ -61934,7 +60999,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   })
                 ]
               }),
-              /* @__PURE__ */ jsx(import_react_native38.View, {
+              /* @__PURE__ */ jsx(import_react_native34.View, {
                 children: /* @__PURE__ */ jsx(TrailingButtons, {
                   addon,
                   isPluginMode,
@@ -62094,7 +61159,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       sort
     ]);
     if (error) {
-      return /* @__PURE__ */ jsx(import_react_native38.View, {
+      return /* @__PURE__ */ jsx(import_react_native34.View, {
         style: {
           flex: 1,
           paddingHorizontal: 8,
@@ -62131,24 +61196,24 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         })
       });
     }
-    return /* @__PURE__ */ jsxs(import_react_native38.View, {
+    return /* @__PURE__ */ jsxs(import_react_native34.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native38.View, {
+        /* @__PURE__ */ jsx(import_react_native34.View, {
           style: {
             paddingHorizontal: 10
           },
           children: /* @__PURE__ */ jsxs(Stack, {
             spacing: 12,
             children: [
-              /* @__PURE__ */ jsx(import_react_native38.View, {
+              /* @__PURE__ */ jsx(import_react_native34.View, {
                 style: {
                   flexDirection: "row",
                   paddingTop: 10
                 },
-                children: /* @__PURE__ */ jsxs(import_react_native38.View, {
+                children: /* @__PURE__ */ jsxs(import_react_native34.View, {
                   style: {
                     flex: 1,
                     flexDirection: "row",
@@ -62164,7 +61229,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                         flex: 1
                       }
                     }),
-                    /* @__PURE__ */ jsx(import_react_native38.View, {
+                    /* @__PURE__ */ jsx(import_react_native34.View, {
                       style: {
                         width: 8
                       }
@@ -62181,7 +61246,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   ]
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native38.View, {
+              /* @__PURE__ */ jsxs(import_react_native34.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -62197,7 +61262,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                       flex: 1
                     }
                   }),
-                  /* @__PURE__ */ jsx(import_react_native38.View, {
+                  /* @__PURE__ */ jsx(import_react_native34.View, {
                     style: {
                       flexDirection: "row",
                       alignItems: "center",
@@ -62237,21 +61302,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             paddingBottom: 90,
             paddingHorizontal: 5
           },
-          ListHeaderComponent: mode === "plugins" ? /* @__PURE__ */ jsx(import_react_native38.View, {
+          ListHeaderComponent: mode === "plugins" ? /* @__PURE__ */ jsx(import_react_native34.View, {
             style: {
               paddingVertical: 6,
               paddingHorizontal: 8
             },
             children: /* @__PURE__ */ jsx(Card, {
               border: "strong",
-              children: /* @__PURE__ */ jsx(import_react_native38.View, {
+              children: /* @__PURE__ */ jsx(import_react_native34.View, {
                 style: {
                   flex: 1,
                   justifyContent: "center",
                   alignItems: "center",
                   flexDirection: "row"
                 },
-                children: /* @__PURE__ */ jsxs(import_react_native38.View, {
+                children: /* @__PURE__ */ jsxs(import_react_native34.View, {
                   style: {
                     gap: 6,
                     flexShrink: 1
@@ -62272,7 +61337,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             })
           }) : null,
           //@ts-ignore
-          renderItem: ({ item: addon }) => /* @__PURE__ */ jsx(import_react_native38.View, {
+          renderItem: ({ item: addon }) => /* @__PURE__ */ jsx(import_react_native34.View, {
             style: {
               paddingVertical: 6,
               paddingHorizontal: 8
@@ -62289,7 +61354,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ]
     });
   }
-  var import_react_native38, showSimpleActionSheet4, hideActionSheet3, PLUGIN_URL2, THEME_URL, Sort;
+  var import_react_native34, showSimpleActionSheet4, hideActionSheet3, PLUGIN_URL2, THEME_URL, Sort;
   var init_PluginBrowser = __esm({
     "src/core/ui/settings/pages/PluginBrowser/index.tsx"() {
       "use strict";
@@ -62298,7 +61363,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_async_to_generator();
       init_jsxRuntime();
       init_common();
-      import_react_native38 = __toESM(require_react_native());
+      import_react_native34 = __toESM(require_react_native());
       init_components();
       init_assets();
       init_safeFetch();
@@ -62326,458 +61391,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         Sort2["BrokenFirst"] = "Broken First";
         return Sort2;
       }(Sort || {});
-    }
-  });
-
-  // src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx
-  var ThemeInfoActionSheet_exports = {};
-  __export(ThemeInfoActionSheet_exports, {
-    default: () => ThemeInfoActionSheet
-  });
-  function ThemeInfoIconButton(props) {
-    var { onPress } = props;
-    props.onPress &&= () => {
-      hideSheet("ThemeInfoActionSheet");
-      onPress?.();
-    };
-    return /* @__PURE__ */ jsx(IconButton, {
-      ...props,
-      label: props.label
-    });
-  }
-  function TitleComponent2({ theme }) {
-    var { authors } = theme.data;
-    return /* @__PURE__ */ jsxs(import_react_native39.View, {
-      style: {
-        gap: 4
-      },
-      children: [
-        /* @__PURE__ */ jsx(import_react_native39.View, {
-          children: /* @__PURE__ */ jsx(Text, {
-            variant: "heading-xl/semibold",
-            children: theme.data.name
-          })
-        }),
-        /* @__PURE__ */ jsx(import_react_native39.View, {
-          style: {
-            flexDirection: "row",
-            flexShrink: 1
-          },
-          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native39.TouchableOpacity, {
-            style: {
-              flexDirection: "row",
-              gap: 8,
-              alignItems: "center",
-              paddingVertical: 4,
-              paddingHorizontal: 8,
-              backgroundColor: "#00000016",
-              borderRadius: 32
-            },
-            disabled: !authors.some((a) => a.id),
-            children: /* @__PURE__ */ jsxs(Text, {
-              variant: "text-md/medium",
-              children: [
-                "by ",
-                authors.map((a) => a.name).join(", ")
-              ]
-            })
-          })
-        })
-      ]
-    });
-  }
-  function ThemeInfoActionSheet({ theme, navigation: navigation2 }) {
-    var [themeState, setThemeState] = (0, import_react14.useState)({
-      ...theme
-    });
-    var [loading, setLoading] = (0, import_react14.useState)(false);
-    (0, import_react14.useEffect)(() => {
-      var interval = setInterval(() => {
-        setThemeState({
-          ...theme
-        });
-      }, 500);
-      return () => clearInterval(interval);
-    }, [
-      theme
-    ]);
-    var copyThemeUrl = () => {
-      clipboard.setString(themeState.id);
-      if (typeof showToast?.showCopyToClipboard === "function") {
-        showToast.showCopyToClipboard();
-      } else {
-        showToast("Copied to clipboard");
-      }
-    };
-    var refetchTheme = () => _async_to_generator(function* () {
-      setLoading(true);
-      try {
-        yield fetchTheme(themeState.id, themeState.selected);
-        showToast("Theme refreshed successfully");
-      } catch (e) {
-        console.error("Failed to refresh theme:", e);
-        showToast("Failed to refresh theme");
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var removeThemeHandler = () => {
-      showConfirmationAlert({
-        title: Strings.HOLD_UP,
-        content: formatString("ARE_YOU_SURE_TO_DELETE_THEME", {
-          name: themeState.data.name
-        }),
-        confirmText: Strings.DELETE,
-        cancelText: Strings.CANCEL,
-        confirmColor: "red",
-        onConfirm: () => _async_to_generator(function* () {
-          hideSheet("ThemeInfoActionSheet");
-          try {
-            var wasSelected = yield removeTheme(themeState.id);
-            if (wasSelected)
-              selectTheme(null);
-            showToast("Theme removed successfully");
-          } catch (e) {
-            console.error("Failed to remove theme:", e);
-            showToast("Failed to remove theme");
-          }
-        })()
-      });
-    };
-    var applyTheme = () => {
-      try {
-        selectTheme(themeState);
-        hideSheet("ThemeInfoActionSheet");
-        showToast(`Applied theme: ${themeState.data.name}`);
-      } catch (e) {
-        console.error("Failed to apply theme:", e);
-        showToast("Failed to apply theme");
-      }
-    };
-    return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native39.ScrollView, {
-        contentContainerStyle: {
-          gap: 12,
-          marginBottom: 12
-        },
-        children: [
-          /* @__PURE__ */ jsx(import_react_native39.View, {
-            style: {
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              paddingVertical: 24,
-              justifyContent: "space-between",
-              width: "100%"
-            },
-            children: /* @__PURE__ */ jsx(TitleComponent2, {
-              theme: themeState
-            })
-          }),
-          /* @__PURE__ */ jsxs(import_react_native39.View, {
-            style: {
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 65,
-              paddingHorizontal: 8
-            },
-            children: [
-              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
-                label: Strings.REFETCH,
-                variant: "secondary",
-                icon: findAssetId("RetryIcon"),
-                onPress: refetchTheme,
-                disabled: loading
-              }),
-              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
-                label: Strings.COPY_URL,
-                variant: "secondary",
-                icon: findAssetId("LinkIcon"),
-                onPress: copyThemeUrl
-              }),
-              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
-                label: Strings.UNINSTALL,
-                variant: "secondary",
-                icon: findAssetId("TrashIcon"),
-                onPress: removeThemeHandler
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsxs(Card, {
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/semibold",
-                style: {
-                  marginBottom: 4,
-                  color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY
-                },
-                children: "Description"
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-md/medium",
-                children: themeState.data.description || "No description provided."
-              })
-            ]
-          })
-        ]
-      })
-    });
-  }
-  var import_react14, import_react_native39;
-  var init_ThemeInfoActionSheet = __esm({
-    "src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_assets();
-      init_sheets();
-      init_components();
-      init_common();
-      import_react14 = __toESM(require_react());
-      import_react_native39 = __toESM(require_react_native());
-      init_toasts();
-      init_alerts2();
-      init_themes();
-      init_i18n();
-      init_color();
-    }
-  });
-
-  // src/core/ui/settings/pages/Themes/ThemeCard.tsx
-  function ThemeCard({ item: theme, overridden, beforeSelect }) {
-    var navigation2 = NavigationNative.useNavigation();
-    var [removed, setRemoved] = React2.useState(false);
-    if (removed)
-      return null;
-    var { authors } = theme.data;
-    return /* @__PURE__ */ jsx(AddonCard, {
-      headerLabel: theme.data.name,
-      headerSublabel: authors ? `by ${authors.map((i) => i.name).join(", ")}` : "",
-      descriptionLabel: theme.data.description ?? "No description.",
-      toggleType: !settings.safeMode?.enabled ? "radio" : void 0,
-      toggleValue: () => !overridden && themes[theme.id].selected,
-      onToggleChange: (v2) => _async_to_generator(function* () {
-        try {
-          if (v2)
-            beforeSelect?.();
-          yield selectTheme(v2 ? theme : null);
-          showToast(v2 ? `Applied ${theme.data.name}` : "Theme disabled", findAssetId("Check"));
-        } catch (e) {
-          console.error("Error while selecting theme:", e);
-          showToast(e?.message ?? "Could not apply theme", findAssetId("CircleXIcon-primary"));
-        }
-      })(),
-      overflowTitle: theme.data.name,
-      actions: [
-        {
-          icon: "CircleInformationIcon-primary",
-          onPress: () => {
-            var importPromise = Promise.resolve().then(() => (init_ThemeInfoActionSheet(), ThemeInfoActionSheet_exports));
-            showSheet("ThemeInfoActionSheet", importPromise, {
-              theme,
-              navigation: navigation2
-            });
-          }
-        }
-      ]
-    });
-  }
-  var init_ThemeCard = __esm({
-    "src/core/ui/settings/pages/Themes/ThemeCard.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_AddonCard();
-      init_themes();
-      init_assets();
-      init_settings();
-      init_toasts();
-      init_sheets();
-      init_common();
-    }
-  });
-
-  // src/core/ui/settings/pages/Themes/index.tsx
-  var Themes_exports = {};
-  __export(Themes_exports, {
-    default: () => Themes
-  });
-  function Themes() {
-    useProxy(settings);
-    useProxy(themes);
-    var cxThemes = useCxAddonRows("theme");
-    var activeCxTheme = cxThemes.find((theme) => theme.active);
-    var themeName = (theme) => "source" in theme ? theme.name : theme.data.name;
-    return /* @__PURE__ */ jsx(AddonPage, {
-      title: Strings.THEMES,
-      isEnabled: (theme) => "source" in theme ? theme.active : !activeCxTheme && theme.selected,
-      searchKeywords: [
-        themeName,
-        (p) => ("source" in p ? p.description : p.data.description) ?? "",
-        (p) => "source" in p ? p.keywords ?? "" : p.data.authors?.map((a) => a.name).join(", ") ?? ""
-      ],
-      sortOptions: {
-        "Name (A-Z)": (a, b3) => themeName(a).localeCompare(themeName(b3)),
-        "Name (Z-A)": (a, b3) => themeName(b3).localeCompare(themeName(a))
-      },
-      installAction: {
-        label: "Install a theme",
-        fetchFn: installTheme
-      },
-      items: [
-        ...Object.values(themes),
-        ...cxThemes
-      ],
-      ListHeaderComponent: () => /* @__PURE__ */ jsx(ImportCxAddonButton, {
-        kind: "theme"
-      }),
-      safeModeHint: {
-        message: formatString("SAFE_MODE_NOTICE_THEMES", {
-          enabled: Boolean(settings.safeMode?.currentThemeId)
-        }),
-        footer: settings.safeMode?.currentThemeId && /* @__PURE__ */ jsx(Button, {
-          size: "small",
-          text: Strings.DISABLE_THEME,
-          onPress: () => delete settings.safeMode?.currentThemeId,
-          style: {
-            marginTop: 8
-          }
-        })
-      },
-      CardComponent: ({ item, result }) => "source" in item ? /* @__PURE__ */ jsx(CxAddonCard, {
-        kind: "theme",
-        entry: item
-      }) : /* @__PURE__ */ jsx(ThemeCard, {
-        item,
-        result,
-        overridden: !!activeCxTheme,
-        beforeSelect: () => {
-          if (activeCxTheme)
-            disableCxAddon(activeCxTheme.id, activeCxTheme.name);
-        }
-      }),
-      OptionsActionSheetComponent: () => {
-        useObservable([
-          colorsPref
-        ]);
-        return /* @__PURE__ */ jsxs(ActionSheet, {
-          children: [
-            /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
-              title: "Options"
-            }),
-            /* @__PURE__ */ jsxs(import_react_native40.View, {
-              style: {
-                paddingVertical: 20,
-                gap: 12
-              },
-              children: [
-                /* @__PURE__ */ jsxs(TableRowGroup, {
-                  title: "Override Theme Type",
-                  children: [
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Auto",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("RobotIcon")
-                      }),
-                      value: !colorsPref.type,
-                      onValueChange: (enabled) => {
-                        if (enabled) {
-                          colorsPref.type = void 0;
-                        } else {
-                          colorsPref.type = "dark";
-                        }
-                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
-                          update: true
-                        });
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Dark",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("ThemeDarkIcon")
-                      }),
-                      value: colorsPref.type === "dark",
-                      onValueChange: (enabled) => {
-                        colorsPref.type = enabled ? "dark" : void 0;
-                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
-                          update: true
-                        });
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Light",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("ThemeLightIcon")
-                      }),
-                      value: colorsPref.type === "light",
-                      onValueChange: (enabled) => {
-                        colorsPref.type = enabled ? "light" : void 0;
-                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
-                          update: true
-                        });
-                      }
-                    })
-                  ]
-                }),
-                /* @__PURE__ */ jsxs(TableRowGroup, {
-                  title: "Chat Background",
-                  children: [
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Show Background",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("ImageIcon")
-                      }),
-                      value: !colorsPref.customBackground,
-                      onValueChange: (enabled) => {
-                        colorsPref.customBackground = enabled ? null : "hidden";
-                      }
-                    }),
-                    /* @__PURE__ */ jsx(TableSwitchRow, {
-                      label: "Hide Background",
-                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
-                        source: findAssetId("DenyIcon")
-                      }),
-                      value: colorsPref.customBackground === "hidden",
-                      onValueChange: (enabled) => {
-                        colorsPref.customBackground = enabled ? "hidden" : null;
-                      }
-                    })
-                  ]
-                })
-              ]
-            })
-          ]
-        });
-      }
-    });
-  }
-  var import_react_native40;
-  var init_Themes = __esm({
-    "src/core/ui/settings/pages/Themes/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      init_i18n();
-      init_AddonPage();
-      init_CxExtensions();
-      init_AddonCard2();
-      init_ThemeCard();
-      init_storage();
-      init_themes();
-      init_preferences();
-      init_updater();
-      init_assets();
-      init_settings();
-      init_storage2();
-      init_components();
-      import_react_native40 = __toESM(require_react_native());
     }
   });
 
@@ -62838,12 +61451,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       preview2.accent,
       preview2.text
     ];
-    return /* @__PURE__ */ jsx(import_react_native41.View, {
+    return /* @__PURE__ */ jsx(import_react_native35.View, {
       style: {
         flexDirection: "row",
         gap: 6
       },
-      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native41.View, {
+      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native35.View, {
         style: {
           width: 22,
           height: 22,
@@ -62892,7 +61505,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 8,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native41.View, {
+          /* @__PURE__ */ jsxs(import_react_native35.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -62900,7 +61513,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               gap: 12
             },
             children: [
-              /* @__PURE__ */ jsxs(import_react_native41.View, {
+              /* @__PURE__ */ jsxs(import_react_native35.View, {
                 style: {
                   flex: 1
                 },
@@ -62931,13 +61544,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             numberOfLines: 2,
             children: theme.description
           }),
-          /* @__PURE__ */ jsxs(import_react_native41.View, {
+          /* @__PURE__ */ jsxs(import_react_native35.View, {
             style: {
               flexDirection: "row",
               gap: 8
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native41.View, {
+              /* @__PURE__ */ jsx(import_react_native35.View, {
                 style: {
                   flex: 1
                 },
@@ -62949,7 +61562,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   onPress: use
                 })
               }),
-              installed && /* @__PURE__ */ jsx(import_react_native41.View, {
+              installed && /* @__PURE__ */ jsx(import_react_native35.View, {
                 style: {
                   flex: 1
                 },
@@ -62983,12 +61596,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       t.source,
       ...t.authors
     ].some((v2) => v2?.toLowerCase().includes(q3)));
-    return /* @__PURE__ */ jsxs(import_react_native41.View, {
+    return /* @__PURE__ */ jsxs(import_react_native35.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native41.View, {
+        /* @__PURE__ */ jsx(import_react_native35.View, {
           style: {
             paddingHorizontal: 12,
             paddingTop: 12,
@@ -63023,7 +61636,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             padding: 12,
             paddingBottom: 48
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native41.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native35.View, {
             style: {
               height: 10
             }
@@ -63049,7 +61662,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ]
     });
   }
-  var import_react_native41, CLOUDCORD_INDEX, MARKETPLACE;
+  var import_react_native35, CLOUDCORD_INDEX, MARKETPLACE;
   var init_ThemeStore = __esm({
     "src/core/ui/settings/pages/ThemeStore/index.tsx"() {
       "use strict";
@@ -63064,7 +61677,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_components();
       init_Search();
       init_toasts();
-      import_react_native41 = __toESM(require_react_native());
+      import_react_native35 = __toESM(require_react_native());
       CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/themes/mobile/index.json";
       MARKETPLACE = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
     }
@@ -63213,12 +61826,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   // src/core/ui/settings/pages/Fonts/FontEditor.tsx
   function promptDetachConfirmationForThen(fontName, cb) {
     if (fontName && fonts[fontName].source)
-      openAlert3("revenge-fonts-detach-source-confirmation", /* @__PURE__ */ jsx(AlertModal4, {
+      openAlert2("revenge-fonts-detach-source-confirmation", /* @__PURE__ */ jsx(AlertModal3, {
         title: "Detach font pack URL?",
         content: "You need to detach the font pack URL from this font pack before you can manually edit its font entries. Do you want to detach the font pack URL?",
         actions: /* @__PURE__ */ jsxs(Stack, {
           children: [
-            /* @__PURE__ */ jsx(AlertActionButton4, {
+            /* @__PURE__ */ jsx(AlertActionButton3, {
               text: "Detach",
               variant: "destructive",
               onPress: () => {
@@ -63226,7 +61839,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 cb();
               }
             }),
-            /* @__PURE__ */ jsx(AlertActionButton4, {
+            /* @__PURE__ */ jsx(AlertActionButton3, {
               text: Strings.CANCEL,
               variant: "secondary"
             })
@@ -63250,9 +61863,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function RevengeFontsExtractor({ fonts: fonts2, setName }) {
     var currentTheme = getCurrentTheme().data;
     var themeFonts = currentTheme.fonts;
-    var [fontName, setFontName] = (0, import_react15.useState)(guessFontName(Object.values(themeFonts)));
-    var [error, setError] = (0, import_react15.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+    var [fontName, setFontName] = (0, import_react12.useState)(guessFontName(Object.values(themeFonts)));
+    var [error, setError] = (0, import_react12.useState)(void 0);
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -63302,10 +61915,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     });
   }
   function JsonFontImporter({ fonts: fonts2, setName, setSource }) {
-    var [fontLink, setFontLink] = (0, import_react15.useState)("");
-    var [saving, setSaving] = (0, import_react15.useState)(false);
-    var [error, setError] = (0, import_react15.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+    var [fontLink, setFontLink] = (0, import_react12.useState)("");
+    var [saving, setSaving] = (0, import_react12.useState)(false);
+    var [error, setError] = (0, import_react12.useState)(void 0);
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -63346,9 +61959,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     });
   }
   function EntryEditorActionSheet(props) {
-    var [familyName, setFamilyName] = (0, import_react15.useState)(props.name);
-    var [fontUrl, setFontUrl] = (0, import_react15.useState)(props.fontEntries[props.name]);
-    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+    var [familyName, setFamilyName] = (0, import_react12.useState)(props.name);
+    var [fontUrl, setFontUrl] = (0, import_react12.useState)(props.fontEntries[props.name]);
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -63402,18 +62015,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }), "FontEditorActionSheet");
   }
   function NewEntryRow({ fontName, fontEntry }) {
-    var nameRef = (0, import_react15.useRef)();
-    var urlRef = (0, import_react15.useRef)();
-    var [nameSet, setNameSet] = (0, import_react15.useState)(false);
-    var [error, setError] = (0, import_react15.useState)();
-    return /* @__PURE__ */ jsxs(import_react_native42.View, {
+    var nameRef = (0, import_react12.useRef)();
+    var urlRef = (0, import_react12.useRef)();
+    var [nameSet, setNameSet] = (0, import_react12.useState)(false);
+    var [error, setError] = (0, import_react12.useState)();
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         flexDirection: "row",
         gap: 8,
         justifyContent: "flex-start"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native42.View, {
+        /* @__PURE__ */ jsx(import_react_native36.View, {
           style: {
             flex: 1
           },
@@ -63467,11 +62080,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     });
   }
   function FontEditor(props) {
-    var [name, setName] = (0, import_react15.useState)(props.name);
-    var [source, setSource] = (0, import_react15.useState)(props.name && fonts[props.name].source);
-    var [importing, setIsImporting] = (0, import_react15.useState)(false);
-    var [errors, setErrors] = (0, import_react15.useState)();
-    var memoEntry = (0, import_react15.useMemo)(() => {
+    var [name, setName] = (0, import_react12.useState)(props.name);
+    var [source, setSource] = (0, import_react12.useState)(props.name && fonts[props.name].source);
+    var [importing, setIsImporting] = (0, import_react12.useState)(false);
+    var [errors, setErrors] = (0, import_react12.useState)();
+    var memoEntry = (0, import_react12.useMemo)(() => {
       return createProxy(props.name ? {
         ...fonts[props.name].main
       } : {}).proxy;
@@ -63481,7 +62094,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var fontEntries = useProxy(memoEntry);
     var navigation2 = NavigationNative.useNavigation();
     var [, forceUpdate] = React.useReducer(() => ({}), 0);
-    return /* @__PURE__ */ jsx(import_react_native42.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native36.ScrollView, {
       style: {
         flex: 1
       },
@@ -63612,7 +62225,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             color: "text-feedback-critical",
             children: "Some font entries cannot be imported. Please modify the entries and try again."
           }),
-          /* @__PURE__ */ jsx(import_react_native42.View, {
+          /* @__PURE__ */ jsx(import_react_native36.View, {
             style: {
               flexDirection: "row",
               justifyContent: "flex-end",
@@ -63655,7 +62268,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react15, import_react_native42, actionSheet2, openAlert3, AlertModal4, AlertActionButton4;
+  var import_react12, import_react_native36, actionSheet2, openAlert2, AlertModal3, AlertActionButton3;
   var init_FontEditor = __esm({
     "src/core/ui/settings/pages/Fonts/FontEditor.tsx"() {
       "use strict";
@@ -63674,11 +62287,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_components();
       init_wrappers();
       init_components2();
-      import_react15 = __toESM(require_react());
-      import_react_native42 = __toESM(require_react_native());
+      import_react12 = __toESM(require_react());
+      import_react_native36 = __toESM(require_react_native());
       actionSheet2 = findByPropsLazy("hideActionSheet");
-      ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
-      ({ AlertModal: AlertModal4, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
+      ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ AlertModal: AlertModal3, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
     }
   });
 
@@ -63690,19 +62303,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return /* @__PURE__ */ jsx(Card, {
       children: /* @__PURE__ */ jsx(Stack, {
         spacing: 16,
-        children: /* @__PURE__ */ jsxs(import_react_native43.View, {
+        children: /* @__PURE__ */ jsxs(import_react_native37.View, {
           style: {
             flexDirection: "row",
             alignItems: "center"
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native43.View, {
+            /* @__PURE__ */ jsx(import_react_native37.View, {
               children: /* @__PURE__ */ jsx(Text, {
                 variant: "heading-lg/semibold",
                 children: font.name
               })
             }),
-            /* @__PURE__ */ jsx(import_react_native43.View, {
+            /* @__PURE__ */ jsx(import_react_native37.View, {
               style: {
                 marginLeft: "auto"
               },
@@ -63748,7 +62361,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native43, useToken2;
+  var import_react_native37, useToken2;
   var init_FontCard = __esm({
     "src/core/ui/settings/pages/Fonts/FontCard.tsx"() {
       "use strict";
@@ -63766,7 +62379,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_metro();
       init_common();
       init_components();
-      import_react_native43 = __toESM(require_react_native());
+      import_react_native37 = __toESM(require_react_native());
       init_FontEditor();
       ({ useToken: useToken2 } = lazyDestructure(() => findByProps("useToken")));
     }
@@ -63824,6 +62437,1455 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/core/ui/settings/pages/CxExtensions/AddonCard.tsx
+  function useAddonReview(kind, entry) {
+    var navigation2 = NavigationNative.useNavigation();
+    var title = entry?.name ?? `Import ${kind}`;
+    return wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+      return {
+        default: () => /* @__PURE__ */ jsx(CxExtensions, {
+          kind,
+          entry
+        })
+      };
+    })(), title, void 0, "push");
+  }
+  function AddonActions({ kind }) {
+    var navigation2 = NavigationNative.useNavigation();
+    var review = useAddonReview(kind);
+    var isPlugin = kind === "plugin";
+    var discoverLabel = isPlugin ? "Discover plugins" : "Discover themes";
+    var discover = wrapOnPress(void 0, navigation2, () => isPlugin ? Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports)) : Promise.resolve().then(() => (init_ThemeStore(), ThemeStore_exports)), discoverLabel, void 0, "push");
+    var openFonts = wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_Fonts(), Fonts_exports)), "Fonts", void 0, "push");
+    return /* @__PURE__ */ jsxs(import_react_native38.View, {
+      style: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+        paddingVertical: 8
+      },
+      children: [
+        /* @__PURE__ */ jsx(Button, {
+          text: discoverLabel,
+          variant: "secondary",
+          size: "small",
+          onPress: discover
+        }),
+        /* @__PURE__ */ jsx(Button, {
+          text: isPlugin ? "Import plugin file" : "Import theme file",
+          variant: "secondary",
+          size: "small",
+          onPress: review
+        }),
+        !isPlugin && isFontSupported() && /* @__PURE__ */ jsx(Button, {
+          text: "Fonts",
+          variant: "secondary",
+          size: "small",
+          onPress: openFonts
+        })
+      ]
+    });
+  }
+  function CxAddonCard({ kind, entry }) {
+    var review = useAddonReview(kind, entry);
+    return /* @__PURE__ */ jsx(AddonCard, {
+      headerLabel: entry.name,
+      descriptionLabel: entry.description,
+      toggleType: kind === "theme" ? "radio" : "switch",
+      toggleValue: () => entry.active,
+      actions: entry.active ? [
+        {
+          icon: "SettingsIcon",
+          onPress: review
+        }
+      ] : void 0,
+      onToggleChange: (enabled) => {
+        if (enabled) {
+          if (settings.safeMode?.enabled)
+            return showToast("Add-ons are paused in Safe Mode.");
+          return review();
+        }
+        try {
+          disableCxAddon(entry.id, entry.name);
+        } catch (error) {
+          showToast(error instanceof Error ? error.message : String(error));
+        }
+      }
+    });
+  }
+  var import_react_native38;
+  var init_AddonCard2 = __esm({
+    "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_AddonCard();
+      init_loader();
+      init_settings();
+      init_shared();
+      init_toasts();
+      init_common();
+      init_components();
+      import_react_native38 = __toESM(require_react_native());
+      init_CxExtensions();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts
+  var usePluginCardStyles;
+  var init_usePluginCardStyles = __esm({
+    "src/core/ui/settings/pages/Plugins/usePluginCardStyles.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_common();
+      init_styles();
+      usePluginCardStyles = createStyles({
+        smallIcon: {
+          tintColor: tokens.colors.LOGO_PRIMARY,
+          height: 18,
+          width: 18
+        },
+        badgeIcon: {
+          tintColor: tokens.colors.LOGO_PRIMARY,
+          height: 12,
+          width: 12
+        },
+        badgesContainer: {
+          flexWrap: "wrap",
+          flexDirection: "row",
+          gap: 6,
+          borderRadius: 6,
+          padding: 4
+        }
+      });
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/components/PluginCard.tsx
+  function getHighlightColor() {
+    return (0, import_chroma_js4.default)(tokens.unsafe_rawColors.YELLOW_300).alpha(0.3).hex();
+  }
+  function Title() {
+    var styles2 = usePluginCardStyles();
+    var { plugin: plugin2, result } = useCardContext();
+    var highlightedNode = result[0].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+      style: {
+        backgroundColor: getHighlightColor()
+      },
+      children: m2
+    }, i));
+    var icon3 = plugin2.icon && findAssetId(plugin2.icon);
+    var textNode = /* @__PURE__ */ jsx(Text, {
+      numberOfLines: 1,
+      variant: "heading-lg/semibold",
+      children: highlightedNode.length ? highlightedNode : plugin2.name
+    });
+    return /* @__PURE__ */ jsxs(import_react_native39.View, {
+      style: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 6
+      },
+      children: [
+        icon3 && /* @__PURE__ */ jsx(import_react_native39.Image, {
+          style: styles2.smallIcon,
+          source: icon3
+        }),
+        textNode
+      ]
+    });
+  }
+  function Authors() {
+    var { plugin: plugin2, result } = useCardContext();
+    var styles2 = usePluginCardStyles();
+    if (!plugin2.authors)
+      return null;
+    var highlightedNode = result[2].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+      style: {
+        backgroundColor: getHighlightColor()
+      },
+      children: m2
+    }, i));
+    var badges = plugin2.getBadges();
+    var authorText = highlightedNode.length > 0 ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
+    return /* @__PURE__ */ jsxs(import_react_native39.View, {
+      style: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        flexShrink: 1,
+        gap: 4
+      },
+      children: [
+        /* @__PURE__ */ jsxs(Text, {
+          variant: "text-sm/semibold",
+          color: "text-muted",
+          children: [
+            "by ",
+            authorText
+          ]
+        }),
+        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native39.View, {
+          style: styles2.badgesContainer,
+          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native39.Image, {
+            source: b3.source,
+            style: styles2.badgeIcon
+          }, i))
+        })
+      ]
+    });
+  }
+  function Description() {
+    var { plugin: plugin2, result } = useCardContext();
+    var highlightedNode = result[1].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+      style: {
+        backgroundColor: getHighlightColor()
+      },
+      children: m2
+    }, i));
+    return /* @__PURE__ */ jsx(Text, {
+      variant: "text-md/medium",
+      children: highlightedNode.length ? highlightedNode : plugin2.description
+    });
+  }
+  function PluginCard({ result, item: plugin2 }) {
+    plugin2.usePluginState();
+    var [toggling, setToggling] = (0, import_react13.useState)(false);
+    var cardContextValue = (0, import_react13.useMemo)(() => ({
+      plugin: plugin2,
+      result
+    }), [
+      plugin2,
+      result
+    ]);
+    var core = isCorePlugin(plugin2.id);
+    return /* @__PURE__ */ jsx(CardContext.Provider, {
+      value: cardContextValue,
+      children: /* @__PURE__ */ jsx(Card, {
+        children: /* @__PURE__ */ jsxs(Stack, {
+          spacing: 16,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native39.View, {
+              style: {
+                flexDirection: "row",
+                justifyContent: "space-between"
+              },
+              children: [
+                /* @__PURE__ */ jsxs(import_react_native39.View, {
+                  style: {
+                    flexShrink: 1
+                  },
+                  children: [
+                    /* @__PURE__ */ jsx(Title, {}),
+                    /* @__PURE__ */ jsx(Authors, {})
+                  ]
+                }),
+                /* @__PURE__ */ jsx(import_react_native39.View, {
+                  children: /* @__PURE__ */ jsxs(Stack, {
+                    spacing: 12,
+                    direction: "horizontal",
+                    children: [
+                      /* @__PURE__ */ jsx(Actions, {}),
+                      /* @__PURE__ */ jsx(import_react_native39.View, {
+                        style: core ? {
+                          opacity: 0.5
+                        } : void 0,
+                        children: /* @__PURE__ */ jsx(TableSwitch, {
+                          value: core ? true : plugin2.isEnabled(),
+                          disabled: core || toggling,
+                          onValueChange: (v2) => _async_to_generator(function* () {
+                            if (!core) {
+                              setToggling(true);
+                              try {
+                                yield plugin2.toggle(v2);
+                              } catch (error) {
+                                showToast(error instanceof Error ? error.message : String(error), findAssetId("CircleXIcon-primary"));
+                              } finally {
+                                setToggling(false);
+                              }
+                            }
+                          })()
+                        })
+                      })
+                    ]
+                  })
+                })
+              ]
+            }),
+            /* @__PURE__ */ jsx(Description, {})
+          ]
+        })
+      })
+    });
+  }
+  var import_chroma_js4, import_react13, import_react_native39, CardContext, useCardContext, Actions;
+  var init_PluginCard = __esm({
+    "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_usePluginCardStyles();
+      init_assets();
+      init_toasts();
+      init_common();
+      init_components();
+      init_sheets();
+      import_chroma_js4 = __toESM(require_chroma());
+      import_react13 = __toESM(require_react());
+      import_react_native39 = __toESM(require_react_native());
+      init_plugins4();
+      CardContext = /* @__PURE__ */ (0, import_react13.createContext)(null);
+      useCardContext = () => (0, import_react13.useContext)(CardContext);
+      Actions = () => {
+        var { plugin: plugin2 } = useCardContext();
+        var navigation2 = NavigationNative.useNavigation();
+        return /* @__PURE__ */ jsxs(import_react_native39.View, {
+          style: {
+            flexDirection: "row",
+            gap: 6
+          },
+          children: [
+            /* @__PURE__ */ jsx(IconButton, {
+              size: "sm",
+              variant: "secondary",
+              icon: findAssetId("WrenchIcon"),
+              disabled: !plugin2.getPluginSettingsComponent(),
+              onPress: () => navigation2.push("PUPU_CUSTOM_PAGE", {
+                title: plugin2.name,
+                render: plugin2.getPluginSettingsComponent()
+              })
+            }),
+            /* @__PURE__ */ jsx(IconButton, {
+              size: "sm",
+              variant: "secondary",
+              icon: findAssetId("CircleInformationIcon-primary"),
+              onPress: () => void showSheet("PluginInfoActionSheet", plugin2.resolveSheetComponent(), {
+                plugin: plugin2,
+                navigation: navigation2
+              })
+            })
+          ]
+        });
+      };
+    }
+  });
+
+  // src/metro/common/stores.ts
+  var UserStore3;
+  var init_stores = __esm({
+    "src/metro/common/stores.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_wrappers();
+      UserStore3 = findByStoreNameLazy("UserStore");
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx
+  function TitleComponent({ plugin: plugin2 }) {
+    var users = FluxUtils.useStateFromStoresArray([
+      UserStore3
+    ], () => {
+      plugin2.authors?.forEach((a) => a.id && maybeFetchUser(a.id));
+      return plugin2.authors?.map((a) => UserStore3.getUser(a.id));
+    });
+    var { authors } = plugin2;
+    var authorTextNode = [];
+    if (authors) {
+      var _loop2 = function(author2) {
+        authorTextNode.push(/* @__PURE__ */ jsx(Text, {
+          onPress: () => showUserProfileActionSheet({
+            userId: author2.id
+          }),
+          variant: "text-md/medium",
+          children: author2.name
+        }));
+        authorTextNode.push(", ");
+      };
+      for (var author of authors)
+        _loop2(author);
+      authorTextNode.pop();
+    }
+    return /* @__PURE__ */ jsxs(import_react_native40.View, {
+      style: {
+        gap: 4
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native40.View, {
+          children: /* @__PURE__ */ jsx(Text, {
+            variant: "heading-xl/semibold",
+            children: plugin2.name
+          })
+        }),
+        /* @__PURE__ */ jsx(import_react_native40.View, {
+          style: {
+            flexDirection: "row",
+            flexShrink: 1
+          },
+          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native40.View, {
+            style: {
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+              backgroundColor: "#00000016",
+              borderRadius: 32
+            },
+            children: [
+              users.length && /* @__PURE__ */ jsx(AvatarPile, {
+                size: "xxsmall",
+                names: plugin2.authors?.map((a) => a.name),
+                totalCount: plugin2.authors?.length,
+                children: users.map((a) => /* @__PURE__ */ jsx(Avatar, {
+                  size: "xxsmall",
+                  user: a
+                }))
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/medium",
+                children: authorTextNode
+              })
+            ]
+          })
+        })
+      ]
+    });
+  }
+  var import_react_native40, showUserProfileActionSheet, maybeFetchUser;
+  var init_TitleComponent = __esm({
+    "src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_lazy();
+      init_metro();
+      init_common();
+      init_components();
+      init_stores();
+      import_react_native40 = __toESM(require_react_native());
+      showUserProfileActionSheet = findByNameLazy("showUserProfileActionSheet");
+      ({ getUser: maybeFetchUser } = lazyDestructure(() => findByProps("getUser", "fetchProfile")));
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx
+  var PluginInfoActionSheet_exports = {};
+  __export(PluginInfoActionSheet_exports, {
+    default: () => PluginInfoActionSheet
+  });
+  function PluginInfoIconButton(props) {
+    var { onPress } = props;
+    props.onPress &&= () => {
+      hideSheet("PluginInfoActionSheet");
+      onPress?.();
+    };
+    return /* @__PURE__ */ jsx(IconButton, {
+      ...props
+    });
+  }
+  function PluginInfoActionSheet({ plugin: plugin2, navigation: navigation2 }) {
+    plugin2.usePluginState();
+    var [loading, setLoading] = (0, import_react14.useState)(false);
+    var isVendettaPlugin = plugin2.id.includes("/");
+    var isCorePlugin2 = plugin2.id.startsWith("bunny.") || plugin2.id.startsWith("vendetta.");
+    var copyPluginUrl = () => {
+      var url2 = plugin2.id;
+      if (isVendettaPlugin) {
+        url2 = plugin2.id;
+      } else {
+        try {
+          var pluginAny = plugin2;
+          var repoUrl = (
+            //@ts-expect-error
+            pluginAny._manifest?.parentRepository || //@ts-expect-error
+            pluginAny.manifest?.parentRepository
+          );
+          url2 = repoUrl ? `${repoUrl}/builds/${plugin2.id}` : plugin2.id;
+        } catch (e) {
+          url2 = plugin2.id;
+        }
+      }
+      clipboard.setString(url2);
+      showToast("Copied to clipboard!", findAssetId("toast_copy_link"));
+    };
+    var refetchPlugin = () => _async_to_generator(function* () {
+      setLoading(true);
+      try {
+        if (isVendettaPlugin) {
+          var vdPlugin = VdPluginManager.plugins[plugin2.id];
+          if (vdPlugin.enabled)
+            VdPluginManager.stopPlugin(plugin2.id, false);
+          yield VdPluginManager.fetchPlugin(plugin2.id);
+          if (vdPlugin.enabled)
+            yield VdPluginManager.startPlugin(plugin2.id);
+          showToast("Plugin refreshed successfully");
+        } else {
+          showToast("Plugin refreshed successfully");
+        }
+      } catch (e) {
+        showToast("Failed to refresh plugin");
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var clearPluginData = () => {
+      showConfirmationAlert({
+        title: "Clear Data",
+        content: "Are you sure you want to clear all data for this plugin? This action cannot be undone.",
+        confirmText: "Clear",
+        confirmColor: "red",
+        cancelText: "Cancel",
+        onConfirm: () => _async_to_generator(function* () {
+          hideSheet("PluginInfoActionSheet");
+          try {
+            if (isVendettaPlugin) {
+              var vdPlugin = VdPluginManager.plugins[plugin2.id];
+              if (vdPlugin.enabled)
+                VdPluginManager.stopPlugin(plugin2.id, false);
+              yield purgeStorage(plugin2.id);
+              if (vdPlugin.enabled)
+                yield VdPluginManager.startPlugin(plugin2.id);
+            } else {
+              yield purgeStorage2(`plugins/storage/${plugin2.id}.json`);
+            }
+            showToast("Plugin data cleared successfully");
+          } catch (e) {
+            showToast("Failed to clear plugin data");
+          }
+        })()
+      });
+    };
+    var uninstallPluginHandler = () => {
+      if (isCorePlugin2) {
+        showToast("Core plugins cannot be uninstalled");
+        return;
+      }
+      showConfirmationAlert({
+        title: "Uninstall Plugin",
+        content: "Are you sure you want to uninstall this plugin? This action cannot be undone.",
+        confirmText: "Uninstall",
+        confirmColor: "red",
+        cancelText: "Cancel",
+        onConfirm: () => _async_to_generator(function* () {
+          hideSheet("PluginInfoActionSheet");
+          try {
+            if (isVendettaPlugin) {
+              yield VdPluginManager.removePlugin(plugin2.id);
+            } else {
+            }
+            showToast("Plugin uninstalled successfully");
+          } catch (e) {
+            showToast(`Failed to uninstall plugin: ${e instanceof Error ? e.message : String(e)}`);
+          }
+        })()
+      });
+    };
+    return /* @__PURE__ */ jsx(ActionSheet, {
+      children: /* @__PURE__ */ jsxs(import_react_native41.ScrollView, {
+        contentContainerStyle: {
+          gap: 12,
+          marginBottom: 12
+        },
+        children: [
+          /* @__PURE__ */ jsx(import_react_native41.View, {
+            style: {
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              paddingVertical: 24,
+              justifyContent: "space-between",
+              width: "100%"
+            },
+            children: /* @__PURE__ */ jsx(TitleComponent, {
+              plugin: plugin2
+            })
+          }),
+          /* @__PURE__ */ jsxs(import_react_native41.View, {
+            style: {
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 22,
+              paddingHorizontal: 4
+            },
+            children: [
+              /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Configure",
+                variant: "secondary",
+                disabled: !plugin2.getPluginSettingsComponent(),
+                icon: findAssetId("WrenchIcon"),
+                onPress: () => {
+                  navigation2.push("PUPU_CUSTOM_PAGE", {
+                    title: plugin2.name,
+                    render: () => /* @__PURE__ */ jsx(ScaledPluginSettings, {
+                      component: plugin2.getPluginSettingsComponent()
+                    })
+                  });
+                }
+              }),
+              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Refetch",
+                variant: "secondary",
+                icon: findAssetId("RetryIcon"),
+                onPress: refetchPlugin,
+                disabled: loading
+              }),
+              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Copy URL",
+                variant: "secondary",
+                icon: findAssetId("LinkIcon"),
+                onPress: copyPluginUrl
+              }),
+              /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Clear Data",
+                variant: "secondary",
+                icon: findAssetId("FileIcon"),
+                onPress: clearPluginData
+              }),
+              !isCorePlugin2 && /* @__PURE__ */ jsx(PluginInfoIconButton, {
+                label: "Uninstall",
+                variant: "secondary",
+                icon: findAssetId("TrashIcon"),
+                onPress: uninstallPluginHandler
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsxs(Card, {
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/semibold",
+                color: "text-primary",
+                style: {
+                  marginBottom: 4,
+                  color: "text-strong"
+                },
+                children: "Description"
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/medium",
+                children: plugin2.description
+              })
+            ]
+          })
+        ]
+      })
+    });
+  }
+  var import_react14, import_react_native41;
+  var init_PluginInfoActionSheet = __esm({
+    "src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_sheets();
+      init_components();
+      init_common();
+      init_toasts();
+      init_alerts2();
+      init_plugins();
+      init_storage();
+      init_storage2();
+      init_assets();
+      import_react14 = __toESM(require_react());
+      import_react_native41 = __toESM(require_react_native());
+      init_TitleComponent();
+      init_ScaledPluginSettings();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/models/bunny.ts
+  function unifyBunnyPlugin(manifest) {
+    return {
+      id: manifest.id,
+      name: manifest.display.name,
+      description: manifest.display.description,
+      authors: manifest.display.authors,
+      getBadges() {
+        return [
+          {
+            source: {
+              uri: cloudcord_default
+            }
+          }
+        ];
+      },
+      isEnabled: () => isPluginEnabled(manifest.id),
+      isInstalled: () => manifest.id in pluginSettings,
+      usePluginState() {
+        useObservable([
+          pluginSettings
+        ]);
+      },
+      toggle(start) {
+        try {
+          start ? enablePlugin(manifest.id, true) : disablePlugin(manifest.id);
+        } catch (e) {
+          console.error(e);
+        }
+      },
+      resolveSheetComponent() {
+        return Promise.resolve({
+          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
+        });
+      },
+      getPluginSettingsComponent() {
+        return getPluginSettingsComponent(manifest.id);
+      }
+    };
+  }
+  var init_bunny = __esm({
+    "src/core/ui/settings/pages/Plugins/models/bunny.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_settings3();
+      init_plugins4();
+      init_storage2();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/models/vendetta.ts
+  function unifyVdPlugin(vdPlugin) {
+    return {
+      id: vdPlugin.id,
+      name: vdPlugin.manifest.name,
+      description: vdPlugin.manifest.description,
+      authors: vdPlugin.manifest.authors,
+      icon: vdPlugin.manifest.vendetta?.icon,
+      getBadges() {
+        return [];
+      },
+      isEnabled: () => vdPlugin.enabled,
+      isInstalled: () => Boolean(vdPlugin && VdPluginManager.plugins[vdPlugin.id]),
+      usePluginState() {
+        useProxy(VdPluginManager.plugins[vdPlugin.id]);
+      },
+      toggle(start) {
+        return _async_to_generator(function* () {
+          if (start)
+            yield VdPluginManager.startPlugin(vdPlugin.id);
+          else
+            VdPluginManager.stopPlugin(vdPlugin.id);
+        })();
+      },
+      resolveSheetComponent() {
+        return Promise.resolve({
+          default: (init_PluginInfoActionSheet(), __toCommonJS(PluginInfoActionSheet_exports)).default
+        });
+      },
+      getPluginSettingsComponent() {
+        return VdPluginManager.getSettings(vdPlugin.id);
+      }
+    };
+  }
+  var init_vendetta = __esm({
+    "src/core/ui/settings/pages/Plugins/models/vendetta.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_plugins();
+      init_storage();
+    }
+  });
+
+  // src/core/ui/settings/pages/Plugins/index.tsx
+  var Plugins_exports = {};
+  __export(Plugins_exports, {
+    default: () => Plugins
+  });
+  function PluginListCard({ item, result }) {
+    return "source" in item ? /* @__PURE__ */ jsx(CxAddonCard, {
+      kind: "plugin",
+      entry: item
+    }) : /* @__PURE__ */ jsx(PluginCard, {
+      item,
+      result
+    });
+  }
+  function PluginPage(props) {
+    var items = props.useItems();
+    return /* @__PURE__ */ jsx(AddonPage, {
+      CardComponent: PluginListCard,
+      isEnabled: isPluginRowEnabled,
+      title: Strings.PLUGINS,
+      searchKeywords: [
+        "name",
+        "description",
+        (p) => ("source" in p ? [
+          p.keywords,
+          ...(p.commands ?? []).map((command) => "/" + command)
+        ].filter(Boolean).join(" ") : p.authors?.map((a) => typeof a === "string" ? a : a.name).join()) || ""
+      ],
+      sortOptions: {
+        "Name (A-Z)": (a, b3) => a.name.localeCompare(b3.name),
+        "Name (Z-A)": (a, b3) => b3.name.localeCompare(a.name)
+      },
+      safeModeHint: {
+        message: Strings.SAFE_MODE_NOTICE_PLUGINS
+      },
+      items,
+      ...props
+    });
+  }
+  function Plugins() {
+    useProxy(settings);
+    var navigation2 = NavigationNative.useNavigation();
+    return /* @__PURE__ */ jsx(PluginPage, {
+      useItems: () => {
+        useProxy(VdPluginManager.plugins);
+        useObservable([
+          pluginSettings
+        ]);
+        var corePlugins = [
+          ...registeredPlugins.values()
+        ].filter((p) => isPluginInstalled(p.id) && isCorePlugin(p.id)).map(unifyBunnyPlugin);
+        var vdPlugins = Object.values(VdPluginManager.plugins).map(unifyVdPlugin);
+        var bnPlugins = [
+          ...registeredPlugins.values()
+        ].filter((p) => isPluginInstalled(p.id) && !isCorePlugin(p.id)).map(unifyBunnyPlugin);
+        var catalog = useCxAddonRows("plugin");
+        var native = [
+          ...corePlugins,
+          ...vdPlugins,
+          ...bnPlugins
+        ];
+        var nativeNames = new Set(native.map((plugin2) => plugin2.name.toLowerCase()));
+        return [
+          ...native,
+          ...catalog.filter((plugin2) => plugin2.active || !nativeNames.has(plugin2.name.toLowerCase()))
+        ];
+      },
+      ListHeaderComponent: () => {
+        var unproxiedPlugins = Object.values(VdPluginManager.plugins).filter((p) => !p.id.startsWith(VD_PROXY_PREFIX) && !p.id.startsWith(BUNNY_PROXY_PREFIX));
+        if (!unproxiedPlugins.length)
+          return /* @__PURE__ */ jsx(AddonActions, {
+            kind: "plugin"
+          });
+        return /* @__PURE__ */ jsxs(import_react_native42.View, {
+          style: {
+            marginVertical: 12,
+            marginHorizontal: 10
+          },
+          children: [
+            /* @__PURE__ */ jsx(AddonActions, {
+              kind: "plugin"
+            }),
+            /* @__PURE__ */ jsx(Card, {
+              border: "strong",
+              children: /* @__PURE__ */ jsxs(import_react_native42.View, {
+                style: {
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "row"
+                },
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native42.View, {
+                    style: {
+                      gap: 6,
+                      flexShrink: 1
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx(Text, {
+                        variant: "heading-md/bold",
+                        children: "Unproxied Plugins Found"
+                      }),
+                      /* @__PURE__ */ jsx(Text, {
+                        variant: "text-sm/medium",
+                        color: "text-muted",
+                        children: "Plugins installed from unproxied sources may run unverified code in this app without your awareness."
+                      })
+                    ]
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native42.View, {
+                    style: {
+                      marginLeft: "auto"
+                    },
+                    children: /* @__PURE__ */ jsx(IconButton, {
+                      size: "sm",
+                      variant: "secondary",
+                      icon: findAssetId("CircleInformationIcon-primary"),
+                      style: {
+                        marginLeft: 8
+                      },
+                      onPress: () => {
+                        navigation2.push("PUPU_CUSTOM_PAGE", {
+                          title: "Unproxied Plugins",
+                          render: () => {
+                            return /* @__PURE__ */ jsx(FlashList, {
+                              data: unproxiedPlugins,
+                              contentContainerStyle: {
+                                padding: 8
+                              },
+                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native42.View, {
+                                style: {
+                                  height: 8
+                                }
+                              }),
+                              renderItem: ({ item: p }) => /* @__PURE__ */ jsx(Card, {
+                                children: /* @__PURE__ */ jsx(Text, {
+                                  variant: "heading-md/semibold",
+                                  children: p.id
+                                })
+                              })
+                            });
+                          }
+                        });
+                      }
+                    })
+                  })
+                ]
+              })
+            })
+          ]
+        });
+      },
+      installAction: {
+        label: "Install a plugin",
+        fetchFn: (url2) => _async_to_generator(function* () {
+          if (!url2.startsWith(VD_PROXY_PREFIX) && !url2.startsWith(BUNNY_PROXY_PREFIX) && !settings.developerSettings) {
+            openAlert3("bunny-plugin-unproxied-confirmation", /* @__PURE__ */ jsx(AlertModal4, {
+              title: "Hold On!",
+              content: "You're trying to install a plugin from an unproxied external source. This means you're trusting the creator to run their code in this app without your knowledge. Are you sure you want to continue?",
+              extraContent: /* @__PURE__ */ jsx(Card, {
+                children: /* @__PURE__ */ jsx(Text, {
+                  variant: "text-md/bold",
+                  children: url2
+                })
+              }),
+              actions: /* @__PURE__ */ jsxs(AlertActions2, {
+                children: [
+                  /* @__PURE__ */ jsx(AlertActionButton4, {
+                    text: "Continue",
+                    variant: "primary",
+                    onPress: () => {
+                      VdPluginManager.installPlugin(url2).then(() => showToast(Strings.TOASTS_INSTALLED_PLUGIN, findAssetId("Check"))).catch((e) => openAlert3("bunny-plugin-install-failed", /* @__PURE__ */ jsx(AlertModal4, {
+                        title: "Install Failed",
+                        content: `Unable to install plugin from '${url2}':`,
+                        extraContent: /* @__PURE__ */ jsx(Card, {
+                          children: /* @__PURE__ */ jsx(Text, {
+                            variant: "text-md/normal",
+                            children: e instanceof Error ? e.message : String(e)
+                          })
+                        }),
+                        actions: /* @__PURE__ */ jsx(AlertActionButton4, {
+                          text: "Okay",
+                          variant: "primary"
+                        })
+                      })));
+                    }
+                  }),
+                  /* @__PURE__ */ jsx(AlertActionButton4, {
+                    text: "Cancel",
+                    variant: "secondary"
+                  })
+                ]
+              })
+            }));
+          } else {
+            return yield VdPluginManager.installPlugin(url2);
+          }
+        })()
+      }
+    });
+  }
+  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled;
+  var init_Plugins = __esm({
+    "src/core/ui/settings/pages/Plugins/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_i18n();
+      init_AddonPage();
+      init_CxExtensions();
+      init_AddonCard2();
+      init_PluginCard();
+      init_plugins();
+      init_storage();
+      init_plugins4();
+      init_assets();
+      init_settings();
+      init_storage2();
+      init_toasts();
+      init_constants();
+      init_lazy();
+      init_metro();
+      init_common();
+      init_components();
+      import_react_native42 = __toESM(require_react_native());
+      init_bunny();
+      init_vendetta();
+      ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ AlertModal: AlertModal4, AlertActions: AlertActions2, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
+      isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
+    }
+  });
+
+  // src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx
+  var ThemeInfoActionSheet_exports = {};
+  __export(ThemeInfoActionSheet_exports, {
+    default: () => ThemeInfoActionSheet
+  });
+  function ThemeInfoIconButton(props) {
+    var { onPress } = props;
+    props.onPress &&= () => {
+      hideSheet("ThemeInfoActionSheet");
+      onPress?.();
+    };
+    return /* @__PURE__ */ jsx(IconButton, {
+      ...props,
+      label: props.label
+    });
+  }
+  function TitleComponent2({ theme }) {
+    var { authors } = theme.data;
+    return /* @__PURE__ */ jsxs(import_react_native43.View, {
+      style: {
+        gap: 4
+      },
+      children: [
+        /* @__PURE__ */ jsx(import_react_native43.View, {
+          children: /* @__PURE__ */ jsx(Text, {
+            variant: "heading-xl/semibold",
+            children: theme.data.name
+          })
+        }),
+        /* @__PURE__ */ jsx(import_react_native43.View, {
+          style: {
+            flexDirection: "row",
+            flexShrink: 1
+          },
+          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native43.TouchableOpacity, {
+            style: {
+              flexDirection: "row",
+              gap: 8,
+              alignItems: "center",
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+              backgroundColor: "#00000016",
+              borderRadius: 32
+            },
+            disabled: !authors.some((a) => a.id),
+            children: /* @__PURE__ */ jsxs(Text, {
+              variant: "text-md/medium",
+              children: [
+                "by ",
+                authors.map((a) => a.name).join(", ")
+              ]
+            })
+          })
+        })
+      ]
+    });
+  }
+  function ThemeInfoActionSheet({ theme, navigation: navigation2 }) {
+    var [themeState, setThemeState] = (0, import_react15.useState)({
+      ...theme
+    });
+    var [loading, setLoading] = (0, import_react15.useState)(false);
+    (0, import_react15.useEffect)(() => {
+      var interval = setInterval(() => {
+        setThemeState({
+          ...theme
+        });
+      }, 500);
+      return () => clearInterval(interval);
+    }, [
+      theme
+    ]);
+    var copyThemeUrl = () => {
+      clipboard.setString(themeState.id);
+      if (typeof showToast?.showCopyToClipboard === "function") {
+        showToast.showCopyToClipboard();
+      } else {
+        showToast("Copied to clipboard");
+      }
+    };
+    var refetchTheme = () => _async_to_generator(function* () {
+      setLoading(true);
+      try {
+        yield fetchTheme(themeState.id, themeState.selected);
+        showToast("Theme refreshed successfully");
+      } catch (e) {
+        console.error("Failed to refresh theme:", e);
+        showToast("Failed to refresh theme");
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var removeThemeHandler = () => {
+      showConfirmationAlert({
+        title: Strings.HOLD_UP,
+        content: formatString("ARE_YOU_SURE_TO_DELETE_THEME", {
+          name: themeState.data.name
+        }),
+        confirmText: Strings.DELETE,
+        cancelText: Strings.CANCEL,
+        confirmColor: "red",
+        onConfirm: () => _async_to_generator(function* () {
+          hideSheet("ThemeInfoActionSheet");
+          try {
+            var wasSelected = yield removeTheme(themeState.id);
+            if (wasSelected)
+              selectTheme(null);
+            showToast("Theme removed successfully");
+          } catch (e) {
+            console.error("Failed to remove theme:", e);
+            showToast("Failed to remove theme");
+          }
+        })()
+      });
+    };
+    var applyTheme = () => {
+      try {
+        selectTheme(themeState);
+        hideSheet("ThemeInfoActionSheet");
+        showToast(`Applied theme: ${themeState.data.name}`);
+      } catch (e) {
+        console.error("Failed to apply theme:", e);
+        showToast("Failed to apply theme");
+      }
+    };
+    return /* @__PURE__ */ jsx(ActionSheet, {
+      children: /* @__PURE__ */ jsxs(import_react_native43.ScrollView, {
+        contentContainerStyle: {
+          gap: 12,
+          marginBottom: 12
+        },
+        children: [
+          /* @__PURE__ */ jsx(import_react_native43.View, {
+            style: {
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              paddingVertical: 24,
+              justifyContent: "space-between",
+              width: "100%"
+            },
+            children: /* @__PURE__ */ jsx(TitleComponent2, {
+              theme: themeState
+            })
+          }),
+          /* @__PURE__ */ jsxs(import_react_native43.View, {
+            style: {
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 65,
+              paddingHorizontal: 8
+            },
+            children: [
+              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
+                label: Strings.REFETCH,
+                variant: "secondary",
+                icon: findAssetId("RetryIcon"),
+                onPress: refetchTheme,
+                disabled: loading
+              }),
+              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
+                label: Strings.COPY_URL,
+                variant: "secondary",
+                icon: findAssetId("LinkIcon"),
+                onPress: copyThemeUrl
+              }),
+              /* @__PURE__ */ jsx(ThemeInfoIconButton, {
+                label: Strings.UNINSTALL,
+                variant: "secondary",
+                icon: findAssetId("TrashIcon"),
+                onPress: removeThemeHandler
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsxs(Card, {
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/semibold",
+                style: {
+                  marginBottom: 4,
+                  color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY
+                },
+                children: "Description"
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-md/medium",
+                children: themeState.data.description || "No description provided."
+              })
+            ]
+          })
+        ]
+      })
+    });
+  }
+  var import_react15, import_react_native43;
+  var init_ThemeInfoActionSheet = __esm({
+    "src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_assets();
+      init_sheets();
+      init_components();
+      init_common();
+      import_react15 = __toESM(require_react());
+      import_react_native43 = __toESM(require_react_native());
+      init_toasts();
+      init_alerts2();
+      init_themes();
+      init_i18n();
+      init_color();
+    }
+  });
+
+  // src/core/ui/settings/pages/Themes/ThemeCard.tsx
+  function ThemeCard({ item: theme, overridden, beforeSelect }) {
+    var navigation2 = NavigationNative.useNavigation();
+    var [removed, setRemoved] = React2.useState(false);
+    if (removed)
+      return null;
+    var { authors } = theme.data;
+    return /* @__PURE__ */ jsx(AddonCard, {
+      headerLabel: theme.data.name,
+      headerSublabel: authors ? `by ${authors.map((i) => i.name).join(", ")}` : "",
+      descriptionLabel: theme.data.description ?? "No description.",
+      toggleType: !settings.safeMode?.enabled ? "radio" : void 0,
+      toggleValue: () => !overridden && themes[theme.id].selected,
+      onToggleChange: (v2) => _async_to_generator(function* () {
+        try {
+          if (v2)
+            beforeSelect?.();
+          yield selectTheme(v2 ? theme : null);
+          showToast(v2 ? `Applied ${theme.data.name}` : "Theme disabled", findAssetId("Check"));
+        } catch (e) {
+          console.error("Error while selecting theme:", e);
+          showToast(e?.message ?? "Could not apply theme", findAssetId("CircleXIcon-primary"));
+        }
+      })(),
+      overflowTitle: theme.data.name,
+      actions: [
+        {
+          icon: "CircleInformationIcon-primary",
+          onPress: () => {
+            var importPromise = Promise.resolve().then(() => (init_ThemeInfoActionSheet(), ThemeInfoActionSheet_exports));
+            showSheet("ThemeInfoActionSheet", importPromise, {
+              theme,
+              navigation: navigation2
+            });
+          }
+        }
+      ]
+    });
+  }
+  var init_ThemeCard = __esm({
+    "src/core/ui/settings/pages/Themes/ThemeCard.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_AddonCard();
+      init_themes();
+      init_assets();
+      init_settings();
+      init_toasts();
+      init_sheets();
+      init_common();
+    }
+  });
+
+  // src/core/ui/settings/pages/Themes/index.tsx
+  var Themes_exports = {};
+  __export(Themes_exports, {
+    default: () => Themes
+  });
+  function Themes() {
+    useProxy(settings);
+    useProxy(themes);
+    var cxThemes = useCxAddonRows("theme");
+    var activeCxTheme = cxThemes.find((theme) => theme.active);
+    var themeName = (theme) => "source" in theme ? theme.name : theme.data.name;
+    return /* @__PURE__ */ jsx(AddonPage, {
+      title: Strings.THEMES,
+      isEnabled: (theme) => "source" in theme ? theme.active : !activeCxTheme && theme.selected,
+      searchKeywords: [
+        themeName,
+        (p) => ("source" in p ? p.description : p.data.description) ?? "",
+        (p) => "source" in p ? p.keywords ?? "" : p.data.authors?.map((a) => a.name).join(", ") ?? ""
+      ],
+      sortOptions: {
+        "Name (A-Z)": (a, b3) => themeName(a).localeCompare(themeName(b3)),
+        "Name (Z-A)": (a, b3) => themeName(b3).localeCompare(themeName(a))
+      },
+      installAction: {
+        label: "Install a theme",
+        fetchFn: installTheme
+      },
+      items: [
+        ...Object.values(themes),
+        ...cxThemes
+      ],
+      ListHeaderComponent: () => /* @__PURE__ */ jsx(AddonActions, {
+        kind: "theme"
+      }),
+      safeModeHint: {
+        message: formatString("SAFE_MODE_NOTICE_THEMES", {
+          enabled: Boolean(settings.safeMode?.currentThemeId)
+        }),
+        footer: settings.safeMode?.currentThemeId && /* @__PURE__ */ jsx(Button, {
+          size: "small",
+          text: Strings.DISABLE_THEME,
+          onPress: () => delete settings.safeMode?.currentThemeId,
+          style: {
+            marginTop: 8
+          }
+        })
+      },
+      CardComponent: ({ item, result }) => "source" in item ? /* @__PURE__ */ jsx(CxAddonCard, {
+        kind: "theme",
+        entry: item
+      }) : /* @__PURE__ */ jsx(ThemeCard, {
+        item,
+        result,
+        overridden: !!activeCxTheme,
+        beforeSelect: () => {
+          if (activeCxTheme)
+            disableCxAddon(activeCxTheme.id, activeCxTheme.name);
+        }
+      }),
+      OptionsActionSheetComponent: () => {
+        useObservable([
+          colorsPref
+        ]);
+        return /* @__PURE__ */ jsxs(ActionSheet, {
+          children: [
+            /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
+              title: "Options"
+            }),
+            /* @__PURE__ */ jsxs(import_react_native44.View, {
+              style: {
+                paddingVertical: 20,
+                gap: 12
+              },
+              children: [
+                /* @__PURE__ */ jsxs(TableRowGroup, {
+                  title: "Override Theme Type",
+                  children: [
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Auto",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("RobotIcon")
+                      }),
+                      value: !colorsPref.type,
+                      onValueChange: (enabled) => {
+                        if (enabled) {
+                          colorsPref.type = void 0;
+                        } else {
+                          colorsPref.type = "dark";
+                        }
+                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
+                          update: true
+                        });
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Dark",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("ThemeDarkIcon")
+                      }),
+                      value: colorsPref.type === "dark",
+                      onValueChange: (enabled) => {
+                        colorsPref.type = enabled ? "dark" : void 0;
+                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
+                          update: true
+                        });
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Light",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("ThemeLightIcon")
+                      }),
+                      value: colorsPref.type === "light",
+                      onValueChange: (enabled) => {
+                        colorsPref.type = enabled ? "light" : void 0;
+                        getCurrentTheme()?.data && updateBunnyColor(getCurrentTheme().data, {
+                          update: true
+                        });
+                      }
+                    })
+                  ]
+                }),
+                /* @__PURE__ */ jsxs(TableRowGroup, {
+                  title: "Chat Background",
+                  children: [
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Show Background",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("ImageIcon")
+                      }),
+                      value: !colorsPref.customBackground,
+                      onValueChange: (enabled) => {
+                        colorsPref.customBackground = enabled ? null : "hidden";
+                      }
+                    }),
+                    /* @__PURE__ */ jsx(TableSwitchRow, {
+                      label: "Hide Background",
+                      icon: /* @__PURE__ */ jsx(TableRowIcon, {
+                        source: findAssetId("DenyIcon")
+                      }),
+                      value: colorsPref.customBackground === "hidden",
+                      onValueChange: (enabled) => {
+                        colorsPref.customBackground = enabled ? "hidden" : null;
+                      }
+                    })
+                  ]
+                })
+              ]
+            })
+          ]
+        });
+      }
+    });
+  }
+  var import_react_native44;
+  var init_Themes = __esm({
+    "src/core/ui/settings/pages/Themes/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      init_i18n();
+      init_AddonPage();
+      init_CxExtensions();
+      init_AddonCard2();
+      init_ThemeCard();
+      init_storage();
+      init_themes();
+      init_preferences();
+      init_updater();
+      init_assets();
+      init_settings();
+      init_storage2();
+      init_components();
+      import_react_native44 = __toESM(require_react_native());
+    }
+  });
+
   // src/core/ui/settings/pages/Addons/index.tsx
   var Addons_exports = {};
   __export(Addons_exports, {
@@ -63856,7 +63918,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }, [
       navigation2
     ]);
-    return /* @__PURE__ */ jsx(import_react_native44.ScrollView, {
+    var hasThemes = isThemeSupported();
+    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
       contentContainerStyle: {
         paddingBottom: 38
       },
@@ -63876,60 +63939,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
               onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
             }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Discover plugins",
-              subLabel: "Browse and install new plugins",
-              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "SettingsIcon"),
-              onPress: () => open("Discover plugins", () => (init_PluginBrowser(), __toCommonJS(PluginBrowser_exports)))
-            }),
-            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
+            hasThemes && /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Themes",
               subLabel: "Manage your Discord themes",
               icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
               onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
             }),
-            isThemeSupported() && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Discover themes",
-              subLabel: "Browse community themes and use one in a tap",
-              icon: icon2("ChannelListMagnifyingGlassIcon", "SearchIcon", "PaintPaletteIcon"),
-              onPress: () => open("Discover themes", () => (init_ThemeStore(), __toCommonJS(ThemeStore_exports)))
-            }),
-            isFontSupported() ? /* @__PURE__ */ jsx(TableRow, {
+            !hasThemes && isFontSupported() && /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Fonts",
               subLabel: "Choose and manage fonts",
-              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon"),
+              icon: icon2("LettersIcon", "TextIcon"),
               onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
-            }) : /* @__PURE__ */ jsx(TableRow, {
-              label: "Fonts",
-              subLabel: "Custom fonts are unavailable on this loader",
-              icon: icon2("LettersIcon", "TextIcon", "SettingsIcon")
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Extras",
-              subLabel: "Fake Nitro, gift links, boosts, friend requests and account tools",
-              icon: icon2("GiftIcon", "NitroWheelIcon", "StarIcon", "SettingsIcon"),
-              onPress: () => open("Extras", () => ({
-                default: (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).ExtrasPage
-              }))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Cloudsync",
-              subLabel: "Back up and sync your settings",
-              icon: icon2("CloudIcon", "SyncIcon", "SettingsIcon"),
-              onPress: () => open("Cloudsync", () => (init_StoreCloud(), __toCommonJS(StoreCloud_exports)))
             })
           ]
         })
       })
     });
   }
-  var import_react_native44;
+  var import_react_native45;
   var init_Addons = __esm({
     "src/core/ui/settings/pages/Addons/index.tsx"() {
       "use strict";
@@ -63937,7 +63966,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
-      import_react_native44 = __toESM(require_react_native());
+      import_react_native45 = __toESM(require_react_native());
       init_common();
       init_components();
       init_loader();
@@ -64009,7 +64038,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         })
       ]
     });
-    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16,
@@ -64058,7 +64087,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 ]
               }),
               field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native45.View, {
+              /* @__PURE__ */ jsxs(import_react_native46.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -64088,7 +64117,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native45.View, {
+              /* @__PURE__ */ jsxs(import_react_native46.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -64140,7 +64169,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       assignment
     }, assignment.userId) : null;
   }
-  var import_react_native45;
+  var import_react_native46;
   var init_TestingPlugins = __esm({
     "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
       "use strict";
@@ -64155,7 +64184,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_pluginTesting();
       init_common();
       init_components();
-      import_react_native45 = __toESM(require_react_native());
+      import_react_native46 = __toESM(require_react_native());
     }
   });
 
@@ -64212,7 +64241,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       },
       {
         key: "STORE_CLOUD",
-        title: () => "Cloudsync",
+        title: () => "CloudSync",
         icon: {
           uri: "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png"
         },
@@ -64223,6 +64252,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         title: () => "Add-ons",
         icon: safeAsset("AppsIcon"),
         render: () => Promise.resolve().then(() => (init_Addons(), Addons_exports))
+      },
+      {
+        key: "CLOUDCORD_PREVIEWS",
+        title: () => "Previews",
+        icon: safeAsset("EyeIcon", "GiftIcon", "SettingsIcon"),
+        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports)).then((module) => ({
+          default: module.PreviewsPage
+        }))
+      },
+      {
+        key: "CLOUDCORD_ACCOUNT_TOOLS",
+        title: () => "Account Tools",
+        icon: safeAsset("WrenchIcon", "SettingsIcon"),
+        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports)).then((module) => ({
+          default: module.AccountToolsPage
+        }))
       },
       {
         key: "CLOUDCORD_TESTING_PLUGINS",
@@ -64247,9 +64292,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     ];
     var defaultOrder = [
       "CLOUDCORD",
-      "BOTCORD",
       "FAKE_PROFILE",
       "BUNNY_PLUGINS",
+      "CLOUDCORD_PREVIEWS",
+      "CLOUDCORD_ACCOUNT_TOOLS",
+      "STORE_CLOUD",
+      "BOTCORD",
       "CLOUDCORD_TESTING_PLUGINS",
       "CLOUDCORD_DIAGNOSTICS"
     ];
@@ -64263,7 +64311,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ...baseItems,
       hiddenControlsItem
     ].filter((row) => ![
-      "STORE_CLOUD",
       "CLOUDCORD_PLUGIN_BROWSER",
       "CLOUDCORD_RECOVERY"
     ].includes(row.key)).map((row) => {
@@ -64351,7 +64398,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         children: /* @__PURE__ */ jsxs(SafeAreaView, {
           style: styles2.container,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native46.View, {
+            /* @__PURE__ */ jsxs(import_react_native47.View, {
               style: {
                 gap: 4
               },
@@ -64379,7 +64426,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native46.ScrollView, {
+            /* @__PURE__ */ jsxs(import_react_native47.ScrollView, {
               fadingEdgeLength: 64,
               contentContainerStyle: {
                 gap: 12
@@ -64422,7 +64469,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native46, useStyles4;
+  var import_react_native47, useStyles4;
   var init_ErrorBoundaryScreen = __esm({
     "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
       "use strict";
@@ -64437,7 +64484,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_styles();
       init_common();
       init_components();
-      import_react_native46 = __toESM(require_react_native());
+      import_react_native47 = __toESM(require_react_native());
       init_ErrorComponentStackCard();
       init_ErrorStackCard();
       useStyles4 = createStyles({
@@ -64526,7 +64573,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   });
 
   // src/core/vendetta/api.tsx
-  var import_react16, import_react_native47, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
+  var import_react16, import_react_native48, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
   var init_api3 = __esm({
     "src/core/vendetta/api.tsx"() {
       "use strict";
@@ -64557,7 +64604,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_toasts();
       init_dist();
       import_react16 = __toESM(require_react());
-      import_react_native47 = __toESM(require_react_native());
+      import_react_native48 = __toESM(require_react_native());
       init_plugins();
       makeIcon = (leading) => leading;
       CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
@@ -64622,7 +64669,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     ActionSheetTitleHeader: module.BottomSheetTitleHeader,
                     ActionSheetContentContainer: ({ children }) => {
                       (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
-                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native47.View, null, children);
+                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native48.View, null, children);
                     }
                   };
                 }
@@ -64809,7 +64856,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   // src/lib/api/native/legacyRuntimeRefresh.ts
   function invokeLegacyReload() {
     return _async_to_generator(function* () {
-      var reader = import_react_native48.NativeModules.FileReaderModule ?? import_react_native48.NativeModules.RCTFileReaderModule;
+      var reader = import_react_native49.NativeModules.FileReaderModule ?? import_react_native49.NativeModules.RCTFileReaderModule;
       if (typeof reader?.readAsDataURL !== "function")
         return false;
       yield reader.readAsDataURL({
@@ -64846,7 +64893,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     })();
   }
-  var import_react_native48, CURRENT_RUNTIME_URL;
+  var import_react_native49, CURRENT_RUNTIME_URL;
   var init_legacyRuntimeRefresh = __esm({
     "src/lib/api/native/legacyRuntimeRefresh.ts"() {
       "use strict";
@@ -64855,7 +64902,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_async_to_generator();
       init_storage();
       init_settings();
-      import_react_native48 = __toESM(require_react_native());
+      import_react_native49 = __toESM(require_react_native());
       CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
     }
   });
@@ -65095,7 +65142,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e3b12efb877d8a0eb96bf4a6e80daa5b6e4d461a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a9beed78f38dffc39277043f2c4ce63c0ec811f8";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
