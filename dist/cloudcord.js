@@ -36248,9 +36248,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function AddonPage({ CardComponent, ...props }) {
     var [search, setSearch] = (0, import_react11.useState)("");
-    var [sortFn, setSortFn] = React.useState(() => null);
+    var [enabledOnly, setEnabledOnly] = (0, import_react11.useState)(false);
+    var [sortFn, setSortFn] = (0, import_react11.useState)(() => null);
+    var [filter, setFilter] = (0, import_react11.useState)("");
     var { bottom: bottomInset } = useSafeAreaInsets();
     var navigation2 = NavigationNative.useNavigation();
+    var matchesFilter = props.filterOptions?.[filter] ?? props.defaultFilter;
     (0, import_react11.useEffect)(() => {
       if (props.OptionsActionSheetComponent) {
         navigation2.setOptions({
@@ -36269,7 +36272,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       var values = props.items;
       if (props.resolveItem)
         values = values.map(props.resolveItem).filter(isNotNil);
-      var items = values.filter((i) => isNotNil(i) && typeof i === "object");
+      var items = values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
       if (!search && sortFn)
         items.sort(sortFn);
       return import_fuzzysort.default.go(search, items, {
@@ -36278,8 +36281,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       });
     }, [
       props.items,
+      props.isEnabled,
       sortFn,
-      search
+      search,
+      enabledOnly,
+      matchesFilter
     ]);
     var onInstallPress = (0, import_react11.useCallback)(() => {
       if (!props.installAction)
@@ -36295,7 +36301,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         onPress?.();
       }
     }, []);
-    if (results.length === 0 && !search) {
+    if (results.length === 0 && !search && !enabledOnly && !filter && !props.ListHeaderComponent) {
       return /* @__PURE__ */ jsxs(import_react_native31.View, {
         style: {
           gap: 32,
@@ -36377,6 +36383,30 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
+        props.isEnabled && /* @__PURE__ */ jsx(TableSwitchRow, {
+          label: "Enabled only",
+          value: enabledOnly,
+          onValueChange: setEnabledOnly
+        }),
+        props.filterOptions && /* @__PURE__ */ jsx(Button, {
+          variant: "secondary",
+          size: "sm",
+          text: filter || "All plugins",
+          onPress: () => showSimpleActionSheet2({
+            key: "AddonListFilters",
+            header: {
+              title: "Filter plugins",
+              onClose: () => hideActionSheet("AddonListFilters")
+            },
+            options: [
+              "",
+              ...Object.keys(props.filterOptions)
+            ].map((name) => ({
+              label: name || "All plugins",
+              onPress: () => setFilter(name)
+            }))
+          })
+        }),
         props.ListHeaderComponent && /* @__PURE__ */ jsx(props.ListHeaderComponent, {})
       ]
     });
@@ -36400,7 +36430,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(Text, {
                 variant: "text-lg/semibold",
                 color: "text-default",
-                children: "Hmmm... could not find that!"
+                children: filter ? "No plugins match these filters." : enabledOnly && !search ? "No add-ons are enabled." : "No add-ons found."
               })
             ]
           }),
@@ -52524,7 +52554,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "560afc850e2072a68df61ff2034ecd32d40021d082549d99b45f1b5c324930fe"
+            appearanceRevision: "560afc850e2072a68df61ff2034ecd32d40021d082549d99b45f1b5c324930fe",
+            privateCommands: true
           },
           {
             name: "AtSomeone",
@@ -52571,7 +52602,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "9f44d571612fa60f9dfcfedb1cb7ec791b3c58422f07e9f2c7fa260477f74f6e"
+            appearanceRevision: "9f44d571612fa60f9dfcfedb1cb7ec791b3c58422f07e9f2c7fa260477f74f6e",
+            privateCommands: true
           },
           {
             name: "BetterChatNames",
@@ -52700,7 +52732,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "fe5e0c4e8428a16dbec7380657ff718ba561b9ba9a5806b840aa7608ff03d1c8"
+            appearanceRevision: "fe5e0c4e8428a16dbec7380657ff718ba561b9ba9a5806b840aa7608ff03d1c8",
+            privateCommands: true
           },
           {
             name: "BypassPinPrompt",
@@ -52760,7 +52793,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "edaaa6c353ed5ae0b1226b53fa0768367fd5e83c8f293c765142041ef542216d"
+            appearanceRevision: "edaaa6c353ed5ae0b1226b53fa0768367fd5e83c8f293c765142041ef542216d",
+            privateCommands: true
           },
           {
             name: "ClapText",
@@ -52818,7 +52852,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "1a913c28a383c0e2b3236d6c46cda9af3fac0471ef5482e66237bed84c6a1700"
+            appearanceRevision: "1a913c28a383c0e2b3236d6c46cda9af3fac0471ef5482e66237bed84c6a1700",
+            privateCommands: true
           },
           {
             name: "Color Converter",
@@ -52831,7 +52866,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "717db9fa96c52602500f4a297fe5566d4a6005fd1ba67d4e00c2e58803b0ba88"
+            appearanceRevision: "717db9fa96c52602500f4a297fe5566d4a6005fd1ba67d4e00c2e58803b0ba88",
+            privateCommands: true
           },
           {
             name: "Color Mixer",
@@ -52843,7 +52879,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "ab7bdeba3beda590ca752dfde44208e7d1091b70e7c79db1dc3df3e43207fa32"
+            appearanceRevision: "ab7bdeba3beda590ca752dfde44208e7d1091b70e7c79db1dc3df3e43207fa32",
+            privateCommands: true
           },
           {
             name: "ColorText",
@@ -52876,7 +52913,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "8a6571a5f25c6dd9a6ce6dc6fb05b9bd0028e003f3dd9eb48ff4227fdc593d40"
+            appearanceRevision: "8a6571a5f25c6dd9a6ce6dc6fb05b9bd0028e003f3dd9eb48ff4227fdc593d40",
+            privateCommands: true
           },
           {
             name: "CompactCompose",
@@ -52924,7 +52962,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20"
+            appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20",
+            privateCommands: true
           },
           {
             name: "CopyBios",
@@ -53087,7 +53126,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18"
+            appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18",
+            privateCommands: true
           },
           {
             name: "CSV Column",
@@ -53099,7 +53139,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5"
+            appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5",
+            privateCommands: true
           },
           {
             name: "CSV to Markdown",
@@ -53111,7 +53152,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1"
+            appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1",
+            privateCommands: true
           },
           {
             name: "CustomTimestamps",
@@ -53142,7 +53184,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "6bec04ebdb1f4e619904a7a1694448e4e464bb5c168d4514f4a38b83653c4006"
+            appearanceRevision: "6bec04ebdb1f4e619904a7a1694448e4e464bb5c168d4514f4a38b83653c4006",
+            privateCommands: true
           },
           {
             name: "Days Between",
@@ -53154,7 +53197,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "ffb6315e5f4628232c4b4f4daa247d12b7ad705e609b6b5182b55ea130a3e11a"
+            appearanceRevision: "ffb6315e5f4628232c4b4f4daa247d12b7ad705e609b6b5182b55ea130a3e11a",
+            privateCommands: true
           },
           {
             name: "Declutter",
@@ -53194,7 +53238,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "b1e07b26d2e9aec1dd374fd4286111c1cc6cecfad5e417e8438bb3f7f7bce693"
+            appearanceRevision: "b1e07b26d2e9aec1dd374fd4286111c1cc6cecfad5e417e8438bb3f7f7bce693",
+            privateCommands: true
           },
           {
             name: "Discord Link Details",
@@ -53206,7 +53251,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "de375129c1a6f0c0167c450336a626633bfdb14cf549ace5186eceb16a2a65ab"
+            appearanceRevision: "de375129c1a6f0c0167c450336a626633bfdb14cf549ace5186eceb16a2a65ab",
+            privateCommands: true
           },
           {
             name: "Discord Timestamp",
@@ -53219,7 +53265,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "f8dd293b323bb4f78d2c219d370045e59f183dd39457c74b4cde7355a23467ab"
+            appearanceRevision: "f8dd293b323bb4f78d2c219d370045e59f183dd39457c74b4cde7355a23467ab",
+            privateCommands: true
           },
           {
             name: "DontRoundMyTimestamps",
@@ -53256,7 +53303,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "10cad05d5a25d1c1c69f4f7df88993efd796f408992bdcef7b2140223400501e"
+            appearanceRevision: "10cad05d5a25d1c1c69f4f7df88993efd796f408992bdcef7b2140223400501e",
+            privateCommands: true
           },
           {
             name: "Duration Converter",
@@ -53268,7 +53316,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "62d8be3950f686cb41cb3570da9b245ecc1a1344e759dda3904deaae623de90b"
+            appearanceRevision: "62d8be3950f686cb41cb3570da9b245ecc1a1344e759dda3904deaae623de90b",
+            privateCommands: true
           },
           {
             name: "EmbeddedURLs",
@@ -53289,7 +53338,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "d695cbf61031f6f60e1492fcc9e387c435f14933328eab0416384d9fa7d3ab7c"
+            appearanceRevision: "d695cbf61031f6f60e1492fcc9e387c435f14933328eab0416384d9fa7d3ab7c",
+            privateCommands: true
           },
           {
             name: "Equius'sTypingQuirk",
@@ -53317,7 +53367,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "3ec2a4e37763a849937c21c6d3e06749f3edf63ef132424ff41d0a51f1ebec14"
+            appearanceRevision: "3ec2a4e37763a849937c21c6d3e06749f3edf63ef132424ff41d0a51f1ebec14",
+            privateCommands: true
           },
           {
             name: "FakeProfileThemes",
@@ -53357,7 +53408,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7"
+            appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7",
+            privateCommands: true
           },
           {
             name: "File Transfer Estimate",
@@ -53369,7 +53421,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736"
+            appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736",
+            privateCommands: true
           },
           {
             name: "FixCodeblockGap",
@@ -54280,7 +54333,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "824ea2d52eb31cc78fa7f8c0adf6709f71e12f0c529f7fbd60c9545fb18dc7de"
+            appearanceRevision: "824ea2d52eb31cc78fa7f8c0adf6709f71e12f0c529f7fbd60c9545fb18dc7de",
+            privateCommands: true
           },
           {
             name: "IgnoreCalls",
@@ -54336,7 +54390,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5"
+            appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5",
+            privateCommands: true
           },
           {
             name: "JSON Check",
@@ -54348,7 +54403,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f"
+            appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f",
+            privateCommands: true
           },
           {
             name: "JSON Compact",
@@ -54360,7 +54416,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb"
+            appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb",
+            privateCommands: true
           },
           {
             name: "JSON Format",
@@ -54372,7 +54429,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c"
+            appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c",
+            privateCommands: true
           },
           {
             name: "JSON Keys",
@@ -54384,7 +54442,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d"
+            appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d",
+            privateCommands: true
           },
           {
             name: "JSON Pointer",
@@ -54396,7 +54455,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "cce9a34c37c39761ba736fcf2101312f25ca0cf5cdbf8a20a16f8db085f6d900"
+            appearanceRevision: "cce9a34c37c39761ba736fcf2101312f25ca0cf5cdbf8a20a16f8db085f6d900",
+            privateCommands: true
           },
           {
             name: "JumpToTop",
@@ -54453,7 +54513,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "3544e3d0cff90a35a71d6453fb16294daeff812e5daef57c7132b74666db017f"
+            appearanceRevision: "3544e3d0cff90a35a71d6453fb16294daeff812e5daef57c7132b74666db017f",
+            privateCommands: true
           },
           {
             name: "LinkConverter",
@@ -54483,7 +54544,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261"
+            appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261",
+            privateCommands: true
           },
           {
             name: "Markdown Escape",
@@ -54495,7 +54557,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b"
+            appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b",
+            privateCommands: true
           },
           {
             name: "Meeting Timestamp",
@@ -54507,7 +54570,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce"
+            appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce",
+            privateCommands: true
           },
           {
             name: "Message Budget",
@@ -54519,7 +54583,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "871e9aef7a49228b859b27c889d33df5db666dd2a0e986542f90450951cb301f"
+            appearanceRevision: "871e9aef7a49228b859b27c889d33df5db666dd2a0e986542f90450951cb301f",
+            privateCommands: true
           },
           {
             name: "MessageBurst",
@@ -54828,7 +54893,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "a3d8ed0516a0744ae8bfba7d9aaedc3d52b2d1801ce4f5cf8c28865d2597b10c"
+            appearanceRevision: "a3d8ed0516a0744ae8bfba7d9aaedc3d52b2d1801ce4f5cf8c28865d2597b10c",
+            privateCommands: true
           },
           {
             name: "Number Lines",
@@ -54840,7 +54906,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da"
+            appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da",
+            privateCommands: true
           },
           {
             name: "Number Summary",
@@ -54852,7 +54919,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb"
+            appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb",
+            privateCommands: true
           },
           {
             name: "OpenSteamLinksInApp",
@@ -54872,7 +54940,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e"
+            appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e",
+            privateCommands: true
           },
           {
             name: "PingNotifications",
@@ -54954,7 +55023,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "7d9315a5485ec4dbace842a66d573b3c8412747a45aaa180050928cd234ee725"
+            appearanceRevision: "7d9315a5485ec4dbace842a66d573b3c8412747a45aaa180050928cd234ee725",
+            privateCommands: true
           },
           {
             name: "ReadableLineLength",
@@ -54994,7 +55064,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7"
+            appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7",
+            privateCommands: true
           },
           {
             name: "RelationshipNotifier",
@@ -55039,7 +55110,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "3120fff9dc0b3d5c7b10d5a36790889834e63855d918591628d837ac14c94ec6"
+            appearanceRevision: "3120fff9dc0b3d5c7b10d5a36790889834e63855d918591628d837ac14c94ec6",
+            privateCommands: true
           },
           {
             name: "RevealAllSpoilers",
@@ -55080,7 +55152,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "1a6cf1874ecf898df5517cccde97da90526624064f8515b8245c09926ff8f296"
+            appearanceRevision: "1a6cf1874ecf898df5517cccde97da90526624064f8515b8245c09926ff8f296",
+            privateCommands: true
           },
           {
             name: "RoundServerIcons",
@@ -55227,7 +55300,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "6b4c8e3d7cc9cf5d1282b1c1752691cb0e9349c2506eea48f871417b6fcd27e2"
+            appearanceRevision: "6b4c8e3d7cc9cf5d1282b1c1752691cb0e9349c2506eea48f871417b6fcd27e2",
+            privateCommands: true
           },
           {
             name: "SmallerAvatarsInChat",
@@ -55266,7 +55340,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "ab92c1aa44aece19e5566c1fbc0c5ffbdcbd9ca66034b2aff29f4c131dc4f50f"
+            appearanceRevision: "ab92c1aa44aece19e5566c1fbc0c5ffbdcbd9ca66034b2aff29f4c131dc4f50f",
+            privateCommands: true
           },
           {
             name: "SoftCorners",
@@ -55295,7 +55370,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "5272fd6ffc1ca86448fef84a183ff8fb30d3442bb16860e3537d0199f2251307"
+            appearanceRevision: "5272fd6ffc1ca86448fef84a183ff8fb30d3442bb16860e3537d0199f2251307",
+            privateCommands: true
           },
           {
             name: "SortReactions",
@@ -55406,7 +55482,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40"
+            appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40",
+            privateCommands: true
           },
           {
             name: "TalkInReverse",
@@ -55434,7 +55511,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "af2bfbac3d600fd166703c4a2c13b91075a9fb497c568c7d400048bcf1fe1f9a"
+            appearanceRevision: "af2bfbac3d600fd166703c4a2c13b91075a9fb497c568c7d400048bcf1fe1f9a",
+            privateCommands: true
           },
           {
             name: "TextReplace",
@@ -55454,7 +55532,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "6554f9b1b18d14eac32a85e66a21fddbfac3b452d339fb0c0d498c19f945e023"
+            appearanceRevision: "6554f9b1b18d14eac32a85e66a21fddbfac3b452d339fb0c0d498c19f945e023",
+            privateCommands: true
           },
           {
             name: "ThinScrollbars",
@@ -55475,7 +55554,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4"
+            appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4",
+            privateCommands: true
           },
           {
             name: "Total Time",
@@ -55487,7 +55567,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca"
+            appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca",
+            privateCommands: true
           },
           {
             name: "Translate",
@@ -55520,7 +55601,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849"
+            appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849",
+            privateCommands: true
           },
           {
             name: "TSV to Markdown",
@@ -55532,7 +55614,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a"
+            appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a",
+            privateCommands: true
           },
           {
             name: "Unicode Inspector",
@@ -55544,7 +55627,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f"
+            appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f",
+            privateCommands: true
           },
           {
             name: "Unindent",
@@ -55564,7 +55648,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "07d60765a5167987e470a46f82f49c116e8f1d54bb4c3b412ebe9f5444f80cf6"
+            appearanceRevision: "07d60765a5167987e470a46f82f49c116e8f1d54bb4c3b412ebe9f5444f80cf6",
+            privateCommands: true
           },
           {
             name: "UnitConverter",
@@ -55589,7 +55674,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "5a1b3879b131dee4257e757865253bd0129ac1bc72ab98bf5b301294336042f5"
+            appearanceRevision: "5a1b3879b131dee4257e757865253bd0129ac1bc72ab98bf5b301294336042f5",
+            privateCommands: true
           },
           {
             name: "UnlockedAvatarZoom",
@@ -55619,7 +55705,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "b084d7a797c96a28383f910da48cb676776f66a59c30d4b0f3143c55e33fb969"
+            appearanceRevision: "b084d7a797c96a28383f910da48cb676776f66a59c30d4b0f3143c55e33fb969",
+            privateCommands: true
           },
           {
             name: "URL Inspector",
@@ -55631,7 +55718,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "895e7daba701168255e6410d0ed80ba77b24e50bcdf65ef5b72711dba5d19ad7"
+            appearanceRevision: "895e7daba701168255e6410d0ed80ba77b24e50bcdf65ef5b72711dba5d19ad7",
+            privateCommands: true
           },
           {
             name: "UserNotes",
@@ -55663,7 +55751,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "8780ff0a5aa64eab83768a7a9b7d2335dd22e2162c7c944c327ff06be5a9bdfc"
+            appearanceRevision: "8780ff0a5aa64eab83768a7a9b7d2335dd22e2162c7c944c327ff06be5a9bdfc",
+            privateCommands: true
           },
           {
             name: "VibeCheck",
@@ -55794,7 +55883,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ],
-            appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065"
+            appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065",
+            privateCommands: true
           },
           {
             name: "WriteUpperCase",
@@ -60189,13 +60279,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var revision = React2.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
     return React2.useMemo(() => {
       var entries2 = kind === "plugin" ? mobileCatalogPlugins : cxCatalog.themes;
+      var approvals = new Map(readRememberedAppearance().map((entry) => [
+        entry.name,
+        entry.revision
+      ]));
       var catalog = entries2.map((entry) => {
         var id = kind === "theme" ? "theme" : "plugin:" + entry.name;
         var current = session.source(id);
+        var active = current !== void 0 && (kind === "plugin" || current === entry.source);
+        var saved = approvals.get(entry.name);
+        var needsReview = kind === "plugin" && !active && saved !== void 0 && saved !== entry.appearanceRevision;
         return {
           ...entry,
           id,
-          active: current !== void 0 && (kind === "plugin" || current === entry.source)
+          active,
+          needsReview
         };
       });
       var imported = session.list().filter(({ id, name }) => id === "theme" === (kind === "theme") && !catalog.some((entry) => entry.name === name)).map(({ id, name }) => ({
@@ -62990,9 +63088,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return /* @__PURE__ */ jsx(AddonCard, {
       headerLabel: entry.name,
       descriptionLabel: entry.description,
+      headerSublabel: entry.needsReview ? "Review update to enable" : void 0,
       toggleType: kind === "theme" ? "radio" : "switch",
       toggleValue: () => entry.active,
-      actions: entry.active ? [
+      actions: entry.active || entry.needsReview ? [
         {
           icon: "SettingsIcon",
           onPress: review
@@ -63718,6 +63817,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       CardComponent: PluginListCard,
       isEnabled: isPluginRowEnabled,
       title: Strings.PLUGINS,
+      filterOptions: pluginFilters,
+      defaultFilter: showDefaultRow,
       searchKeywords: [
         "name",
         "description",
@@ -63760,9 +63861,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           ...bnPlugins
         ];
         var nativeNames = new Set(native.map((plugin2) => plugin2.name.toLowerCase()));
+        var entries2 = catalog.map((plugin2) => !plugin2.active && nativeNames.has(plugin2.name.toLowerCase()) ? {
+          ...plugin2,
+          alternate: true
+        } : plugin2);
         return [
           ...native,
-          ...catalog.filter((plugin2) => plugin2.active || !nativeNames.has(plugin2.name.toLowerCase()))
+          ...entries2
         ];
       },
       ListHeaderComponent: () => {
@@ -63899,7 +64004,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled;
+  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, pluginFilters, showDefaultRow;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -63930,6 +64035,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
       ({ AlertModal: AlertModal4, AlertActions: AlertActions2, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
       isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
+      pluginFilters = {
+        "Private commands": (item) => "source" in item && item.privateCommands === true,
+        "Needs review": (item) => "source" in item && item.needsReview === true
+      };
+      showDefaultRow = (item) => !("source" in item && item.alternate);
     }
   });
 
@@ -65641,7 +65751,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b30b6878cb7a9e520f63811b54a4434abe90261";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f1e702d0e17abc05483b20802311d2083a857e13";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
