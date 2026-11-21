@@ -2397,6 +2397,10 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                     return registerLocalText("channels");
                 case "copy-channel-name":
                     return registerCopyChannelName(enabled);
+                case "copy-role-color":
+                case "copy-role-mention":
+                case "view-role-icon":
+                    throw new Error("Role menu actions are available on desktop and browser.");
                 case "hide-suggested-channels": {
                     const suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
                     if (!suggested) throw new Error("Discord's suggested channels section is unavailable");

@@ -1,0 +1,3 @@
+plugin "CopyRoleColor":
+  needs guild.roleclipboard
+  use copy-role-color

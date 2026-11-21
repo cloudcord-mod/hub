@@ -49,6 +49,8 @@ import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/
 import plugin_catalog_copy_profile_names from "../../../../examples/cx/catalog/plugins/copy-profile-names.cx";
 import plugin_catalog_copy_pronouns from "../../../../examples/cx/catalog/plugins/copy-pronouns.cx";
 import plugin_catalog_copy_raw_text from "../../../../examples/cx/catalog/plugins/copy-raw-text.cx";
+import plugin_catalog_copy_role_color from "../../../../examples/cx/catalog/plugins/copy-role-color.cx";
+import plugin_catalog_copy_role_mention from "../../../../examples/cx/catalog/plugins/copy-role-mention.cx";
 import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plugins/copy-server-bio.cx";
 import plugin_catalog_copy_server_nickname from "../../../../examples/cx/catalog/plugins/copy-server-nickname.cx";
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
@@ -299,6 +301,7 @@ import plugin_catalog_user_notes from "../../../../examples/cx/catalog/plugins/u
 import plugin_catalog_user_tags from "../../../../examples/cx/catalog/plugins/user-tags.cx";
 import plugin_catalog_utf_8_byte_count from "../../../../examples/cx/catalog/plugins/utf-8-byte-count.cx";
 import plugin_catalog_vibe_check from "../../../../examples/cx/catalog/plugins/vibe-check.cx";
+import plugin_catalog_view_role_icon from "../../../../examples/cx/catalog/plugins/view-role-icon.cx";
 import plugin_catalog_voice_count from "../../../../examples/cx/catalog/plugins/voice-count.cx";
 import plugin_catalog_voice_join_messages from "../../../../examples/cx/catalog/plugins/voice-join-messages.cx";
 import plugin_catalog_vriska_s_typing_quirk from "../../../../examples/cx/catalog/plugins/vriska-s-typing-quirk.cx";
@@ -468,6 +471,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyProfileNames", source: plugin_catalog_copy_profile_names, description: "Copy Username", keywords: "Copy Display Name", categories: ["Profiles"] },
         { name: "CopyPronouns", source: plugin_catalog_copy_pronouns, description: "Copy Pronouns", categories: ["Profiles"] },
         { name: "Copy Raw Text", source: plugin_catalog_copy_raw_text, description: "Add Copy Raw Text to message menus", categories: ["Chat"] },
+        { name: "CopyRoleColor", source: plugin_catalog_copy_role_color, description: "Copy the selected server role's hex color", desktopOnly: true, categories: ["Servers & channels"] },
+        { name: "CopyRoleMention", source: plugin_catalog_copy_role_mention, description: "Copy mention markup for the selected server role", desktopOnly: true, categories: ["Servers & channels"] },
         { name: "CopyServerBio", source: plugin_catalog_copy_server_bio, description: "Copy Server Bio", categories: ["Profiles"] },
         { name: "CopyServerNickname", source: plugin_catalog_copy_server_nickname, description: "Copy Server Nickname", categories: ["Profiles"] },
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links, description: "Add Copy Sticker Link and Open Sticker Link actions", categories: ["Media"] },
@@ -718,6 +723,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "UserTags", source: plugin_catalog_user_tags, description: "Tag users in profile menus and search those tags on this device", commands: ["find-user-tags"], categories: ["Commands","Profiles"] },
         { name: "UTF-8 Byte Count", source: plugin_catalog_utf_8_byte_count, description: "/utf8size", commands: ["utf8size"], categories: ["Commands"] },
         { name: "VibeCheck", source: plugin_catalog_vibe_check, description: "/vibe", commands: ["vibe"], categories: ["Chat","Commands"] },
+        { name: "ViewRoleIcon", source: plugin_catalog_view_role_icon, description: "Open the selected server role's icon in Discord's image viewer", desktopOnly: true, categories: ["Servers & channels"] },
         { name: "VoiceCount", source: plugin_catalog_voice_count, description: "Show occupancy and capacity in the channel list", categories: ["Voice & calls"] },
         { name: "VoiceJoinMessages", source: plugin_catalog_voice_join_messages, description: "Show local notifications when friends join or move between voice channels", categories: ["Voice & calls"] },
         { name: "Vriska'sTypingQuirk", source: plugin_catalog_vriska_s_typing_quirk, description: "Apply 38 text rules to message sends and preserve links", categories: ["Chat"] },

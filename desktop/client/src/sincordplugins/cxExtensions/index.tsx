@@ -39,7 +39,7 @@ import definePlugin from "@utils/types";
 import { findByProps, findComponentByCodeLazy, findCssClassesLazy, findStore, waitFor, waitForSubscriptions, wreq } from "@webpack";
 import { ActiveJoinedThreadsStore, ChannelActions, ChannelStore, ComponentDispatch, Constants, EmojiStore, FluxDispatcher, GuildChannelStore, GuildMemberStore, GuildStore, IconUtils, Menu, MessageActions, MessageStore, NavigationRouter, PermissionsBits, PermissionStore, PinActions, PresenceStore, React, ReadStateStore, RelationshipStore, RestAPI, RTCConnectionStore, SelectedChannelStore, SelectedGuildStore, showToast, SpotifyStore, UserProfileStore, UserStore, VoiceStateStore, useRef, useState } from "@webpack/common";
 import type { ReactNode } from "react";
-import { Alerts, MediaEngineStore } from "@webpack/common";
+import { Alerts, GuildRoleStore, MediaEngineStore } from "@webpack/common";
 
 const session = createCxSession();
 const callClock = createCxCallClock();
@@ -157,6 +157,47 @@ function registerCopyChannelName() {
     const menus = ["channel-context", "thread-context", "user-context", "gdm-context"];
     addContextMenuPatch(menus, patch);
     return () => { active = false; removeContextMenuPatch(menus, patch); };
+}
+
+function registerRoleMenuAction(effect: "copy-role-color" | "copy-role-mention" | "view-role-icon") {
+    // BetterRoleContext by Vendicated and goodbee (GPL-3.0-or-later).
+    const labels = {
+        "copy-role-color": "Copy Role Color",
+        "copy-role-mention": "Copy Role Mention",
+        "view-role-icon": "View Role Icon",
+    };
+    let active = true;
+    const itemId = "cx-" + effect;
+    const patch: NavContextMenuPatchCallback = (children, props) => {
+        const id = props?.id;
+        const explicitGuild = props?.guildId ?? props?.guild?.id;
+        const guild = explicitGuild ?? SelectedGuildStore.getGuildId();
+        if (!active || !isCxProfileUserId(id) || !isCxProfileUserId(guild)
+            || children.some(child => child?.props?.id === itemId)) return;
+        function getValue() {
+            const role = GuildRoleStore.getRole(guild, id);
+            if (!role || role.id !== id) return;
+            if (effect === "copy-role-mention") return "<@&" + id + ">";
+            if (effect === "copy-role-color") {
+                const color = role.colorStrings?.primaryColor ?? role.colorString;
+                return /^#[a-f0-9]{6}$/i.test(color ?? "") ? color : undefined;
+            }
+            if (typeof role.icon === "string" && /^(?:a_)?[a-f0-9]{32}$/i.test(role.icon)) {
+                const format = role.icon.startsWith("a_") ? "gif" : "png";
+                return "https://cdn.discordapp.com/role-icons/" + id + "/" + role.icon + "." + format + "?size=256";
+            }
+        }
+        if (!getValue()) return;
+        children.push(<Menu.MenuItem id={itemId} label={labels[effect]} action={() => {
+            if (!active || explicitGuild == null && SelectedGuildStore.getGuildId() !== guild) return;
+            const value = getValue();
+            if (!value) return;
+            if (effect === "view-role-icon") openImageModal({ url: value, width: 256, height: 256 });
+            else void copyToClipboard(value).catch(() => showToast("Couldn't copy the role information."));
+        }} />);
+    };
+    addContextMenuPatch("dev-context", patch);
+    return () => { active = false; removeContextMenuPatch("dev-context", patch); };
 }
 
 const clearLocalNotes: Partial<Record<"notes" | "channels", () => void>> = {};
@@ -1042,6 +1083,10 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                     return registerLocalText("channels");
                 case "copy-channel-name":
                     return registerCopyChannelName();
+                case "copy-role-color":
+                case "copy-role-mention":
+                case "view-role-icon":
+                    return registerRoleMenuAction(effect);
                 case "hide-suggested-channels":
                     return registerHideSuggestedChannels();
                 case "copy-text-attachment":

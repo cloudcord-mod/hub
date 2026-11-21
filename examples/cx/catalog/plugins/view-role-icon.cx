@@ -1,0 +1,3 @@
+plugin "ViewRoleIcon":
+  needs guild.rolemedia
+  use view-role-icon

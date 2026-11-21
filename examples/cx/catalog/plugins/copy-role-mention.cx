@@ -1,0 +1,3 @@
+plugin "CopyRoleMention":
+  needs guild.roleclipboard
+  use copy-role-mention

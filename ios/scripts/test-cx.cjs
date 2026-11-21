@@ -244,6 +244,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const me = "100000000000000001", sender = "100000000000000002", other = "100000000000000003";
         const guildId = "100000000000000004";
         const roleId = "100000000000000005";
+        let selectedRoleGuild;
+        const roleIcon = "b".repeat(32);
         const jumpChannel = { id: "100000000000000016", type: 0, guild_id: guildId };
         const jumpRequests = [], jumpRoutes = [];
         let resolveJump;
@@ -424,6 +426,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 getMemberIds: () => [me, sender],
                 getMembers: () => [{ userId: sender, roles: [roleId], nick: "Tester@everyone" }],
             },
+            SelectedGuildStore: { getGuildId: () => selectedRoleGuild },
+            GuildRoleStore: { getRole: (guild, id) => guild === guildId && id === roleId
+                ? { id, colorStrings: { primaryColor: "#12abcd" }, icon: roleIcon } : undefined },
             GuildStore: { getGuilds: () => ({ [guildId]: { id: guildId } }),
                 getGuild: id => id === guildId ? { id, ownerId: me } : undefined },
             GuildChannelStore: { getChannels: () => ({
@@ -682,7 +687,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             },
             "@api/Settings": { Settings: { plugins: { CallTimer: { enabled: false } } } },
             "@api/ContextMenu": {
-                addContextMenuPatch: (menus, patch) => { assert.ok(["user-context", "expression-picker", "image-context", "message", "channel-context"].some(menu => menus.includes(menu))); menuPatches.add(patch); },
+                addContextMenuPatch: (menus, patch) => { assert.ok(["user-context", "expression-picker", "image-context", "message", "channel-context", "dev-context"].some(menu => menus.includes(menu))); menuPatches.add(patch); },
                 findGroupChildrenByChildId: (id, children) => children.some(item => item?.props?.id === id) ? children : null,
                 removeContextMenuPatch: (_, patch) => menuPatches.delete(patch),
             },
@@ -1161,6 +1166,34 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.match(renderDelay(delayed).props.text, /3 seconds and 200 milliseconds/);
             assert.equal(renderDelay({ ...delayed, author: { id: me } }), null);
             click(render(), "Disable Latency Options");
+
+            selectedRoleGuild = guildId;
+            const rolePlugins = ["CopyRoleColor", "CopyRoleMention", "ViewRoleIcon"];
+            for (const name of rolePlugins) {
+                selectCatalog(name);
+                click(render(), "Allow for this session");
+            }
+            const roleActions = props => {
+                const actions = [];
+                for (const patch of menuPatches) patch(actions, props);
+                return actions;
+            };
+            assert.deepEqual(roleActions({ id: roleId, guildId: other }), []);
+            assert.deepEqual(roleActions({ id: "invalid", guildId }), []);
+            const menu = roleActions({ id: roleId });
+            assert.deepEqual(menu.map(item => item.props.label), ["Copy Role Color", "Copy Role Mention", "View Role Icon"]);
+            selectedRoleGuild = other;
+            menu[0].props.action();
+            assert.equal(clipboardWrites.length, 0);
+            const explicitMenu = roleActions({ id: roleId, guildId });
+            for (const item of explicitMenu) item.props.action();
+            assert.deepEqual(clipboardWrites.splice(0), ["#12abcd", "<@&" + roleId + ">"]);
+            assert.equal(viewedProfiles.pop().url, "https://cdn.discordapp.com/role-icons/" + roleId + "/" + roleIcon + ".png?size=256");
+            for (const name of rolePlugins) click(render(), "Disable " + name);
+            explicitMenu[0].props.action();
+            assert.equal(clipboardWrites.length, 0);
+            assert.equal(menuPatches.size, 0);
+            selectedRoleGuild = undefined;
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));
