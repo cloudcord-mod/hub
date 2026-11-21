@@ -25112,6 +25112,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...users
     ];
     clearCache();
+    reapplyBadgeDirectory(id);
     for (var refresh of identityRefreshers)
       refresh();
     for (var store of [
@@ -26522,17 +26523,29 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       info_label: entry.info_label ?? rootSettings.cloudcordBadgeInfo?.[entry.badge_id] ?? KNOWN_BADGE_INFO[entry.badge_id]
     };
   }
+  function rememberNativeBadgeDirectory(id, badges) {
+    nativeBadgeDirectories.delete(id);
+    nativeBadgeDirectories.set(id, badges.map((entry) => entry && {
+      ...entry
+    }));
+    if (nativeBadgeDirectories.size > 100)
+      nativeBadgeDirectories.delete(nativeBadgeDirectories.keys().next().value);
+  }
   function rewriteBadgeDirectory(action) {
     var type = action?.type;
     if (type !== "BADGE_DIRECTORY_FETCH_SUCCESS" && type !== "BADGE_FETCH_SUCCESS" && type !== "BADGE_SUMMARY_FETCH_SUCCESS")
       return false;
-    try {
-      learnBadgeInfo(Array.isArray(action.badges) ? action.badges : action.badge ? [
-        action.badge
-      ] : []);
-    } catch (e) {
-    }
     var id = String(action.userId || "");
+    if (!badgeDirectoryReplays.has(action)) {
+      if (/^\d{15,22}$/.test(id) && type === "BADGE_DIRECTORY_FETCH_SUCCESS" && Array.isArray(action.badges))
+        rememberNativeBadgeDirectory(id, action.badges);
+      try {
+        learnBadgeInfo(Array.isArray(action.badges) ? action.badges : action.badge ? [
+          action.badge
+        ] : []);
+      } catch (e) {
+      }
+    }
     var src = id ? badgeSourceFor(id) : void 0;
     if (!src)
       return false;
@@ -26579,26 +26592,34 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       queueSharedPublish();
   }
   function reapplyBadgeDirectory(id) {
-    try {
-      var store = findByStoreName("BadgeDirectoryStore");
-      if (!store?.hasCatalogFor?.(id))
-        return;
-      var badges = (store.getBadges(id) || []).map((entry) => ({
-        ...entry
-      }));
-      if (badges.length)
-        setTimeout(() => {
-          try {
-            FluxDispatcher.dispatch({
-              type: "BADGE_DIRECTORY_FETCH_SUCCESS",
-              userId: id,
-              badges
-            });
-          } catch (e) {
-          }
-        }, 0);
-    } catch (e) {
-    }
+    if (queuedBadgeDirectoryReplays.has(id))
+      return;
+    queuedBadgeDirectoryReplays.add(id);
+    setTimeout(() => {
+      queuedBadgeDirectoryReplays.delete(id);
+      try {
+        if (!nativeBadgeDirectories.has(id)) {
+          var store = findByStoreName("BadgeDirectoryStore");
+          if (!store?.hasCatalogFor?.(id))
+            return;
+          var badges = store.getBadges(id);
+          if (!Array.isArray(badges))
+            return;
+          rememberNativeBadgeDirectory(id, badges);
+        }
+        var badges1 = nativeBadgeDirectories.get(id).map((entry) => entry && {
+          ...entry
+        });
+        var action = {
+          type: "BADGE_DIRECTORY_FETCH_SUCCESS",
+          userId: id,
+          badges: badges1
+        };
+        badgeDirectoryReplays.add(action);
+        FluxDispatcher.dispatch(action);
+      } catch (e) {
+      }
+    }, 0);
   }
   function installNativeBadgeHooks() {
     if (nativeBadgeHooksInstalled)
@@ -33253,7 +33274,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, KNOWN_BADGE_INFO, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -34282,6 +34303,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         14: "1 Quest completed",
         16: "This is just the beginning..."
       };
+      nativeBadgeDirectories = /* @__PURE__ */ new Map();
+      badgeDirectoryReplays = /* @__PURE__ */ new WeakSet();
+      queuedBadgeDirectoryReplays = /* @__PURE__ */ new Set();
       nativeBadgeHooksInstalled = false;
       identityRefreshers = /* @__PURE__ */ new Set();
       identityRenderers = /* @__PURE__ */ new WeakMap();
@@ -60063,7 +60087,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2cc4e96cceb290b20dd084b101844e9ae251d00b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "9236e31a89da5d26a670a14037687abb74217b7e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
