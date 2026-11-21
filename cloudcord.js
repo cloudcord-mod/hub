@@ -11580,12 +11580,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return true;
     }
   }
-  function usesCachedSettingsList() {
+  function getSettingsVersion() {
     try {
-      var version = parseInt(String(NativeClientInfoModule?.getConstants?.()?.Version ?? ""), 10);
-      return Number.isFinite(version) && version >= 352;
+      return parseInt(String(NativeClientInfoModule?.getConstants?.()?.Version ?? ""), 10);
     } catch (e) {
-      return false;
+      return NaN;
     }
   }
   function patchTabsUI(unpatches) {
@@ -11781,13 +11780,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var patchedRenderers = /* @__PURE__ */ new WeakSet();
     var patchedLists = /* @__PURE__ */ new WeakSet();
     var patchedScreens = /* @__PURE__ */ new WeakSet();
-    var prepareListProps = (props) => {
-      var node = props?.node;
+    var prepareRootList = (node) => {
       var sections = node?.sections;
       if (!Array.isArray(sections) || !sections.some((section) => section?.settings?.includes?.("ACCOUNT")))
-        return props;
+        return node;
       if (sections.some((section) => section?.label === "CloudCord"))
-        return props;
+        return node;
       var copy = sections.map((section) => ({
         ...section,
         ...Array.isArray(section?.settings) ? {
@@ -11798,11 +11796,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }));
       insertCloudCordSections(copy);
       return {
+        ...node,
+        sections: copy
+      };
+    };
+    var prepareListProps = (props) => {
+      var node = prepareRootList(props?.node);
+      return node === props?.node ? props : {
         ...props,
-        node: {
-          ...node,
-          sections: copy
-        }
+        node
       };
     };
     var listJsx = (_component, element) => ({
@@ -11906,9 +11908,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       });
     };
-    var patchCreateListModule = (module) => {
+    var patchCreateListModule = (module, rootOnly) => {
       if (patchedLists.has(module))
         return;
+      if (rootOnly) {
+        unpatches.push(before("createList", module, (args) => {
+          args[0] = prepareRootList(args[0]);
+          return args;
+        }));
+        patchedLists.add(module);
+        return;
+      }
       unpatches.push(before("createList", module, function(args) {
         var [config] = args;
         insertCloudCordSectionsInTree(config);
@@ -11942,7 +11952,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }));
       patchedScreens.add(parent);
     };
-    var cachedSettingsList = usesCachedSettingsList();
+    var settingsVersion = getSettingsVersion();
+    var cachedSettingsList = settingsVersion >= 352;
+    var patchRootList = settingsVersion >= 354;
     unpatches.push(observeSettingsModules((exports, path) => {
       for (var module of [
         exports,
@@ -11956,10 +11968,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         } catch (error) {
           console.warn("CloudCord settings renderer patch failed", error);
         }
-        if (!cachedSettingsList) {
+        if (!cachedSettingsList || patchRootList) {
           try {
             if (Object.getOwnPropertyNames(module).includes("createList") && typeof module.createList === "function")
-              patchCreateListModule(module);
+              patchCreateListModule(module, patchRootList);
           } catch (error) {
             console.warn("CloudCord settings list patch failed", error?.stack ?? error);
           }
@@ -64968,7 +64980,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b1b0c725826e6ed242bbf8f24bb75c85bea5bde8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0be2365b4647c39d7e862aec933c2a7fc435c7a5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
