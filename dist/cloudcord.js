@@ -46582,6 +46582,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       name
     };
   }
+  function getCxChannelNoteLabel(id, channel, username, guildName) {
+    if (!channel)
+      return "Unavailable channel \xB7 " + id;
+    var name = getCxChannelNameCopy(channel, username)?.name ?? id;
+    var server = channel.guild_id && guildName(channel.guild_id);
+    return server ? server + " \xB7 " + name : name;
+  }
   function cleanChannelName(name, type) {
     return name.normalize("NFKC").replace(/[ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ]/g, (letter) => smallCaps[letter]).replace(RegExp("[^ -~]?\\p{Extended_Pictographic}[^ -~]?", "ug"), "").replace(RegExp("-?[^\\p{Letter} -~]-?", "ug"), [
       2,
@@ -47331,35 +47338,56 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function createCxUserNotes(account, read, update, enabled = () => true, kind = "notes") {
     var active = true;
     var current = (id) => active && enabled() && account() === id;
+    function openForOwner(owner, subject, edit) {
+      return _async_to_generator(function* () {
+        if (!isCxProfileUserId(subject) || !current(owner))
+          return;
+        var saved = (yield read(owner))?.[subject];
+        if (!current(owner))
+          return;
+        edit(typeof saved === "string" ? saved.slice(0, CX_USER_NOTE_LIMIT) : "", (value) => _async_to_generator(function* () {
+          if (!current(owner))
+            return;
+          if (value.length > CX_USER_NOTE_LIMIT)
+            throw new Error("Notes can have up to 2,000 characters.");
+          var text = kind === "tags" ? normalizeTags(value) : value;
+          yield update(owner, (notes) => {
+            if (!current(owner))
+              return notes ?? {};
+            var next = {
+              ...notes
+            };
+            if (text.trim()) {
+              if (!Object.hasOwn(next, subject) && Object.keys(next).length >= 500)
+                throw new Error("Clear an entry before adding another.");
+              next[subject] = text;
+            } else
+              delete next[subject];
+            return next;
+          });
+        })());
+      })();
+    }
     return {
       open(subject, edit) {
         return _async_to_generator(function* () {
           var owner = account();
-          if (!isCxProfileUserId(owner) || !isCxProfileUserId(subject) || !current(owner))
+          if (isCxProfileUserId(owner))
+            yield openForOwner(owner, subject, edit);
+        })();
+      },
+      browse(show) {
+        return _async_to_generator(function* () {
+          var owner = account();
+          if (kind !== "channels" || !isCxProfileUserId(owner) || !current(owner))
             return;
-          var saved = (yield read(owner))?.[subject];
+          var saved = yield read(owner);
           if (!current(owner))
             return;
-          edit(typeof saved === "string" ? saved.slice(0, CX_USER_NOTE_LIMIT) : "", (value) => _async_to_generator(function* () {
-            if (!current(owner))
-              return;
-            if (value.length > CX_USER_NOTE_LIMIT)
-              throw new Error("Notes can have up to 2,000 characters.");
-            var text = kind === "tags" ? normalizeTags(value) : value;
-            yield update(owner, (notes) => {
-              if (!current(owner))
-                return notes ?? {};
-              var next = {
-                ...notes
-              };
-              if (text.trim()) {
-                if (!Object.hasOwn(next, subject) && Object.keys(next).length >= 500)
-                  throw new Error("Clear an entry before adding another.");
-                next[subject] = text;
-              } else
-                delete next[subject];
-              return next;
-            });
+          var ids = Object.entries(saved ?? {}).filter(([id, text]) => isCxProfileUserId(id) && typeof text === "string" && text.trim()).map(([id]) => id);
+          show(ids, (id, edit) => _async_to_generator(function* () {
+            if (ids.includes(id))
+              yield openForOwner(owner, id, edit);
           })());
         })();
       },
@@ -57427,6 +57455,55 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     });
   }
+  function ChannelNotesPicker({ items, open }) {
+    var [query, setQuery] = React2.useState("");
+    var [page, setPage] = React2.useState(0);
+    var pageSize = 8;
+    var search = query.trim().toLowerCase();
+    var matches = items.filter((item) => item.name.toLowerCase().includes(search));
+    return /* @__PURE__ */ jsxs(import_react_native43.View, {
+      children: [
+        /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+          accessibilityLabel: "Search saved channels",
+          placeholder: "Search saved channels",
+          value: query,
+          onChangeText: (value) => {
+            setQuery(value);
+            setPage(0);
+          },
+          style: {
+            padding: 10,
+            color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
+          }
+        }),
+        /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
+          style: {
+            maxHeight: 270
+          },
+          keyboardShouldPersistTaps: "handled",
+          children: /* @__PURE__ */ jsxs(TableRowGroup, {
+            children: [
+              matches.slice(page * pageSize, (page + 1) * pageSize).map((item) => /* @__PURE__ */ jsx(TableRow, {
+                label: item.name,
+                onPress: () => open(item.id)
+              }, item.id)),
+              !matches.length && /* @__PURE__ */ jsx(TableRow, {
+                label: "No matching channels"
+              }),
+              page > 0 && /* @__PURE__ */ jsx(TableRow, {
+                label: "Previous notes",
+                onPress: () => setPage(page - 1)
+              }),
+              (page + 1) * pageSize < matches.length && /* @__PURE__ */ jsx(TableRow, {
+                label: "Next notes",
+                onPress: () => setPage(page + 1)
+              })
+            ]
+          })
+        })
+      ]
+    });
+  }
   function registerLocalText(kind) {
     var tags = kind === "tags";
     var channel = kind === "channels";
@@ -57446,44 +57523,45 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     })(), () => !settings.safeMode?.enabled, kind);
     var failed = (error) => showToast(error instanceof Error ? error.message : "Couldn\u2019t update " + label2.toLowerCase() + ".");
     var alertKey = tags ? "cloudcord-cx-user-tags" : channel ? "cloudcord-cx-channel-note" : "cloudcord-cx-user-note";
+    var edit = (initial, save) => {
+      var draft = initial;
+      openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
+        title: label2,
+        extraContent: /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+          accessibilityLabel: tags ? "Private tags" : "Private note",
+          defaultValue: initial,
+          multiline: true,
+          maxLength: CX_USER_NOTE_LIMIT,
+          placeholder: tags ? "One tag per line" : void 0,
+          style: {
+            minHeight: 100,
+            padding: 10,
+            color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
+          },
+          onChangeText: (value) => {
+            draft = value;
+          }
+        }),
+        actions: /* @__PURE__ */ jsxs(AlertActions3, {
+          children: [
+            /* @__PURE__ */ jsx(AlertActionButton5, {
+              text: "Cancel",
+              variant: "secondary",
+              onPress: () => dismissAlert(alertKey)
+            }),
+            /* @__PURE__ */ jsx(AlertActionButton5, {
+              text: "Save",
+              variant: "primary",
+              onPress: () => {
+                void save(draft).then(() => dismissAlert(alertKey), failed);
+              }
+            })
+          ]
+        })
+      }));
+    };
     var action = (id) => {
-      void notes.open(id, (initial, save) => {
-        var draft = initial;
-        openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
-          title: label2,
-          extraContent: /* @__PURE__ */ jsx(import_react_native43.TextInput, {
-            accessibilityLabel: tags ? "Private tags" : "Private note",
-            defaultValue: initial,
-            multiline: true,
-            maxLength: CX_USER_NOTE_LIMIT,
-            placeholder: tags ? "One tag per line" : void 0,
-            style: {
-              minHeight: 100,
-              padding: 10,
-              color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
-            },
-            onChangeText: (value) => {
-              draft = value;
-            }
-          }),
-          actions: /* @__PURE__ */ jsxs(AlertActions3, {
-            children: [
-              /* @__PURE__ */ jsx(AlertActionButton5, {
-                text: "Cancel",
-                variant: "secondary",
-                onPress: () => dismissAlert(alertKey)
-              }),
-              /* @__PURE__ */ jsx(AlertActionButton5, {
-                text: "Save",
-                variant: "primary",
-                onPress: () => {
-                  void save(draft).then(() => dismissAlert(alertKey), failed);
-                }
-              })
-            ]
-          })
-        }));
-      }).catch(failed);
+      void notes.open(id, edit).catch(failed);
     };
     var stopMenu = channel ? registerChannelSheetEntry(alertKey, () => !settings.safeMode?.enabled, ({ id }) => isCxProfileUserId(id) ? {
       label: label2,
@@ -57497,6 +57575,37 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       ]
     });
+    var browseKey = "cloudcord-cx-channel-notes-picker";
+    if (channel)
+      browseLocalChannelNotes = () => {
+        void notes.browse((ids, open) => {
+          if (!ids.length) {
+            showToast("No channel notes saved on this device.");
+            return;
+          }
+          var items = ids.map((id) => ({
+            id,
+            name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id), (user) => UserStore3?.getUser?.(user)?.username, (guild) => GuildStore?.getGuild?.(guild)?.name)
+          })).sort((a, b3) => a.name.localeCompare(b3.name));
+          openAlert(browseKey, /* @__PURE__ */ jsx(AlertModal5, {
+            title: "Saved channel notes",
+            extraContent: /* @__PURE__ */ jsx(ChannelNotesPicker, {
+              items,
+              open: (id) => {
+                dismissAlert(browseKey);
+                void open(id, edit).catch(failed);
+              }
+            }),
+            actions: /* @__PURE__ */ jsx(AlertActions3, {
+              children: /* @__PURE__ */ jsx(AlertActionButton5, {
+                text: "Close",
+                variant: "secondary",
+                onPress: () => dismissAlert(browseKey)
+              })
+            })
+          }));
+        }).catch(failed);
+      };
     if (tags)
       findLocalUserTags = notes.search;
     else
@@ -57519,6 +57628,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
     return () => {
       notes.stop();
+      if (channel)
+        browseLocalChannelNotes = void 0;
       if (tags)
         findLocalUserTags = void 0;
       else
@@ -58934,6 +59045,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 label: "Clear local user notes",
                 onPress: clearLocalNotes.notes
               }),
+              browseLocalChannelNotes && /* @__PURE__ */ jsx(TableRow, {
+                label: "Browse channel notes",
+                onPress: browseLocalChannelNotes
+              }),
               clearLocalNotes.channels && /* @__PURE__ */ jsx(TableRow, {
                 label: "Clear local channel notes",
                 onPress: clearLocalNotes.channels
@@ -58951,7 +59066,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins;
+  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -60329,7 +60444,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1787cddd2296d4ecc669e375e94a03e5cd5c76fb";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "119b1a6f39198ef8059c29204c24d26ee888bef9";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
