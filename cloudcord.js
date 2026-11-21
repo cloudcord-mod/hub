@@ -24774,29 +24774,81 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function publishSharedProfile() {
     return _async_to_generator(function* () {
       if (rootSettings.fakeProfileLocalOnly || !preview.enabled || !currentUserId || Reflect.get(rootSettings, "fakeProfilePreviewBackup"))
-        return;
+        return false;
+      if (profileSyncDelay(currentUserId))
+        return false;
       var queue = publishSharedProfile;
       if (queue.pending) {
         queue.queued = true;
         return queue.pending;
       }
       queue.pending = (() => _async_to_generator(function* () {
+        var confirmed = false;
         try {
           do {
             queue.queued = false;
+            var ownerId = currentUserId;
+            confirmed = false;
+            setProfileSyncFeedback(ownerId, "uploading");
             try {
-              yield publishSharedProfileSnapshot();
+              confirmed = (yield publishSharedProfileSnapshot()) === true;
             } catch (error) {
-              if (!queue.queued)
+              if (!queue.queued) {
+                if (ownerId && canPublishProfile(ownerId) && profileSyncFeedback?.phase !== "pending")
+                  setProfileSyncFeedback(ownerId, "failed");
                 throw error;
+              }
             }
-          } while (queue.queued && !rootSettings.fakeProfileLocalOnly && preview.enabled && currentUserId);
+          } while (queue.queued && currentUserId && canPublishProfile(currentUserId) && !profileSyncDelay(currentUserId));
+          return confirmed;
         } finally {
           queue.pending = void 0;
         }
       })())();
       return queue.pending;
     })();
+  }
+  function canPublishProfile(ownerId) {
+    return currentUserId === ownerId && !rootSettings.fakeProfileLocalOnly && preview.enabled && !Reflect.get(rootSettings, "fakeProfilePreviewBackup");
+  }
+  function profileSyncDelay(ownerId) {
+    return profileSyncRetry?.ownerId === ownerId ? Math.max(0, profileSyncRetry.until - Date.now()) : 0;
+  }
+  function setProfileSyncFeedback(ownerId, phase) {
+    if (!ownerId || ownerId !== currentUserId)
+      return;
+    if (profileSyncFeedback?.ownerId === ownerId && profileSyncFeedback.phase === phase && profileSyncFeedback.snapshot === preview)
+      return;
+    profileSyncFeedback = {
+      ownerId,
+      phase,
+      snapshot: preview
+    };
+    for (var listener of profileSyncListeners)
+      listener();
+  }
+  function profileSyncLabel() {
+    if (!preview.enabled)
+      return "Off";
+    if (Reflect.get(rootSettings, "fakeProfilePreviewBackup"))
+      return "Template preview";
+    if (rootSettings.fakeProfileLocalOnly)
+      return "This device";
+    if (currentUserId && profileSyncDelay(currentUserId))
+      return "Retry scheduled";
+    if (profileSyncFeedback?.ownerId === currentUserId && profileSyncFeedback.snapshot === preview) {
+      switch (profileSyncFeedback.phase) {
+        case "confirmed":
+          return "Synced";
+        case "uploading":
+          return "Syncing\u2026";
+        case "retry":
+          return "Retry scheduled";
+        case "failed":
+          return "Sync failed";
+      }
+    }
+    return "Waiting to sync";
   }
   function publishSharedProfileSnapshot(allowRetry = true) {
     return _async_to_generator(function* () {
@@ -24823,12 +24875,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       var path = saved.id ? `/v1/profiles/${encodeURIComponent(saved.id)}` : "/v1/profiles";
       var localFingerprint = JSON.stringify(preview);
       var profileSnapshot = yield ownSharedProfile();
-      if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
+      if (!canPublishProfile(ownerId))
         return;
       var latestResponse = yield fetchProfileResponse(`${SHARED_PROFILE_API}/v1/profiles/user/${encodeURIComponent(ownerId)}`, {
         cache: "no-store"
       });
-      if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
+      if (!canPublishProfile(ownerId))
         return;
       if (JSON.stringify(preview) !== localFingerprint) {
         publishSharedProfile.queued = true;
@@ -24836,8 +24888,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
       if (latestResponse.ok) {
         var latest = yield latestResponse.json();
-        if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
+        if (!canPublishProfile(ownerId))
           return;
+        if (JSON.stringify(preview) !== localFingerprint) {
+          publishSharedProfile.queued = true;
+          return;
+        }
         var remote = latest?.profile && typeof latest.profile === "object" ? latest.profile : {};
         var snapshot2 = profileSnapshot;
         for (var [field, media] of [
@@ -24877,8 +24933,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       var clearSnapshot = {
         ...rootSettings.fakeProfileMediaCleared || {}
       };
-      if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
+      if (!canPublishProfile(ownerId))
         return;
+      var uploadingPreview = preview;
       var response = yield fetchProfileResponse(`${SHARED_PROFILE_API}${path}`, {
         method: saved.id ? "PUT" : "POST",
         headers: {
@@ -24895,14 +24952,26 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (currentUserId !== ownerId)
         return;
       if (!response.ok) {
+        if (!canPublishProfile(ownerId))
+          return;
         if (response.status === 429) {
-          var retrySeconds = Math.max(2, Number(response.headers.get("retry-after") || 10));
+          var retryAfter = response.headers.get("retry-after")?.trim();
+          var wait = retryAfter && /^\d+$/.test(retryAfter) ? Number(retryAfter) * 1e3 : Date.parse(retryAfter || "") - Date.now();
+          var retryDelay = Number.isFinite(wait) ? Math.max(2e3, Math.min(wait, 2147483647)) : 1e4;
+          profileSyncRetry = {
+            ownerId,
+            until: Date.now() + retryDelay
+          };
           if (publishTimer)
             clearTimeout(publishTimer);
-          publishTimer = setTimeout(() => void publishSharedProfile().catch((error) => {
-            diagnostics.last = error?.message || "Sharing will retry later";
-          }), retrySeconds * 1e3);
-          diagnostics.last = `CloudCord sharing paused; retrying in ${retrySeconds}s`;
+          publishTimer = setTimeout(() => {
+            publishTimer = null;
+            void publishSharedProfile().catch((error) => {
+              diagnostics.last = error?.message || "Could not sync this profile";
+            });
+          }, retryDelay);
+          setProfileSyncFeedback(ownerId, "retry");
+          diagnostics.last = `CloudCord sharing paused; retrying in ${Math.ceil(retryDelay / 1e3)}s`;
           return;
         }
         if (response.status === 409) {
@@ -24944,21 +25013,31 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       }
       diagnostics.last = "Fake Profile shared automatically";
+      if (uploadingPreview !== preview || !canPublishProfile(ownerId) || profileSyncFeedback?.phase === "pending")
+        return false;
+      setProfileSyncFeedback(ownerId, "confirmed");
+      return true;
     })();
   }
   function queueSharedPublish() {
     if (rootSettings.fakeProfileLocalOnly || Reflect.get(rootSettings, "fakeProfilePreviewBackup")) {
-      if (publishTimer)
+      if (publishTimer) {
         clearTimeout(publishTimer);
+        publishTimer = null;
+      }
       return;
     }
-    if (!preview.enabled)
+    if (!currentUserId || !preview.enabled)
       return;
     if (publishTimer)
       clearTimeout(publishTimer);
-    publishTimer = setTimeout(() => void publishSharedProfile().catch((error) => {
-      diagnostics.last = error?.message || "Sharing will retry later";
-    }), 1200);
+    setProfileSyncFeedback(currentUserId, "pending");
+    publishTimer = setTimeout(() => {
+      publishTimer = null;
+      void publishSharedProfile().catch((error) => {
+        diagnostics.last = error?.message || "Could not sync this profile";
+      });
+    }, Math.max(1200, profileSyncDelay(currentUserId)));
   }
   function pullOwnSharedProfile(force = false) {
     return _async_to_generator(function* () {
@@ -25039,10 +25118,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           activityAmounts: data.activityAmounts && typeof data.activityAmounts === "object" && !Array.isArray(data.activityAmounts) ? data.activityAmounts : {},
           syncRevision: Number(data.syncRevision || 0)
         };
-        if (JSON.stringify(nextPreview) === JSON.stringify(preview))
-          return;
-        rootSettings.fakeProfile = preview = nextPreview;
-        clearCache();
+        if (JSON.stringify(nextPreview) !== JSON.stringify(preview)) {
+          rootSettings.fakeProfile = preview = nextPreview;
+          clearCache();
+        }
+        setProfileSyncFeedback(requestedUserId, "confirmed");
         diagnostics.last = "Fake Profile synced across devices";
       } catch (e) {
       } finally {
@@ -30361,11 +30441,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function ActionButton({ label: label2, onPress, muted = false }) {
+  function ActionButton({ label: label2, onPress, muted = false, disabled }) {
     return /* @__PURE__ */ jsx(GlassButton2, {
       label: label2,
       onPress,
-      muted
+      muted,
+      disabled
     });
   }
   function normalizeDateInput(value) {
@@ -31552,6 +31633,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var navigation2 = NavigationNative.useNavigation();
     (0, import_react9.useEffect)(() => {
       fakeProfileEditorOpen = true;
+      profileSyncListeners.add(redraw);
       var active = true;
       void initializeFakeProfile().then(() => {
         if (active) {
@@ -31563,6 +31645,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return () => {
         active = false;
         fakeProfileEditorOpen = false;
+        profileSyncListeners.delete(redraw);
       };
     }, []);
     var update = (key, value, refresh = false) => {
@@ -31920,6 +32003,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         children: "Your Discord account changed. Go back and reopen the profile editor before making changes."
       });
     var appearance = studioPreviewAppearance(preview, realCurrentUser);
+    var syncLabel = profileSyncLabel();
+    var canSync = Boolean(currentUserId && preview.enabled && !Reflect.get(rootSettings, "fakeProfilePreviewBackup") && syncLabel !== "Syncing\u2026" && syncLabel !== "Retry scheduled");
     return /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
       style: {
         flex: 1,
@@ -31945,7 +32030,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             accent: appearance.bannerColor,
             enabled: preview.enabled,
             onToggle: () => update("enabled", !preview.enabled, true),
-            syncLabel: rootSettings.fakeProfileLocalOnly ? "This device" : "Synced",
+            syncLabel,
             onPreview: openPreview,
             quickLook: showPreview,
             onQuickLook: () => setShowPreview(!showPreview)
@@ -32007,7 +32092,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             var name = preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "there";
             return /* @__PURE__ */ jsx(OverviewPanel, {
               name,
-              subtitle: preview.enabled ? rootSettings.fakeProfileLocalOnly ? "Your custom profile is on, on this device only" : "Your custom profile is on and synced everywhere" : "Your custom profile is off",
+              subtitle: preview.enabled ? "Your custom profile is on" : "Your custom profile is off",
               stats: [
                 {
                   label: "Username",
@@ -32026,8 +32111,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 },
                 {
                   label: "Sync",
-                  value: rootSettings.fakeProfileLocalOnly ? "Device" : "Everywhere",
-                  hint: rootSettings.fakeProfileLocalOnly ? "Only you see it" : "Other CloudCord users see it"
+                  value: syncLabel,
+                  hint: rootSettings.fakeProfileLocalOnly ? "Edits stay on this device" : "CloudCord profile sharing"
                 }
               ],
               tasks: [
@@ -33262,22 +33347,33 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 }),
                 /* @__PURE__ */ jsx(ActionButton, {
                   label: "Use this profile on all devices",
+                  disabled: !canSync,
                   onPress: () => void (() => _async_to_generator(function* () {
+                    var ownerId = currentUserId;
+                    if (!ownerId || !canSync)
+                      return;
+                    if (publishTimer) {
+                      clearTimeout(publishTimer);
+                      publishTimer = null;
+                    }
                     rootSettings.fakeProfileLocalOnly = false;
-                    preview.syncRevision = Date.now();
+                    preview.syncRevision = Math.max(Date.now(), Number(preview.syncRevision || 0) + 1);
                     rootSettings.fakeProfile = {
                       ...preview,
                       selectedBadges: {
                         ...preview.selectedBadges || {}
                       }
                     };
+                    preview = rootSettings.fakeProfile;
                     suppressOwnPullUntil = Date.now() + 6e4;
                     refreshPreview();
                     try {
-                      yield publishSharedProfile();
-                      diagnostics.last = "This profile is now active on all devices";
-                      import_react_native28.Alert.alert("FakeProfile", "This profile is now active on all of your CloudCord devices.");
+                      var confirmed = yield publishSharedProfile();
+                      if (confirmed && currentUserId === ownerId && profileSyncLabel() === "Synced")
+                        import_react_native28.Alert.alert("Profile synced", "CloudCord accepted the current profile for sharing.");
                     } catch (error) {
+                      if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
+                        return;
                       diagnostics.last = error?.message || "Could not sync this profile";
                       import_react_native28.Alert.alert("FakeProfile", diagnostics.last);
                     }
@@ -33384,7 +33480,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -34087,6 +34183,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       suppressOwnPullUntil = 0;
       mediaSelections = /* @__PURE__ */ new Map();
       REPLACE_BADGES_SYNC_ID = "__cc_replace_real_badges";
+      profileSyncListeners = /* @__PURE__ */ new Set();
       sharedProfileSeenAt = /* @__PURE__ */ new Map();
       SHARED_RECENT_PROFILE_LIMIT = 256;
       SHARED_PROFILE_CACHE_LIMIT = 512;
@@ -61084,7 +61181,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7d77edb54603972d7d29fb6988b01ee80b60465d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e0d5558c13a12043cce36f430da6bc977787c317";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
