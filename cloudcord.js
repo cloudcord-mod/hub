@@ -40326,6 +40326,133 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "white"
       ];
       cxCommandFunctions = {
+        snowflakeTimestamp(input) {
+          var text = input.trim();
+          if (!/^\d{17,20}$/.test(text))
+            return;
+          var snowflake3 = BigInt(text);
+          if (snowflake3 > 0xffffffffffffffffn || text[0] === "0")
+            return;
+          var timestamp = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
+          return `Created <t:${timestamp}:F> (<t:${timestamp}:R>).`;
+        },
+        sortLines: (text) => text.split(/\r\n|\r|\n/).sort((a, b3) => {
+          var left = a.toLowerCase();
+          var right = b3.toLowerCase();
+          return left < right ? -1 : left > right ? 1 : 0;
+        }).join("\n"),
+        trimLines: (text) => text.split(/\r\n|\r|\n/).map((line) => line.trim()).join("\n"),
+        linesToCsv: (text) => {
+          var fields = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
+          return fields.map((field) => `"${field.replaceAll('"', '""')}"`).join(",");
+        },
+        numberLines: (text) => {
+          var lines = text.split(/\r\n|\r|\n/);
+          if (lines.at(-1) === "")
+            lines.pop();
+          return lines.map((line, index) => `${index + 1}. ${line}`).join("\n");
+        },
+        slugifyText: (text) => text.normalize("NFKD").replace(RegExp("\\p{M}", "gu"), "").toLowerCase().replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), "-").replace(/^-|-$/g, ""),
+        unicodeInfo(text) {
+          var points = Array.from(text, (character) => "U+" + character.codePointAt(0).toString(16).toUpperCase().padStart(4, "0"));
+          if (!points.length || points.length > 128)
+            return;
+          return `${points.length} Unicode code points \xB7 ${text.length} UTF-16 code units
+\`${points.join(" ")}\``;
+        },
+        encodeUrlComponent(text) {
+          try {
+            var encoded = encodeURIComponent(text);
+            return encoded.length <= 3900 ? encoded : "Encoded text is too long for one reply.";
+          } catch (e) {
+            return "This text contains invalid Unicode.";
+          }
+        },
+        decodeUrlComponent(text) {
+          try {
+            return decodeURIComponent(text);
+          } catch (e) {
+            return "This text contains an invalid URL escape.";
+          }
+        },
+        escapeMarkdown(text) {
+          var escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
+          return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
+        },
+        checkJson(text) {
+          try {
+            JSON.parse(text);
+            return "Valid JSON.";
+          } catch (e) {
+            return "Invalid JSON.";
+          }
+        },
+        wordFrequency(text) {
+          var counts = /* @__PURE__ */ new Map();
+          for (var word of text.toLowerCase().match(RegExp("[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*", "gu")) ?? []) {
+            counts.set(word, (counts.get(word) ?? 0) + 1);
+          }
+          return [
+            ...counts
+          ].sort(([, left], [, right]) => right - left).slice(0, 10).map(([word2, count]) => (word2.length > 80 ? word2.slice(0, 80) + "\u2026" : word2) + " \u2014 " + count).join("\n") || "No words found.";
+        },
+        hexToRgb(input) {
+          var hex = input.trim().replace(/^#/, "");
+          if (/^[\da-f]{3}$/i.test(hex))
+            hex = [
+              ...hex
+            ].map((digit) => digit.repeat(2)).join("");
+          if (!/^[\da-f]{6}$/i.test(hex))
+            return;
+          var channels2 = hex.match(/../g).map((value) => Number.parseInt(value, 16));
+          return `\`rgb(${channels2.join(", ")})\``;
+        },
+        rgbToHex(input) {
+          var text = input.trim();
+          var channels2 = /^(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})$/.exec(text) ?? /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i.exec(text);
+          if (!channels2)
+            return;
+          var values = channels2.slice(1).map(Number);
+          if (values.some((value) => value > 255))
+            return;
+          return "`#" + values.map((value) => value.toString(16).padStart(2, "0")).join("") + "`";
+        },
+        daysBetween(start, end) {
+          var dates = [
+            start,
+            end
+          ].map((value) => value.trim());
+          if (!dates.every((date) => /^\d{4}-\d{2}-\d{2}$/.test(date)))
+            return;
+          var midnights = dates.map((date) => /* @__PURE__ */ new Date(date + "T00:00:00Z"));
+          if (!midnights.every((date, index) => Number.isFinite(date.getTime()) && date.toISOString().startsWith(dates[index] + "T")))
+            return;
+          var days = (midnights[1].getTime() - midnights[0].getTime()) / 864e5;
+          return `${days} ${Math.abs(days) === 1 ? "day" : "days"}`;
+        },
+        discordTimestamp(seconds, format) {
+          var input = seconds.trim();
+          if (!/^-?\d+$/.test(input) || !/^[tTdDfFR]$/.test(format))
+            return;
+          var timestamp = Number(input);
+          if (Number.isSafeInteger(timestamp) && Math.abs(timestamp) <= 864e10) {
+            return `\`<t:${timestamp}:${format}>\``;
+          }
+        },
+        discordLocalTimestamp(date, time, format) {
+          var day = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date.trim());
+          var clock = /^(\d{2}):(\d{2})$/.exec(time.trim());
+          if (!day || !clock || !/^[tTdDfFR]$/.test(format))
+            return;
+          var [year, month, dayOfMonth] = day.slice(1).map(Number);
+          var [hour, minute] = clock.slice(1).map(Number);
+          var instant = /* @__PURE__ */ new Date(0);
+          instant.setFullYear(year, month - 1, dayOfMonth);
+          instant.setHours(hour, minute, 0, 0);
+          if (instant.getFullYear() !== year || instant.getMonth() !== month - 1 || instant.getDate() !== dayOfMonth || instant.getHours() !== hour || instant.getMinutes() !== minute)
+            return;
+          return `\`<t:${instant.getTime() / 1e3}:${format}>\``;
+        },
         colorText(text, color, background, style) {
           var foregroundIndex = ansiForegrounds.indexOf(color);
           var backgroundIndex = ansiBackgrounds.indexOf(background);
@@ -49245,6 +49372,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/color-converter.cx
+  var color_converter_default;
+  var init_color_converter = __esm({
+    "../examples/cx/catalog/plugins/color-converter.cx"() {
+      color_converter_default = 'plugin "Color Converter":\n  needs commands.register\n  needs reply.local\n  on command "hextorgb" with text:\n    reply "${hexToRgb(text)}" else "Enter a three- or six-digit hex color."\n  on command "rgbtohex" with text:\n    reply "${rgbToHex(text)}" else "Enter three comma-separated RGB values from 0 to 255."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/color-text.cx
   var color_text_default;
   var init_color_text = __esm({
@@ -49373,6 +49508,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/days-between.cx
+  var days_between_default;
+  var init_days_between = __esm({
+    "../examples/cx/catalog/plugins/days-between.cx"() {
+      days_between_default = 'plugin "Days Between":\n  needs commands.register\n  needs reply.local\n  on command "daysbetween":\n    input "start" text\n    input "end" text\n    reply "${daysBetween(start, end)}" else "Enter two valid dates as YYYY-MM-DD."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/declutter.cx
   var declutter_default;
   var init_declutter = __esm({
@@ -49386,6 +49529,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_dim_inactive_channels = __esm({
     "../examples/cx/catalog/plugins/dim-inactive-channels.cx"() {
       dim_inactive_channels_default = 'plugin "DimInactiveChannels":\n  needs appearance.style\n  style inactive-channel-opacity\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/discord-timestamp.cx
+  var discord_timestamp_default;
+  var init_discord_timestamp = __esm({
+    "../examples/cx/catalog/plugins/discord-timestamp.cx"() {
+      discord_timestamp_default = 'plugin "Discord Timestamp":\n  needs commands.register\n  needs reply.local\n  on command "discordtimestamp":\n    input "seconds" text\n    input "format" choice "t,T,d,D,f,F,R"\n    reply "${discordTimestamp(seconds, format)}" else "Enter a Unix timestamp in whole seconds."\n  on command "discordlocaltimestamp":\n    input "date" text\n    input "time" text\n    input "format" choice "t,T,d,D,f,F,R"\n    reply "${discordLocalTimestamp(date, time, format)}" else "Enter a valid local date and time as YYYY-MM-DD and HH:MM."\n';
     }
   });
 
@@ -50328,6 +50479,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/json-check.cx
+  var json_check_default;
+  var init_json_check = __esm({
+    "../examples/cx/catalog/plugins/json-check.cx"() {
+      json_check_default = 'plugin "JSON Check":\n  needs commands.register\n  needs reply.local\n  on command "jsoncheck" with text:\n    reply "${checkJson(text)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/jump-to-top.cx
   var jump_to_top_default;
   var init_jump_to_top = __esm({
@@ -50360,11 +50519,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/lines-to-csv.cx
+  var lines_to_csv_default;
+  var init_lines_to_csv = __esm({
+    "../examples/cx/catalog/plugins/lines-to-csv.cx"() {
+      lines_to_csv_default = 'plugin "Lines to CSV":\n  needs commands.register\n  needs reply.local\n  on command "linestocsv" with text:\n    reply "${linesToCsv(text)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/link-converter.cx
   var link_converter_default;
   var init_link_converter = __esm({
     "../examples/cx/catalog/plugins/link-converter.cx"() {
       link_converter_default = 'plugin "LinkConverter":\n  needs messages.transform\n  needs messages.redirectlinks\n  needs profile.redirectlinks\n  before send rewrite-link "https://reddit.com" with "https://rxddit.com"\n  before profile rewrite-link "https://reddit.com" with "https://rxddit.com"\n  before send rewrite-link "https://www.reddit.com" with "https://rxddit.com"\n  before profile rewrite-link "https://www.reddit.com" with "https://rxddit.com"\n  before send rewrite-link "https://old.reddit.com" with "https://rxddit.com"\n  before profile rewrite-link "https://old.reddit.com" with "https://rxddit.com"\n  before send rewrite-link "https://x.com" with "https://fxtwitter.com"\n  before profile rewrite-link "https://x.com" with "https://fxtwitter.com"\n  before send rewrite-link "https://www.x.com" with "https://fxtwitter.com"\n  before profile rewrite-link "https://www.x.com" with "https://fxtwitter.com"\n  before send rewrite-link "https://instagram.com" with "https://vxinstagram.com"\n  before profile rewrite-link "https://instagram.com" with "https://vxinstagram.com"\n  before send rewrite-link "https://www.instagram.com" with "https://vxinstagram.com"\n  before profile rewrite-link "https://www.instagram.com" with "https://vxinstagram.com"\n  before send rewrite-link "https://tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://www.tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://www.tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://vm.tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://vm.tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://vt.tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://vt.tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://youtube.com" with "https://yout-ube.com"\n  before profile rewrite-link "https://youtube.com" with "https://yout-ube.com"\n  before send rewrite-link "https://www.youtube.com" with "https://yout-ube.com"\n  before profile rewrite-link "https://www.youtube.com" with "https://yout-ube.com"\n  before send rewrite-link "https://m.youtube.com" with "https://yout-ube.com"\n  before profile rewrite-link "https://m.youtube.com" with "https://yout-ube.com"\n  before send rewrite-link "https://bsky.app" with "https://fxbsky.app"\n  before profile rewrite-link "https://bsky.app" with "https://fxbsky.app"\n  before send rewrite-link "https://www.bsky.app" with "https://fxbsky.app"\n  before profile rewrite-link "https://www.bsky.app" with "https://fxbsky.app"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/markdown-escape.cx
+  var markdown_escape_default;
+  var init_markdown_escape = __esm({
+    "../examples/cx/catalog/plugins/markdown-escape.cx"() {
+      markdown_escape_default = 'plugin "Markdown Escape":\n  needs commands.register\n  needs reply.local\n  on command "escapemarkdown" with text:\n    reply "${escapeMarkdown(text)}"\n';
     }
   });
 
@@ -50728,6 +50903,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/number-lines.cx
+  var number_lines_default;
+  var init_number_lines = __esm({
+    "../examples/cx/catalog/plugins/number-lines.cx"() {
+      number_lines_default = 'plugin "Number Lines":\n  needs commands.register\n  needs reply.local\n  on command "numberlines" with text:\n    reply "${numberLines(text)}" else "Enter text to number."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/open-steam-links-in-app.cx
   var open_steam_links_in_app_default;
   var init_open_steam_links_in_app = __esm({
@@ -50976,6 +51159,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/slugify-text.cx
+  var slugify_text_default;
+  var init_slugify_text = __esm({
+    "../examples/cx/catalog/plugins/slugify-text.cx"() {
+      slugify_text_default = 'plugin "Slugify Text":\n  needs commands.register\n  needs reply.local\n  on command "slugifytext" with text:\n    reply "${slugifyText(text)}" else "Enter text containing letters or numbers."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/smaller-avatars-in-chat.cx
   var smaller_avatars_in_chat_default;
   var init_smaller_avatars_in_chat = __esm({
@@ -50992,6 +51183,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/snowflake-created-at.cx
+  var snowflake_created_at_default;
+  var init_snowflake_created_at = __esm({
+    "../examples/cx/catalog/plugins/snowflake-created-at.cx"() {
+      snowflake_created_at_default = 'plugin "Snowflake Created At":\n  needs commands.register\n  needs reply.local\n  on command "snowflakecreated" with text:\n    reply "${snowflakeTimestamp(text)}" else "Enter a valid Discord ID."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/soft-corners.cx
   var soft_corners_default;
   var init_soft_corners = __esm({
@@ -51005,6 +51204,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_sollux_typing_quirk = __esm({
     "../examples/cx/catalog/plugins/sollux-typing-quirk.cx"() {
       sollux_typing_quirk_default = 'plugin "SolluxTypingQuirk":\n  needs messages.transform\n  before send rewrite-text:\n    replace ["i"] with "ii"\n    replace ["I"] with "II"\n    replace ["s","S"] with "2" ignore-case\n    replace ["to"] with "two" ignore-case\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/sort-lines.cx
+  var sort_lines_default;
+  var init_sort_lines = __esm({
+    "../examples/cx/catalog/plugins/sort-lines.cx"() {
+      sort_lines_default = 'plugin "Sort Lines":\n  needs commands.register\n  needs reply.local\n  on command "sortlines" with text:\n    reply "${sortLines(text)}"\n';
     }
   });
 
@@ -51120,6 +51327,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/trim-lines.cx
+  var trim_lines_default;
+  var init_trim_lines = __esm({
+    "../examples/cx/catalog/plugins/trim-lines.cx"() {
+      trim_lines_default = 'plugin "Trim Lines":\n  needs commands.register\n  needs reply.local\n  on command "trimlines" with text:\n    reply "${trimLines(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/unicode-inspector.cx
+  var unicode_inspector_default;
+  var init_unicode_inspector = __esm({
+    "../examples/cx/catalog/plugins/unicode-inspector.cx"() {
+      unicode_inspector_default = 'plugin "Unicode Inspector":\n  needs commands.register\n  needs reply.local\n  on command "unicodeinfo" with text:\n    reply "${unicodeInfo(text)}" else "Enter between 1 and 128 Unicode code points."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/unindent.cx
   var unindent_default;
   var init_unindent = __esm({
@@ -51149,6 +51372,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_unsuppress_embeds = __esm({
     "../examples/cx/catalog/plugins/unsuppress-embeds.cx"() {
       unsuppress_embeds_default = 'plugin "UnsuppressEmbeds":\n  needs messages.toggleembeds\n  use toggle-message-embeds\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/url-component-codec.cx
+  var url_component_codec_default;
+  var init_url_component_codec = __esm({
+    "../examples/cx/catalog/plugins/url-component-codec.cx"() {
+      url_component_codec_default = 'plugin "URL Component Codec":\n  needs commands.register\n  needs reply.local\n  on command "urlencode" with text:\n    reply "${encodeUrlComponent(text)}"\n  on command "urldecode" with text:\n    reply "${decodeUrlComponent(text)}"\n';
     }
   });
 
@@ -51278,6 +51509,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_wiki_lookup = __esm({
     "../examples/cx/catalog/plugins/wiki-lookup.cx"() {
       wiki_lookup_default = 'plugin "WikiLookup":\n  needs commands.register\n  needs reply.local\n  needs lookup.wikipedia\n  on command "wiki":\n    input "message" text\n    lookup wikipedia "message"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/word-frequency.cx
+  var word_frequency_default;
+  var init_word_frequency = __esm({
+    "../examples/cx/catalog/plugins/word-frequency.cx"() {
+      word_frequency_default = 'plugin "Word Frequency":\n  needs commands.register\n  needs reply.local\n  on command "wordfrequency" with text:\n    reply "${wordFrequency(text)}"\n';
     }
   });
 
@@ -52134,6 +52373,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_clear_urls();
       init_client_side_block();
       init_cloud_cord_accent();
+      init_color_converter();
       init_color_text();
       init_colorful_mentions();
       init_compact_compose();
@@ -52150,8 +52390,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_count_lines();
       init_custom_timestamps();
       init_dashless();
+      init_days_between();
       init_declutter();
       init_dim_inactive_channels();
+      init_discord_timestamp();
       init_dont_round_my_timestamps();
       init_double_click_edit();
       init_double_click_to_reply();
@@ -52246,11 +52488,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_image_link();
       init_in_role();
       init_ingtoninator();
+      init_json_check();
       init_jump_to_top();
       init_jump_to();
       init_keyword_notify();
       init_leet_text();
+      init_lines_to_csv();
       init_link_converter();
+      init_markdown_escape();
       init_message_burst();
       init_message_notifier();
       init_more_commands();
@@ -52275,6 +52520,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_no_unblock_to_jump();
       init_normalize_message_links();
       init_notify_when_muted();
+      init_number_lines();
       init_open_steam_links_in_app();
       init_ping_notifications();
       init_polish_wording();
@@ -52306,10 +52552,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_silence_users();
       init_silent_message_toggle();
       init_silent_typing();
+      init_slugify_text();
       init_smaller_avatars_in_chat();
       init_smooth_scrolling();
+      init_snowflake_created_at();
       init_soft_corners();
       init_sollux_typing_quirk();
+      init_sort_lines();
       init_sort_reactions();
       init_space_out();
       init_split_large_messages();
@@ -52324,10 +52573,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_thin_scrollbars();
       init_translate();
       init_transparent_chat_bar();
+      init_trim_lines();
+      init_unicode_inspector();
       init_unindent();
       init_unique_lines();
       init_unit_converter();
       init_unsuppress_embeds();
+      init_url_component_codec();
       init_user_notes();
       init_user_tags();
       init_vibe_check();
@@ -52339,6 +52591,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_wider_channel_list();
       init_wider_chat();
       init_wiki_lookup();
+      init_word_frequency();
       init_write_upper_case();
       init_zero_width_sanitizer();
       init_midnight();
@@ -52567,6 +52820,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: cloud_cord_accent_default
           },
           {
+            name: "Color Converter",
+            source: color_converter_default
+          },
+          {
             name: "ColorText",
             source: color_text_default
           },
@@ -52633,12 +52890,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: dashless_default
           },
           {
+            name: "Days Between",
+            source: days_between_default
+          },
+          {
             name: "Declutter",
             source: declutter_default
           },
           {
             name: "DimInactiveChannels",
             source: dim_inactive_channels_default
+          },
+          {
+            name: "Discord Timestamp",
+            source: discord_timestamp_default
           },
           {
             name: "DontRoundMyTimestamps",
@@ -53026,6 +53291,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: ingtoninator_default
           },
           {
+            name: "JSON Check",
+            source: json_check_default
+          },
+          {
             name: "JumpToTop",
             source: jump_to_top_default
           },
@@ -53042,8 +53311,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: leet_text_default
           },
           {
+            name: "Lines to CSV",
+            source: lines_to_csv_default
+          },
+          {
             name: "LinkConverter",
             source: link_converter_default
+          },
+          {
+            name: "Markdown Escape",
+            source: markdown_escape_default
           },
           {
             name: "MessageBurst",
@@ -53142,6 +53419,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "NotifyWhenMuted",
             source: notify_when_muted_default
+          },
+          {
+            name: "Number Lines",
+            source: number_lines_default
           },
           {
             name: "OpenSteamLinksInApp",
@@ -53269,6 +53550,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: silent_typing_default
           },
           {
+            name: "Slugify Text",
+            source: slugify_text_default
+          },
+          {
             name: "SmallerAvatarsInChat",
             source: smaller_avatars_in_chat_default,
             desktopOnly: true
@@ -53279,6 +53564,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             desktopOnly: true
           },
           {
+            name: "Snowflake Created At",
+            source: snowflake_created_at_default
+          },
+          {
             name: "SoftCorners",
             source: soft_corners_default,
             desktopOnly: true
@@ -53286,6 +53575,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "SolluxTypingQuirk",
             source: sollux_typing_quirk_default
+          },
+          {
+            name: "Sort Lines",
+            source: sort_lines_default
           },
           {
             name: "SortReactions",
@@ -53346,6 +53639,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             source: transparent_chat_bar_default
           },
           {
+            name: "Trim Lines",
+            source: trim_lines_default
+          },
+          {
+            name: "Unicode Inspector",
+            source: unicode_inspector_default
+          },
+          {
             name: "Unindent",
             source: unindent_default
           },
@@ -53360,6 +53661,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "UnsuppressEmbeds",
             source: unsuppress_embeds_default
+          },
+          {
+            name: "URL Component Codec",
+            source: url_component_codec_default
           },
           {
             name: "UserNotes",
@@ -53405,6 +53710,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "WikiLookup",
             source: wiki_lookup_default
+          },
+          {
+            name: "Word Frequency",
+            source: word_frequency_default
           },
           {
             name: "WriteUpperCase",
@@ -59015,7 +59324,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6ac40fe8dc43c415acf6b8b2d0c58b67196ca396";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8cfd3a69f9601ab87f14b239f050a4de2f4313b2";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
