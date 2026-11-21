@@ -1,0 +1,8 @@
+plugin "Number Base Converter":
+  needs commands.register
+  needs reply.local
+  on command "convertbase":
+    input "number" text
+    input "from" integer
+    input "to" integer
+    reply "${convertNumberBase(number, from, to)}" else "Enter up to 256 digits without prefixes and use bases from 2 to 36."

@@ -23,7 +23,7 @@ let clockTime;
 const clockTimers = new Set();
 const scheduleTimers = new Map();
 vm.runInNewContext(code, {
-    module: moduleBox, AbortController,
+    module: moduleBox, AbortController, URL,
     setTimeout(callback, delay) {
         if (delay < 60_000) return setTimeout(callback, delay);
         scheduleTimers.set(callback, delay);
@@ -2242,6 +2242,41 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         command.execute([{ name: "text", value: "abc" }], { channel: { id: "test-channel" } });
         assert.deepEqual(delivered, [["test-channel", "3 characters"]]);
         assert.equal(Object.keys(registered).length, 0, platform + " unregisters on disable");
+
+        for (const [plugin, examples] of [
+            ["Color Contrast", [
+                ["colorcontrast", { foreground: "#fff", background: "#000" }, /^Contrast ≈ 21\.00:1.*normal text passes/s],
+                ["colorcontrast", { foreground: "#777", background: "#fff" }, /normal text fails.*large text passes/s],
+            ]],
+            ["Date Offset", [
+                ["dateoffset", { date: "2024-03-01", days: -1 }, /^\x602024-02-29\x60$/],
+                ["dateoffset", { date: "2026-02-29", days: 1 }, /^Enter a calendar date/],
+            ]],
+            ["Unix Date Converter", [
+                ["unixtoiso", { timestamp: "-1", unit: "milliseconds" }, /1969-12-31T23:59:59\.999Z/],
+                ["isotounix", { text: "1970-01-01T01:00:00.125+01:00" }, /Seconds \x600\.125\x60\nMilliseconds \x60125\x60/],
+                ["isotounix", { text: "1970-01-01T01:00:00" }, /^Enter an ISO date/],
+            ]],
+            ["Number Base Converter", [
+                ["convertbase", { number: "-9007199254740993", from: 10, to: 16 }, /^\x60-20000000000001\x60$/],
+                ["convertbase", { number: "2", from: 2, to: 10 }, /^Enter up to 256 digits/],
+            ]],
+            ["Aspect Ratio", [["aspectratio", { width: 1920, height: 1080 }, /^\x6016:9\x60/]]],
+            ["UTF-8 Byte Count", [["utf8size", { text: "Aé猫🔔" }, /^10 UTF-8 bytes$/]]],
+            ["URL Inspector", [
+                ["inspecturl", { text: "https://example.com:8443/private?key=private#private" }, /^Scheme \x60https\x60\nHost \x60example\.com:8443\x60\nQuery parameters 1\nFragment present$/],
+                ["inspecturl", { text: "https://guest:private@example.com/" }, /without embedded credentials/],
+            ]],
+            ["TSV to Markdown", [["tsvtomarkdown", { text: "Name\tValue\nA|B\t3" }, /\| Name \| Value \|\n\| --- \| --- \|\n\| A\\\|B \| 3 \|/]]],
+        ]) {
+            selectCatalog(plugin);
+            click(render(), "Allow for this session");
+            for (const [name, args, expected] of examples) {
+                assert.equal(registered[name].execute(Object.entries(args).map(([name, value]) => ({ name, value })), diagnosticContext), undefined);
+                assert.match(delivered.pop()?.[1] ?? "", expected, plugin + " replies privately on " + platform);
+            }
+            click(render(), "Disable " + plugin);
+        }
 
         const incomingCases = [
             ["StickerBlocker", null, () => ({

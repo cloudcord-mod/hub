@@ -36,6 +36,28 @@ function randomInteger(low: number, high: number) {
     if (Number.isSafeInteger(range) && range > 0) return low + Math.floor(Math.random() * range);
 }
 
+function hexChannels(input: string) {
+    let hex = input.trim().replace(/^#/, "");
+    if (/^[\da-f]{3}$/i.test(hex)) hex = [...hex].map(digit => digit.repeat(2)).join("");
+    if (/^[\da-f]{6}$/i.test(hex)) return hex.match(/../g)!.map(value => Number.parseInt(value, 16));
+}
+
+function utcMidnight(input: string) {
+    const date = input.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    const instant = new Date(date + "T00:00:00Z");
+    if (Number.isFinite(instant.getTime()) && instant.toISOString().startsWith(date + "T")) return instant.getTime();
+}
+
+function integerText(input: string) {
+    const text = input.trim();
+    if (!/^[+-]?\d+$/.test(text)) return;
+    const value = Number(text);
+    return Number.isSafeInteger(value) ? value : undefined;
+}
+
+const dayMilliseconds = 86_400_000;
+
 export const cxCommandFunctions = {
     snowflakeTimestamp(input: string) {
         const text = input.trim();
@@ -141,11 +163,21 @@ export const cxCommandFunctions = {
             (word.length > 80 ? word.slice(0, 80) + "…" : word) + " — " + count).join("\n") || "No words found.";
     },
     hexToRgb(input: string) {
-        let hex = input.trim().replace(/^#/, "");
-        if (/^[\da-f]{3}$/i.test(hex)) hex = [...hex].map(digit => digit.repeat(2)).join("");
-        if (!/^[\da-f]{6}$/i.test(hex)) return;
-        const channels = hex.match(/../g)!.map(value => Number.parseInt(value, 16));
-        return `\`rgb(${channels.join(", ")})\``;
+        const channels = hexChannels(input);
+        if (channels) return `\`rgb(${channels.join(", ")})\``;
+    },
+    colorContrast(foreground: string, background: string) {
+        const colors = [hexChannels(foreground), hexChannels(background)];
+        const luminances = colors.map(channels => channels?.map(channel => {
+            const rgb = channel / 255;
+            return rgb <= 0.04045 ? rgb / 12.92 : ((rgb + 0.055) / 1.055) ** 2.4;
+        }));
+        const [text, surface] = luminances;
+        if (!text || !surface) return;
+        const relativeLuminance = ([red, green, blue]: number[]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+        const a = relativeLuminance(text), b = relativeLuminance(surface);
+        const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+        return `Contrast ≈ ${ratio.toFixed(2)}:1\nWCAG AA normal text ${ratio >= 4.5 ? "passes" : "fails"}\nWCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
     },
     rgbToHex(input: string) {
         const text = input.trim();
@@ -157,12 +189,79 @@ export const cxCommandFunctions = {
         return "`#" + values.map(value => value.toString(16).padStart(2, "0")).join("") + "`";
     },
     daysBetween(start: string, end: string) {
-        const dates = [start, end].map(value => value.trim());
-        if (!dates.every(date => /^\d{4}-\d{2}-\d{2}$/.test(date))) return;
-        const midnights = dates.map(date => new Date(date + "T00:00:00Z"));
-        if (!midnights.every((date, index) => Number.isFinite(date.getTime()) && date.toISOString().startsWith(dates[index] + "T"))) return;
-        const days = (midnights[1].getTime() - midnights[0].getTime()) / 86_400_000;
+        const first = utcMidnight(start), last = utcMidnight(end);
+        if (first === undefined || last === undefined) return;
+        const days = (last - first) / dayMilliseconds;
         return `${days} ${Math.abs(days) === 1 ? "day" : "days"}`;
+    },
+    offsetDate(input: string, dayOffset: string) {
+        const start = utcMidnight(input), days = integerText(dayOffset);
+        if (start === undefined || days === undefined) return;
+        const date = new Date(start + days * dayMilliseconds);
+        if (Number.isFinite(date.getTime()) && date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999)
+            return `\`${date.toISOString().slice(0, 10)}\``;
+    },
+    unixToIso(input: string, unit: string) {
+        const value = integerText(input);
+        if (value === undefined || (unit !== "seconds" && unit !== "milliseconds")) return;
+        const instant = new Date(unit === "seconds" ? value * 1000 : value);
+        if (Number.isFinite(instant.getTime())) return `\`${instant.toISOString()}\``;
+    },
+    isoToUnix(input: string) {
+        const parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
+        if (!parsed) return;
+        const [, date, hours, mins, secs, fraction = "", direction, offsetHours = "0", offsetMinutes = "0"] = parsed;
+        const midnight = utcMidnight(date);
+        if (midnight === undefined || Number(hours) > 23 || Number(mins) > 59 || Number(secs) > 59 || Number(offsetHours) > 23 || Number(offsetMinutes) > 59) return;
+        const offset = (Number(offsetHours) * 60 + Number(offsetMinutes)) * (direction === "-" ? -1 : 1);
+        const ms = midnight + ((Number(hours) * 60 + Number(mins) - offset) * 60 + Number(secs)) * 1000 + Number(fraction.padEnd(3, "0"));
+        return `Seconds \`${ms / 1000}\`\nMilliseconds \`${ms}\``;
+    },
+    convertNumberBase(input: string, from: string, to: string) {
+        const match = /^([+-]?)([0-9a-z]{1,256})$/i.exec(input.trim());
+        const source = integerText(from), destination = integerText(to);
+        if (!match || source === undefined || destination === undefined || source < 2 || source > 36 || destination < 2 || destination > 36) return;
+        const base = BigInt(source);
+        let value = 0n;
+        for (const character of match[2]) {
+            const digit = Number.parseInt(character, 36);
+            if (digit >= source) return;
+            value = value * base + BigInt(digit);
+        }
+        return `\`${(match[1] === "-" ? -value : value).toString(destination).toUpperCase()}\``;
+    },
+    aspectRatio(width: string, height: string) {
+        const w = integerText(width), h = integerText(height);
+        if (w === undefined || h === undefined || w < 1 || h < 1) return;
+        let a = w, b = h;
+        while (b) [a, b] = [b, a % b];
+        return `\`${w / a}:${h / a}\` · ${w} × ${h} px`;
+    },
+    utf8Size(text: string) {
+        let bytes = 0;
+        for (const character of text) {
+            const code = character.codePointAt(0)!;
+            bytes += code <= 0x7f ? 1 : code <= 0x7ff ? 2 : code <= 0xffff ? 3 : 4;
+        }
+        return `${bytes} UTF-8 ${bytes === 1 ? "byte" : "bytes"}`;
+    },
+    inspectUrl(input: string) {
+        const text = input.trim();
+        if (!/^https?:\/\//i.test(text) || text.length > 3000 || /[\s\\]/.test(text)) return;
+        try {
+            const url = new URL(text);
+            if (url.username || url.password) return;
+            const count = url.search.slice(1).split("&").filter(Boolean).length;
+            return `Scheme \`${url.protocol.slice(0, -1)}\`\nHost \`${url.host.replaceAll("`", "%60")}\`\nQuery parameters ${count}\nFragment ${url.hash ? "present" : "absent"}`;
+        } catch { /* Invalid URL. */ }
+    },
+    tsvToMarkdown(input: string) {
+        const rows = input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(row => row.split("\t"));
+        const columns = rows[0].length;
+        if (columns < 2 || columns > 16 || rows.length > 64 || rows.some(row => row.length !== columns)) return;
+        const row = (cells: string[]) => "| " + cells.map(cell => cell.replace(/[\\|]/g, "\\$&").replace(/`(?=``)/g, "`\u200b").trim()).join(" | ") + " |";
+        const output = [row(rows[0]), row(Array.from({ length: columns }, () => "---")), ...rows.slice(1).map(row)].join("\n");
+        return output.length <= 3900 ? codeFence + "markdown\n" + output + "\n" + codeFence : "The table is too long for one reply.";
     },
     discordTimestamp(seconds: string, format: string) {
         const input = seconds.trim();

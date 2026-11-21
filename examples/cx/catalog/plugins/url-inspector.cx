@@ -1,0 +1,5 @@
+plugin "URL Inspector":
+  needs commands.register
+  needs reply.local
+  on command "inspecturl" with text:
+    reply "${inspectUrl(text)}" else "Enter an HTTP or HTTPS URL without embedded credentials."

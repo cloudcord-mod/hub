@@ -1,0 +1,5 @@
+plugin "UTF-8 Byte Count":
+  needs commands.register
+  needs reply.local
+  on command "utf8size" with text:
+    reply "${utf8Size(text)}"

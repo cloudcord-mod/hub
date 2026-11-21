@@ -1,0 +1,7 @@
+plugin "Date Offset":
+  needs commands.register
+  needs reply.local
+  on command "dateoffset":
+    input "date" text
+    input "days" integer
+    reply "${offsetDate(date, days)}" else "Enter a calendar date as YYYY-MM-DD and a whole number of days to add or subtract."

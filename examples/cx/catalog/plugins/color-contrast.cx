@@ -1,0 +1,7 @@
+plugin "Color Contrast":
+  needs commands.register
+  needs reply.local
+  on command "colorcontrast":
+    input "foreground" text
+    input "background" text
+    reply "${colorContrast(foreground, background)}" else "Enter foreground and background hex colors, like #fff and #222222."

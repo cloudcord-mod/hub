@@ -1,0 +1,7 @@
+plugin "Aspect Ratio":
+  needs commands.register
+  needs reply.local
+  on command "aspectratio":
+    input "width" integer
+    input "height" integer
+    reply "${aspectRatio(width, height)}" else "Enter positive whole-number dimensions."

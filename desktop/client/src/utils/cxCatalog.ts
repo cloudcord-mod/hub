@@ -4,6 +4,7 @@ import plugin_catalog_all_call_time_counter from "../../../../examples/cx/catalo
 import plugin_catalog_always_animate from "../../../../examples/cx/catalog/plugins/always-animate.cx";
 import plugin_catalog_amoled_mode from "../../../../examples/cx/catalog/plugins/amoled-mode.cx";
 import plugin_catalog_anonymise_file_names from "../../../../examples/cx/catalog/plugins/anonymise-file-names.cx";
+import plugin_catalog_aspect_ratio from "../../../../examples/cx/catalog/plugins/aspect-ratio.cx";
 import plugin_catalog_at_someone from "../../../../examples/cx/catalog/plugins/at-someone.cx";
 import plugin_catalog_auto_vaporwave from "../../../../examples/cx/catalog/plugins/auto-vaporwave.cx";
 import plugin_catalog_avatar_grabber from "../../../../examples/cx/catalog/plugins/avatar-grabber.cx";
@@ -30,6 +31,7 @@ import plugin_catalog_clean_channel_name from "../../../../examples/cx/catalog/p
 import plugin_catalog_clear_urls from "../../../../examples/cx/catalog/plugins/clear-urls.cx";
 import plugin_catalog_client_side_block from "../../../../examples/cx/catalog/plugins/client-side-block.cx";
 import plugin_catalog_cloud_cord_accent from "../../../../examples/cx/catalog/plugins/cloud-cord-accent.cx";
+import plugin_catalog_color_contrast from "../../../../examples/cx/catalog/plugins/color-contrast.cx";
 import plugin_catalog_color_converter from "../../../../examples/cx/catalog/plugins/color-converter.cx";
 import plugin_catalog_color_text from "../../../../examples/cx/catalog/plugins/color-text.cx";
 import plugin_catalog_colorful_mentions from "../../../../examples/cx/catalog/plugins/colorful-mentions.cx";
@@ -53,6 +55,7 @@ import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
+import plugin_catalog_date_offset from "../../../../examples/cx/catalog/plugins/date-offset.cx";
 import plugin_catalog_days_between from "../../../../examples/cx/catalog/plugins/days-between.cx";
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
 import plugin_catalog_decode_base64 from "../../../../examples/cx/catalog/plugins/decode-base64.cx";
@@ -206,6 +209,7 @@ import plugin_catalog_no_typing_animation from "../../../../examples/cx/catalog/
 import plugin_catalog_no_unblock_to_jump from "../../../../examples/cx/catalog/plugins/no-unblock-to-jump.cx";
 import plugin_catalog_normalize_message_links from "../../../../examples/cx/catalog/plugins/normalize-message-links.cx";
 import plugin_catalog_notify_when_muted from "../../../../examples/cx/catalog/plugins/notify-when-muted.cx";
+import plugin_catalog_number_base_converter from "../../../../examples/cx/catalog/plugins/number-base-converter.cx";
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
@@ -264,14 +268,18 @@ import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plug
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
+import plugin_catalog_tsv_to_markdown from "../../../../examples/cx/catalog/plugins/tsv-to-markdown.cx";
 import plugin_catalog_unicode_inspector from "../../../../examples/cx/catalog/plugins/unicode-inspector.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
 import plugin_catalog_unique_lines from "../../../../examples/cx/catalog/plugins/unique-lines.cx";
 import plugin_catalog_unit_converter from "../../../../examples/cx/catalog/plugins/unit-converter.cx";
+import plugin_catalog_unix_date_converter from "../../../../examples/cx/catalog/plugins/unix-date-converter.cx";
 import plugin_catalog_unsuppress_embeds from "../../../../examples/cx/catalog/plugins/unsuppress-embeds.cx";
 import plugin_catalog_url_component_codec from "../../../../examples/cx/catalog/plugins/url-component-codec.cx";
+import plugin_catalog_url_inspector from "../../../../examples/cx/catalog/plugins/url-inspector.cx";
 import plugin_catalog_user_notes from "../../../../examples/cx/catalog/plugins/user-notes.cx";
 import plugin_catalog_user_tags from "../../../../examples/cx/catalog/plugins/user-tags.cx";
+import plugin_catalog_utf_8_byte_count from "../../../../examples/cx/catalog/plugins/utf-8-byte-count.cx";
 import plugin_catalog_vibe_check from "../../../../examples/cx/catalog/plugins/vibe-check.cx";
 import plugin_catalog_voice_count from "../../../../examples/cx/catalog/plugins/voice-count.cx";
 import plugin_catalog_voice_join_messages from "../../../../examples/cx/catalog/plugins/voice-join-messages.cx";
@@ -397,6 +405,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "AlwaysAnimate", source: plugin_catalog_always_animate, description: "Animate avatars, banners, and server icons", categories: ["Appearance"], appearanceRevision: "6ca0d83b5f1187005ec249c75c2bb955b5ab0bfacb66607ab148b6648dd40139" },
         { name: "AmoledMode", source: plugin_catalog_amoled_mode, description: "use black backgrounds in dark mode", categories: ["Appearance"], appearanceRevision: "bf99224c4afbbf358e4d46d6c6ab292bbde63d4d7188452e02dde9fbab2ba125" },
         { name: "AnonymiseFileNames", source: plugin_catalog_anonymise_file_names, description: "Use random upload names by default", commands: ["spoiler"], categories: ["Commands","Media"] },
+        { name: "Aspect Ratio", source: plugin_catalog_aspect_ratio, description: "/aspectratio", commands: ["aspectratio"], categories: ["Commands"] },
         { name: "AtSomeone", source: plugin_catalog_at_someone, description: "/someone", commands: ["someone"], categories: ["Chat","Commands","Servers & channels"] },
         { name: "AutoVaporwave", source: plugin_catalog_auto_vaporwave, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "AvatarGrabber", source: plugin_catalog_avatar_grabber, description: "/avatar", commands: ["avatar"], categories: ["Chat","Commands","Media","Profiles"] },
@@ -423,6 +432,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ClearURLs", source: plugin_catalog_clear_urls, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ClientSideBlock", source: plugin_catalog_client_side_block, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },
         { name: "CloudCordAccent", source: plugin_catalog_cloud_cord_accent, description: "apply the CloudCord accent", categories: ["Appearance"], appearanceRevision: "980c573677ccb78c99e84cb288cf401ae3ecd11dc5d5436b4cd0fc145c5e3780" },
+        { name: "Color Contrast", source: plugin_catalog_color_contrast, description: "/colorcontrast", commands: ["colorcontrast"], categories: ["Commands"] },
         { name: "Color Converter", source: plugin_catalog_color_converter, description: "/hextorgb · /rgbtohex", commands: ["hextorgb","rgbtohex"], categories: ["Commands"] },
         { name: "ColorText", source: plugin_catalog_color_text, description: "/color", commands: ["color"], categories: ["Chat","Commands"] },
         { name: "ColorfulMentions", source: plugin_catalog_colorful_mentions, description: "tint inline mentions purple", categories: ["Appearance"], appearanceRevision: "84ed334d7bbfa85c7c10f1ce59c128908e80a62f7442539ba51f0dfb0c24fa16" },
@@ -446,6 +456,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Count Lines", source: plugin_catalog_count_lines, description: "/countlines", commands: ["countlines"], categories: ["Commands"] },
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps, description: "Format cozy timestamps as [calendar]", keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL • [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL • [relative]", categories: ["Appearance"], appearanceRevision: "5f19c067a66226d3e35e1a88bbdffa11e01b993a315630ad0e5c9c18de0e803e" },
         { name: "Dashless", source: plugin_catalog_dashless, description: "Replace hyphens with spaces in text channel names", categories: ["Appearance"], appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9" },
+        { name: "Date Offset", source: plugin_catalog_date_offset, description: "/dateoffset", commands: ["dateoffset"], categories: ["Commands"] },
         { name: "Days Between", source: plugin_catalog_days_between, description: "/daysbetween", commands: ["daysbetween"], categories: ["Commands"] },
         { name: "Declutter", source: plugin_catalog_declutter, description: "Hide the listed interface elements on this device", keywords: "Hide avatar decorations Hide nameplates Hide profile effects Hide server tags Hide the Shop entry Hide the Nitro entry Hide the Quests entry Hide the server boost progress bar Hide the chat gift button", categories: ["Appearance","Profiles"], appearanceRevision: "581e52ce690890cda2febcff0b8afdc8a7b8e45496f33d3d3dad1e1952d71b8d" },
         { name: "DecodeBase64", source: plugin_catalog_decode_base64, description: "Decode Base64 in the selected message and copy the result on request", categories: ["Chat"] },
@@ -599,6 +610,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "NoUnblockToJump", source: plugin_catalog_no_unblock_to_jump, description: "Skip the blocked, ignored, or spam author prompt when jumping to a message", categories: ["Chat"] },
         { name: "NormalizeMessageLinks", source: plugin_catalog_normalize_message_links, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "NotifyWhenMuted", source: plugin_catalog_notify_when_muted, description: "Play a sound when you try to speak while muted", categories: ["Voice & calls"] },
+        { name: "Number Base Converter", source: plugin_catalog_number_base_converter, description: "/convertbase", commands: ["convertbase"], categories: ["Commands"] },
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"] },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },
@@ -657,14 +669,18 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar, description: "make the chat input background translucent", categories: ["Appearance"], appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e" },
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"] },
+        { name: "TSV to Markdown", source: plugin_catalog_tsv_to_markdown, description: "/tsvtomarkdown", commands: ["tsvtomarkdown"], categories: ["Commands"] },
         { name: "Unicode Inspector", source: plugin_catalog_unicode_inspector, description: "/unicodeinfo", commands: ["unicodeinfo"], categories: ["Commands"] },
         { name: "Unindent", source: plugin_catalog_unindent, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Unique Lines", source: plugin_catalog_unique_lines, description: "/uniquelines", commands: ["uniquelines"], categories: ["Commands"] },
         { name: "UnitConverter", source: plugin_catalog_unit_converter, description: "/convert", commands: ["convert"], categories: ["Chat","Commands"] },
+        { name: "Unix Date Converter", source: plugin_catalog_unix_date_converter, description: "/unixtoiso · /isotounix", commands: ["unixtoiso","isotounix"], categories: ["Commands"] },
         { name: "UnsuppressEmbeds", source: plugin_catalog_unsuppress_embeds, description: "Suppress or unsuppress embeds in the selected message", categories: ["Chat"] },
         { name: "URL Component Codec", source: plugin_catalog_url_component_codec, description: "/urlencode · /urldecode", commands: ["urlencode","urldecode"], categories: ["Commands"] },
+        { name: "URL Inspector", source: plugin_catalog_url_inspector, description: "/inspecturl", commands: ["inspecturl"], categories: ["Commands"] },
         { name: "UserNotes", source: plugin_catalog_user_notes, description: "Add a local user note editor to profile menus", categories: ["Profiles"] },
         { name: "UserTags", source: plugin_catalog_user_tags, description: "Tag users in profile menus and search those tags on this device", commands: ["find-user-tags"], categories: ["Commands","Profiles"] },
+        { name: "UTF-8 Byte Count", source: plugin_catalog_utf_8_byte_count, description: "/utf8size", commands: ["utf8size"], categories: ["Commands"] },
         { name: "VibeCheck", source: plugin_catalog_vibe_check, description: "/vibe", commands: ["vibe"], categories: ["Chat","Commands"] },
         { name: "VoiceCount", source: plugin_catalog_voice_count, description: "Show occupancy and capacity in the channel list", categories: ["Voice & calls"] },
         { name: "VoiceJoinMessages", source: plugin_catalog_voice_join_messages, description: "Show local notifications when friends join or move between voice channels", categories: ["Voice & calls"] },

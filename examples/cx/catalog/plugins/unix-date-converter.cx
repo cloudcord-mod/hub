@@ -1,0 +1,9 @@
+plugin "Unix Date Converter":
+  needs commands.register
+  needs reply.local
+  on command "unixtoiso":
+    input "timestamp" text
+    input "unit" choice "seconds,milliseconds"
+    reply "${unixToIso(timestamp, unit)}" else "Enter a whole Unix timestamp within the supported date range."
+  on command "isotounix" with text:
+    reply "${isoToUnix(text)}" else "Enter an ISO date and time with seconds and a timezone, like 2026-01-01T12:30:00Z."

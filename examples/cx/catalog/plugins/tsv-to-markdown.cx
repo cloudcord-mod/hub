@@ -1,0 +1,5 @@
+plugin "TSV to Markdown":
+  needs commands.register
+  needs reply.local
+  on command "tsvtomarkdown" with text:
+    reply "${tsvToMarkdown(text)}" else "Paste tab-separated rows with a header and the same number of columns on every line."
