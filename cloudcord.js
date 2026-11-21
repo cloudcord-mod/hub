@@ -47794,6 +47794,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         name
       })),
       source: (id) => active.get(id)?.source,
+      isPrivateCommand: (id) => active.get(id)?.privateCommand ?? false,
       appearanceOptions(id) {
         var entry = active.get(id);
         return entry?.options.map((option) => ({
@@ -60293,14 +60294,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           ...entry,
           id,
           active,
-          needsReview
+          needsReview,
+          privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands
         };
       });
       var imported = session.list().filter(({ id, name }) => id === "theme" === (kind === "theme") && !catalog.some((entry) => entry.name === name)).map(({ id, name }) => ({
         id,
         name,
         source: session.source(id),
-        active: true
+        active: true,
+        privateCommands: session.isPrivateCommand(id)
       }));
       return [
         ...catalog,
@@ -65751,7 +65754,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f1e702d0e17abc05483b20802311d2083a857e13";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "82cc5a84763b1c012958310ea0706d92b597c8a7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
