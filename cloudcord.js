@@ -48920,8 +48920,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       throw new Error("Invalid text or length");
     return decoded;
   }
-  function canRememberCxAppearance(document) {
-    return document.kind === "theme" || Boolean(document.permissions?.length && document.permissions.every((permission) => permission === "appearance.hide" || permission === "appearance.style"));
+  function isPrivateCxCommand(permissions) {
+    return permissions.length === 2 && permissions.includes("commands.register") && permissions.includes("reply.local");
+  }
+  function canRememberCxExtension(document) {
+    var permissions = document.permissions ?? [];
+    return document.kind === "theme" || isPrivateCxCommand(permissions) || permissions.length > 0 && permissions.every((permission) => permission === "appearance.hide" || permission === "appearance.style");
   }
   function searchCxCatalog(entries2, search, category = "All") {
     if (category !== "All")
@@ -54702,7 +54706,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "560afc850e2072a68df61ff2034ecd32d40021d082549d99b45f1b5c324930fe"
           },
           {
             name: "AtSomeone",
@@ -54959,7 +54964,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "1a913c28a383c0e2b3236d6c46cda9af3fac0471ef5482e66237bed84c6a1700"
           },
           {
             name: "Color Converter",
@@ -54971,7 +54977,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "717db9fa96c52602500f4a297fe5566d4a6005fd1ba67d4e00c2e58803b0ba88"
           },
           {
             name: "ColorText",
@@ -55039,7 +55046,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20"
           },
           {
             name: "CopyBios",
@@ -55201,7 +55209,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18"
           },
           {
             name: "CSV to Markdown",
@@ -55212,7 +55221,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1"
           },
           {
             name: "CustomTimestamps",
@@ -55242,7 +55252,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "6bec04ebdb1f4e619904a7a1694448e4e464bb5c168d4514f4a38b83653c4006"
           },
           {
             name: "Days Between",
@@ -55253,7 +55264,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "ffb6315e5f4628232c4b4f4daa247d12b7ad705e609b6b5182b55ea130a3e11a"
           },
           {
             name: "Declutter",
@@ -55292,7 +55304,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "b1e07b26d2e9aec1dd374fd4286111c1cc6cecfad5e417e8438bb3f7f7bce693"
           },
           {
             name: "Discord Link Details",
@@ -55303,7 +55316,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "de375129c1a6f0c0167c450336a626633bfdb14cf549ace5186eceb16a2a65ab"
           },
           {
             name: "Discord Timestamp",
@@ -55315,7 +55329,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "f8dd293b323bb4f78d2c219d370045e59f183dd39457c74b4cde7355a23467ab"
           },
           {
             name: "DontRoundMyTimestamps",
@@ -55351,7 +55366,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "62d8be3950f686cb41cb3570da9b245ecc1a1344e759dda3904deaae623de90b"
           },
           {
             name: "EmbeddedURLs",
@@ -56349,7 +56365,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5"
           },
           {
             name: "JSON Check",
@@ -56360,7 +56377,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f"
           },
           {
             name: "JSON Compact",
@@ -56371,7 +56389,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb"
           },
           {
             name: "JSON Format",
@@ -56382,7 +56401,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c"
           },
           {
             name: "JumpToTop",
@@ -56438,7 +56458,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "3544e3d0cff90a35a71d6453fb16294daeff812e5daef57c7132b74666db017f"
           },
           {
             name: "LinkConverter",
@@ -56467,7 +56488,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261"
           },
           {
             name: "Markdown Escape",
@@ -56478,7 +56500,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b"
           },
           {
             name: "Meeting Timestamp",
@@ -56489,7 +56512,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce"
           },
           {
             name: "MessageBurst",
@@ -56788,7 +56812,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "a3d8ed0516a0744ae8bfba7d9aaedc3d52b2d1801ce4f5cf8c28865d2597b10c"
           },
           {
             name: "Number Lines",
@@ -56799,7 +56824,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da"
           },
           {
             name: "OpenSteamLinksInApp",
@@ -56978,7 +57004,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "1a6cf1874ecf898df5517cccde97da90526624064f8515b8245c09926ff8f296"
           },
           {
             name: "RoundServerIcons",
@@ -57124,7 +57151,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "6b4c8e3d7cc9cf5d1282b1c1752691cb0e9349c2506eea48f871417b6fcd27e2"
           },
           {
             name: "SmallerAvatarsInChat",
@@ -57162,7 +57190,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "ab92c1aa44aece19e5566c1fbc0c5ffbdcbd9ca66034b2aff29f4c131dc4f50f"
           },
           {
             name: "SoftCorners",
@@ -57190,7 +57219,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "5272fd6ffc1ca86448fef84a183ff8fb30d3442bb16860e3537d0199f2251307"
           },
           {
             name: "SortReactions",
@@ -57354,7 +57384,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849"
           },
           {
             name: "TSV to Markdown",
@@ -57365,7 +57396,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a"
           },
           {
             name: "Unicode Inspector",
@@ -57376,7 +57408,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f"
           },
           {
             name: "Unindent",
@@ -57395,7 +57428,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "07d60765a5167987e470a46f82f49c116e8f1d54bb4c3b412ebe9f5444f80cf6"
           },
           {
             name: "UnitConverter",
@@ -57419,7 +57453,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "5a1b3879b131dee4257e757865253bd0129ac1bc72ab98bf5b301294336042f5"
           },
           {
             name: "UnlockedAvatarZoom",
@@ -57448,7 +57483,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "b084d7a797c96a28383f910da48cb676776f66a59c30d4b0f3143c55e33fb969"
           },
           {
             name: "URL Inspector",
@@ -57459,7 +57495,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "895e7daba701168255e6410d0ed80ba77b24e50bcdf65ef5b72711dba5d19ad7"
           },
           {
             name: "UserNotes",
@@ -57490,7 +57527,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "8780ff0a5aa64eab83768a7a9b7d2335dd22e2162c7c944c327ff06be5a9bdfc"
           },
           {
             name: "VibeCheck",
@@ -57620,7 +57658,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             categories: [
               "Commands"
-            ]
+            ],
+            appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065"
           },
           {
             name: "WriteUpperCase",
@@ -61991,14 +62030,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         continue;
       try {
         var review = reviewCx(entry.source);
-        if (!canRememberCxAppearance(review))
+        if (!canRememberCxExtension(review))
           continue;
         session.enable(entry.source, {
           ...createMobileCxHost(),
           toast() {
-          },
-          registerCommand() {
-            throw new Error("Saved appearance cannot register commands");
           }
         }, review.permissions, saved.selected);
       } catch (e) {
@@ -62335,7 +62371,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
               }).map((saved) => /* @__PURE__ */ jsx(TableRow, {
                 label: `Forget ${saved.name}`,
-                subLabel: settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered appearance needs review",
+                subLabel: settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered extension is inactive",
                 onPress: () => {
                   try {
                     forgetRememberedAppearance(saved.name);
@@ -64162,7 +64198,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "475e0d016d0f4a233bcae8bef6343bf1866cfd84";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ccdb9abc2fd8e3f170a80b855e05ecf010486f3e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
