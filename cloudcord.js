@@ -41872,6 +41872,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }, enabled);
   }
+  function formatCxWordCount(content) {
+    if (typeof content !== "string")
+      return;
+    var words = content.match(/\S+/g)?.length ?? 0;
+    if (words > 5)
+      return `${words} words, ${content.length} characters`;
+  }
   var cxNativeEffects, cxAvatarResolutions, extensionGroups, replacementExtensions, roundingUsers, overrideLayers;
   var init_cxNativeEffects = __esm({
     "src/lib/api/cxNativeEffects.ts"() {
@@ -42031,6 +42038,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "quick-mention": {
           permission: "messages.insertmention",
           label: "Insert the selected message author's mention into the current draft"
+        },
+        "copy-raw-text": {
+          permission: "messages.copytext",
+          label: "Add Copy Raw Text to message menus"
+        },
+        "message-word-count": {
+          permission: "messages.wordcount",
+          label: "Show word and character counts below messages longer than five words"
         },
         "quote-message": {
           permission: "messages.quote",
@@ -49063,6 +49078,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "messages.openeditor": "Open Discord\u2019s editor for your own message when you double-click or double-tap it",
         "messages.openreply": "Open a Discord reply draft when you double-click or double-tap another user\u2019s message",
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
+        "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
+        "messages.wordcount": "Count words and characters in displayed messages on this device",
         "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
         "drafts.long": "Keep the full text of your local drafts",
         "messages.pin": "Pin or unpin a message immediately when you choose a pin action.",
@@ -49534,6 +49551,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_copy_profile_colors = __esm({
     "../examples/cx/catalog/plugins/copy-profile-colors.cx"() {
       copy_profile_colors_default = 'plugin "CopyProfileColors":\n  needs profilemenu.copy\n  on profile menu copy profile-colors\n  on profile menu copy server-profile-colors\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-raw-text.cx
+  var copy_raw_text_default;
+  var init_copy_raw_text = __esm({
+    "../examples/cx/catalog/plugins/copy-raw-text.cx"() {
+      copy_raw_text_default = 'plugin "Copy Raw Text":\n  needs messages.copytext\n  use copy-raw-text\n';
     }
   });
 
@@ -51645,6 +51670,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // ../examples/cx/catalog/plugins/word-count.cx
+  var word_count_default;
+  var init_word_count = __esm({
+    "../examples/cx/catalog/plugins/word-count.cx"() {
+      word_count_default = 'plugin "WordCount":\n  needs messages.wordcount\n  use message-word-count\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/word-frequency.cx
   var word_frequency_default;
   var init_word_frequency = __esm({
@@ -52519,6 +52552,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_copy_file_contents();
       init_copy_media_link();
       init_copy_profile_colors();
+      init_copy_raw_text();
       init_copy_sticker_links();
       init_copy_user_mention();
       init_copy_user_urls();
@@ -52733,6 +52767,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_wider_channel_list();
       init_wider_chat();
       init_wiki_lookup();
+      init_word_count();
       init_word_frequency();
       init_write_upper_case();
       init_zero_width_sanitizer();
@@ -53016,6 +53051,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "CopyProfileColors",
             source: copy_profile_colors_default
+          },
+          {
+            name: "Copy Raw Text",
+            source: copy_raw_text_default
           },
           {
             name: "CopyStickerLinks",
@@ -53896,6 +53935,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "WikiLookup",
             source: wiki_lookup_default
+          },
+          {
+            name: "WordCount",
+            source: word_count_default
           },
           {
             name: "Word Frequency",
@@ -57528,6 +57571,50 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }
               case "quick-mention":
                 return registerQuickMention(enabled);
+              case "copy-raw-text":
+                return registerMessageMenuActions(enabled, ({ message }, close) => {
+                  var text = message?.content;
+                  if (typeof text !== "string" || !text.length)
+                    return [];
+                  return [
+                    {
+                      label: "Copy Raw Text",
+                      run() {
+                        try {
+                          clipboard.setString(text);
+                          showToast.showCopyToClipboard?.();
+                          close();
+                        } catch (e) {
+                          showToast("Couldn't copy message text.");
+                        }
+                      }
+                    }
+                  ];
+                }, false);
+              case "message-word-count": {
+                var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+                return overrideCxMethods(renderer, {
+                  default(args, invoke) {
+                    var row2 = invoke(args);
+                    if (!row2 || typeof row2 !== "object" || !("content" in row2) || !Array.isArray(row2.content) || !row2.content.length)
+                      return row2;
+                    var input = args[0];
+                    if (input?.isInlineReplyPreview)
+                      return row2;
+                    var label2 = formatCxWordCount(input?.message?.content);
+                    return label2 ? {
+                      ...row2,
+                      content: [
+                        ...row2.content,
+                        {
+                          type: "text",
+                          content: "\n" + label2
+                        }
+                      ]
+                    } : row2;
+                  }
+                }, enabled);
+              }
               case "quote-message":
                 if (!effectOptions || !("includeLink" in effectOptions))
                   throw new Error("Missing quote options");
@@ -57607,8 +57694,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               case "split-long-messages":
                 return registerSplitSender();
               case "flat-attachments": {
-                var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-                return overrideCxMethods(renderer, {
+                var renderer1 = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+                return overrideCxMethods(renderer1, {
                   default(args, invoke) {
                     var presentation = invoke(args);
                     if (!presentation || typeof presentation !== "object" || !("useAttachmentGridLayout" in presentation) || presentation.useAttachmentGridLayout !== true)
@@ -58146,6 +58233,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_jsxRuntime();
       init_sendMessage();
       init_patcher();
+      init_cx();
       init_cx();
       init_cx();
       init_cx();
@@ -59510,7 +59598,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fa78b9ca0889f7a4bb4b199424b1633c515f4e4e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "370e8b7c36065375951ffde770536f9051e3706b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
