@@ -42224,6 +42224,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           permission: "profile.localnotes",
           label: "Add a local user note editor to profile menus"
         },
+        "channel-notes": {
+          permission: "channels.notes",
+          label: "Add a local note editor to channel menus"
+        },
         "user-tags": {
           permission: "profile.localtags",
           label: "Tag users in profile menus and search those tags on this device"
@@ -47328,19 +47332,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var active = true;
     var current = (id) => active && enabled() && account() === id;
     return {
-      open(user, edit) {
+      open(subject, edit) {
         return _async_to_generator(function* () {
           var owner = account();
-          if (!isCxProfileUserId(owner) || !isCxProfileUserId(user) || !current(owner))
+          if (!isCxProfileUserId(owner) || !isCxProfileUserId(subject) || !current(owner))
             return;
-          var saved = (yield read(owner))?.[user];
+          var saved = (yield read(owner))?.[subject];
           if (!current(owner))
             return;
           edit(typeof saved === "string" ? saved.slice(0, CX_USER_NOTE_LIMIT) : "", (value) => _async_to_generator(function* () {
             if (!current(owner))
               return;
             if (value.length > CX_USER_NOTE_LIMIT)
-              throw new Error("User notes can have up to 2,000 characters.");
+              throw new Error("Notes can have up to 2,000 characters.");
             var text = kind === "tags" ? normalizeTags(value) : value;
             yield update(owner, (notes) => {
               if (!current(owner))
@@ -47349,11 +47353,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 ...notes
               };
               if (text.trim()) {
-                if (!Object.hasOwn(next, user) && Object.keys(next).length >= 500)
+                if (!Object.hasOwn(next, subject) && Object.keys(next).length >= 500)
                   throw new Error("Clear an entry before adding another.");
-                next[user] = text;
+                next[subject] = text;
               } else
-                delete next[user];
+                delete next[subject];
               return next;
             });
           })());
@@ -49456,6 +49460,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "messages.jumpblocked": "Jump to messages without changing your block or ignore list",
         "channels.jump": "Jump within the current channel when you choose the navigation control",
         "channels.clipboard": "Copy the selected channel or category name when you choose its menu action",
+        "channels.notes": "Read and edit your private channel notes stored on this device",
         "profilemenu.copy": "Add the listed copy actions to user menus, including profile colors when specified. Writes to the clipboard only when selected.",
         "profilemenu.media": "Open or download the selected user's Discord avatar or banner when you choose a profile menu action.",
         "appearance.hide": "Hide the listed interface elements on this device",
@@ -51069,6 +51074,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   var init_link_converter = __esm({
     "../examples/cx/catalog/plugins/link-converter.cx"() {
       link_converter_default = 'plugin "LinkConverter":\n  needs messages.transform\n  needs messages.redirectlinks\n  needs profile.redirectlinks\n  before send rewrite-link "https://reddit.com" with "https://rxddit.com"\n  before profile rewrite-link "https://reddit.com" with "https://rxddit.com"\n  before send rewrite-link "https://www.reddit.com" with "https://rxddit.com"\n  before profile rewrite-link "https://www.reddit.com" with "https://rxddit.com"\n  before send rewrite-link "https://old.reddit.com" with "https://rxddit.com"\n  before profile rewrite-link "https://old.reddit.com" with "https://rxddit.com"\n  before send rewrite-link "https://x.com" with "https://fxtwitter.com"\n  before profile rewrite-link "https://x.com" with "https://fxtwitter.com"\n  before send rewrite-link "https://www.x.com" with "https://fxtwitter.com"\n  before profile rewrite-link "https://www.x.com" with "https://fxtwitter.com"\n  before send rewrite-link "https://instagram.com" with "https://vxinstagram.com"\n  before profile rewrite-link "https://instagram.com" with "https://vxinstagram.com"\n  before send rewrite-link "https://www.instagram.com" with "https://vxinstagram.com"\n  before profile rewrite-link "https://www.instagram.com" with "https://vxinstagram.com"\n  before send rewrite-link "https://tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://www.tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://www.tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://vm.tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://vm.tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://vt.tiktok.com" with "https://tnktok.com"\n  before profile rewrite-link "https://vt.tiktok.com" with "https://tnktok.com"\n  before send rewrite-link "https://youtube.com" with "https://yout-ube.com"\n  before profile rewrite-link "https://youtube.com" with "https://yout-ube.com"\n  before send rewrite-link "https://www.youtube.com" with "https://yout-ube.com"\n  before profile rewrite-link "https://www.youtube.com" with "https://yout-ube.com"\n  before send rewrite-link "https://m.youtube.com" with "https://yout-ube.com"\n  before profile rewrite-link "https://m.youtube.com" with "https://yout-ube.com"\n  before send rewrite-link "https://bsky.app" with "https://fxbsky.app"\n  before profile rewrite-link "https://bsky.app" with "https://fxbsky.app"\n  before send rewrite-link "https://www.bsky.app" with "https://fxbsky.app"\n  before profile rewrite-link "https://www.bsky.app" with "https://fxbsky.app"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/local-channel-notes.cx
+  var local_channel_notes_default;
+  var init_local_channel_notes = __esm({
+    "../examples/cx/catalog/plugins/local-channel-notes.cx"() {
+      local_channel_notes_default = 'plugin "LocalChannelNotes":\n  needs channels.notes\n  use channel-notes\n';
     }
   });
 
@@ -53093,6 +53106,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_leet_text();
       init_lines_to_csv();
       init_link_converter();
+      init_local_channel_notes();
       init_markdown_escape();
       init_message_burst();
       init_message_notifier();
@@ -54044,6 +54058,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             name: "LinkConverter",
             source: link_converter_default
+          },
+          {
+            name: "LocalChannelNotes",
+            source: local_channel_notes_default
           },
           {
             name: "Markdown Escape",
@@ -56675,7 +56693,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }
   }
-  function registerCopyChannelName(enabled) {
+  function registerChannelSheetEntry(key, enabled, getItem) {
     var sheet = findByProps("ActionSheet")?.ActionSheet;
     var row = findByProps("ActionSheetRow")?.ActionSheetRow;
     if (!sheet || !row?.Group)
@@ -56684,8 +56702,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var stop = registerRenderedTree("ChannelLongPressActionSheetConnected", (tree, props) => {
       if (!props.channel)
         return tree;
-      var copy = getCxChannelNameCopy(props.channel, (id) => UserStore3?.getUser?.(id)?.username);
-      if (!copy)
+      var item = getItem(props.channel);
+      if (!item)
         return tree;
       var ActionSheetRow2 = row;
       return mapAppearanceElements(tree, (element) => element.type === sheet ? React2.cloneElement(element, {
@@ -56693,16 +56711,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ...React2.Children.toArray(element.props.children),
           /* @__PURE__ */ jsx(ActionSheetRow2.Group, {
             children: /* @__PURE__ */ jsx(ActionSheetRow2, {
-              label: copy.label,
+              label: item.label,
               onPress: () => {
                 if (!active || !enabled())
                   return;
                 props.onClose?.();
-                clipboard.setString(copy.name);
-                showToast.showCopyToClipboard?.();
+                item.action();
               }
             })
-          }, "cx-copy-channel-name")
+          }, key)
         ]
       }) : element);
     });
@@ -56710,6 +56727,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       active = false;
       stop();
     };
+  }
+  function registerCopyChannelName(enabled) {
+    return registerChannelSheetEntry("cx-copy-channel-name", enabled, (channel) => {
+      var copy = getCxChannelNameCopy(channel, (id) => UserStore3?.getUser?.(id)?.username);
+      if (!copy)
+        return;
+      return {
+        label: copy.label,
+        action: () => {
+          clipboard.setString(copy.name);
+          showToast.showCopyToClipboard?.();
+        }
+      };
+    });
   }
   function registerLongDrafts(enabled) {
     var store = findByStoreName("DraftStore");
@@ -57396,16 +57427,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     });
   }
-  function registerLocalUserText(kind) {
+  function registerLocalText(kind) {
     var tags = kind === "tags";
-    var label2 = tags ? "Local User Tags" : "Local User Note";
-    if (tags ? findLocalUserTags : clearLocalUserNotes)
+    var channel = kind === "channels";
+    var label2 = tags ? "Local User Tags" : channel ? "Local Channel Note" : "Local User Note";
+    if (tags ? findLocalUserTags : clearLocalNotes[kind])
       throw new Error(label2 + " is already enabled");
     var { AlertModal: AlertModal5, AlertActions: AlertActions3, AlertActionButton: AlertActionButton5 } = findByProps("AlertModal", "AlertActions") ?? {};
     if (!AlertModal5 || !AlertActions3 || !AlertActionButton5)
       throw new Error("Discord's note editor is unavailable");
     var getStorage = () => localUserNotesStorage ??= createStorageAsync("plugins/storage/cloudcord.cx-user-notes.json");
-    var key = (account) => tags ? "tags:" + account : account;
+    var key = (account) => (tags ? "tags:" : channel ? "channel:" : "") + account;
     var notes = createCxUserNotes(() => UserStore3.getCurrentUser()?.id, (account) => _async_to_generator(function* () {
       return (yield getStorage())[key(account)];
     })(), (account, mutate) => _async_to_generator(function* () {
@@ -57413,59 +57445,63 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       storage[key(account)] = mutate(storage[key(account)]);
     })(), () => !settings.safeMode?.enabled, kind);
     var failed = (error) => showToast(error instanceof Error ? error.message : "Couldn\u2019t update " + label2.toLowerCase() + ".");
-    var alertKey = tags ? "cloudcord-cx-user-tags" : "cloudcord-cx-user-note";
-    var stopMenu = registerProfileMenuEntry({
+    var alertKey = tags ? "cloudcord-cx-user-tags" : channel ? "cloudcord-cx-channel-note" : "cloudcord-cx-user-note";
+    var action = (id) => {
+      void notes.open(id, (initial, save) => {
+        var draft = initial;
+        openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
+          title: label2,
+          extraContent: /* @__PURE__ */ jsx(import_react_native43.TextInput, {
+            accessibilityLabel: tags ? "Private tags" : "Private note",
+            defaultValue: initial,
+            multiline: true,
+            maxLength: CX_USER_NOTE_LIMIT,
+            placeholder: tags ? "One tag per line" : void 0,
+            style: {
+              minHeight: 100,
+              padding: 10,
+              color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
+            },
+            onChangeText: (value) => {
+              draft = value;
+            }
+          }),
+          actions: /* @__PURE__ */ jsxs(AlertActions3, {
+            children: [
+              /* @__PURE__ */ jsx(AlertActionButton5, {
+                text: "Cancel",
+                variant: "secondary",
+                onPress: () => dismissAlert(alertKey)
+              }),
+              /* @__PURE__ */ jsx(AlertActionButton5, {
+                text: "Save",
+                variant: "primary",
+                onPress: () => {
+                  void save(draft).then(() => dismissAlert(alertKey), failed);
+                }
+              })
+            ]
+          })
+        }));
+      }).catch(failed);
+    };
+    var stopMenu = channel ? registerChannelSheetEntry(alertKey, () => !settings.safeMode?.enabled, ({ id }) => isCxProfileUserId(id) ? {
+      label: label2,
+      action: () => action(id)
+    } : void 0) : registerProfileMenuEntry({
       key: tags ? "user-tags" : "user-notes",
       getItems: (id) => [
         {
           label: label2,
-          action: () => {
-            void notes.open(id, (initial, save) => {
-              var draft = initial;
-              openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
-                title: label2,
-                extraContent: /* @__PURE__ */ jsx(import_react_native43.TextInput, {
-                  accessibilityLabel: tags ? "Private tags" : "Private note",
-                  defaultValue: initial,
-                  multiline: true,
-                  maxLength: CX_USER_NOTE_LIMIT,
-                  placeholder: tags ? "One tag per line" : void 0,
-                  style: {
-                    minHeight: 100,
-                    padding: 10,
-                    color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
-                  },
-                  onChangeText: (value) => {
-                    draft = value;
-                  }
-                }),
-                actions: /* @__PURE__ */ jsxs(AlertActions3, {
-                  children: [
-                    /* @__PURE__ */ jsx(AlertActionButton5, {
-                      text: "Cancel",
-                      variant: "secondary",
-                      onPress: () => dismissAlert(alertKey)
-                    }),
-                    /* @__PURE__ */ jsx(AlertActionButton5, {
-                      text: "Save",
-                      variant: "primary",
-                      onPress: () => {
-                        void save(draft).then(() => dismissAlert(alertKey), failed);
-                      }
-                    })
-                  ]
-                })
-              }));
-            }).catch(failed);
-          }
+          action: () => action(id)
         }
       ]
     });
     if (tags)
       findLocalUserTags = notes.search;
     else
-      clearLocalUserNotes = () => {
-        void notes.clear(() => new Promise((resolve) => import_react_native43.Alert.alert("Clear local user notes?", "This removes every local note for this account on this device.", [
+      clearLocalNotes[kind] = () => {
+        void notes.clear(() => new Promise((resolve) => import_react_native43.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
           {
             text: "Cancel",
             style: "cancel",
@@ -57486,7 +57522,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (tags)
         findLocalUserTags = void 0;
       else
-        clearLocalUserNotes = void 0;
+        delete clearLocalNotes[kind];
       stopMenu();
     };
   }
@@ -58100,9 +58136,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               case "profile-media":
                 return registerProfileMedia();
               case "user-notes":
-                return registerLocalUserText("notes");
+                return registerLocalText("notes");
               case "user-tags":
-                return registerLocalUserText("tags");
+                return registerLocalText("tags");
+              case "channel-notes":
+                return registerLocalText("channels");
               case "copy-channel-name":
                 return registerCopyChannelName(enabled);
               case "hide-suggested-channels": {
@@ -58892,9 +58930,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }
                 }, id)
               ]),
-              clearLocalUserNotes && /* @__PURE__ */ jsx(TableRow, {
+              clearLocalNotes.notes && /* @__PURE__ */ jsx(TableRow, {
                 label: "Clear local user notes",
-                onPress: clearLocalUserNotes
+                onPress: clearLocalNotes.notes
+              }),
+              clearLocalNotes.channels && /* @__PURE__ */ jsx(TableRow, {
+                label: "Clear local channel notes",
+                onPress: clearLocalNotes.channels
               })
             ]
           }),
@@ -58909,7 +58951,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalUserNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins;
+  var import_react_native43, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore3, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -59014,6 +59056,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       maxTextAttachmentBytes = 256 * 1024;
       settingsEntryVisibility = /* @__PURE__ */ new WeakMap();
       profileMenuActions = /* @__PURE__ */ new Set();
+      clearLocalNotes = {};
       mobileCatalogPlugins = cxCatalog.plugins.filter((entry) => !("desktopOnly" in entry && entry.desktopOnly));
     }
   });
@@ -60286,7 +60329,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "46db71fa509a4868c801f4369272ba656f0bd52c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1787cddd2296d4ecc669e375e94a03e5cd5c76fb";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
