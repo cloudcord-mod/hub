@@ -10,6 +10,7 @@ import { addServerListElement, removeServerListElement, ServerListRenderPosition
 import { TextButton } from "@components/Button";
 import ErrorBoundary from "@components/ErrorBoundary";
 import ReplyTimestamp, { type ReplyTimestampProps } from "@plugins/replyTimestamp/ReplyTimestamp";
+import { MessageLatencyTooltip } from "@plugins/messageLatency/MessageLatencyTooltip";
 import { CopyIcon, UpArrowIcon } from "@components/Icons";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxUploadAnonymiser } from "@utils/cx";
@@ -29,6 +30,7 @@ import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type C
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
 import { canRememberCxAppearance, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
+import type { CxMessageLatencyOptions } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
 import { cxCatalog } from "@utils/cxCatalog";
@@ -472,6 +474,8 @@ let reactionSortUsers = 0;
 let plainUrlPasteUsers = 0;
 let revealSpoilerUsers = 0;
 let replyTimestampUsers = 0;
+const messageLatencyGrants = new Set<CxMessageLatencyOptions>();
+let messageLatencyOptions: CxMessageLatencyOptions | undefined;
 let noMiddleClickPasteUsers = 0;
 
 // NoMiddleClickPaste by Darxoon (GPL-3.0-or-later).
@@ -1163,6 +1167,14 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "reply-timestamp":
                     replyTimestampUsers++;
                     return () => { replyTimestampUsers--; };
+                case "message-latency":
+                    if (!effectOptions || !("latency" in effectOptions)) throw new Error("Missing message latency threshold");
+                    messageLatencyGrants.add(effectOptions);
+                    messageLatencyOptions = effectOptions;
+                    return () => {
+                        messageLatencyGrants.delete(effectOptions);
+                        messageLatencyOptions = [...messageLatencyGrants].at(-1);
+                    };
                 case "no-middle-click-paste":
                     if (!IS_LINUX || IS_MOBILE) throw new Error("Middle-click paste control is available on Linux.");
                     if (noMiddleClickPasteUsers === 0) window.addEventListener("mouseup", preventMiddleClickPaste);
@@ -1529,7 +1541,7 @@ export function CxSettings() {
                 {label} <input type="range" aria-label={label} aria-valuetext={value + unit} value={value} min={min} max={max} onChange={event => {
                     const selected = event.currentTarget.valueAsNumber;
                     if (!Number.isInteger(selected) || selected < min || selected > max || selected === value) return;
-                    const directive = new RegExp("^  use " + effect + "(?: \\d+)?(?=\\r?$)", "m");
+                    const directive = new RegExp("^  use " + effect + "(?: \\d+)?(?= |\\r?$)", "m");
                     const next = candidate.source.replace(directive, "  use " + effect + " " + selected);
                     if (next === candidate.source) return;
                     setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
@@ -1608,6 +1620,13 @@ export default definePlugin({
         },
     },
     patches: [{
+        // MessageLatency by arHSM, GPL-3.0-or-later.
+        find: "showCommunicationDisabledStyles",
+        replacement: {
+            match: /(message:(\i),avatar:\i,username:\(0,\i.jsxs\)\(\i.Fragment,\{children:\[)(\i&&)/,
+            replace: "$1$self.renderMessageLatency($2),$3",
+        },
+    }, {
         // ReplyTimestamp by Kyuuhachi, GPL-3.0-or-later.
         find: "#{intl::REPLY_QUOTE_MESSAGE_NOT_LOADED}",
         replacement: {
@@ -1909,6 +1928,9 @@ export default definePlugin({
     usePlainUrlPaste() { return plainUrlPasteUsers > 0; },
     avatarCropZoom(original: number) { return Math.max(original, ...avatarCropZoomLimits.values()); },
     notificationVolumeFactor() { return Math.min(100, ...notificationVolumeLimits.values()) / 100; },
+    renderMessageLatency(message: Message) {
+        return messageLatencyOptions ? <MessageLatencyTooltip message={message} options={messageLatencyOptions} /> : null;
+    },
     renderReplyTimestamp(props?: ReplyTimestampProps) {
         if (!replyTimestampUsers || !props) return null;
         return <ReplyTimestamp key="cx-reply-timestamp" {...props} />;

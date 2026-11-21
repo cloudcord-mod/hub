@@ -2643,6 +2643,8 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                     throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
                 case "reply-timestamp":
                     throw new Error("Reply timestamps are available on desktop and browser.");
+                case "message-latency":
+                    throw new Error("The send-delay indicator is available on desktop and browser.");
                 case "animated-assets":
                     return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                 case "floor-relative-time":

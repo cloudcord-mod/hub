@@ -195,6 +195,7 @@ import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/p
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_meeting_timestamp from "../../../../examples/cx/catalog/plugins/meeting-timestamp.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
+import plugin_catalog_message_latency from "../../../../examples/cx/catalog/plugins/message-latency.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
 import plugin_catalog_monospace_chat from "../../../../examples/cx/catalog/plugins/monospace-chat.cx";
 import plugin_catalog_more_commands from "../../../../examples/cx/catalog/plugins/more-commands.cx";
@@ -613,6 +614,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"] },
         { name: "Meeting Timestamp", source: plugin_catalog_meeting_timestamp, description: "/meetingtimestamp", commands: ["meetingtimestamp"], categories: ["Commands"] },
         { name: "MessageBurst", source: plugin_catalog_message_burst, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
+        { name: "MessageLatency", source: plugin_catalog_message_latency, description: "Show an estimated send-delay indicator on messages", desktopOnly: true, categories: ["Chat"] },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },
         { name: "MonospaceChat", source: plugin_catalog_monospace_chat, description: "Shows chat text in a monospace font", desktopOnly: true, categories: ["Appearance"] },
         { name: "MoreCommands", source: plugin_catalog_more_commands, description: "/choose · /flipcoin · /rolldice", commands: ["choose","flipcoin","rolldice","randomnumber","wordcount","transform","ask","gettime","echo","lenny","mock","morse","dissatisfaction","smug","happy","crying","angry","anger","joy","blush","confused","sleeping","laughing","giving","peace","ending1","uwu","comfy","lovehappy","loveee","give","lovegive","music","stars","lovegiving"], categories: ["Chat","Commands"] },

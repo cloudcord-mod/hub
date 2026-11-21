@@ -907,6 +907,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             vm.runInNewContext(transformSync(source, { loader: "tsx", format: "cjs", jsx: "automatic" }).code,
                 { module: replyView, require: name => replyMocks[name] });
             mocks["@plugins/replyTimestamp/ReplyTimestamp"] = replyView.exports;
+            const latencyView = { exports: {} };
+            const latency = read("desktop/client/src/plugins/messageLatency/MessageLatencyTooltip.tsx");
+            vm.runInNewContext(transformSync(latency, { loader: "tsx", format: "cjs", jsx: "automatic" }).code, {
+                module: latencyView,
+                require: name => ({
+                    ...replyMocks,
+                    "@utils/guards": { isNonNullish: value => value != null },
+                    "@webpack/common": { Tooltip: "Tooltip", AuthenticationStore: { getId: () => me },
+                        SnowflakeUtils: { extractTimestamp: id => Number(BigInt(id) >> 22n) } },
+                })[name],
+            });
+            mocks["@plugins/messageLatency/MessageLatencyTooltip"] = latencyView.exports;
         }
         vm.runInNewContext(transformSync(read(adapter), { loader: "tsx", format: "cjs", jsx: "automatic" }).code, {
             module,
@@ -1124,6 +1136,31 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(renderReply({ state: 2 }), null);
             click(render(), "Disable ReplyTimestamp");
             assert.equal(runtime.renderReplyTimestamp({ referencedMessage: replied, baseMessage }), null);
+
+            const delayId = delay => String((1_700_000_000_000n + BigInt(delay)) << 22n);
+            const delayed = { author: { id: sender }, id: delayId(3200), nonce: delayId(0) };
+            assert.equal(runtime.renderMessageLatency(delayed), null);
+            selectCatalog("MessageLatency");
+            click(render(), "Allow for this session");
+            const renderDelay = message => {
+                const component = runtime.renderMessageLatency(message);
+                return component.type(component.props);
+            };
+            assert.match(renderDelay(delayed).props.text, /delay of 3 seconds/);
+            assert.equal(renderDelay({ ...delayed, id: delayId(400) }), null);
+            assert.equal(renderDelay({ ...delayed, nonce: "invalid" }), null);
+            assert.equal(renderDelay({ ...delayed, author: { id: sender, bot: true } }), null);
+            click(render(), "Disable MessageLatency");
+            assert.equal(runtime.renderMessageLatency(delayed), null);
+            const delayEditor = find(render(), item => item.props["aria-label"] === "CX source");
+            delayEditor.props.onChange({ currentTarget: { value: 'plugin "Latency Options":\n  needs messages.senddelay\n  use message-latency milliseconds ignore-self' } });
+            click(render(), "Review CX");
+            find(render(), item => item.props["aria-label"] === "Send-delay threshold").props.onChange({ currentTarget: { valueAsNumber: 1 } });
+            assert.match(find(render(), item => item.props["aria-label"] === "CX source").props.value, /message-latency 1 milliseconds ignore-self/);
+            click(render(), "Allow for this session");
+            assert.match(renderDelay(delayed).props.text, /3 seconds and 200 milliseconds/);
+            assert.equal(renderDelay({ ...delayed, author: { id: me } }), null);
+            click(render(), "Disable Latency Options");
         } else {
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));

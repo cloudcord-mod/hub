@@ -1,0 +1,3 @@
+plugin "MessageLatency":
+  needs messages.senddelay
+  use message-latency

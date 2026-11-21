@@ -80,6 +80,7 @@ const permissionLabels = {
     "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
     "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
     "messages.replytimestamp": "Read the timestamp of a loaded message to show it in a reply preview",
+    "messages.senddelay": "Compare timestamp metadata supplied with a visible message to estimate its send delay",
     "messages.wordcount": "Count words and characters in displayed messages on this device",
     "messages.quote": "Insert a quote into your draft or copy it to the clipboard when you select the corresponding action",
     "drafts.long": "Keep the full text of your local drafts",
@@ -213,8 +214,9 @@ export type CxTheme = {
 type CxQuoteOptions = { includeLink: boolean; };
 type CxAvatarCropOptions = { maxAvatarCropZoom: number; };
 type CxNotificationVolumeOptions = { notificationVolume: number; };
-type CxNumberOption = { effect: "avatar-crop-zoom" | "notification-volume"; label: string; value: number; min: number; max: number; unit: string; };
-type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxNotificationVolumeOptions;
+export type CxMessageLatencyOptions = { latency: number; detectDiscordKotlin: boolean; showMillis: boolean; ignoreSelf: boolean; };
+type CxNumberOption = { effect: "avatar-crop-zoom" | "notification-volume" | "message-latency"; label: string; value: number; min: number; max: number; unit: string; };
+type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
 
 type CxPlugin = {
     kind: "plugin";
@@ -232,6 +234,7 @@ type CxPlugin = {
     avatarResolution?: CxAvatarResolution;
     avatarCropOptions?: CxAvatarCropOptions;
     notificationVolumeOptions?: CxNotificationVolumeOptions;
+    messageLatencyOptions?: CxMessageLatencyOptions;
     voiceMemberOptions?: CxVoiceMemberOptions;
     voiceQueueOptions?: CxVoiceQueueOptions;
     cameraToneOptions?: CxCameraToneOptions;
@@ -374,6 +377,7 @@ export function parseCx(source: string): CxDocument {
     let avatarResolution: CxAvatarResolution | undefined;
     let avatarCropOptions: CxAvatarCropOptions | undefined;
     let notificationVolumeOptions: CxNotificationVolumeOptions | undefined;
+    let messageLatencyOptions: CxMessageLatencyOptions | undefined;
     let voiceMemberOptions: CxVoiceMemberOptions | undefined;
     let voiceQueueOptions: CxVoiceQueueOptions | undefined;
     let mutedVoiceOptions: CxMutedVoiceOptions | undefined;
@@ -483,6 +487,13 @@ export function parseCx(source: string): CxDocument {
                 const volume = effect[2] ?? "100";
                 if (!/^(?:100|[1-9]?\d)$/.test(volume)) throw new Error("Choose a notification volume from 0 to 100");
                 notificationVolumeOptions = { notificationVolume: Number(volume) };
+            } else if (name === "message-latency") {
+                const flags = effect[2]?.split(" ") ?? [];
+                const threshold = /^\d+$/.test(flags[0] ?? "") ? Number(flags.shift()) : 2;
+                if (threshold > 600 || flags.some(flag => !["milliseconds", "ignore-self", "no-legacy-android"].includes(flag))
+                    || new Set(flags).size !== flags.length) throw new Error("Use a latency threshold of 0 to 600 seconds and optional latency flags");
+                messageLatencyOptions = { latency: threshold, showMillis: flags.includes("milliseconds"),
+                    ignoreSelf: flags.includes("ignore-self"), detectDiscordKotlin: !flags.includes("no-legacy-android") };
             } else if (name === "all-call-time-counter") {
                 const flags = effect[2]?.split(" ") ?? [];
                 if (flags.some(flag => !["human", "minutes-only", "exclude-self"].includes(flag)) || new Set(flags).size !== flags.length)
@@ -761,7 +772,7 @@ export function parseCx(source: string): CxDocument {
         throw new Error("Remove unused CX permissions");
     return {
         kind: "plugin", name, commands, permissions: [...permissions], messageTransforms: transforms, sendConfirmation, suppressReplyPing,
-        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, notificationVolumeOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
+        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, notificationVolumeOptions, messageLatencyOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
     };
 }
 
@@ -774,6 +785,9 @@ export function reviewCx(source: string) {
     });
     if (document.notificationVolumeOptions) numberOptions.push({
         effect: "notification-volume", label: "Notification volume", value: document.notificationVolumeOptions.notificationVolume, min: 0, max: 100, unit: "%",
+    });
+    if (document.messageLatencyOptions) numberOptions.push({
+        effect: "message-latency", label: "Send-delay threshold", value: document.messageLatencyOptions.latency, min: 0, max: 600, unit: "s",
     });
     return {
         kind: document.kind,
@@ -960,6 +974,7 @@ function bindCx(source: string, host: CxHost, approved: readonly CxPermission[],
         const nativeOptions: Partial<Record<CxNativeEffect, CxNativeOptions>> = {
             "avatar-crop-zoom": document.avatarCropOptions,
             "notification-volume": document.notificationVolumeOptions,
+            "message-latency": document.messageLatencyOptions,
             "all-call-time-counter": document.voiceMemberOptions,
             "wait-for-slot": document.voiceQueueOptions,
             "webcam-start-notifier": document.cameraToneOptions,

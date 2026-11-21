@@ -1189,6 +1189,14 @@ const sharedSourceRecipes = [
     {
         capability: "native-effect",
         sources: {
+            "desktop/client/src/plugins/messageLatency/index.tsx": "455a13239e4b58fb03db933f03690ec8b8aef29311973eaa74e10b66cd20bb26",
+        },
+        companions: { "MessageLatencyTooltip.tsx": "f49a45b2c2510d73d39e7b27e5e70bded7f3c5975560802539dc112df096063f" },
+        lines: ["  needs messages.senddelay", "  use message-latency"],
+    },
+    {
+        capability: "native-effect",
+        sources: {
             "desktop/client/src/plugins/replyTimestamp/index.tsx": "065a088485a2fe9734b87688e94e3e6d2386fd75ceae098e00ae91b9d90af933",
         },
         companions: {

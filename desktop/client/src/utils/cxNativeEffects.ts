@@ -50,6 +50,7 @@ export const cxNativeEffects = {
     "copy-message-reference": { permission: "messages.copyreference", label: "Copy the selected message’s Markdown link, timestamp, or author mention" },
     "reveal-spoilers-shortcut": { permission: "messages.revealspoilers", label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true },
     "reply-timestamp": { permission: "messages.replytimestamp", label: "Show the original message's timestamp on loaded reply previews", desktopOnly: true },
+    "message-latency": { permission: "messages.senddelay", label: "Show an estimated send-delay indicator on messages", desktopOnly: true },
     "message-word-count": { permission: "messages.wordcount", label: "Show word and character counts below messages longer than five words" },
     "quote-message": { permission: "messages.quote", label: "Add Quote and Copy as Quote actions to message menus" },
     "keep-long-drafts": { permission: "drafts.long", label: "Preserve long drafts in Discord’s local draft store" },
