@@ -42224,7 +42224,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function nonBlankText(value) {
     return typeof value === "string" && value.trim() ? value : void 0;
   }
-  function getCxProfileMenuCopy(action, id, profiles, guildId, users) {
+  function getCxProfileMenuCopy(action, id, profiles, guildId, users, members) {
     var entry = cxProfileMenuActions[action];
     if (entry.scope === "none")
       return entry.format(id);
@@ -42235,9 +42235,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         var user = users?.getUser?.(id);
         return nonBlankText(action === "username" ? user?.username : user?.globalName);
       }
+      if (action === "server-nickname" && guildId) {
+        return nonBlankText(members?.getMember?.(guildId, id)?.nick);
+      }
       var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
       if (action === "profile-bio" || action === "server-profile-bio")
         return nonBlankText(profile?.bio);
+      if (action === "profile-pronouns")
+        return nonBlankText(profile?.pronouns);
       var colors = profile?.themeColors;
       if (!Array.isArray(colors) || colors.length < 2)
         return;
@@ -42279,6 +42284,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "server-profile-bio": {
           label: "Copy Server Bio",
+          scope: "server"
+        },
+        "profile-pronouns": {
+          label: "Copy Pronouns",
+          scope: "user",
+          unavailable: "No profile pronouns found."
+        },
+        "server-nickname": {
+          label: "Copy Server Nickname",
           scope: "server"
         },
         "profile-colors": {
@@ -50502,6 +50516,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-pronouns.cx
+  var copy_pronouns_default;
+  var init_copy_pronouns = __esm({
+    "../examples/cx/catalog/plugins/copy-pronouns.cx"() {
+      copy_pronouns_default = 'plugin "CopyPronouns":\n  needs profilemenu.copy\n  on profile menu copy profile-pronouns\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-raw-text.cx
   var copy_raw_text_default;
   var init_copy_raw_text = __esm({
@@ -50515,6 +50537,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_server_bio = __esm({
     "../examples/cx/catalog/plugins/copy-server-bio.cx"() {
       copy_server_bio_default = 'plugin "CopyServerBio":\n  needs profilemenu.copy\n  on profile menu copy server-profile-bio\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-server-nickname.cx
+  var copy_server_nickname_default;
+  var init_copy_server_nickname = __esm({
+    "../examples/cx/catalog/plugins/copy-server-nickname.cx"() {
+      copy_server_nickname_default = 'plugin "CopyServerNickname":\n  needs profilemenu.copy\n  on profile menu copy server-nickname\n';
     }
   });
 
@@ -53721,8 +53751,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_message_reference();
       init_copy_profile_colors();
       init_copy_profile_names();
+      init_copy_pronouns();
       init_copy_raw_text();
       init_copy_server_bio();
+      init_copy_server_nickname();
       init_copy_sticker_links();
       init_copy_user_mention();
       init_copy_user_urls();
@@ -54526,6 +54558,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "CopyPronouns",
+            source: copy_pronouns_default,
+            description: "Copy Pronouns",
+            categories: [
+              "Profiles"
+            ]
+          },
+          {
             name: "Copy Raw Text",
             source: copy_raw_text_default,
             description: "Add Copy Raw Text to message menus",
@@ -54537,6 +54577,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "CopyServerBio",
             source: copy_server_bio_default,
             description: "Copy Server Bio",
+            categories: [
+              "Profiles"
+            ]
+          },
+          {
+            name: "CopyServerNickname",
+            source: copy_server_nickname_default,
+            description: "Copy Server Nickname",
             categories: [
               "Profiles"
             ]
@@ -60124,7 +60172,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return registerProfileMenuEntry({
       key: action,
       getItems(id, guildId) {
-        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore3);
+        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore3, GuildMemberStore);
         if ((scope === "server" || scope === "identity") && !getCopy())
           return [];
         return [
@@ -63299,7 +63347,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2be2a2c3b4a33ccbbbdb2f09944851f2855cabab";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5ad2be22e6d8c58500d24c7a6212fa39586493b6";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
