@@ -19,7 +19,7 @@ import { Current, installPresenceHooks, installTagIconSwap, loadCatalog, Namepla
 import { popNotice, showNotice } from "@api/Notices";
 import { installNativeSocialHooks } from "@utils/nativeSocialHooks";
 import { installConnectionSettings } from "@utils/connectionSettings";
-import { appearanceOptions, availableServerTags, Catalog, customDiscordMediaURL, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance } from "@utils/profileAppearance";
+import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
 
@@ -1172,37 +1172,25 @@ function getCustomSocialData(userId: string): ProfileAppearance | null | undefin
     return viewedSharedProfile(userId);
 }
 
-function decorateSharedIdentity(source: any, data: CustomProfileData) {
-    if (!source || !data) return source;
-    const username = data.username || source.username;
-    const globalName = data.globalName || source.globalName || source.displayName;
-    const clone = Object.create(Object.getPrototypeOf(source) || Object.prototype);
-    // Native account flags/methods may be non-enumerable. Preserve them on the
-    // presentation clone instead of dropping them through object spread/assign.
-    for (const key of Reflect.ownKeys(source)) {
-        const descriptor = Object.getOwnPropertyDescriptor(source, key);
-        if (descriptor) Object.defineProperty(clone, key, { ...descriptor, configurable: true, ...("value" in descriptor ? { writable: true } : {}) });
-    }
+function decorateSharedIdentity(source: any, data: CustomProfileData, includeSubscription = false) {
+    if (!source || typeof source !== "object" || !data) return source;
+    const fields = profileAvatarPresentation(data.avatar);
+    const { username, globalName } = data;
     if (username) {
-        clone.username = username;
-        clone.userName = username;
-        clone.tag = `@${username}`;
-        clone.getTag = () => `${username}#0000`;
+        Object.assign(fields, { username, userName: username, tag: `@${username}`, getTag: () => `${username}#0000` });
     }
     if (globalName) {
-        clone.globalName = globalName;
-        clone.displayName = globalName;
-        clone.name = globalName;
-        clone.getGlobalName = () => globalName;
+        Object.assign(fields, { globalName, global_name: globalName, displayName: globalName, name: globalName, getGlobalName: () => globalName });
     }
-    return clone;
+    if (data.nameplate !== undefined) fields.collectibles = source.collectibles;
+    applyNativeProfileMetadata(fields, data, false, includeSubscription);
+    return Object.keys(fields).length ? copyProfilePresentation(source, fields) : source;
 }
 
 function decorateSharedProfile(profile: any, data: CustomProfileData) {
-    if (!profile || !data) return profile;
-    const merged: any = nativeSocialProfile(profile, data);
-    const username = data.username || profile.username || profile.user?.username;
-    const globalName = data.globalName || profile.globalName || profile.displayName || profile.user?.globalName;
+    if (!profile || typeof profile !== "object" || !data) return profile;
+    const merged: any = { ...nativeSocialProfile(profile, data), ...profileAvatarPresentation(data.avatar) };
+    const { username, globalName } = data;
     if (username) {
         merged.username = username;
         merged.userName = username;
@@ -1211,13 +1199,15 @@ function decorateSharedProfile(profile: any, data: CustomProfileData) {
     }
     if (globalName) {
         merged.globalName = globalName;
+        merged.global_name = globalName;
         merged.displayName = globalName;
         merged.name = globalName;
         merged.getGlobalName = () => globalName;
     }
     if (profile.user) merged.user = decorateSharedIdentity(profile.user, data);
-    if (profile.userProfile && profile.userProfile !== profile) merged.userProfile = decorateSharedIdentity(profile.userProfile, data);
-    if (profile.displayProfile && profile.displayProfile !== profile) merged.displayProfile = decorateSharedIdentity(profile.displayProfile, data);
+    if (profile.userProfile && profile.userProfile !== profile) merged.userProfile = decorateSharedIdentity(profile.userProfile, data, true);
+    if (profile.displayProfile && profile.displayProfile !== profile) merged.displayProfile = decorateSharedIdentity(profile.displayProfile, data, true);
+    if (data.nameplate !== undefined) merged.collectibles = profile.collectibles;
     if (data.bio) merged.bio = data.bio;
     if (data.pronouns) merged.pronouns = data.pronouns;
     if (data.banner) {
@@ -1231,8 +1221,8 @@ function decorateSharedProfile(profile: any, data: CustomProfileData) {
     if (data.accentColor != null) merged.accentColor = data.accentColor;
     if (data.accentColor != null) merged.themeColors = [data.accentColor, data.accentColor2 ?? data.accentColor];
     // Badges arrive in Discord's own profile data (rewriteFetchedProfile); leave them as they are.
-    applyNativeProfileMetadata(merged, data);
-    return Object.assign(Object.create(Object.getPrototypeOf(profile)), profile, merged);
+    applyNativeProfileMetadata(merged, data, false);
+    return copyProfilePresentation(profile, merged);
 }
 
 function resolveProfileUserId(subject: any, profile: any): string {
@@ -2156,9 +2146,11 @@ function disguiseUser(real: any, fields: Record<string, () => unknown>): any {
 
 /** Decoration, badge flags and profile metadata from a CloudCord profile onto a disguised user. */
 function dressUserClone(clone: any, profile: CustomProfileData) {
-    if (profile.decorationAsset) clone.avatarDecoration = clone.avatarDecorationData = nativeDecoration(profile);
-    if (shouldReplaceBadges(profile)) clone.publicFlags = profile.badgeFlags ?? 0;
-    applyNativeProfileMetadata(clone, profile, false, false);
+    const fields = profileAvatarPresentation(profile.avatar);
+    if (profile.nameplate !== undefined) fields.collectibles = clone.collectibles;
+    if (profile.decorationAsset) fields.avatarDecoration = fields.avatarDecorationData = nativeDecoration(profile);
+    applyNativeProfileMetadata(fields, profile, false, false);
+    setProfilePresentationFields(clone, fields);
 }
 
 /** Accounts in Discord's account switcher, or just the current one when the switcher is unavailable. */
@@ -2368,7 +2360,7 @@ export default definePlugin({
         const shared = viewedSharedProfile(user.id);
         if (!shared) {
             requestSharedProfile(user.id);
-            return user;
+            return original;
         }
         const real = user.__cp_isClone ? original : user;
         const cached = otherUserCache.get(real);
@@ -2419,10 +2411,10 @@ export default definePlugin({
                 if (!Number.isNaN(joined.getTime())) overrides.joinedAt = joined;
             }
             if (data.decorationAsset) overrides.avatarDecoration = overrides.avatarDecorationData = nativeDecoration(data);
+            if (data.nameplate !== undefined) overrides.collectibles = profile.collectibles;
             if (data.nitro && accentColor != null) overrides.themeColors = [accentColor, data.accentColor2 ?? accentColor];
             applyNativeProfileMetadata(overrides, data);
-            const result = Object.create(Object.getPrototypeOf(profile));
-            return Object.assign(result, profile, overrides);
+            return copyProfilePresentation(profile, overrides);
         } catch { return profile; }
     },
 

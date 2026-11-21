@@ -136,6 +136,29 @@ export function nativeProfilePreviewSurface(userId: string, profile?: DiscordPro
     };
 }
 
+export function setProfilePresentationFields(target: object, fields: Record<string, unknown>) {
+    for (const [key, value] of Object.entries(fields)) {
+        Object.defineProperty(target, key, { value, configurable: true, enumerable: true, writable: true });
+    }
+}
+
+export function copyProfilePresentation<T extends object>(source: T, fields: Record<string, unknown> = {}): T {
+    const descriptors = Object.getOwnPropertyDescriptors(source);
+    for (const key of Reflect.ownKeys(descriptors)) {
+        (descriptors as Record<PropertyKey, PropertyDescriptor>)[key].configurable = true;
+    }
+    const clone = Object.create(Object.getPrototypeOf(source), descriptors) as T;
+    setProfilePresentationFields(clone, fields);
+    return clone;
+}
+
+export function profileAvatarPresentation(avatar: unknown): Record<string, unknown> {
+    return typeof avatar === "string" && /^(https:\/\/|data:image\/(?:png|jpe?g|gif|webp);base64,)/i.test(avatar) ? {
+        avatarURL: avatar, avatarUrl: avatar, avatarSrc: avatar,
+        getAvatarURL: () => avatar, getAvatarSource: () => ({ uri: avatar }),
+    } : {};
+}
+
 /** Drafts stay editable locally, but invalid entries must not disappear silently on sharing. */
 export function customConnectionServiceName(service: string): string {
     const names: Record<string, string> = {steam:"Steam",youtube:"YouTube",roblox:"Roblox",github:"GitHub",twitch:"Twitch",spotify:"Spotify",x:"X",reddit:"Reddit",tiktok:"TikTok",instagram:"Instagram",domain:"Domain",other:"Other"};

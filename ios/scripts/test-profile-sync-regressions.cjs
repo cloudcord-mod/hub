@@ -1,5 +1,6 @@
 const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
 const esbuild = require(process.env.CLOUDCORD_ESBUILD || require.resolve('esbuild', { paths: [require('node:path').resolve('desktop/client')] }));
+const profileAppearance = require('./load-profile-appearance.cjs');
 const desktop = fs.readFileSync('desktop/client/src/sincordplugins/fakeProfile/index.tsx', 'utf8');
 const workflow = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
 const mobile = workflow.split("cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'")[1].split('\n          TSX')[0].replace(/^          /gm, '');
@@ -43,30 +44,43 @@ assert.equal(badges.length, 4, 'native badge lists are never mutated');
 
 // Exercise both native profile-decoration paths, not just the final badge renderer.
 const nativeRows = Object.freeze([Object.freeze({ id: 'partner' })]);
-const nativeProfile = Object.freeze({ badges: nativeRows, bio: 'real' });
-const profiles = testContext({ nativeSocialProfile: profile => ({ ...profile }),
+const nativeProfile = Object.create({
+    get bio() { return 'real'; },
+    nativeStatus() { return this.status; },
+});
+Object.defineProperties(nativeProfile, { badges: { value: nativeRows, enumerable: true }, status: { value: 'native' } });
+Object.freeze(nativeProfile);
+const profiles = testContext({ ...profileAppearance,
     applyNativeProfileMetadata() {}, isEnabled: true, storedData: {}, Object, Date });
 vm.runInContext(compile(block(desktop, 'function hasFakeBadges(', 'const NITRO_LEVEL_MONTHS')
     + block(desktop, 'function decorateSharedProfile(', 'function resolveProfileUserId(')
     + 'const plugin = {' + block(desktop, '    hookUserProfile(', 'fakeObfuscatedEmail(') + '}; this.ownProfile = plugin.hookUserProfile;'), profiles);
 for (const replaceRealBadges of [false, true]) {
-    profiles.storedData = { replaceRealBadges, nitro: true, nitroLevel: 0 };
+    profiles.storedData = { replaceRealBadges, nitro: true, nitroLevel: 0, bio: 'shared' };
     const sharedProfile = profiles.decorateSharedProfile(nativeProfile, profiles.storedData);
     const ownProfile = profiles.ownProfile(nativeProfile);
     // Fake badges arrive in Discord's own fetched profile data (rewriteFetchedProfile),
     // so reading a profile leaves Discord's badge list as it is.
     assert.equal(sharedProfile.badges.length, 1, 'shared profile reads keep Discord badge data');
     assert.equal(ownProfile.badges.length, 1, 'own profile reads keep Discord badge data');
+    assert.equal(sharedProfile.bio, 'shared');
+    assert.equal(ownProfile.bio, 'shared');
+    assert.equal(sharedProfile.nativeStatus(), 'native');
+    assert.equal(ownProfile.nativeStatus(), 'native');
 }
 assert.equal(nativeProfile.badges, nativeRows);
 assert.equal(nativeRows.length, 1, 'decorating profiles must not erase Discord cached badges');
 
 const accountFlags = Object.freeze({ has: bit => bit === 1 });
-const nativeUser = Object.create({ isProvisional() { return this.flags.has(1); } });
+const nativeUser = Object.create({
+    get tag() { return '@real'; },
+    getAvatarURL() { return 'https://example.com/native.png'; },
+    isProvisional() { return this.flags.has(1); },
+});
 Object.assign(nativeUser, { id: '123456789012345', username: 'real', globalName: 'Real' });
 Object.defineProperty(nativeUser, 'flags', { value: accountFlags });
-const sharedIdentity = { username: 'shared', badgeFlags: 8, replaceRealBadges: true };
-const identity = testContext({ ...runtime, otherUserCache: new WeakMap(), nativeProfileAppearance: () => ({}), nativeCollectibles: value => value,
+const sharedIdentity = { username: 'shared', avatar: 'https://example.com/shared.png', badgeFlags: 8, replaceRealBadges: true };
+const identity = testContext({ ...profileAppearance, ...runtime, otherUserCache: new WeakMap(), nativeProfileAppearance: () => ({}), nativeCollectibles: value => value,
     isEnabled: true, storedData: { username: 'custom', badgeFlags: 8, replaceRealBadges: true },
     viewedSharedProfile: () => sharedIdentity,
     isRealProfileView: () => false, isMe: () => false,
@@ -77,15 +91,21 @@ vm.runInContext(compile(block(desktop, 'function hasFakeBadges(', '// Last profi
     + block(desktop, 'function decorateSharedIdentity(', 'function decorateSharedProfile(')
     + block(desktop, 'function disguiseUser(', 'function signedInAccounts(')
     + 'const plugin = {' + block(desktop, '    fakeCurrentUser(', '    getActiveProfileColors(') + '}; this.ownUser = plugin.fakeCurrentUser; this.otherUser = plugin.fakeOtherUser;'), identity);
-for (const [decorate, mine] of [[identity.ownUser, true], [identity.otherUser, false], [value => identity.decorateSharedIdentity(value, { username: 'shared' }), false]]) {
+for (const [decorate, mine] of [[identity.ownUser, true], [identity.otherUser, false], [value => identity.decorateSharedIdentity(value, sharedIdentity), false]]) {
     identity.isMe = () => mine;
     const cloned = decorate(nativeUser);
     assert.equal(cloned.flags, accountFlags, 'cosmetic badges cannot replace Discord account-status flags');
     assert.equal(cloned.isProvisional(), true, 'native account-status methods remain callable');
     assert.notEqual(cloned.username, 'real');
+    if (!mine) {
+        assert.equal(cloned.tag, '@shared');
+        assert.equal(cloned.getAvatarURL(), sharedIdentity.avatar);
+        assert.equal(cloned.getAvatarSource().uri, sharedIdentity.avatar);
+    }
 }
 assert.equal(nativeUser.flags, accountFlags);
 assert.equal(nativeUser.username, 'real');
+assert.equal(nativeUser.getAvatarURL(), 'https://example.com/native.png');
 identity.isMe = () => false;
 const stableOther = identity.otherUser(nativeUser);
 assert.equal(identity.otherUser(nativeUser), stableOther, 'unchanged native/shared user reads retain object identity');
