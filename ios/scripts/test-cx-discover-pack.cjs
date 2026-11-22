@@ -46,7 +46,10 @@ function stub(name) {
     });
 }
 const metro = {
-    common: stub("metro.common"),
+    common: Object.assign(stub("metro.common"), {
+        React: stub("metro.common.React"),
+        ReactNative: stub("metro.common.ReactNative"),
+    }),
     find: stub("metro.find"),
     findByName: stub("metro.findByName"),
     findByStoreName: stub("metro.findByStoreName"),
@@ -64,7 +67,10 @@ const runtimeFixture = name => new Proxy({ metro: metroFixture }, {
 });
 const vendetta = runtimeFixture("vendetta");
 globalThis.window = globalThis;
-globalThis.nativeModuleProxy = Object.create(null);
+// Model a completed migration. The fixture has no filesystem or network access.
+globalThis.nativeModuleProxy = {
+    NativeFileModule: { DocumentsDirPath: "/fixture", fileExists: async () => true },
+};
 globalThis.vendetta = vendetta;
 globalThis.bunny = runtimeFixture("bunny");
 const module = { exports: {} };
