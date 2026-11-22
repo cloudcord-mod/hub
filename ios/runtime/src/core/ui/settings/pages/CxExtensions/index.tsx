@@ -3290,7 +3290,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
             {!entry && <Text style={{ color: "#b5bac1" }}>Paste the contents of a .cx file to review it.</Text>}
             {!entry && <TextInput
                 accessibilityLabel="CX source"
-                placeholder={'theme "Midnight":'}
+                placeholder={kind === "plugin" ? 'plugin "My Plugin":' : 'theme "Midnight":'}
                 placeholderTextColor="#b5bac1"
                 value={source}
                 maxLength={MAX_CX_SOURCE}
@@ -3327,8 +3327,12 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                     label={label} value={candidate.selected.includes(target)} onValueChange={(checked: boolean) => {
                         setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, checked) });
                     }} />)}
-                {candidate && <TableRow label={activeSource ? "Apply for this session" : "Allow for this session"} onPress={() => enable()} />}
-                {candidate && rememberRevision && <TableRow label={activeSource ? "Apply and remember on this device" : "Allow and remember on this device"} onPress={() => enable(true)} />}
+                {candidate && (settings.safeMode?.enabled
+                    ? <TableRow label="Add-ons are paused in Safe Mode" />
+                    : <>
+                        <TableRow label={activeSource ? "Apply for this session" : "Allow for this session"} onPress={() => enable()} />
+                        {rememberRevision && <TableRow label={activeSource ? "Apply and remember on this device" : "Allow and remember on this device"} onPress={() => enable(true)} />}
+                    </>)}
                 {candidate && !entry && !source && <TableRow label="Edit source" onPress={() => setSource(candidate.source)} />}
                 {session.list().filter(({ id, name }) => !kind || (entry?.id === id && entry.name === name)).flatMap(({ id, name }) => {
                     const entry = rememberedCatalog.get(name);

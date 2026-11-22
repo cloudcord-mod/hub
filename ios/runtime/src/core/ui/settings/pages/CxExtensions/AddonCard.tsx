@@ -1,6 +1,5 @@
 import AddonCard from "@core/ui/components/AddonCard";
 import { isFontSupported } from "@lib/api/native/loader";
-import { settings } from "@lib/api/settings";
 import { wrapOnPress } from "@lib/ui/settings/patches/shared";
 import { showToast } from "@lib/ui/toasts";
 import { NavigationNative } from "@metro/common";
@@ -41,10 +40,7 @@ export function CxAddonCard({ kind, entry }: { kind: CxAddonKind; entry: CxAddon
         toggleType={kind === "theme" ? "radio" : "switch"} toggleValue={() => entry.active}
         actions={entry.active || entry.needsReview ? [{ icon: "SettingsIcon", onPress: review }] : undefined}
         onToggleChange={enabled => {
-            if (enabled) {
-                if (settings.safeMode?.enabled) return showToast("Add-ons are paused in Safe Mode.");
-                return review();
-            }
+            if (enabled) return review();
             try { disableCxAddon(entry.id, entry.name); }
             catch (error) { showToast(error instanceof Error ? error.message : String(error)); }
         }} />;
