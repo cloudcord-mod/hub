@@ -36920,6 +36920,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-quest-dock-promo-backdrop": hideMobileComponent("HideQuestDockPromoBackdrop", "the Quest dock backdrop before joining a quest", "modules/quests/native/QuestDock/QuestDockUnenrolledBackground.tsx"),
+        "hide-activity-preview-backdrop": hideMobileComponent("HideActivityPreviewBackdrop", "background artwork in embedded activity previews", "modules/activities/native/EmbeddedActivityBackgroundImageWithOverlay.tsx"),
+        "hide-quest-dock-backdrop": hideMobileComponent("HideQuestDockBackdrop", "the blurred backdrop of the Quest dock", "modules/quests/native/QuestDock/QuestDockBlurredContentBackground.tsx"),
+        "hide-appearance-preview-gradient": hideMobileComponent("HideAppearancePreviewGradient", "the gradient behind Appearance settings previews", "modules/user_settings/appearance/native/components/SettingsAppearanceGradientBackground.tsx"),
+        "hide-activity-shelf-artwork": hideMobileComponent("HideActivityShelfArtwork", "background artwork on voice activity shelf cards", "modules/voice_panel/native/controls/activities/ActivityShelfItemBackground.tsx"),
         "hide-shop-nitro-coin-art": hideMobileComponent("HideShopNitroCoinArt", "the fractional Nitro coin illustration in the Shop", "modules/collectibles/native/FractionalNitroCoinIllustration.tsx"),
         "hide-mobile-header-gradient": hideMobileComponent("HideMobileHeaderGradient", "the themed gradient behind mobile panel headers", "modules/main_tabs_v2/native/panels/ThemedHeaderBackgroundGradient.tsx"),
         "hide-bounties-banner-art": hideMobileComponent("HideBountiesBannerArt", "the decorative background behind the Bounties banner", "modules/quests/native/BountiesBannerBackground.tsx"),
@@ -51075,6 +51080,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-activity-preview-backdrop.cx
+  var hide_activity_preview_backdrop_default;
+  var init_hide_activity_preview_backdrop = __esm({
+    "../examples/cx/catalog/plugins/hide-activity-preview-backdrop.cx"() {
+      hide_activity_preview_backdrop_default = 'plugin "HideActivityPreviewBackdrop":\n  needs appearance.hide\n  hide hide-activity-preview-backdrop\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-activity-shelf-artwork.cx
+  var hide_activity_shelf_artwork_default;
+  var init_hide_activity_shelf_artwork = __esm({
+    "../examples/cx/catalog/plugins/hide-activity-shelf-artwork.cx"() {
+      hide_activity_shelf_artwork_default = 'plugin "HideActivityShelfArtwork":\n  needs appearance.hide\n  hide hide-activity-shelf-artwork\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-add-friend-hint.cx
   var hide_add_friend_hint_default;
   var init_hide_add_friend_hint = __esm({
@@ -51128,6 +51149,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_app_search_intro = __esm({
     "../examples/cx/catalog/plugins/hide-app-search-intro.cx"() {
       hide_app_search_intro_default = 'plugin "HideAppSearchIntro":\n  needs appearance.hide\n  hide hide-app-search-intro\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-appearance-preview-gradient.cx
+  var hide_appearance_preview_gradient_default;
+  var init_hide_appearance_preview_gradient = __esm({
+    "../examples/cx/catalog/plugins/hide-appearance-preview-gradient.cx"() {
+      hide_appearance_preview_gradient_default = 'plugin "HideAppearancePreviewGradient":\n  needs appearance.hide\n  hide hide-appearance-preview-gradient\n';
     }
   });
 
@@ -51984,6 +52013,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_profile_your_friends_card = __esm({
     "../examples/cx/catalog/plugins/hide-profile-your-friends-card.cx"() {
       hide_profile_your_friends_card_default = 'plugin "HideProfileYourFriendsCard":\n  needs appearance.hide\n  hide hide-profile-your-friends-card\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-quest-dock-backdrop.cx
+  var hide_quest_dock_backdrop_default;
+  var init_hide_quest_dock_backdrop = __esm({
+    "../examples/cx/catalog/plugins/hide-quest-dock-backdrop.cx"() {
+      hide_quest_dock_backdrop_default = 'plugin "HideQuestDockBackdrop":\n  needs appearance.hide\n  hide hide-quest-dock-backdrop\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-quest-dock-promo-backdrop.cx
+  var hide_quest_dock_promo_backdrop_default;
+  var init_hide_quest_dock_promo_backdrop = __esm({
+    "../examples/cx/catalog/plugins/hide-quest-dock-promo-backdrop.cx"() {
+      hide_quest_dock_promo_backdrop_default = 'plugin "HideQuestDockPromoBackdrop":\n  needs appearance.hide\n  hide hide-quest-dock-promo-backdrop\n';
     }
   });
 
@@ -55205,6 +55250,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_active_channel_cards();
       init_hide_active_now();
       init_hide_activity_cards();
+      init_hide_activity_preview_backdrop();
+      init_hide_activity_shelf_artwork();
       init_hide_add_friend_hint();
       init_hide_add_server_button();
       init_hide_app_launcher_button_animation();
@@ -55212,6 +55259,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_app_launcher_recommendations();
       init_hide_app_recommendation_rows();
       init_hide_app_search_intro();
+      init_hide_appearance_preview_gradient();
       init_hide_apps_button();
       init_hide_avatar_decorations();
       init_hide_badge_customization_tip();
@@ -55319,6 +55367,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_wishlist_suggestions();
       init_hide_profile_wishlist_tip();
       init_hide_profile_your_friends_card();
+      init_hide_quest_dock_backdrop();
+      init_hide_quest_dock_promo_backdrop();
       init_hide_quest_modal_clouds();
       init_hide_quest_orb_multiplier_pill();
       init_hide_quests_tab();
@@ -57070,6 +57120,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7"
           },
           {
+            name: "HideActivityPreviewBackdrop",
+            source: hide_activity_preview_backdrop_default,
+            description: "Hide background artwork in embedded activity previews",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "67488a9b799920034951de925a482ab779eeaf1c199f449a23ccf3f6c2779060"
+          },
+          {
+            name: "HideActivityShelfArtwork",
+            source: hide_activity_shelf_artwork_default,
+            description: "Hide background artwork on voice activity shelf cards",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "b0bb8b1cb3068b7accf280739a9d6fcbc14723036b0eedae1f0a758cf349882b"
+          },
+          {
             name: "HideAddFriendHint",
             source: hide_add_friend_hint_default,
             description: "Hide the hint below the Add Friend field",
@@ -57136,6 +57206,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "139066a6c48a5295ea0c7e0387b823aa332a0c1c7ee93340cc85b59ff7ab603b"
+          },
+          {
+            name: "HideAppearancePreviewGradient",
+            source: hide_appearance_preview_gradient_default,
+            description: "Hide the gradient behind Appearance settings previews",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "9910562a7295e8b1988248fa64fc77739b2b5df8ad868f971b0f42ca28d06c20"
           },
           {
             name: "HideAppsButton",
@@ -58164,6 +58244,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389"
+          },
+          {
+            name: "HideQuestDockBackdrop",
+            source: hide_quest_dock_backdrop_default,
+            description: "Hide the blurred backdrop of the Quest dock",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "cc78b8ed69c32639c24c82065730f1ea0f3854e38e8173dc4b7b17a3c0e842bb"
+          },
+          {
+            name: "HideQuestDockPromoBackdrop",
+            source: hide_quest_dock_promo_backdrop_default,
+            description: "Hide the Quest dock backdrop before joining a quest",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "d1ccae350149851130e7c69acd7ca9e0201bb8d8ac0162f0257fb6220113217e"
           },
           {
             name: "HideQuestModalClouds",
@@ -70947,7 +71047,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "457c994f5581f426d0740a8fb3a5a265d90d577a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d59df716e8628561297863f63642adb2e832cba3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
