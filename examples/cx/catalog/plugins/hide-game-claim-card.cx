@@ -1,0 +1,3 @@
+plugin "HideGameClaimCard":
+  needs appearance.hide
+  hide hide-game-claim-card

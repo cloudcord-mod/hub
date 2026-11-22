@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-scheduled-message-draft-tip": hideMobileComponent("HideScheduledMessageDraftTip", "the scheduled-message draft tooltip", "modules/scheduled_messages/native/ScheduledMessageDraftCoachmark.tsx"),
+    "hide-you-settings-tip": hideMobileComponent("HideYouSettingsTip", "the settings shortcut tooltip on the You tab", "modules/main_tabs_v2/native/tabs/you/YouSettingsCoachmark.tsx"),
+    "hide-game-claim-card": hideMobileComponent("HideGameClaimCard", "the game claim promotion card in eligible servers", "modules/game_claim/native/GameClaimCoachmark.tsx"),
     "hide-boost-progress-tip": hideMobileComponent("HideBoostProgressTip", "the server boost progress tooltip", "modules/premium/powerups/native/BoostProgressBarCoachmark.tsx"),
     "hide-powerup-unlock-tip": hideMobileComponent("HidePowerupUnlockTip", "the boost-to-unlock tooltip for server powerups", "modules/premium/powerups/native/GuildPowerupsBoostToUnlockCoachmark.tsx"),
     "hide-server-theme-tip": hideMobileComponent("HideServerThemeTip", "the server theme introduction for members", "modules/premium/powerups/native/GuildThemeMemberCoachmark.tsx"),

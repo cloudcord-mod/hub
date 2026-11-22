@@ -1,0 +1,3 @@
+plugin "HideYouSettingsTip":
+  needs appearance.hide
+  hide hide-you-settings-tip

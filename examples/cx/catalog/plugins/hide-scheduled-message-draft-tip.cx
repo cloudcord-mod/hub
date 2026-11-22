@@ -1,0 +1,3 @@
+plugin "HideScheduledMessageDraftTip":
+  needs appearance.hide
+  hide hide-scheduled-message-draft-tip
