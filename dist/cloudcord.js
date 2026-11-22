@@ -12849,14 +12849,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   text: "Use",
                   onPress: () => {
                     if (index === 0) {
-                      loaderConfig.customLoadUrl.enabled = false;
-                      loaderConfig.customLoadUrl.url = "";
-                      showToast("Using current stable CloudCord. Reloading\u2026", findAssetId("Check"));
-                      BundleUpdaterManager.reload();
+                      loaderConfig.customLoadUrl = {
+                        enabled: false,
+                        url: ""
+                      };
+                      showToast("Stable source selected. Close and reopen Discord to apply it.", findAssetId("Check"));
                       return;
                     }
-                    loaderConfig.customLoadUrl.enabled = true;
-                    loaderConfig.customLoadUrl.url = `https://raw.githubusercontent.com/cloudcord-mod/release-hub/${version.sha}/dist/cc.js`;
+                    loaderConfig.customLoadUrl = {
+                      enabled: true,
+                      url: `https://raw.githubusercontent.com/cloudcord-mod/hub/${version.sha}/dist/cc.js`
+                    };
                     showToast("Version selected. Apply and reload when ready.", findAssetId("Check"));
                   }
                 })
@@ -72316,7 +72319,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b2a70005892056f153ab636e58d94b1d028f41d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ab32b707cf6df682517dfd9eac519659e428ecd6";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
