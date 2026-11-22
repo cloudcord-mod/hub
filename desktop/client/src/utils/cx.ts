@@ -335,6 +335,17 @@ function normalizeCatalogSearch(value: string) {
     return value.normalize("NFKD").toLowerCase().replace(/\p{M}/gu, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 }
 
+const cxCommandSearchIndex = new WeakMap<readonly string[], { original: readonly string[]; compact: readonly string[]; }>();
+
+function catalogSearchCommands(commands: readonly string[] | undefined) {
+    if (!commands?.length) return;
+    const cached = cxCommandSearchIndex.get(commands);
+    if (cached?.original.length === commands.length && commands.every((name, index) => name === cached.original[index])) return cached.compact;
+    const compact = commands.map(command => normalizeCatalogSearch(command).replaceAll(" ", ""));
+    cxCommandSearchIndex.set(commands, { original: [...commands], compact });
+    return compact;
+}
+
 function catalogSearchFields(entry: CxSearchEntry) {
     const { name, description, keywords } = entry;
     const cached = cxSearchIndex.get(entry);
@@ -362,7 +373,7 @@ export function searchCxCatalog<T extends CxSearchEntry>(entries: readonly T[], 
         const prefix: T[] = [];
         const partial: T[] = [];
         for (const entry of entries) {
-            const commands = entry.commands?.map(command => normalizeCatalogSearch(command).replaceAll(" ", ""));
+            const commands = catalogSearchCommands(entry.commands);
             if (commands?.includes(compactQuery)) exact.push(entry);
             else if (commands?.some(command => command.startsWith(compactQuery))) prefix.push(entry);
             else if (commands?.some(command => command.includes(compactQuery))) partial.push(entry);
@@ -379,7 +390,7 @@ export function searchCxCatalog<T extends CxSearchEntry>(entries: readonly T[], 
         const { lowerName, compactName, searchableText } = catalogSearchFields(entry);
         if (lowerName === query) exact.push(entry);
         else if (compactQuery && compactName === compactQuery) normalized.push(entry);
-        else if (compactQuery && entry.commands?.some(command => normalizeCatalogSearch(command).replaceAll(" ", "") === compactQuery)) commandMatches.push(entry);
+        else if (compactQuery && catalogSearchCommands(entry.commands)?.includes(compactQuery)) commandMatches.push(entry);
         else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery)) partial.push(entry);
         else if (terms.length && terms.every(term => searchableText.includes(term))) feature.push(entry);
     }

@@ -6035,6 +6035,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.deepEqual(Array.from(moduleBox.exports.searchCxCatalog(commandEntries, "/duration"), entry => entry.name),
             ["Playback", "Duration Details", "Convert Duration"]);
         assert.equal(moduleBox.exports.searchCxCatalog(commandEntries, "duration")[0].name, "Playback");
+        commandEntries[2].commands[0] = "duration-preview";
+        assert.equal(moduleBox.exports.searchCxCatalog(commandEntries, "/duration-preview")[0].name, "Playback");
         const mutableEntry = { name: "Café Notes", keywords: "private mémoire" };
         assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "cafenotes")[0], mutableEntry);
         assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "memoire")[0], mutableEntry);
