@@ -1935,12 +1935,50 @@ function addReady(ports) {
     console.log("Added " + files.size + " CX ports. Desktop catalog has " + catalog.plugins + "/" + desktopPluginTarget + " plugins.");
 }
 
+function auditDesktopSources(sourceDir) {
+    const sourceRoot = path.resolve(sourceDir);
+    const { cxAppearanceTargets, cxNativeEffects } = require("./sync-cx-catalog.cjs").loadCxRuntime();
+    const catalogNames = new Set();
+    for (const name of fs.readdirSync(catalogFolder).filter(name => name.endsWith(".cx"))) {
+        const source = fs.readFileSync(path.join(catalogFolder, name), "utf8");
+        const header = /^plugin ("(?:[^"\\]|\\.)*"):/m.exec(source);
+        if (header) catalogNames.add(JSON.parse(header[1]).toLowerCase());
+    }
+    const desktopNames = new Set();
+    for (const group of desktopGroups) {
+        for (const file of entryFiles(path.join(root, "desktop/client/src", group))) {
+            const record = inspectPlugin(file, fs.readFileSync(file, "utf8"), "desktop");
+            if (record) desktopNames.add(record.name.toLowerCase());
+        }
+    }
+    const records = [];
+    const groups = fs.readdirSync(sourceRoot, { withFileTypes: true })
+        .filter(entry => entry.isDirectory() && /plugins$/i.test(entry.name));
+    for (const group of groups) for (const file of entryFiles(path.join(sourceRoot, group.name))) {
+        const relative = path.relative(sourceRoot, file).replaceAll(path.sep, "/");
+        const source = fs.readFileSync(file, "utf8");
+        const plugin = inspectPlugin(relative, source, "desktop", cxAppearanceTargets, cxNativeEffects);
+        if (!plugin) continue;
+        const key = plugin.name.toLowerCase();
+        records.push({ name: plugin.name, file: relative, desktopInCloudCord: desktopNames.has(key),
+            cxInCloudCord: catalogNames.has(key), matchingCxRecipe: Boolean(plugin.cx), targets: plugin.targets,
+            operations: plugin.operations ?? [] });
+    }
+    return records;
+}
+
 async function main(rawArgs) {
     const args = [...rawArgs];
     if (args.length === 1 && args[0] === "--help") {
         console.log(usage);
         console.log("Scan source patterns, export candidates for review, or add ready ports to the shared catalog.");
+        console.log("Audit an external desktop plugin tree without writing ports with --audit-desktop-source <src-folder>.");
         console.log("Check native appearance paths with --check-appearance-paths <Android path list> <iOS path list>.");
+        return;
+    }
+    if (args[0] === "--audit-desktop-source") {
+        if (args.length !== 2) throw new Error("Expected a desktop plugin source directory");
+        process.stdout.write(JSON.stringify(auditDesktopSources(args[1]), null, 2) + "\n");
         return;
     }
     if (args[0] === "--check-appearance-paths") {
