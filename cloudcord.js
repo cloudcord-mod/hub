@@ -17471,6 +17471,93 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       result.presenceStatus = data.presenceStatus;
     return result;
   }
+  function portableLookText(value, limit, multiline = false) {
+    if (typeof value !== "string")
+      return "";
+    var clean = value.replace(/[\x00-\x08\x0b-\x1f\x7f\u202a-\u202e\u2066-\u2069]/g, "");
+    return (multiline ? clean : clean.replace(/[\n\t]/g, " ")).slice(0, limit);
+  }
+  function portableLookImage(value) {
+    if (typeof value !== "string" || value.length > portableImageLimit)
+      return "";
+    return /^data:image\/(?:png|webp|gif|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(value) ? value : customPreviewURL(value);
+  }
+  function portableLookProfile(data) {
+    var { customFriends, customConnections, ...appearance } = normalizeProfileAppearance({
+      displayNameStyles: data.displayNameStyles,
+      serverTag: data.serverTag,
+      nameplate: data.nameplate,
+      profileEffect: data.profileEffect,
+      profileFrame: data.profileFrame,
+      customActivity: data.customActivity,
+      customStatus: data.customStatus,
+      presenceStatus: data.presenceStatus
+    });
+    var number = (value, min, max) => typeof value === "number" && Number.isSafeInteger(value) && value >= min && value <= max ? value : void 0;
+    var date = (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "";
+    var badges = (value) => Array.isArray(value) ? [
+      ...new Set(value.filter((id) => typeof id === "string" && /^[a-z\d_-]{1,80}$/i.test(id)))
+    ].slice(0, 80) : [];
+    var decorationAsset2 = typeof data.decorationAsset === "string" && /^(?:a_)?[a-f0-9]{32}$/i.test(data.decorationAsset) ? data.decorationAsset : void 0;
+    return {
+      ...appearance,
+      username: portableLookText(data.username, 32),
+      globalName: portableLookText(data.globalName, 32),
+      bio: portableLookText(data.bio, 512, true),
+      pronouns: portableLookText(data.pronouns, 40),
+      avatar: portableLookImage(data.avatar),
+      banner: portableLookImage(data.banner),
+      avatarDecoration: portableLookImage(data.avatarDecoration),
+      avatarDecorationSku: typeof data.avatarDecorationSku === "string" && SNOWFLAKE.test(data.avatarDecorationSku) ? data.avatarDecorationSku : void 0,
+      decorationAsset: decorationAsset2,
+      decorationSkuId: typeof data.decorationSkuId === "string" && SNOWFLAKE.test(data.decorationSkuId) ? data.decorationSkuId : void 0,
+      primaryColor: number(data.primaryColor, 0, 16777215),
+      accentColor: number(data.accentColor, 0, 16777215),
+      badgeFlags: number(data.badgeFlags, 0, 2147483647) ?? 0,
+      customBadgeIds: badges(data.customBadgeIds),
+      hiddenBadgeIds: badges(data.hiddenBadgeIds),
+      badgeOrder: badges(data.badgeOrder),
+      replaceRealBadges: data.replaceRealBadges === true,
+      nitro: data.nitro === true,
+      nitroLevel: number(data.nitroLevel, -1, 64),
+      nitroSince: date(data.nitroSince),
+      boostMonths: number(data.boostMonths, -1, 64),
+      giftLevel: number(data.giftLevel, -1, 64),
+      createdAt: date(data.createdAt),
+      signupDate: date(data.signupDate),
+      oldName: portableLookText(data.oldName, 32)
+    };
+  }
+  function encodePortableLook(name, data) {
+    var profile = portableLookProfile(data);
+    if (data.avatar && !profile.avatar || data.banner && !profile.banner)
+      throw new Error("A picture can't be copied. Use a smaller image or an HTTPS image link.");
+    var text = JSON.stringify({
+      format: portableLookFormat,
+      version: 1,
+      name: portableLookText(name, 40).trim() || "Saved look",
+      profile
+    });
+    if (text.length > portableLookLimit)
+      throw new Error("This look is too large to copy. Try using links for its pictures.");
+    return text;
+  }
+  function decodePortableLook(text) {
+    if (typeof text !== "string" || text.length > portableLookLimit || !text.trim())
+      throw new Error("Copy a saved CloudCord look to your clipboard first.");
+    var data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error("The clipboard does not contain a valid CloudCord look.");
+    }
+    if (data?.format !== portableLookFormat || data.version !== 1 || !data.profile || typeof data.profile !== "object" || Array.isArray(data.profile))
+      throw new Error("Copy a saved CloudCord look to your clipboard first.");
+    return {
+      name: portableLookText(data.name, 40).trim() || "Imported look",
+      profile: portableLookProfile(data.profile)
+    };
+  }
   function streamURL(value) {
     var url2 = customPreviewURL(value);
     if (!url2)
@@ -17753,7 +17840,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return "";
   }
-  var ACTIVITY_TYPES, PRESENCE_STATUSES, SNOWFLAKE, TAG_ICON_DATA, TAG_ICON_MAX_LENGTH, textField, DISCORD_STREAM_URL, customTagIcons, ITEM_DECORATION, ITEM_EFFECT, ITEM_NAMEPLATE, ITEM_FRAME, camel;
+  var ACTIVITY_TYPES, PRESENCE_STATUSES, SNOWFLAKE, TAG_ICON_DATA, TAG_ICON_MAX_LENGTH, textField, portableLookFormat, portableLookLimit, portableImageLimit, DISCORD_STREAM_URL, customTagIcons, ITEM_DECORATION, ITEM_EFFECT, ITEM_NAMEPLATE, ITEM_FRAME, camel;
   var init_profileAppearance = __esm({
     "src/lib/api/profileAppearance.ts"() {
       "use strict";
@@ -17792,6 +17879,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       TAG_ICON_DATA = /^data:image\/(?:png|webp|gif|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/;
       TAG_ICON_MAX_LENGTH = 7e4;
       textField = (value, maximum) => typeof value === "string" ? value.trim().slice(0, maximum) : "";
+      portableLookFormat = "cloudcord.saved-look";
+      portableLookLimit = 345e4;
+      portableImageLimit = 17e5;
       DISCORD_STREAM_URL = /^https?:\/\/(?:www\.)?(twitch\.tv\/(.+)|youtube.com\/watch\?v=)/;
       customTagIcons = /* @__PURE__ */ new Map();
       ITEM_DECORATION = 0;
@@ -31304,19 +31394,55 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [busy, setBusy] = (0, import_react9.useState)(false);
     var [sharing, setSharing] = (0, import_react9.useState)(null);
     var [publicShares, setPublicShares] = (0, import_react9.useState)(null);
-    var run = (task) => _async_to_generator(function* () {
-      if (!ownerId || ownerId !== currentUserId)
+    var run = (task, title = "Sharing") => _async_to_generator(function* () {
+      if (busy || !ownerId || ownerId !== currentUserId)
         return;
       setBusy(true);
       try {
         yield task();
       } catch (error) {
         if (ownerId === currentUserId)
-          import_react_native28.Alert.alert("Sharing", error?.message || "Something went wrong.");
+          import_react_native28.Alert.alert(title, error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
     })();
+    var copyLook = (item) => run(() => _async_to_generator(function* () {
+      var clipboard2 = findByProps("getString", "setString");
+      if (typeof clipboard2?.setString !== "function")
+        throw new Error("Clipboard is unavailable.");
+      var profile = yield ownSharedProfile(item.data);
+      if (ownerId !== currentUserId)
+        return;
+      if (item.data.avatarMedia?.uri && !profile.avatar || item.data.bannerMedia?.uri && !profile.banner)
+        throw new Error("A picture couldn't be read on this device. Use a smaller image or an HTTPS image link.");
+      yield clipboard2.setString(encodePortableLook(item.name, profile));
+      if (ownerId === currentUserId)
+        showToast("Copied look to the clipboard.");
+    })(), "Saved looks");
+    var importLook = () => run(() => _async_to_generator(function* () {
+      var clipboard2 = findByProps("getString", "setString");
+      if (typeof clipboard2?.getString !== "function")
+        throw new Error("Clipboard is unavailable.");
+      var look = decodePortableLook(yield clipboard2.getString());
+      if (ownerId !== currentUserId)
+        return;
+      var data = savedSnapshot({
+        ...previewFromShared(look.profile),
+        hiddenBadgeIds: look.profile.hiddenBadgeIds,
+        badgeOrder: look.profile.badgeOrder
+      });
+      commit([
+        {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+          name: look.name,
+          savedAt: Date.now(),
+          data
+        },
+        ...readSavedProfiles(ownerId)
+      ]);
+      showToast("Saved \u201C" + look.name + "\u201D on this device.");
+    })(), "Saved looks");
     var importCode = (value) => run(() => _async_to_generator(function* () {
       var id = shareCodeFrom(value);
       if (!id)
@@ -31400,27 +31526,38 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         gap: 20
       },
       children: [
-        /* @__PURE__ */ jsx(S2.Panel, {
-          children: /* @__PURE__ */ jsxs(S2.Section, {
-            title: "Save your profile",
-            description: "Keep copies of this account\u2019s custom profile on this device.",
-            children: [
-              /* @__PURE__ */ jsx(S2.Field, {
-                label: "Name",
-                children: /* @__PURE__ */ jsx(TextInput4, {
-                  value: name,
-                  placeholder: "Main, Alt or Profile " + (items.length + 1),
-                  maxLength: 40,
-                  onChangeText: setName
+        /* @__PURE__ */ jsxs(S2.Panel, {
+          children: [
+            /* @__PURE__ */ jsxs(S2.Section, {
+              title: "Save your profile",
+              description: "Keep copies of this account\u2019s custom profile on this device.",
+              children: [
+                /* @__PURE__ */ jsx(S2.Field, {
+                  label: "Name",
+                  children: /* @__PURE__ */ jsx(TextInput4, {
+                    value: name,
+                    placeholder: "Main, Alt or Profile " + (items.length + 1),
+                    maxLength: 40,
+                    onChangeText: setName
+                  })
+                }),
+                /* @__PURE__ */ jsx(S2.Button, {
+                  label: "Save current look",
+                  primary: true,
+                  onPress: saveCurrent
                 })
-              }),
-              /* @__PURE__ */ jsx(S2.Button, {
-                label: "Save current look",
-                primary: true,
-                onPress: saveCurrent
+              ]
+            }),
+            /* @__PURE__ */ jsx(S2.Section, {
+              title: "Move a saved look",
+              description: "Copy a look, transfer the copied text, then import it on the other device.",
+              children: /* @__PURE__ */ jsx(S2.Button, {
+                label: "Import from clipboard",
+                disabled: busy,
+                onPress: importLook
               })
-            ]
-          })
+            })
+          ]
         }),
         !items.length ? /* @__PURE__ */ jsx(Text, {
           variant: "text-sm/medium",
@@ -31552,6 +31689,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     onPress: () => remove(item)
                   })
                 ]
+              }),
+              /* @__PURE__ */ jsx(S2.Button, {
+                label: "Copy look",
+                disabled: busy,
+                onPress: () => copyLook(item)
               }),
               sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native28.View, {
                 style: {
@@ -65754,7 +65896,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "82cc5a84763b1c012958310ea0706d92b597c8a7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7bf3dc2fc8651537f07b16dba9831e9bd3296d81";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
