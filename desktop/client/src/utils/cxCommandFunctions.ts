@@ -678,6 +678,14 @@ export const cxCommandFunctions = {
         const seconds = Math.ceil(bytes * 8 / 1_000_000 / megabits);
         if (Number.isSafeInteger(seconds)) return "Estimated transfer time: " + readableDuration(seconds);
     },
+    runningPace(distance: string, duration: string) {
+        const kilometers = Number(distance);
+        const seconds = durationSeconds(duration);
+        if (!/^\d+(?:\.\d+)?$/.test(distance) || !Number.isFinite(kilometers) || kilometers <= 0 || !seconds) return;
+        const pace = Math.round(seconds / kilometers);
+        if (!Number.isSafeInteger(pace) || pace < 1) return;
+        return Math.floor(pace / 60) + ":" + String(pace % 60).padStart(2, "0") + " per km";
+    },
     countdownTimestamp(input: string) {
         const duration = durationSeconds(input);
         if (!duration) return;

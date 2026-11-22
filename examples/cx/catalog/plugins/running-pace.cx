@@ -1,0 +1,7 @@
+plugin "Running Pace":
+  needs commands.register
+  needs reply.local
+  on command "runningpace":
+    input "distance" text
+    input "duration" text
+    reply "${runningPace(distance, duration)}" else "Enter a positive distance in kilometers and a duration such as 25m."

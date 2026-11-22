@@ -398,6 +398,7 @@ import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/p
 import plugin_catalog_rounded_avatars_square from "../../../../examples/cx/catalog/plugins/rounded-avatars-square.cx";
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
 import plugin_catalog_rounded_images from "../../../../examples/cx/catalog/plugins/rounded-images.cx";
+import plugin_catalog_running_pace from "../../../../examples/cx/catalog/plugins/running-pace.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
 import plugin_catalog_screen_share_alert from "../../../../examples/cx/catalog/plugins/screen-share-alert.cx";
 import plugin_catalog_scroll_to_latest from "../../../../examples/cx/catalog/plugins/scroll-to-latest.cx";
@@ -982,6 +983,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "RoundedAvatarsSquare", source: plugin_catalog_rounded_avatars_square, description: "give avatars softer square corners", desktopOnly: true, categories: ["Appearance"] },
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar, description: "round the chat bar", categories: ["Appearance"], appearanceRevision: "a1b819ce91635dd9353e95423d84f0334072934369d4d60635ba720593976761" },
         { name: "RoundedImages", source: plugin_catalog_rounded_images, description: "Rounder corners on images and videos in chat", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Running Pace", source: plugin_catalog_running_pace, description: "/runningpace", commands: ["runningpace"], categories: ["Commands"], appearanceRevision: "b794b4fdbe1057c769279550e44e090065bf29cafc0deb63f6751c33d2e0591c", privateCommands: true },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages, description: "/schedule", commands: ["schedule"], categories: ["Chat","Commands"] },
         { name: "ScreenShareAlert", source: plugin_catalog_screen_share_alert, description: "Show local alerts when someone starts sharing in your current voice call", categories: ["Voice & calls"] },
         { name: "ScrollToLatest", source: plugin_catalog_scroll_to_latest, description: "Open channels at the latest message and mark them read", categories: ["Servers & channels"] },

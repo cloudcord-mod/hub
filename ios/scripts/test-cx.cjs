@@ -3126,6 +3126,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["extractmentions", { text: "<@!123456789012345678> <@123456789012345678> <@&234567890123456789> <#345678901234567890>" }, /^User \x60123456789012345678\x60\nRole \x60234567890123456789\x60\nChannel \x60345678901234567890\x60$/],
                 ["extractmentions", { text: "no mentions" }, /^No Discord/],
             ]],
+            ["Running Pace", [
+                ["runningpace", { distance: "5", duration: "27m30s" }, /^5:30 per km$/],
+                ["runningpace", { distance: "0", duration: "1h" }, /^Enter a positive distance/],
+            ]],
             ["Percentage Change", [
                 ["percentchange", { before: "80", after: "100" }, /^\+25%$/],
                 ["percentchange", { before: "-10", after: "-8" }, /^\+20%$/],
