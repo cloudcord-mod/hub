@@ -118,6 +118,8 @@ type DiscordProfileSurface = {
     pronouns?: unknown;
     themeColors?: unknown;
     theme_colors?: unknown;
+    primaryColor?: unknown;
+    primary_color?: unknown;
     accentColor?: unknown;
     accent_color?: unknown;
 };
@@ -148,14 +150,18 @@ export function sharedProfileColorPair(data?: { profileColorsEnabled?: unknown; 
 }
 
 export function nativeProfilePreviewSurface(userId: string, profile?: DiscordProfileSurface | null, userBanner?: unknown) {
-    const colors = profile?.themeColors ?? profile?.theme_colors;
+    const colors = Array.isArray(profile?.themeColors) ? profile.themeColors
+        : Array.isArray(profile?.theme_colors) ? profile.theme_colors : [];
+    const bannerColor = profilePreviewColor(profile?.accentColor) ?? profilePreviewColor(profile?.accent_color);
+    const primary = profilePreviewColor(colors[0]) ?? profilePreviewColor(profile?.primaryColor) ?? profilePreviewColor(profile?.primary_color);
+    const accent = profilePreviewColor(colors[1]);
     return {
         banner: customDiscordMediaURL("banners", userId, profile?.banner) || customDiscordMediaURL("banners", userId, userBanner) || undefined,
         bio: typeof profile?.bio === "string" ? profile.bio : undefined,
         pronouns: typeof profile?.pronouns === "string" ? profile.pronouns : undefined,
-        primary: Array.isArray(colors) ? profilePreviewColor(colors[0]) : undefined,
-        accent: Array.isArray(colors) ? profilePreviewColor(colors[1]) : undefined,
-        bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color),
+        primary: primary ?? accent,
+        accent: accent ?? primary,
+        bannerColor,
     };
 }
 

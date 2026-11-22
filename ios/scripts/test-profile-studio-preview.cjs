@@ -175,6 +175,13 @@ assert.equal(fallbackSurface.primary, "#000000");
 assert.equal(fallbackSurface.accent, "#123456");
 assert.equal(fallbackSurface.bannerColor, "#abcdef");
 assert.equal(profileAppearance.nativeProfilePreviewSurface(id, { banner: "https://example.com/draft.png" }).banner, undefined);
+const standaloneColor = profileAppearance.nativeProfilePreviewSurface(id, { primary_color: 0, accent_color: 0xabcdef });
+assert.equal(standaloneColor.primary, "#000000");
+assert.equal(standaloneColor.accent, "#000000");
+assert.equal(standaloneColor.bannerColor, "#abcdef");
+const legacyGradient = profileAppearance.nativeProfilePreviewSurface(id, { themeColors: {}, theme_colors: [-1, 0x123456] });
+assert.equal(legacyGradient.primary, "#123456");
+assert.equal(legacyGradient.accent, "#123456");
 
 layout = "profile";
 const previewDesktop = data => flatten(ProfilePreview({ data, fallbackName: "Native", fallbackUsername: "native", fallbackAvatar: "avatar", fallbackSurface }));
