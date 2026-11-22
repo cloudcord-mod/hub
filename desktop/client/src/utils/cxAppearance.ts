@@ -17,6 +17,14 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "disable-chat-gif-autoplay": {
+        plugin: "DisableChatGifAutoplay", label: "automatic GIF playback in native chat", css: "", mobileOnly: true,
+        mobile: { messageRenderOption: "gifAutoPlay" },
+    },
+    "disable-chat-emoji-animation": {
+        plugin: "DisableChatEmojiAnimation", label: "animated emoji and reactions in native chat", css: "", mobileOnly: true,
+        mobile: { messageRenderOption: "animateEmoji" },
+    },
     "hide-home-drawer-streaming-subtitle": hideMobileComponent("HideHomeDrawerStreamingSubtitle", "streaming status text in the home drawer", "modules/home_drawer/native/subtitles/StreamingSubtitle.tsx"),
     "hide-home-drawer-typing-subtitle": hideMobileComponent("HideHomeDrawerTypingSubtitle", "typing status text in the home drawer", "modules/home_drawer/native/subtitles/TypingSubtitle.tsx"),
     "hide-home-drawer-voice-subtitle": hideMobileComponent("HideHomeDrawerVoiceSubtitle", "voice activity text in the home drawer", "modules/home_drawer/native/subtitles/VoiceSubtitle.tsx"),

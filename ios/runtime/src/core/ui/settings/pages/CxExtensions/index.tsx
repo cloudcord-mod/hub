@@ -2271,6 +2271,17 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
                     && "isMentionLowImportance" in element.props ? null : element);
             return () => { stopCount(); stopLegacy(); };
         }
+        if ("messageRenderOption" in mobile) {
+            const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+            return overrideCxMethods(renderer, {
+                default(args, invoke) {
+                    const input = args[0] as { options?: Record<string, unknown>; } | undefined;
+                    const key = mobile.messageRenderOption;
+                    if (input?.options?.[key] !== true) return invoke(args);
+                    return invoke([{ ...input, options: { ...input.options, [key]: false } }, ...args.slice(1)]);
+                },
+            }, () => !settings.safeMode?.enabled);
+        }
         if (!("messagePresentation" in mobile)) return registerJsxAppearance(mobile, () => null);
         const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
         if (typeof renderer?.default !== "function" && "legacyComponents" in mobile)

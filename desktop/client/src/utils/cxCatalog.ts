@@ -97,6 +97,8 @@ import plugin_catalog_decision_draft from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_declutter from "../../../../examples/cx/catalog/plugins/declutter.cx";
 import plugin_catalog_decode_base64 from "../../../../examples/cx/catalog/plugins/decode-base64.cx";
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
+import plugin_catalog_disable_chat_emoji_animation from "../../../../examples/cx/catalog/plugins/disable-chat-emoji-animation.cx";
+import plugin_catalog_disable_chat_gif_autoplay from "../../../../examples/cx/catalog/plugins/disable-chat-gif-autoplay.cx";
 import plugin_catalog_discord_countdown from "../../../../examples/cx/catalog/plugins/discord-countdown.cx";
 import plugin_catalog_discord_link_details from "../../../../examples/cx/catalog/plugins/discord-link-details.cx";
 import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/plugins/discord-timestamp.cx";
@@ -733,6 +735,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Declutter", source: plugin_catalog_declutter, description: "Hide the listed interface elements on this device", keywords: "Hide avatar decorations Hide nameplates Hide profile effects Hide server tags Hide the Shop entry Hide the Nitro entry Hide the Quests entry Hide the server boost progress bar Hide the chat gift button", categories: ["Appearance","Profiles"], appearanceRevision: "581e52ce690890cda2febcff0b8afdc8a7b8e45496f33d3d3dad1e1952d71b8d" },
         { name: "DecodeBase64", source: plugin_catalog_decode_base64, description: "Decode Base64 in the selected message and copy the result on request", categories: ["Chat"] },
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels, description: "dim channel names without unread messages", categories: ["Appearance"], appearanceRevision: "160f84b67cdbe906ff267e13c45e81408f856278e15e24e2286e5b66e88c0663" },
+        { name: "DisableChatEmojiAnimation", source: plugin_catalog_disable_chat_emoji_animation, description: "Hide animated emoji and reactions in native chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c415c2d639fb38d8bc6c3646f9afa852d91515bf5ea2c220d881d35433caeb79" },
+        { name: "DisableChatGifAutoplay", source: plugin_catalog_disable_chat_gif_autoplay, description: "Hide automatic GIF playback in native chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "26be71396727cf7bb54acdf14786f6ac51197dc97f3c8e2f601f572cfb8b9e98" },
         { name: "Discord Countdown", source: plugin_catalog_discord_countdown, description: "/countdowntimestamp", commands: ["countdowntimestamp"], categories: ["Commands"], appearanceRevision: "b1e07b26d2e9aec1dd374fd4286111c1cc6cecfad5e417e8438bb3f7f7bce693", privateCommands: true },
         { name: "Discord Link Details", source: plugin_catalog_discord_link_details, description: "/discordlinkdetails", commands: ["discordlinkdetails"], categories: ["Commands"], appearanceRevision: "de375129c1a6f0c0167c450336a626633bfdb14cf549ace5186eceb16a2a65ab", privateCommands: true },
         { name: "Discord Timestamp", source: plugin_catalog_discord_timestamp, description: "/discordtimestamp · /discordlocaltimestamp", commands: ["discordtimestamp","discordlocaltimestamp"], categories: ["Commands"], appearanceRevision: "f8dd293b323bb4f78d2c219d370045e59f183dd39457c74b4cde7355a23467ab", privateCommands: true },

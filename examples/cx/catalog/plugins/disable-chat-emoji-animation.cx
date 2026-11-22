@@ -1,0 +1,3 @@
+plugin "DisableChatEmojiAnimation":
+  needs appearance.hide
+  hide disable-chat-emoji-animation

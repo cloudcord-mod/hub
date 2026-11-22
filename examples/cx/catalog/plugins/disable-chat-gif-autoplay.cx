@@ -1,0 +1,3 @@
+plugin "DisableChatGifAutoplay":
+  needs appearance.hide
+  hide disable-chat-gif-autoplay

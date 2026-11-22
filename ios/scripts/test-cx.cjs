@@ -2365,6 +2365,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(legacy.type(legacy.props), original);
                 assert.equal(appearanceHooks.size, 0);
                 continue;
+            } else if (rule.mobile.messageRenderOption) {
+                const options = Object.freeze({ gifAutoPlay: true, animateEmoji: true });
+                const input = Object.freeze({ options });
+                const rendered = messageRenderer.default(input);
+                for (const key of Object.keys(options)) assert.equal(rendered.options[key], key !== rule.mobile.messageRenderOption);
+                settings.safeMode = { enabled: true };
+                assert.equal(messageRenderer.default(input), input);
+                settings.safeMode = undefined;
             } else if (rule.mobile.messagePresentation) {
                 const rendered = messageRenderer.default();
                 assert.equal(rendered.content, messagePresentation.content);
