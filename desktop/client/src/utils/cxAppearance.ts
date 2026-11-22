@@ -295,7 +295,7 @@ export const cxAppearanceTargets = {
     },
     "hide-chat-attachments": {
         plugin: "HideChatAttachments", label: "file and media attachments in chat",
-        css: "", mobileOnly: true,
+        css: '[id^="message-accessories-"] :is([class^="attachment_"], [class*=" attachment_"], [class^="newMosaicStyle_"], [class*=" newMosaicStyle_"], [class^="audioAttachment_"], [class*=" audioAttachment_"]) { display: none !important; }',
         mobile: { messagePresentation: "attachments" },
     },
     "hide-chat-role-dots": {
