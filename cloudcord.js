@@ -40531,22 +40531,78 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     };
   }
   function getCxMessageClipboard(effect, message, channel) {
+    var item = (key, label2, text) => text ? [
+      {
+        key,
+        label: label2,
+        text
+      }
+    ] : [];
+    var content = typeof message?.content === "string" ? message.content : "";
     if (effect === "copy-raw-text") {
-      var text = message?.content;
-      return typeof text === "string" && text.length ? [
-        {
-          key: "raw-text",
-          label: "Copy Raw Text",
-          text
+      return item("raw-text", "Copy Raw Text", content);
+    }
+    if (effect === "copy-attachment-names") {
+      var names = (message?.attachments ?? []).flatMap((file) => typeof file?.filename === "string" && file.filename.trim() ? [
+        file.filename.replace(/[\r\n]+/g, " ")
+      ] : []);
+      return item("attachment-names", "Copy Attachment Names", names.join("\n"));
+    }
+    if (effect === "copy-message-links") {
+      var links2 = /* @__PURE__ */ new Set();
+      for (var match of content.matchAll(/https?:\/\/[^\s<>"`]+/gi)) {
+        var link = match[0].replace(/[.,!?;:]+$/, "");
+        for (var [open, close] of [
+          [
+            "(",
+            ")"
+          ],
+          [
+            "[",
+            "]"
+          ],
+          [
+            "{",
+            "}"
+          ]
+        ]) {
+          var extra = link.split(close).length - link.split(open).length;
+          for (var index = 0; index < extra && link.endsWith(close); index++)
+            link = link.slice(0, -1);
         }
-      ] : [];
+        try {
+          if (new URL(link).hostname)
+            links2.add(link);
+        } catch (e) {
+        }
+      }
+      return item("message-links", "Copy Links from Message", [
+        ...links2
+      ].join("\n"));
+    }
+    if (effect === "copy-message-code") {
+      var blocks = [
+        ...content.matchAll(/(?:^|\n)[ \t]{0,3}(`{3,})[^\r\n`]*\r?\n([\s\S]*?)\r?\n[ \t]{0,3}\1[ \t]*(?=\r?\n|$)/g)
+      ];
+      return item("message-code", "Copy Code from Message", blocks.map((block) => block[2]).filter(Boolean).join("\n\n"));
     }
     if (!message || !isCxProfileUserId(message.id))
       return [];
     var snowflake3 = BigInt(message.id);
     if (snowflake3 > 0xffffffffffffffffn || message.id[0] === "0")
       return [];
-    var seconds = Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3);
+    var timestamp = Number(snowflake3 >> 22n) + 14200704e5;
+    var seconds = Math.floor(timestamp / 1e3);
+    if (effect === "copy-message-info") {
+      if (!isCxProfileUserId(message.channel_id))
+        return [];
+      return item("message-info", "Copy Message Info", JSON.stringify({
+        messageId: message.id,
+        channelId: message.channel_id,
+        authorId: isCxProfileUserId(message.author?.id) ? message.author.id : void 0,
+        sentAt: new Date(timestamp).toISOString()
+      }, null, 2));
+    }
     var items = [
       {
         key: "message-timestamp",
@@ -41118,6 +41174,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "copy-message-reference": {
           permission: "messages.copyreference",
           label: "Copy the selected message\u2019s Markdown link, timestamp, or author mention"
+        },
+        "copy-attachment-names": {
+          permission: "messages.copytext",
+          label: "Copy the selected message\u2019s attachment filenames"
+        },
+        "copy-message-links": {
+          permission: "messages.copytext",
+          label: "Copy HTTP links from the selected message"
+        },
+        "copy-message-code": {
+          permission: "messages.copytext",
+          label: "Copy fenced code from the selected message"
+        },
+        "copy-message-info": {
+          permission: "messages.copyreference",
+          label: "Copy the selected message\u2019s IDs and UTC timestamp as JSON"
         },
         "reveal-spoilers-shortcut": {
           permission: "messages.revealspoilers",
@@ -48680,8 +48752,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
         "messages.paste": "Change how pasted text enters the message composer",
         "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
-        "messages.copytext": "Copy the selected message's original text to the clipboard when you choose Copy Raw Text",
-        "messages.copyreference": "Copy a link, timestamp or author mention for the selected message when you choose its menu action",
+        "messages.copytext": "Copy text or attachment names from a selected message when you choose its menu action",
+        "messages.copyreference": "Copy links, timestamps or IDs for a selected message when you choose its menu action",
         "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
         "messages.replytimestamp": "Read the timestamp of a loaded message to show it in a reply preview",
         "messages.senddelay": "Compare timestamp metadata supplied with a visible message to estimate its send delay",
@@ -49217,6 +49289,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-attachment-names.cx
+  var copy_attachment_names_default;
+  var init_copy_attachment_names = __esm({
+    "../examples/cx/catalog/plugins/copy-attachment-names.cx"() {
+      copy_attachment_names_default = 'plugin "CopyAttachmentNames":\n  needs messages.copytext\n  use copy-attachment-names\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-bios.cx
   var copy_bios_default;
   var init_copy_bios = __esm({
@@ -49246,6 +49326,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_media_link = __esm({
     "../examples/cx/catalog/plugins/copy-media-link.cx"() {
       copy_media_link_default = 'plugin "CopyMediaLink":\n  needs media.clipboard\n  use copy-media-link\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-message-code.cx
+  var copy_message_code_default;
+  var init_copy_message_code = __esm({
+    "../examples/cx/catalog/plugins/copy-message-code.cx"() {
+      copy_message_code_default = 'plugin "CopyMessageCode":\n  needs messages.copytext\n  use copy-message-code\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-message-info.cx
+  var copy_message_info_default;
+  var init_copy_message_info = __esm({
+    "../examples/cx/catalog/plugins/copy-message-info.cx"() {
+      copy_message_info_default = 'plugin "CopyMessageInfo":\n  needs messages.copyreference\n  use copy-message-info\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-message-links.cx
+  var copy_message_links_default;
+  var init_copy_message_links = __esm({
+    "../examples/cx/catalog/plugins/copy-message-links.cx"() {
+      copy_message_links_default = 'plugin "CopyMessageLinks":\n  needs messages.copytext\n  use copy-message-links\n';
     }
   });
 
@@ -53083,10 +53187,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_compact_messages();
       init_compact_server_list();
       init_compare_lines();
+      init_copy_attachment_names();
       init_copy_bios();
       init_copy_emoji_markdown();
       init_copy_file_contents();
       init_copy_media_link();
+      init_copy_message_code();
+      init_copy_message_info();
+      init_copy_message_links();
       init_copy_message_reference();
       init_copy_profile_colors();
       init_copy_profile_names();
@@ -53997,6 +54105,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "CopyAttachmentNames",
+            source: copy_attachment_names_default,
+            description: "Copy the selected message\u2019s attachment filenames",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
             name: "CopyBios",
             source: copy_bios_default,
             description: "Copy Bio",
@@ -54026,6 +54142,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Add a clipboard action to media and link menus",
             categories: [
               "Media"
+            ]
+          },
+          {
+            name: "CopyMessageCode",
+            source: copy_message_code_default,
+            description: "Copy fenced code from the selected message",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "CopyMessageInfo",
+            source: copy_message_info_default,
+            description: "Copy the selected message\u2019s IDs and UTC timestamp as JSON",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "CopyMessageLinks",
+            source: copy_message_links_default,
+            description: "Copy HTTP links from the selected message",
+            categories: [
+              "Chat"
             ]
           },
           {
@@ -61371,6 +61511,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerQuickMention(enabled);
           case "copy-raw-text":
           case "copy-message-reference":
+          case "copy-attachment-names":
+          case "copy-message-links":
+          case "copy-message-code":
+          case "copy-message-info":
             return registerMessageMenuActions(enabled, ({ message, channel }, close) => getCxMessageClipboard(effect, message, channel).map(({ label: label2, text }) => ({
               label: label2,
               run() {
@@ -67112,7 +67256,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ae03b0356364a2fb8177986512c4377af518819a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fe2729e9f5894ce728bee64a6109f2ea9f05dbfe";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
