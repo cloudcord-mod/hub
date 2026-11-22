@@ -5245,6 +5245,39 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(quoted.content.length, 3);
             click(render(), "Disable FixCodeblockGap");
             assert.equal(markupParser.parseMessageMarkup(message, undefined, false).content, ast);
+
+            const emoji = Object.freeze({ type: "emoji", content: "🙂" });
+            const custom = Object.freeze({ type: "customEmoji", id: sender, jumboable: true });
+            const space = Object.freeze({ type: "text", content: " " });
+            const pair = Object.freeze([emoji, space, custom]);
+            const messageWithEmoji = { ast: Object.freeze([{ type: "paragraph", content: pair }]) };
+            const triple = { ast: Object.freeze([emoji, emoji, custom]) };
+            const mixed = { ast: Object.freeze([emoji, text]) };
+            const baseline = markupParser.parseMessageMarkup(messageWithEmoji, undefined, false);
+
+            for (const limit of [2, 0]) {
+                selectCatalog("MoreJumboEmoji");
+                const field = find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit");
+                assert.equal(field.props.value, "50");
+                field.props.onChangeText("201");
+                assert.equal(find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit").props.value, "50");
+                field.props.onChangeText(String(limit));
+                assert.equal(find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit").props.value, String(limit));
+                click(render(), "Allow for this session");
+                const parsed = markupParser.parseMessageMarkup(messageWithEmoji, undefined, false);
+                assert.equal(Boolean(parsed.content[0].content[0].jumboable), limit === 2);
+                assert.equal(parsed.content[0].content[1], space);
+                assert.equal(parsed.content[0].content[2].jumboable, limit === 2);
+                assert.equal(markupParser.parseMessageMarkup(triple, undefined, false).content[2].jumboable, false);
+                assert.equal(markupParser.parseMessageMarkup(mixed, undefined, false).content, mixed.ast);
+                assert.equal(markupParser.parseMessageMarkup(triple, undefined, false, true).content, triple.ast);
+                settings.safeMode = { enabled: true };
+                assert.equal(markupParser.parseMessageMarkup(messageWithEmoji, undefined, false), baseline);
+                settings.safeMode = undefined;
+                click(render(), "Disable MoreJumboEmoji");
+                assert.equal(markupParser.parseMessageMarkup(messageWithEmoji, undefined, false), baseline);
+                assert.equal(custom.jumboable, true);
+            }
         }
 
         selectCatalog("OpenSteamLinksInApp");

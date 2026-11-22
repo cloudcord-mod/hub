@@ -228,6 +228,13 @@ type CxJumboEmojiOptions = { jumboEmojiLimit: number; };
 type CxNotificationVolumeOptions = { notificationVolume: number; };
 export { getCxMessageLatency, type CxMessageLatencyOptions } from "./cxMessageLatency";
 type CxNumberOption = { effect: "avatar-crop-zoom" | "jumbo-emoji-limit" | "notification-volume" | "message-latency"; label: string; value: number; min: number; max: number; unit: string; };
+
+export function updateCxNumberOption(source: string, option: CxNumberOption, selected: number) {
+    const { effect, value, min, max } = option;
+    if (!Number.isInteger(selected) || selected < min || selected > max || selected === value) return source;
+    const directive = new RegExp("^  use " + effect + "(?: \\d+)?(?= |\\r?$)", "m");
+    return source.replace(directive, "  use " + effect + " " + selected);
+}
 type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceShareOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxJumboEmojiOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
 
 type CxPlugin = {

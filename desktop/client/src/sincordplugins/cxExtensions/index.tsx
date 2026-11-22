@@ -30,7 +30,7 @@ import { saveFile } from "@utils/web";
 import { bindCxChannelOpenRead, filterCxEmojiGrid, isCxNotificationMuted, type CxMessageAlert } from "@utils/cx";
 import { createCxTimestampRegistry, type CxTimestampSurface } from "@utils/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel } from "@utils/cx";
-import { canRememberCxExtension, isPrivateCxCommand, MAX_REMEMBERED_CX_EXTENSIONS, type CxTheme, runCxCleanups, selectCxAppearanceOption } from "@utils/cx";
+import { canRememberCxExtension, isPrivateCxCommand, MAX_REMEMBERED_CX_EXTENSIONS, type CxTheme, runCxCleanups, selectCxAppearanceOption, updateCxNumberOption } from "@utils/cx";
 import type { CxMessageLatencyOptions } from "@utils/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, getCxMessageGesture, validateCxMediaLink, type CxChannelLabel } from "@utils/cx";
 import { describeCcpReport, inspectCcpRuntime } from "@utils/ccpInspect";
@@ -1693,16 +1693,14 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
             <strong>{candidate.review.name}</strong>
             <ul>{candidate.review.effects.map(effect => <li key={effect}>{effect}</li>)}</ul>
             {candidate.review.commands && <p>{candidate.review.commands.join(", ")}</p>}
-            {candidate.review.numberOptions.map(({ effect, label, value, min, max, unit }) => <label key={effect} style={{ display: "block" }}>
-                {label} <input type="range" aria-label={label} aria-valuetext={value + unit} value={value} min={min} max={max} onChange={event => {
-                    const selected = event.currentTarget.valueAsNumber;
-                    if (!Number.isInteger(selected) || selected < min || selected > max || selected === value) return;
-                    const directive = new RegExp("^  use " + effect + "(?: \\d+)?(?= |\\r?$)", "m");
-                    const next = candidate.source.replace(directive, "  use " + effect + " " + selected);
-                    if (next === candidate.source) return;
-                    setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
-                    setCandidate({ ...candidate, source: next, loader: undefined, review: reviewCx(next) });
-                }} /> {value}{unit}
+            {candidate.review.numberOptions.map(option => <label key={option.effect} style={{ display: "block" }}>
+                {option.label} <input type="range" aria-label={option.label} aria-valuetext={option.value + option.unit} value={option.value}
+                    min={option.min} max={option.max} onChange={event => {
+                        const next = updateCxNumberOption(candidate.source, option, event.currentTarget.valueAsNumber);
+                        if (next === candidate.source) return;
+                        setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
+                        setCandidate({ ...candidate, source: next, loader: undefined, review: reviewCx(next) });
+                    }} /> {option.value}{option.unit}
             </label>)}
             {candidate.review.appearanceOptions.map(({ target, label }) => <div key={target}>
                 <label><input type="checkbox" aria-label={label} checked={candidate.selected.includes(target)} onChange={event => {

@@ -18,7 +18,7 @@ export const cxNativeEffects = {
     "floor-relative-time": { permission: "appearance.style", label: "Round relative timestamps down" },
     "avatar-resolution": { permission: "appearance.avatarresolution", label: "Request higher-resolution Discord avatars" },
     "avatar-crop-zoom": { permission: "appearance.avatarcrop", label: "Increase the zoom limit in Discord's avatar crop tool", desktopOnly: true },
-    "jumbo-emoji-limit": { permission: "appearance.style", label: "Change how many emoji can appear at jumbo size in an emoji-only message", desktopOnly: true },
+    "jumbo-emoji-limit": { permission: "appearance.style", label: "Change how many emoji can appear at jumbo size in an emoji-only message" },
     "stop-auto-unread": { permission: "notifications.preventautoupgrade", label: "Keep your chosen channel notification settings" },
     "notification-volume": { permission: "notifications.volume", label: "Adjust the volume of Discord notifications and in-app sounds", desktopOnly: true },
     "flat-attachments": { permission: "appearance.style", label: "Show chat attachments individually without the media grid" },

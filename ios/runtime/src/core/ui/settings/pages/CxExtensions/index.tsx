@@ -12,7 +12,7 @@ import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAc
 import { getCxMessageLatency, type CxMessageLatencyOptions } from "@lib/api/cx";
 import { createCxTimestampRegistry, formatCxReplyTimestamp, type CxTimestampFormats, type CxTimestampSurface } from "@lib/api/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel, type CxVoiceMemberOptions } from "@lib/api/cx";
-import { selectCxAppearanceOption } from "@lib/api/cx";
+import { selectCxAppearanceOption, updateCxNumberOption } from "@lib/api/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, validateCxMediaLink, validateCxStickerLink, type CxChannelLabel } from "@lib/api/cx";
 import { registerCommand } from "@lib/api/commands";
 import { describeCcpReport } from "@lib/api/ccpInspect";
@@ -46,6 +46,26 @@ const voiceCounts = createCxVoiceCount();
 const voicePing = createCxVoicePing();
 const navigationControls = createCxNavigationControls();
 const timestamps = createCxTimestampRegistry();
+type CxJumboMarkup = { type?: string; content?: unknown; jumboable?: boolean; } | null;
+
+function applyJumboEmojiLimit(content: CxJumboMarkup[], limit: number): CxJumboMarkup[] {
+    const first = content[0];
+    const paragraph = content.length === 1 && first?.type === "paragraph" && Array.isArray(first.content) ? first : null;
+    const nodes = paragraph ? paragraph.content as CxJumboMarkup[] : content;
+    const isEmoji = (node: CxJumboMarkup) => node?.type === "emoji" || node?.type === "customEmoji";
+    let count = 0;
+    for (const node of nodes) {
+        if (isEmoji(node)) count++;
+        else if (typeof node?.content !== "string" || node.content.trim()) return content;
+    }
+    if (!count) return content;
+    const jumboable = count <= limit;
+    const needsChange = (node: CxJumboMarkup) => isEmoji(node) && (node?.jumboable === true) !== jumboable;
+    if (!nodes.some(needsChange)) return content;
+    const next = nodes.map(node => needsChange(node) ? { ...node, jumboable } : node);
+    return paragraph ? [{ ...paragraph, content: next }] : next;
+}
+
 const timestampFields = [
     ["timestamp", "cozy"], ["timestampTooltip", "tooltip"], ["timestampAccessibilityLabel", "accessibility"],
 ] as const satisfies readonly [string, CxTimestampSurface][];
@@ -2835,6 +2855,23 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                     throw new Error("Middle-click paste control is available on Linux.");
                 case "avatar-crop-zoom":
                     throw new Error("Avatar crop zoom is available on desktop and browser.");
+                case "jumbo-emoji-limit": {
+                    if (!effectOptions || !("jumboEmojiLimit" in effectOptions)) throw new Error("Missing jumbo emoji limit");
+                    const parser = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
+                    const cache = new WeakMap<object, unknown>();
+                    const limit = effectOptions.jumboEmojiLimit;
+                    return overrideCxMethods(parser, {
+                        parseMessageMarkup(args, invoke) {
+                            const row = invoke(args) as { content?: CxJumboMarkup[]; isInlineReplyPreview?: boolean; hasBailedAst?: boolean; } | undefined;
+                            if (!Array.isArray(row?.content) || row.isInlineReplyPreview || row.hasBailedAst) return row;
+                            if (cache.has(row)) return cache.get(row);
+                            const content = applyJumboEmojiLimit(row.content, limit);
+                            const result = content === row.content ? row : { ...row, content };
+                            cache.set(row, result);
+                            return result;
+                        },
+                    }, enabled);
+                }
                 case "notification-volume":
                     throw new Error("Notification volume control is available on desktop and browser.");
                 case "reveal-spoilers-shortcut":
@@ -3196,6 +3233,21 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                     label={candidate.review.name}
                     subLabel={[...candidate.review.effects, ...(candidate.review.commands ?? [])].join("\n")}
                 />}
+                {candidate && candidate.review.numberOptions.filter(option => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency").map(option =>
+                    <View key={option.effect} style={{ flexDirection: "row", alignItems: "center", gap: 12, paddingHorizontal: 12, paddingVertical: 6 }}>
+                        <Text style={{ color: "#fff", flex: 1 }}>{option.label} ({option.min}–{option.max}{option.unit})</Text>
+                        <TextInput accessibilityLabel={option.label} keyboardType="number-pad" selectTextOnFocus
+                            value={String(option.value)} maxLength={String(option.max).length}
+                            style={{ color: "#fff", backgroundColor: "#27282d", borderRadius: 8, minWidth: 54, padding: 8, textAlign: "center" }}
+                            onChangeText={(text: string) => {
+                                if (!/^\d+$/.test(text)) return;
+                                const next = updateCxNumberOption(candidate.source, option, Number(text));
+                                if (next === candidate.source) return;
+                                setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
+                                setCandidate({ ...candidate, source: next, review: reviewCx(next) });
+                            }} />
+                    </View>
+                )}
                 {candidate?.review.appearanceOptions.filter(supportsMobileHide).map(({ target, label }) => <TableSwitchRow key={target}
                     label={label} value={candidate.selected.includes(target)} onValueChange={(checked: boolean) => {
                         setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, checked) });
