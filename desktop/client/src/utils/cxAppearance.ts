@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-home-drawer-streaming-subtitle": hideMobileComponent("HideHomeDrawerStreamingSubtitle", "streaming status text in the home drawer", "modules/home_drawer/native/subtitles/StreamingSubtitle.tsx"),
+    "hide-home-drawer-typing-subtitle": hideMobileComponent("HideHomeDrawerTypingSubtitle", "typing status text in the home drawer", "modules/home_drawer/native/subtitles/TypingSubtitle.tsx"),
+    "hide-home-drawer-voice-subtitle": hideMobileComponent("HideHomeDrawerVoiceSubtitle", "voice activity text in the home drawer", "modules/home_drawer/native/subtitles/VoiceSubtitle.tsx"),
     "hide-quest-dock-promo-backdrop": hideMobileComponent("HideQuestDockPromoBackdrop", "the Quest dock backdrop before joining a quest", "modules/quests/native/QuestDock/QuestDockUnenrolledBackground.tsx"),
     "hide-activity-preview-backdrop": hideMobileComponent("HideActivityPreviewBackdrop", "background artwork in embedded activity previews", "modules/activities/native/EmbeddedActivityBackgroundImageWithOverlay.tsx"),
     "hide-quest-dock-backdrop": hideMobileComponent("HideQuestDockBackdrop", "the blurred backdrop of the Quest dock", "modules/quests/native/QuestDock/QuestDockBlurredContentBackground.tsx"),

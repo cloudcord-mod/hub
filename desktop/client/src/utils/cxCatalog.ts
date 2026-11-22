@@ -207,6 +207,9 @@ import plugin_catalog_hide_gift_button from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hide_gift_wishlist_banner from "../../../../examples/cx/catalog/plugins/hide-gift-wishlist-banner.cx";
 import plugin_catalog_hide_guild_boost_tag from "../../../../examples/cx/catalog/plugins/hide-guild-boost-tag.cx";
 import plugin_catalog_hide_help_button from "../../../../examples/cx/catalog/plugins/hide-help-button.cx";
+import plugin_catalog_hide_home_drawer_streaming_subtitle from "../../../../examples/cx/catalog/plugins/hide-home-drawer-streaming-subtitle.cx";
+import plugin_catalog_hide_home_drawer_typing_subtitle from "../../../../examples/cx/catalog/plugins/hide-home-drawer-typing-subtitle.cx";
+import plugin_catalog_hide_home_drawer_voice_subtitle from "../../../../examples/cx/catalog/plugins/hide-home-drawer-voice-subtitle.cx";
 import plugin_catalog_hide_image_alt_text from "../../../../examples/cx/catalog/plugins/hide-image-alt-text.cx";
 import plugin_catalog_hide_inbox_button from "../../../../examples/cx/catalog/plugins/hide-inbox-button.cx";
 import plugin_catalog_hide_join_messages from "../../../../examples/cx/catalog/plugins/hide-join-messages.cx";
@@ -833,6 +836,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideGiftWishlistBanner", source: plugin_catalog_hide_gift_wishlist_banner, description: "Hide the gift wishlist banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "f9b174f7bfc2d5e61f72706d348288ed1ffa64fede6a85411e5b27b0debecc11" },
         { name: "HideGuildBoostTag", source: plugin_catalog_hide_guild_boost_tag, description: "Hide the server boost gem", categories: ["Appearance"], appearanceRevision: "cfa92d873cfda042a72a953595c6f4a12855f7a4c62838e76d5e9436aa533eff" },
         { name: "HideHelpButton", source: plugin_catalog_hide_help_button, description: "Hide the Help entry", categories: ["Appearance"], appearanceRevision: "e8ed06f3a9370cfa1b44db2ee4ba4deb0e406c48e524f1870b8d84f03936666f" },
+        { name: "HideHomeDrawerStreamingSubtitle", source: plugin_catalog_hide_home_drawer_streaming_subtitle, description: "Hide streaming status text in the home drawer", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "1769a20be524575443562af5c1178ab28a7d808ccf8ebdc39ed6ba59a5408baa" },
+        { name: "HideHomeDrawerTypingSubtitle", source: plugin_catalog_hide_home_drawer_typing_subtitle, description: "Hide typing status text in the home drawer", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c92e4bee1126d8d7257b3788a108108832439545046b056288ace27d76bb97d4" },
+        { name: "HideHomeDrawerVoiceSubtitle", source: plugin_catalog_hide_home_drawer_voice_subtitle, description: "Hide voice activity text in the home drawer", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "dc800ba958ac22a8b0cddb5611d551bb701b1aab24840e912ecf8270df425568" },
         { name: "HideImageAltText", source: plugin_catalog_hide_image_alt_text, description: "Hide the image description control", categories: ["Appearance"], appearanceRevision: "d27a5ece853912fb32212eac8041d3481610ca40de40187d47643652183fe017" },
         { name: "HideInboxButton", source: plugin_catalog_hide_inbox_button, description: "Hide the notifications entry", categories: ["Appearance"], appearanceRevision: "bb7b7b3ae1cc8d09f3bc0ae5a2fa0a60658f118f5eb4fea73772e8a9f1f8fad5" },
         { name: "HideJoinMessages", source: plugin_catalog_hide_join_messages, description: "Hide system messages for joins", categories: ["Chat"] },

@@ -1,0 +1,3 @@
+plugin "HideHomeDrawerTypingSubtitle":
+  needs appearance.hide
+  hide hide-home-drawer-typing-subtitle

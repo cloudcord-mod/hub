@@ -1,0 +1,3 @@
+plugin "HideHomeDrawerStreamingSubtitle":
+  needs appearance.hide
+  hide hide-home-drawer-streaming-subtitle
