@@ -1,0 +1,7 @@
+plugin "Normalize Unicode":
+  needs commands.register
+  needs reply.local
+  on command "normalizeunicode":
+    input "text" text
+    input "form" text
+    reply "${normalizeUnicode(text, form)}" else "Enter text and one of NFC, NFD, NFKC, or NFKD."

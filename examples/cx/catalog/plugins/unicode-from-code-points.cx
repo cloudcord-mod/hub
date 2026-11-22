@@ -1,0 +1,6 @@
+plugin "Unicode From Code Points":
+  needs commands.register
+  needs reply.local
+  on command "unicodefrompoints":
+    input "text" text
+    reply "${unicodeFromPoints(text)}" else "Enter space-separated Unicode code points such as U+1F600 U+0041."

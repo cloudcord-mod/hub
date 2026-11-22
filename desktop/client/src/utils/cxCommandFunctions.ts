@@ -284,6 +284,17 @@ export const cxCommandFunctions = {
     },
     slugifyText: (text: string) => text.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase()
         .replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, ""),
+    unicodeFromPoints(text: string) {
+        const tokens = text.trim().split(/\s+/);
+        if (tokens.length > 128 || tokens.some(token => !/^U\+[0-9a-f]{1,6}$/i.test(token))) return;
+        const points = tokens.map(token => parseInt(token.slice(2), 16));
+        if (points.some(point => point > 0x10ffff || (point >= 0xd800 && point <= 0xdfff))) return;
+        return planningBlock(String.fromCodePoint(...points));
+    },
+    normalizeUnicode(text: string, form: string) {
+        if (!text || !/^(?:NFC|NFD|NFKC|NFKD)$/.test(form)) return;
+        return planningBlock(text.normalize(form));
+    },
     unicodeInfo(text: string) {
         const points = Array.from(text, character => "U+" + character.codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0"));
         if (!points.length || points.length > 128) return;

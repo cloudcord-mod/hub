@@ -3001,6 +3001,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["indentlines", { text: "a\r\n\r\nb", spaces: "2" }, /\n  a\n\n  b\n/],
                 ["indentlines", { text: "a", spaces: "17" }, /^Enter a whole number/],
             ]],
+            ["Unicode From Code Points", [
+                ["unicodefrompoints", { text: "U+1F600 U+0041" }, /😀A/],
+                ["unicodefrompoints", { text: "U+D800" }, /^Enter space-separated/],
+            ]],
+            ["Normalize Unicode", [
+                ["normalizeunicode", { text: "e\u0301", form: "NFC" }, /é/],
+                ["normalizeunicode", { text: "a", form: "invalid" }, /^Enter text/],
+            ]],
             ["Show Invisible Characters", [
                 ["showinvisibles", { text: "A\tB\u00a0C\r\nD\u200b" }, /A\[TAB\]B\[NBSP\]C\[CRLF\]\nD\[ZWSP\]/],
             ]],

@@ -393,6 +393,7 @@ import plugin_catalog_no_shadows from "../../../../examples/cx/catalog/plugins/n
 import plugin_catalog_no_typing_animation from "../../../../examples/cx/catalog/plugins/no-typing-animation.cx";
 import plugin_catalog_no_unblock_to_jump from "../../../../examples/cx/catalog/plugins/no-unblock-to-jump.cx";
 import plugin_catalog_normalize_message_links from "../../../../examples/cx/catalog/plugins/normalize-message-links.cx";
+import plugin_catalog_normalize_unicode from "../../../../examples/cx/catalog/plugins/normalize-unicode.cx";
 import plugin_catalog_notification_volume from "../../../../examples/cx/catalog/plugins/notification-volume.cx";
 import plugin_catalog_notify_when_muted from "../../../../examples/cx/catalog/plugins/notify-when-muted.cx";
 import plugin_catalog_number_base_converter from "../../../../examples/cx/catalog/plugins/number-base-converter.cx";
@@ -488,6 +489,7 @@ import plugin_catalog_transpose_csv from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
 import plugin_catalog_tsv_to_csv from "../../../../examples/cx/catalog/plugins/tsv-to-csv.cx";
 import plugin_catalog_tsv_to_markdown from "../../../../examples/cx/catalog/plugins/tsv-to-markdown.cx";
+import plugin_catalog_unicode_from_code_points from "../../../../examples/cx/catalog/plugins/unicode-from-code-points.cx";
 import plugin_catalog_unicode_inspector from "../../../../examples/cx/catalog/plugins/unicode-inspector.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
 import plugin_catalog_unique_lines from "../../../../examples/cx/catalog/plugins/unique-lines.cx";
@@ -1022,6 +1024,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "NoTypingAnimation", source: plugin_catalog_no_typing_animation, description: "Keep Discord's typing dots still", categories: ["Appearance"], appearanceRevision: "33ca72b51483126bf3dd4f9e40adb8ef725d2b01edc0beafcf567cd84e6f5f9a" },
         { name: "NoUnblockToJump", source: plugin_catalog_no_unblock_to_jump, description: "Skip the blocked, ignored, or spam author prompt when jumping to a message", categories: ["Chat"] },
         { name: "NormalizeMessageLinks", source: plugin_catalog_normalize_message_links, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
+        { name: "Normalize Unicode", source: plugin_catalog_normalize_unicode, description: "/normalizeunicode", commands: ["normalizeunicode"], categories: ["Commands"], appearanceRevision: "e7baa8a6574affa8523faccec0ab4f5c5c4457f5e754e5765ba335146c441f23", privateCommands: true },
         { name: "NotificationVolume", source: plugin_catalog_notification_volume, description: "Adjust the volume of Discord notifications and in-app sounds (100%)", desktopOnly: true, categories: ["Chat"] },
         { name: "NotifyWhenMuted", source: plugin_catalog_notify_when_muted, description: "Play a sound when you try to speak while muted", categories: ["Voice & calls"] },
         { name: "Number Base Converter", source: plugin_catalog_number_base_converter, description: "/convertbase", commands: ["convertbase"], categories: ["Commands"], appearanceRevision: "a3d8ed0516a0744ae8bfba7d9aaedc3d52b2d1801ce4f5cf8c28865d2597b10c", privateCommands: true },
@@ -1117,6 +1120,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"], appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849", privateCommands: true },
         { name: "TSV to CSV", source: plugin_catalog_tsv_to_csv, description: "/tsvtocsv", commands: ["tsvtocsv"], categories: ["Commands"], appearanceRevision: "fd03053374fa9b987c7037a3ef839d6b74524cb54d62b9cff8bc7a3c90a39def", privateCommands: true },
         { name: "TSV to Markdown", source: plugin_catalog_tsv_to_markdown, description: "/tsvtomarkdown", commands: ["tsvtomarkdown"], categories: ["Commands"], appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a", privateCommands: true },
+        { name: "Unicode From Code Points", source: plugin_catalog_unicode_from_code_points, description: "/unicodefrompoints", commands: ["unicodefrompoints"], categories: ["Commands"], appearanceRevision: "dd0e87b09b264ba6e9ab74eb257ec86da227e2578ffc5a85eac879a90a99515f", privateCommands: true },
         { name: "Unicode Inspector", source: plugin_catalog_unicode_inspector, description: "/unicodeinfo", commands: ["unicodeinfo"], categories: ["Commands"], appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f", privateCommands: true },
         { name: "Unindent", source: plugin_catalog_unindent, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Unique Lines", source: plugin_catalog_unique_lines, description: "/uniquelines", commands: ["uniquelines"], categories: ["Commands"], appearanceRevision: "07d60765a5167987e470a46f82f49c116e8f1d54bb4c3b412ebe9f5444f80cf6", privateCommands: true },
