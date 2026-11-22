@@ -62244,6 +62244,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           throw new Error(`Open this file from ${preview2.kind === "theme" ? "Themes" : "Plugins"}.`);
         setCandidate({
           source: next,
+          originalSource: next,
           review: preview2,
           selected: preview2.appearanceOptions.filter((option) => option.defaultOn && supportsMobileHide(option)).map((option) => option.target)
         });
@@ -62547,9 +62548,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     onChangeText: (text) => {
                       if (!/^\d+$/.test(text))
                         return;
-                      var next = updateCxNumberOption(candidate.source, option, Number(text));
-                      if (next === candidate.source)
+                      var selected = Number(text);
+                      if (selected < option.min || selected > option.max || selected === option.value)
                         return;
+                      var next = applyRememberedNumbers(candidate.originalSource, {
+                        ...numberValues,
+                        [option.effect]: selected
+                      });
                       setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
                       setCandidate({
                         ...candidate,
@@ -67505,7 +67510,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "640c56e13d1a7b55cabd01af366c38ac909a2ed0";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "29a2bed7742c65ae02a9b0e58882ebc699d7ce16";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
