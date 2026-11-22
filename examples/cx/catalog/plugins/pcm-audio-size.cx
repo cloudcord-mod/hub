@@ -1,0 +1,9 @@
+plugin "PCM Audio Size":
+  needs commands.register
+  needs reply.local
+  on command "pcmsize":
+    input "rate" text
+    input "bits" text
+    input "channels" text
+    input "duration" text
+    reply "${pcmAudioSize(rate, bits, channels, duration)}" else "Enter sample rate in Hz, bit depth 8, 16, 24, or 32, 1 to 32 channels, and a duration."

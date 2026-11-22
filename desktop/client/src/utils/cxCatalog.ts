@@ -338,6 +338,7 @@ import plugin_catalog_html_escape from "../../../../examples/cx/catalog/plugins/
 import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins/ignore-calls.cx";
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
+import plugin_catalog_image_pixel_count from "../../../../examples/cx/catalog/plugins/image-pixel-count.cx";
 import plugin_catalog_improve_contrast from "../../../../examples/cx/catalog/plugins/improve-contrast.cx";
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_indent_lines from "../../../../examples/cx/catalog/plugins/indent-lines.cx";
@@ -402,6 +403,7 @@ import plugin_catalog_number_summary from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_opacity_contrast from "../../../../examples/cx/catalog/plugins/opacity-contrast.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
 import plugin_catalog_ordered_line_diff from "../../../../examples/cx/catalog/plugins/ordered-line-diff.cx";
+import plugin_catalog_pcm_audio_size from "../../../../examples/cx/catalog/plugins/pcm-audio-size.cx";
 import plugin_catalog_percentage_change from "../../../../examples/cx/catalog/plugins/percentage-change.cx";
 import plugin_catalog_pick_names from "../../../../examples/cx/catalog/plugins/pick-names.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
@@ -969,6 +971,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "IgnoreCalls", source: plugin_catalog_ignore_calls, description: "Edit the source to enter Discord IDs", categories: ["Voice & calls"] },
         { name: "ImageFilename", source: plugin_catalog_image_filename, description: "Show image filenames and GIF links", categories: ["Media"] },
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
+        { name: "Image Pixel Count", source: plugin_catalog_image_pixel_count, description: "/pixelcount", commands: ["pixelcount"], categories: ["Commands"], appearanceRevision: "b7370fa1ee7f6e7422f8be5d8b9551705f5438c878d0fe239911bdfd3699ecae", privateCommands: true },
         { name: "Improve Contrast", source: plugin_catalog_improve_contrast, description: "/improvecontrast", commands: ["improvecontrast"], categories: ["Commands"], appearanceRevision: "a5f2ddbbf7bdc8258da75b5c2540054215e0528fcb069b39682fcc973c144776", privateCommands: true },
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
         { name: "Indent Lines", source: plugin_catalog_indent_lines, description: "/indentlines", commands: ["indentlines"], categories: ["Commands"], appearanceRevision: "105e91032887863c35b9e5e1d74a847c62af5d275cceafa7e2d79320cd272d65", privateCommands: true },
@@ -1033,6 +1036,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Opacity Contrast", source: plugin_catalog_opacity_contrast, description: "/opacitycontrast", commands: ["opacitycontrast"], categories: ["Commands"], appearanceRevision: "c25ed9504fa3ab322289d6ea6bb3d13e1a66d385f72e4be47637e52367db43bc", privateCommands: true },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
         { name: "Ordered Line Diff", source: plugin_catalog_ordered_line_diff, description: "/linediff", commands: ["linediff"], categories: ["Commands"], appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302", privateCommands: true },
+        { name: "PCM Audio Size", source: plugin_catalog_pcm_audio_size, description: "/pcmsize", commands: ["pcmsize"], categories: ["Commands"], appearanceRevision: "8f5b371208287d9131b6fb1ff3076a24c6173c17cc448232e63f1b22328ae4dc", privateCommands: true },
         { name: "Percentage Change", source: plugin_catalog_percentage_change, description: "/percentchange", commands: ["percentchange"], categories: ["Commands"], appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e", privateCommands: true },
         { name: "Pick Names", source: plugin_catalog_pick_names, description: "/picknames", commands: ["picknames"], categories: ["Commands"], appearanceRevision: "6bac0273d0f9dfd45078b339e3a8f38fd2295eed75074ed7cc6125f808925467", privateCommands: true },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },

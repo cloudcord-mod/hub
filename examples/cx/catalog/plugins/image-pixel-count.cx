@@ -1,0 +1,7 @@
+plugin "Image Pixel Count":
+  needs commands.register
+  needs reply.local
+  on command "pixelcount":
+    input "width" text
+    input "height" text
+    reply "${imagePixelCount(width, height)}" else "Enter whole-number image dimensions from 1 to 1000000."

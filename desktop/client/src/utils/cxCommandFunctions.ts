@@ -984,6 +984,20 @@ export const cxCommandFunctions = {
         return "Resize to " + scaledW + " × " + scaledH + " px\n" + action + ": "
             + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
     },
+    imagePixelCount(width: string, height: string) {
+        const columns = integerText(width), rows = integerText(height);
+        if (columns === undefined || rows === undefined || columns < 1 || rows < 1 || columns > 1_000_000 || rows > 1_000_000) return;
+        const count = columns * rows;
+        return count + " pixels · " + count / 1_000_000 + " MP";
+    },
+    pcmAudioSize(rate: string, bits: string, channels: string, duration: string) {
+        const sampleRate = integerText(rate), bitDepth = integerText(bits), channelCount = integerText(channels);
+        const seconds = durationSeconds(duration);
+        if (sampleRate === undefined || sampleRate < 1 || sampleRate > 768_000 || bitDepth === undefined
+            || ![8, 16, 24, 32].includes(bitDepth) || channelCount === undefined || channelCount < 1 || channelCount > 32 || !seconds) return;
+        const bytes = sampleRate * (bitDepth / 8) * channelCount * seconds;
+        if (Number.isSafeInteger(bytes)) return "PCM payload: " + bytes + " bytes · " + bytes / 1_000_000 + " MB";
+    },
     videoSizeEstimate(rate: string, duration: string) {
         const kbps = Number(rate);
         const seconds = durationSeconds(duration);

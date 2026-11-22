@@ -2968,6 +2968,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["fitimage", { source: "1920x1080", box: "1000×1000", mode: "contain" }, /1000 × 562 px\nPadding: 0 px horizontally, 438 px vertically/],
                 ["fitimage", { source: "1920x1080", box: "1000x1000", mode: "cover" }, /1778 × 1000 px\nCrop: 778 px horizontally, 0 px vertically/],
             ]],
+            ["Image Pixel Count", [
+                ["pixelcount", { width: "3840", height: "2160" }, /^8294400 pixels · 8\.2944 MP$/],
+                ["pixelcount", { width: "0", height: "2160" }, /^Enter whole-number/],
+            ]],
+            ["PCM Audio Size", [
+                ["pcmsize", { rate: "48000", bits: "24", channels: "2", duration: "1m" }, /^PCM payload: 17280000 bytes · 17\.28 MB$/],
+                ["pcmsize", { rate: "48000", bits: "12", channels: "2", duration: "1m" }, /^Enter sample rate/],
+            ]],
             ["Video Size Estimate", [
                 ["videosize", { rate: "2000", duration: "2m" }, /^Estimated payload: 30 MB$/],
                 ["videosize", { rate: "0", duration: "1m" }, /^Enter a positive total/],
