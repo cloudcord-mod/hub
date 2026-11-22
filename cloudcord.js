@@ -36912,6 +36912,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-gif-search-suggestions": hideMobileComponent("HideGifSearchSuggestions", "suggested searches in the GIF picker", "modules/gif_picker/native/GIFPickerSearchSuggestions.tsx"),
         "hide-emoji-search-promotion": hideMobileComponent("HideEmojiSearchPromotion", "the Nitro upsell in emoji search", "modules/emoji_picker/native/components/EmojiPickerPremiumSearchUpsell.tsx"),
         "hide-server-tag-promotion": hideMobileComponent("HideServerTagPromotion", "the server tag upsell in server settings", "modules/guild_settings/native/GuildSettingsServerTagUpsellCard.tsx"),
+        "hide-chat-input-refresh-tip": hideMobileComponent("HideChatInputRefreshTip", "the redesigned chat input tip", "modules/chat_input/native/RefreshChatInputCoachmark.tsx"),
+        "hide-shop-button-tip": hideMobileComponent("HideShopButtonTip", "the Shop button introduction", "modules/collectibles/native/MobileShopButtonCoachmark.tsx"),
+        "hide-shop-orbs-tip": hideMobileComponent("HideShopOrbsTip", "the Orbs badge introduction in the Shop", "modules/collectibles/native/OrbsBadgeCoachmark.tsx"),
+        "hide-shop-wishlist-tip": hideMobileComponent("HideShopWishlistTip", "the wishlist button introduction in the Shop", "modules/collectibles/native/WishlistButtonCoachmark.tsx"),
+        "hide-shop-this-look-tip": hideMobileComponent("HideShopThisLookTip", "the Shop This Look marketing tip", "modules/collectibles/shop_this_look/native/ShopThisLookMarketingCoachmark.tsx"),
+        "hide-typing-indicator-profile-tip": hideMobileComponent("HideTypingIndicatorProfileTip", "the custom typing indicator tip on profiles", "modules/custom_typing_indicator/native/CustomTypingIndicatorProfileCoachmark.tsx"),
+        "hide-display-name-styles-tip": hideMobileComponent("HideDisplayNameStylesTip", "the display name styles tip on profiles", "modules/display_name_styles/native/DisplayNameStylesFlywheelProfileCoachmark.tsx"),
+        "hide-profile-nitro-card": hideMobileComponent("HideProfileNitroCard", "the Nitro upsell card on profiles", "modules/user_profile/native/UserProfilePremiumUpsellCard.tsx"),
+        "hide-badge-customization-tip": hideMobileComponent("HideBadgeCustomizationTip", "the badge customization tip on profiles", "modules/user_profile/native/BadgeCustomizationProfileCoachmark.tsx"),
+        "hide-call-activities-tip": hideMobileComponent("HideCallActivitiesTip", "the Activities tooltip in private calls", "modules/activities/native/ActivitiesPrivateChannelCallTooltip.tsx"),
         // PlainFolderIcon by botato (GPL-3.0-or-later).
         "plain-folder-icon": {
           plugin: "PlainFolderIcon",
@@ -49930,6 +49940,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-badge-customization-tip.cx
+  var hide_badge_customization_tip_default;
+  var init_hide_badge_customization_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-badge-customization-tip.cx"() {
+      hide_badge_customization_tip_default = 'plugin "HideBadgeCustomizationTip":\n  needs appearance.hide\n  hide hide-badge-customization-tip\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-badges.cx
   var hide_badges_default;
   var init_hide_badges = __esm({
@@ -49962,6 +49980,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-call-activities-tip.cx
+  var hide_call_activities_tip_default;
+  var init_hide_call_activities_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-call-activities-tip.cx"() {
+      hide_call_activities_tip_default = 'plugin "HideCallActivitiesTip":\n  needs appearance.hide\n  hide hide-call-activities-tip\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-call-buttons.cx
   var hide_call_buttons_default;
   var init_hide_call_buttons = __esm({
@@ -49983,6 +50009,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_character_count = __esm({
     "../examples/cx/catalog/plugins/hide-character-count.cx"() {
       hide_character_count_default = 'plugin "HideCharacterCount":\n  needs appearance.hide\n  hide chat-character-counter\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx
+  var hide_chat_input_refresh_tip_default;
+  var init_hide_chat_input_refresh_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx"() {
+      hide_chat_input_refresh_tip_default = 'plugin "HideChatInputRefreshTip":\n  needs appearance.hide\n  hide hide-chat-input-refresh-tip\n';
     }
   });
 
@@ -50023,6 +50057,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_discover_button = __esm({
     "../examples/cx/catalog/plugins/hide-discover-button.cx"() {
       hide_discover_button_default = 'plugin "HideDiscoverButton":\n  needs appearance.style\n  style hide-discover-button\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-display-name-styles-tip.cx
+  var hide_display_name_styles_tip_default;
+  var init_hide_display_name_styles_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-display-name-styles-tip.cx"() {
+      hide_display_name_styles_tip_default = 'plugin "HideDisplayNameStylesTip":\n  needs appearance.hide\n  hide hide-display-name-styles-tip\n';
     }
   });
 
@@ -50338,6 +50380,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-nitro-card.cx
+  var hide_profile_nitro_card_default;
+  var init_hide_profile_nitro_card = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-nitro-card.cx"() {
+      hide_profile_nitro_card_default = 'plugin "HideProfileNitroCard":\n  needs appearance.hide\n  hide hide-profile-nitro-card\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-notes.cx
   var hide_profile_notes_default;
   var init_hide_profile_notes = __esm({
@@ -50426,11 +50476,43 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-shop-button-tip.cx
+  var hide_shop_button_tip_default;
+  var init_hide_shop_button_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-button-tip.cx"() {
+      hide_shop_button_tip_default = 'plugin "HideShopButtonTip":\n  needs appearance.hide\n  hide hide-shop-button-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-shop-orbs-tip.cx
+  var hide_shop_orbs_tip_default;
+  var init_hide_shop_orbs_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-orbs-tip.cx"() {
+      hide_shop_orbs_tip_default = 'plugin "HideShopOrbsTip":\n  needs appearance.hide\n  hide hide-shop-orbs-tip\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-shop-tab.cx
   var hide_shop_tab_default;
   var init_hide_shop_tab = __esm({
     "../examples/cx/catalog/plugins/hide-shop-tab.cx"() {
       hide_shop_tab_default = 'plugin "HideShopTab":\n  needs appearance.hide\n  hide shop-entry\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-shop-this-look-tip.cx
+  var hide_shop_this_look_tip_default;
+  var init_hide_shop_this_look_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-this-look-tip.cx"() {
+      hide_shop_this_look_tip_default = 'plugin "HideShopThisLookTip":\n  needs appearance.hide\n  hide hide-shop-this-look-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-shop-wishlist-tip.cx
+  var hide_shop_wishlist_tip_default;
+  var init_hide_shop_wishlist_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-wishlist-tip.cx"() {
+      hide_shop_wishlist_tip_default = 'plugin "HideShopWishlistTip":\n  needs appearance.hide\n  hide hide-shop-wishlist-tip\n';
     }
   });
 
@@ -50543,6 +50625,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_timestamps = __esm({
     "../examples/cx/catalog/plugins/hide-timestamps.cx"() {
       hide_timestamps_default = 'plugin "HideTimestamps":\n  needs appearance.hide\n  hide message-timestamps\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-typing-indicator-profile-tip.cx
+  var hide_typing_indicator_profile_tip_default;
+  var init_hide_typing_indicator_profile_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-typing-indicator-profile-tip.cx"() {
+      hide_typing_indicator_profile_tip_default = 'plugin "HideTypingIndicatorProfileTip":\n  needs appearance.hide\n  hide hide-typing-indicator-profile-tip\n';
     }
   });
 
@@ -53060,18 +53150,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_app_launcher_recommendations();
       init_hide_apps_button();
       init_hide_avatar_decorations();
+      init_hide_badge_customization_tip();
       init_hide_badges();
       init_hide_blocked_and_ignored_messages();
       init_hide_boost_goal();
       init_hide_bot_tags();
+      init_hide_call_activities_tip();
       init_hide_call_buttons();
       init_hide_channel_topic();
       init_hide_character_count();
+      init_hide_chat_input_refresh_tip();
       init_hide_clan_tags();
       init_hide_contact_sync_promotion();
       init_hide_custom_statuses();
       init_hide_disabled_emojis();
       init_hide_discover_button();
+      init_hide_display_name_styles_tip();
       init_hide_dm_search();
       init_hide_double_tap_reaction_tip();
       init_hide_download_apps_button();
@@ -53111,6 +53205,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_effects();
       init_hide_profile_friend_request_banner();
       init_hide_profile_mutuals();
+      init_hide_profile_nitro_card();
       init_hide_profile_notes();
       init_hide_quests_tab();
       init_hide_reactions();
@@ -53122,7 +53217,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_server_banner();
       init_hide_server_banners();
       init_hide_server_tag_promotion();
+      init_hide_shop_button_tip();
+      init_hide_shop_orbs_tip();
       init_hide_shop_tab();
+      init_hide_shop_this_look_tip();
+      init_hide_shop_wishlist_tip();
       init_hide_soundboard_nitro_banner();
       init_hide_spoiler_warnings();
       init_hide_status_emojis();
@@ -53137,6 +53236,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_thread_suggestions();
       init_hide_threads_button();
       init_hide_timestamps();
+      init_hide_typing_indicator_profile_tip();
       init_hide_typing_indicator();
       init_hide_unread_pills();
       init_hide_upload_button();
@@ -54555,6 +54655,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "af04631611ed161cb774835f80057bedb39a04a347cc9c7862a25db7ec22af1f"
           },
           {
+            name: "HideBadgeCustomizationTip",
+            source: hide_badge_customization_tip_default,
+            description: "Hide the badge customization tip on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "a87e71ce4ff7f7c60574ab43187c45329ff88f0d9f260605112721f12f8f912b"
+          },
+          {
             name: "HideBadges",
             source: hide_badges_default,
             description: "Hide profile badge rows",
@@ -54591,6 +54701,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e"
           },
           {
+            name: "HideCallActivitiesTip",
+            source: hide_call_activities_tip_default,
+            description: "Hide the Activities tooltip in private calls",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2"
+          },
+          {
             name: "HideCallButtons",
             source: hide_call_buttons_default,
             description: "Hide the buttons to start calls in DMs",
@@ -54617,6 +54737,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113"
+          },
+          {
+            name: "HideChatInputRefreshTip",
+            source: hide_chat_input_refresh_tip_default,
+            description: "Hide the redesigned chat input tip",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36"
           },
           {
             name: "HideClanTags",
@@ -54663,6 +54793,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideDisplayNameStylesTip",
+            source: hide_display_name_styles_tip_default,
+            description: "Hide the display name styles tip on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "b2f3e613dda86aa78c01940feeed87d0a2ef9e4f750df312df248c6b01e4ef50"
           },
           {
             name: "HideDmSearch",
@@ -55024,6 +55164,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "679a2cd8c5a444c7897181afbcd449254c80d87cfe5025194459bc8bba4f1904"
           },
           {
+            name: "HideProfileNitroCard",
+            source: hide_profile_nitro_card_default,
+            description: "Hide the Nitro upsell card on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "ca245a8305d7861da8d39766e9f4905cc01d6bf84530d9046e6233955a682434"
+          },
+          {
             name: "HideProfileNotes",
             source: hide_profile_notes_default,
             description: "Hide local notes in profile cards",
@@ -55126,6 +55276,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640"
           },
           {
+            name: "HideShopButtonTip",
+            source: hide_shop_button_tip_default,
+            description: "Hide the Shop button introduction",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848"
+          },
+          {
+            name: "HideShopOrbsTip",
+            source: hide_shop_orbs_tip_default,
+            description: "Hide the Orbs badge introduction in the Shop",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c85b6065539f13b9ef0db320e0202a52659ad7c1524c8630cf4bc2a4a81e31fe"
+          },
+          {
             name: "HideShopTab",
             source: hide_shop_tab_default,
             description: "Hide the Shop entry",
@@ -55133,6 +55303,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d"
+          },
+          {
+            name: "HideShopThisLookTip",
+            source: hide_shop_this_look_tip_default,
+            description: "Hide the Shop This Look marketing tip",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "4f2f4cf3a6832e4de7ae8318151be0a4f77b256d80d0dc59ad5c92c6288e7ca4"
+          },
+          {
+            name: "HideShopWishlistTip",
+            source: hide_shop_wishlist_tip_default,
+            description: "Hide the wishlist button introduction in the Shop",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "a3934a5cb2fcc81c41fc2a7ac8efb1db6370fa514bc570daba7dedffafbdda18"
           },
           {
             name: "HideSoundboardNitroBanner",
@@ -55259,6 +55449,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "b584410226ed8ce4eb10775147be265d2aad4d6012abd6c537babfad719e0225"
+          },
+          {
+            name: "HideTypingIndicatorProfileTip",
+            source: hide_typing_indicator_profile_tip_default,
+            description: "Hide the custom typing indicator tip on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "39a7b3e04b4075305e8dd260cec2d0d9178be84fed2cebf8220e8129351d2ca5"
           },
           {
             name: "HideTypingIndicator",
@@ -66912,7 +67112,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "08f2c0cd34345bd302ee015acb17ae9f344e167c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ae03b0356364a2fb8177986512c4377af518819a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
