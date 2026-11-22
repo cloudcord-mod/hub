@@ -36902,6 +36902,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-profile-activity-badges": hideMobileComponent("HideProfileActivityBadges", "activity badges on profiles", "modules/user_profile/native/UserProfileActivityBadges.tsx"),
+        "hide-profile-activity-timebar": hideMobileComponent("HideProfileActivityTimebar", "the elapsed-time bar on profile activity cards", "modules/user_profile/native/UserProfileActivityTimebar.tsx"),
+        "hide-profile-wishlist-suggestions": hideMobileComponent("HideProfileWishlistSuggestions", "suggested items on profile wishlists", "modules/user_profile/native/UserProfileWishlistSuggestionsGrid.tsx"),
+        "hide-profile-wishlist-tip": hideMobileComponent("HideProfileWishlistTip", "the wishlist viewing tip on profiles", "modules/user_profile/native/WishlistViewerCoachmark.tsx"),
         "hide-app-launcher-intro": hideMobileComponent("HideAppLauncherIntro", "the Apps launcher introduction", "modules/app_launcher/native/onboarding/banner/AppLauncherOnboardingBanner.tsx"),
         "hide-app-launcher-recommendations": hideMobileComponent("HideAppLauncherRecommendations", "recommendations in the Apps launcher", "modules/app_launcher/native/screens/home/recommendations/RecommendationsBanner.tsx"),
         "hide-contact-sync-promotion": hideMobileComponent("HideContactSyncPromotion", "the contact sync promotion", "modules/contact_sync/native/components/ContactSyncUpsellCTA.tsx"),
@@ -50450,6 +50454,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-activity-badges.cx
+  var hide_profile_activity_badges_default;
+  var init_hide_profile_activity_badges = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-activity-badges.cx"() {
+      hide_profile_activity_badges_default = 'plugin "HideProfileActivityBadges":\n  needs appearance.hide\n  hide hide-profile-activity-badges\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-activity-timebar.cx
+  var hide_profile_activity_timebar_default;
+  var init_hide_profile_activity_timebar = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-activity-timebar.cx"() {
+      hide_profile_activity_timebar_default = 'plugin "HideProfileActivityTimebar":\n  needs appearance.hide\n  hide hide-profile-activity-timebar\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-banner-images.cx
   var hide_profile_banner_images_default;
   var init_hide_profile_banner_images = __esm({
@@ -50503,6 +50523,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_profile_notes = __esm({
     "../examples/cx/catalog/plugins/hide-profile-notes.cx"() {
       hide_profile_notes_default = 'plugin "HideProfileNotes":\n  needs appearance.hide\n  hide profile-notes\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx
+  var hide_profile_wishlist_suggestions_default;
+  var init_hide_profile_wishlist_suggestions = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx"() {
+      hide_profile_wishlist_suggestions_default = 'plugin "HideProfileWishlistSuggestions":\n  needs appearance.hide\n  hide hide-profile-wishlist-suggestions\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx
+  var hide_profile_wishlist_tip_default;
+  var init_hide_profile_wishlist_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx"() {
+      hide_profile_wishlist_tip_default = 'plugin "HideProfileWishlistTip":\n  needs appearance.hide\n  hide hide-profile-wishlist-tip\n';
     }
   });
 
@@ -53314,6 +53350,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_orb_wallet_seasonal_promotion();
       init_hide_pins_button();
       init_hide_premium_group_promotion();
+      init_hide_profile_activity_badges();
+      init_hide_profile_activity_timebar();
       init_hide_profile_banner_images();
       init_hide_profile_connections();
       init_hide_profile_effects();
@@ -53321,6 +53359,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_mutuals();
       init_hide_profile_nitro_card();
       init_hide_profile_notes();
+      init_hide_profile_wishlist_suggestions();
+      init_hide_profile_wishlist_tip();
       init_hide_quests_tab();
       init_hide_reactions();
       init_hide_reply_previews();
@@ -55261,6 +55301,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "HideProfileActivityBadges",
+            source: hide_profile_activity_badges_default,
+            description: "Hide activity badges on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "5eb45da8e6b8f4b64553b82a09ba64b96f22ac4ab0faf9d8ae00b93eda857a40"
+          },
+          {
+            name: "HideProfileActivityTimebar",
+            source: hide_profile_activity_timebar_default,
+            description: "Hide the elapsed-time bar on profile activity cards",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "a4f2b8a3365692099cd125181785282a06e13d22e28ec0c5a546686646d822da"
+          },
+          {
             name: "Hide Profile Banner Images",
             source: hide_profile_banner_images_default,
             description: "Hide Discord-hosted profile banner images except your own and those of friends",
@@ -55328,6 +55388,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Profiles"
             ],
             appearanceRevision: "44621fb025c00ea1584c339676b98267d76beef6faba3d1da94312ab63b15e83"
+          },
+          {
+            name: "HideProfileWishlistSuggestions",
+            source: hide_profile_wishlist_suggestions_default,
+            description: "Hide suggested items on profile wishlists",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "d23c4eb8f183ca2a7f49fc9086f59dd68e5f6c031b000430c0670ea2754d0622"
+          },
+          {
+            name: "HideProfileWishlistTip",
+            source: hide_profile_wishlist_tip_default,
+            description: "Hide the wishlist viewing tip on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "74d22841fc73e0f740b1819df239a6b3023720a18799b73e96b32cf90f67649f"
           },
           {
             name: "HideQuestsTab",
@@ -67382,7 +67462,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "809eb7a0c36cf965f207fd6924ecc7568f8c4ac7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4d80942e0f0576acb500a5e8524a1cdc50661632";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
