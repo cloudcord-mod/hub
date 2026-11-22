@@ -38974,6 +38974,27 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return;
           return planningBlock(text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&").replace(/\r/g, "\\r").replace(/\n/g, "\\n"));
         },
+        truncateText(text, limit) {
+          var length = integerText(limit);
+          if (!text || length === void 0 || length < 1 || length > 2e3)
+            return;
+          var points = Array.from(text);
+          return planningBlock(points.length > length ? points.slice(0, length - 1).join("") + "\u2026" : text);
+        },
+        findLongLines(text, limit) {
+          var length = integerText(limit);
+          if (!text || length === void 0 || length < 1)
+            return;
+          var lines = text.split(/\r\n|\r|\n/).flatMap((line, index) => {
+            var size = Array.from(line).length;
+            return size > length ? [
+              "Line " + (index + 1) + " \xB7 " + size + " code points"
+            ] : [];
+          });
+          if (!lines.length)
+            return "No lines exceed the limit.";
+          return lines.slice(0, 50).join("\n") + (lines.length > 50 ? "\n" + (lines.length - 50) + " more" : "");
+        },
         countTextMatches(text, phrase) {
           if (!text || !phrase)
             return;
@@ -51148,6 +51169,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/find-long-lines.cx
+  var find_long_lines_default;
+  var init_find_long_lines = __esm({
+    "../examples/cx/catalog/plugins/find-long-lines.cx"() {
+      find_long_lines_default = 'plugin "Find Long Lines":\n  needs commands.register\n  needs reply.local\n  on command "findlonglines":\n    input "text" text\n    input "limit" text\n    reply "${findLongLines(text, limit)}" else "Enter text and a positive whole-number line limit."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/fit-image.cx
   var fit_image_default;
   var init_fit_image = __esm({
@@ -54320,6 +54349,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/truncate-text.cx
+  var truncate_text_default;
+  var init_truncate_text = __esm({
+    "../examples/cx/catalog/plugins/truncate-text.cx"() {
+      truncate_text_default = 'plugin "Truncate Text":\n  needs commands.register\n  needs reply.local\n  on command "truncatetext":\n    input "text" text\n    input "limit" text\n    reply "${truncateText(text, limit)}" else "Enter text and a code-point limit from 1 to 2000."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/tsv-to-csv.cx
   var tsv_to_csv_default;
   var init_tsv_to_csv = __esm({
@@ -55590,6 +55627,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_file_size_converter();
       init_file_transfer_estimate();
       init_filter_lines();
+      init_find_long_lines();
       init_fit_image();
       init_fix_codeblock_gap();
       init_fix_file_extensions();
@@ -55965,6 +56003,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_transparent_chat_bar();
       init_transpose_csv();
       init_trim_lines();
+      init_truncate_text();
       init_tsv_to_csv();
       init_tsv_to_markdown();
       init_unicode_from_code_points();
@@ -57379,6 +57418,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "d0d8fa478df843e609eb1e2a81205c822db438d5f0d1d31f596b7e0d4964da8a",
+            privateCommands: true
+          },
+          {
+            name: "Find Long Lines",
+            source: find_long_lines_default,
+            description: "/findlonglines",
+            commands: [
+              "findlonglines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "498ac253d635245b4b0ce06b19ffc86eacdedbde1e8387aa13d40ba34ac9a77d",
             privateCommands: true
           },
           {
@@ -61157,6 +61209,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849",
+            privateCommands: true
+          },
+          {
+            name: "Truncate Text",
+            source: truncate_text_default,
+            description: "/truncatetext",
+            commands: [
+              "truncatetext"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fb3353fcfa8814176a2068c522a13e2e7a73148ca0c9ee768e327770595abf43",
             privateCommands: true
           },
           {
@@ -71709,7 +71774,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "59386c7ad76a72de02c490e4c6e744854006e94f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3598c62f5d673f6f78a3620d8c749feddfe82bab";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
