@@ -1802,10 +1802,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             if (desktop && target === "hide-profile-banner") {
                 const plugin = module.exports.default;
                 const patch = plugin.patches.find(patch => patch.find === 'backgroundColor:"COMPLETE"');
-                const original = 'return {overflow:"visible",before:flag(!1),style:{backgroundImage:null!=image?`url(${image})`:void 0}};';
+                const original = 'return {overflow:"visible",before:flag(!1),style:{color:"red",backgroundImage:null!=image?`url(${image})`:void 0}};';
                 const match = new RegExp(patch.replacement.match.source.replaceAll("\\i", "[a-zA-Z_$][\\w$]*"));
                 const patched = original.replace(match, patch.replacement.replace.replace("$self", "plugin"));
                 const banner = new Function("plugin", "image", "flag", patched);
+                const viewIconsSource = read("desktop/client/src/plugins/viewIcons/index.tsx");
+                const viewIconsBannerMatch = /find: 'backgroundColor:"COMPLETE"',\s+replacement: \{\s+match: (\/[^\n]+\/),/.exec(viewIconsSource)[1];
+                const viewIconsRegex = new RegExp(viewIconsBannerMatch.slice(1, -1).replaceAll("\\i", "[a-zA-Z_$][\\w$]*"));
+                assert.ok(viewIconsRegex.test(patched), "View Icons can still find the guarded banner");
+                const clickable = original.replace(viewIconsRegex, '$1onClick:()=>image,style:{cursor:"pointer",');
+                assert.notEqual(clickable, original);
+                assert.ok(match.test(clickable), "banner visibility can still find the clickable banner");
                 assert.equal(banner(plugin, "banner.png", () => false).style.backgroundImage, undefined);
                 click(render(), "Disable " + rule.plugin);
                 assert.equal(banner(plugin, "banner.png", () => false).style.backgroundImage, "url(banner.png)");

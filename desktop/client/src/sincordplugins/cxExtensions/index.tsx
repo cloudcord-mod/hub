@@ -2036,7 +2036,7 @@ export default definePlugin({
     }, {
         find: 'backgroundColor:"COMPLETE"',
         replacement: {
-            match: /(overflow:"visible",.{0,125}?!1\),style:\{.{0,250}?backgroundImage:)(null!=(\i)\?`url\(\$\{\3\}\)`)/,
+            match: /(overflow:"visible",.{0,125}?!1\),.{0,250}?style:\{.{0,250}?backgroundImage:)(null!=(\i)\?`url\(\$\{\3\}\)`)/,
             replace: "$1!$self.shouldHideProfileBanner()&&$2",
         },
     }, {
