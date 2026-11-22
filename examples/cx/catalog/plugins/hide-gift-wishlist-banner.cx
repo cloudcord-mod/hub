@@ -1,0 +1,3 @@
+plugin "HideGiftWishlistBanner":
+  needs appearance.hide
+  hide hide-gift-wishlist-banner

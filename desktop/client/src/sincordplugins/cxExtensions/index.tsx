@@ -783,8 +783,10 @@ function registerStaticTypingDots() {
 }
 
 function applyAppearanceCss(target: keyof typeof cxAppearanceTargets) {
+    const rule = cxAppearanceTargets[target];
+    if ("mobileOnly" in rule && rule.mobileOnly) throw new Error("This appearance option is available on mobile.");
     const style = document.createElement("style");
-    style.textContent = cxAppearanceTargets[target].css;
+    style.textContent = rule.css;
     document.head.append(style);
     return () => style.remove();
 }
@@ -1509,12 +1511,13 @@ const activeCatalogLoaders = new Map<string, () => Promise<string>>();
 export type CxAddonKind = "plugin" | "theme";
 type CxAddonSource = string | (() => Promise<string>);
 export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
-const desktopCatalogPlugins = cxCatalog.plugins.filter(entry => !entry.linuxOnly);
+const desktopCatalogPlugins = cxCatalog.plugins.filter(entry => !entry.mobileOnly);
+const nonLinuxCatalogPlugins = desktopCatalogPlugins.filter(entry => !entry.linuxOnly);
 
 export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
     const revision = React.useSyncExternalStore(subscribeAppearance, () => appearanceUpdates);
     const rows = React.useMemo(() => {
-        const entries = kind === "theme" ? cxCatalog.themes : IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : desktopCatalogPlugins;
+        const entries = kind === "theme" ? cxCatalog.themes : IS_LINUX && !IS_MOBILE ? desktopCatalogPlugins : nonLinuxCatalogPlugins;
         const approvals = new Map(rememberedAppearance.map(entry => [entry.id, entry.source]));
         const catalog = entries.map(entry => {
             const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
@@ -1619,7 +1622,7 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
         }
     }
 
-    const catalogPlugins = IS_LINUX && !IS_MOBILE ? cxCatalog.plugins : cxCatalog.plugins.filter(entry => !entry.linuxOnly);
+    const catalogPlugins = IS_LINUX && !IS_MOBILE ? desktopCatalogPlugins : nonLinuxCatalogPlugins;
     return <section style={{ display: "grid", gap: 12 }}>
         {!kind && <><h2>CX Extensions</h2>
         <details onToggle={event => setShowCatalog(event.currentTarget.open)}>

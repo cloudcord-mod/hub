@@ -12,7 +12,21 @@ function hideDesktopClass(plugin: string, label: string, className: string) {
     } as const;
 }
 
+function hideMobileComponent(plugin: string, label: string, path: string) {
+    return { plugin, label, css: "", mobileOnly: true, mobile: { hideComponentPaths: [path] } } as const;
+}
+
 export const cxAppearanceTargets = {
+    "hide-app-launcher-intro": hideMobileComponent("HideAppLauncherIntro", "the Apps launcher introduction", "modules/app_launcher/native/onboarding/banner/AppLauncherOnboardingBanner.tsx"),
+    "hide-app-launcher-recommendations": hideMobileComponent("HideAppLauncherRecommendations", "recommendations in the Apps launcher", "modules/app_launcher/native/screens/home/recommendations/RecommendationsBanner.tsx"),
+    "hide-contact-sync-promotion": hideMobileComponent("HideContactSyncPromotion", "the contact sync promotion", "modules/contact_sync/native/components/ContactSyncUpsellCTA.tsx"),
+    "hide-double-tap-reaction-tip": hideMobileComponent("HideDoubleTapReactionTip", "the double-tap reaction tip above the composer", "modules/double_tap_to_react/native/DoubleTapToReactChatInputBanner.tsx"),
+    "hide-gift-badge-progress": hideMobileComponent("HideGiftBadgeProgress", "the gifting badge progress banner", "modules/premium/gifting/native/views/GiftingBadgeProgressBanner.tsx"),
+    "hide-gift-wishlist-banner": hideMobileComponent("HideGiftWishlistBanner", "the gift wishlist banner", "modules/premium/native/gifting/PremiumGiftWishlistBanner.tsx"),
+    "hide-saved-messages-promotion": hideMobileComponent("HideSavedMessagesPromotion", "the Nitro upsell in Saved Messages", "modules/saved_messages/native/NitroLimitUpsellBar.tsx"),
+    "hide-gif-search-suggestions": hideMobileComponent("HideGifSearchSuggestions", "suggested searches in the GIF picker", "modules/gif_picker/native/GIFPickerSearchSuggestions.tsx"),
+    "hide-emoji-search-promotion": hideMobileComponent("HideEmojiSearchPromotion", "the Nitro upsell in emoji search", "modules/emoji_picker/native/components/EmojiPickerPremiumSearchUpsell.tsx"),
+    "hide-server-tag-promotion": hideMobileComponent("HideServerTagPromotion", "the server tag upsell in server settings", "modules/guild_settings/native/GuildSettingsServerTagUpsellCard.tsx"),
     // PlainFolderIcon by botato (GPL-3.0-or-later).
     "plain-folder-icon": {
         plugin: "PlainFolderIcon", label: "Replace the mini server icons in collapsed folders with a plain folder icon",
@@ -115,7 +129,7 @@ export const cxAppearanceTargets = {
     "profile-friend-request-banner": {
         plugin: "HideProfileFriendRequestBanner", label: "friend request banners in profiles",
         css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
-        desktopOnly: true, mobile: [], catalogOriginal: true,
+        mobile: { hideComponentPaths: ["modules/user_profile/native/UserProfileIncomingFriendRequest.tsx"] }, catalogOriginal: true,
     },
     "message-length-promotion": hideDesktopClass("HideMessageLengthPromotion", "the Nitro promotion shown with long messages", "messageLengthUpsellContainer"),
     "orb-wallet-nitro-promotion": hideDesktopClass("HideOrbWalletNitroPromotion", "the Nitro promotion in the Orbs Wallet", "orbWalletNitroUpsellCard"),

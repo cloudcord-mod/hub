@@ -1,0 +1,3 @@
+plugin "HideContactSyncPromotion":
+  needs appearance.hide
+  hide hide-contact-sync-promotion

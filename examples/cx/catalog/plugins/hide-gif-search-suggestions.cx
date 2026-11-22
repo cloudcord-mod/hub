@@ -1,0 +1,3 @@
+plugin "HideGifSearchSuggestions":
+  needs appearance.hide
+  hide hide-gif-search-suggestions

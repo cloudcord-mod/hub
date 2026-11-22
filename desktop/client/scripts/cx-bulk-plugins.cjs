@@ -1884,7 +1884,7 @@ function selectReadyPorts(ports, baseline, runtime) {
             const candidate = portFiles([port]);
             const [[filename, source]] = candidate;
             if (files.get(filename) === source) continue;
-            if (baseline.plugins + files.size >= desktopPluginTarget) throw new Error("catalog limit reached");
+            if (baseline.desktopPlugins + files.size >= desktopPluginTarget) throw new Error("catalog limit reached");
             if (baseline.pluginFiles.has(filename) || files.has(filename)) throw new Error("duplicate CX filename " + filename);
             const plugin = runtime.parseCx(source);
             const name = plugin.name.trim().toLowerCase();
@@ -1932,7 +1932,7 @@ function addReady(ports) {
         for (const file of created) fs.unlinkSync(file);
         throw error;
     }
-    console.log("Added " + files.size + " CX ports. Desktop catalog has " + catalog.plugins + "/" + desktopPluginTarget + " plugins.");
+    console.log("Added " + files.size + " CX ports. Desktop catalog has " + catalog.desktopPlugins + "/" + desktopPluginTarget + " plugins.");
 }
 
 function auditDesktopSources(sourceDir) {

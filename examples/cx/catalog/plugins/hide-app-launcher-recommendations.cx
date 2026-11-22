@@ -1,0 +1,3 @@
+plugin "HideAppLauncherRecommendations":
+  needs appearance.hide
+  hide hide-app-launcher-recommendations

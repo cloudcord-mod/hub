@@ -1,0 +1,3 @@
+plugin "HideDoubleTapReactionTip":
+  needs appearance.hide
+  hide hide-double-tap-reaction-tip

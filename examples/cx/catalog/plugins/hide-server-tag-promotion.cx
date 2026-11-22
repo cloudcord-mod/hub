@@ -1,0 +1,3 @@
+plugin "HideServerTagPromotion":
+  needs appearance.hide
+  hide hide-server-tag-promotion

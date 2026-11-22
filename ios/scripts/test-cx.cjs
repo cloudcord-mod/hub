@@ -557,7 +557,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const renderHeader = tree => tree;
         const nativeHeaders = new Map(["PrivateChannelButtons", "MessagesHeader", "VoiceUserItem", "MediaModalSpoilerOverlay",
             "GuildBoostingMarketingProgressBar", "GuildPowerupsBoostGem", "PresenceActivityStatus", "ChatInputExpressionButton",
-            "UserProfileNote", "UserProfileConnections", "LegacyUserProfileConnections", "UserProfileMutuals", "UserProfileMutualGuilds"].map(name => [
+            "UserProfileNote", "UserProfileConnections", "LegacyUserProfileConnections", "UserProfileMutuals", "UserProfileMutualGuilds",
+            "UserProfileIncomingFriendRequest", "AppLauncherOnboardingBanner", "RecommendationsBanner", "ContactSyncUpsellCTA",
+            "DoubleTapToReactChatInputBanner", "GiftingBadgeProgressBanner", "PremiumGiftWishlistBanner", "NitroLimitUpsellBar",
+            "GIFPickerSearchSuggestions", "EmojiPickerPremiumSearchUpsell", "GuildSettingsServerTagUpsellCard"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>
@@ -1597,7 +1600,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(suggestedMarkers.size + appearanceHooks.size, 0);
         assert.equal(suggestedObserver, undefined);
         for (const [target, rule] of Object.entries(moduleBox.exports.cxAppearanceTargets)) {
-            if (rule.desktopOnly) continue;
+            if (rule.desktopOnly || desktop && rule.mobileOnly) continue;
             const appearancePort = cxCatalog.plugins.find(entry => entry.name === rule.plugin).source;
             assert.throws(() => activateCx(appearancePort, host, []), /approval/);
             const action = rule.style ? "style" : "hide";
@@ -5410,7 +5413,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.throws(() => parseCx(replacements + '\n  before send replace "a" with "again"'), /Duplicate/);
         if (!desktop) click(render(), "Browse catalog");
         searchFor("");
-        const visiblePlugins = desktop ? cxCatalog.plugins : cxCatalog.plugins.filter(entry => !entry.desktopOnly);
+        const visiblePlugins = cxCatalog.plugins.filter(entry => desktop ? !entry.mobileOnly : !entry.desktopOnly);
         assert.ok(!button(render(), visiblePlugins[12].name));
         click(render(), "Next plugins page");
         assert.ok(button(render(), visiblePlugins[12].name));
@@ -5453,6 +5456,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "local records")[0], mutableEntry);
         searchFor("/!!!");
         assert.ok(!button(render(), "Color Converter"));
+        const mobilePlugin = cxCatalog.plugins.find(entry => entry.mobileOnly);
+        assert.ok(mobilePlugin, "mobile-only catalog fixture");
+        searchFor(mobilePlugin.name);
+        assert.equal(Boolean(button(render(), mobilePlugin.name)), !desktop);
         if (!desktop) {
             const desktopPlugin = cxCatalog.plugins.find(entry => entry.desktopOnly);
             assert.ok(desktopPlugin, "desktop-only catalog fixture");
@@ -5694,9 +5701,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             stylesheet,
         });
         for (const entry of cxCatalog.plugins) {
-            if (!desktop && entry.desktopOnly) {
+            if (desktop ? entry.mobileOnly : entry.desktopOnly) {
                 if (resultsPath) adapterResults.push({
-                    platform, name: entry.name, status: "Blocked", errors: ["Requires desktop CloudCord"],
+                    platform, name: entry.name, status: "Blocked",
+                    errors: [entry.mobileOnly ? "Requires mobile CloudCord" : "Requires desktop CloudCord"],
                     sourceHash: createHash("sha256").update(entry.source.replace(/\r\n/g, "\n").trim()).digest("hex"),
                 });
                 continue;

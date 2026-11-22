@@ -1,0 +1,3 @@
+plugin "HideGiftBadgeProgress":
+  needs appearance.hide
+  hide hide-gift-badge-progress

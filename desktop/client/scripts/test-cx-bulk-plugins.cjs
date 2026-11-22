@@ -76,8 +76,8 @@ const batchPorts = selectReadyPorts([
 assert.deepEqual([...batchPorts.files.keys()], ["literal-replace.cx"]);
 assert.deepEqual(batchPorts.skipped.map(({ file }) => file), ["existing", "invalid", "duplicate"]);
 assert.match(batchPorts.skipped[2].reason, /duplicate CX command/);
-assert.deepEqual([...selectReadyPorts([candidate], { ...catalog, plugins: desktopPluginTarget }, runtime).files], []);
-assert.equal(selectReadyPorts([candidate], { ...catalog, plugins: desktopPluginTarget - 1 }, runtime).files.size, 1);
+assert.deepEqual([...selectReadyPorts([candidate], { ...catalog, desktopPlugins: desktopPluginTarget }, runtime).files], []);
+assert.equal(selectReadyPorts([candidate], { ...catalog, desktopPlugins: desktopPluginTarget - 1 }, runtime).files.size, 1);
 
 const silentMessageAlias = {
     name: "AutoSilentMessage", file: "upstream-alias",
@@ -297,6 +297,14 @@ for (const [key, rule] of Object.entries(cxAppearanceTargets)) {
         const document = parseCx(require("node:fs").readFileSync(file, "utf8"));
         assert.equal(document.name, rule.plugin);
         assert.deepEqual([...document.hiddenTargets], [key]);
+        continue;
+    }
+    if (rule.mobileOnly) {
+        const document = parseCx(require("node:fs").readFileSync(require("node:path").resolve(__dirname,
+            "../../../examples/cx/catalog/plugins/" + key + ".cx"), "utf8"));
+        assert.equal(document.name, rule.plugin);
+        assert.deepEqual([...document.hiddenTargets], [key]);
+        assert.ok(!matches.some(record => record.name === rule.plugin), rule.plugin + " cannot be inferred from desktop CSS");
         continue;
     }
     if (rule.desktopOnly) continue;

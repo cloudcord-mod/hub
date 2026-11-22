@@ -1,0 +1,3 @@
+plugin "HideSavedMessagesPromotion":
+  needs appearance.hide
+  hide hide-saved-messages-promotion
