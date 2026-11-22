@@ -249,8 +249,18 @@
   var runtimeUpdates_exports = {};
   __export(runtimeUpdates_exports, {
     createRainUpdater: () => createRainUpdater,
+    fetchRuntimeUpdate: () => fetchRuntimeUpdate,
     startAutoUpdates: () => startAutoUpdates
   });
+  function fetchRuntimeUpdate(updater) {
+    return _async_to_generator(function* () {
+      if (typeof updater?.checkForUpdates === "function")
+        return updater.checkForUpdates();
+      if (typeof updater?.download === "function")
+        return updater.download();
+      throw new Error("This loader cannot fetch from settings. Use Refetch Bundle in the recovery menu.");
+    })();
+  }
   function startAutoUpdates(prefs, updater) {
     var stopped = false, checking = false;
     var check = () => _async_to_generator(function* () {
@@ -259,9 +269,7 @@
       checking = true;
       prefs.cloudcordUpdateStatus = "Checking for updates\u2026";
       try {
-        if (typeof updater?.checkForUpdates !== "function")
-          throw new Error("This loader cannot check for updates.");
-        yield updater.checkForUpdates();
+        yield fetchRuntimeUpdate(updater);
         if (!stopped)
           prefs.cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
       } catch (error) {
@@ -13418,10 +13426,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 onPress: () => _async_to_generator(function* () {
                   settings.cloudcordUpdateStatus = "Checking for updates\u2026";
                   try {
-                    var fetchRuntime = BundleUpdaterManager?.checkForUpdates ?? BundleUpdaterManager?.download;
-                    if (typeof fetchRuntime !== "function")
-                      throw new Error("This loader cannot fetch from settings. Use Refetch Bundle in the recovery menu.");
-                    yield fetchRuntime.call(BundleUpdaterManager);
+                    yield fetchRuntimeUpdate(BundleUpdaterManager);
                     settings.cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
                   } catch (error) {
                     var message = error instanceof Error ? error.message : "Runtime download failed";
@@ -13556,6 +13561,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_ccpReport();
       init_debug();
       init_modules();
+      init_runtimeUpdates();
       init_settings();
       init_alerts();
       init_constants();
@@ -72210,7 +72216,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1a81d6cc1b71c64a7f494702b6e962dbceaed68d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cc19efd1c6dbcf226f81ddc7f3182eac477a9f73";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
