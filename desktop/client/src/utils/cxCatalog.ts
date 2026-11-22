@@ -146,7 +146,10 @@ import plugin_catalog_hide_channel_topic from "../../../../examples/cx/catalog/p
 import plugin_catalog_hide_character_count from "../../../../examples/cx/catalog/plugins/hide-character-count.cx";
 import plugin_catalog_hide_chat_attachments from "../../../../examples/cx/catalog/plugins/hide-chat-attachments.cx";
 import plugin_catalog_hide_chat_input_refresh_tip from "../../../../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx";
+import plugin_catalog_hide_chat_linked_role_tags from "../../../../examples/cx/catalog/plugins/hide-chat-linked-role-tags.cx";
+import plugin_catalog_hide_chat_post_previews from "../../../../examples/cx/catalog/plugins/hide-chat-post-previews.cx";
 import plugin_catalog_hide_chat_role_dots from "../../../../examples/cx/catalog/plugins/hide-chat-role-dots.cx";
+import plugin_catalog_hide_chat_thread_previews from "../../../../examples/cx/catalog/plugins/hide-chat-thread-previews.cx";
 import plugin_catalog_hide_clan_tags from "../../../../examples/cx/catalog/plugins/hide-clan-tags.cx";
 import plugin_catalog_hide_composer_emoji_promo from "../../../../examples/cx/catalog/plugins/hide-composer-emoji-promo.cx";
 import plugin_catalog_hide_contact_sync_promotion from "../../../../examples/cx/catalog/plugins/hide-contact-sync-promotion.cx";
@@ -691,7 +694,10 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideCharacterCount", source: plugin_catalog_hide_character_count, description: "Hide the chat character counter", categories: ["Appearance"], appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113" },
         { name: "HideChatAttachments", source: plugin_catalog_hide_chat_attachments, description: "Hide file and media attachments in chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "eadd0623581b9ca2709e566983428ff4b3e8a35f4ea913338c5c311d95bb9de9" },
         { name: "HideChatInputRefreshTip", source: plugin_catalog_hide_chat_input_refresh_tip, description: "Hide the redesigned chat input tip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36" },
+        { name: "HideChatLinkedRoleTags", source: plugin_catalog_hide_chat_linked_role_tags, description: "Hide linked role tags next to names in chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "8ea7f36df7a526a2929e340921ca07ecf930dc322e13133b8a038bf77e357fa5" },
+        { name: "HideChatPostPreviews", source: plugin_catalog_hide_chat_post_previews, description: "Hide post preview embeds in chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6166c6741f43013fc343d2711f087a99140c22c10e61df514ece1dc5f11c5490" },
         { name: "HideChatRoleDots", source: plugin_catalog_hide_chat_role_dots, description: "Hide role color dots next to names in chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "aea9c80e488fef746d51483621339a35d64d4c00014bd1dab2e5c5f30afe5979" },
+        { name: "HideChatThreadPreviews", source: plugin_catalog_hide_chat_thread_previews, description: "Hide thread preview cards below chat messages", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "7218cf2d502f4c515d1c49bb40b7c347be1d9b8b7ffe610166bf9ae10614af4f" },
         { name: "HideClanTags", source: plugin_catalog_hide_clan_tags, description: "Hide server tags", categories: ["Appearance"], appearanceRevision: "6d2231275be6c0e73ae8d96c0540194b7f13e1b24703a1ae7b979a930091d921" },
         { name: "HideComposerEmojiPromo", source: plugin_catalog_hide_composer_emoji_promo, description: "Hide the premium emoji promotion in composer autocomplete", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74f9ba1b6c628e3e2fdd215363186334b12e201a140ab9a6b668cf4ba745b0df" },
         { name: "HideContactSyncPromotion", source: plugin_catalog_hide_contact_sync_promotion, description: "Hide the contact sync promotion", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b53140224dc8cf752876e2bd4a6e91807d4a56d90f78f7dcd6347a476b542348" },

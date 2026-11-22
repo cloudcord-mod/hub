@@ -1,0 +1,3 @@
+plugin "HideChatLinkedRoleTags":
+  needs appearance.hide
+  hide hide-chat-linked-role-tags

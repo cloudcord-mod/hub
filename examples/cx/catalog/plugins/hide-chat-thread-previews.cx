@@ -1,0 +1,3 @@
+plugin "HideChatThreadPreviews":
+  needs appearance.hide
+  hide hide-chat-thread-previews

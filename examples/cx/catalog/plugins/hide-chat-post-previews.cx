@@ -1,0 +1,3 @@
+plugin "HideChatPostPreviews":
+  needs appearance.hide
+  hide hide-chat-post-previews

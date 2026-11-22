@@ -509,6 +509,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             reactions: Object.freeze([{ count: 3 }]),
             attachments: Object.freeze([{ id: "file" }]),
             roleIcon: Object.freeze({ id: "role" }), shouldShowRoleDot: true,
+            threadEmbed: Object.freeze({ id: "thread" }),
+            connectionsRoleTag: Object.freeze({ id: "linked-role" }),
+            postPreviewEmbeds: Object.freeze([{ id: "post-preview" }]),
             embeds: Object.freeze([{ title: "Link preview" }]),
             safetyPolicyNoticeEmbed: Object.freeze({ title: "Safety notice" }),
             safetySystemNotificationEmbed: Object.freeze({ title: "Safety notification" }),
@@ -2353,7 +2356,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 for (const field of ["timestamp", "timestampTooltip", "timestampAccessibilityLabel"]) {
                     assert.equal(rendered[field], rule.mobile.messagePresentation === "timestamps" ? undefined : messagePresentation[field]);
                 }
-                for (const field of ["referencedMessage", "avatarDecorationURL", "roleIcon"]) {
+                assert.equal(rendered.postPreviewEmbeds.length, rule.mobile.messagePresentation === "postPreviewEmbeds" ? 0 : 1);
+                for (const field of ["referencedMessage", "avatarDecorationURL", "roleIcon", "threadEmbed", "connectionsRoleTag"]) {
                     assert.equal(rendered[field], rule.mobile.messagePresentation === field ? undefined : messagePresentation[field]);
                 }
                 for (const name of rule.mobile.legacyComponents ?? []) {

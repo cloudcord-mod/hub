@@ -2286,13 +2286,14 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
                     if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
                         return { ...presentation, timestamp: undefined, timestampTooltip: undefined, timestampAccessibilityLabel: undefined };
                     }
-                } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL" || mobile.messagePresentation === "roleIcon") {
-                    const field = mobile.messagePresentation;
-                    if (field in presentation && (presentation as Record<string, unknown>)[field] != null) return { ...presentation, [field]: undefined };
                 } else {
                     const field = mobile.messagePresentation;
                     const items = (presentation as Record<string, unknown>)[field];
-                    if (Array.isArray(items) && items.length) return { ...presentation, [field]: [] };
+                    if (Array.isArray(items)) {
+                        if (items.length) return { ...presentation, [field]: [] };
+                    } else if (items != null) {
+                        return { ...presentation, [field]: undefined };
+                    }
                 }
                 return presentation;
             },

@@ -17,6 +17,21 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-chat-thread-previews": {
+        plugin: "HideChatThreadPreviews", label: "thread preview cards below chat messages",
+        css: "", mobileOnly: true,
+        mobile: { messagePresentation: "threadEmbed" },
+    },
+    "hide-chat-linked-role-tags": {
+        plugin: "HideChatLinkedRoleTags", label: "linked role tags next to names in chat",
+        css: "", mobileOnly: true,
+        mobile: { messagePresentation: "connectionsRoleTag" },
+    },
+    "hide-chat-post-previews": {
+        plugin: "HideChatPostPreviews", label: "post preview embeds in chat",
+        css: "", mobileOnly: true,
+        mobile: { messagePresentation: "postPreviewEmbeds" },
+    },
     "hide-game-community-promo": hideMobileComponent("HideGameCommunityPromo", "the card promoting other game communities", "modules/game_community_upsell/native/GameCommunityMultiGuildUpsellCard.tsx"),
     "hide-outbound-promotion-cards": hideMobileComponent("HideOutboundPromotionCards", "external offer cards on premium surfaces", "components_native/premium/OutboundPromotionCard.tsx"),
     "hide-premium-marketing-banner": hideMobileComponent("HidePremiumMarketingBanner", "the banner tile on the premium promotions page", "modules/premium/promotions/native/MarketingPageBannerTile.tsx"),
