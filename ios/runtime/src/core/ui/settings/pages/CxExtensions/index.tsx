@@ -3095,10 +3095,11 @@ export function restoreRememberedCxAppearance() {
             const source = applyRememberedNumbers(entry.source, saved.numberValues);
             const review = reviewCx(source);
             if (!canRememberCxExtension(review)) continue;
+            const selected = review.appearanceOptions.filter(option => supportsMobileHide(option) && saved.selected.includes(option.target)).map(option => option.target);
             session.enable(source, {
                 ...createMobileCxHost(),
                 toast() {},
-            }, review.permissions, saved.selected);
+            }, review.permissions, selected);
             failedRestores.delete(saved.name);
         } catch {
             failedRestores.add(saved.name);
