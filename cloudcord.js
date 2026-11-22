@@ -68792,6 +68792,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     useProxy(fonts);
     var navigation2 = NavigationNative.useNavigation();
     var [busy, setBusy] = (0, import_react10.useState)(false);
+    var canApply = isFontSupported();
     var installed = Boolean(fonts[font.name]);
     var selected = fonts.__selected === font.name;
     return /* @__PURE__ */ jsx(Card, {
@@ -68828,14 +68829,14 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     },
                     size: "sm",
                     variant: "secondary",
-                    disabled: !installed || selected || busy,
+                    disabled: !canApply || !installed || selected || busy,
                     icon: findAssetId("WrenchIcon")
                   }),
                   /* @__PURE__ */ jsx(Button, {
                     size: "sm",
                     variant: selected ? "secondary" : "primary",
-                    disabled: busy,
-                    text: busy ? "Loading\u2026" : selected ? "Unapply" : "Use font",
+                    disabled: !canApply || busy,
+                    text: !canApply ? "Requires loader update" : busy ? "Loading\u2026" : selected ? "Unapply" : "Use font",
                     onPress: () => _async_to_generator(function* () {
                       setBusy(true);
                       try {
@@ -68879,6 +68880,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_storage();
       init_fonts();
       init_assets();
+      init_loader();
       init_modules();
       init_lazy();
       init_metro();
@@ -68899,7 +68901,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   function Fonts() {
     useProxy(settings);
     useProxy(fonts);
-    var [discover, setDiscover] = (0, import_react11.useState)(false);
+    var [discover, setDiscover] = (0, import_react11.useState)(!isFontSupported());
     var installed = Object.values(fonts).filter((font) => typeof font === "object" && font?.spec === 1);
     var navigation2 = NavigationNative.useNavigation();
     return /* @__PURE__ */ jsx(AddonPage, {
@@ -68924,7 +68926,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         message: Strings.SAFE_MODE_NOTICE_FONTS
       },
       CardComponent: FontCard,
-      installAction: {
+      installAction: isFontSupported() ? {
         label: "Install a font",
         onPress: () => {
           navigation2.push("BUNNY_CUSTOM_PAGE", {
@@ -68932,7 +68934,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             render: () => /* @__PURE__ */ jsx(FontEditor, {})
           });
         }
-      }
+      } : void 0
     });
   }
   var import_react11, googleCatalog;
@@ -68948,6 +68950,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_storage();
       init_fonts();
       init_googleFonts();
+      init_loader();
       init_settings();
       init_common();
       init_components();
@@ -70589,10 +70592,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
               onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
             }),
-            !hasThemes && isFontSupported() && /* @__PURE__ */ jsx(TableRow, {
+            /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Fonts",
-              subLabel: "Choose and manage fonts",
+              subLabel: isFontSupported() ? "Browse and apply fonts" : "Browse fonts \xB7 applying requires a compatible loader",
               icon: icon2("LettersIcon", "TextIcon"),
               onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
             })
@@ -73803,61 +73806,57 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     }), [
       navigation2
     ]);
-    var cloudIcon = findAssetId("CloudIcon") || findAssetId("CloudArrowUpIcon");
-    var groups = [
+    var tools = [
       {
-        title: "Customize",
-        items: [
-          {
-            key: "CLOUDCORD_PREVIEWS",
-            label: "Previews",
-            action: actions.previews
-          }
-        ]
+        key: "CLOUDCORD_PREVIEWS",
+        label: "Previews",
+        description: "Preview profile and visual changes",
+        icon: "ImageIcon",
+        action: actions.previews
       },
       {
-        title: "Accounts and data",
-        items: [
-          {
-            key: "CLOUDCORD_ACCOUNT_TOOLS",
-            label: "Account Tools",
-            action: actions.account
-          },
-          {
-            key: "STORE_CLOUD",
-            label: "CloudSync",
-            action: actions.sync,
-            icon: cloudIcon
-          },
-          {
-            key: "BOTCORD",
-            label: "Botcord",
-            action: actions.bot
-          }
-        ]
+        key: "CLOUDCORD_ACCOUNT_TOOLS",
+        label: "Account Tools",
+        description: "Manage account options",
+        icon: "UserIcon",
+        action: actions.account
       },
       {
-        title: "Testing and support",
-        items: [
-          {
-            key: "CLOUDCORD_TESTING_PLUGINS",
-            label: "Testing Plugins",
-            action: actions.testing,
-            visible: Boolean(assigned)
-          },
-          {
-            key: "CLOUDCORD_DIAGNOSTICS",
-            label: "Diagnostics",
-            action: actions.diagnostics,
-            visible: preferences.cloudcordDiagnosticsEnabled === true
-          }
-        ]
+        key: "STORE_CLOUD",
+        label: "CloudSync",
+        description: "Manage cloud sync",
+        icon: "CloudIcon",
+        action: actions.sync
+      },
+      {
+        key: "BOTCORD",
+        label: "Botcord",
+        description: "Open Botcord tools",
+        icon: "RobotIcon",
+        action: actions.bot
+      },
+      {
+        key: "CLOUDCORD_TESTING_PLUGINS",
+        label: "Testing Plugins",
+        description: "Review assigned plugins",
+        icon: "PuzzlePieceIcon",
+        action: actions.testing,
+        visible: Boolean(assigned)
+      },
+      {
+        key: "CLOUDCORD_DIAGNOSTICS",
+        label: "Diagnostics",
+        description: "View runtime diagnostics",
+        icon: "WrenchIcon",
+        action: actions.diagnostics,
+        visible: preferences.cloudcordDiagnosticsEnabled === true
       }
     ];
     var order = new Map((preferences.cloudcordTabOrder ?? []).map((key, index) => [
       key,
       index
     ]));
+    var visible = tools.filter((item) => item.visible !== false && !hidden.includes(item.key)).sort((a, b3) => (order.get(a.key) ?? Infinity) - (order.get(b3.key) ?? Infinity));
     return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
       contentContainerStyle: {
         paddingBottom: 38
@@ -73868,19 +73867,20 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           paddingHorizontal: 12
         },
         spacing: 24,
-        children: groups.map(({ title, items }) => {
-          var visible = items.filter((item) => item.visible !== false && !hidden.includes(item.key)).sort((a, b3) => (order.get(a.key) ?? Infinity) - (order.get(b3.key) ?? Infinity));
-          return !!visible.length && /* @__PURE__ */ jsx(TableRowGroup, {
-            title,
-            children: visible.map((item) => /* @__PURE__ */ jsx(TableRow, {
+        children: /* @__PURE__ */ jsx(TableRowGroup, {
+          title: "Tools",
+          children: visible.map((item) => {
+            var icon3 = findAssetId(item.icon) || findAssetId("SettingsIcon");
+            return /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: item.label,
-              icon: item.icon ? /* @__PURE__ */ jsx(TableRow.Icon, {
-                source: item.icon
+              subLabel: item.description,
+              icon: icon3 ? /* @__PURE__ */ jsx(TableRow.Icon, {
+                source: icon3
               }) : void 0,
               onPress: item.action
-            }, item.key))
-          }, title);
+            }, item.key);
+          })
         })
       })
     });
@@ -73965,8 +73965,8 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var defaultOrder = [
       "CLOUDCORD",
       "FAKE_PROFILE",
-      "BUNNY_PLUGINS",
-      "CLOUDCORD_TOOLS"
+      "CLOUDCORD_TOOLS",
+      "BUNNY_PLUGINS"
     ];
     var configurableKeys = new Set(defaultOrder.filter((key) => key !== "CLOUDCORD"));
     var configuredOrder = settings.cloudcordTabOrder ?? [];
@@ -74825,7 +74825,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "73eb83d7a102be0c6f14157d99ec5351c76c2718";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "12ba7c32f5406b6021d4ee84b8b82a3fd2a48fe3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
