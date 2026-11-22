@@ -1,0 +1,3 @@
+plugin "HideProfileFixedBackdrop":
+  needs appearance.hide
+  hide hide-profile-fixed-backdrop

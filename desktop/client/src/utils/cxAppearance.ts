@@ -17,6 +17,12 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-home-drawer-mention-subtitle": hideMobileComponent("HideHomeDrawerMentionSubtitle", "mention status text in the home drawer", "modules/home_drawer/native/subtitles/MentionSubtitle.tsx"),
+    "hide-home-drawer-unread-subtitle": hideMobileComponent("HideHomeDrawerUnreadSubtitle", "unread status text in the home drawer", "modules/home_drawer/native/subtitles/UnreadSubtitle.tsx"),
+    "hide-stage-backdrop": hideMobileComponent("HideStageBackdrop", "decorative background artwork in Stage channels", "modules/stage_channels/native/components/StageChannelBackground.tsx"),
+    "hide-profile-fixed-backdrop": hideMobileComponent("HideProfileFixedBackdrop", "the fixed backdrop behind profile content", "modules/user_profile/native/UserProfileFixedBackground.tsx"),
+    "hide-profile-banner": hideMobileComponent("HideProfileBanner", "banner images on mobile profiles", "modules/user_profile/native/UserProfileBanner.tsx"),
+    "hide-profile-activity-card-badges": hideMobileComponent("HideProfileActivityCardBadges", "badges within profile activity cards", "modules/user_profile/native/UserProfileActivityCardBadges.tsx"),
     "hide-channel-list-dividers": hideMobileComponent("HideChannelListDividers", "separator lines in the server channel list", "modules/channel_list_v2/native/components/Divider.tsx"),
     "hide-premium-offer-divider": hideMobileComponent("HidePremiumOfferDivider", "decorative separators in Premium offer sheets", "modules/premium/roadblocks/native/views/PremiumUpsellSectionDivider.tsx"),
     "hide-channel-list-subtitles": hideMobileComponent("HideChannelListSubtitles", "secondary text below mobile channel names", "modules/launchpad/native/shared/ChannelSubtitle.tsx", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelSubtitle.tsx"),

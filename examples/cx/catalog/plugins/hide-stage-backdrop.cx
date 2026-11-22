@@ -1,0 +1,3 @@
+plugin "HideStageBackdrop":
+  needs appearance.hide
+  hide hide-stage-backdrop

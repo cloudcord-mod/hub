@@ -1,0 +1,3 @@
+plugin "HideProfileActivityCardBadges":
+  needs appearance.hide
+  hide hide-profile-activity-card-badges

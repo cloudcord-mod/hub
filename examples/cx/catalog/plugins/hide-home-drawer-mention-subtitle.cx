@@ -1,0 +1,3 @@
+plugin "HideHomeDrawerMentionSubtitle":
+  needs appearance.hide
+  hide hide-home-drawer-mention-subtitle

@@ -1,0 +1,3 @@
+plugin "HideHomeDrawerUnreadSubtitle":
+  needs appearance.hide
+  hide hide-home-drawer-unread-subtitle

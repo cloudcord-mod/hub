@@ -1,0 +1,3 @@
+plugin "HideProfileBanner":
+  needs appearance.hide
+  hide hide-profile-banner
