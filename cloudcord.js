@@ -38885,6 +38885,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return lines.map((line, index) => `${index + 1}. ${line}`).join("\n");
         },
         slugifyText: (text) => text.normalize("NFKD").replace(RegExp("\\p{M}", "gu"), "").toLowerCase().replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), "-").replace(/^-|-$/g, ""),
+        unicodeFromPoints(text) {
+          var tokens2 = text.trim().split(/\s+/);
+          if (tokens2.length > 128 || tokens2.some((token) => !/^U\+[0-9a-f]{1,6}$/i.test(token)))
+            return;
+          var points = tokens2.map((token) => parseInt(token.slice(2), 16));
+          if (points.some((point) => point > 1114111 || point >= 55296 && point <= 57343))
+            return;
+          return planningBlock(String.fromCodePoint(...points));
+        },
+        normalizeUnicode(text, form) {
+          if (!text || !/^(?:NFC|NFD|NFKC|NFKD)$/.test(form))
+            return;
+          return planningBlock(text.normalize(form));
+        },
         unicodeInfo(text) {
           var points = Array.from(text, (character) => "U+" + character.codePointAt(0).toString(16).toUpperCase().padStart(4, "0"));
           if (!points.length || points.length > 128)
@@ -53340,6 +53354,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/normalize-unicode.cx
+  var normalize_unicode_default;
+  var init_normalize_unicode = __esm({
+    "../examples/cx/catalog/plugins/normalize-unicode.cx"() {
+      normalize_unicode_default = 'plugin "Normalize Unicode":\n  needs commands.register\n  needs reply.local\n  on command "normalizeunicode":\n    input "text" text\n    input "form" text\n    reply "${normalizeUnicode(text, form)}" else "Enter text and one of NFC, NFD, NFKC, or NFKD."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/notification-volume.cx
   var notification_volume_default;
   var init_notification_volume = __esm({
@@ -54097,6 +54119,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_tsv_to_markdown = __esm({
     "../examples/cx/catalog/plugins/tsv-to-markdown.cx"() {
       tsv_to_markdown_default = 'plugin "TSV to Markdown":\n  needs commands.register\n  needs reply.local\n  on command "tsvtomarkdown" with text:\n    reply "${tsvToMarkdown(text)}" else "Paste tab-separated rows with a header and the same number of columns on every line."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/unicode-from-code-points.cx
+  var unicode_from_code_points_default;
+  var init_unicode_from_code_points = __esm({
+    "../examples/cx/catalog/plugins/unicode-from-code-points.cx"() {
+      unicode_from_code_points_default = 'plugin "Unicode From Code Points":\n  needs commands.register\n  needs reply.local\n  on command "unicodefrompoints":\n    input "text" text\n    reply "${unicodeFromPoints(text)}" else "Enter space-separated Unicode code points such as U+1F600 U+0041."\n';
     }
   });
 
@@ -55606,6 +55636,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_no_typing_animation();
       init_no_unblock_to_jump();
       init_normalize_message_links();
+      init_normalize_unicode();
       init_notification_volume();
       init_notify_when_muted();
       init_number_base_converter();
@@ -55701,6 +55732,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_trim_lines();
       init_tsv_to_csv();
       init_tsv_to_markdown();
+      init_unicode_from_code_points();
       init_unicode_inspector();
       init_unindent();
       init_unique_lines();
@@ -59755,6 +59787,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Normalize Unicode",
+            source: normalize_unicode_default,
+            description: "/normalizeunicode",
+            commands: [
+              "normalizeunicode"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "e7baa8a6574affa8523faccec0ab4f5c5c4457f5e754e5765ba335146c441f23",
+            privateCommands: true
+          },
+          {
             name: "NotificationVolume",
             source: notification_volume_default,
             description: "Adjust the volume of Discord notifications and in-app sounds (100%)",
@@ -60757,6 +60802,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a",
+            privateCommands: true
+          },
+          {
+            name: "Unicode From Code Points",
+            source: unicode_from_code_points_default,
+            description: "/unicodefrompoints",
+            commands: [
+              "unicodefrompoints"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "dd0e87b09b264ba6e9ab74eb257ec86da227e2578ffc5a85eac879a90a99515f",
             privateCommands: true
           },
           {
@@ -71236,7 +71294,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "76cb59149a91d93c071f9b771a31a447fb69fc03";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "69d4fd3f3b426fcaa02dfaf3b293157e863e7838";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
