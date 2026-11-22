@@ -48433,6 +48433,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       keywords,
       lowerName: name.toLowerCase(),
       compactName: normalizeCatalogSearch(name).replaceAll(" ", ""),
+      nameWords: normalizeCatalogSearch(name.replace(RegExp("([\\p{Ll}\\p{N}])(\\p{Lu})", "gu"), "$1 $2").replace(RegExp("(\\p{Lu})(\\p{Lu}\\p{Ll})", "gu"), "$1 $2")).split(" "),
       searchableText: normalizeCatalogSearch(name + " " + (description ?? "") + " " + (keywords ?? ""))
     };
     cxSearchIndex.set(entry, fields);
@@ -48440,7 +48441,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   }
   function searchCxCatalog(entries2, search, category = "All") {
     var _loop2 = function(entry12) {
-      var { lowerName, compactName, searchableText } = catalogSearchFields(entry12);
+      var { lowerName, compactName, nameWords, searchableText } = catalogSearchFields(entry12);
       if (lowerName === query)
         exact1.push(entry12);
       else if (compactQuery && compactName === compactQuery)
@@ -48449,6 +48450,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         commandMatches.push(entry12);
       else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery))
         partial1.push(entry12);
+      else if (terms.length > 1 && terms.every((term) => nameWords.some((word) => word.startsWith(term))))
+        nameWordMatches.push(entry12);
       else if (terms.length && terms.every((term) => searchableText.includes(term)))
         feature.push(entry12);
     };
@@ -48483,10 +48486,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var normalized = [];
     var commandMatches = [];
     var partial1 = [];
+    var nameWordMatches = [];
     var feature = [];
     for (var entry1 of entries2)
       _loop2(entry1);
-    return exact1.concat(normalized, commandMatches, partial1, feature);
+    return exact1.concat(normalized, commandMatches, partial1, nameWordMatches, feature);
   }
   function parseCx(source) {
     var _loop2 = function(line12) {
@@ -72019,7 +72023,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "191d05669296cfa4b13367538e600d823daa42e0";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "36df151e75c68521261a87dce307adfb9c447999";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
