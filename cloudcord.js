@@ -37896,6 +37896,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           desktopOnly: true,
           style: {}
         },
+        "readable-chat-timestamps": {
+          plugin: "ReadableChatTimestamps",
+          label: "Make inline chat timestamps larger and easier to read",
+          css: '[id^="chat-messages-"] time:is([class^="timestampInline_"], [class*=" timestampInline_"]), [id^="chat-messages-"] :is([class^="timestampInline_"], [class*=" timestampInline_"]) time { color: var(--text-normal, currentColor) !important; font-size: 0.875rem !important; }',
+          desktopOnly: true,
+          style: {}
+        },
         "message-stickers": {
           plugin: "HideStickers",
           label: "stickers in chat",
@@ -54002,6 +54009,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/readable-chat-timestamps.cx
+  var readable_chat_timestamps_default;
+  var init_readable_chat_timestamps = __esm({
+    "../examples/cx/catalog/plugins/readable-chat-timestamps.cx"() {
+      readable_chat_timestamps_default = 'plugin "ReadableChatTimestamps":\n  needs appearance.style\n  style readable-chat-timestamps\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/readable-ink.cx
   var readable_ink_default;
   var init_readable_ink = __esm({
@@ -56195,6 +56210,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_quote_message();
       init_read_all_notifications_button();
       init_read_all_notifications();
+      init_readable_chat_timestamps();
       init_readable_ink();
       init_readable_line_length();
       init_readable_spoilers();
@@ -60825,6 +60841,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands",
               "Servers & channels"
+            ]
+          },
+          {
+            name: "ReadableChatTimestamps",
+            source: readable_chat_timestamps_default,
+            description: "Make inline chat timestamps larger and easier to read",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
             ]
           },
           {
@@ -72175,7 +72200,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ad276f778741a9a14a7f0405266d8eb9c9cbc0e3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cfde8532d9f01a85132f16d6f2de0385bd4a0542";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
