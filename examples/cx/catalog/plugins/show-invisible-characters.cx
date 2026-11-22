@@ -1,0 +1,6 @@
+plugin "Show Invisible Characters":
+  needs commands.register
+  needs reply.local
+  on command "showinvisibles":
+    input "text" text
+    reply "${showInvisibleCharacters(text)}" else "Enter text to inspect."

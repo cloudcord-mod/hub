@@ -316,6 +316,25 @@ export const cxCommandFunctions = {
         if (!lines.length) return;
         return planningBlock(lines.map((line, index) => (mode === "bullet" ? "- " : (index + 1) + ". ") + line).join("\n"));
     },
+    showInvisibleCharacters(text: string) {
+        if (!text) return;
+        const labels: Record<string, string> = { " ": "·", "\t": "[TAB]", "\u00a0": "[NBSP]", "\u200b": "[ZWSP]", "\u200d": "[ZWJ]", "\uFEFF": "[BOM]" };
+        return planningBlock(text.replace(/[ \t\u00a0\u200b\u200d\uFEFF]|\r\n|\r|\n/g, character =>
+            labels[character] ?? (character === "\r\n" ? "[CRLF]\n" : character === "\n" ? "[LF]\n" : "[CR]\n")));
+    },
+    expandTabs(text: string, width: string) {
+        const size = integerText(width);
+        if (!text || size === undefined || size < 1 || size > 16) return;
+        const lines = text.split(/\r\n|\r|\n/).map(line => {
+            let column = 0;
+            return Array.from(line, character => {
+                const advance = character === "\t" ? size - column % size : 1;
+                column += advance;
+                return character === "\t" ? " ".repeat(advance) : character;
+            }).join("");
+        });
+        return planningBlock(lines.join("\n"));
+    },
     escapeHtml(text: string) {
         if (!text) return;
         const entities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };

@@ -2985,6 +2985,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["indentlines", { text: "a\r\n\r\nb", spaces: "2" }, /\n  a\n\n  b\n/],
                 ["indentlines", { text: "a", spaces: "17" }, /^Enter a whole number/],
             ]],
+            ["Show Invisible Characters", [
+                ["showinvisibles", { text: "A\tB\u00a0C\r\nD\u200b" }, /A\[TAB\]B\[NBSP\]C\[CRLF\]\nD\[ZWSP\]/],
+            ]],
+            ["Expand Tabs", [
+                ["expandtabs", { text: "ab\tX\r\n\tY", width: "4" }, /ab  X\n    Y/],
+                ["expandtabs", { text: "a\tb", width: "0" }, /^Enter text/],
+            ]],
             ["Format Spoiler", [
                 ["formatspoiler", { text: "A|B\r\n\r\nC" }, /\|\|A\\\|B\|\|\n\n\|\|C\|\|/],
             ]],

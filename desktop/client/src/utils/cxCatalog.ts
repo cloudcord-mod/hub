@@ -107,6 +107,7 @@ import plugin_catalog_encode_base64 from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
 import plugin_catalog_event_window from "../../../../examples/cx/catalog/plugins/event-window.cx";
+import plugin_catalog_expand_tabs from "../../../../examples/cx/catalog/plugins/expand-tabs.cx";
 import plugin_catalog_extract_line_range from "../../../../examples/cx/catalog/plugins/extract-line-range.cx";
 import plugin_catalog_extract_mentions from "../../../../examples/cx/catalog/plugins/extract-mentions.cx";
 import plugin_catalog_fake_profile_themes from "../../../../examples/cx/catalog/plugins/fake-profile-themes.cx";
@@ -414,6 +415,7 @@ import plugin_catalog_sed_enhanced from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_send_timestamps from "../../../../examples/cx/catalog/plugins/send-timestamps.cx";
 import plugin_catalog_shift_timestamp from "../../../../examples/cx/catalog/plugins/shift-timestamp.cx";
 import plugin_catalog_ship_calc from "../../../../examples/cx/catalog/plugins/ship-calc.cx";
+import plugin_catalog_show_invisible_characters from "../../../../examples/cx/catalog/plugins/show-invisible-characters.cx";
 import plugin_catalog_show_ping from "../../../../examples/cx/catalog/plugins/show-ping.cx";
 import plugin_catalog_show_song_name from "../../../../examples/cx/catalog/plugins/show-song-name.cx";
 import plugin_catalog_signature from "../../../../examples/cx/catalog/plugins/signature.cx";
@@ -700,6 +702,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "Event Window", source: plugin_catalog_event_window, description: "/eventwindow", commands: ["eventwindow"], categories: ["Commands"], appearanceRevision: "2b493a66f732896ad09e295f4ebdcdd2cff9375cc7b045d97269f351d91b2f3e", privateCommands: true },
+        { name: "Expand Tabs", source: plugin_catalog_expand_tabs, description: "/expandtabs", commands: ["expandtabs"], categories: ["Commands"], appearanceRevision: "f2195ebbbfc81dfe5d88192560bdbd24c1cc0975a591e7650a63ae6004b3f46b", privateCommands: true },
         { name: "Extract Line Range", source: plugin_catalog_extract_line_range, description: "/linerange", commands: ["linerange"], categories: ["Commands"], appearanceRevision: "bf377de933d188bafcc7f0ccd195aad3a03ed09d551e2a521c4b6ddf12b350bf", privateCommands: true },
         { name: "Extract Mentions", source: plugin_catalog_extract_mentions, description: "/extractmentions", commands: ["extractmentions"], categories: ["Commands"], appearanceRevision: "3ec2a4e37763a849937c21c6d3e06749f3edf63ef132424ff41d0a51f1ebec14", privateCommands: true },
         { name: "FakeProfileThemes", source: plugin_catalog_fake_profile_themes, description: "Show colors encoded in bios when the profile has no native theme", commands: ["cx-profile-colors"], categories: ["Appearance","Commands"] },
@@ -1007,6 +1010,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "SendTimestamps", source: plugin_catalog_send_timestamps, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Shift Timestamp", source: plugin_catalog_shift_timestamp, description: "/shifttimestamp", commands: ["shifttimestamp"], categories: ["Commands"], appearanceRevision: "ce6b64d62d0d71d19d7b25a422da767dacd965b260bcbdf9f11b3a3e327427aa", privateCommands: true },
         { name: "ShipCalc", source: plugin_catalog_ship_calc, description: "/ship", commands: ["ship"], categories: ["Chat","Commands"] },
+        { name: "Show Invisible Characters", source: plugin_catalog_show_invisible_characters, description: "/showinvisibles", commands: ["showinvisibles"], categories: ["Commands"], appearanceRevision: "db147200de57ccf9db04e33480d80b06b98533c10eb3d0b13da212d78d779f1b", privateCommands: true },
         { name: "ShowPing", source: plugin_catalog_show_ping, description: "Show your live call latency in milliseconds", keywords: "Hide the desktop Krisp button beside the voice connection controls", categories: ["Appearance","Voice & calls"] },
         { name: "ShowSongName", source: plugin_catalog_show_song_name, description: "Show the song title in Spotify activity status", categories: ["Appearance"], appearanceRevision: "a1198a0081e2aa6e20ff9ef087da55aa322a18eb8009cd406f2a0bafc7a3fa8d" },
         { name: "Signature", source: plugin_catalog_signature, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },

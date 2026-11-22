@@ -1,0 +1,7 @@
+plugin "Expand Tabs":
+  needs commands.register
+  needs reply.local
+  on command "expandtabs":
+    input "text" text
+    input "width" text
+    reply "${expandTabs(text, width)}" else "Enter text and a tab width from 1 to 16."
