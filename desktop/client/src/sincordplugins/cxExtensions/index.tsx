@@ -1535,11 +1535,13 @@ export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
             const restoreFailed = !active && saved !== undefined && failedAppearanceRestores.get(id) === saved
                 && (typeof source === "string" ? source === saved : entry.name === failedThemeName);
             const needsReview = !active && (restoreFailed || kind === "plugin" && saved !== undefined && typeof source === "string" && saved !== source);
-            return { ...entry, id, active, needsReview, restoreFailed, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
+            return { ...entry, id, active, needsReview, restoreFailed, commands: active ? session.commands(id) : entry.commands,
+                privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
             && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
-                id, name, source: session.source(id)!, active: true, privateCommands: session.isPrivateCommand(id),
+                id, name, source: session.source(id)!, active: true, commands: session.commands(id),
+                categories: session.commands(id)?.length ? ["Commands"] as const : undefined, privateCommands: session.isPrivateCommand(id),
             }));
         return [...catalog, ...imported];
     }, [kind, revision]);

@@ -6545,6 +6545,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const local = useCxAddonRows("plugin", "").find(row => row.name === "Local Private Command");
         assert.equal(local?.privateCommands, true, platform + " classifies imported private commands by their approved permissions");
         assert.ok(local.active);
+        assert.deepEqual(Array.from(local.commands), ["local-filter-test"]);
+        assert.ok(local.categories.includes("Commands"));
+        assert.equal(moduleBox.exports.searchCxCatalog([local], "/local-filter-test")[0], local);
         await disableCxAddon(local.id, local.name);
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");

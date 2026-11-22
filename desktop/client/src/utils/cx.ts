@@ -1308,10 +1308,11 @@ export function runCxIncomingRules(rules: readonly IncomingRule[], payload: Inco
 
 
 export function createCxSession() {
-    const active = new Map<string, { name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; privateCommand: boolean; }>();
+    const active = new Map<string, { name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; privateCommand: boolean; commands?: readonly string[]; }>();
     return {
         list: () => [...active].map(([id, { name }]) => ({ id, name })),
         source: (id: string) => active.get(id)?.source,
+        commands: (id: string) => active.get(id)?.commands,
         isPrivateCommand: (id: string) => active.get(id)?.privateCommand ?? false,
         appearanceOptions(id: string) {
             const entry = active.get(id);
@@ -1331,7 +1332,10 @@ export function createCxSession() {
             if (activeSameType >= (privateCommand ? maxPrivateCxCommandPlugins : maxOtherCxExtensions)) {
                 throw new Error(privateCommand ? "Disable a private command plugin before adding another" : "Disable an active theme or plugin with effects before adding another");
             }
-            active.set(id, { name: review.name, source, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected), privateCommand });
+            active.set(id, {
+                name: review.name, source, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected),
+                privateCommand, commands: review.commands?.map(command => command.slice(1)),
+            });
         },
         disable(id: string) {
             const entry = active.get(id);
