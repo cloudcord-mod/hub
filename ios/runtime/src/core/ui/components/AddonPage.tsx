@@ -157,6 +157,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         return sortFn ? Array.from(matches).sort((a, b) => sortFn(a.obj, b.obj)) : matches;
     }, [items, props.searchKeywords, sortFn, query, commandSearch]);
 
+    const getItemKey = props.getItemKey;
+    const keyExtractor = useCallback(({ obj }: { obj: T }, index: number) =>
+        getItemKey?.(obj) ?? String(index), [getItemKey]);
+    const renderItem = useCallback(({ item }: { item: Fuzzysort.KeysResult<T> }) =>
+        <CardComponent item={item.obj} result={item} />, [CardComponent]);
+
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };
         const { label, onPress, fetchFn } = props.installAction;
@@ -233,7 +239,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
             <FlashList
                 data={results}
                 extraData={search}
-                keyExtractor={props.getItemKey ? ({ obj }: { obj: T; }) => props.getItemKey!(obj) : undefined}
+                keyExtractor={getItemKey ? keyExtractor : undefined}
                 keyboardShouldPersistTaps="handled"
                 estimatedItemSize={136}
                 ListHeaderComponent={headerElement}
@@ -250,7 +256,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 contentContainerStyle={{ padding: 8, paddingHorizontal: 12, paddingBottom: 90 }}
                 ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
                 ListFooterComponent={props.ListFooterComponent}
-                renderItem={({ item }: any) => <CardComponent item={item.obj} result={item} />}
+                renderItem={renderItem}
             />
             {props.installAction && <FloatingActionButton
                 positionBottom={bottomInset + 8}
