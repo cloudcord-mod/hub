@@ -1,0 +1,3 @@
+plugin "CopyRoleName":
+  needs guild.roleclipboard
+  use copy-role-name

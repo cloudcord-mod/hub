@@ -96,7 +96,7 @@ const permissionLabels = {
     "replies.suppressping": "Send replies without pinging the person you reply to",
     "profile.avatar": "Read the avatar URL of the selected Discord user or your own avatar when the command runs",
     "guild.members": "Read loaded members with the role you select in the current server",
-    "guild.roleclipboard": "Copy a loaded role's color or mention markup when you choose the corresponding menu action",
+    "guild.roleclipboard": "Copy a loaded role's name, color, or mention markup when you choose a menu action",
     "guild.rolemedia": "Open the selected role's Discord-hosted icon when you choose View Role Icon",
     "guild.randommember": "Pick a loaded member of the current server to mention",
     "friends.invites.create": "Create a friend invite when you run the listed command",

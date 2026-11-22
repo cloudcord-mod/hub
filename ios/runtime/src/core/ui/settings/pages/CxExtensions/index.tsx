@@ -2612,6 +2612,7 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "copy-channel-name":
                     return registerCopyChannelName(enabled);
                 case "copy-role-color":
+                case "copy-role-name":
                 case "copy-role-mention":
                 case "view-role-icon":
                     return registerMobileRoleMenu(effect, enabled);

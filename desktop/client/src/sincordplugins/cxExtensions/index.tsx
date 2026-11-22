@@ -1126,6 +1126,7 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "copy-channel-name":
                     return registerCopyChannelName();
                 case "copy-role-color":
+                case "copy-role-name":
                 case "copy-role-mention":
                 case "view-role-icon":
                     return registerRoleMenuAction(effect);

@@ -448,7 +448,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             },
             SelectedGuildStore: { getGuildId: () => selectedRoleGuild },
             GuildRoleStore: { getRole: (guild, id) => guild === guildId && id === roleId
-                ? { id, colorStrings: { primaryColor: "#12abcd" }, icon: roleIcon } : undefined },
+                ? { id, name: "Event Host", colorStrings: { primaryColor: "#12abcd" }, icon: roleIcon } : undefined },
             GuildStore: { getGuilds: () => ({ [guildId]: { id: guildId } }),
                 getGuild: id => id === guildId ? { id, ownerId: me, ...serverMenuData } : undefined },
             GuildChannelStore: { getChannels: () => ({
@@ -1254,6 +1254,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
 
             selectedRoleGuild = guildId;
             const rolePlugins = ["CopyRoleColor", "CopyRoleMention", "ViewRoleIcon"];
+            rolePlugins.push("CopyRoleName");
             for (const name of rolePlugins) {
                 selectCatalog(name);
                 click(render(), "Allow for this session");
@@ -1266,13 +1267,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.deepEqual(roleActions({ id: roleId, guildId: other }), []);
             assert.deepEqual(roleActions({ id: "invalid", guildId }), []);
             const menu = roleActions({ id: roleId });
-            assert.deepEqual(menu.map(item => item.props.label), ["Copy Role Color", "Copy Role Mention", "View Role Icon"]);
+            assert.deepEqual(menu.map(item => item.props.label), ["Copy Role Color", "Copy Role Mention", "View Role Icon", "Copy Role Name"]);
             selectedRoleGuild = other;
             menu[0].props.action();
             assert.equal(clipboardWrites.length, 0);
             const explicitMenu = roleActions({ id: roleId, guildId });
             for (const item of explicitMenu) item.props.action();
-            assert.deepEqual(clipboardWrites.splice(0), ["#12abcd", "<@&" + roleId + ">"]);
+            assert.deepEqual(clipboardWrites.splice(0), ["#12abcd", "<@&" + roleId + ">", "Event Host"]);
             assert.equal(viewedProfiles.pop().url, "https://cdn.discordapp.com/role-icons/" + roleId + "/" + roleIcon + ".png?size=256");
             for (const name of rolePlugins) click(render(), "Disable " + name);
             explicitMenu[0].props.action();
@@ -1320,6 +1321,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             groupMenuData = undefined;
         } else {
             const rolePlugins = ["CopyRoleColor", "CopyRoleMention", "ViewRoleIcon"];
+            rolePlugins.push("CopyRoleName");
             for (const name of rolePlugins) {
                 selectCatalog(name);
                 click(render(), "Allow for this session");
@@ -1337,8 +1339,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             button(roles, "Copy Role Color").props.onPress();
             button(roles, "Copy Role Mention").props.onPress();
             button(roles, "View Role Icon").props.onPress();
+            button(roles, "Copy Role Name").props.onPress();
             await new Promise(setImmediate);
-            assert.deepEqual(clipboardWrites.splice(0), ["#12abcd", "<@&" + roleId + ">"]);
+            assert.deepEqual(clipboardWrites.splice(0), ["#12abcd", "<@&" + roleId + ">", "Event Host"]);
             assert.equal(viewedProfiles.pop().uri, "https://cdn.discordapp.com/role-icons/" + roleId + "/" + roleIcon + ".png?size=256");
             settings.safeMode = { enabled: true };
             button(roles, "Copy Role Color").props.onPress();

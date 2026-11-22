@@ -36,6 +36,7 @@ export function getCxServerMenuValue(guild: {
 }
 
 export const cxRoleMenuLabels = {
+    "copy-role-name": "Copy Role Name",
     "copy-role-color": "Copy Role Color",
     "copy-role-mention": "Copy Role Mention",
     "view-role-icon": "View Role Icon",
@@ -44,9 +45,10 @@ export const cxRoleMenuLabels = {
 export type CxRoleMenuEffect = keyof typeof cxRoleMenuLabels;
 
 export function getCxRoleMenuValue(effect: CxRoleMenuEffect, id: string, role: {
-    id?: unknown; colorStrings?: { primaryColor?: unknown; }; colorString?: unknown; icon?: unknown;
+    id?: unknown; name?: unknown; colorStrings?: { primaryColor?: unknown; }; colorString?: unknown; icon?: unknown;
 } | undefined) {
     if (!role || role.id !== id || !isCxProfileUserId(id)) return;
+    if (effect === "copy-role-name") return typeof role.name === "string" && role.name.trim() ? role.name : undefined;
     if (effect === "copy-role-mention") return "<@&" + id + ">";
     if (effect === "copy-role-color") {
         const color = role.colorStrings?.primaryColor ?? role.colorString;
