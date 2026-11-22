@@ -68,8 +68,13 @@ abstract class DownloadStep : Step(), KoinComponent {
 
         container.log("Downloading file at url: $targetUrl")
         var lastLogProgress = 0f
+        var lastPercent: Int? = null
         val result = downloader.download(targetUrl, targetFile) { newProgress ->
-            progress = newProgress ?: -1f
+            val percent = newProgress?.let { (it * 100f).toInt() }
+            if (percent != lastPercent) {
+                lastPercent = percent
+                progress = percent?.div(100f) ?: -1f
+            }
 
             if (newProgress != null && newProgress > lastLogProgress + 0.1f) {
                 container.log("Download progress: ${(newProgress * 100.0).toPrecision(0)}% after ${getDuration()}ms")

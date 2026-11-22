@@ -2,7 +2,7 @@ name: CloudCord Manager Preview
 # Isolated tester build; never publishes over the production Android release.
 on:
   push:
-    branches: [xohus/rain-manager-test]
+    branches: [xohus/rain-manager-test, xohus/android-manager-upgrade]
     paths: ['android-manager-test/**', '.github/workflows/android-manager-test.yml']
   workflow_dispatch:
 permissions:
@@ -98,6 +98,13 @@ jobs:
           name: CloudCordManager-instrumentation
           retention-days: 3
           path: android-manager-test/app/build/outputs/apk/androidTest/debug/*.apk
+      - name: Download the current public Manager for upgrade testing
+        run: |
+          set -euo pipefail
+          apk="$RUNNER_TEMP/cloudcord-manager-public.apk"
+          curl --fail --location --retry 3 --output "$apk" \
+            "https://github.com/cloudcord-mod/hub/releases/download/new_beta_android/CloudCordManager-1.0.13-c4287a5.apk"
+          echo "af74e7e5fab922c0ec6a0e7f91283e0a5d49c8ee6ef92b8ab495a83106025e27  $apk" | sha256sum --check
       - name: Patch, install and launch real Discord on Android 15
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -108,7 +115,11 @@ jobs:
           heap-size: 1024M
           disk-size: 8G
           disable-animations: true
-          script: cd android-manager-test && CLOUDCORD_TEST_DISCORD_VERSION=354012 CHECK_NATIVE_RECOVERY=1 bash test-patched-install.sh
+          script: |
+            adb install "$RUNNER_TEMP/cloudcord-manager-public.apk"
+            adb install -r android-manager-test/app/build/outputs/apk/debug/app-debug.apk
+            adb shell dumpsys package com.getcloudcord.manager | grep 'versionCode=1023 '
+            cd android-manager-test && CLOUDCORD_TEST_DISCORD_VERSION=354012 CHECK_NATIVE_RECOVERY=1 bash test-patched-install.sh
       - name: Upload patched Discord diagnostics
         if: always()
         uses: actions/upload-artifact@v4
