@@ -39937,6 +39937,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         csvToMarkdown(input) {
           return markdownTable(csvRows(input));
         },
+        csvToTsv(input) {
+          if (input.length > 12e3)
+            return;
+          var rows = csvRows(input);
+          var columns = rows[0]?.length;
+          if (!columns || rows.some((row) => row.length !== columns || row.some((field) => /[\t\r\n]/.test(field))))
+            return;
+          return planningBlock(rows.map((row) => row.join("	")).join("\n"));
+        },
+        surroundLines(text, prefix2, suffix) {
+          if (!text || !(prefix2 || suffix) || /[\r\n]/.test(prefix2 + suffix) || prefix2.length + suffix.length > 64)
+            return;
+          return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((line) => prefix2 + line + suffix).join("\n"));
+        },
         transposeCsv(input) {
           if (input.length > 12e3)
             return;
@@ -50466,6 +50480,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/csv-to-tsv.cx
+  var csv_to_tsv_default;
+  var init_csv_to_tsv = __esm({
+    "../examples/cx/catalog/plugins/csv-to-tsv.cx"() {
+      csv_to_tsv_default = 'plugin "CSV to TSV":\n  needs commands.register\n  needs reply.local\n  on command "csvtotsv":\n    input "text" text\n    reply "${csvToTsv(text)}" else "Paste rectangular CSV with no tabs or line breaks inside fields."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/custom-emoji-markup.cx
   var custom_emoji_markup_default;
   var init_custom_emoji_markup = __esm({
@@ -53813,6 +53835,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/surround-lines.cx
+  var surround_lines_default;
+  var init_surround_lines = __esm({
+    "../examples/cx/catalog/plugins/surround-lines.cx"() {
+      surround_lines_default = 'plugin "Surround Lines":\n  needs commands.register\n  needs reply.local\n  on command "surroundlines":\n    input "text" text\n    input "prefix" text\n    input "suffix" text\n    reply "${surroundLines(text, prefix, suffix)}" else "Enter text and a prefix or suffix without line breaks."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/talk-in-reverse.cx
   var talk_in_reverse_default;
   var init_talk_in_reverse = __esm({
@@ -55124,6 +55154,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_count_lines();
       init_csv_column();
       init_csv_to_markdown();
+      init_csv_to_tsv();
       init_custom_emoji_markup();
       init_custom_timestamps();
       init_dashless();
@@ -55498,6 +55529,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_sticky_date_dividers();
       init_stop_auto_unread();
       init_strip_url_tracking();
+      init_surround_lines();
       init_talk_in_reverse();
       init_terezi_typing_quirk();
       init_test_result_summary();
@@ -56483,6 +56515,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1",
+            privateCommands: true
+          },
+          {
+            name: "CSV to TSV",
+            source: csv_to_tsv_default,
+            description: "/csvtotsv",
+            commands: [
+              "csvtotsv"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "a2bb7ff2aaaf7cf411a5f76068115e98a6c209fe5dc0a58d8b1af87caf10f81c",
             privateCommands: true
           },
           {
@@ -60252,6 +60297,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40",
+            privateCommands: true
+          },
+          {
+            name: "Surround Lines",
+            source: surround_lines_default,
+            description: "/surroundlines",
+            commands: [
+              "surroundlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "71e06ef1a3d96e5376cb5e6833af5b4a08b3f484cfcc746d3fe5933dfd42363d",
             privateCommands: true
           },
           {
@@ -70889,7 +70947,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c59c6aadd8b2ecc66dfb412e686611e7a038dd7c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "457c994f5581f426d0740a8fb3a5a265d90d577a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
