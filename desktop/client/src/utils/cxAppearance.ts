@@ -17,6 +17,10 @@ function hideMobileComponent(plugin: string, label: string, path: string) {
 }
 
 export const cxAppearanceTargets = {
+    "hide-profile-activity-badges": hideMobileComponent("HideProfileActivityBadges", "activity badges on profiles", "modules/user_profile/native/UserProfileActivityBadges.tsx"),
+    "hide-profile-activity-timebar": hideMobileComponent("HideProfileActivityTimebar", "the elapsed-time bar on profile activity cards", "modules/user_profile/native/UserProfileActivityTimebar.tsx"),
+    "hide-profile-wishlist-suggestions": hideMobileComponent("HideProfileWishlistSuggestions", "suggested items on profile wishlists", "modules/user_profile/native/UserProfileWishlistSuggestionsGrid.tsx"),
+    "hide-profile-wishlist-tip": hideMobileComponent("HideProfileWishlistTip", "the wishlist viewing tip on profiles", "modules/user_profile/native/WishlistViewerCoachmark.tsx"),
     "hide-app-launcher-intro": hideMobileComponent("HideAppLauncherIntro", "the Apps launcher introduction", "modules/app_launcher/native/onboarding/banner/AppLauncherOnboardingBanner.tsx"),
     "hide-app-launcher-recommendations": hideMobileComponent("HideAppLauncherRecommendations", "recommendations in the Apps launcher", "modules/app_launcher/native/screens/home/recommendations/RecommendationsBanner.tsx"),
     "hide-contact-sync-promotion": hideMobileComponent("HideContactSyncPromotion", "the contact sync promotion", "modules/contact_sync/native/components/ContactSyncUpsellCTA.tsx"),

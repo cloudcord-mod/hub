@@ -1,0 +1,3 @@
+plugin "HideProfileActivityBadges":
+  needs appearance.hide
+  hide hide-profile-activity-badges

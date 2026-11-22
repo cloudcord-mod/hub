@@ -1,0 +1,3 @@
+plugin "HideProfileWishlistSuggestions":
+  needs appearance.hide
+  hide hide-profile-wishlist-suggestions

@@ -167,6 +167,8 @@ import plugin_catalog_hide_orb_wallet_nitro_promotion from "../../../../examples
 import plugin_catalog_hide_orb_wallet_seasonal_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-seasonal-promotion.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
 import plugin_catalog_hide_premium_group_promotion from "../../../../examples/cx/catalog/plugins/hide-premium-group-promotion.cx";
+import plugin_catalog_hide_profile_activity_badges from "../../../../examples/cx/catalog/plugins/hide-profile-activity-badges.cx";
+import plugin_catalog_hide_profile_activity_timebar from "../../../../examples/cx/catalog/plugins/hide-profile-activity-timebar.cx";
 import plugin_catalog_hide_profile_banner_images from "../../../../examples/cx/catalog/plugins/hide-profile-banner-images.cx";
 import plugin_catalog_hide_profile_connections from "../../../../examples/cx/catalog/plugins/hide-profile-connections.cx";
 import plugin_catalog_hide_profile_effects from "../../../../examples/cx/catalog/plugins/hide-profile-effects.cx";
@@ -174,6 +176,8 @@ import plugin_catalog_hide_profile_friend_request_banner from "../../../../examp
 import plugin_catalog_hide_profile_mutuals from "../../../../examples/cx/catalog/plugins/hide-profile-mutuals.cx";
 import plugin_catalog_hide_profile_nitro_card from "../../../../examples/cx/catalog/plugins/hide-profile-nitro-card.cx";
 import plugin_catalog_hide_profile_notes from "../../../../examples/cx/catalog/plugins/hide-profile-notes.cx";
+import plugin_catalog_hide_profile_wishlist_suggestions from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx";
+import plugin_catalog_hide_profile_wishlist_tip from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
 import plugin_catalog_hide_reactions from "../../../../examples/cx/catalog/plugins/hide-reactions.cx";
 import plugin_catalog_hide_reply_previews from "../../../../examples/cx/catalog/plugins/hide-reply-previews.cx";
@@ -652,6 +656,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideOrbWalletSeasonalPromotion", source: plugin_catalog_hide_orb_wallet_seasonal_promotion, description: "Hide the Black Friday card in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button, description: "Hide the pinned messages shortcut", categories: ["Appearance"], appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67" },
         { name: "HidePremiumGroupPromotion", source: plugin_catalog_hide_premium_group_promotion, description: "Hide the premium group promotion in the offer dialog", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideProfileActivityBadges", source: plugin_catalog_hide_profile_activity_badges, description: "Hide activity badges on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5eb45da8e6b8f4b64553b82a09ba64b96f22ac4ab0faf9d8ae00b93eda857a40" },
+        { name: "HideProfileActivityTimebar", source: plugin_catalog_hide_profile_activity_timebar, description: "Hide the elapsed-time bar on profile activity cards", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "a4f2b8a3365692099cd125181785282a06e13d22e28ec0c5a546686646d822da" },
         { name: "Hide Profile Banner Images", source: plugin_catalog_hide_profile_banner_images, description: "Hide Discord-hosted profile banner images except your own and those of friends", categories: ["Appearance"], appearanceRevision: "c2654ca55ea9bf9aa21d8bb1cef13879d1c933a0c6c9ed27d5917ef051ec10db" },
         { name: "HideProfileConnections", source: plugin_catalog_hide_profile_connections, description: "Hide connections in profile cards", categories: ["Appearance","Profiles"], appearanceRevision: "67db92b87e8fbbb17a52ec3362fdc70a6e0954b7d12788a893e4c5ceb0f70770" },
         { name: "HideProfileEffects", source: plugin_catalog_hide_profile_effects, description: "Hide profile effects", categories: ["Appearance","Profiles"], appearanceRevision: "8110c30799aff6431793b0a0c777fdda3acf3eea1ece8723bf08b4d08124acd3" },
@@ -659,6 +665,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideProfileMutuals", source: plugin_catalog_hide_profile_mutuals, description: "Hide mutual friends and servers in profile cards", categories: ["Appearance","Profiles"], appearanceRevision: "679a2cd8c5a444c7897181afbcd449254c80d87cfe5025194459bc8bba4f1904" },
         { name: "HideProfileNitroCard", source: plugin_catalog_hide_profile_nitro_card, description: "Hide the Nitro upsell card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ca245a8305d7861da8d39766e9f4905cc01d6bf84530d9046e6233955a682434" },
         { name: "HideProfileNotes", source: plugin_catalog_hide_profile_notes, description: "Hide local notes in profile cards", categories: ["Appearance","Profiles"], appearanceRevision: "44621fb025c00ea1584c339676b98267d76beef6faba3d1da94312ab63b15e83" },
+        { name: "HideProfileWishlistSuggestions", source: plugin_catalog_hide_profile_wishlist_suggestions, description: "Hide suggested items on profile wishlists", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d23c4eb8f183ca2a7f49fc9086f59dd68e5f6c031b000430c0670ea2754d0622" },
+        { name: "HideProfileWishlistTip", source: plugin_catalog_hide_profile_wishlist_tip, description: "Hide the wishlist viewing tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74d22841fc73e0f740b1819df239a6b3023720a18799b73e96b32cf90f67649f" },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry", categories: ["Appearance"], appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe" },
         { name: "HideReactions", source: plugin_catalog_hide_reactions, description: "Hide message reactions", categories: ["Appearance"], appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58" },
         { name: "HideReplyPreviews", source: plugin_catalog_hide_reply_previews, description: "Hide reply previews in chat", categories: ["Appearance"], appearanceRevision: "52b8a30f8c997d36d491a0ba44775a6c8245f58d14b93596a19138806198994c" },

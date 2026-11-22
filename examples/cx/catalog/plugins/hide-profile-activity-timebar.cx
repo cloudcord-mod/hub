@@ -1,0 +1,3 @@
+plugin "HideProfileActivityTimebar":
+  needs appearance.hide
+  hide hide-profile-activity-timebar
