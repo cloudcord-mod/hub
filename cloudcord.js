@@ -22566,21 +22566,43 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             backgroundColor: card
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 width: 38,
-                height: 38,
-                borderRadius: 19,
-                overflow: "hidden"
+                height: 38
               },
-              children: /* @__PURE__ */ jsx(StudioAvatar, {
-                uri: avatar,
-                fallback: fallbackAvatar,
-                name
-              }, JSON.stringify([
-                avatar,
-                fallbackAvatar
-              ]))
+              children: [
+                /* @__PURE__ */ jsx(import_react_native25.View, {
+                  style: {
+                    width: 38,
+                    height: 38,
+                    borderRadius: 19,
+                    overflow: "hidden"
+                  },
+                  children: /* @__PURE__ */ jsx(StudioAvatar, {
+                    uri: avatar,
+                    fallback: fallbackAvatar,
+                    name
+                  }, JSON.stringify([
+                    avatar,
+                    fallbackAvatar
+                  ]))
+                }),
+                decoration ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+                  source: {
+                    uri: decoration
+                  },
+                  style: {
+                    position: "absolute",
+                    top: -5,
+                    left: -5,
+                    width: 48,
+                    height: 48
+                  },
+                  resizeMode: "contain",
+                  accessible: false
+                }) : null
+              ]
             }),
             /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
@@ -74216,7 +74238,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f77e2119804dd6d2ec56b9898929b2afd5b2b061";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f2f057a2f4e31234c950a78ce095bd4ed0421e4";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
