@@ -659,6 +659,11 @@ export const cxAppearanceTargets = {
         css: '[class*="messageContent_"]::selection, [class*="messageContent_"] ::selection { color: HighlightText !important; background-color: Highlight !important; }',
         desktopOnly: true, style: {},
     },
+    "wrap-chat-code-blocks": {
+        plugin: "WrapChatCodeBlocks", label: "Wrap long lines in chat code blocks",
+        css: '[class*="messageContent_"] pre > code { white-space: pre-wrap !important; overflow-wrap: anywhere; }',
+        desktopOnly: true, style: {},
+    },
     "floating-chat-bar": {
         plugin: "FloatingChatBar", label: "lift the chat bar above the bottom edge",
         css: 'form [class*="channelTextArea"] { margin-bottom: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 25%); }',

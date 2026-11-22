@@ -1,0 +1,3 @@
+plugin "WrapChatCodeBlocks":
+  needs appearance.style
+  style wrap-chat-code-blocks

@@ -548,6 +548,7 @@ import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/
 import plugin_catalog_word_count from "../../../../examples/cx/catalog/plugins/word-count.cx";
 import plugin_catalog_word_frequency from "../../../../examples/cx/catalog/plugins/word-frequency.cx";
 import plugin_catalog_work_session_budget from "../../../../examples/cx/catalog/plugins/work-session-budget.cx";
+import plugin_catalog_wrap_chat_code_blocks from "../../../../examples/cx/catalog/plugins/wrap-chat-code-blocks.cx";
 import plugin_catalog_wrap_text from "../../../../examples/cx/catalog/plugins/wrap-text.cx";
 import plugin_catalog_write_upper_case from "../../../../examples/cx/catalog/plugins/write-upper-case.cx";
 import plugin_catalog_zero_width_sanitizer from "../../../../examples/cx/catalog/plugins/zero-width-sanitizer.cx";
@@ -1207,6 +1208,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "WordCount", source: plugin_catalog_word_count, description: "Show word and character counts below messages longer than five words", categories: ["Chat"] },
         { name: "Word Frequency", source: plugin_catalog_word_frequency, description: "/wordfrequency", commands: ["wordfrequency"], categories: ["Commands"], appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065", privateCommands: true },
         { name: "Work Session Budget", source: plugin_catalog_work_session_budget, description: "/sessionbudget", commands: ["sessionbudget"], categories: ["Commands"], appearanceRevision: "0c100044729ae85eb7d9cc7a3fada7136b6016ff6e17b09e702ca24a78b6d7b2", privateCommands: true },
+        { name: "WrapChatCodeBlocks", source: plugin_catalog_wrap_chat_code_blocks, description: "Wrap long lines in chat code blocks", desktopOnly: true, categories: ["Appearance"] },
         { name: "Wrap Text", source: plugin_catalog_wrap_text, description: "/wraptext", commands: ["wraptext"], categories: ["Commands"], appearanceRevision: "e60541db78f6a4d662c6501972181a629fc629e6acb5290275a0ea069a6a1834", privateCommands: true },
         { name: "WriteUpperCase", source: plugin_catalog_write_upper_case, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ZeroWidthSanitizer", source: plugin_catalog_zero_width_sanitizer, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
