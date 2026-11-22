@@ -308,14 +308,14 @@ export default function Diagnostics() {
                     subLabel={`${version.sha.slice(0, 7)} · ${version.date.slice(0, 10)} · ${version.title}`}
                     trailing={<Button size="sm" variant="secondary" text="Use" onPress={() => {
                         if (index === 0) {
-                            loaderConfig.customLoadUrl.enabled = false;
-                            loaderConfig.customLoadUrl.url = "";
-                            showToast("Using current stable CloudCord. Reloading…", findAssetId("Check"));
-                            BundleUpdaterManager.reload();
+                            loaderConfig.customLoadUrl = { enabled: false, url: "" };
+                            showToast("Stable source selected. Close and reopen Discord to apply it.", findAssetId("Check"));
                             return;
                         }
-                        loaderConfig.customLoadUrl.enabled = true;
-                        loaderConfig.customLoadUrl.url = `https://raw.githubusercontent.com/cloudcord-mod/release-hub/${version.sha}/dist/cc.js`;
+                        loaderConfig.customLoadUrl = {
+                            enabled: true,
+                            url: `https://raw.githubusercontent.com/cloudcord-mod/hub/${version.sha}/dist/cc.js`,
+                        };
                         showToast("Version selected. Apply and reload when ready.", findAssetId("Check"));
                     }} />}
                 />)}
