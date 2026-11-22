@@ -1,0 +1,3 @@
+plugin "HideProfileRolesCard":
+  needs appearance.hide
+  hide hide-profile-roles-card

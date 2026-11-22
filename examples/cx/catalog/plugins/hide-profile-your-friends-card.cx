@@ -1,0 +1,3 @@
+plugin "HideProfileYourFriendsCard":
+  needs appearance.hide
+  hide hide-profile-your-friends-card

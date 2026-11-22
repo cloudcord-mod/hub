@@ -1,0 +1,3 @@
+plugin "HideYouBannerDecorations":
+  needs appearance.hide
+  hide hide-you-banner-decorations

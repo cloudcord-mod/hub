@@ -17,6 +17,11 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-profile-about-me": hideMobileComponent("HideProfileAboutMe", "the About Me card on profiles", "modules/user_profile/native/UserProfileAboutMeCard.tsx"),
+    "hide-profile-roles-card": hideMobileComponent("HideProfileRolesCard", "the server roles card on profiles", "modules/user_profile/native/UserProfileRolesCard.tsx"),
+    "hide-profile-personal-widgets": hideMobileComponent("HideProfilePersonalWidgets", "personal widgets displayed on profiles", "modules/user_profile/native/UserProfilePersonalWidgetCard.tsx"),
+    "hide-profile-your-friends-card": hideMobileComponent("HideProfileYourFriendsCard", "the Your Friends card on profiles", "modules/user_profile/native/UserProfileYourFriendsCard.tsx"),
+    "hide-you-banner-decorations": hideMobileComponent("HideYouBannerDecorations", "decorative overlays on the You tab banner", "modules/main_tabs_v2/native/tabs/you/YouBannerDecorations.tsx"),
     "hide-you-trial-offer": hideMobileComponent("HideYouTrialOffer", "the expiring trial offer card on the You tab", "modules/main_tabs_v2/native/tabs/you/YouExpiringTrialOfferCard.tsx"),
     "hide-recap-shortcut": hideMobileComponent("HideRecapShortcut", "the In Case You Missed It shortcut in the You bar", "modules/main_tabs_v2/native/you_bar/YouBarICYMIButton.tsx"),
     "hide-shop-nitro-unlock-button": hideMobileComponent("HideShopNitroUnlockButton", "the Unlock with Nitro button in the Shop", "modules/collectibles/native/UnlockWithNitroButton.tsx"),
