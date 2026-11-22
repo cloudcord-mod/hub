@@ -41012,18 +41012,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "copy-role-color": {
           permission: "guild.roleclipboard",
-          label: "Copy the selected server role's hex color",
-          desktopOnly: true
+          label: "Copy the selected server role's hex color"
         },
         "copy-role-mention": {
           permission: "guild.roleclipboard",
-          label: "Copy mention markup for the selected server role",
-          desktopOnly: true
+          label: "Copy mention markup for the selected server role"
         },
         "view-role-icon": {
           permission: "guild.rolemedia",
-          label: "Open the selected server role's icon in Discord's image viewer",
-          desktopOnly: true
+          label: "Open the selected server role's icon in Discord's image viewer"
         },
         "view-server-media": {
           permission: "servers.mediaview",
@@ -46518,12 +46515,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var text = guild[field];
     return typeof text === "string" && text.trim() ? text : void 0;
   }
+  function getCxRoleMenuValue(effect, id, role) {
+    if (!role || role.id !== id || !isCxProfileUserId(id))
+      return;
+    if (effect === "copy-role-mention")
+      return "<@&" + id + ">";
+    if (effect === "copy-role-color") {
+      var color = role.colorStrings?.primaryColor ?? role.colorString;
+      return typeof color === "string" && /^#[a-f0-9]{6}$/i.test(color) ? color : void 0;
+    }
+    if (typeof role.icon !== "string" || !/^(?:a_)?[a-f0-9]{32}$/i.test(role.icon))
+      return;
+    var format = role.icon.startsWith("a_") ? "gif" : "png";
+    return "https://cdn.discordapp.com/role-icons/" + id + "/" + role.icon + "." + format + "?size=256";
+  }
+  var cxRoleMenuLabels;
   var init_cxServerMedia = __esm({
     "src/lib/api/cxServerMedia.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_cxProfileMenu();
+      cxRoleMenuLabels = {
+        "copy-role-color": "Copy Role Color",
+        "copy-role-mention": "Copy Role Mention",
+        "view-role-icon": "View Role Icon"
+      };
     }
   });
 
@@ -53866,7 +53883,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "CopyRoleColor",
             source: copy_role_color_default,
             description: "Copy the selected server role's hex color",
-            desktopOnly: true,
             categories: [
               "Servers & channels"
             ]
@@ -53875,7 +53891,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "CopyRoleMention",
             source: copy_role_mention_default,
             description: "Copy mention markup for the selected server role",
-            desktopOnly: true,
             categories: [
               "Servers & channels"
             ]
@@ -56773,7 +56788,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "ViewRoleIcon",
             source: view_role_icon_default,
             description: "Open the selected server role's icon in Discord's image viewer",
-            desktopOnly: true,
             categories: [
               "Media",
               "Servers & channels"
@@ -59545,16 +59559,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       };
     });
   }
-  function registerMobileServerMenu(effect, enabled) {
-    var view = effect === "view-server-media" || effect === "view-group-dm-icon";
-    var viewer = view ? findByFilePath("modules/media_viewer/native/components/openMediaModal.tsx") : void 0;
-    if (view && !viewer?.openMediaModal)
+  function getMobileAssetViewer() {
+    var viewer = findByFilePath("modules/media_viewer/native/components/openMediaModal.tsx");
+    if (typeof viewer?.openMediaModal !== "function")
       throw new Error("Discord's media viewer is unavailable");
-    var active = true;
-    var available = () => active && enabled();
-    var open = (url2, width, height) => {
-      if (!available() || !viewer)
-        return;
+    return (url2, width, height) => {
       try {
         viewer.openMediaModal({
           initialSources: [
@@ -59576,6 +59585,76 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       } catch (e) {
         showToast("Couldn't open the selected image.");
       }
+    };
+  }
+  function copyMobileMenuInformation(value, available) {
+    return _async_to_generator(function* () {
+      try {
+        if (!available())
+          return;
+        yield clipboard.setString(value);
+        if (available())
+          showToast.showCopyToClipboard?.();
+      } catch (e) {
+        if (available())
+          showToast("Couldn't copy the selected information.");
+      }
+    })();
+  }
+  function registerMobileRoleMenu(effect, enabled) {
+    var module = findByFilePath("modules/messages/native/RoleMembersActionSheet.tsx");
+    var target = module?.default ?? module?.RoleMembersActionSheet;
+    var sheet = findByProps("BottomSheet")?.BottomSheet;
+    var row = findByProps("ActionSheetRow")?.ActionSheetRow;
+    var store = findByStoreName("GuildRoleStore");
+    if (!target || !sheet || !row?.Group || typeof store?.getRole !== "function")
+      throw new Error("Discord's role sheet is unavailable");
+    var open = effect === "view-role-icon" ? getMobileAssetViewer() : void 0;
+    var Row2 = row;
+    var active = true;
+    var available = () => active && enabled();
+    var stop = registerRenderedTree(target, (tree, props) => {
+      var { guildId, roleId } = props;
+      if (!isCxProfileUserId(guildId) || !isCxProfileUserId(roleId))
+        return tree;
+      var getValue = () => getCxRoleMenuValue(effect, roleId, store.getRole(guildId, roleId));
+      if (!getValue())
+        return tree;
+      return mapAppearanceElements(tree, (element) => element.type === sheet ? React2.cloneElement(element, {
+        children: [
+          /* @__PURE__ */ jsx(Row2.Group, {
+            children: /* @__PURE__ */ jsx(Row2, {
+              label: cxRoleMenuLabels[effect],
+              onPress: () => {
+                if (!available())
+                  return;
+                var value = getValue();
+                if (!value)
+                  return;
+                if (open)
+                  open(value, 256, 256);
+                else
+                  void copyMobileMenuInformation(value, available);
+              }
+            })
+          }, "cx-" + effect),
+          ...React2.Children.toArray(element.props.children)
+        ]
+      }) : element);
+    });
+    return () => {
+      active = false;
+      stop();
+    };
+  }
+  function registerMobileServerMenu(effect, enabled) {
+    var view = effect === "view-server-media" || effect === "view-group-dm-icon";
+    var viewer = view ? getMobileAssetViewer() : void 0;
+    var active = true;
+    var available = () => active && enabled();
+    var open = (url2, width, height) => {
+      if (available())
+        viewer?.(url2, width, height);
     };
     if (effect === "view-group-dm-icon") {
       var getIcon = (id) => {
@@ -59634,16 +59713,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   else
                     import_react_native32.Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
                 } else {
-                  void Promise.resolve().then(() => {
-                    if (available())
-                      return clipboard.setString(value);
-                  }).then(() => {
-                    if (available())
-                      showToast.showCopyToClipboard?.();
-                  }).catch(() => {
-                    if (available())
-                      showToast("Couldn't copy the selected information.");
-                  });
+                  void copyMobileMenuInformation(value, available);
                 }
               }
             }, field.key))
@@ -60805,7 +60875,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-role-color":
           case "copy-role-mention":
           case "view-role-icon":
-            throw new Error("Role menu actions are available on desktop and browser.");
+            return registerMobileRoleMenu(effect, enabled);
           case "view-server-media":
           case "copy-server-media-links":
           case "copy-server-details":
@@ -66674,7 +66744,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6409d813bb17cd462af8a4af8c0bce44880a6127";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "03cf660d68f1f38d3ea1f160dae3c3f5f62dd324";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
