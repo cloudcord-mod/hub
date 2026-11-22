@@ -38365,6 +38365,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return seconds;
   }
+  function readableDuration(seconds) {
+    return [
+      ...durationUnits
+    ].map(([unit, size]) => {
+      var part = Math.floor(seconds / size);
+      seconds %= size;
+      return part ? part + unit : "";
+    }).filter(Boolean).join(" ") || "0s";
+  }
   function isoUnixMilliseconds(input) {
     var parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
     if (!parsed)
@@ -39100,6 +39109,28 @@ Milliseconds \`${ms}\``;
           var hours = Math.floor(seconds % 86400 / 3600);
           var minutes = Math.floor(seconds % 3600 / 60);
           return `${days}d ${hours}h ${minutes}m ${seconds % 60}s \xB7 ${seconds} seconds`;
+        },
+        playbackDuration(input, rate) {
+          var duration = durationSeconds(input);
+          var speed = Number(rate);
+          if (!duration || !/^\d+(?:\.\d{1,2})?$/.test(rate) || speed < 0.25 || speed > 4)
+            return;
+          return "Playback time: " + readableDuration(Math.round(duration / speed)) + " at " + speed + "\xD7";
+        },
+        timestampDifference(start, end) {
+          var from = isoUnixMilliseconds(start), to = isoUnixMilliseconds(end);
+          if (from === void 0 || to === void 0)
+            return;
+          var difference = to - from;
+          if (!difference)
+            return "The timestamps are the same instant.";
+          var seconds = Math.abs(difference) / 1e3;
+          var remainder = Math.abs(difference) % 1e3;
+          var duration = seconds < 1 ? "" : readableDuration(Math.floor(seconds));
+          return [
+            duration,
+            remainder ? remainder + "ms" : ""
+          ].filter(Boolean).join(" ") + (difference > 0 ? " later" : " earlier");
         },
         countdownTimestamp(input) {
           var duration = durationSeconds(input);
@@ -52077,6 +52108,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/playback-duration.cx
+  var playback_duration_default;
+  var init_playback_duration = __esm({
+    "../examples/cx/catalog/plugins/playback-duration.cx"() {
+      playback_duration_default = 'plugin "Playback Duration":\n  needs commands.register\n  needs reply.local\n  on command "playbacktime":\n    input "duration" text\n    input "speed" text\n    reply "${playbackDuration(duration, speed)}" else "Use a duration such as 1h 30m and a playback speed from 0.25 to 4."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/polish-wording.cx
   var polish_wording_default;
   var init_polish_wording = __esm({
@@ -52602,6 +52641,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_thin_scrollbars = __esm({
     "../examples/cx/catalog/plugins/thin-scrollbars.cx"() {
       thin_scrollbars_default = 'plugin "ThinScrollbars":\n  needs appearance.style\n  style thin-scrollbars\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/timestamp-difference.cx
+  var timestamp_difference_default;
+  var init_timestamp_difference = __esm({
+    "../examples/cx/catalog/plugins/timestamp-difference.cx"() {
+      timestamp_difference_default = 'plugin "Timestamp Difference":\n  needs commands.register\n  needs reply.local\n  on command "timestampdiff":\n    input "start" text\n    input "end" text\n    reply "${timestampDifference(start, end)}" else "Use two ISO timestamps with explicit time zones."\n';
     }
   });
 
@@ -54053,6 +54100,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_pick_names();
       init_ping_notifications();
       init_plain_folder_icon();
+      init_playback_duration();
       init_polish_wording();
       init_poll_draft();
       init_profile_media();
@@ -54119,6 +54167,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_text_replace();
       init_theme_starter();
       init_thin_scrollbars();
+      init_timestamp_difference();
       init_timestamp_styles();
       init_total_time();
       init_translate();
@@ -57314,6 +57363,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Playback Duration",
+            source: playback_duration_default,
+            description: "/playbacktime",
+            commands: [
+              "playbacktime"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "b31fafdd291c4499b847101f814e47849ba29e27f17e8bc10c95d9ab44bf8e1c",
+            privateCommands: true
+          },
+          {
             name: "PolishWording",
             source: polish_wording_default,
             description: "Change text before Discord sends messages you compose",
@@ -57968,6 +58030,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Timestamp Difference",
+            source: timestamp_difference_default,
+            description: "/timestampdiff",
+            commands: [
+              "timestampdiff"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "f322ad1f90489ea334f18706038470062328b80579da8eea741730784d3859d1",
+            privateCommands: true
           },
           {
             name: "Timestamp Styles",
@@ -68427,7 +68502,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b21b84d8fdc8a0e9c5e501c0893bd36bcd722228";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "214743197ec9ab63b608d1300b55e272120902ce";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
