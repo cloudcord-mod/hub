@@ -36900,6 +36900,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-new-channel-badge": hideMobileComponent("HideNewChannelBadge", "the New label on recently added channels", "modules/channel_list_v2/native/components/NewBadge.tsx"),
+        "hide-recap-new-content-pill": hideMobileComponent("HideRecapNewContentPill", "the new-content pill in the recap", "modules/icymi/native/NewContentPill.tsx"),
+        "hide-quest-orb-multiplier-pill": hideMobileComponent("HideQuestOrbMultiplierPill", "the Orb multiplier perk label on quests", "modules/quests/native/QuestOrbMultiplierPerkPill.tsx"),
+        "hide-settings-premium-new-badge": hideMobileComponent("HideSettingsPremiumNewBadge", "the dismissible New badge on premium settings", "modules/user_settings/defs/native/DismissiblePremiumNewBadge.tsx"),
+        "hide-orb-onboarding-pill": hideMobileComponent("HideOrbOnboardingPill", "the Orb onboarding pill", "modules/virtual_currency/native/OrbOnboardingPill.tsx"),
         "hide-profile-about-me": hideMobileComponent("HideProfileAboutMe", "the About Me card on profiles", "modules/user_profile/native/UserProfileAboutMeCard.tsx"),
         "hide-profile-roles-card": hideMobileComponent("HideProfileRolesCard", "the server roles card on profiles", "modules/user_profile/native/UserProfileRolesCard.tsx"),
         "hide-profile-personal-widgets": hideMobileComponent("HideProfilePersonalWidgets", "personal widgets displayed on profiles", "modules/user_profile/native/UserProfilePersonalWidgetCard.tsx"),
@@ -51258,6 +51263,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-new-channel-badge.cx
+  var hide_new_channel_badge_default;
+  var init_hide_new_channel_badge = __esm({
+    "../examples/cx/catalog/plugins/hide-new-channel-badge.cx"() {
+      hide_new_channel_badge_default = 'plugin "HideNewChannelBadge":\n  needs appearance.hide\n  hide hide-new-channel-badge\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-new-messages-bar.cx
   var hide_new_messages_bar_default;
   var init_hide_new_messages_bar = __esm({
@@ -51287,6 +51300,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_notification_bell = __esm({
     "../examples/cx/catalog/plugins/hide-notification-bell.cx"() {
       hide_notification_bell_default = 'plugin "HideNotificationBell":\n  needs appearance.hide\n  hide notification-settings\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-orb-onboarding-pill.cx
+  var hide_orb_onboarding_pill_default;
+  var init_hide_orb_onboarding_pill = __esm({
+    "../examples/cx/catalog/plugins/hide-orb-onboarding-pill.cx"() {
+      hide_orb_onboarding_pill_default = 'plugin "HideOrbOnboardingPill":\n  needs appearance.hide\n  hide hide-orb-onboarding-pill\n';
     }
   });
 
@@ -51490,6 +51511,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-quest-orb-multiplier-pill.cx
+  var hide_quest_orb_multiplier_pill_default;
+  var init_hide_quest_orb_multiplier_pill = __esm({
+    "../examples/cx/catalog/plugins/hide-quest-orb-multiplier-pill.cx"() {
+      hide_quest_orb_multiplier_pill_default = 'plugin "HideQuestOrbMultiplierPill":\n  needs appearance.hide\n  hide hide-quest-orb-multiplier-pill\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-quests-tab.cx
   var hide_quests_tab_default;
   var init_hide_quests_tab = __esm({
@@ -51503,6 +51532,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_reactions = __esm({
     "../examples/cx/catalog/plugins/hide-reactions.cx"() {
       hide_reactions_default = 'plugin "HideReactions":\n  needs appearance.hide\n  hide message-reactions\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-recap-new-content-pill.cx
+  var hide_recap_new_content_pill_default;
+  var init_hide_recap_new_content_pill = __esm({
+    "../examples/cx/catalog/plugins/hide-recap-new-content-pill.cx"() {
+      hide_recap_new_content_pill_default = 'plugin "HideRecapNewContentPill":\n  needs appearance.hide\n  hide hide-recap-new-content-pill\n';
     }
   });
 
@@ -51623,6 +51660,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_server_theme_tip = __esm({
     "../examples/cx/catalog/plugins/hide-server-theme-tip.cx"() {
       hide_server_theme_tip_default = 'plugin "HideServerThemeTip":\n  needs appearance.hide\n  hide hide-server-theme-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-settings-premium-new-badge.cx
+  var hide_settings_premium_new_badge_default;
+  var init_hide_settings_premium_new_badge = __esm({
+    "../examples/cx/catalog/plugins/hide-settings-premium-new-badge.cx"() {
+      hide_settings_premium_new_badge_default = 'plugin "HideSettingsPremiumNewBadge":\n  needs appearance.hide\n  hide hide-settings-premium-new-badge\n';
     }
   });
 
@@ -54572,10 +54617,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_message_length_promotion();
       init_hide_monthly_reward_promotions();
       init_hide_nameplates();
+      init_hide_new_channel_badge();
       init_hide_new_messages_bar();
       init_hide_nitro_tab();
       init_hide_nitro_tenure_tip();
       init_hide_notification_bell();
+      init_hide_orb_onboarding_pill();
       init_hide_orb_wallet_nitro_promotion();
       init_hide_orb_wallet_seasonal_promotion();
       init_hide_outbound_promotion_cards();
@@ -54601,8 +54648,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_wishlist_suggestions();
       init_hide_profile_wishlist_tip();
       init_hide_profile_your_friends_card();
+      init_hide_quest_orb_multiplier_pill();
       init_hide_quests_tab();
       init_hide_reactions();
+      init_hide_recap_new_content_pill();
       init_hide_recap_server_recommendations();
       init_hide_recap_shortcut();
       init_hide_reply_previews();
@@ -54618,6 +54667,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_server_live_notice();
       init_hide_server_tag_promotion();
       init_hide_server_theme_tip();
+      init_hide_settings_premium_new_badge();
       init_hide_shop_button_tip();
       init_hide_shop_featured_collections();
       init_hide_shop_limited_time_badges();
@@ -56836,6 +56886,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "a1a4921ec50253e74f70cee18c4210151654b56ab3af47085be01cb56028aa58"
           },
           {
+            name: "HideNewChannelBadge",
+            source: hide_new_channel_badge_default,
+            description: "Hide the New label on recently added channels",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "02ad347b103d7161395232d2feb7485d9f95a783619ddd1894c04b22b179074e"
+          },
+          {
             name: "HideNewMessagesBar",
             source: hide_new_messages_bar_default,
             description: "Hide the new messages bar",
@@ -56871,6 +56931,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "7ba7ebf67f69bf87b478780c25dc22ee79e44f0f381e0339fbc78c50ace61320"
+          },
+          {
+            name: "HideOrbOnboardingPill",
+            source: hide_orb_onboarding_pill_default,
+            description: "Hide the Orb onboarding pill",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "9c70370a7090f039389ada40d4c00e2486165ea96d0dcce509f1d07bd1d8de13"
           },
           {
             name: "HideOrbWalletNitroPromotion",
@@ -57118,6 +57188,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389"
           },
           {
+            name: "HideQuestOrbMultiplierPill",
+            source: hide_quest_orb_multiplier_pill_default,
+            description: "Hide the Orb multiplier perk label on quests",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "03f19a71805dbf9465f5644be6b64fd64e68a18e496d5aa9b25caf615d8b7b5b"
+          },
+          {
             name: "HideQuestsTab",
             source: hide_quests_tab_default,
             description: "Hide the Quests entry",
@@ -57134,6 +57214,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58"
+          },
+          {
+            name: "HideRecapNewContentPill",
+            source: hide_recap_new_content_pill_default,
+            description: "Hide the new-content pill in the recap",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "e239a186a6a46a20ffc388a06fb118208fcc07140658a4b89ff83213d3e94962"
           },
           {
             name: "HideRecapServerRecommendations",
@@ -57278,6 +57368,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "fcf3ec61162e3f78d941d24c2b2ffec00e111bbb1cca794bce45461c77443b4e"
+          },
+          {
+            name: "HideSettingsPremiumNewBadge",
+            source: hide_settings_premium_new_badge_default,
+            description: "Hide the dismissible New badge on premium settings",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "e6966c616536b401b01ee778a177fb7436960d5946903a6a8a9cf149c5f3e05e"
           },
           {
             name: "HideShopButtonTip",
@@ -69623,7 +69723,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "59e338905e48bb578e732047563ae7ab9bdc173f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "92ac75181754de0d08d53fc2f3debd890f8f9e32";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
