@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-gift-button-animation": hideMobileComponent("HideGiftButtonAnimation", "the decorative animation on the chat gift button", "modules/chat_input/native/GiftIconTrinketsAnimation.tsx"),
+    "hide-app-launcher-button-animation": hideMobileComponent("HideAppLauncherButtonAnimation", "the app launcher button introduction animation", "modules/app_launcher/native/onboarding/AppLauncherOnboardingChatInputButtonAnimation.tsx"),
+    "hide-super-reaction-animation": hideMobileComponent("HideSuperReactionAnimation", "the Super Reaction animation in chat", "modules/messages/native/burst_reactions/BurstReactionAnimation.tsx"),
     "hide-stage-boost-promo": hideMobileComponent("HideStageBoostPromo", "the boost upsell in Stage channels", "modules/guild_scheduled_events/native/components/StageChannelUpsell.tsx"),
     "hide-app-recommendation-rows": hideMobileComponent("HideAppRecommendationRows", "individual recommended app rows in the launcher", "modules/app_launcher/native/base_components/RecommendationAppRow.tsx"),
     "hide-premium-upsell-gradient": hideMobileComponent("HidePremiumUpsellGradient", "the decorative gradient behind premium upsells", "modules/premium/roadblocks/native/views/PremiumUpsellGradientBackground.tsx"),

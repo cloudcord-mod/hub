@@ -1,0 +1,3 @@
+plugin "HideGiftButtonAnimation":
+  needs appearance.hide
+  hide hide-gift-button-animation

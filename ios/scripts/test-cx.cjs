@@ -602,7 +602,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "ChannelUnreadBadge", "Badges", "SettingsAppearanceChannelListPreviewNitroUpsell",
             "UserSettingsGiftingBadgeProgress", "UserProfileDismissibleUpsells",
             "MediaMessagePreview", "StickerPackBanner", "StageChannelUpsell", "RecommendationAppRow",
-            "PremiumUpsellGradientBackground"].map(name => [
+            "PremiumUpsellGradientBackground", "GiftIconTrinketsAnimation",
+            "AppLauncherOnboardingChatInputButtonAnimation", "BurstReactionAnimation"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>

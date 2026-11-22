@@ -137,6 +137,7 @@ import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_activity_cards from "../../../../examples/cx/catalog/plugins/hide-activity-cards.cx";
 import plugin_catalog_hide_add_friend_hint from "../../../../examples/cx/catalog/plugins/hide-add-friend-hint.cx";
 import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catalog/plugins/hide-add-server-button.cx";
+import plugin_catalog_hide_app_launcher_button_animation from "../../../../examples/cx/catalog/plugins/hide-app-launcher-button-animation.cx";
 import plugin_catalog_hide_app_launcher_intro from "../../../../examples/cx/catalog/plugins/hide-app-launcher-intro.cx";
 import plugin_catalog_hide_app_launcher_recommendations from "../../../../examples/cx/catalog/plugins/hide-app-launcher-recommendations.cx";
 import plugin_catalog_hide_app_recommendation_rows from "../../../../examples/cx/catalog/plugins/hide-app-recommendation-rows.cx";
@@ -194,6 +195,7 @@ import plugin_catalog_hide_gif_button from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_gif_favorite_button from "../../../../examples/cx/catalog/plugins/hide-gif-favorite-button.cx";
 import plugin_catalog_hide_gif_search_suggestions from "../../../../examples/cx/catalog/plugins/hide-gif-search-suggestions.cx";
 import plugin_catalog_hide_gift_badge_progress from "../../../../examples/cx/catalog/plugins/hide-gift-badge-progress.cx";
+import plugin_catalog_hide_gift_button_animation from "../../../../examples/cx/catalog/plugins/hide-gift-button-animation.cx";
 import plugin_catalog_hide_gift_button from "../../../../examples/cx/catalog/plugins/hide-gift-button.cx";
 import plugin_catalog_hide_gift_wishlist_banner from "../../../../examples/cx/catalog/plugins/hide-gift-wishlist-banner.cx";
 import plugin_catalog_hide_guild_boost_tag from "../../../../examples/cx/catalog/plugins/hide-guild-boost-tag.cx";
@@ -288,6 +290,7 @@ import plugin_catalog_hide_sticker_search_suggestions from "../../../../examples
 import plugin_catalog_hide_stickers from "../../../../examples/cx/catalog/plugins/hide-stickers.cx";
 import plugin_catalog_hide_stream_previews from "../../../../examples/cx/catalog/plugins/hide-stream-previews.cx";
 import plugin_catalog_hide_suggested_channels from "../../../../examples/cx/catalog/plugins/hide-suggested-channels.cx";
+import plugin_catalog_hide_super_reaction_animation from "../../../../examples/cx/catalog/plugins/hide-super-reaction-animation.cx";
 import plugin_catalog_hide_system_messages from "../../../../examples/cx/catalog/plugins/hide-system-messages.cx";
 import plugin_catalog_hide_thread_suggestions from "../../../../examples/cx/catalog/plugins/hide-thread-suggestions.cx";
 import plugin_catalog_hide_threads_button from "../../../../examples/cx/catalog/plugins/hide-threads-button.cx";
@@ -740,6 +743,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideActivityCards", source: plugin_catalog_hide_activity_cards, description: "Hide activity cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7" },
         { name: "HideAddFriendHint", source: plugin_catalog_hide_add_friend_hint, description: "Hide the hint below the Add Friend field", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideAddServerButton", source: plugin_catalog_hide_add_server_button, description: "Hide the add-a-server button", categories: ["Appearance"], appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f" },
+        { name: "HideAppLauncherButtonAnimation", source: plugin_catalog_hide_app_launcher_button_animation, description: "Hide the app launcher button introduction animation", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "dbe46592775b83cb2865f691d4a17e9f502bf4a84d9c249614982db5a883f7b4" },
         { name: "HideAppLauncherIntro", source: plugin_catalog_hide_app_launcher_intro, description: "Hide the Apps launcher introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ce7dcfafd46c3e9a304f179a75d79c4305955819ddd5b53dfb683e5e5f652d93" },
         { name: "HideAppLauncherRecommendations", source: plugin_catalog_hide_app_launcher_recommendations, description: "Hide recommendations in the Apps launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "3578c09c61c7bd97ca8d3e6d627476cf7633d5e4de2f50203bf84bab6673566c" },
         { name: "HideAppRecommendationRows", source: plugin_catalog_hide_app_recommendation_rows, description: "Hide individual recommended app rows in the launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "38bf86f99da339d0fd91838f1b241bbafb6b0a68086e34d43b5234b43b29f0ba" },
@@ -797,6 +801,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideGifFavoriteButton", source: plugin_catalog_hide_gif_favorite_button, description: "Hide the favorite button when viewing GIFs", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5133bb74db5017212d71f4cd4eec44be922f2ae2257f7877de07baf7ba1d6d8e" },
         { name: "HideGifSearchSuggestions", source: plugin_catalog_hide_gif_search_suggestions, description: "Hide suggested searches in the GIF picker", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b827be2027141767b08deeba23ea88217ed2d75f1821af1765ab0c9d3606e844" },
         { name: "HideGiftBadgeProgress", source: plugin_catalog_hide_gift_badge_progress, description: "Hide the gifting badge progress banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "f5142301c6aa7f978ba0198c59757ccb800df6190c622413f1df0b90da72e186" },
+        { name: "HideGiftButtonAnimation", source: plugin_catalog_hide_gift_button_animation, description: "Hide the decorative animation on the chat gift button", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "49f34439fc9c2edc0540d0544a956d466a21d71304657cc03efed926e140d910" },
         { name: "HideGiftButton", source: plugin_catalog_hide_gift_button, description: "Hide the chat gift button", categories: ["Appearance"], appearanceRevision: "d1392300974c2c311c2ba67e55d4dd5340d720455db58c084beb4e7a867e46b0" },
         { name: "HideGiftWishlistBanner", source: plugin_catalog_hide_gift_wishlist_banner, description: "Hide the gift wishlist banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "f9b174f7bfc2d5e61f72706d348288ed1ffa64fede6a85411e5b27b0debecc11" },
         { name: "HideGuildBoostTag", source: plugin_catalog_hide_guild_boost_tag, description: "Hide the server boost gem", categories: ["Appearance"], appearanceRevision: "cfa92d873cfda042a72a953595c6f4a12855f7a4c62838e76d5e9436aa533eff" },
@@ -891,6 +896,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideStickers", source: plugin_catalog_hide_stickers, description: "Hide stickers in chat", categories: ["Appearance"], appearanceRevision: "26af7d108cb384ee165e988d7d79c0f6c341bcf0682b782d8f811e6c4ce4362f" },
         { name: "HideStreamPreviews", source: plugin_catalog_hide_stream_previews, description: "Hide voice-channel stream previews", categories: ["Appearance","Voice & calls"], appearanceRevision: "39126a76c6a90f2543527630c56c35b8cd483983a7e67791f500282771082792" },
         { name: "HideSuggestedChannels", source: plugin_catalog_hide_suggested_channels, description: "Hide the suggested channels section", categories: ["Appearance"], appearanceRevision: "3f1a5c689eb15245e51159b852079aa18b3d56764577b8d55489097b53b47523" },
+        { name: "HideSuperReactionAnimation", source: plugin_catalog_hide_super_reaction_animation, description: "Hide the Super Reaction animation in chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "70b79727ea4c5e1a41e55dd5c6beaf13294e24159911f91af25d44f6e3131ab9" },
         { name: "HideSystemMessages", source: plugin_catalog_hide_system_messages, description: "Hide system messages for pins, joins, boosts", categories: ["Chat"] },
         { name: "HideThreadSuggestions", source: plugin_catalog_hide_thread_suggestions, description: "Hide thread suggestions above the composer", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideThreadsButton", source: plugin_catalog_hide_threads_button, description: "Hide the threads shortcut in the channel header", categories: ["Appearance"], appearanceRevision: "918d45b9050ba06227cf5eed87a6476f74f2a309de65e50aca40f081e744ddc6" },
