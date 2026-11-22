@@ -67196,7 +67196,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }),
           !entry && /* @__PURE__ */ jsx(import_react_native32.TextInput, {
             accessibilityLabel: "CX source",
-            placeholder: 'theme "Midnight":',
+            placeholder: kind === "plugin" ? 'plugin "My Plugin":' : 'theme "Midnight":',
             placeholderTextColor: "#b5bac1",
             value: source,
             maxLength: MAX_CX_SOURCE,
@@ -67301,14 +67301,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   });
                 }
               }, target)),
-              candidate && /* @__PURE__ */ jsx(TableRow, {
-                label: activeSource ? "Apply for this session" : "Allow for this session",
-                onPress: () => enable()
-              }),
-              candidate && rememberRevision && /* @__PURE__ */ jsx(TableRow, {
-                label: activeSource ? "Apply and remember on this device" : "Allow and remember on this device",
-                onPress: () => enable(true)
-              }),
+              candidate && (settings.safeMode?.enabled ? /* @__PURE__ */ jsx(TableRow, {
+                label: "Add-ons are paused in Safe Mode"
+              }) : /* @__PURE__ */ jsxs(Fragment, {
+                children: [
+                  /* @__PURE__ */ jsx(TableRow, {
+                    label: activeSource ? "Apply for this session" : "Allow for this session",
+                    onPress: () => enable()
+                  }),
+                  rememberRevision && /* @__PURE__ */ jsx(TableRow, {
+                    label: activeSource ? "Apply and remember on this device" : "Allow and remember on this device",
+                    onPress: () => enable(true)
+                  })
+                ]
+              })),
               candidate && !entry && !source && /* @__PURE__ */ jsx(TableRow, {
                 label: "Edit source",
                 onPress: () => setSource(candidate.source)
@@ -69647,11 +69653,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         }
       ] : void 0,
       onToggleChange: (enabled) => {
-        if (enabled) {
-          if (settings.safeMode?.enabled)
-            return showToast("Add-ons are paused in Safe Mode.");
+        if (enabled)
           return review();
-        }
         try {
           disableCxAddon(entry.id, entry.name);
         } catch (error) {
@@ -69670,7 +69673,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_jsxRuntime();
       init_AddonCard();
       init_loader();
-      init_settings();
       init_shared();
       init_toasts();
       init_common();
@@ -72320,7 +72322,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "98662ec2a6b9dd5c3ef5508450b50b2a6cd1ab7e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "54498695c39d5e233b0b4a7828d295d1be5c7737";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
