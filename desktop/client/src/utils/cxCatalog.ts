@@ -99,6 +99,8 @@ import plugin_catalog_decode_base64 from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_dim_inactive_channels from "../../../../examples/cx/catalog/plugins/dim-inactive-channels.cx";
 import plugin_catalog_disable_chat_emoji_animation from "../../../../examples/cx/catalog/plugins/disable-chat-emoji-animation.cx";
 import plugin_catalog_disable_chat_gif_autoplay from "../../../../examples/cx/catalog/plugins/disable-chat-gif-autoplay.cx";
+import plugin_catalog_disable_inline_attachment_media from "../../../../examples/cx/catalog/plugins/disable-inline-attachment-media.cx";
+import plugin_catalog_disable_inline_embed_media from "../../../../examples/cx/catalog/plugins/disable-inline-embed-media.cx";
 import plugin_catalog_discord_countdown from "../../../../examples/cx/catalog/plugins/discord-countdown.cx";
 import plugin_catalog_discord_link_details from "../../../../examples/cx/catalog/plugins/discord-link-details.cx";
 import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/plugins/discord-timestamp.cx";
@@ -737,6 +739,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "DimInactiveChannels", source: plugin_catalog_dim_inactive_channels, description: "dim channel names without unread messages", categories: ["Appearance"], appearanceRevision: "160f84b67cdbe906ff267e13c45e81408f856278e15e24e2286e5b66e88c0663" },
         { name: "DisableChatEmojiAnimation", source: plugin_catalog_disable_chat_emoji_animation, description: "Hide animated emoji and reactions in native chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c415c2d639fb38d8bc6c3646f9afa852d91515bf5ea2c220d881d35433caeb79" },
         { name: "DisableChatGifAutoplay", source: plugin_catalog_disable_chat_gif_autoplay, description: "Hide automatic GIF playback in native chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "26be71396727cf7bb54acdf14786f6ac51197dc97f3c8e2f601f572cfb8b9e98" },
+        { name: "DisableInlineAttachmentMedia", source: plugin_catalog_disable_inline_attachment_media, description: "Hide inline media previews for chat attachments", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "8dd523702d9c348e286109c15d832789f0f7901f8ffb9241a8262728ebf21c88" },
+        { name: "DisableInlineEmbedMedia", source: plugin_catalog_disable_inline_embed_media, description: "Hide inline media previews inside link embeds", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "419e5a7ceab6e636ca3cbdb47d5221c4cd0153da4ae64380843b952447399077" },
         { name: "Discord Countdown", source: plugin_catalog_discord_countdown, description: "/countdowntimestamp", commands: ["countdowntimestamp"], categories: ["Commands"], appearanceRevision: "b1e07b26d2e9aec1dd374fd4286111c1cc6cecfad5e417e8438bb3f7f7bce693", privateCommands: true },
         { name: "Discord Link Details", source: plugin_catalog_discord_link_details, description: "/discordlinkdetails", commands: ["discordlinkdetails"], categories: ["Commands"], appearanceRevision: "de375129c1a6f0c0167c450336a626633bfdb14cf549ace5186eceb16a2a65ab", privateCommands: true },
         { name: "Discord Timestamp", source: plugin_catalog_discord_timestamp, description: "/discordtimestamp · /discordlocaltimestamp", commands: ["discordtimestamp","discordlocaltimestamp"], categories: ["Commands"], appearanceRevision: "f8dd293b323bb4f78d2c219d370045e59f183dd39457c74b4cde7355a23467ab", privateCommands: true },

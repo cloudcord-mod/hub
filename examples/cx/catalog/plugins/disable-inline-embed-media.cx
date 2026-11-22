@@ -1,0 +1,3 @@
+plugin "DisableInlineEmbedMedia":
+  needs appearance.hide
+  hide disable-inline-embed-media

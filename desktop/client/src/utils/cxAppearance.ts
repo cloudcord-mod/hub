@@ -17,6 +17,14 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "disable-inline-attachment-media": {
+        plugin: "DisableInlineAttachmentMedia", label: "inline media previews for chat attachments", css: "", mobileOnly: true,
+        mobile: { messageRenderOption: "inlineAttachmentMedia" },
+    },
+    "disable-inline-embed-media": {
+        plugin: "DisableInlineEmbedMedia", label: "inline media previews inside link embeds", css: "", mobileOnly: true,
+        mobile: { messageRenderOption: "inlineEmbedMedia" },
+    },
     "disable-chat-gif-autoplay": {
         plugin: "DisableChatGifAutoplay", label: "automatic GIF playback in native chat", css: "", mobileOnly: true,
         mobile: { messageRenderOption: "gifAutoPlay" },

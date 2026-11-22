@@ -2366,7 +2366,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(appearanceHooks.size, 0);
                 continue;
             } else if (rule.mobile.messageRenderOption) {
-                const options = Object.freeze({ gifAutoPlay: true, animateEmoji: true });
+                const options = Object.freeze({ gifAutoPlay: true, animateEmoji: true, inlineAttachmentMedia: true, inlineEmbedMedia: true });
                 const input = Object.freeze({ options });
                 const rendered = messageRenderer.default(input);
                 for (const key of Object.keys(options)) assert.equal(rendered.options[key], key !== rule.mobile.messageRenderOption);

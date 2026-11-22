@@ -1,0 +1,3 @@
+plugin "DisableInlineAttachmentMedia":
+  needs appearance.hide
+  hide disable-inline-attachment-media
