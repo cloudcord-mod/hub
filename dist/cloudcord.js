@@ -36900,6 +36900,33 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-chat-thread-previews": {
+          plugin: "HideChatThreadPreviews",
+          label: "thread preview cards below chat messages",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messagePresentation: "threadEmbed"
+          }
+        },
+        "hide-chat-linked-role-tags": {
+          plugin: "HideChatLinkedRoleTags",
+          label: "linked role tags next to names in chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messagePresentation: "connectionsRoleTag"
+          }
+        },
+        "hide-chat-post-previews": {
+          plugin: "HideChatPostPreviews",
+          label: "post preview embeds in chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messagePresentation: "postPreviewEmbeds"
+          }
+        },
         "hide-game-community-promo": hideMobileComponent("HideGameCommunityPromo", "the card promoting other game communities", "modules/game_community_upsell/native/GameCommunityMultiGuildUpsellCard.tsx"),
         "hide-outbound-promotion-cards": hideMobileComponent("HideOutboundPromotionCards", "external offer cards on premium surfaces", "components_native/premium/OutboundPromotionCard.tsx"),
         "hide-premium-marketing-banner": hideMobileComponent("HidePremiumMarketingBanner", "the banner tile on the premium promotions page", "modules/premium/promotions/native/MarketingPageBannerTile.tsx"),
@@ -50818,11 +50845,35 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-chat-linked-role-tags.cx
+  var hide_chat_linked_role_tags_default;
+  var init_hide_chat_linked_role_tags = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-linked-role-tags.cx"() {
+      hide_chat_linked_role_tags_default = 'plugin "HideChatLinkedRoleTags":\n  needs appearance.hide\n  hide hide-chat-linked-role-tags\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-chat-post-previews.cx
+  var hide_chat_post_previews_default;
+  var init_hide_chat_post_previews = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-post-previews.cx"() {
+      hide_chat_post_previews_default = 'plugin "HideChatPostPreviews":\n  needs appearance.hide\n  hide hide-chat-post-previews\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-chat-role-dots.cx
   var hide_chat_role_dots_default;
   var init_hide_chat_role_dots = __esm({
     "../examples/cx/catalog/plugins/hide-chat-role-dots.cx"() {
       hide_chat_role_dots_default = 'plugin "HideChatRoleDots":\n  needs appearance.hide\n  hide hide-chat-role-dots\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-chat-thread-previews.cx
+  var hide_chat_thread_previews_default;
+  var init_hide_chat_thread_previews = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-thread-previews.cx"() {
+      hide_chat_thread_previews_default = 'plugin "HideChatThreadPreviews":\n  needs appearance.hide\n  hide hide-chat-thread-previews\n';
     }
   });
 
@@ -54309,7 +54360,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_character_count();
       init_hide_chat_attachments();
       init_hide_chat_input_refresh_tip();
+      init_hide_chat_linked_role_tags();
+      init_hide_chat_post_previews();
       init_hide_chat_role_dots();
+      init_hide_chat_thread_previews();
       init_hide_clan_tags();
       init_hide_composer_emoji_promo();
       init_hide_contact_sync_promotion();
@@ -56152,6 +56206,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36"
           },
           {
+            name: "HideChatLinkedRoleTags",
+            source: hide_chat_linked_role_tags_default,
+            description: "Hide linked role tags next to names in chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "8ea7f36df7a526a2929e340921ca07ecf930dc322e13133b8a038bf77e357fa5"
+          },
+          {
+            name: "HideChatPostPreviews",
+            source: hide_chat_post_previews_default,
+            description: "Hide post preview embeds in chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "6166c6741f43013fc343d2711f087a99140c22c10e61df514ece1dc5f11c5490"
+          },
+          {
             name: "HideChatRoleDots",
             source: hide_chat_role_dots_default,
             description: "Hide role color dots next to names in chat",
@@ -56160,6 +56234,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "aea9c80e488fef746d51483621339a35d64d4c00014bd1dab2e5c5f30afe5979"
+          },
+          {
+            name: "HideChatThreadPreviews",
+            source: hide_chat_thread_previews_default,
+            description: "Hide thread preview cards below chat messages",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "7218cf2d502f4c515d1c49bb40b7c347be1d9b8b7ffe610166bf9ae10614af4f"
           },
           {
             name: "HideClanTags",
@@ -64570,21 +64654,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     timestampAccessibilityLabel: void 0
                   };
                 }
-              } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL" || mobile.messagePresentation === "roleIcon") {
+              } else {
                 var field1 = mobile.messagePresentation;
-                if (field1 in presentation && presentation[field1] != null)
+                var items = presentation[field1];
+                if (Array.isArray(items)) {
+                  if (items.length)
+                    return {
+                      ...presentation,
+                      [field1]: []
+                    };
+                } else if (items != null) {
                   return {
                     ...presentation,
                     [field1]: void 0
                   };
-              } else {
-                var field2 = mobile.messagePresentation;
-                var items = presentation[field2];
-                if (Array.isArray(items) && items.length)
-                  return {
-                    ...presentation,
-                    [field2]: []
-                  };
+                }
               }
               return presentation;
             }
@@ -69189,7 +69273,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "828e175ccc6fb9f3aab9aa1c810baf2825b02ca1";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "504537ceef484cf2ee298d5ba2f4c33b0d6de4d3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
