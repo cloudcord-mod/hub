@@ -1,0 +1,3 @@
+plugin "CopyServerProfileBannerLink":
+  needs profilemenu.copy
+  on profile menu copy server-banner-link

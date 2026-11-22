@@ -434,7 +434,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             UserProfileStore: {
                 getUserProfile: id => id === sender ? { bio: "Hello from the **profile**", pronouns: "they/them", themeColors: Object.freeze([0, 0x12abcd]), banner: "a_" + "a".repeat(32) } : undefined,
                 getGuildMemberProfile: (id, guild) => id === sender && guild === guildId
-                    ? { themeColors: [0x123, 0xffffff], bio: "Hello from the **server profile**" } : undefined,
+                    ? { themeColors: [0x123, 0xffffff], bio: "Hello from the **server profile**", banner: "e".repeat(32) } : undefined,
             },
             ChannelStore: { getChannel: id => id === menuGroupId ? groupMenuData : id === queueChannel.id ? queueChannel : id === jumpChannel.id ? jumpChannel : ({ id, name: "test", recipients: [sender], nsfw: id === "nsfw-channel", guild_id: id === "guild-channel" || id === repeatChannel ? guildId : undefined,
                 rateLimitPerUser: id === "slow-channel" ? 10 : 0 }) },
@@ -2476,22 +2476,24 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         click(render(), "Disable CopyServerBio");
         includeProfileNames = false;
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
-        for (const name of ["CopyPronouns", "CopyServerNickname", "CopyServerAvatarLink"]) {
+        for (const name of ["CopyPronouns", "CopyServerNickname", "CopyServerAvatarLink", "CopyServerProfileBannerLink"]) {
             selectCatalog(name);
             click(render(), "Allow for this session");
         }
         assert.deepEqual(Array.from(actionList(sender), item => item.label), ["Copy Pronouns"]);
         assert.deepEqual(Array.from(actionList(sender, other), item => item.label), ["Copy Pronouns"]);
         const profileDetails = actionList(sender, guildId);
-        assert.deepEqual(Array.from(profileDetails, item => item.label), ["Copy Pronouns", "Copy Server Nickname", "Copy Server Avatar Link"]);
+        assert.deepEqual(Array.from(profileDetails, item => item.label), ["Copy Pronouns", "Copy Server Nickname", "Copy Server Avatar Link", "Copy Server Profile Banner Link"]);
         for (const action of profileDetails) action.action();
-        assert.deepEqual(clipboardWrites.slice(-3), ["they/them", "Server nickname",
-            "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + sender + "/avatars/a_" + "f".repeat(32) + ".webp?size=4096&animated=true"]);
+        assert.deepEqual(clipboardWrites.slice(-4), ["they/them", "Server nickname",
+            "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + sender + "/avatars/a_" + "f".repeat(32) + ".webp?size=4096&animated=true",
+            "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + sender + "/banners/" + "e".repeat(32) + ".png?size=4096"]);
         actionList(other, guildId)[0].action();
         assert.equal(notifications.pop(), "No profile pronouns found.");
         click(render(), "Disable CopyPronouns");
         click(render(), "Disable CopyServerNickname");
         click(render(), "Disable CopyServerAvatarLink");
+        click(render(), "Disable CopyServerProfileBannerLink");
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
         {
             const port = cxCatalog.plugins.find(entry => entry.name === "UserNotes").source;

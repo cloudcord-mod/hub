@@ -14,6 +14,7 @@ export const cxProfileMenuActions = {
     "profile-pronouns": { label: "Copy Pronouns", scope: "user", unavailable: "No profile pronouns found." },
     "server-nickname": { label: "Copy Server Nickname", scope: "server" },
     "server-avatar-link": { label: "Copy Server Avatar Link", scope: "server" },
+    "server-banner-link": { label: "Copy Server Profile Banner Link", scope: "server" },
     "profile-colors": { label: "Copy Profile Colors", scope: "user", unavailable: "No profile colors found." },
     "server-profile-colors": { label: "Copy Server Profile Colors", scope: "server" },
 } as const;
@@ -45,7 +46,7 @@ export function getCxProfileMedia(id: string, user: { avatar?: unknown; discrimi
     return assets;
 }
 
-type Profile = { themeColors?: unknown; bio?: unknown; pronouns?: unknown; };
+type Profile = { themeColors?: unknown; bio?: unknown; pronouns?: unknown; banner?: unknown; };
 type ProfileStore = {
     getUserProfile?: (id: string) => Profile | null | undefined;
     getGuildMemberProfile?: (id: string, guildId: string) => Profile | null | undefined;
@@ -71,12 +72,13 @@ export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, pr
         if (action === "server-nickname" && guildId) {
             return nonBlankText(members?.getMember?.(guildId, id)?.nick);
         }
-        if (action === "server-avatar-link") {
+        if (action === "server-avatar-link" || action === "server-banner-link") {
             if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id)) return;
-            const hash = members?.getMember?.(guildId, id)?.avatar;
+            const avatar = action === "server-avatar-link";
+            const hash = avatar ? members?.getMember?.(guildId, id)?.avatar : profiles?.getGuildMemberProfile?.(id, guildId)?.banner;
             if (typeof hash !== "string" || !/^(?:a_)?[0-9a-f]{32}$/.test(hash)) return;
             const format = hash.startsWith("a_") ? "webp?size=4096&animated=true" : "png?size=4096";
-            return "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + id + "/avatars/" + hash + "." + format;
+            return "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + id + (avatar ? "/avatars/" : "/banners/") + hash + "." + format;
         }
         const profile = entry.scope === "server"
             ? profiles?.getGuildMemberProfile?.(id, guildId!) : profiles?.getUserProfile?.(id);
