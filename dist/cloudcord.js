@@ -39538,6 +39538,27 @@ Copy \`<t:${timestamp}:F>\``;
             return `${label2} \xB7 ${markup} \xB7 \`${markup}\``;
           }).join("\n");
         },
+        inspectDiscordTimestamp(input) {
+          var match = /^<t:(-?\d{1,13})(?::([tTdDfFR]))?>$/.exec(input.trim());
+          if (!match)
+            return;
+          var seconds = Number(match[1]);
+          var date = new Date(seconds * 1e3);
+          if (!Number.isFinite(date.getTime()))
+            return;
+          return "UTC " + date.toISOString() + " \xB7 Unix seconds " + seconds + " \xB7 Format " + (match[2] ?? "f");
+        },
+        timestampAtOffset(input, offset) {
+          var instant = isoUnixMilliseconds(input);
+          var match = /^([+-])(\d{2}):(\d{2})$/.exec(offset.trim());
+          if (instant === void 0 || !match)
+            return;
+          var hours = Number(match[2]), minutes = Number(match[3]);
+          if (hours > 23 || minutes > 59)
+            return;
+          var displacement = (hours * 60 + minutes) * 6e4 * (match[1] === "-" ? -1 : 1);
+          return new Date(instant + displacement).toISOString().replace(/Z$/, match[0]);
+        },
         recurringTimestamps(start, interval, count) {
           var ms = isoUnixMilliseconds(start);
           var step = durationSeconds(interval), occurrences = integerText(count);
@@ -52555,6 +52576,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/inspect-discord-timestamp.cx
+  var inspect_discord_timestamp_default;
+  var init_inspect_discord_timestamp = __esm({
+    "../examples/cx/catalog/plugins/inspect-discord-timestamp.cx"() {
+      inspect_discord_timestamp_default = 'plugin "Inspect Discord Timestamp":\n  needs commands.register\n  needs reply.local\n  on command "inspecttimestamp":\n    input "text" text\n    reply "${inspectDiscordTimestamp(text)}" else "Paste a Discord timestamp such as <t:1760000000:R>."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/iso-week.cx
   var iso_week_default;
   var init_iso_week = __esm({
@@ -53800,6 +53829,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_timestamp_styles = __esm({
     "../examples/cx/catalog/plugins/timestamp-styles.cx"() {
       timestamp_styles_default = 'plugin "Timestamp Styles":\n  needs commands.register\n  needs reply.local\n  on command "timestampstyles" with text:\n    reply "${timestampStyles(text)}" else "Enter a date and time with a timezone, such as 2026-11-22T20:00:00+03:00."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/timestamp-time-zone-offset.cx
+  var timestamp_time_zone_offset_default;
+  var init_timestamp_time_zone_offset = __esm({
+    "../examples/cx/catalog/plugins/timestamp-time-zone-offset.cx"() {
+      timestamp_time_zone_offset_default = 'plugin "Timestamp Time Zone Offset":\n  needs commands.register\n  needs reply.local\n  on command "timestampoffset":\n    input "timestamp" text\n    input "offset" text\n    reply "${timestampAtOffset(timestamp, offset)}" else "Enter an ISO timestamp with its time zone and a target offset such as +03:00."\n';
     }
   });
 
@@ -55283,6 +55320,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_in_role();
       init_indent_lines();
       init_ingtoninator();
+      init_inspect_discord_timestamp();
       init_iso_week();
       init_join_lines();
       init_json_check();
@@ -55418,6 +55456,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_thin_scrollbars();
       init_timestamp_difference();
       init_timestamp_styles();
+      init_timestamp_time_zone_offset();
       init_total_time();
       init_transfer_duration();
       init_translate();
@@ -58775,6 +58814,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Inspect Discord Timestamp",
+            source: inspect_discord_timestamp_default,
+            description: "/inspecttimestamp",
+            commands: [
+              "inspecttimestamp"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "6fc09a5a211f7e8a286f584370781b4ccac23476121968cdb3d91c2afa728f0c",
+            privateCommands: true
+          },
+          {
             name: "ISO Week",
             source: iso_week_default,
             description: "/isoweek",
@@ -60185,6 +60237,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4",
+            privateCommands: true
+          },
+          {
+            name: "Timestamp Time Zone Offset",
+            source: timestamp_time_zone_offset_default,
+            description: "/timestampoffset",
+            commands: [
+              "timestampoffset"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "587f054a27a9ebdc3b5d57872dcacabcbe690f66d46be6f16da314420056638f",
             privateCommands: true
           },
           {
@@ -70724,7 +70789,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "07733c353fe3b47f1d5fdbefa55e135270a74659";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3529151ccc7374cb711b6c3e8eca55c9065f8e98";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
