@@ -22545,6 +22545,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           username,
           pronouns,
           avatar,
+          fallbackAvatar,
           banner,
           primary,
           secondary: accent,
@@ -72018,7 +72019,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "324a5a1dcd6aaf9c2f46365482e6d679a4788205";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "13f009a89df07bb0e1f9192c5ec7087a45415f52";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
