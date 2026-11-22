@@ -1,0 +1,6 @@
+plugin "Transpose CSV":
+  needs commands.register
+  needs reply.local
+  on command "transposecsv":
+    input "text" text
+    reply "${transposeCsv(text)}" else "Paste a rectangular CSV table with up to 64 rows and 32 columns."

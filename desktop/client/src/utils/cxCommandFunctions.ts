@@ -233,6 +233,18 @@ export const cxCommandFunctions = {
         return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(line => line ? "> " + line : ">").join("\n"));
     },
     removeBlankLines: (text: string) => text.split(/\r\n|\r|\n/).filter(line => line.trim()).join("\n"),
+    filterLines(text: string, contains: string) {
+        if (!contains.trim()) return;
+        const query = contains.toLowerCase();
+        const lines = text.split(/\r\n|\r|\n/).filter(line => line.toLowerCase().includes(query));
+        return lines.length ? planningBlock(lines.join("\n")) : "No matching lines.";
+    },
+    extractLineRange(text: string, first: string, last: string) {
+        const start = integerText(first), end = integerText(last);
+        const lines = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
+        if (start === undefined || end === undefined || start < 1 || end < start || end > lines.length) return;
+        return planningBlock(lines.slice(start - 1, end).join("\n"));
+    },
     reverseLineOrder: (text: string) => text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).reverse().join("\n"),
     joinLines(text: string, separator: string) {
         if (separator.length > 32) return;
@@ -944,6 +956,15 @@ export const cxCommandFunctions = {
     },
     csvToMarkdown(input: string) {
         return markdownTable(csvRows(input));
+    },
+    transposeCsv(input: string) {
+        if (input.length > 12000) return;
+        const rows = csvRows(input);
+        const columns = rows[0]?.length ?? 0;
+        if (!columns || columns > 32 || rows.length > 64 || rows.some(row => row.length !== columns)) return;
+        const transposed = rows[0].map((_, column) =>
+            rows.map(row => '"' + row[column].replaceAll('"', '""') + '"').join(","));
+        return planningBlock(transposed.join("\n"));
     },
     csvColumn(input: string, column: string) {
         const position = integerText(column);

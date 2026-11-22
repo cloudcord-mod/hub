@@ -1,0 +1,7 @@
+plugin "Filter Lines":
+  needs commands.register
+  needs reply.local
+  on command "filterlines":
+    input "text" text
+    input "contains" text
+    reply "${filterLines(text, contains)}" else "Provide text and a literal search phrase."

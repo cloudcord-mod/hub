@@ -2957,6 +2957,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["inspecturl", { text: "https://guest:private@example.com/" }, /without embedded credentials/],
             ]],
             ["TSV to Markdown", [["tsvtomarkdown", { text: "Name\tValue\nA|B\t3" }, /\| Name \| Value \|\n\| --- \| --- \|\n\| A\\\|B \| 3 \|/]]],
+            ["Filter Lines", [
+                ["filterlines", { text: "One\r\n[Error] two\n[ERROR] three", contains: "[error]" }, /\[Error\] two\n\[ERROR\] three/],
+                ["filterlines", { text: "One", contains: "Two" }, /^No matching lines/],
+            ]],
+            ["Extract Line Range", [
+                ["linerange", { text: "One\r\nTwo\r\nThree\r\n", first: "2", last: "3" }, /Two\nThree/],
+                ["linerange", { text: "One", first: "1", last: "2" }, /^Enter valid/],
+            ]],
+            ["Transpose CSV", [
+                ["transposecsv", { text: 'A,B\n"C,D","E""F"' }, /"A","C,D"\n"B","E""F"/],
+                ["transposecsv", { text: "A,B\nC" }, /^Paste a rectangular/],
+            ]],
             ["CSV to Markdown", [
                 ["csvtomarkdown", { text: 'Name,Value\r\n"A,B","C""D"\r\n"two\nlines",\r\n' }, /\| A,B \| C"D \|\n\| two<br>lines \|  \|/],
                 ["csvtomarkdown", { text: 'Name,Value\n"unterminated,5' }, /^Paste comma-separated/],

@@ -1,0 +1,8 @@
+plugin "Extract Line Range":
+  needs commands.register
+  needs reply.local
+  on command "linerange":
+    input "text" text
+    input "first" text
+    input "last" text
+    reply "${extractLineRange(text, first, last)}" else "Enter valid first and last line numbers."

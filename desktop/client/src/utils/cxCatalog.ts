@@ -106,12 +106,14 @@ import plugin_catalog_encode_base64 from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
 import plugin_catalog_event_window from "../../../../examples/cx/catalog/plugins/event-window.cx";
+import plugin_catalog_extract_line_range from "../../../../examples/cx/catalog/plugins/extract-line-range.cx";
 import plugin_catalog_extract_mentions from "../../../../examples/cx/catalog/plugins/extract-mentions.cx";
 import plugin_catalog_fake_profile_themes from "../../../../examples/cx/catalog/plugins/fake-profile-themes.cx";
 import plugin_catalog_feferi_typing_quirk from "../../../../examples/cx/catalog/plugins/feferi-typing-quirk.cx";
 import plugin_catalog_file_name_randomization from "../../../../examples/cx/catalog/plugins/file-name-randomization.cx";
 import plugin_catalog_file_size_converter from "../../../../examples/cx/catalog/plugins/file-size-converter.cx";
 import plugin_catalog_file_transfer_estimate from "../../../../examples/cx/catalog/plugins/file-transfer-estimate.cx";
+import plugin_catalog_filter_lines from "../../../../examples/cx/catalog/plugins/filter-lines.cx";
 import plugin_catalog_fit_image from "../../../../examples/cx/catalog/plugins/fit-image.cx";
 import plugin_catalog_fix_codeblock_gap from "../../../../examples/cx/catalog/plugins/fix-codeblock-gap.cx";
 import plugin_catalog_fix_file_extensions from "../../../../examples/cx/catalog/plugins/fix-file-extensions.cx";
@@ -416,6 +418,7 @@ import plugin_catalog_total_time from "../../../../examples/cx/catalog/plugins/t
 import plugin_catalog_transfer_duration from "../../../../examples/cx/catalog/plugins/transfer-duration.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
+import plugin_catalog_transpose_csv from "../../../../examples/cx/catalog/plugins/transpose-csv.cx";
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
 import plugin_catalog_tsv_to_markdown from "../../../../examples/cx/catalog/plugins/tsv-to-markdown.cx";
 import plugin_catalog_unicode_inspector from "../../../../examples/cx/catalog/plugins/unicode-inspector.cx";
@@ -662,12 +665,14 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "Event Window", source: plugin_catalog_event_window, description: "/eventwindow", commands: ["eventwindow"], categories: ["Commands"], appearanceRevision: "2b493a66f732896ad09e295f4ebdcdd2cff9375cc7b045d97269f351d91b2f3e", privateCommands: true },
+        { name: "Extract Line Range", source: plugin_catalog_extract_line_range, description: "/linerange", commands: ["linerange"], categories: ["Commands"], appearanceRevision: "bf377de933d188bafcc7f0ccd195aad3a03ed09d551e2a521c4b6ddf12b350bf", privateCommands: true },
         { name: "Extract Mentions", source: plugin_catalog_extract_mentions, description: "/extractmentions", commands: ["extractmentions"], categories: ["Commands"], appearanceRevision: "3ec2a4e37763a849937c21c6d3e06749f3edf63ef132424ff41d0a51f1ebec14", privateCommands: true },
         { name: "FakeProfileThemes", source: plugin_catalog_fake_profile_themes, description: "Show colors encoded in bios when the profile has no native theme", commands: ["cx-profile-colors"], categories: ["Appearance","Commands"] },
         { name: "FeferiTypingQuirk", source: plugin_catalog_feferi_typing_quirk, description: "Apply 168 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "FileNameRandomization", source: plugin_catalog_file_name_randomization, description: "Use format upload names when selected for a file", categories: ["Media"] },
         { name: "File Size Converter", source: plugin_catalog_file_size_converter, description: "/convertfilesize", commands: ["convertfilesize"], categories: ["Commands"], appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7", privateCommands: true },
         { name: "File Transfer Estimate", source: plugin_catalog_file_transfer_estimate, description: "/transferestimate", commands: ["transferestimate"], categories: ["Commands"], appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736", privateCommands: true },
+        { name: "Filter Lines", source: plugin_catalog_filter_lines, description: "/filterlines", commands: ["filterlines"], categories: ["Commands"], appearanceRevision: "d0d8fa478df843e609eb1e2a81205c822db438d5f0d1d31f596b7e0d4964da8a", privateCommands: true },
         { name: "Fit Image", source: plugin_catalog_fit_image, description: "/fitimage", commands: ["fitimage"], categories: ["Commands"], appearanceRevision: "5d1274609c71f256618b07102e5199ebdc822cf20323e89816e3b57a48ee4f1a", privateCommands: true },
         { name: "FixCodeblockGap", source: plugin_catalog_fix_codeblock_gap, description: "Remove the extra blank line after fenced code blocks", categories: ["Appearance"], appearanceRevision: "38be5817842b779d1c8c9dcd688ef0755dbc9370e7832efbbe90c72399c1074b" },
         { name: "FixFileExtensions", source: plugin_catalog_fix_file_extensions, description: "Use supported filename extensions for listed attachment formats", categories: ["Media"] },
@@ -972,6 +977,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Transfer Duration", source: plugin_catalog_transfer_duration, description: "/transfertime", commands: ["transfertime"], categories: ["Commands"], appearanceRevision: "4aee6915d955f7780f0f8ba3772a58ac53c33a4a8a4939d306659e0cdd161bd5", privateCommands: true },
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar, description: "make the chat input background translucent", categories: ["Appearance"], appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e" },
+        { name: "Transpose CSV", source: plugin_catalog_transpose_csv, description: "/transposecsv", commands: ["transposecsv"], categories: ["Commands"], appearanceRevision: "3bd1c5b25daeeda2b83a92591289182ee31e8321201bbf94d57433875f5ac7cd", privateCommands: true },
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"], appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849", privateCommands: true },
         { name: "TSV to Markdown", source: plugin_catalog_tsv_to_markdown, description: "/tsvtomarkdown", commands: ["tsvtomarkdown"], categories: ["Commands"], appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a", privateCommands: true },
         { name: "Unicode Inspector", source: plugin_catalog_unicode_inspector, description: "/unicodeinfo", commands: ["unicodeinfo"], categories: ["Commands"], appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f", privateCommands: true },
