@@ -62295,6 +62295,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   __export(ThemeStore_exports, {
     default: () => ThemeStore3
   });
+  function asTheme(entry, marketplace) {
+    var url2 = marketplace ? entry?.installUrl : entry?.id;
+    if (!entry || typeof url2 !== "string" || !/^https:\/\//i.test(url2) || typeof entry.name !== "string" || !entry.name.trim())
+      return null;
+    var colors = entry.preview;
+    var validPreview = colors && [
+      colors.background,
+      colors.surface,
+      colors.accent,
+      colors.text
+    ].every((color) => typeof color === "string" && /^#(?:[\da-f]{3,4}|[\da-f]{6}|[\da-f]{8})$/i.test(color));
+    return {
+      url: url2,
+      name: entry.name,
+      description: typeof entry.description === "string" ? entry.description : "",
+      authors: Array.isArray(entry.authors) ? entry.authors.filter((author) => typeof author === "string") : [],
+      source: marketplace ? "Marketplace" : typeof entry.source === "string" ? entry.source : "CloudCord",
+      hasBackground: entry.hasBackground === true,
+      preview: validPreview ? colors : void 0
+    };
+  }
   function loadThemes() {
     return _async_to_generator(function* () {
       var [index, market] = yield allSettled([
@@ -62308,28 +62329,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var list = [];
       if (index.status === "fulfilled" && Array.isArray(index.value?.themes)) {
         for (var t of index.value.themes) {
-          list.push({
-            url: t.id,
-            name: t.name,
-            description: t.description ?? "",
-            authors: t.authors ?? [],
-            source: t.source ?? "CloudCord",
-            hasBackground: t.hasBackground,
-            preview: t.preview
-          });
+          var theme = asTheme(t, false);
+          if (theme)
+            list.push(theme);
         }
       }
       if (market.status === "fulfilled" && Array.isArray(market.value)) {
         for (var t1 of market.value) {
-          if (typeof t1?.installUrl !== "string" || typeof t1?.name !== "string")
-            continue;
-          list.push({
-            url: t1.installUrl,
-            name: t1.name,
-            description: t1.description ?? "",
-            authors: Array.isArray(t1.authors) ? t1.authors : [],
-            source: "Marketplace"
-          });
+          var theme1 = asTheme(t1, true);
+          if (theme1)
+            list.push(theme1);
         }
       }
       if (!list.length)
@@ -62364,36 +62373,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }, i))
     });
   }
-  function ThemeRow({ theme, refresh }) {
-    var [busy, setBusy] = React2.useState(false);
+  function ThemeRow({ theme, busy, change }) {
     var installed = Boolean(themes[theme.url]);
     var active = getCurrentTheme()?.id === theme.url;
-    var use = () => _async_to_generator(function* () {
-      setBusy(true);
-      try {
-        if (!themes[theme.url])
-          yield installTheme(theme.url);
-        yield selectTheme(themes[theme.url]);
-        showToast(`Now using ${theme.name}`, findAssetId("CheckIcon"));
-      } catch (e) {
-        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-      } finally {
-        setBusy(false);
-        refresh();
-      }
-    })();
-    var remove = () => _async_to_generator(function* () {
-      setBusy(true);
-      try {
-        yield removeTheme(theme.url);
-        showToast(`Removed ${theme.name}`, findAssetId("TrashIcon"));
-      } catch (e) {
-        showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-      } finally {
-        setBusy(false);
-        refresh();
-      }
-    })();
+    var currentAction = busy?.url === theme.url ? busy.action : void 0;
     return /* @__PURE__ */ jsx(Card, {
       style: {
         borderRadius: 22
@@ -62425,7 +62408,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     numberOfLines: 1,
                     children: [
                       theme.authors.length ? `by ${theme.authors.join(", ")}` : theme.source,
-                      theme.hasBackground ? " \xB7 background" : ""
+                      theme.hasBackground ? " \xB7 background" : "",
+                      active ? " \xB7 in use" : installed ? " \xB7 installed" : ""
                     ]
                   })
                 ]
@@ -62453,9 +62437,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 children: /* @__PURE__ */ jsx(Button, {
                   size: "md",
                   variant: active ? "secondary" : "primary",
-                  text: active ? "In use" : busy ? "Working\u2026" : "Use",
-                  disabled: busy || active,
-                  onPress: use
+                  text: currentAction === "use" || currentAction === "reset" ? "Applying\u2026" : active ? "Use default" : installed ? "Use" : "Install and use",
+                  disabled: busy !== null,
+                  onPress: () => change(theme, active ? "reset" : "use")
                 })
               }),
               installed && /* @__PURE__ */ jsx(import_react_native35.View, {
@@ -62465,9 +62449,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 children: /* @__PURE__ */ jsx(Button, {
                   size: "md",
                   variant: "destructive",
-                  text: "Remove",
-                  disabled: busy,
-                  onPress: remove
+                  text: currentAction === "remove" ? "Removing\u2026" : "Remove",
+                  disabled: busy !== null,
+                  onPress: () => change(theme, "remove")
                 })
               })
             ]
@@ -62480,42 +62464,140 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var [list, setList] = React2.useState(null);
     var [error, setError] = React2.useState("");
     var [query, setQuery] = React2.useState("");
-    var [, setTick] = React2.useState(0);
-    var refresh = () => setTick((t) => t + 1);
+    var [attempt, setAttempt] = React2.useState(0);
+    var [installedOnly, setInstalledOnly] = React2.useState(false);
+    var [backgroundOnly, setBackgroundOnly] = React2.useState(false);
+    var [alphabetical, setAlphabetical] = React2.useState(false);
+    var [busy, setBusy] = React2.useState(null);
+    var changingTheme = React2.useRef(false);
     React2.useEffect(() => {
-      loadThemes().then(setList, (e) => setError(e instanceof Error ? e.message : String(e)));
-    }, []);
+      var current = true;
+      void loadThemes().then((entries2) => {
+        if (current)
+          setList(entries2);
+      }, (error2) => {
+        if (current)
+          setError(error2 instanceof Error ? error2.message : String(error2));
+      });
+      return () => {
+        current = false;
+      };
+    }, [
+      attempt
+    ]);
+    function change(theme, action) {
+      return _async_to_generator(function* () {
+        if (changingTheme.current)
+          return;
+        changingTheme.current = true;
+        setBusy({
+          url: theme.url,
+          action
+        });
+        try {
+          if (action === "remove") {
+            if (!themes[theme.url])
+              return;
+            yield removeTheme(theme.url);
+          } else if (action === "reset") {
+            if (getCurrentTheme()?.id !== theme.url)
+              return;
+            yield selectTheme(null);
+          } else {
+            if (!themes[theme.url])
+              yield installTheme(theme.url);
+            yield selectTheme(themes[theme.url]);
+          }
+          var message = action === "remove" ? `Removed ${theme.name}` : action === "reset" ? "Restored the default theme" : `Now using ${theme.name}`;
+          showToast(message, findAssetId("CheckIcon"));
+        } catch (e) {
+          showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
+        } finally {
+          changingTheme.current = false;
+          setBusy(null);
+        }
+      })();
+    }
     var q3 = query.trim().toLowerCase();
-    var shown = (list ?? []).filter((t) => !q3 || [
+    var shown = (list ?? []).filter((t) => (!installedOnly || Boolean(themes[t.url])) && (!backgroundOnly || t.hasBackground) && (!q3 || [
       t.name,
       t.description,
       t.source,
       ...t.authors
-    ].some((v2) => v2?.toLowerCase().includes(q3)));
+    ].some((value) => value.toLowerCase().includes(q3))));
+    if (alphabetical)
+      shown.sort((a, b3) => a.name.localeCompare(b3.name));
     return /* @__PURE__ */ jsxs(import_react_native35.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native35.View, {
+        /* @__PURE__ */ jsxs(import_react_native35.View, {
           style: {
             paddingHorizontal: 12,
             paddingTop: 12,
             paddingBottom: 4
           },
-          children: /* @__PURE__ */ jsx(Search_default, {
-            placeholder: list ? `Search ${list.length} themes` : "Search themes",
-            onChangeText: setQuery
-          })
+          children: [
+            /* @__PURE__ */ jsx(Search_default, {
+              placeholder: "Search themes or authors",
+              onChangeText: setQuery
+            }),
+            !!list && /* @__PURE__ */ jsxs(import_react_native35.View, {
+              style: {
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 6,
+                marginTop: 8
+              },
+              children: [
+                /* @__PURE__ */ jsx(Button, {
+                  size: "sm",
+                  variant: installedOnly ? "primary" : "secondary",
+                  text: "Installed only",
+                  onPress: () => setInstalledOnly((value) => !value)
+                }),
+                /* @__PURE__ */ jsx(Button, {
+                  size: "sm",
+                  variant: backgroundOnly ? "primary" : "secondary",
+                  text: "With backgrounds",
+                  onPress: () => setBackgroundOnly((value) => !value)
+                }),
+                /* @__PURE__ */ jsx(Button, {
+                  size: "sm",
+                  variant: alphabetical ? "primary" : "secondary",
+                  text: "Sort A\u2013Z",
+                  onPress: () => setAlphabetical((value) => !value)
+                })
+              ]
+            })
+          ]
         }),
-        error ? /* @__PURE__ */ jsx(Text, {
-          variant: "text-md/medium",
-          color: "text-muted",
+        error ? /* @__PURE__ */ jsxs(import_react_native35.View, {
           style: {
-            textAlign: "center",
+            alignItems: "center",
+            gap: 8,
             padding: 24
           },
-          children: error
+          children: [
+            /* @__PURE__ */ jsx(Text, {
+              variant: "text-md/medium",
+              color: "text-muted",
+              style: {
+                textAlign: "center"
+              },
+              children: error
+            }),
+            /* @__PURE__ */ jsx(Button, {
+              size: "md",
+              variant: "secondary",
+              text: "Try again",
+              onPress: () => {
+                setError("");
+                setAttempt((value) => value + 1);
+              }
+            })
+          ]
         }) : !list ? /* @__PURE__ */ jsx(Text, {
           variant: "text-md/medium",
           color: "text-muted",
@@ -62526,6 +62608,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           children: "Loading themes\u2026"
         }) : /* @__PURE__ */ jsx(FlashList, {
           data: shown,
+          extraData: busy,
           estimatedItemSize: 150,
           keyExtractor: (t) => t.url,
           contentContainerStyle: {
@@ -62537,22 +62620,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               height: 10
             }
           }),
-          ListEmptyComponent: /* @__PURE__ */ jsxs(Text, {
+          ListEmptyComponent: /* @__PURE__ */ jsx(Text, {
             variant: "text-md/medium",
             color: "text-muted",
             style: {
               textAlign: "center",
               padding: 24
             },
-            children: [
-              "No themes match \u201C",
-              query,
-              "\u201D."
-            ]
+            children: q3 || installedOnly || backgroundOnly ? "No themes match these filters." : "No themes available."
           }),
           renderItem: ({ item }) => /* @__PURE__ */ jsx(ThemeRow, {
             theme: item,
-            refresh
+            busy,
+            change
           })
         })
       ]
@@ -62574,7 +62654,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_Search();
       init_toasts();
       import_react_native35 = __toESM(require_react_native());
-      CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/themes/mobile/index.json";
+      CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/hub/main/themes/mobile/index.json";
       MARKETPLACE = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
     }
   });
@@ -66050,7 +66130,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c08b7456f2be228dc44115da74eb8b888577cfe1";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "30032563e8e2fe52cddb174fe46768726d37439c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
