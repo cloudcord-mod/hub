@@ -41027,23 +41027,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "view-server-media": {
           permission: "servers.mediaview",
-          label: "View the selected server's icon and banner",
-          desktopOnly: true
+          label: "View the selected server's icon and banner"
         },
         "copy-server-media-links": {
           permission: "servers.mediacopy",
-          label: "Copy links to the selected server's icon and banner",
-          desktopOnly: true
+          label: "Copy links to the selected server's icon and banner"
         },
         "copy-server-details": {
           permission: "servers.detailscopy",
-          label: "Copy the selected server's name or description",
-          desktopOnly: true
+          label: "Copy the selected server's name or description"
         },
         "view-group-dm-icon": {
           permission: "channels.iconview",
-          label: "View the selected group DM's icon",
-          desktopOnly: true
+          label: "View the selected group DM's icon"
         },
         "hide-suggested-channels": {
           permission: "appearance.hide",
@@ -46473,6 +46469,64 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/lib/api/cxServerMedia.ts
+  function getCxServerMenuFields(effect) {
+    if (effect === "view-group-dm-icon")
+      return [
+        {
+          key: "icon",
+          label: "View Group Icon",
+          width: 512
+        }
+      ];
+    if (effect === "copy-server-details")
+      return [
+        {
+          key: "name",
+          label: "Copy Server Name"
+        },
+        {
+          key: "description",
+          label: "Copy Server Description"
+        }
+      ];
+    var view = effect === "view-server-media";
+    return [
+      {
+        key: "icon",
+        label: view ? "View Server Icon" : "Copy Server Icon Link",
+        width: 512
+      },
+      {
+        key: "banner",
+        label: view ? "View Server Banner" : "Copy Server Banner Link",
+        width: 1024
+      }
+    ];
+  }
+  function getCxGuildAssetUrl(path, id, hash) {
+    if (!isCxProfileUserId(id) || typeof hash !== "string" || !/^(?:a_)?[a-f0-9]{32}$/.test(hash))
+      return;
+    var format = hash.startsWith("a_") ? "gif" : "png";
+    return "https://cdn.discordapp.com/" + path + "/" + id + "/" + hash + "." + format + "?size=4096";
+  }
+  function getCxServerMenuValue(guild, id, field) {
+    if (!guild || guild.id !== id || !isCxProfileUserId(id))
+      return;
+    if (field === "icon" || field === "banner")
+      return getCxGuildAssetUrl(field === "icon" ? "icons" : "banners", id, guild[field]);
+    var text = guild[field];
+    return typeof text === "string" && text.trim() ? text : void 0;
+  }
+  var init_cxServerMedia = __esm({
+    "src/lib/api/cxServerMedia.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_cxProfileMenu();
+    }
+  });
+
   // src/lib/api/cxVoiceQueue.ts
   function getCxVoiceQueueRoom(channel, states) {
     var limit = channel.userLimit ?? channel.user_limit;
@@ -48475,6 +48529,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cxVoiceCount();
       init_cxCameraTone();
       init_cxVoiceShareAlerts();
+      init_cxServerMedia();
       init_cxVoiceQueue();
       init_cxVoiceMemberClock();
       init_cxCallClock();
@@ -53837,7 +53892,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "Copy Server Details",
             source: copy_server_details_default,
             description: "Copy the selected server's name or description",
-            desktopOnly: true,
             categories: [
               "Servers & channels"
             ]
@@ -53846,7 +53900,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "Copy Server Media Links",
             source: copy_server_media_links_default,
             description: "Copy links to the selected server's icon and banner",
-            desktopOnly: true,
             categories: [
               "Media",
               "Servers & channels"
@@ -56711,7 +56764,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "View Group DM Icon",
             source: view_group_dm_icon_default,
             description: "View the selected group DM's icon",
-            desktopOnly: true,
             categories: [
               "Media",
               "Servers & channels"
@@ -56731,7 +56783,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "View Server Media",
             source: view_server_media_default,
             description: "View the selected server's icon and banner",
-            desktopOnly: true,
             categories: [
               "Media",
               "Servers & channels"
@@ -59494,6 +59545,117 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       };
     });
   }
+  function registerMobileServerMenu(effect, enabled) {
+    var view = effect === "view-server-media" || effect === "view-group-dm-icon";
+    var viewer = view ? findByFilePath("modules/media_viewer/native/components/openMediaModal.tsx") : void 0;
+    if (view && !viewer?.openMediaModal)
+      throw new Error("Discord's media viewer is unavailable");
+    var active = true;
+    var available = () => active && enabled();
+    var open = (url2, width, height) => {
+      if (!available() || !viewer)
+        return;
+      try {
+        viewer.openMediaModal({
+          initialSources: [
+            {
+              uri: url2,
+              mediaIndex: 0,
+              width,
+              height,
+              accessoryType: "embed"
+            }
+          ],
+          analyticsSource: "user_profile_avatar",
+          openAs: "action-sheet",
+          shareable: false,
+          disableDownload: true,
+          disableMediaOverlayButton: true,
+          disableMediaOverlayFooter: true
+        });
+      } catch (e) {
+        showToast("Couldn't open the selected image.");
+      }
+    };
+    if (effect === "view-group-dm-icon") {
+      var getIcon = (id) => {
+        var channel = ChannelStore.getChannel(id);
+        if (channel?.id === id && channel.type === 3)
+          return getCxGuildAssetUrl("channel-icons", id, channel.icon);
+      };
+      var stop = registerChannelSheetEntry("cx-group-dm-icon", available, (channel) => {
+        var { id } = channel;
+        if (!isCxProfileUserId(id) || !getIcon(id))
+          return;
+        return {
+          label: "View Group Icon",
+          action: () => {
+            var url2 = getIcon(id);
+            if (url2)
+              open(url2, 512, 512);
+          }
+        };
+      });
+      return () => {
+        active = false;
+        stop();
+      };
+    }
+    var module = findByFilePath("modules/guild_action_sheet/native/components/GuildActionSheetActions.tsx");
+    var target = module?.GuildActionSheetPrimaryActions;
+    var row = findByProps("ActionSheetRow")?.ActionSheetRow;
+    if (!target || !row?.Group)
+      throw new Error("Discord's server actions are unavailable");
+    var Row2 = row;
+    var fields = getCxServerMenuFields(effect);
+    var stop1 = registerRenderedTree(target, (tree, props) => {
+      var id = props.guild?.id;
+      if (!isCxProfileUserId(id))
+        return tree;
+      var getValue = (field) => getCxServerMenuValue(GuildStore.getGuild(id), id, field.key);
+      var items = fields.filter((field) => getValue(field));
+      if (!items.length)
+        return tree;
+      return /* @__PURE__ */ jsxs(Fragment, {
+        children: [
+          tree,
+          /* @__PURE__ */ jsx(Row2.Group, {
+            children: items.map((field) => /* @__PURE__ */ jsx(Row2, {
+              label: field.label,
+              onPress: () => {
+                if (!available())
+                  return;
+                var value = getValue(field);
+                if (!value)
+                  return;
+                if (view && "width" in field) {
+                  if (field.key === "icon")
+                    open(value, field.width, field.width);
+                  else
+                    import_react_native32.Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
+                } else {
+                  void Promise.resolve().then(() => {
+                    if (available())
+                      return clipboard.setString(value);
+                  }).then(() => {
+                    if (available())
+                      showToast.showCopyToClipboard?.();
+                  }).catch(() => {
+                    if (available())
+                      showToast("Couldn't copy the selected information.");
+                  });
+                }
+              }
+            }, field.key))
+          }, "cx-" + effect)
+        ]
+      });
+    });
+    return () => {
+      active = false;
+      stop1();
+    };
+  }
   function registerLongDrafts(enabled) {
     var store = findByStoreName("DraftStore");
     var premiumLimit = findByProps("MAX_MESSAGE_LENGTH_PREMIUM")?.MAX_MESSAGE_LENGTH_PREMIUM;
@@ -60648,7 +60810,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-server-media-links":
           case "copy-server-details":
           case "view-group-dm-icon":
-            throw new Error("These server and group menu actions are available on desktop and browser.");
+            return registerMobileServerMenu(effect, enabled);
           case "hide-suggested-channels": {
             var suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
             if (!suggested)
@@ -61678,6 +61840,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_jsxRuntime();
       init_sendMessage();
       init_patcher();
+      init_cx();
       init_cx();
       init_cx();
       init_cx();
@@ -66511,7 +66674,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5d9e7919c5d93399b7a85fcbc13fa839d7923685";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6409d813bb17cd462af8a4af8c0bce44880a6127";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
