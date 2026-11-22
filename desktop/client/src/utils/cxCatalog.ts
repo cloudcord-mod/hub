@@ -47,6 +47,7 @@ import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/
 import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
 import plugin_catalog_compare_lines from "../../../../examples/cx/catalog/plugins/compare-lines.cx";
+import plugin_catalog_copy_account_creation_timestamp from "../../../../examples/cx/catalog/plugins/copy-account-creation-timestamp.cx";
 import plugin_catalog_copy_attachment_links from "../../../../examples/cx/catalog/plugins/copy-attachment-links.cx";
 import plugin_catalog_copy_attachment_names from "../../../../examples/cx/catalog/plugins/copy-attachment-names.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
@@ -559,6 +560,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CompactMessages", source: plugin_catalog_compact_messages, description: "Tighter spacing between messages", desktopOnly: true, categories: ["Appearance"] },
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, description: "Makes the server list narrower", desktopOnly: true, categories: ["Appearance"] },
         { name: "Compare Lines", source: plugin_catalog_compare_lines, description: "/comparelines", commands: ["comparelines"], categories: ["Commands"], appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20", privateCommands: true },
+        { name: "CopyAccountCreationTimestamp", source: plugin_catalog_copy_account_creation_timestamp, description: "Copy Account Creation Timestamp", categories: ["Profiles"] },
         { name: "CopyAttachmentLinks", source: plugin_catalog_copy_attachment_links, description: "Copy links to files attached to the selected message", categories: ["Chat"] },
         { name: "CopyAttachmentNames", source: plugin_catalog_copy_attachment_names, description: "Copy the selected message’s attachment filenames", categories: ["Chat"] },
         { name: "CopyBios", source: plugin_catalog_copy_bios, description: "Copy Bio", categories: ["Profiles"] },

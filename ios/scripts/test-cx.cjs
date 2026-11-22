@@ -2416,6 +2416,15 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         menuActions[1].action();
         assert.deepEqual(clipboardWrites, ["<https://discord.com/users/" + sender + ">", "<@" + sender + ">"]);
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
+        selectCatalog("CopyAccountCreationTimestamp");
+        click(render(), "Allow for this session");
+        const accountAction = actionList(sender)[0];
+        assert.equal(accountAction.label, "Copy Account Creation Timestamp");
+        accountAction.action();
+        assert.equal(clipboardWrites.pop(), "<t:" + Math.floor((Number(BigInt(sender) >> 22n) + 1420070400000) / 1000) + ":F>");
+        click(render(), "Disable CopyAccountCreationTimestamp");
+        accountAction.action();
+        assert.equal(clipboardWrites.length, 2);
         selectCatalog("CopyProfileColors");
         click(render(), "Allow for this session");
         assert.deepEqual(Array.from(actionList(sender), item => item.label), ["Copy Profile Colors"]);

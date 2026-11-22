@@ -1,0 +1,3 @@
+plugin "CopyAccountCreationTimestamp":
+  needs profilemenu.copy
+  on profile menu copy account-created
