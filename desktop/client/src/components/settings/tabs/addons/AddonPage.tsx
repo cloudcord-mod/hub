@@ -199,12 +199,12 @@ export function PluginsPage() {
                                 const alternate = cxByName.get(plugin.name.toLowerCase());
                                 return <PluginCard key={plugin.name} plugin={plugin} disabled={false} onRestartNeeded={onRestartNeeded}
                                     footer={alternate && !alternate.active && !isPluginEnabled(plugin.name)
-                                        && <button className={cl("mode")} onClick={() => reviewAddon("plugin", alternate)}>{alternate.needsReview ? "Review update" : "Catalog version"}</button>} />;
+                                        && <button className={cl("mode")} onClick={() => reviewAddon("plugin", alternate)}>{alternate.restoreFailed ? "Review startup failure" : alternate.needsReview ? "Review update" : "Catalog version"}</button>} />;
                             }
                             return <AddonCard key={extension.id} name={extension.name} description={extension.description}
                                 enabled={extension.active} setEnabled={on => toggleCxAddon("plugin", extension, on)}
                                 infoButton={(extension.active || extension.needsReview) && <button className={cl("mode")} onClick={() => reviewAddon("plugin", extension)}>
-                                    {extension.needsReview ? "Review update" : "Options"}
+                                    {extension.restoreFailed ? "Review startup failure" : extension.needsReview ? "Review update" : "Options"}
                                 </button>} />;
                         })}
                     </div>
@@ -381,8 +381,8 @@ export function ThemesPage() {
         })),
     ].filter(r => match(r.name, r.author, r.description));
     installed.push(...cxRows.map(entry => ({
-        key: entry.id + ":" + entry.name, name: entry.name, description: entry.description, on: entry.active,
-        set: on => toggleCxAddon("theme", entry, on), options: entry.active ? () => reviewAddon("theme", entry) : undefined,
+        key: entry.id + ":" + entry.name, name: entry.name, description: entry.restoreFailed ? "Couldn’t start automatically" : entry.description, on: entry.active,
+        set: on => toggleCxAddon("theme", entry, on), options: entry.active || entry.restoreFailed ? () => reviewAddon("theme", entry) : undefined,
     })));
     const visibleInstalled = enabledOnly ? installed.filter(row => row.on) : installed;
     visibleInstalled

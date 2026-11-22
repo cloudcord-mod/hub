@@ -674,6 +674,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         };
         const selectedTheme = { name: "Previously selected" };
         let themeSupported = true;
+        let rejectDesktopStyles = false;
         let nativeTheme = selectedTheme, nativeMode, stylesheet;
         let cursor = 0;
         const useState = initial => {
@@ -1015,7 +1016,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 body: {},
                 querySelectorAll: selector => selector === 'ul[aria-label="Channels"]' ? [suggestedList] : [],
                 createElement: () => ({ remove() { stylesheet = undefined; } }),
-                head: { append: value => { stylesheet = value; } },
+                head: { append: value => {
+                    if (rejectDesktopStyles) throw new Error("Stylesheet unavailable");
+                    stylesheet = value;
+                } },
                 addEventListener: (name, handler) => documentListeners.set(name, handler),
                 removeEventListener: (name, handler) => {
                     assert.equal(documentListeners.get(name), handler);
@@ -6170,6 +6174,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             await click(render(), "Allow and remember on this device");
             plugin.stop();
             assert.ok(!button(render(), "Disable Blue Hour"));
+            rejectDesktopStyles = true;
+            plugin.start();
+            await new Promise(setImmediate);
+            const failedTheme = module.exports.useCxAddonRows("theme", "").find(row => row.name === "Blue Hour");
+            assert.equal(failedTheme.restoreFailed, true);
+            assert.equal(failedTheme.active, false);
+            plugin.stop();
+            rejectDesktopStyles = false;
             plugin.start();
             await new Promise(setImmediate);
             assert.equal(findOption().props.checked, true, "startup restores a remembered optional appearance setting");

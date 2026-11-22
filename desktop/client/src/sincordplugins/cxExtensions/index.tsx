@@ -1481,18 +1481,21 @@ async function restoreRememberedAppearance(generation: number) {
                     const saved = rememberedAppearance.find(record => record.id === id && record.source === source);
                     if (!saved) return;
                     session.enable(source, { ...createDesktopCxHost(review.name), toast() {} }, review.permissions, saved.selected);
+                    failedAppearanceRestores.delete(id);
                     if (typeof bundled === "function") activeCatalogLoaders.set(id, bundled);
                 };
                 if (isPrivateCxCommand(review.permissions) && !BUILT_IN) {
                     const cancel = onBuiltInCommandsReady(() => {
                         pendingCommandRestores.delete(cancel);
                         try { restore(); }
-                        catch { /* The approval stays available to review or forget. */ }
+                        catch { failedAppearanceRestores.set(id, source); }
                         finally { if (generation === appearanceGeneration) refreshRememberedAppearance(); }
                     });
                     pendingCommandRestores.add(cancel);
                 } else restore();
-            } catch { /* A saved appearance remains available to remove or review again. */ }
+            } catch {
+                if (generation === appearanceGeneration) failedAppearanceRestores.set(entry.id, entry.source);
+            }
         }
     } catch {
         if (generation === appearanceGeneration) appearanceRestoreNotice = "Couldn't load remembered CX extensions.";
@@ -1502,10 +1505,11 @@ async function restoreRememberedAppearance(generation: number) {
 }
 
 const activeCatalogLoaders = new Map<string, () => Promise<string>>();
+const failedAppearanceRestores = new Map<string, string>();
 
 export type CxAddonKind = "plugin" | "theme";
 type CxAddonSource = string | (() => Promise<string>);
-export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
+export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; privateCommands?: boolean; needsReview?: boolean; restoreFailed?: boolean; };
 const desktopCatalogPlugins = cxCatalog.plugins.filter(entry => !entry.mobileOnly);
 const nonLinuxCatalogPlugins = desktopCatalogPlugins.filter(entry => !entry.linuxOnly);
 
@@ -1514,6 +1518,12 @@ export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
     const rows = React.useMemo(() => {
         const entries = kind === "theme" ? cxCatalog.themes : IS_LINUX && !IS_MOBILE ? desktopCatalogPlugins : nonLinuxCatalogPlugins;
         const approvals = new Map(rememberedAppearance.map(entry => [entry.id, entry.source]));
+        const failedTheme = kind === "theme" ? failedAppearanceRestores.get("theme") : undefined;
+        let failedThemeName: string | undefined;
+        if (failedTheme) {
+            try { failedThemeName = reviewCx(failedTheme).name; }
+            catch { /* An unreadable saved theme has no matching catalog row. */ }
+        }
         const catalog = entries.map(entry => {
             const id = kind === "theme" ? "theme" : "plugin:" + entry.name;
             const current = session.source(id);
@@ -1521,8 +1531,10 @@ export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
             const active = current !== undefined && (kind === "plugin"
                 || (typeof source === "string" ? current === source : activeCatalogLoaders.get(id) === source));
             const saved = approvals.get(id);
-            const needsReview = kind === "plugin" && !active && saved !== undefined && typeof source === "string" && saved !== source;
-            return { ...entry, id, active, needsReview, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
+            const restoreFailed = !active && saved !== undefined && failedAppearanceRestores.get(id) === saved
+                && (typeof source === "string" ? source === saved : entry.name === failedThemeName);
+            const needsReview = !active && (restoreFailed || kind === "plugin" && saved !== undefined && typeof source === "string" && saved !== source);
+            return { ...entry, id, active, needsReview, restoreFailed, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
             && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
@@ -1596,6 +1608,7 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
         if (!candidate) return;
         try {
             session.enable(candidate.source, createDesktopCxHost(candidate.review.name), candidate.review.permissions, candidate.selected);
+            failedAppearanceRestores.delete(candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name);
             if (candidate.loader) {
                 const id = candidate.review.kind === "theme" ? "theme" : "plugin:" + candidate.review.name;
                 activeCatalogLoaders.set(id, candidate.loader);
@@ -1744,8 +1757,8 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
             </div>;
         })}
         {rememberedAppearance.filter(entry => (!kind || ((entry.id === "theme") === (kind === "theme")))
-            && session.source(entry.id) !== entry.source).map(({ id }) => <div key={id}>
-            <span>Remembered extension is inactive</span>
+            && session.source(entry.id) !== entry.source).map(({ id, source }) => <div key={id}>
+            <span>{failedAppearanceRestores.get(id) === source ? "Couldn’t start automatically" : "Remembered extension is inactive"}</span>
             <button onClick={() => writeRememberedAppearance(id).catch(() => setStatus("Couldn't remove the saved approval."))}>Forget {id === "theme" ? "theme" : id.slice(7)}</button>
         </div>)}
         {appearanceRestoreNotice && <p>{appearanceRestoreNotice}</p>}
@@ -1763,6 +1776,7 @@ export default definePlugin({
     required: true,
     start() {
         appearanceRestoreNotice = "";
+        failedAppearanceRestores.clear();
         void restoreRememberedAppearance(++appearanceGeneration);
     },
     dependencies: ["CommandsAPI", "MessageEventsAPI", "ContextMenuAPI", "ServerListAPI", "MessagePopoverAPI", "MessageAccessoriesAPI", "DynamicImageModalAPI"],
