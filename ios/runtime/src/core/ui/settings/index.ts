@@ -2,7 +2,6 @@ import PupuIcon from "@assets/icons/cloudcord.png";
 import { useProxy } from "@core/vendetta/storage";
 import { findAssetId } from "@lib/api/assets";
 import { settings } from "@lib/api/settings";
-import { useMobileTestingAssignment } from "@lib/api/pluginTesting";
 import { registerSection } from "@ui/settings";
 import type { RowConfig } from "@ui/settings";
 import { version } from "bunny-build-info";
@@ -48,18 +47,6 @@ export default function initSettings() {
     const baseItems: RowConfig[] = [
             coreItem,
             {
-                key: "STORE_CLOUD",
-                title: () => "CloudSync",
-                icon: { uri: PupuIcon },
-                render: () => import("@core/ui/settings/pages/StoreCloud")
-            },
-            {
-                key: "BOTCORD",
-                title: () => "Botcord",
-                icon: safeAsset("RobotIcon", "AppsIcon"),
-                render: () => import("@core/ui/settings/pages/BotCord")
-            },
-            {
                 key: "BUNNY_PLUGINS",
                 title: () => "Add-ons",
                 icon: safeAsset("AppsIcon"),
@@ -70,28 +57,10 @@ export default function initSettings() {
                 title: () => "Tools",
                 icon: safeAsset("WrenchIcon", "SettingsIcon"),
                 render: () => import("@core/ui/settings/pages/Tools"),
-                usePredicate: () => {
-                    const hidden = useProxy(settings).cloudcordHiddenTabs ?? [];
-                    return !hidden.includes("CLOUDCORD_PREVIEWS") || !hidden.includes("CLOUDCORD_ACCOUNT_TOOLS");
-                },
-            },
-            {
-                key: "CLOUDCORD_TESTING_PLUGINS",
-                title: () => "Testing Plugins",
-                icon: safeAsset("AppsIcon", "WrenchIcon"),
-                render: () => import("@core/ui/settings/pages/TestingPlugins"),
-                usePredicate: () => Boolean(useMobileTestingAssignment()),
-            },
-            {
-                key: "CLOUDCORD_DIAGNOSTICS",
-                title: () => "Diagnostics",
-                icon: safeAsset("WrenchIcon", "SettingsIcon"),
-                render: () => import("@core/ui/settings/pages/Diagnostics"),
-                usePredicate: () => useProxy(settings).cloudcordDiagnosticsEnabled === true
             }
         ];
 
-    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_TOOLS", "STORE_CLOUD", "BOTCORD", "CLOUDCORD_TESTING_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
+    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_TOOLS"];
     const configurableKeys = new Set(defaultOrder.filter(key => key !== "CLOUDCORD"));
     const configuredOrder = settings.cloudcordTabOrder ?? [];
     const orderIndex = new Map(configuredOrder.map((key, index) => [key, index]));

@@ -3,9 +3,9 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const esbuild = require('esbuild');
 const desktop = fs.readFileSync('src/plugins/_core/settings.tsx', 'utf8');
-assert.match(desktop, /settings\.store\.diagnosticsMode === true && buildEntry\(\{\s*key: "cloudcord_diagnostics"/);
+assert.match(desktop, /diagnostics=\{diagnosticsMode === true\}/);
 const layoutSource = desktop.slice(desktop.indexOf('    buildLayout(originalLayoutBuilder:'), desktop.indexOf('    addControlsToDeveloperPage(layout:'));
-const layoutState = { showCloudCordSection: true, showSectionHeading: true, settingsLocation: 'top' };
+const layoutState = { showCloudCordSection: true, showSectionHeading: true, showFakeProfileTab: true, settingsLocation: 'top' };
 let assignedTester = false;
 const layoutContext = vm.createContext({ settings: { store: layoutState }, LayoutTypes: { SECTION: 1 }, isTruthy: Boolean,
     VencordTab: 'overview', BotCordTab: 'bot', FakeProfileTab: 'profile', AddonsTab: 'addons', CloudCordDiagnosticsTab: 'diagnostics',
@@ -20,38 +20,31 @@ for (const enabled of [undefined, false, true, false]) {
     layoutState.showCloudSyncTab = assignedTester = enabled === true;
     const layout = layoutContext.builder.buildLayout({ key: '$Root', buildLayout: () => [{ key: 'user_section' }] });
     const entries = layout.find(node => node.key === 'cloudcord_section').buildLayout();
-    assert.equal(entries.some(node => node.key === 'cloudcord_diagnostics'), enabled === true);
+    assert.deepEqual(Array.from(entries, node => node.key),
+        ['cloudcord_main', 'cloudcord_fake_profile', 'cloudcord_cloud_sync', 'cloudcord_tools']);
     assert.ok(entries.some(node => node.key === 'cloudcord_cloud_sync' && node.Component === 'addons'));
-    assert.ok(entries.some(node => node.key === 'cloudcord_tweaks' && node.Component === 'tweaks'));
     assert.equal(entries.filter(node => node.key === 'cloudcord_tools' && node.Component === 'tools').length, 1);
     assert.ok(!entries.some(node => ['cloudcord_previews', 'cloudcord_account_tools'].includes(node.key)));
-    assert.equal(entries.some(node => node.key === 'cloudcord_sync'), enabled === true);
-    assert.equal(entries.some(node => node.key === 'cloudcord_testing_plugins'), assignedTester);
 }
 const mobile = fs.readFileSync('../../ios/runtime/src/core/ui/settings/index.ts', 'utf8');
-assert.match(mobile, /usePredicate: \(\) => useProxy\(settings\)\.cloudcordDiagnosticsEnabled === true/);
+const mobileTools = fs.readFileSync('../../ios/runtime/src/core/ui/settings/pages/Tools/index.tsx', 'utf8');
+assert.match(mobileTools, /visible: preferences\.cloudcordDiagnosticsEnabled === true/);
+assert.match(mobileTools, /findAssetId\("CloudIcon"\)/);
+assert.doesNotMatch(mobileTools, /PupuIcon/);
 const mobileState = {}, sections = [];
 const mobileContext = vm.createContext({ settings: mobileState, PupuIcon: 'icon', Strings: { THEMES: 'Themes', FONTS: 'Fonts' }, version: 'test',
     findAssetId: () => 1, isThemeSupported: () => true, isFontSupported: () => true, useProxy: value => value, registerSection: section => sections.push(section) });
 const mobileSource = mobile.replace(/^import .*;\r?\n/gm, '').replace('export { PupuIcon };', '').replace('export default function initSettings', 'function initSettings');
 vm.runInContext(esbuild.transformSync(mobileSource, { loader: 'ts' }).code, mobileContext);
 mobileContext.initSettings();
-const diagnosticRow = sections.find(section => section.name === 'CloudCord').items.find(row => row.key === 'CLOUDCORD_DIAGNOSTICS');
 const mobileRows = sections.find(section => section.name === 'CloudCord').items;
-for (const key of ['BUNNY_PLUGINS', 'CLOUDCORD_TOOLS', 'STORE_CLOUD']) {
-    assert.equal(mobileRows.filter(row => row.key === key).length, 1);
-}
+assert.deepEqual(Array.from(mobileRows.filter(row => !row.nativeSection), row => row.key),
+    ['CLOUDCORD', 'BUNNY_PLUGINS', 'CLOUDCORD_TOOLS']);
+const workflow = fs.readFileSync('../../.github/workflows/cloudcord.yml', 'utf8');
+assert.match(workflow, /items\.append\(fake_profile_item\)/);
+assert.doesNotMatch(workflow, /items\.append\((?:store_cloud|botcord|diagnostics)_item\)/);
 const toolsRow = mobileRows.find(row => row.key === 'CLOUDCORD_TOOLS');
-assert.ok(!mobileRows.some(row => ['CLOUDCORD_PREVIEWS', 'CLOUDCORD_ACCOUNT_TOOLS'].includes(row.key)));
-mobileState.cloudcordHiddenTabs = ['CLOUDCORD_PREVIEWS'];
 assert.equal(toolsRow.usePredicate(), true);
-mobileState.cloudcordHiddenTabs.push('CLOUDCORD_ACCOUNT_TOOLS');
-assert.equal(toolsRow.usePredicate(), false);
-for (const enabled of [undefined, false, true, false]) {
-    mobileState.cloudcordDiagnosticsEnabled = enabled;
-    assert.equal(diagnosticRow.usePredicate(), enabled === true);
-}
-mobileState.cloudcordDiagnosticsEnabled = true;
 mobileState.cloudcordSectionHidden = true;
-assert.equal(diagnosticRow.usePredicate(), false);
+assert.equal(toolsRow.usePredicate(), false);
 console.log('PASS desktop and mobile settings placement and conditional entries');

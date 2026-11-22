@@ -6,18 +6,13 @@
 
 import { definePluginSettings } from "@api/Settings";
 import {
-    CloudIcon,
     MainSettingsIcon,
     InfoIcon,
     PluginsIcon,
-    PaintbrushIcon,
-    RobotIcon,
     UserIcon
 } from "@components/Icons";
 import {
     AddonsTab,
-    BotCordTab,
-    CloudCordDiagnosticsTab,
     FakeProfileTab,
     VencordTab,
     wrapTab,
@@ -34,20 +29,9 @@ import type { ComponentType, PropsWithChildren, ReactNode } from "react";
 
 const ToolsTab = wrapTab(() => {
     const { ToolsTab: Page } = require("@components/settings/tabs/extras");
-    return <Page />;
+    const { showBotCordTab, showCloudSyncTab, diagnosticsMode } = settings.use(["showBotCordTab", "showCloudSyncTab", "diagnosticsMode"]);
+    return <Page bot={showBotCordTab} sync={showCloudSyncTab} diagnostics={diagnosticsMode === true} testing={Boolean(currentAssignment())} />;
 }, "Tools");
-const TweaksTab = wrapTab(() => {
-    const { TweaksPage: Page } = require("@components/settings/tabs/addons/TweaksPage");
-    return <Page />;
-}, "Tweaks");
-const CloudSyncTab = wrapTab(() => {
-    const Page = require("@components/settings/tabs/sync/CloudTab").default;
-    return <Page />;
-}, "CloudSync");
-const TestingPluginsTab = wrapTab(() => {
-    const Page = require("@components/settings/tabs/addons/TestingPlugins").default;
-    return <Page />;
-}, "Testing Plugins");
 
 let LayoutTypes = {
     SECTION: 1,
@@ -129,7 +113,7 @@ export const settings = definePluginSettings({
     },
     showBotCordTab: {
         type: OptionType.BOOLEAN,
-        description: "Show BotCord in the CloudCord settings section",
+        description: "Show Botcord in CloudCord Tools",
         default: true
     },
     showFakeProfileTab: {
@@ -139,7 +123,7 @@ export const settings = definePluginSettings({
     },
     showCloudSyncTab: {
         type: OptionType.BOOLEAN,
-        description: "Show CloudSync in the CloudCord settings section",
+        description: "Show CloudSync in CloudCord Tools",
         default: true
     },
     showPluginsTab: {
@@ -247,13 +231,6 @@ export default definePlugin({
                 Component: VencordTab,
                 Icon: InfoIcon
             }),
-            settings.store.showBotCordTab && buildEntry({
-                key: "cloudcord_botcord",
-                title: "Botcord",
-                panelTitle: "Botcord",
-                Component: BotCordTab,
-                Icon: RobotIcon
-            }),
             settings.store.showFakeProfileTab && buildEntry({
                 key: "cloudcord_fake_profile",
                 title: "Profile",
@@ -268,17 +245,7 @@ export default definePlugin({
                 Component: AddonsTab,
                 Icon: PluginsIcon
             }),
-            buildEntry({ key: "cloudcord_tweaks", title: "Tweaks", Component: TweaksTab, Icon: PaintbrushIcon }),
             buildEntry({ key: "cloudcord_tools", title: "Tools", Component: ToolsTab, Icon: MainSettingsIcon }),
-            settings.store.showCloudSyncTab && buildEntry({ key: "cloudcord_sync", title: "CloudSync", Component: CloudSyncTab, Icon: CloudIcon }),
-            currentAssignment() && buildEntry({ key: "cloudcord_testing_plugins", title: "Testing Plugins", Component: TestingPluginsTab, Icon: PluginsIcon }),
-            settings.store.diagnosticsMode === true && buildEntry({
-                key: "cloudcord_diagnostics",
-                title: "Diagnostics",
-                panelTitle: "CloudCord Diagnostics",
-                Component: CloudCordDiagnosticsTab,
-                Icon: MainSettingsIcon
-            })
         ].filter(isTruthy);
 
         const cloudcordSection: SettingsLayoutNode = {

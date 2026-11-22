@@ -33,14 +33,19 @@ const cl = classNameFactory("cc-home-");
 // matching sidebar entry instead; Add-ons pages can also preselect a tab.
 const SIDEBAR: Record<string, string> = {
     cloudcord_fake_profile: "Profile",
-    cloudcord_botcord: "Botcord",
     cloudcord_cloud_sync: "Add-ons",
-    cloudcord_tweaks: "Tweaks",
-    cloudcord_sync: "CloudSync",
+    cloudcord_tools: "Tools",
 };
+
+const TOOL_ROUTES = { cloudcord_botcord: "bot", cloudcord_tweaks: "tweaks", cloudcord_sync: "sync" } as const;
 
 function open(key: string, addonsTab?: string) {
     if (addonsTab) setNextAddonsTab(addonsTab);
+    const tool = TOOL_ROUTES[key as keyof typeof TOOL_ROUTES];
+    if (tool) {
+        require("../extras").setNextTool(tool);
+        key = "cloudcord_tools";
+    }
     const label = SIDEBAR[key];
     const leaf = [...document.querySelectorAll("nav *, [class*=sidebar] *")]
         .find(e => e.childElementCount === 0 && e.textContent?.trim() === label);
