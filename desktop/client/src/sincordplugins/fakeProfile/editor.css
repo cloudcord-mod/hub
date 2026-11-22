@@ -245,7 +245,7 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
     .cpx-saved-item:hover .cpx-dc { transform: none; }
 }
 .cpx-dc-themed { padding: 4px; background: linear-gradient(var(--dc-primary), var(--dc-secondary)); }
-.cpx-dc-inner { position: relative; border-radius: 4px; overflow: hidden; }
+.cpx-dc-inner { position: relative; border-radius: 4px; overflow: hidden; container: cpx-profile-popout / inline-size; }
 .cpx-dc-themed .cpx-dc-inner { background: linear-gradient(rgb(0 0 0 / 45%), rgb(0 0 0 / 55%)); }
 .cpx-dc-banner { height: 92px; background: var(--background-base-lowest, var(--background-tertiary)) center / cover no-repeat; }
 .cpx-dc-avatar { position: absolute; top: 52px; left: 14px; width: 80px; height: 80px; }
@@ -255,7 +255,10 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 .cpx-dc-status { position: absolute; right: 0; bottom: 2px; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 0 0 5px var(--dc-bg); background: #23a55a; }
 .cpx-dc-themed .cpx-dc-status { box-shadow: 0 0 0 5px color-mix(in srgb, var(--dc-primary) 55%, #000); }
 .cpx-dc-status-idle { background: #f0b232; } .cpx-dc-status-dnd { background: #f23f43; } .cpx-dc-status-invisible { background: #80848e; } .cpx-dc-status-streaming { background: #593695; }
-.cpx-dc-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 2px; max-width: 55%; margin: 8px 10px 0 auto; padding: 3px 4px; border-radius: 8px; background: rgb(0 0 0 / 35%); }
+.cpx-dc-badges { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 2px; width: fit-content; box-sizing: border-box; max-width: min(55%, calc(100% - 120px)); margin: 8px 10px 0 auto; padding: 3px 4px; border-radius: 8px; background: rgb(0 0 0 / 35%); }
+@container cpx-profile-popout (width < 150px) {
+    .cpx-dc-badges { max-width: calc(100% - 20px); margin-top: 50px; }
+}
 .cpx-dc-badges img { width: 20px; height: 20px; object-fit: contain; }
 .cpx-dc-body { display: flex; flex-direction: column; gap: 10px; padding: 44px 14px 14px; }
 .cpx-dc-badges + .cpx-dc-body { padding-top: 20px; }
