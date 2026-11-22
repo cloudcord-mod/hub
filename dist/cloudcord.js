@@ -38866,6 +38866,34 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
           return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
         },
+        escapeHtml(text) {
+          if (!text)
+            return;
+          var entities = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          };
+          return planningBlock(text.replace(/[&<>"']/g, (character) => entities[character]));
+        },
+        indentLines(text, spaces) {
+          var width = integerText(spaces);
+          if (!text || width === void 0 || width < 1 || width > 16)
+            return;
+          var indent = " ".repeat(width);
+          return planningBlock(text.split(/\r\n|\r|\n/).map((line) => line ? indent + line : line).join("\n"));
+        },
+        formatCodeBlock(text, language) {
+          var syntax = language.trim();
+          if (!text.trim() || !/^[a-z0-9_+-]{1,24}$/i.test(syntax))
+            return;
+          var code = text.replace(/`(?=``)/g, "`\u200B");
+          if (code.length <= 3800)
+            return codeFence + syntax + "\n" + code + "\n" + codeFence;
+          return "The result is too long for one reply.";
+        },
         checkJson(text) {
           try {
             JSON.parse(text);
@@ -50754,6 +50782,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/format-code-block.cx
+  var format_code_block_default;
+  var init_format_code_block = __esm({
+    "../examples/cx/catalog/plugins/format-code-block.cx"() {
+      format_code_block_default = 'plugin "Format Code Block":\n  needs commands.register\n  needs reply.local\n  on command "formatcodeblock":\n    input "text" text\n    input "language" text\n    reply "${formatCodeBlock(text, language)}" else "Enter code and a short syntax label such as js or text."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/friend-invites.cx
   var friend_invites_default;
   var init_friend_invites = __esm({
@@ -52118,6 +52154,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/html-escape.cx
+  var html_escape_default;
+  var init_html_escape = __esm({
+    "../examples/cx/catalog/plugins/html-escape.cx"() {
+      html_escape_default = 'plugin "HTML Escape":\n  needs commands.register\n  needs reply.local\n  on command "escapehtml":\n    input "text" text\n    reply "${escapeHtml(text)}" else "Enter text to escape."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/ignore-calls.cx
   var ignore_calls_default;
   var init_ignore_calls = __esm({
@@ -52155,6 +52199,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_in_role = __esm({
     "../examples/cx/catalog/plugins/in-role.cx"() {
       in_role_default = 'plugin "InRole":\n  needs commands.register\n  needs guild.members\n  needs reply.local\n  on command "inrole":\n    input "role" role\n    reply "${roleMembers(role)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/indent-lines.cx
+  var indent_lines_default;
+  var init_indent_lines = __esm({
+    "../examples/cx/catalog/plugins/indent-lines.cx"() {
+      indent_lines_default = 'plugin "Indent Lines":\n  needs commands.register\n  needs reply.local\n  on command "indentlines":\n    input "text" text\n    input "spaces" text\n    reply "${indentLines(text, spaces)}" else "Enter a whole number from 1 to 16 for the indent."\n';
     }
   });
 
@@ -54667,6 +54719,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_follow_voice_user();
       init_force_owner_crown();
       init_foreign_copy_handler();
+      init_format_code_block();
       init_friend_invites();
       init_gamzee_s_typing_quirk();
       init_google_that();
@@ -54837,11 +54890,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hop_on();
       init_hover_highlight_messages();
       init_hsl_color_converter();
+      init_html_escape();
       init_ignore_calls();
       init_image_filename();
       init_image_link();
       init_improve_contrast();
       init_in_role();
+      init_indent_lines();
       init_ingtoninator();
       init_iso_week();
       init_join_lines();
@@ -56354,6 +56409,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Servers & channels"
             ]
+          },
+          {
+            name: "Format Code Block",
+            source: format_code_block_default,
+            description: "/formatcodeblock",
+            commands: [
+              "formatcodeblock"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "376cafda7086045c053f3582f3d4ebd021390b22c0888121bab36248b73a18eb",
+            privateCommands: true
           },
           {
             name: "FriendInvites",
@@ -57984,6 +58052,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "HTML Escape",
+            source: html_escape_default,
+            description: "/escapehtml",
+            commands: [
+              "escapehtml"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "a0f96e9b36ee69cd2b9df93ed39f296b65e170ec028f879622b68e975365f233",
+            privateCommands: true
+          },
+          {
             name: "IgnoreCalls",
             source: ignore_calls_default,
             description: "Edit the source to enter Discord IDs",
@@ -58031,6 +58112,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands",
               "Servers & channels"
             ]
+          },
+          {
+            name: "Indent Lines",
+            source: indent_lines_default,
+            description: "/indentlines",
+            commands: [
+              "indentlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "105e91032887863c35b9e5e1d74a847c62af5d275cceafa7e2d79320cd272d65",
+            privateCommands: true
           },
           {
             name: "Ingtoninator",
@@ -69945,7 +70039,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a62e78c3904ad3f56d68cea15c6145fb4ea9e4c5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "bc603af098aeadc9379ebde0137da2d42c96a74d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
