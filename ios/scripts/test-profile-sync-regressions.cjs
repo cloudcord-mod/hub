@@ -26,6 +26,12 @@ vm.runInContext(compile(block(desktop, 'function fromSharedProfile(', 'const NIT
 assert.equal(ctx.fromSharedProfile({ nitro: false, nitroLevel: 0 }).nitro, false);
 assert.equal(ctx.fromSharedProfile({ nitroLevel: 0 }).nitro, true);
 assert.equal(ctx.fromSharedProfile({}).nitro, false);
+for (const field of ["bio", "pronouns"]) {
+    assert.equal(ctx.fromSharedProfile({})[field], undefined);
+    assert.equal(ctx.fromSharedProfile({ [field]: 42 })[field], undefined);
+    const payload = JSON.parse(JSON.stringify(ctx.toSharedProfile({ [field]: "" })));
+    assert.equal(ctx.fromSharedProfile(payload)[field], "");
+}
 const syncedColors = { primaryColor: 0, accentColor: 0x123456 };
 assert.equal(ctx.fromSharedProfile(syncedColors).accentColor, 0, 'older profiles can use black without an enable flag');
 assert.equal(ctx.fromSharedProfile({ ...syncedColors, profileColorsEnabled: false }).accentColor, undefined);

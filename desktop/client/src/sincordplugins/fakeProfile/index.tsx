@@ -588,8 +588,8 @@ function fromSharedProfile(data: any): CustomProfileData {
     return {
         ...normalizeProfileAppearance(data),
         username: data?.username || "", globalName: data?.globalName || data?.displayName || "",
-        avatar: data?.avatar || "", banner: data?.banner || "", bio: data?.bio || "",
-        pronouns: data?.pronouns || "", accentColor: colors?.[0],
+        avatar: data?.avatar || "", banner: data?.banner || "", bio: typeof data?.bio === "string" ? data.bio : undefined,
+        pronouns: typeof data?.pronouns === "string" ? data.pronouns : undefined, accentColor: colors?.[0],
         accentColor2: colors?.[1], badgeFlags: data?.badgeFlags || 0,
         nitro: data?.nitro === true || data?.nitro == null && Number(data?.nitroLevel ?? -1) >= 0, nitroLevel: data?.nitroLevel, nitroSince: data?.nitroSince || "",
         boostMonths: data?.boostMonths, giftLevel: Number.isInteger(data?.giftLevel) ? data.giftLevel : undefined, customBadgeIds: Array.isArray(data?.customBadgeIds) ? data.customBadgeIds.filter((id: string) => id !== REPLACE_BADGES_SYNC_ID) : [],
