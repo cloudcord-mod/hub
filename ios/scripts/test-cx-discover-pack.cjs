@@ -49,6 +49,7 @@ const metro = {
     common: Object.assign(stub("metro.common"), {
         React: stub("metro.common.React"),
         ReactNative: stub("metro.common.ReactNative"),
+        constants: stub("metro.common.constants"),
         stylesheet: { createThemedStyleSheet: stub("metro.common.stylesheet.createThemedStyleSheet") },
         FluxDispatcher: {
             subscribe: stub("metro.common.FluxDispatcher.subscribe"),
@@ -71,6 +72,10 @@ const runtimeFixture = name => new Proxy({ metro: metroFixture }, {
     get: (target, key) => key in target ? target[key] : stub(name + "." + String(key)),
 });
 const vendetta = runtimeFixture("vendetta");
+vendetta.ui = Object.assign(stub("vendetta.ui"), {
+    semanticColors: stub("vendetta.ui.semanticColors"),
+    rawColors: stub("vendetta.ui.rawColors"),
+});
 globalThis.window = globalThis;
 // Model a completed migration. The fixture has no filesystem or network access.
 globalThis.nativeModuleProxy = {
