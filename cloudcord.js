@@ -17143,6 +17143,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       second ?? first
     ];
   }
+  function nativePreviewDecoration(...sources) {
+    for (var source of sources) {
+      if (!source || typeof source !== "object")
+        continue;
+      var data = source;
+      for (var key of [
+        "avatarDecorationData",
+        "avatar_decoration_data",
+        "avatarDecoration"
+      ]) {
+        var decoration = data[key];
+        var asset = decoration && typeof decoration === "object" ? decoration.asset : void 0;
+        if (typeof asset === "string" && /^(?:a_)?[a-f0-9]{32}$/i.test(asset)) {
+          return `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?size=160&passthrough=true`;
+        }
+      }
+    }
+  }
   function nativeProfilePreviewSurface(userId, profile, userBanner) {
     var colors = Array.isArray(profile?.themeColors) ? profile.themeColors : Array.isArray(profile?.theme_colors) ? profile.theme_colors : [];
     var bannerColor = profilePreviewColor(profile?.accentColor) ?? profilePreviewColor(profile?.accent_color);
@@ -31574,6 +31592,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       username: data.username || realUser?.username || "username",
       avatar: data.avatarMedia?.uri || realAvatar,
       fallbackAvatar: realAvatar,
+      decoration: data.avatarDecoration || nativePreviewDecoration(realUser, profile),
       banner: data.bannerMedia?.uri || fallback.banner,
       fallbackBanner: fallback.banner,
       bio: data.bio ?? fallback.bio,
@@ -31880,7 +31899,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(S2.DiscordProfileCard, {
                 ...appearance,
                 secondary: appearance.accent,
-                decoration: data.avatarDecoration || void 0,
                 badges,
                 officialBadgeIcon: CLOUDCORD_BADGE_ICON,
                 frame: data.profileFrame ? catalog?.frames.find((item2) => item2.skuId === data.profileFrame.skuId)?.label ?? "Selected" : void 0,
@@ -32847,7 +32865,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               children: /* @__PURE__ */ jsx(K2.PreviewCard, {
                 ...appearance,
-                decoration: preview.avatarDecoration || void 0,
                 customStatus: preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : void 0,
                 activity: preview.customActivity ? {
                   verb: ACTIVITY_TYPES.find((type) => type.value === preview.customActivity?.type)?.label || "",
@@ -74238,7 +74255,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f2f057a2f4e31234c950a78ce095bd4ed0421e4";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "24f150776e771f2a9c1aa10055d3ba8c0cfbff28";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
