@@ -72032,7 +72032,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d540e21c6eb1a960443c70eb2a4d7cdf7918067c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "baa56e424e0127f15852c6c70f8a27d9f322d967";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
