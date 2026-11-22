@@ -67,6 +67,17 @@ function TabIcon({ tab, active, size = 18 }: { tab: StudioTab; active?: boolean;
 // ---- Shell ----
 const STATUS_COLORS: Record<string, string> = { online: "#23A55A", idle: "#F0B232", dnd: "#F23F43", invisible: "#80848E", streaming: "#593695" };
 
+function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }: {
+    status?: string; borderColor: string; borderWidth?: number; bottom?: number;
+}) {
+    const visibleStatus = status === "offline" ? "invisible" : status && Object.hasOwn(STATUS_COLORS, status) ? status : "online";
+    const label = visibleStatus === "invisible" ? "offline" : visibleStatus === "dnd" ? "do not disturb" : visibleStatus;
+    return <View accessible accessibilityLabel={`Status: ${label}`} style={{
+        position: "absolute", right: 2, bottom, width: 22, height: 22, borderRadius: 11,
+        borderWidth, borderColor, backgroundColor: STATUS_COLORS[visibleStatus],
+    }} />;
+}
+
 function StudioAvatar({ uri, name }: { uri?: string; name: string }) {
     const [failed, setFailed] = useState(false);
     if (uri && !failed) {
@@ -98,7 +109,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
                     <View style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 5, borderColor: C.panel(), backgroundColor: C.raised(), overflow: "hidden" }}>
                         <StudioAvatar key={avatar} uri={avatar} name={name} />
                     </View>
-                    <View style={{ position: "absolute", right: 2, bottom: 2, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: C.panel(), backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
+                    <StudioPresence status={status} borderColor={C.panel()} bottom={2} />
                 </View>
                 <View style={{ flex: 1, paddingBottom: 4 }}>
                     <Text variant="heading-lg/extrabold" numberOfLines={1} style={{ color: C.text() }}>{name}</Text>
@@ -452,7 +463,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
                         <StudioAvatar key={avatar} uri={avatar} name={name} />
                     </View>
                     {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -10, left: -10, width: 104, height: 104 }} resizeMode="contain" /> : null}
-                    <View accessible accessibilityLabel={`Status: ${status || "online"}`} style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: card, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
+                    <StudioPresence status={status} borderColor={card} />
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, borderRadius: 8, overflow: "hidden", paddingVertical: 2 }}>
                     {nameplate ? <PreviewNameplate uri={nameplate} /> : null}
@@ -512,7 +523,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
                 <StudioAvatar key={avatar} uri={avatar} name={name} />
             </View>
             {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
-            <View accessible accessibilityLabel={`Status: ${status || "online"}`} style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 5, borderColor: ring, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
+            <StudioPresence status={status} borderColor={ring} borderWidth={5} />
         </View>
         {badges.length ? <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "58%", marginTop: 8, marginRight: 10, paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.panel }}>
             {badges.map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20, tintColor: icon === officialBadgeIcon ? (colors === LIGHT ? "#000000" : "#ffffff") : undefined }} resizeMode="contain" />)}

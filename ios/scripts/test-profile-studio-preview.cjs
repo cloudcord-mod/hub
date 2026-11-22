@@ -207,7 +207,7 @@ assert.equal(mobileDraft.primary, "#987654");
 assert.equal(mobileDraft.bannerColor, "#987654");
 layout = "Popout";
 assert.ok(media(mobileRender(nativeLook)).includes(nativeBanner));
-assert.ok(mobileRender(nativeLook).some(node => node.props.accessibilityLabel === "Status: dnd"));
+assert.ok(mobileRender(nativeLook).some(node => node.props.accessibilityLabel === "Status: do not disturb"));
 assert.ok(media(mobileRender(mobileDraft)).includes("draft"));
 layout = "Profile";
 const twoToneDraft = mobileAppearance({ profileColorsEnabled: true, primaryColor: "#234567", accentColor: "#765432" }, account);
