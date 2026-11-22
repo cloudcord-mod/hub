@@ -129,6 +129,7 @@ import plugin_catalog_hide_channel_topic from "../../../../examples/cx/catalog/p
 import plugin_catalog_hide_character_count from "../../../../examples/cx/catalog/plugins/hide-character-count.cx";
 import plugin_catalog_hide_chat_input_refresh_tip from "../../../../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx";
 import plugin_catalog_hide_clan_tags from "../../../../examples/cx/catalog/plugins/hide-clan-tags.cx";
+import plugin_catalog_hide_composer_emoji_promo from "../../../../examples/cx/catalog/plugins/hide-composer-emoji-promo.cx";
 import plugin_catalog_hide_contact_sync_promotion from "../../../../examples/cx/catalog/plugins/hide-contact-sync-promotion.cx";
 import plugin_catalog_hide_custom_statuses from "../../../../examples/cx/catalog/plugins/hide-custom-statuses.cx";
 import plugin_catalog_hide_disabled_emojis from "../../../../examples/cx/catalog/plugins/hide-disabled-emojis.cx";
@@ -144,6 +145,7 @@ import plugin_catalog_hide_emoji_search_promotion from "../../../../examples/cx/
 import plugin_catalog_hide_empty_folders from "../../../../examples/cx/catalog/plugins/hide-empty-folders.cx";
 import plugin_catalog_hide_friend_requests_badge from "../../../../examples/cx/catalog/plugins/hide-friend-requests-badge.cx";
 import plugin_catalog_hide_gif_button from "../../../../examples/cx/catalog/plugins/hide-gif-button.cx";
+import plugin_catalog_hide_gif_favorite_button from "../../../../examples/cx/catalog/plugins/hide-gif-favorite-button.cx";
 import plugin_catalog_hide_gif_search_suggestions from "../../../../examples/cx/catalog/plugins/hide-gif-search-suggestions.cx";
 import plugin_catalog_hide_gift_badge_progress from "../../../../examples/cx/catalog/plugins/hide-gift-badge-progress.cx";
 import plugin_catalog_hide_gift_button from "../../../../examples/cx/catalog/plugins/hide-gift-button.cx";
@@ -620,6 +622,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideCharacterCount", source: plugin_catalog_hide_character_count, description: "Hide the chat character counter", categories: ["Appearance"], appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113" },
         { name: "HideChatInputRefreshTip", source: plugin_catalog_hide_chat_input_refresh_tip, description: "Hide the redesigned chat input tip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36" },
         { name: "HideClanTags", source: plugin_catalog_hide_clan_tags, description: "Hide server tags", categories: ["Appearance"], appearanceRevision: "6d2231275be6c0e73ae8d96c0540194b7f13e1b24703a1ae7b979a930091d921" },
+        { name: "HideComposerEmojiPromo", source: plugin_catalog_hide_composer_emoji_promo, description: "Hide the premium emoji promotion in composer autocomplete", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74f9ba1b6c628e3e2fdd215363186334b12e201a140ab9a6b668cf4ba745b0df" },
         { name: "HideContactSyncPromotion", source: plugin_catalog_hide_contact_sync_promotion, description: "Hide the contact sync promotion", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b53140224dc8cf752876e2bd4a6e91807d4a56d90f78f7dcd6347a476b542348" },
         { name: "HideCustomStatuses", source: plugin_catalog_hide_custom_statuses, description: "Hide custom statuses in the member list", categories: ["Appearance"], appearanceRevision: "549b5cc6629e0f3cc22555035bb96816d9308806a2bf71f2c320eee04f82dc7d" },
         { name: "HideDisabledEmojis", source: plugin_catalog_hide_disabled_emojis, description: "Hide unavailable emoji in Discord’s emoji picker", categories: ["Appearance"], appearanceRevision: "0e8e0b52055839b1fb48d75d078ff2945b3b7cc483df10b1939c0ebcd189785d" },
@@ -635,6 +638,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideEmptyFolders", source: plugin_catalog_hide_empty_folders, description: "Hide empty expanded server folders", categories: ["Appearance"], appearanceRevision: "1724bea813368f7e907c921f341adf457f98769eb360c0a9be46deef5e0bd9a7" },
         { name: "HideFriendRequestsBadge", source: plugin_catalog_hide_friend_requests_badge, description: "Hide the pending friend requests counter", categories: ["Appearance"], appearanceRevision: "111bc312069e6c29234d3675d597cd7c35bae9f8d2f21868e4a806ce23ab1e36" },
         { name: "HideGifButton", source: plugin_catalog_hide_gif_button, description: "Hide the GIF picker shortcut", categories: ["Appearance"], appearanceRevision: "d7af74fc801892989cd4bed7856bf4f73b673f8e14548316368442fd81e166cf" },
+        { name: "HideGifFavoriteButton", source: plugin_catalog_hide_gif_favorite_button, description: "Hide the favorite button when viewing GIFs", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5133bb74db5017212d71f4cd4eec44be922f2ae2257f7877de07baf7ba1d6d8e" },
         { name: "HideGifSearchSuggestions", source: plugin_catalog_hide_gif_search_suggestions, description: "Hide suggested searches in the GIF picker", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b827be2027141767b08deeba23ea88217ed2d75f1821af1765ab0c9d3606e844" },
         { name: "HideGiftBadgeProgress", source: plugin_catalog_hide_gift_badge_progress, description: "Hide the gifting badge progress banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "f5142301c6aa7f978ba0198c59757ccb800df6190c622413f1df0b90da72e186" },
         { name: "HideGiftButton", source: plugin_catalog_hide_gift_button, description: "Hide the chat gift button", categories: ["Appearance"], appearanceRevision: "d1392300974c2c311c2ba67e55d4dd5340d720455db58c084beb4e7a867e46b0" },

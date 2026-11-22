@@ -1,0 +1,3 @@
+plugin "HideGifFavoriteButton":
+  needs appearance.hide
+  hide hide-gif-favorite-button

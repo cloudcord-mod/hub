@@ -17,6 +17,8 @@ function hideMobileComponent(plugin: string, label: string, path: string) {
 }
 
 export const cxAppearanceTargets = {
+    "hide-gif-favorite-button": hideMobileComponent("HideGifFavoriteButton", "the favorite button when viewing GIFs", "modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"),
+    "hide-composer-emoji-promo": hideMobileComponent("HideComposerEmojiPromo", "the premium emoji promotion in composer autocomplete", "modules/channel_text_area/native/ChannelAutocompleteEmojiUpsell.tsx"),
     "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),
     "hide-voice-event-banner": hideMobileComponent("HideVoiceEventBanner", "the scheduled event banner in voice channels", "modules/guild_scheduled_events/native/components/GuildEventVoiceBanner.tsx"),
     "hide-profile-activity-badges": hideMobileComponent("HideProfileActivityBadges", "activity badges on profiles", "modules/user_profile/native/UserProfileActivityBadges.tsx"),

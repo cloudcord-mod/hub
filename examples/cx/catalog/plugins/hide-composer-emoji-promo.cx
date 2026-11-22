@@ -1,0 +1,3 @@
+plugin "HideComposerEmojiPromo":
+  needs appearance.hide
+  hide hide-composer-emoji-promo
