@@ -38263,7 +38263,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "readable-line-length": {
           plugin: "ReadableLineLength",
           label: "limit the width of long message lines",
-          css: '[class*="messageContent"] { max-width: 80ch; }',
+          css: '[class*="messageContent"] { max-width: min(100%, 80ch); min-width: 0; overflow-wrap: anywhere; }',
           style: {
             messageWidthRenderer: "modules/messages/native/renderer/createMessageContent.tsx",
             width: 640
@@ -72175,7 +72175,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "12fddd1f91c1ef3e951bae4077c1d264e6d193cd";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ad276f778741a9a14a7f0405266d8eb9c9cbc0e3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
