@@ -36900,6 +36900,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-scheduled-message-draft-tip": hideMobileComponent("HideScheduledMessageDraftTip", "the scheduled-message draft tooltip", "modules/scheduled_messages/native/ScheduledMessageDraftCoachmark.tsx"),
+        "hide-you-settings-tip": hideMobileComponent("HideYouSettingsTip", "the settings shortcut tooltip on the You tab", "modules/main_tabs_v2/native/tabs/you/YouSettingsCoachmark.tsx"),
+        "hide-game-claim-card": hideMobileComponent("HideGameClaimCard", "the game claim promotion card in eligible servers", "modules/game_claim/native/GameClaimCoachmark.tsx"),
         "hide-boost-progress-tip": hideMobileComponent("HideBoostProgressTip", "the server boost progress tooltip", "modules/premium/powerups/native/BoostProgressBarCoachmark.tsx"),
         "hide-powerup-unlock-tip": hideMobileComponent("HidePowerupUnlockTip", "the boost-to-unlock tooltip for server powerups", "modules/premium/powerups/native/GuildPowerupsBoostToUnlockCoachmark.tsx"),
         "hide-server-theme-tip": hideMobileComponent("HideServerThemeTip", "the server theme introduction for members", "modules/premium/powerups/native/GuildThemeMemberCoachmark.tsx"),
@@ -50869,6 +50872,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-game-claim-card.cx
+  var hide_game_claim_card_default;
+  var init_hide_game_claim_card = __esm({
+    "../examples/cx/catalog/plugins/hide-game-claim-card.cx"() {
+      hide_game_claim_card_default = 'plugin "HideGameClaimCard":\n  needs appearance.hide\n  hide hide-game-claim-card\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-gif-button.cx
   var hide_gif_button_default;
   var init_hide_gif_button = __esm({
@@ -51221,6 +51232,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-scheduled-message-draft-tip.cx
+  var hide_scheduled_message_draft_tip_default;
+  var init_hide_scheduled_message_draft_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-scheduled-message-draft-tip.cx"() {
+      hide_scheduled_message_draft_tip_default = 'plugin "HideScheduledMessageDraftTip":\n  needs appearance.hide\n  hide hide-scheduled-message-draft-tip\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-scrollbars.cx
   var hide_scrollbars_default;
   var init_hide_scrollbars = __esm({
@@ -51522,6 +51541,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_voice_user_avatars = __esm({
     "../examples/cx/catalog/plugins/hide-voice-user-avatars.cx"() {
       hide_voice_user_avatars_default = 'plugin "HideVoiceUserAvatars":\n  needs appearance.hide\n  hide voice-user-avatars\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-you-settings-tip.cx
+  var hide_you_settings_tip_default;
+  var init_hide_you_settings_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-you-settings-tip.cx"() {
+      hide_you_settings_tip_default = 'plugin "HideYouSettingsTip":\n  needs appearance.hide\n  hide hide-you-settings-tip\n';
     }
   });
 
@@ -54145,6 +54172,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_emoji_search_promotion();
       init_hide_empty_folders();
       init_hide_friend_requests_badge();
+      init_hide_game_claim_card();
       init_hide_gif_button();
       init_hide_gif_favorite_button();
       init_hide_gif_search_suggestions();
@@ -54189,6 +54217,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_reply_previews();
       init_hide_role_icons();
       init_hide_saved_messages_promotion();
+      init_hide_scheduled_message_draft_tip();
       init_hide_scrollbars();
       init_hide_send_button();
       init_hide_server_banner();
@@ -54227,6 +54256,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_voice_event_banner();
       init_hide_voice_panel_tips();
       init_hide_voice_user_avatars();
+      init_hide_you_settings_tip();
       init_high_contrast_text();
       init_high_res_profile_images();
       init_highlight_links();
@@ -56118,6 +56148,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "111bc312069e6c29234d3675d597cd7c35bae9f8d2f21868e4a806ce23ab1e36"
           },
           {
+            name: "HideGameClaimCard",
+            source: hide_game_claim_card_default,
+            description: "Hide the game claim promotion card in eligible servers",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "e06c36c1379dfbfbd22049ecf024ebf3b88e4be4e393fcf2df0c35be8cf77494"
+          },
+          {
             name: "HideGifButton",
             source: hide_gif_button_default,
             description: "Hide the GIF picker shortcut",
@@ -56530,6 +56570,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "5c7dfd96eb5c9e1ae835bc02b146d77646dc516decf54e1f65eeb3c7f0fbd686"
           },
           {
+            name: "HideScheduledMessageDraftTip",
+            source: hide_scheduled_message_draft_tip_default,
+            description: "Hide the scheduled-message draft tooltip",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c716b391631199cf57ca67a70276b28b2380a639f0700729a257670861f8205d"
+          },
+          {
             name: "HideScrollbars",
             source: hide_scrollbars_default,
             description: "Hide scroll indicators",
@@ -56886,6 +56936,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Voice & calls"
             ],
             appearanceRevision: "208bcea2901031db1d7d2886d1fd0f43d98dcfc3582575a4f0730e8dd1ff9703"
+          },
+          {
+            name: "HideYouSettingsTip",
+            source: hide_you_settings_tip_default,
+            description: "Hide the settings shortcut tooltip on the You tab",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "a675e48f836e167b9f5695b8d55e653b6c4f5fe64b714e4cae579d136aa9911f"
           },
           {
             name: "HighContrastText",
@@ -68847,7 +68907,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "af721c701b21f0021139454296a6a3faf027c83b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c04da7dc80183f3766a56d9794b3697253ec5ac5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
