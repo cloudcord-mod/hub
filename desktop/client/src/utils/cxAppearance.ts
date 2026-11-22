@@ -314,7 +314,7 @@ export const cxAppearanceTargets = {
     "chat-apps-button": {
         plugin: "HideAppsButton", label: "the chat apps button",
         css: 'button[aria-label="Apps"] { display: none !important; }',
-        mobile: ["ChatInputActionButtonApps"],
+        mobile: { hideComponentPaths: ["modules/chat_input/native/action_buttons/ChatInputActionButtonApps.tsx"] },
     },
     "chat-upload-button": {
         plugin: "HideUploadButton", label: "the chat attachment button",
@@ -336,12 +336,12 @@ export const cxAppearanceTargets = {
     "chat-character-counter": {
         plugin: "HideCharacterCount", label: "the chat character counter",
         css: '[class*="characterCount"] { display: none !important; }',
-        mobile: ["ChatInputCharCounter"],
+        mobile: { hideComponentPaths: ["modules/chat_input/native/accessories/ChatInputCharCounter.tsx"] },
     },
     "chat-send-button": {
         plugin: "HideSendButton", label: "the chat send button",
         css: 'button[aria-label="Send Message"] { display: none !important; }',
-        mobile: ["ChatInputSendButton"],
+        mobile: { hideComponentPaths: ["modules/chat_input/native/accessories/ChatInputSendButton.tsx"] },
     },
     "dm-call-buttons": {
         plugin: "HideCallButtons", label: "the buttons to start calls in DMs",
