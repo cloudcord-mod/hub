@@ -38481,6 +38481,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
+      init_type_of();
       searchEngines = /* @__PURE__ */ new Map([
         [
           "Google",
@@ -39006,6 +39007,53 @@ WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
           if (!from || !to || weight === void 0 || weight < 0 || weight > 100)
             return;
           return `\`${hexColor(mixChannels(from, to, weight / 100))}\``;
+        },
+        improveContrast(foreground, background, target) {
+          var _loop2 = function(step2) {
+            var candidates = [
+              [
+                0,
+                0,
+                0
+              ],
+              [
+                255,
+                255,
+                255
+              ]
+            ].map((end) => {
+              var channels2 = mixChannels(ink, end, step2 / 255).map(Math.round);
+              return {
+                color: hexColor(channels2),
+                ratio: contrast(relativeLuminance(channels2), surfaceLuminance)
+              };
+            });
+            var best = candidates[0].ratio >= candidates[1].ratio ? candidates[0] : candidates[1];
+            if (best.ratio >= threshold)
+              return {
+                v: best.color + " \xB7 " + best.ratio.toFixed(2) + ":1"
+              };
+          };
+          var ink = hexChannels(foreground), surface = hexChannels(background);
+          var threshold = target === "aa" ? 4.5 : target === "aaa" ? 7 : target === "large" ? 3 : void 0;
+          if (!ink || !surface || threshold === void 0)
+            return;
+          var surfaceLuminance = relativeLuminance(surface);
+          for (var step = 0; step <= 255; step++) {
+            var _ret = _loop2(step);
+            if (_type_of(_ret) === "object")
+              return _ret.v;
+          }
+          return "Neither black nor white can reach this contrast ratio against the background.";
+        },
+        opacityContrast(foreground, background, opacity) {
+          var ink = hexChannels(foreground), surface = hexChannels(background);
+          var percent = integerText(opacity);
+          if (!ink || !surface || percent === void 0 || percent < 0 || percent > 100)
+            return;
+          var blended = mixChannels(surface, ink, percent / 100).map(Math.round);
+          var ratio = contrast(relativeLuminance(blended), relativeLuminance(surface));
+          return "Blended color " + hexColor(blended) + " \xB7 " + ratio.toFixed(2) + ":1";
         },
         readableInk(background) {
           var surface = hexChannels(background);
@@ -51529,6 +51577,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/improve-contrast.cx
+  var improve_contrast_default;
+  var init_improve_contrast = __esm({
+    "../examples/cx/catalog/plugins/improve-contrast.cx"() {
+      improve_contrast_default = 'plugin "Improve Contrast":\n  needs commands.register\n  needs reply.local\n  on command "improvecontrast":\n    input "foreground" text\n    input "background" text\n    input "target" text\n    reply "${improveContrast(foreground, background, target)}" else "Enter two hex colors and a target of aa, aaa, or large."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/in-role.cx
   var in_role_default;
   var init_in_role = __esm({
@@ -52142,6 +52198,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_number_summary = __esm({
     "../examples/cx/catalog/plugins/number-summary.cx"() {
       number_summary_default = 'plugin "Number Summary":\n  needs commands.register\n  needs reply.local\n  on command "numberstats" with text:\n    reply "${summarizeNumbers(text)}" else "Enter up to 128 decimal numbers separated by commas or spaces."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/opacity-contrast.cx
+  var opacity_contrast_default;
+  var init_opacity_contrast = __esm({
+    "../examples/cx/catalog/plugins/opacity-contrast.cx"() {
+      opacity_contrast_default = 'plugin "Opacity Contrast":\n  needs commands.register\n  needs reply.local\n  on command "opacitycontrast":\n    input "foreground" text\n    input "background" text\n    input "opacity" integer\n    reply "${opacityContrast(foreground, background, opacity)}" else "Enter two hex colors and an opacity from 0 to 100."\n';
     }
   });
 
@@ -54134,6 +54198,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_ignore_calls();
       init_image_filename();
       init_image_link();
+      init_improve_contrast();
       init_in_role();
       init_ingtoninator();
       init_iso_week();
@@ -54190,6 +54255,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_number_base_converter();
       init_number_lines();
       init_number_summary();
+      init_opacity_contrast();
       init_open_steam_links_in_app();
       init_ordered_line_diff();
       init_percentage_change();
@@ -56839,6 +56905,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Improve Contrast",
+            source: improve_contrast_default,
+            description: "/improvecontrast",
+            commands: [
+              "improvecontrast"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "a5f2ddbbf7bdc8258da75b5c2540054215e0528fcb069b39682fcc973c144776",
+            privateCommands: true
+          },
+          {
             name: "InRole",
             source: in_role_default,
             description: "/inrole",
@@ -57432,6 +57511,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb",
+            privateCommands: true
+          },
+          {
+            name: "Opacity Contrast",
+            source: opacity_contrast_default,
+            description: "/opacitycontrast",
+            commands: [
+              "opacitycontrast"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c25ed9504fa3ab322289d6ea6bb3d13e1a66d385f72e4be47637e52367db43bc",
             privateCommands: true
           },
           {
@@ -68675,7 +68767,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "04c7f96da9866ba90b9937ec24f0a16b1319918b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e2c433ebbb48247c4009475021e1722c7e67a6a1";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
