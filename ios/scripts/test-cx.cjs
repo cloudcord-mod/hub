@@ -6219,6 +6219,15 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(nativeTheme.name, "Blue Hour");
             const emoji = { ast: [{ type: "emoji", jumboable: true }] };
             assert.equal(markupParser.parseMessageMarkup(emoji, undefined, false).content[0].jumboable, false);
+            assert.ok(!button(render(), "Forget MoreJumboEmoji"), "saved numeric settings match the active extension");
+            const jumboPage = { kind: "plugin", entry: { id: "plugin:MoreJumboEmoji", name: "MoreJumboEmoji", active: true } };
+            click(render(jumboPage), "Edit numeric settings");
+            const numericField = find(render(jumboPage), item => item.props.accessibilityLabel === "Jumbo emoji limit");
+            assert.equal(numericField.props.value, "0");
+            numericField.props.onChangeText("50");
+            click(render(jumboPage), "Apply and remember on this device");
+            assert.equal(settings.cxRememberedAppearance.find(entry => entry.name === "MoreJumboEmoji").numberValues["jumbo-emoji-limit"], 50);
+            assert.equal(markupParser.parseMessageMarkup(emoji, undefined, false).content[0].jumboable, true);
             click(render(), "Disable MoreJumboEmoji");
             assert.equal(markupParser.parseMessageMarkup(emoji, undefined, false).content[0].jumboable, true);
             assert.equal(button(render(), label).props.value, true);

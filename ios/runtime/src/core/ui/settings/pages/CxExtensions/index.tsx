@@ -3169,12 +3169,24 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
         ? Object.fromEntries(candidate.review.numberOptions.map(option => [option.effect, option.value])) : undefined;
     const rememberRevision = catalogEntry && applyRememberedNumbers(catalogEntry.source, numberValues) === candidate?.source
         ? catalogEntry.appearanceRevision : undefined;
+    const activeSource = entry?.active && candidate?.review.name === entry.name ? session.source(entry.id) : undefined;
 
     function enable(remember = false) {
         if (!candidate) return;
         try {
             if (settings.safeMode?.enabled) throw new Error("CX is unavailable in Safe Mode");
-            session.enable(candidate.source, createMobileCxHost(), candidate.review.permissions, candidate.selected);
+            const host = createMobileCxHost();
+            if (activeSource && entry) {
+                const previous = reviewCx(activeSource);
+                const selected = session.appearanceOptions(entry.id).filter(option => option.enabled).map(option => option.target);
+                try {
+                    session.disable(entry.id);
+                    session.enable(candidate.source, host, candidate.review.permissions, candidate.selected);
+                } catch (error) {
+                    session.enable(activeSource, host, previous.permissions, selected);
+                    throw error;
+                }
+            } else session.enable(candidate.source, host, candidate.review.permissions, candidate.selected);
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
             if (remember && rememberRevision) {
@@ -3271,14 +3283,21 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                     label={label} value={candidate.selected.includes(target)} onValueChange={(checked: boolean) => {
                         setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, checked) });
                     }} />)}
-                {candidate && <TableRow label="Allow for this session" onPress={() => enable()} />}
-                {candidate && rememberRevision && <TableRow label="Allow and remember on this device" onPress={() => enable(true)} />}
+                {candidate && <TableRow label={activeSource ? "Apply for this session" : "Allow for this session"} onPress={() => enable()} />}
+                {candidate && rememberRevision && <TableRow label={activeSource ? "Apply and remember on this device" : "Allow and remember on this device"} onPress={() => enable(true)} />}
                 {candidate && !entry && !source && <TableRow label="Edit source" onPress={() => setSource(candidate.source)} />}
                 {session.list().filter(({ id, name }) => !kind || (entry?.id === id && entry.name === name)).flatMap(({ id, name }) => {
                     const entry = rememberedCatalog.get(name);
                     const saved = entry && remembered.find(item => item.name === name && item.revision === entry.appearanceRevision
                         && applyRememberedNumbers(entry.source, item.numberValues) === session.source(id));
+                    const currentSource = session.source(id);
+                    const current = currentSource && kind === "plugin" ? reviewCx(currentSource) : undefined;
                     return [
+                        ...(currentSource && current?.numberOptions.some(option => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency")
+                            ? [<TableRow key={id + ":settings"} label="Edit numeric settings" onPress={() => {
+                                const selected = session.appearanceOptions(id).filter(option => option.enabled).map(option => option.target);
+                                setCandidate({ source: currentSource, originalSource: saved && entry ? entry.source : currentSource, review: current, selected });
+                            }} />] : []),
                         ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label, enabled }) => <TableSwitchRow key={`${id}:${target}`}
                             label={`${name} · ${label}`} value={enabled} onValueChange={(checked: boolean) => {
                                 try {
@@ -3299,7 +3318,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                 {remembered.filter(saved => {
                     const entry = rememberedCatalog.get(saved.name);
                     if (kind && ((entry?.id === "theme") !== (kind === "theme"))) return false;
-                    return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== entry.source;
+                    return !entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== applyRememberedNumbers(entry.source, saved.numberValues);
                 }).map(saved => <TableRow key={saved.name} label={`Forget ${saved.name}`} subLabel={settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered extension is inactive"} onPress={() => {
                     try { forgetRememberedAppearance(saved.name); refreshRememberedAppearance(); }
                     catch (error) { setStatus(String(error instanceof Error ? error.message : error)); }
