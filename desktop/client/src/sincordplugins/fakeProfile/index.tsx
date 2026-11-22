@@ -2097,7 +2097,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
         others: <OtherProfilesPanel />,
         templates: <TemplatesPanel ownerId={selectedAccountId} current={data} onApply={value => setData(current => loadSavedLook(current, value))} />,
         saved: <SavedProfilesPanel key={selectedAccountId} current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
-            decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
+            fallbackDecoration={nativePreviewDecoration(selectedUser, nativeProfile)} decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
             effectFor={skuId => catalogData?.effects.find(item => item.skuId === skuId)?.title} frameFor={skuId => catalogData?.frames.find(item => item.skuId === skuId)?.label} />,
         connections: <>
             <Section title="Connections" description="Accounts shown on your profile. These are previews, not verified connections.">
@@ -2149,7 +2149,8 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                     badges={profilePreviewBadges(data, selectedAccountId)}
                     onBadges={() => { setTab("badges"); setPreviewExpanded(false); }}
                     onSaved={() => { setTab("saved"); setPreviewExpanded(false); }}
-                    decorationUrl={data.decorationAsset ? currentDecoration?.url || getDecorationUrl(data.decorationAsset) : nativePreviewDecoration(selectedUser, nativeProfile)}
+                    decorationUrl={data.decorationAsset ? currentDecoration?.url || getDecorationUrl(data.decorationAsset) : undefined}
+                    fallbackDecoration={nativePreviewDecoration(selectedUser, nativeProfile)}
                     nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined}
                     effectName={data.profileEffect ? catalogData?.effects.find(item => item.skuId === data.profileEffect?.skuId)?.title || "Selected" : undefined}
                     frameName={data.profileFrame ? catalogData?.frames.find(item => item.skuId === data.profileFrame?.skuId)?.label || "Selected" : undefined} />
@@ -3191,10 +3192,10 @@ function loadSavedLook(current: CustomProfileData, look: CustomProfileData): Cus
     return { ...savedSnapshot(look), syncRevision, localOnly, hideOtherProfiles, nativeEditorImages, hideBadgesWhenSyncOff };
 }
 
-function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationFor, effectFor, frameFor }: {
+function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, fallbackDecoration, decorationFor, effectFor, frameFor }: {
     current: CustomProfileData; userId: string; onLoad: (data: CustomProfileData) => void; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
     fallbackSurface: ProfilePreviewSurface;
-    decorationFor: (asset: string) => string | undefined; effectFor: (skuId: string) => string | undefined; frameFor: (skuId: string) => string | undefined;
+    fallbackDecoration?: string; decorationFor: (asset: string) => string | undefined; effectFor: (skuId: string) => string | undefined; frameFor: (skuId: string) => string | undefined;
 }) {
     const [items, setItems] = React.useState(() => readSavedProfiles(userId));
     const [name, setName] = React.useState("");
@@ -3285,7 +3286,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 };
                 return <div key={item.id} className="cpx-saved-item">
                     <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
-                        decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined}
+                        decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined} fallbackDecoration={fallbackDecoration}
                         frameName={data.profileFrame ? frameFor(data.profileFrame.skuId) ?? "Selected" : undefined}
                         effectName={data.profileEffect ? effectFor(data.profileEffect.skuId) ?? "Selected" : undefined}
                         nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined} badges={badges} />

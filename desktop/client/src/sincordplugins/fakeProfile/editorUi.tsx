@@ -198,10 +198,10 @@ function PreviewCosmetics({ frameName, effectName }: { frameName?: string; effec
 }
 
 /** Approximation of how the profile will look; Discord draws the real thing. */
-export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, effectName, frameName, bare, badges = [], onBadges, onSaved }: {
+export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, fallbackDecoration, nameplateUrl, effectName, frameName, bare, badges = [], onBadges, onSaved }: {
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string;
     fallbackSurface?: ProfilePreviewSurface;
-    decorationUrl?: string; nameplateUrl?: string; effectName?: string; frameName?: string; bare?: boolean;
+    decorationUrl?: string; fallbackDecoration?: string; nameplateUrl?: string; effectName?: string; frameName?: string; bare?: boolean;
     badges?: { id: string; icon: string; label: string }[]; onBadges?: () => void; onSaved?: () => void;
 }) {
     const [mode, setMode] = React.useState<"profile" | "popout" | "chat">("profile");
@@ -223,7 +223,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
         {mode === "chat" ? <div className="cpx-chat-preview">
             <div className="cpx-chat-avatar-wrap">
                 <PreviewAvatar key={avatarKey} src={avatar} fallback={fallbackAvatar} name={name} className="cpx-chat-avatar" />
-                {decorationUrl && <img className="cpx-chat-decoration" src={decorationUrl} alt="" />}
+                <PreviewDecoration key={JSON.stringify([decorationUrl, fallbackDecoration])} className="cpx-chat-decoration" src={decorationUrl} fallback={fallbackDecoration} />
             </div>
             <div className="cpx-chat-preview-content">
                 <div className="cpx-chat-preview-heading">
@@ -232,11 +232,11 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 </div>
                 <p>Hey! This is how your profile looks in chat.</p>
             </div>
-        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} frameName={frameName} effectName={effectName} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
+        </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} fallbackDecoration={fallbackDecoration} nameplateUrl={nameplateUrl} badges={badges} frameName={frameName} effectName={effectName} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
             <PreviewBanner key={JSON.stringify([banner, fallbackSurface?.banner])} className="cpx-card-banner" src={banner} fallback={fallbackSurface?.banner} color={bannerColor} />
             <div className="cpx-card-avatar">
                 <PreviewAvatar key={avatarKey} src={avatar} fallback={fallbackAvatar} name={name} className="cpx-card-avatar-img" />
-                {decorationUrl && <img className="cpx-card-decoration" src={decorationUrl} alt="" />}
+                <PreviewDecoration key={JSON.stringify([decorationUrl, fallbackDecoration])} className="cpx-card-decoration" src={decorationUrl} fallback={fallbackDecoration} />
                 <span role="img" className="cpx-card-status" style={{ background: status === "streaming" ? "#593695" : STATUS_COLORS[status] }} aria-label={`Status: ${STATUS_LABELS[status]}`} />
             </div>
             <div className="cpx-card-body">
@@ -259,6 +259,12 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     </aside>;
 }
 
+function PreviewDecoration({ src, fallback, className }: { src?: string; fallback?: string; className: string; }) {
+    const [attempt, setAttempt] = React.useState(0);
+    const active = [src || fallback, src && src !== fallback ? fallback : undefined][attempt];
+    return active ? <img key={active} className={className} src={active} alt="" onError={() => setAttempt(attempt + 1)} /> : null;
+}
+
 function PreviewBanner({ src, fallback, color, className }: { src?: string; fallback?: string; color?: string; className: string; }) {
     const [attempt, setAttempt] = React.useState(0);
     const active = [src || fallback, src && src !== fallback ? fallback : undefined][attempt];
@@ -279,8 +285,8 @@ function PreviewAvatar({ src, fallback, name, className }: { src: string; fallba
 }
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, frameName, effectName, badges = [] }: {
-    data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
+export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, fallbackDecoration, nameplateUrl, frameName, effectName, badges = [] }: {
+    data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; fallbackDecoration?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
     frameName?: string; effectName?: string;
     fallbackSurface?: ProfilePreviewSurface;
 }) {
@@ -295,7 +301,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
             <PreviewBanner key={JSON.stringify([banner, fallbackSurface?.banner])} className="cpx-dc-banner" src={banner} fallback={fallbackSurface?.banner} color={bannerColor} />
             <div className="cpx-dc-avatar">
                 <PreviewAvatar key={JSON.stringify([data.avatar, fallbackAvatar])} src={data.avatar || fallbackAvatar} fallback={fallbackAvatar} name={data.globalName || fallbackName} className="cpx-dc-avatar-img" />
-                {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}
+                <PreviewDecoration key={JSON.stringify([decorationUrl, fallbackDecoration])} className="cpx-dc-decoration" src={decorationUrl} fallback={fallbackDecoration} />
                 <span role="img" className={`cpx-dc-status cpx-dc-status-${status}`} aria-label={`Status: ${STATUS_LABELS[status]}`} />
             </div>
             {badges.length > 0 && <div className="cpx-dc-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}

@@ -170,6 +170,19 @@ for (const [mode, avatarClass] of [
     assert.ok(render().some(node => node.type === "span" && node.props.className === avatarClass + " cpx-avatar-fallback" && node.props.children === "N"), mode);
     avatarAttempt = 0;
 }
+for (const [mode, className] of [["profile", "cpx-card-decoration"], ["popout", "cpx-dc-decoration"], ["chat", "cpx-chat-decoration"]]) {
+    layout = mode;
+    const overlay = () => flatten(ProfilePreview({
+        data: {}, fallbackName: "Nova", fallbackUsername: "nova", fallbackAvatar: avatarPreview.avatar,
+        decorationUrl: decoration, fallbackDecoration,
+    })).find(node => node.props.className === className);
+    assert.equal(overlay()?.props.src, decoration, mode);
+    overlay().props.onError();
+    assert.equal(overlay()?.props.src, fallbackDecoration, mode);
+    overlay().props.onError();
+    assert.equal(overlay(), undefined, mode);
+    avatarAttempt = 0;
+}
 layout = "chat";
 const desktop = flatten(ProfilePreview({
     data: { globalName: mobileProfile.name, serverTag: { tag: mobileProfile.tagText, icon: mobileProfile.tagIcon } },
