@@ -36920,6 +36920,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-stage-boost-promo": hideMobileComponent("HideStageBoostPromo", "the boost upsell in Stage channels", "modules/guild_scheduled_events/native/components/StageChannelUpsell.tsx"),
+        "hide-app-recommendation-rows": hideMobileComponent("HideAppRecommendationRows", "individual recommended app rows in the launcher", "modules/app_launcher/native/base_components/RecommendationAppRow.tsx"),
+        "hide-premium-upsell-gradient": hideMobileComponent("HidePremiumUpsellGradient", "the decorative gradient behind premium upsells", "modules/premium/roadblocks/native/views/PremiumUpsellGradientBackground.tsx"),
         "hide-media-message-preview": hideMobileComponent("HideMediaMessagePreview", "the source-message preview in the media viewer", "modules/media_viewer/native/components/message_preview/MediaMessagePreview.tsx"),
         "hide-sticker-pack-banner": hideMobileComponent("HideStickerPackBanner", "the banner in sticker pack details", "modules/stickers/native/StickerPackBanner.tsx"),
         "hide-channel-list-style-promo": hideMobileComponent("HideChannelListStylePromo", "the Nitro upsell under channel list appearance previews", "modules/user_settings/appearance/native/components/SettingsAppearanceChannelListPreviewNitroUpsell.tsx"),
@@ -51027,6 +51030,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-app-recommendation-rows.cx
+  var hide_app_recommendation_rows_default;
+  var init_hide_app_recommendation_rows = __esm({
+    "../examples/cx/catalog/plugins/hide-app-recommendation-rows.cx"() {
+      hide_app_recommendation_rows_default = 'plugin "HideAppRecommendationRows":\n  needs appearance.hide\n  hide hide-app-recommendation-rows\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-app-search-intro.cx
   var hide_app_search_intro_default;
   var init_hide_app_search_intro = __esm({
@@ -51699,6 +51710,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-premium-upsell-gradient.cx
+  var hide_premium_upsell_gradient_default;
+  var init_hide_premium_upsell_gradient = __esm({
+    "../examples/cx/catalog/plugins/hide-premium-upsell-gradient.cx"() {
+      hide_premium_upsell_gradient_default = 'plugin "HidePremiumUpsellGradient":\n  needs appearance.hide\n  hide hide-premium-upsell-gradient\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-about-me.cx
   var hide_profile_about_me_default;
   var init_hide_profile_about_me = __esm({
@@ -52120,6 +52139,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_spoiler_warnings = __esm({
     "../examples/cx/catalog/plugins/hide-spoiler-warnings.cx"() {
       hide_spoiler_warnings_default = 'plugin "HideSpoilerWarnings":\n  needs appearance.hide\n  hide spoiler-media-label\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-stage-boost-promo.cx
+  var hide_stage_boost_promo_default;
+  var init_hide_stage_boost_promo = __esm({
+    "../examples/cx/catalog/plugins/hide-stage-boost-promo.cx"() {
+      hide_stage_boost_promo_default = 'plugin "HideStageBoostPromo":\n  needs appearance.hide\n  hide hide-stage-boost-promo\n';
     }
   });
 
@@ -55007,6 +55034,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_add_server_button();
       init_hide_app_launcher_intro();
       init_hide_app_launcher_recommendations();
+      init_hide_app_recommendation_rows();
       init_hide_app_search_intro();
       init_hide_apps_button();
       init_hide_avatar_decorations();
@@ -55091,6 +55119,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_powerup_unlock_tip();
       init_hide_premium_group_promotion();
       init_hide_premium_marketing_banner();
+      init_hide_premium_upsell_gradient();
       init_hide_profile_about_me();
       init_hide_profile_activity_badges();
       init_hide_profile_activity_timebar();
@@ -55144,6 +55173,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_shop_wishlist_tip();
       init_hide_soundboard_nitro_banner();
       init_hide_spoiler_warnings();
+      init_hide_stage_boost_promo();
       init_hide_status_emojis();
       init_hide_sticker_autocomplete();
       init_hide_sticker_button();
@@ -56865,6 +56895,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "3578c09c61c7bd97ca8d3e6d627476cf7633d5e4de2f50203bf84bab6673566c"
           },
           {
+            name: "HideAppRecommendationRows",
+            source: hide_app_recommendation_rows_default,
+            description: "Hide individual recommended app rows in the launcher",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "38bf86f99da339d0fd91838f1b241bbafb6b0a68086e34d43b5234b43b29f0ba"
+          },
+          {
             name: "HideAppSearchIntro",
             source: hide_app_search_intro_default,
             description: "Hide the app search introduction banner",
@@ -57664,6 +57704,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "508126ef428933e2220d3d92219d41a375cf541c65f9fb3b88bc4b234baa907a"
           },
           {
+            name: "HidePremiumUpsellGradient",
+            source: hide_premium_upsell_gradient_default,
+            description: "Hide the decorative gradient behind premium upsells",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "8c6f0023b1acc28b86408652ffd22245330f646c66de1a68bee457a7499890a8"
+          },
+          {
             name: "HideProfileAboutMe",
             source: hide_profile_about_me_default,
             description: "Hide the About Me card on profiles",
@@ -58180,6 +58230,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "5319d784ea12ca01dd954473ebb2feee7755dea7b5714f7dfaa4c7026e9e46f6"
+          },
+          {
+            name: "HideStageBoostPromo",
+            source: hide_stage_boost_promo_default,
+            description: "Hide the boost upsell in Stage channels",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "ec26584d9066074d3c3e4e2e28732a604218baea5fcbf3fdf92fd191ac015cf7"
           },
           {
             name: "HideStatusEmojis",
@@ -70542,7 +70602,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e6f8d592094732d2da18ceffea1a15d99aa25a23";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fa540b7b702738e6461f3c50f051d4d8def2fd63";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
