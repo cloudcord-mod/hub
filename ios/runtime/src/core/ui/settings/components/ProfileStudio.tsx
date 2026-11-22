@@ -449,8 +449,12 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
             {(["Profile", "Popout", "Chat"] as const).map(mode => <Action key={mode} label={mode} grow primary={layout === mode} selected={layout === mode} onPress={() => setLayout(mode)} />)}
         </View>
         {layout === "Chat" ? <View style={{ flexDirection: "row", gap: GAP.md, padding: GAP.md, borderRadius: R.md, backgroundColor: card }}>
-            <View style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
-                <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
+            <View style={{ width: 38, height: 38 }}>
+                <View style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
+                    <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
+                </View>
+                {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -5, left: -5, width: 48, height: 48 }}
+                    resizeMode="contain" accessible={false} /> : null}
             </View>
             <View style={{ flex: 1, gap: 4 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6 }}>

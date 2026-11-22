@@ -221,7 +221,10 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 {(["profile", "popout", "chat"] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} className={`cpx-btn ${mode === value ? "cpx-btn-primary" : "cpx-btn-ghost"}`} onClick={() => setMode(value)}>{value === "profile" ? "Profile" : value === "popout" ? "Popout" : "Chat"}</button>)}
             </div></>}
         {mode === "chat" ? <div className="cpx-chat-preview">
-            <PreviewAvatar key={avatarKey} src={avatar} fallback={fallbackAvatar} name={name} className="cpx-chat-avatar" />
+            <div className="cpx-chat-avatar-wrap">
+                <PreviewAvatar key={avatarKey} src={avatar} fallback={fallbackAvatar} name={name} className="cpx-chat-avatar" />
+                {decorationUrl && <img className="cpx-chat-decoration" src={decorationUrl} alt="" />}
+            </div>
             <div className="cpx-chat-preview-content">
                 <div className="cpx-chat-preview-heading">
                     <strong>{name}</strong>

@@ -134,6 +134,8 @@ theme = "dark";
 assert.equal(mobileRender(mobileProfile).find(node => node.props.children === mobileProfile.name).props.style.color, "#F2F3F5");
 selectTab(mobilePopout, "Chat").props.onPress();
 assert.deepEqual(media(mobileRender(mobileProfile)), [mobileProfile.tagIcon]);
+const decoration = "https://cdn.example/decoration.png";
+assert.deepEqual(media(mobileRender({ ...mobileProfile, decoration })), [decoration, mobileProfile.tagIcon]);
 assert.equal(containsText(mobileRender(mobileProfile), "Frame: Starlight"), false);
 assert.deepEqual(media(mobileRender({ name: "No cosmetics", username: "plain" })), []);
 
@@ -160,8 +162,9 @@ for (const [mode, avatarClass] of [
 layout = "chat";
 const desktop = flatten(ProfilePreview({
     data: { globalName: mobileProfile.name, serverTag: { tag: mobileProfile.tagText, icon: mobileProfile.tagIcon } },
-    fallbackName: "Fallback", fallbackUsername: "fallback", fallbackAvatar: "https://cdn.example/avatar.png",
+    fallbackName: "Fallback", fallbackUsername: "fallback", fallbackAvatar: "https://cdn.example/avatar.png", decorationUrl: decoration,
 }));
+assert.equal(desktop.find(node => node.props.className === "cpx-chat-decoration").props.src, decoration);
 const heading = desktop.find(node => node.props.className === "cpx-chat-preview-heading");
 assert.equal(flatten(heading).find(node => node.type === "strong").props.children, mobileProfile.name);
 assert.equal(flatten(heading).find(node => node.type === "img").props.src, mobileProfile.tagIcon);
