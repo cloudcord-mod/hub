@@ -4693,6 +4693,7 @@ jobs:
                   avatar: data.avatarMedia?.uri || realAvatar,
                   fallbackAvatar: realAvatar,
                   banner: data.bannerMedia?.uri || fallback.banner,
+                  fallbackBanner: fallback.banner,
                   bio: data.bio ?? fallback.bio,
                   pronouns: data.pronouns ?? fallback.pronouns,
                   primary: primary ?? accent ?? fallback.primary,

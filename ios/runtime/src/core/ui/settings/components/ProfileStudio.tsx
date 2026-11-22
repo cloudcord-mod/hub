@@ -90,15 +90,22 @@ function StudioAvatar({ uri, fallback, name }: { uri?: string; fallback?: string
     </View>;
 }
 
+function StudioBanner({ uri, fallback }: { uri?: string; fallback?: string }) {
+    const [attempt, setAttempt] = useState(0);
+    const active = [uri || fallback, uri && uri !== fallback ? fallback : undefined][attempt];
+    return active ? <Image key={active} source={{ uri: active }} style={{ width: "100%", height: "100%" }}
+        resizeMode="cover" onError={() => setAttempt(attempt + 1)} /> : null;
+}
+
 /** Hero header: banner, avatar, names, the main switch and preview buttons. */
-export function StudioHero({ name, username, avatar, fallbackAvatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }: {
-    name: string; username: string; avatar?: string; fallbackAvatar?: string; banner?: string; accent?: string; status?: string;
+export function StudioHero({ name, username, avatar, fallbackAvatar, banner, fallbackBanner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }: {
+    name: string; username: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; accent?: string; status?: string;
     enabled: boolean; onToggle: () => void; syncLabel: string; onPreview: () => void; quickLook: boolean; onQuickLook: () => void;
 }) {
     const tint = accent || C.raised();
     return <View style={{ borderRadius: R.lg, overflow: "hidden", backgroundColor: C.panel(), borderWidth: 1, borderColor: C.line() }}>
         <View style={{ height: 96, backgroundColor: tint }}>
-            {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
+            <StudioBanner key={JSON.stringify([banner, fallbackBanner])} uri={banner} fallback={fallbackBanner} />
             <View style={{ position: "absolute", top: 12, right: 12, flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, backgroundColor: "rgba(0,0,0,0.55)" }}>
                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: enabled ? C.green : C.off }} />
                 <Text variant="text-xs/bold" style={{ color: "#FFFFFF" }}>{enabled ? syncLabel : "Off"}</Text>
@@ -428,8 +435,8 @@ function PreviewCosmetics({ frame, effect }: { frame?: string; effect?: string }
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
-    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
+export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
+    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
     badges?: string[]; officialBadgeIcon?: string; onBadges?: () => void; onSaved?: () => void;
 }) {
@@ -452,11 +459,11 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
                 </View>
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
-        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} fallbackAvatar={fallbackAvatar} banner={banner} primary={primary} secondary={accent} bannerColor={bannerColor}
+        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} fallbackAvatar={fallbackAvatar} banner={banner} fallbackBanner={fallbackBanner} primary={primary} secondary={accent} bannerColor={bannerColor}
             decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} frame={frame} effect={effect} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             {primary && accent && accent !== primary ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "55%", borderBottomLeftRadius: R.lg, borderBottomRightRadius: R.lg, backgroundColor: accent }} /> : null}
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: bannerColor || primary || C.raised() }}>
-                {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
+                <StudioBanner key={JSON.stringify([banner, fallbackBanner])} uri={banner} fallback={fallbackBanner} />
             </View>
             <View style={{ backgroundColor: card, borderBottomLeftRadius: R.lg - 3, borderBottomRightRadius: R.lg - 3, padding: GAP.md, paddingTop: 50, gap: 6 }}>
                 <View style={{ position: "absolute", top: -42, left: 14, width: 84, height: 84 }}>
@@ -506,8 +513,8 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
-    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
+export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
+    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
     customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[]; officialBadgeIcon?: string;
     frame?: string; effect?: string;
 }) {
@@ -517,7 +524,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackA
     const themedSurface = colors === LIGHT ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.55)";
     const inner = <View style={{ borderRadius: themed ? 6 : 10, overflow: "hidden", backgroundColor: themed ? themedSurface : colors.page }}>
         <View style={{ height: 96, backgroundColor: bannerColor || primary || colors.raised }}>
-            {banner ? <Image source={{ uri: banner }} style={{ width: "100%", height: "100%" }} resizeMode="cover" /> : null}
+            <StudioBanner key={JSON.stringify([banner, fallbackBanner])} uri={banner} fallback={fallbackBanner} />
         </View>
         <View style={{ position: "absolute", top: 54, left: 14, width: 84, height: 84 }}>
             <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: ring, backgroundColor: ring, overflow: "hidden" }}>

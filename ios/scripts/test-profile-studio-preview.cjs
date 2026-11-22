@@ -260,7 +260,14 @@ const offlineDot = mobileRender({ ...nativeLook, status: "offline" }).find(node 
 assert.equal(offlineDot?.props.style.backgroundColor, "#80848E");
 const unknownDot = mobileRender({ ...nativeLook, status: "constructor" }).find(node => node.props.accessibilityLabel === "Status: online");
 assert.equal(unknownDot?.props.style.backgroundColor, "#23A55A");
-assert.ok(media(mobileRender(mobileDraft)).includes("draft"));
+const mobileDraftBannerImage = mobileRender(mobileDraft).find(node => node.type === "Image" && node.props.source?.uri === "draft");
+assert.ok(mobileDraftBannerImage);
+mobileDraftBannerImage.props.onError();
+const mobileNativeBannerImage = mobileRender(mobileDraft).find(node => node.type === "Image" && node.props.source?.uri === nativeBanner);
+assert.ok(mobileNativeBannerImage);
+mobileNativeBannerImage.props.onError();
+assert.ok(!media(mobileRender(mobileDraft)).includes(nativeBanner));
+avatarAttempt = 0;
 layout = "Profile";
 const twoToneDraft = mobileAppearance({ profileColorsEnabled: true, primaryColor: "#234567", accentColor: "#765432" }, account);
 assert.equal(twoToneDraft.bannerColor, "#765432");
