@@ -35,6 +35,7 @@ export const cxNativeEffects = {
     "profile-media": { permission: "profilemenu.media", label: "Add View and Download actions for Discord avatars and banners" },
     "copy-channel-name": { permission: "channels.clipboard", label: "Add Copy Channel Name and Copy Category Name actions" },
     "copy-channel-topic": { permission: "channels.clipboard", label: "Copy the selected channel’s topic as text" },
+    "copy-channel-created": { permission: "channels.clipboard", label: "Copy the selected server channel’s creation timestamp" },
     "copy-role-color": { permission: "guild.roleclipboard", label: "Copy the selected server role's hex color" },
     "copy-role-name": { permission: "guild.roleclipboard", label: "Copy the selected server role’s name as plain text" },
     "copy-role-mention": { permission: "guild.roleclipboard", label: "Copy mention markup for the selected server role" },

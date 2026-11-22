@@ -2635,6 +2635,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         invokeCopy(topicAction);
         assert.equal(clipboardWrites.pop(), "Read the rules");
         click(render(), "Disable CopyChannelTopic");
+        selectCatalog("CopyChannelCreationTimestamp");
+        click(render(), "Allow for this session");
+        const isCreated = label => label === "Copy Channel Creation Timestamp";
+        assert.equal(getChannelAction({ id: other, type: 3 }, isCreated), undefined);
+        invokeCopy(getChannelAction({ id: repeatChannel, guild_id: guildId }, isCreated));
+        assert.equal(clipboardWrites.pop(), "<t:" + Math.floor((Number(BigInt(repeatChannel) >> 22n) + 1420070400000) / 1000) + ":F>");
+        click(render(), "Disable CopyChannelCreationTimestamp");
         const channelNotes = cxCatalog.plugins.find(entry => entry.name === "LocalChannelNotes").source;
         assert.throws(() => activateCx(channelNotes, host, ["profile.localnotes"]), /approval/);
         selectCatalog("LocalChannelNotes");

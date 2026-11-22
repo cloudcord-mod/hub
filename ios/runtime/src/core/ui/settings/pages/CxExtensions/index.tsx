@@ -32,7 +32,7 @@ import { showToast } from "@lib/ui/toasts";
 import { findByFilePath, findByProps, findByStoreName, findByStoreNameLazy } from "@metro";
 import { metroModules } from "@metro/internals/modules";
 import { getCxMessageGesture } from "@lib/api/cx";
-import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxChannelTopicCopy, getCxProfileMedia } from "@lib/api/cx";
+import { getCxChannelCopy, getCxChannelNoteLabel, getCxProfileMedia, type CxChannelCopyEffect } from "@lib/api/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, runCxCleanups, type CxNoteEditor } from "@lib/api/cx";
 import { clipboard, commands, FluxDispatcher, messageUtil, React } from "@metro/common";
 import { Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
@@ -1354,9 +1354,9 @@ function registerChannelSheetEntry(key: string, enabled: () => boolean, getItem:
     return () => { active = false; stop(); };
 }
 
-function registerCopyChannelDetails(topic: boolean, enabled: () => boolean) {
-    return registerChannelSheetEntry(topic ? "cx-copy-channel-topic" : "cx-copy-channel-name", enabled, channel => {
-        const copy = topic ? getCxChannelTopicCopy(channel) : getCxChannelNameCopy(channel, id => UserStore?.getUser?.(id)?.username);
+function registerCopyChannelDetails(effect: CxChannelCopyEffect, enabled: () => boolean) {
+    return registerChannelSheetEntry("cx-" + effect, enabled, channel => {
+        const copy = getCxChannelCopy(effect, channel, id => UserStore?.getUser?.(id)?.username);
         if (!copy) return;
         return { label: copy.label, action: () => { clipboard.setString(copy.name); showToast.showCopyToClipboard?.(); } };
     });
@@ -2611,7 +2611,8 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                     return registerLocalText("channels");
                 case "copy-channel-name":
                 case "copy-channel-topic":
-                    return registerCopyChannelDetails(effect === "copy-channel-topic", enabled);
+                case "copy-channel-created":
+                    return registerCopyChannelDetails(effect, enabled);
                 case "copy-role-color":
                 case "copy-role-name":
                 case "copy-role-mention":

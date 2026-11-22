@@ -1,10 +1,22 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 
+import { formatCxCreationTimestamp } from "./cxProfileMenu";
+
 export type CxChannelLabel = { id?: string; name?: string; type?: number; guild_id?: string | null; topic?: string | null; };
 
 export function getCxChannelTopicCopy(channel: CxChannelLabel) {
     if (!channel.id || !/^\d{17,20}$/.test(channel.id) || !channel.guild_id || typeof channel.topic !== "string" || !channel.topic.trim()) return;
     return { label: "Copy Channel Topic", name: channel.topic };
+}
+
+export type CxChannelCopyEffect = "copy-channel-name" | "copy-channel-topic" | "copy-channel-created";
+
+export function getCxChannelCopy(effect: CxChannelCopyEffect, channel: Parameters<typeof getCxChannelNameCopy>[0], username: (id: string) => string | undefined) {
+    if (effect === "copy-channel-name") return getCxChannelNameCopy(channel, username);
+    if (effect === "copy-channel-topic") return getCxChannelTopicCopy(channel);
+    if (!channel.guild_id) return;
+    const name = formatCxCreationTimestamp(channel.id);
+    if (name) return { label: "Copy Channel Creation Timestamp", name };
 }
 
 export function getCxChannelNameCopy(channel: CxChannelLabel & { recipients?: readonly string[]; }, username: (id: string) => string | undefined) {

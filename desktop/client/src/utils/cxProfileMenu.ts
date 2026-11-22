@@ -1,12 +1,7 @@
 export const cxProfileMenuActions = {
     "user-url": { label: "Copy User URL", scope: "none", format: (id: string) => "<https://discord.com/users/" + id + ">" },
     "user-mention": { label: "Copy User Mention", scope: "none", format: (id: string) => "<@" + id + ">" },
-    "account-created": { label: "Copy Account Creation Timestamp", scope: "none", format: (id: string) => {
-        if (!isCxProfileUserId(id) || id.startsWith("0")) return;
-        const snowflake = BigInt(id);
-        if (snowflake > 0xffffffffffffffffn) return;
-        return "<t:" + Math.floor((Number(snowflake >> 22n) + 1_420_070_400_000) / 1000) + ":F>";
-    } },
+    "account-created": { label: "Copy Account Creation Timestamp", scope: "none", format: formatCxCreationTimestamp },
     "username": { label: "Copy Username", scope: "identity" },
     "display-name": { label: "Copy Display Name", scope: "identity" },
     "profile-bio": { label: "Copy Bio", scope: "user", unavailable: "No profile bio found." },
@@ -24,6 +19,13 @@ export type CxProfileMenuAction = keyof typeof cxProfileMenuActions;
 
 export function isCxProfileUserId(id: unknown): id is string {
     return typeof id === "string" && /^\d{17,20}$/.test(id);
+}
+
+export function formatCxCreationTimestamp(id: unknown) {
+    if (!isCxProfileUserId(id) || id.startsWith("0")) return;
+    const snowflake = BigInt(id);
+    if (snowflake > 0xffffffffffffffffn) return;
+    return "<t:" + Math.floor((Number(snowflake >> 22n) + 1_420_070_400_000) / 1000) + ":F>";
 }
 
 export function getCxProfileMedia(id: string, user: { avatar?: unknown; discriminator?: string; username?: string; }, banner: unknown) {

@@ -1,0 +1,3 @@
+plugin "CopyChannelCreationTimestamp":
+  needs channels.clipboard
+  use copy-channel-created
