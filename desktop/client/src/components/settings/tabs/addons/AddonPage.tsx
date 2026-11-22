@@ -214,6 +214,7 @@ export function PluginsPage() {
                                         && <button className={cl("mode")} onClick={() => reviewAddon("plugin", alternate)}>{alternate.restoreFailed ? "Review startup failure" : alternate.needsReview ? "Review update" : "Catalog version"}</button>} />;
                             }
                             return <AddonCard key={extension.id} name={extension.name} description={extension.description}
+                                sourceBadge={shownNames.has(extension.name.toLowerCase()) ? <small>Catalog version</small> : undefined}
                                 enabled={extension.active} setEnabled={on => toggleCxAddon("plugin", extension, on)}
                                 infoButton={(extension.active || extension.needsReview) && <button className={cl("mode")} onClick={() => reviewAddon("plugin", extension)}>
                                     {extension.restoreFailed ? "Review startup failure" : extension.needsReview ? "Review update" : "Options"}

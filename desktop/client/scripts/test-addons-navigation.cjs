@@ -113,6 +113,9 @@ const walk = tree => Array.isArray(tree) ? tree.flatMap(walk) : tree?.props ? [t
 const renderList = () => { cursor = 0; return walk(PluginsPage()); };
 const beforeFiltering = renderList();
 assert.ok(beforeFiltering.some(node => node.type === "CatalogCard" && node.props.name === "Local"));
+assert.ok(beforeFiltering.some(node => node.type === "NativeCard" && node.props.plugin.name === "Shared"));
+assert.ok(beforeFiltering.some(node => node.type === "CatalogCard" && node.props.name === "Shared"
+    && node.props.sourceBadge?.props.children.includes("Catalog version")));
 const selectFilter = value => renderList().find(node => node.props["aria-label"] === "Filter plugins").props.onChange({ currentTarget: { value } });
 const shownCards = () => renderList().filter(node => node.type === "CatalogCard" || node.type === "NativeCard");
 selectFilter("private");
