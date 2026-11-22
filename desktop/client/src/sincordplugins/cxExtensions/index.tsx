@@ -518,6 +518,7 @@ function ReadAllServersButton() {
 }
 const profileBioTransforms = new Set<(bio: string) => string>();
 let hiddenProfileBioUsers = 0;
+let hiddenProfileBannerUsers = 0;
 const typingDotListeners = new Set<() => void>();
 let staticTypingDotUsers = 0;
 let codeBlockGapUsers = 0;
@@ -757,6 +758,10 @@ function applyAppearanceTarget(target: keyof typeof cxAppearanceTargets) {
     if (target === "hide-profile-about-me") {
         hiddenProfileBioUsers++;
         return () => { hiddenProfileBioUsers--; };
+    }
+    if (target === "hide-profile-banner") {
+        hiddenProfileBannerUsers++;
+        return () => { hiddenProfileBannerUsers--; };
     }
     if ("mobileOnly" in rule && rule.mobileOnly) throw new Error("This appearance option is available on mobile.");
     const style = document.createElement("style");
@@ -2029,6 +2034,12 @@ export default definePlugin({
             replace: "(!$self.keepImageLinks()&&($&))",
         },
     }, {
+        find: 'backgroundColor:"COMPLETE"',
+        replacement: {
+            match: /(overflow:"visible",.{0,125}?!1\),style:\{.{0,250}?backgroundImage:)(null!=(\i)\?`url\(\$\{\3\}\)`)/,
+            replace: "$1!$self.shouldHideProfileBanner()&&$2",
+        },
+    }, {
         find: "disableInteractions:",
         replacement: {
             match: /(\{(?=[^{}]{0,350}\bdisableInteractions:\i)(?=[^{}]{0,350}\buserBio:\i)[^{}]{1,350}\}=)(\i)(?=[,;])/,
@@ -2185,6 +2196,9 @@ export default definePlugin({
     },
     keepImageLinks() {
         return imageLinkUsers > 0;
+    },
+    shouldHideProfileBanner() {
+        return hiddenProfileBannerUsers > 0;
     },
     rewriteProfileBioProps<T extends { userBio?: unknown; }>(props: T) {
         if (typeof props?.userBio !== "string") return props;

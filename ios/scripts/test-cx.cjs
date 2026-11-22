@@ -1799,6 +1799,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const originalStyles = Object.freeze(rule.style?.key ? { [rule.style.key]: baseStyle } : {});
             const original = Object.freeze({ type: "NativeTarget", props: Object.freeze({ value: "original", style: baseStyle, styles: originalStyles }) });
             const wraps = [];
+            if (desktop && target === "hide-profile-banner") {
+                const plugin = module.exports.default;
+                const patch = plugin.patches.find(patch => patch.find === 'backgroundColor:"COMPLETE"');
+                const original = 'return {overflow:"visible",before:flag(!1),style:{backgroundImage:null!=image?`url(${image})`:void 0}};';
+                const match = new RegExp(patch.replacement.match.source.replaceAll("\\i", "[a-zA-Z_$][\\w$]*"));
+                const patched = original.replace(match, patch.replacement.replace.replace("$self", "plugin"));
+                const banner = new Function("plugin", "image", "flag", patched);
+                assert.equal(banner(plugin, "banner.png", () => false).style.backgroundImage, undefined);
+                click(render(), "Disable " + rule.plugin);
+                assert.equal(banner(plugin, "banner.png", () => false).style.backgroundImage, "url(banner.png)");
+                continue;
+            }
             if (desktop && target === "hide-profile-about-me") {
                 const native = Object.freeze({ userBio: "Native bio", disableInteractions: true });
                 const rewrite = module.exports.default.rewriteProfileBioProps;
