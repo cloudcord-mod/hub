@@ -125,20 +125,26 @@ export function PluginsPage() {
         description: plugin.description,
         keywords: plugin.tags?.join(" "),
         plugin,
+        extension: undefined,
     })), [visible]);
     const allCxRows = cxAddons().useCxAddonRows("plugin", "");
-    const cxRows = useMemo(() => searchCxCatalog(allCxRows, query), [allCxRows, query]);
+    const cxSearchRows = useMemo(() => allCxRows.map(extension => ({
+        ...extension,
+        plugin: undefined,
+        extension,
+    })), [allCxRows]);
+    const cxRows = useMemo(() => searchCxCatalog(cxSearchRows, query), [cxSearchRows, query]);
     const cxByName = useMemo(() => new Map(allCxRows.map(entry => [entry.name.toLowerCase(), entry])), [allCxRows]);
     const nativeByName = useMemo(() => new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin])), [visible]);
 
     const search = query.trim();
     const commandSearch = search.startsWith("/");
     const nativeMatches = useMemo(() => searchCxCatalog(nativeSearchRows, query), [nativeSearchRows, query]);
-    const shownNative = filter === "all" && !commandSearch ? nativeMatches.map(row => row.plugin)
-        .filter(p => !cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name)) : [];
-    const shownNames = new Set(shownNative.map(plugin => plugin.name.toLowerCase()));
+    const shownNative = filter === "all" && !commandSearch ? nativeMatches
+        .filter(({ plugin }) => !cxByName.get(plugin.name.toLowerCase())?.active || isPluginEnabled(plugin.name)) : [];
+    const shownNames = new Set(shownNative.map(row => row.name.toLowerCase()));
     const eligible = [
-        ...shownNative.map(plugin => ({ name: plugin.name, description: plugin.description, keywords: plugin.tags?.join(" "), active: isPluginEnabled(plugin.name), plugin, extension: undefined })),
+        ...shownNative,
         ...cxRows.filter(entry => {
             if (filter === "private") return entry.privateCommands;
             if (filter === "review") return entry.needsReview;
@@ -146,10 +152,12 @@ export function PluginsPage() {
             const name = entry.name.toLowerCase();
             const native = nativeByName.get(name);
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
-        }).map(extension => ({ ...extension, plugin: undefined, extension })),
-    ].filter(row => !enabledOnly || row.active);
+        }),
+    ];
     const ranked = search && !commandSearch ? searchCxCatalog(eligible, query) : eligible;
-    const shown = [...ranked].sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0)
+    const shown = ranked.map(row => ({ ...row, active: row.plugin ? isPluginEnabled(row.plugin.name) : row.extension.active }))
+        .filter(row => !enabledOnly || row.active)
+        .sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0)
         || (search ? 0 : a.name.localeCompare(b.name)));
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
