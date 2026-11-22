@@ -41171,6 +41171,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "voice.channelcount",
           label: "Show occupancy and capacity in the channel list"
         },
+        "screen-share-alert": {
+          permission: "voice.sharealerts",
+          label: "Show local alerts when someone starts sharing in your current voice call"
+        },
         "webcam-start-notifier": {
           permission: "voice.cameratone",
           label: "Play different tones when someone turns their camera on or off"
@@ -46343,6 +46347,132 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/lib/api/cxVoiceShareAlerts.ts
+  function bindCxVoiceShareAlerts(context, options) {
+    var users = /* @__PURE__ */ new Map();
+    var cleanups = [];
+    var account, channel;
+    var active = true;
+    function reset() {
+      account = channel = void 0;
+      users.clear();
+    }
+    function record(user, kind, status, announce) {
+      var state2 = users.get(user);
+      if (!state2) {
+        if (users.size === 512)
+          users.delete(users.keys().next().value);
+        users.set(user, state2 = {});
+      }
+      var wasOn = state2[kind];
+      state2[kind] = status;
+      if (!announce || !status || wasOn === true)
+        return;
+      var now = Date.now(), last = state2.alerted?.[kind];
+      if (last !== void 0 && now - last < options.cooldownSeconds * 1e3)
+        return;
+      (state2.alerted ??= {})[kind] = now;
+      try {
+        context.notify(user, kind);
+      } catch (e) {
+      }
+    }
+    function updateState(state2, announce) {
+      if (!isCxProfileUserId(state2?.userId) || !options.includeSelf && state2.userId === account)
+        return;
+      if (state2.channelId !== channel) {
+        if (state2.channelId !== void 0)
+          users.delete(state2.userId);
+        return;
+      }
+      if (typeof state2.selfStream === "boolean")
+        record(state2.userId, "stream", state2.selfStream, announce);
+      if (options.camera && typeof state2.selfVideo === "boolean")
+        record(state2.userId, "camera", state2.selfVideo, announce);
+    }
+    function sync() {
+      var me = context.account(), current = context.channel();
+      if (!active || context.enabled?.() === false || !isCxProfileUserId(me) || !isCxProfileUserId(current)) {
+        reset();
+        return false;
+      }
+      if (account === me && channel === current)
+        return true;
+      reset();
+      account = me;
+      channel = current;
+      var initial = context.states(current);
+      if (initial && typeof initial === "object") {
+        for (var state2 of Object.values(initial))
+          updateState(state2, false);
+      }
+      return false;
+    }
+    function update(payload) {
+      var unchanged = sync();
+      if (!channel || !Array.isArray(payload?.voiceStates))
+        return;
+      for (var state2 of payload.voiceStates)
+        updateState(state2, unchanged);
+    }
+    function stream(payload, status) {
+      if (!sync() || typeof payload?.streamKey !== "string" || payload.streamKey.length > 80)
+        return;
+      var parsed = /^(?:guild:\d{15,22}:|call:)(\d{15,22}):(\d{15,22})$/.exec(payload.streamKey);
+      if (!parsed || parsed[1] !== channel || !options.includeSelf && parsed[2] === account)
+        return;
+      record(parsed[2], "stream", status, true);
+    }
+    function stop() {
+      active = false;
+      reset();
+      for (var cleanup of cleanups.splice(0).reverse())
+        cleanup();
+    }
+    try {
+      var _loop2 = function(event2, handler2) {
+        context.dispatcher.subscribe(event2, handler2);
+        cleanups.push(() => context.dispatcher.unsubscribe(event2, handler2));
+      };
+      for (var [event, handler] of [
+        [
+          "VOICE_STATE_UPDATES",
+          update
+        ],
+        [
+          "VOICE_CHANNEL_SELECT",
+          sync
+        ],
+        [
+          "LOGOUT",
+          reset
+        ],
+        [
+          "STREAM_CREATE",
+          (payload) => stream(payload, true)
+        ],
+        [
+          "STREAM_DELETE",
+          (payload) => stream(payload, false)
+        ]
+      ])
+        _loop2(event, handler);
+      sync();
+      return stop;
+    } catch (error) {
+      stop();
+      throw error;
+    }
+  }
+  var init_cxVoiceShareAlerts = __esm({
+    "src/lib/api/cxVoiceShareAlerts.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_cxProfileMenu();
+    }
+  });
+
   // src/lib/api/cxVoiceQueue.ts
   function getCxVoiceQueueRoom(channel, states) {
     var limit = channel.userLimit ?? channel.user_limit;
@@ -47138,6 +47268,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             autoJoin: flags2.includes("auto-join"),
             quiet: flags2.includes("quiet")
           };
+        } else if (name3 === "screen-share-alert") {
+          var flags3 = effect2[2]?.split(" ") ?? [];
+          var delays = flags3.filter((flag) => /^cooldown-(?:0|[1-9]\d?|1[01]\d|120)$/.test(flag));
+          if (delays.length > 1 || new Set(flags3).size !== flags3.length || flags3.some((flag) => flag !== "camera" && flag !== "include-self" && !delays.includes(flag)))
+            throw new Error("Screen-share alert options are camera, include-self, and cooldown-0 through cooldown-120");
+          voiceShareOptions = {
+            camera: flags3.includes("camera"),
+            includeSelf: flags3.includes("include-self"),
+            cooldownSeconds: delays.length ? Number(delays[0].slice(9)) : 30
+          };
         } else if (name3 === "webcam-start-notifier") {
           var scope = effect2[2] ?? "all";
           if (scope !== "all" && scope !== "dm-only" && scope !== "server-only")
@@ -47146,25 +47286,25 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             scope
           };
         } else if (name3 === "notify-when-muted") {
-          var flags3 = effect2[2]?.split(" ") ?? [];
-          var delays = flags3.filter((flag) => /^cooldown-(?:[1-9]|[1-5]\d|60)$/.test(flag));
-          if (delays.length > 1 || new Set(flags3).size !== flags3.length || flags3.some((flag) => flag !== "server-mute" && flag !== "ignore-deafened" && !delays.includes(flag)))
+          var flags4 = effect2[2]?.split(" ") ?? [];
+          var delays1 = flags4.filter((flag) => /^cooldown-(?:[1-9]|[1-5]\d|60)$/.test(flag));
+          if (delays1.length > 1 || new Set(flags4).size !== flags4.length || flags4.some((flag) => flag !== "server-mute" && flag !== "ignore-deafened" && !delays1.includes(flag)))
             throw new Error("Mute alert options are server-mute, ignore-deafened, and cooldown-1 through cooldown-60");
           mutedVoiceOptions = {
-            serverMute: flags3.includes("server-mute"),
-            ignoreDeafened: flags3.includes("ignore-deafened"),
-            cooldownSeconds: delays.length ? Number(delays[0].slice(9)) : 5
+            serverMute: flags4.includes("server-mute"),
+            ignoreDeafened: flags4.includes("ignore-deafened"),
+            cooldownSeconds: delays1.length ? Number(delays1[0].slice(9)) : 5
           };
         } else if (name3 === "voice-channel-count") {
-          var flags4 = effect2[2]?.split(" ") ?? [];
-          if (flags4.some((flag) => ![
+          var flags5 = effect2[2]?.split(" ") ?? [];
+          if (flags5.some((flag) => ![
             "show-empty",
             "hide-limit"
-          ].includes(flag)) || new Set(flags4).size !== flags4.length)
+          ].includes(flag)) || new Set(flags5).size !== flags5.length)
             throw new Error("Voice count options are show-empty and hide-limit");
           voiceCountOptions = {
-            showEmpty: flags4.includes("show-empty"),
-            hideLimit: flags4.includes("hide-limit")
+            showEmpty: flags5.includes("show-empty"),
+            hideLimit: flags5.includes("hide-limit")
           };
         } else if (name3 === "quote-message") {
           if (effect2[2] && effect2[2] !== "without-link")
@@ -47544,6 +47684,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var voiceQueueOptions;
     var mutedVoiceOptions;
     var cameraToneOptions;
+    var voiceShareOptions;
     var voiceCountOptions;
     var quoteOptions;
     var uploadNaming;
@@ -47642,6 +47783,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       voiceMemberOptions,
       voiceQueueOptions,
       cameraToneOptions,
+      voiceShareOptions,
       mutedVoiceOptions,
       voiceCountOptions,
       quoteOptions,
@@ -47727,6 +47869,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         }
         if (effect === "notification-volume")
           return label2 + " (" + document.notificationVolumeOptions.notificationVolume + "%)";
+        if (effect === "screen-share-alert" && document.voiceShareOptions?.camera)
+          return label2 + " or turns on their camera";
         if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
           return "Automatically join the selected voice channel when its slot opens";
         return label2;
@@ -48172,6 +48316,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "all-call-time-counter": document.voiceMemberOptions,
         "wait-for-slot": document.voiceQueueOptions,
         "webcam-start-notifier": document.cameraToneOptions,
+        "screen-share-alert": document.voiceShareOptions,
         "notify-when-muted": document.mutedVoiceOptions,
         "voice-channel-count": document.voiceCountOptions,
         "quote-message": document.quoteOptions
@@ -48329,6 +48474,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cxUserNotes();
       init_cxVoiceCount();
       init_cxCameraTone();
+      init_cxVoiceShareAlerts();
       init_cxVoiceQueue();
       init_cxVoiceMemberClock();
       init_cxCallClock();
@@ -48407,6 +48553,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "calls.suppressring": "Silence incoming call rings from the listed users and group DMs",
         "voice.latency": "Read your current voice connection latency",
         "voice.channelcount": "Show the number of connected users next to visible voice and stage channels",
+        "voice.sharealerts": "Watch screen sharing and optional camera starts in your current call and show local alerts",
         "voice.cameratone": "Play local sounds when camera state changes in your current voice call",
         "voice.mutedtone": "Read Discord's local speaking-while-muted flag and play a local alert",
         "voice.waitslot": "Watch a voice channel you queue for and join when you confirm or enable auto-join",
@@ -51212,6 +51359,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/screen-share-alert.cx
+  var screen_share_alert_default;
+  var init_screen_share_alert = __esm({
+    "../examples/cx/catalog/plugins/screen-share-alert.cx"() {
+      screen_share_alert_default = 'plugin "ScreenShareAlert":\n  needs voice.sharealerts\n  use screen-share-alert\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/scroll-to-latest.cx
   var scroll_to_latest_default;
   var init_scroll_to_latest = __esm({
@@ -52920,6 +53075,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_rounded_chat_bar();
       init_rounded_images();
       init_scheduled_messages();
+      init_screen_share_alert();
       init_scroll_to_latest();
       init_sed_enhanced();
       init_send_timestamps();
@@ -55965,6 +56121,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat",
               "Commands"
+            ]
+          },
+          {
+            name: "ScreenShareAlert",
+            source: screen_share_alert_default,
+            description: "Show local alerts when someone starts sharing in your current voice call",
+            categories: [
+              "Voice & calls"
             ]
           },
           {
@@ -60393,10 +60557,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             if (!effectOptions || !("showEmpty" in effectOptions))
               throw new Error("Missing voice count options");
             return registerVoiceChannelCount(effectOptions, enabled);
+          case "screen-share-alert": {
+            if (!effectOptions || !("includeSelf" in effectOptions))
+              throw new Error("Missing screen-share alert options");
+            var voice = findByStoreName("VoiceStateStore");
+            return bindCxVoiceShareAlerts({
+              account: () => UserStore2.getCurrentUser()?.id,
+              channel: () => SelectedChannelStore.getVoiceChannelId() ?? void 0,
+              states: (id) => voice?.getVoiceStatesForChannel?.(id),
+              notify(user, kind) {
+                var name = UserStore2.getUser(user)?.username ?? "Someone";
+                showToast(name + (kind === "stream" ? " started sharing their screen." : " turned on their camera."));
+              },
+              enabled,
+              dispatcher: FluxDispatcher
+            }, effectOptions);
+          }
           case "webcam-start-notifier": {
             if (!effectOptions || !("scope" in effectOptions))
               throw new Error("Missing camera tone options");
-            var voice = findByStoreName("VoiceStateStore");
+            var voice1 = findByStoreName("VoiceStateStore");
             return bindCxCameraTone({
               account: () => UserStore2.getCurrentUser()?.id,
               selected() {
@@ -60408,7 +60588,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     private: channel.type === 1 || channel.type === 3
                   };
               },
-              states: (id) => voice?.getVoiceStatesForChannel?.(id),
+              states: (id) => voice1?.getVoiceStatesForChannel?.(id),
               play: (on) => playCxVoiceTone(on ? "user_join" : "user_leave"),
               enabled,
               dispatcher: FluxDispatcher
@@ -66331,7 +66511,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "130f1d7636de54dc2e22abdff4ac31e8bd829514";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5d9e7919c5d93399b7a85fcbc13fa839d7923685";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
