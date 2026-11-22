@@ -1,0 +1,8 @@
+plugin "Improve Contrast":
+  needs commands.register
+  needs reply.local
+  on command "improvecontrast":
+    input "foreground" text
+    input "background" text
+    input "target" text
+    reply "${improveContrast(foreground, background, target)}" else "Enter two hex colors and a target of aa, aaa, or large."

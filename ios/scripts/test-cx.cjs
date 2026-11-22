@@ -2886,6 +2886,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["messagebudget", { text: "A🔔", limit: "2000" }, /^3\/2000 UTF-16 units · 1997 remaining$/],
                 ["messagebudget", { text: "🔔".repeat(1001), limit: "2000" }, /^2002\/2000 UTF-16 units · 2 over$/],
             ]],
+            ["Improve Contrast", [
+                ["improvecontrast", { foreground: "#999", background: "#fff", target: "aa" }, /^#767676 · 4\.54:1$/],
+                ["improvecontrast", { foreground: "#fff", background: "#777", target: "aaa" }, /^Neither black nor white/],
+            ]],
+            ["Opacity Contrast", [
+                ["opacitycontrast", { foreground: "#000", background: "#fff", opacity: 50 }, /^Blended color #808080 · 3\.95:1$/],
+                ["opacitycontrast", { foreground: "#000", background: "#fff", opacity: 0 }, /^Blended color #ffffff · 1\.00:1$/],
+            ]],
             ["Color Contrast", [
                 ["colorcontrast", { foreground: "#fff", background: "#000" }, /^Contrast ≈ 21\.00:1.*normal text passes/s],
                 ["colorcontrast", { foreground: "#777", background: "#fff" }, /normal text fails.*large text passes/s],

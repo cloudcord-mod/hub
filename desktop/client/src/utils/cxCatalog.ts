@@ -252,6 +252,7 @@ import plugin_catalog_hsl_color_converter from "../../../../examples/cx/catalog/
 import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins/ignore-calls.cx";
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
+import plugin_catalog_improve_contrast from "../../../../examples/cx/catalog/plugins/improve-contrast.cx";
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
 import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso-week.cx";
@@ -308,6 +309,7 @@ import plugin_catalog_notify_when_muted from "../../../../examples/cx/catalog/pl
 import plugin_catalog_number_base_converter from "../../../../examples/cx/catalog/plugins/number-base-converter.cx";
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
 import plugin_catalog_number_summary from "../../../../examples/cx/catalog/plugins/number-summary.cx";
+import plugin_catalog_opacity_contrast from "../../../../examples/cx/catalog/plugins/opacity-contrast.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
 import plugin_catalog_ordered_line_diff from "../../../../examples/cx/catalog/plugins/ordered-line-diff.cx";
 import plugin_catalog_percentage_change from "../../../../examples/cx/catalog/plugins/percentage-change.cx";
@@ -779,6 +781,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "IgnoreCalls", source: plugin_catalog_ignore_calls, description: "Edit the source to enter Discord IDs", categories: ["Voice & calls"] },
         { name: "ImageFilename", source: plugin_catalog_image_filename, description: "Show image filenames and GIF links", categories: ["Media"] },
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
+        { name: "Improve Contrast", source: plugin_catalog_improve_contrast, description: "/improvecontrast", commands: ["improvecontrast"], categories: ["Commands"], appearanceRevision: "a5f2ddbbf7bdc8258da75b5c2540054215e0528fcb069b39682fcc973c144776", privateCommands: true },
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ISO Week", source: plugin_catalog_iso_week, description: "/isoweek", commands: ["isoweek"], categories: ["Commands"], appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5", privateCommands: true },
@@ -835,6 +838,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Number Base Converter", source: plugin_catalog_number_base_converter, description: "/convertbase", commands: ["convertbase"], categories: ["Commands"], appearanceRevision: "a3d8ed0516a0744ae8bfba7d9aaedc3d52b2d1801ce4f5cf8c28865d2597b10c", privateCommands: true },
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"], appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da", privateCommands: true },
         { name: "Number Summary", source: plugin_catalog_number_summary, description: "/numberstats", commands: ["numberstats"], categories: ["Commands"], appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb", privateCommands: true },
+        { name: "Opacity Contrast", source: plugin_catalog_opacity_contrast, description: "/opacitycontrast", commands: ["opacitycontrast"], categories: ["Commands"], appearanceRevision: "c25ed9504fa3ab322289d6ea6bb3d13e1a66d385f72e4be47637e52367db43bc", privateCommands: true },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
         { name: "Ordered Line Diff", source: plugin_catalog_ordered_line_diff, description: "/linediff", commands: ["linediff"], categories: ["Commands"], appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302", privateCommands: true },
         { name: "Percentage Change", source: plugin_catalog_percentage_change, description: "/percentchange", commands: ["percentchange"], categories: ["Commands"], appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e", privateCommands: true },

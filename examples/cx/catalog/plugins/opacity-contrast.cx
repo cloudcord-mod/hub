@@ -1,0 +1,8 @@
+plugin "Opacity Contrast":
+  needs commands.register
+  needs reply.local
+  on command "opacitycontrast":
+    input "foreground" text
+    input "background" text
+    input "opacity" integer
+    reply "${opacityContrast(foreground, background, opacity)}" else "Enter two hex colors and an opacity from 0 to 100."

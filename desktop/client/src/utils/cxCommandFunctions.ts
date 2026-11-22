@@ -495,6 +495,29 @@ export const cxCommandFunctions = {
         if (!from || !to || weight === undefined || weight < 0 || weight > 100) return;
         return `\`${hexColor(mixChannels(from, to, weight / 100))}\``;
     },
+    improveContrast(foreground: string, background: string, target: string) {
+        const ink = hexChannels(foreground), surface = hexChannels(background);
+        const threshold = target === "aa" ? 4.5 : target === "aaa" ? 7 : target === "large" ? 3 : undefined;
+        if (!ink || !surface || threshold === undefined) return;
+        const surfaceLuminance = relativeLuminance(surface);
+        for (let step = 0; step <= 255; step++) {
+            const candidates = [[0, 0, 0], [255, 255, 255]].map(end => {
+                const channels = mixChannels(ink, end, step / 255).map(Math.round);
+                return { color: hexColor(channels), ratio: contrast(relativeLuminance(channels), surfaceLuminance) };
+            });
+            const best = candidates[0].ratio >= candidates[1].ratio ? candidates[0] : candidates[1];
+            if (best.ratio >= threshold) return best.color + " · " + best.ratio.toFixed(2) + ":1";
+        }
+        return "Neither black nor white can reach this contrast ratio against the background.";
+    },
+    opacityContrast(foreground: string, background: string, opacity: string) {
+        const ink = hexChannels(foreground), surface = hexChannels(background);
+        const percent = integerText(opacity);
+        if (!ink || !surface || percent === undefined || percent < 0 || percent > 100) return;
+        const blended = mixChannels(surface, ink, percent / 100).map(Math.round);
+        const ratio = contrast(relativeLuminance(blended), relativeLuminance(surface));
+        return "Blended color " + hexColor(blended) + " · " + ratio.toFixed(2) + ":1";
+    },
     readableInk(background: string) {
         const surface = hexChannels(background);
         if (!surface) return;
