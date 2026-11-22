@@ -158,13 +158,33 @@ function TabIcon({ id }: { id: TabId; }) {
 
 export function TabList({ value, onChange }: { value: TabId; onChange: (tab: TabId) => void; }) {
     const refs = React.useRef<Record<string, HTMLButtonElement | null>>({});
-    const move = (offset: number) => {
-        const index = (TABS.findIndex(tab => tab.id === value) + offset + TABS.length) % TABS.length;
-        onChange(TABS[index].id);
-        refs.current[TABS[index].id]?.focus();
+    const handleKeys = (event: React.KeyboardEvent<HTMLElement>) => {
+        const current = TABS.findIndex(tab => tab.id === value);
+        let index: number;
+        switch (event.key) {
+            case "ArrowDown":
+            case "ArrowRight":
+                index = (current + 1) % TABS.length;
+                break;
+            case "ArrowUp":
+            case "ArrowLeft":
+                index = (current - 1 + TABS.length) % TABS.length;
+                break;
+            case "Home":
+                index = 0;
+                break;
+            case "End":
+                index = TABS.length - 1;
+                break;
+            default:
+                return;
+        }
+        event.preventDefault();
+        const id = TABS[index].id;
+        onChange(id);
+        refs.current[id]?.focus();
     };
-    return <nav className="cpx-tabs" role="tablist" aria-orientation="vertical" aria-label="Profile editor sections"
-        onKeyDown={event => { if (event.key === "ArrowDown" || event.key === "ArrowRight") { event.preventDefault(); move(1); } if (event.key === "ArrowUp" || event.key === "ArrowLeft") { event.preventDefault(); move(-1); } }}>
+    return <nav className="cpx-tabs" role="tablist" aria-orientation="vertical" aria-label="Profile editor sections" onKeyDown={handleKeys}>
         {TABS.map(tab => <button key={tab.id} ref={node => { refs.current[tab.id] = node; }} type="button" role="tab" id={`cpx-tab-${tab.id}`} aria-controls="cpx-panel"
             aria-selected={tab.id === value} tabIndex={tab.id === value ? 0 : -1} className={`cpx-tab ${tab.id === value ? "cpx-on" : ""}`} onClick={() => onChange(tab.id)}>
             <TabIcon id={tab.id} /><span>{tab.label}</span>

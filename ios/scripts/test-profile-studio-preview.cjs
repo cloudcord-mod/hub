@@ -7,7 +7,7 @@ const jsx = (type, props) => ({ type, props });
 let layout;
 let theme;
 let avatarAttempt = 0;
-const react = { useState: initial => typeof initial === "number"
+const react = { useRef: current => ({ current }), useState: initial => typeof initial === "number"
     ? [avatarAttempt, value => { avatarAttempt = value; }]
     : [layout ?? initial, value => { layout = value; }] };
 const requireMock = name => {
@@ -150,7 +150,18 @@ assert.deepEqual(media(mobileRender({ ...mobileProfile, decoration })), [decorat
 assert.equal(containsText(mobileRender(mobileProfile), "Frame: Starlight"), false);
 assert.deepEqual(media(mobileRender({ name: "No cosmetics", username: "plain" })), []);
 
-const { ProfilePreview } = load("desktop/client/src/sincordplugins/fakeProfile/editorUi.tsx");
+const { ProfilePreview, TabList } = load("desktop/client/src/sincordplugins/fakeProfile/editorUi.tsx");
+for (const [key, expected] of [["Home", "profile"], ["End", "others"], ["ArrowDown", "connections"], ["ArrowUp", "status"], ["Tab", undefined]]) {
+    let selected, focused, prevented = false;
+    const tabs = TabList({ value: "badges", onChange: id => { selected = id; } });
+    for (const button of flatten(tabs).filter(node => node.props.role === "tab")) {
+        button.props.ref({ focus() { focused = button.props.id; } });
+    }
+    tabs.props.onKeyDown({ key, preventDefault() { prevented = true; } });
+    assert.equal(selected, expected, key);
+    assert.equal(focused, expected && "cpx-tab-" + expected, key);
+    assert.equal(prevented, Boolean(expected), key);
+}
 for (const [mode, avatarClass] of [
     ["profile", "cpx-card-avatar-img"],
     ["popout", "cpx-dc-avatar-img"],
