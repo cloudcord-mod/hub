@@ -3,7 +3,6 @@ package dev.beefers.vendetta.manager.installer.util
 
 import dev.beefers.vendetta.manager.utils.find
 import com.github.diamondminer88.zip.ZipReader
-import com.github.diamondminer88.zip.ZipWriter
 import com.google.devrel.gmscore.tools.apk.arsc.*
 import java.io.File
 
@@ -97,14 +96,13 @@ object AxmlUtil {
      * @param foregroundIcon A drawable resource id to replace <foreground> with.
      * @param monochromeIcon A drawable resource id to add or replace <monochrome> with.
      */
-    fun patchAdaptiveIcon(
+    fun buildAdaptiveIcon(
         apk: File,
-        resourcePath: String,
         referencePath: String,
         backgroundColor: BinaryResourceIdentifier? = null,
         foregroundIcon: BinaryResourceIdentifier? = null,
         monochromeIcon: BinaryResourceIdentifier? = null,
-    ) {
+    ): ByteArray {
         val xml = readAxml(apk, referencePath)
         val xmlChunk = xml.getMainAxmlChunk()
 
@@ -183,10 +181,7 @@ object AxmlUtil {
             }
         }
 
-        ZipWriter(apk, /* append = */ true).use { zip ->
-            zip.deleteEntry(resourcePath)
-            zip.writeEntry(resourcePath, xml.toByteArray())
-        }
+        return xml.toByteArray()
     }
 
     /**

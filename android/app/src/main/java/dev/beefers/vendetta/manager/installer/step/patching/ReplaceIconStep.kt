@@ -83,7 +83,7 @@ class ReplaceIconStep : Step() {
             else -> null
         }
         
-        for (rscFile in setOf(squareIconFile, roundIconFile)) { // setOf to not possibly patch same file twice
+        val patchedIcons = setOf(squareIconFile, roundIconFile).associateWith { rscFile ->
             val preferredReference = if (postfix == null) rscFile else {
                 rscFile.replace("_$postfix.xml", ".xml")
             }
@@ -93,9 +93,8 @@ class ReplaceIconStep : Step() {
 
             runner.logger.i("Patching adaptive icon ($rscFile <- $referencePath)")
 
-            AxmlUtil.patchAdaptiveIcon(
+            AxmlUtil.buildAdaptiveIcon(
                 apk = baseApk,
-                resourcePath = rscFile,
                 referencePath = referencePath,
                 backgroundColor = backgroundColor,
                 foregroundIcon = foregroundIcon,
@@ -104,14 +103,19 @@ class ReplaceIconStep : Step() {
         }
 
         runner.logger.i("Writing and compiling resources.arsc")
+        val resources = arsc.toByteArray()
         // A fresh Discord APK has no CloudCord mark yet, and deleting a missing entry throws.
         // Only a cached APK patched by an earlier install already contains it.
         val hasMark = ZipReader(baseApk).use { it.openEntry(markPath) != null }
         ZipWriter(baseApk, /* append = */ true).use {
+            for ((path, bytes) in patchedIcons) {
+                it.deleteEntry(path)
+                it.writeEntry(path, bytes)
+            }
             if (hasMark) it.deleteEntry(markPath)
             it.writeEntry(markPath, markBytes)
             it.deleteEntry("resources.arsc")
-            it.writeEntry("resources.arsc", arsc.toByteArray())
+            it.writeEntry("resources.arsc", resources)
         }
     }
 
