@@ -654,6 +654,11 @@ export const cxAppearanceTargets = {
         css: '[class*="messageContent_"] a[href]:focus-visible { outline: 2px solid var(--focus-primary, currentColor) !important; outline-offset: 2px; border-radius: 2px; }',
         desktopOnly: true, style: {},
     },
+    "high-contrast-chat-selection": {
+        plugin: "HighContrastChatSelection", label: "Use high-contrast colors for selected chat text",
+        css: '[class*="messageContent_"]::selection, [class*="messageContent_"] ::selection { color: HighlightText !important; background-color: Highlight !important; }',
+        desktopOnly: true, style: {},
+    },
     "floating-chat-bar": {
         plugin: "FloatingChatBar", label: "lift the chat bar above the bottom edge",
         css: 'form [class*="channelTextArea"] { margin-bottom: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 25%); }',

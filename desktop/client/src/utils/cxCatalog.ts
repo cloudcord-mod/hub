@@ -347,6 +347,7 @@ import plugin_catalog_hide_voice_user_avatars from "../../../../examples/cx/cata
 import plugin_catalog_hide_you_banner_decorations from "../../../../examples/cx/catalog/plugins/hide-you-banner-decorations.cx";
 import plugin_catalog_hide_you_settings_tip from "../../../../examples/cx/catalog/plugins/hide-you-settings-tip.cx";
 import plugin_catalog_hide_you_trial_offer from "../../../../examples/cx/catalog/plugins/hide-you-trial-offer.cx";
+import plugin_catalog_high_contrast_chat_selection from "../../../../examples/cx/catalog/plugins/high-contrast-chat-selection.cx";
 import plugin_catalog_high_contrast_text from "../../../../examples/cx/catalog/plugins/high-contrast-text.cx";
 import plugin_catalog_high_res_profile_images from "../../../../examples/cx/catalog/plugins/high-res-profile-images.cx";
 import plugin_catalog_highlight_links from "../../../../examples/cx/catalog/plugins/highlight-links.cx";
@@ -1005,6 +1006,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideYouBannerDecorations", source: plugin_catalog_hide_you_banner_decorations, description: "Hide decorative overlays on the You tab banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "342a9ca78810b116e597749a72bae2c47f6409b9c4007050e57cc2e8c0ec341e" },
         { name: "HideYouSettingsTip", source: plugin_catalog_hide_you_settings_tip, description: "Hide the settings shortcut tooltip on the You tab", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "a675e48f836e167b9f5695b8d55e653b6c4f5fe64b714e4cae579d136aa9911f" },
         { name: "HideYouTrialOffer", source: plugin_catalog_hide_you_trial_offer, description: "Hide the expiring trial offer card on the You tab", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9c0a5b4d1bf7f53d3706b10be3690c6e2e87551587dea910b98a82ea0507f8ad" },
+        { name: "HighContrastChatSelection", source: plugin_catalog_high_contrast_chat_selection, description: "Use high-contrast colors for selected chat text", desktopOnly: true, categories: ["Appearance"] },
         { name: "HighContrastText", source: plugin_catalog_high_contrast_text, description: "increase text contrast", categories: ["Appearance"], appearanceRevision: "450fe577d86be53325a97156868b1f133e40e2b4ee7c6af192af6088ed8d1332" },
         { name: "High-Res Profile Images", source: plugin_catalog_high_res_profile_images, description: "Request higher-resolution Discord avatars (256 px)", categories: ["Appearance"] },
         { name: "HighlightLinks", source: plugin_catalog_highlight_links, description: "underline message links", categories: ["Appearance"], appearanceRevision: "a2e2fcce45df9c3e2de2a515e855253a8f6ae628eb47bced7183b6d28decd47b" },

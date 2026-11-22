@@ -1,0 +1,3 @@
+plugin "HighContrastChatSelection":
+  needs appearance.style
+  style high-contrast-chat-selection
