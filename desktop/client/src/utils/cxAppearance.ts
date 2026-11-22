@@ -238,7 +238,7 @@ export const cxAppearanceTargets = {
     "avatar-decorations": {
         plugin: "HideAvatarDecorations", label: "avatar decorations",
         css: '[class*="avatarDecoration"] { display: none !important; }',
-        mobile: ["CutoutableAvatarDecoration"],
+        mobile: { messagePresentation: "avatarDecorationURL", legacyComponents: ["CutoutableAvatarDecoration"] },
     },
     "server-banner": {
         plugin: "HideServerBanner", label: "the channel list server banner",
@@ -318,7 +318,7 @@ export const cxAppearanceTargets = {
     "reply-previews": {
         plugin: "HideReplyPreviews", label: "reply previews in chat",
         css: '[class*="repliedMessage"] { display: none !important; }',
-        mobile: ["ReplyMessageContent"],
+        mobile: { messagePresentation: "referencedMessage", legacyComponents: ["ReplyMessageContent"] },
     },
     "chat-apps-button": {
         plugin: "HideAppsButton", label: "the chat apps button",

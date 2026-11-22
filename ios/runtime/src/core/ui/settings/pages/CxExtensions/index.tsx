@@ -2273,7 +2273,9 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
         }
         if (!("messagePresentation" in mobile)) return registerJsxAppearance(mobile, () => null);
         const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-        return overrideCxMethods(renderer, {
+        if (typeof renderer?.default !== "function" && "legacyComponents" in mobile)
+            return registerJsxAppearance(mobile.legacyComponents, () => null);
+        const stopRenderer = overrideCxMethods(renderer, {
             default(args, invoke) {
                 const presentation = invoke(args);
                 if (!presentation || typeof presentation !== "object") return presentation;
@@ -2283,12 +2285,18 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
                     if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
                         return { ...presentation, timestamp: undefined, timestampTooltip: undefined, timestampAccessibilityLabel: undefined };
                     }
+                } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL") {
+                    const field = mobile.messagePresentation;
+                    if (field in presentation && (presentation as Record<string, unknown>)[field] != null) return { ...presentation, [field]: undefined };
                 } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
                     return { ...presentation, stickers: [] };
                 }
                 return presentation;
             },
         }, () => !settings.safeMode?.enabled);
+        if (!("legacyComponents" in mobile)) return stopRenderer;
+        const stopLegacy = registerJsxAppearance(mobile.legacyComponents, () => null);
+        return () => runCxCleanups([stopLegacy, stopRenderer]);
     },
     styleAppearanceTarget(target) {
         const definition = cxAppearanceTargets[target];

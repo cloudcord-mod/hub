@@ -506,6 +506,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             mentioned: true, highlightColor: 0x33ffff00,
             useAttachmentGridLayout: true,
             edited: true, stickers: Object.freeze([{ id: "sticker" }]), content: "hello <t:12345>",
+            referencedMessage: Object.freeze({ id: "reply" }), avatarDecorationURL: "https://example.com/avatar.png",
             timestamp: "8:24 PM", timestampTooltip: "November 7 at 8:24 PM", timestampAccessibilityLabel: "8:24 PM",
         });
         const createMessageContent = (presentation = messagePresentation) => presentation?.cxTestPresentation ?? presentation;
@@ -2337,6 +2338,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(rendered.stickers.length, rule.mobile.messagePresentation === "stickers" ? 0 : 1);
                 for (const field of ["timestamp", "timestampTooltip", "timestampAccessibilityLabel"]) {
                     assert.equal(rendered[field], rule.mobile.messagePresentation === "timestamps" ? undefined : messagePresentation[field]);
+                }
+                for (const field of ["referencedMessage", "avatarDecorationURL"]) {
+                    assert.equal(rendered[field], rule.mobile.messagePresentation === field ? undefined : messagePresentation[field]);
+                }
+                for (const name of rule.mobile.legacyComponents ?? []) {
+                    const wrapped = appearanceHooks.get(name)(null, original);
+                    assert.equal(wrapped.type(wrapped.props), null);
+                    wraps.push(wrapped);
                 }
                 settings.safeMode = { enabled: true };
                 assert.equal(messageRenderer.default(), messagePresentation);
