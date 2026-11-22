@@ -33,7 +33,8 @@ android {
     buildTypes {
         named("debug") {
             if (providers.gradleProperty("cloudcordQa").orNull == "true") {
-                applicationIdSuffix = ".qa"
+                val revision = requireNotNull(getLatestCommit()) { "QA builds require a Git commit" }
+                applicationIdSuffix = ".qa.r$revision"
             }
         }
         named("release") {

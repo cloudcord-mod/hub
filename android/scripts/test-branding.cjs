@@ -28,5 +28,7 @@ assert.match(about, /https:\/\/getcloudcord.com/);
 const installer = read(java + 'installer/step/patching/ReplaceIconStep.kt');
 for (const text of ['R.drawable.cloudcord_mark_source', 'foregroundIcon = foregroundIcon', 'monochromeIcon = foregroundIcon', 'it.writeEntry(markPath, markBytes)', 'Rect(72, 72, 360, 360)']) assert(installer.includes(text), text);
 assert.match(read('app/build.gradle.kts'), /applicationId = "gg.xohus.cloudcord.manager"/);
-assert.match(read(java + 'domain/manager/PreferenceManager.kt'), /stringPreference\("package_name", "cocobo1.pupu.app"\)/, 'branding must not silently replace installed app identity');
+const preferences = read(java + 'domain/manager/PreferenceManager.kt');
+assert.match(preferences, /else\s*\{\s*"cocobo1\.pupu\.app"\s*\}/, 'preserve the installed client identity for regular builds');
+assert.match(preferences, /stringPreference\("package_name", defaultClientPackage\)/);
 console.log('PASS Android branding source guards: canonical mark, launcher/splash/home, localized names, honest credits, installed icon layers and identity preservation (not device verification)');

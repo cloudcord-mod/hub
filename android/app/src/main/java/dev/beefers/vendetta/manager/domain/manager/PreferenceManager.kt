@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.annotation.StringRes
+import dev.beefers.vendetta.manager.BuildConfig
 import dev.beefers.vendetta.manager.R
 import dev.beefers.vendetta.manager.domain.manager.base.BasePreferenceManager
 import dev.beefers.vendetta.manager.utils.DiscordVersion
@@ -16,7 +17,12 @@ class PreferenceManager(context: Context) :
     val DEFAULT_MODULE_LOCATION =
         (context.externalCacheDir ?: File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS).resolve("PupuManager").also { it.mkdirs() }).resolve("xposed.apk")
 
-    var packageName by stringPreference("package_name", "cocobo1.pupu.app")
+    private val defaultClientPackage = if (BuildConfig.APPLICATION_ID.startsWith("gg.xohus.cloudcord.manager.qa.")) {
+        "${BuildConfig.APPLICATION_ID}.client"
+    } else {
+        "cocobo1.pupu.app"
+    }
+    var packageName by stringPreference("package_name", defaultClientPackage)
 
     var appName by stringPreference("app_name", "CloudCord")
 
