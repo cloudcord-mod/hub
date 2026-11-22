@@ -25523,8 +25523,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           profileColorsEnabled: sharedProfileColorsEnabled(data),
           primaryColor: colorHex(data.primaryColor, preview.primaryColor),
           accentColor: colorHex(data.accentColor, preview.accentColor),
-          bio: String(data.bio || ""),
-          pronouns: String(data.pronouns || ""),
+          bio: typeof data.bio === "string" ? data.bio : void 0,
+          pronouns: typeof data.pronouns === "string" ? data.pronouns : void 0,
           createdAt: String(data.createdAt || ""),
           signupDate: String(data.signupDate || data.joinedSince || ""),
           oldName: String(data.oldName || ""),
@@ -26550,8 +26550,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     setOwnValue(cloned, "globalName", displayName2);
     setOwnValue(cloned, "global_name", displayName2);
     setOwnValue(cloned, "displayName", displayName2);
-    setOwnValue(cloned, "bio", preview.bio);
-    setOwnValue(cloned, "pronouns", preview.pronouns);
+    if (typeof preview.bio === "string")
+      setOwnValue(cloned, "bio", preview.bio);
+    if (typeof preview.pronouns === "string")
+      setOwnValue(cloned, "pronouns", preview.pronouns);
     var createdAt = profileDate(preview.createdAt);
     var joinedAt = profileDate(preview.signupDate);
     if (createdAt)
@@ -32176,8 +32178,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       profileColorsEnabled: sharedProfileColorsEnabled(data),
       primaryColor: colorHex(data.primaryColor, ""),
       accentColor: colorHex(data.accentColor, ""),
-      bio: String(data.bio || ""),
-      pronouns: String(data.pronouns || ""),
+      bio: typeof data.bio === "string" ? data.bio : void 0,
+      pronouns: typeof data.pronouns === "string" ? data.pronouns : void 0,
       createdAt: String(data.createdAt || ""),
       signupDate: String(data.signupDate || data.joinedSince || ""),
       oldName: String(data.oldName || ""),
@@ -32944,7 +32946,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   displayName: shared?.globalName || shared?.displayName || user?.globalName || user?.global_name || "",
                   avatar: shared?.avatar || nativeAvatar,
                   banner: shared?.banner || customDiscordMediaURL("banners", id, profile?.banner ?? user?.banner),
-                  bio: shared?.bio || profile?.bio || "",
+                  bio: shared?.bio ?? profile?.bio ?? "",
                   badges: BADGES.filter(([, , flag, , customId]) => customId ? customIds.includes(customId) : flag && (flags & flag) !== 0).map(([, name, , icon3]) => ({
                     name,
                     icon: icon3
@@ -34891,8 +34893,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         profileColorsEnabled: false,
         primaryColor: "#5865F2",
         accentColor: "#EB459E",
-        bio: "",
-        pronouns: "",
         createdAt: "",
         signupDate: "",
         oldName: "",
@@ -72316,7 +72316,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fd1e3cc86fd3e1e58e955b9598147080f90f2195";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b2a70005892056f153ab636e58d94b1d028f41d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
