@@ -40656,6 +40656,76 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/lib/api/cxExpressionLinks.ts
+  function formatCxEmojiMarkdown(emoji) {
+    if (!emoji)
+      return;
+    if (typeof emoji.surrogate === "string" && RegExp("^[^\\x00-\\x7f<>]{1,32}$", "u").test(emoji.surrogate) && !emoji.id)
+      return emoji.surrogate;
+    var label2 = emoji.name ?? emoji.alt;
+    if (typeof label2 !== "string" || typeof emoji.id !== "string" || !snowflake.test(emoji.id))
+      return;
+    var name = label2.replace(/^:|:$/g, "").replace(/~\d+$/, "");
+    if (!/^[a-z0-9_]{1,32}$/i.test(name))
+      return;
+    var animated = emoji.animated === true || typeof emoji.src === "string" && (/\.gif(?:\?|$)/i.test(emoji.src) || /[?&]animated=true(?:&|$)/i.test(emoji.src));
+    return `<${animated ? "a" : ""}:${name}:${emoji.id}>`;
+  }
+  function formatCxStickerLink(sticker) {
+    var id = sticker?.id;
+    if (typeof id !== "string" || !snowflake.test(id))
+      return;
+    var format = sticker?.format_type ?? sticker?.formatType;
+    if (format === 4)
+      return `https://media.discordapp.net/stickers/${id}.gif?size=512&lossless=true`;
+    if (format !== 1 && format !== 2 && format !== 3)
+      return;
+    return `https://cdn.discordapp.com/stickers/${id}.${format === 3 ? "json" : "png"}?size=512&lossless=true`;
+  }
+  function validateCxStickerLink(link) {
+    if (typeof link === "string" && /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/stickers\/\d{17,20}\.(?:png|json|gif|webp)(?:\?[a-z0-9_=&-]{1,128})?$/i.test(link))
+      return link;
+  }
+  function validateCxMediaLink(link) {
+    if (typeof link !== "string" || link.length > 8192 || RegExp('[\\s\\x00-\\x1f\\x7f\\\\<>"\\u202a-\\u202e\\u2066-\\u2069]', "u").test(link))
+      return;
+    if (/^https?:\/\/(?:[a-z\d.-]+|\[[a-f\d:]+\])(?::\d{1,5})?(?:[/?#]|$)/i.test(link))
+      return link;
+  }
+  function getCxSteamLink(input) {
+    if (typeof input !== "string")
+      return;
+    var link = validateCxMediaLink(input.replace(/^steam:\/\/openurl\//i, ""));
+    var match = link && /^https?:\/\/(steamcommunity\.com|store\.steampowered\.com|help\.steampowered\.com|s\.team)(\/[^?#]*)?([?#].*)?$/i.exec(link);
+    if (!match)
+      return;
+    var host = match[1].toLowerCase();
+    var path = match[2] ?? "/";
+    if (/%(?:2e|2f|5c)|(?:^|\/)\.{1,2}(?:\/|$)/i.test(path))
+      return;
+    if (host === "steamcommunity.com" && /^\/(?:linkfilter|openid)(?:\/|$)/i.test(path))
+      return;
+    if (host === "s.team" && !/^\/a\/\d+\/?$|^\/p\/[a-z0-9-]+\/[a-z0-9-]+\/?$/i.test(path))
+      return;
+    if (host === "store.steampowered.com" && /^\/(?:steamlink|m\/launchapp)(?:\/|$)/i.test(path))
+      return;
+    var https = "https://" + host + path + (match[3] ?? "");
+    return {
+      https,
+      steam: "steam://openurl/" + https,
+      mobile: host !== "help.steampowered.com"
+    };
+  }
+  var snowflake;
+  var init_cxExpressionLinks = __esm({
+    "src/lib/api/cxExpressionLinks.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      snowflake = /^\d{17,20}$/;
+    }
+  });
+
   // src/lib/api/cxNativeEffects.ts
   function getCxSpotifySongName(activity) {
     if (activity?.type === 2 && activity.name === "Spotify" && typeof activity.details === "string" && activity.details.trim()) {
@@ -40707,8 +40777,23 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ] : []);
       return item("attachment-names", "Copy Attachment Names", names.join("\n"));
     }
+    if (effect === "copy-attachment-links") {
+      var links2 = (message?.attachments ?? []).map((file) => validateCxMediaLink(file?.url)).filter(Boolean);
+      return item("attachment-links", "Copy Attachment Links", [
+        ...new Set(links2)
+      ].join("\n"));
+    }
+    if (effect === "copy-replied-message-link") {
+      var reference = message?.messageReference ?? message?.message_reference;
+      if (!isCxProfileUserId(reference?.message_id) || !isCxProfileUserId(reference?.channel_id))
+        return [];
+      var guildId = reference.guild_id ?? (channel?.id === reference.channel_id ? channel.guild_id ?? "@me" : void 0);
+      if (guildId !== "@me" && !isCxProfileUserId(guildId))
+        return [];
+      return item("replied-message-link", "Copy Replied Message Link", "https://discord.com/channels/" + guildId + "/" + reference.channel_id + "/" + reference.message_id);
+    }
     if (effect === "copy-message-links") {
-      var links2 = /* @__PURE__ */ new Set();
+      var links1 = /* @__PURE__ */ new Set();
       for (var match of content.matchAll(/https?:\/\/[^\s<>"`]+/gi)) {
         var link = match[0].replace(/[.,!?;:]+$/, "");
         for (var [open, close] of [
@@ -40731,12 +40816,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         }
         try {
           if (new URL(link).hostname)
-            links2.add(link);
+            links1.add(link);
         } catch (e) {
         }
       }
       return item("message-links", "Copy Links from Message", [
-        ...links2
+        ...links1
       ].join("\n"));
     }
     if (effect === "copy-message-code") {
@@ -41107,6 +41192,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_cxProfileMenu();
+      init_cxExpressionLinks();
       cxNativeEffects = {
         "user-notes": {
           permission: "profile.localnotes",
@@ -41353,6 +41439,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "copy-message-info": {
           permission: "messages.copyreference",
           label: "Copy the selected message\u2019s IDs and UTC timestamp as JSON"
+        },
+        "copy-attachment-links": {
+          permission: "messages.copytext",
+          label: "Copy links to files attached to the selected message"
+        },
+        "copy-replied-message-link": {
+          permission: "messages.copyreference",
+          label: "Copy the link to the message this reply references"
         },
         "reveal-spoilers-shortcut": {
           permission: "messages.revealspoilers",
@@ -45771,7 +45865,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   // src/lib/api/cxPlusReactions.ts
   function createCxPlusReactionHandler(host) {
     return (channel, message, options) => {
-      if (typeof channel !== "string" || !snowflake.test(channel) || typeof message?.content !== "string" || message.reaction || message.tts || message.attachments?.length || message.stickers?.length || message.stickerIds?.length || options?.uploads?.length || options?.attachmentsToUpload?.length || options?.stickers?.length || options?.stickerIds?.length || options?.messageReference || options?.replyOptions?.messageReference || options?.scheduledTimestamp != null)
+      if (typeof channel !== "string" || !snowflake2.test(channel) || typeof message?.content !== "string" || message.reaction || message.tts || message.attachments?.length || message.stickers?.length || message.stickerIds?.length || options?.uploads?.length || options?.attachmentsToUpload?.length || options?.stickers?.length || options?.stickerIds?.length || options?.messageReference || options?.replyOptions?.messageReference || options?.scheduledTimestamp != null)
         return;
       var parsed = shortcut.exec(message.content.trim());
       if (!parsed)
@@ -45783,7 +45877,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           return;
         var list = cache?._array ?? cache?.toArray?.();
         var target = list?.[list.length - pluses.length];
-        if (!target?.id || !snowflake.test(target.id) || (target.channel_id ?? target.channelId ?? channel) !== channel)
+        if (!target?.id || !snowflake2.test(target.id) || (target.channel_id ?? target.channelId ?? channel) !== channel)
           return;
         var emoji;
         if (rawEmoji)
@@ -45796,7 +45890,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           var guild = host.guild(channel);
           var matches = (item) => item.available !== false && (item.uniqueName === shortcode || item.name === shortcode);
           var custom = customId ? (store?.getUsableCustomEmojiById ?? store?.getCustomEmojiById)?.call(store, customId) : (guild ? store?.getUsableGuildEmoji?.(guild)?.find(matches) : void 0) ?? Object.values(store?.getGuilds?.() ?? {}).flatMap((group) => group.usableEmojis ?? group.emojis ?? group._emojis ?? []).find(matches);
-          if (custom?.id && snowflake.test(custom.id) && custom.name && custom.available !== false) {
+          if (custom?.id && snowflake2.test(custom.id) && custom.name && custom.available !== false) {
             emoji = {
               id: custom.id,
               name: custom.name,
@@ -45825,14 +45919,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     };
   }
-  var shortcut, snowflake;
+  var shortcut, snowflake2;
   var init_cxPlusReactions = __esm({
     "src/lib/api/cxPlusReactions.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       shortcut = RegExp("^(\\++)(?::([\\w~-]+):|<a?:[\\w~-]+:(\\d{17,20})>|(\\p{Extended_Pictographic}(?:\\ufe0f|\\p{Emoji_Modifier}|\\u200d\\p{Extended_Pictographic})*|\\p{Regional_Indicator}{2}|[0-9#*]\\ufe0f?\\u20e3))$", "u");
-      snowflake = /^\d{17,20}$/;
+      snowflake2 = /^\d{17,20}$/;
     }
   });
 
@@ -46005,76 +46099,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
-    }
-  });
-
-  // src/lib/api/cxExpressionLinks.ts
-  function formatCxEmojiMarkdown(emoji) {
-    if (!emoji)
-      return;
-    if (typeof emoji.surrogate === "string" && RegExp("^[^\\x00-\\x7f<>]{1,32}$", "u").test(emoji.surrogate) && !emoji.id)
-      return emoji.surrogate;
-    var label2 = emoji.name ?? emoji.alt;
-    if (typeof label2 !== "string" || typeof emoji.id !== "string" || !snowflake2.test(emoji.id))
-      return;
-    var name = label2.replace(/^:|:$/g, "").replace(/~\d+$/, "");
-    if (!/^[a-z0-9_]{1,32}$/i.test(name))
-      return;
-    var animated = emoji.animated === true || typeof emoji.src === "string" && (/\.gif(?:\?|$)/i.test(emoji.src) || /[?&]animated=true(?:&|$)/i.test(emoji.src));
-    return `<${animated ? "a" : ""}:${name}:${emoji.id}>`;
-  }
-  function formatCxStickerLink(sticker) {
-    var id = sticker?.id;
-    if (typeof id !== "string" || !snowflake2.test(id))
-      return;
-    var format = sticker?.format_type ?? sticker?.formatType;
-    if (format === 4)
-      return `https://media.discordapp.net/stickers/${id}.gif?size=512&lossless=true`;
-    if (format !== 1 && format !== 2 && format !== 3)
-      return;
-    return `https://cdn.discordapp.com/stickers/${id}.${format === 3 ? "json" : "png"}?size=512&lossless=true`;
-  }
-  function validateCxStickerLink(link) {
-    if (typeof link === "string" && /^https:\/\/(?:cdn\.discordapp\.com|media\.discordapp\.net)\/stickers\/\d{17,20}\.(?:png|json|gif|webp)(?:\?[a-z0-9_=&-]{1,128})?$/i.test(link))
-      return link;
-  }
-  function validateCxMediaLink(link) {
-    if (typeof link !== "string" || link.length > 8192 || RegExp('[\\s\\x00-\\x1f\\x7f\\\\<>"\\u202a-\\u202e\\u2066-\\u2069]', "u").test(link))
-      return;
-    if (/^https?:\/\/(?:[a-z\d.-]+|\[[a-f\d:]+\])(?::\d{1,5})?(?:[/?#]|$)/i.test(link))
-      return link;
-  }
-  function getCxSteamLink(input) {
-    if (typeof input !== "string")
-      return;
-    var link = validateCxMediaLink(input.replace(/^steam:\/\/openurl\//i, ""));
-    var match = link && /^https?:\/\/(steamcommunity\.com|store\.steampowered\.com|help\.steampowered\.com|s\.team)(\/[^?#]*)?([?#].*)?$/i.exec(link);
-    if (!match)
-      return;
-    var host = match[1].toLowerCase();
-    var path = match[2] ?? "/";
-    if (/%(?:2e|2f|5c)|(?:^|\/)\.{1,2}(?:\/|$)/i.test(path))
-      return;
-    if (host === "steamcommunity.com" && /^\/(?:linkfilter|openid)(?:\/|$)/i.test(path))
-      return;
-    if (host === "s.team" && !/^\/a\/\d+\/?$|^\/p\/[a-z0-9-]+\/[a-z0-9-]+\/?$/i.test(path))
-      return;
-    if (host === "store.steampowered.com" && /^\/(?:steamlink|m\/launchapp)(?:\/|$)/i.test(path))
-      return;
-    var https = "https://" + host + path + (match[3] ?? "");
-    return {
-      https,
-      steam: "steam://openurl/" + https,
-      mobile: host !== "help.steampowered.com"
-    };
-  }
-  var snowflake2;
-  var init_cxExpressionLinks = __esm({
-    "src/lib/api/cxExpressionLinks.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      snowflake2 = /^\d{17,20}$/;
     }
   });
 
@@ -48922,7 +48946,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "messages.insertmention": "Insert a mention into your current draft when you choose Quick Mention",
         "messages.paste": "Change how pasted text enters the message composer",
         "messages.decode": "Read Base64 text in the selected message and copy decoded text when requested",
-        "messages.copytext": "Copy text or attachment names from a selected message when you choose its menu action",
+        "messages.copytext": "Copy text or attachment details from a selected message when you choose its menu action",
         "messages.copyreference": "Copy links, timestamps or IDs for a selected message when you choose its menu action",
         "messages.revealspoilers": "Reveal hidden spoiler content in the current message or chat when you use the shortcut",
         "messages.replytimestamp": "Read the timestamp of a loaded message to show it in a reply preview",
@@ -49467,6 +49491,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-attachment-links.cx
+  var copy_attachment_links_default;
+  var init_copy_attachment_links = __esm({
+    "../examples/cx/catalog/plugins/copy-attachment-links.cx"() {
+      copy_attachment_links_default = 'plugin "CopyAttachmentLinks":\n  needs messages.copytext\n  use copy-attachment-links\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-attachment-names.cx
   var copy_attachment_names_default;
   var init_copy_attachment_names = __esm({
@@ -49568,6 +49600,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_raw_text = __esm({
     "../examples/cx/catalog/plugins/copy-raw-text.cx"() {
       copy_raw_text_default = 'plugin "Copy Raw Text":\n  needs messages.copytext\n  use copy-raw-text\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-replied-message-link.cx
+  var copy_replied_message_link_default;
+  var init_copy_replied_message_link = __esm({
+    "../examples/cx/catalog/plugins/copy-replied-message-link.cx"() {
+      copy_replied_message_link_default = 'plugin "CopyRepliedMessageLink":\n  needs messages.copyreference\n  use copy-replied-message-link\n';
     }
   });
 
@@ -53558,6 +53598,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_compact_messages();
       init_compact_server_list();
       init_compare_lines();
+      init_copy_attachment_links();
       init_copy_attachment_names();
       init_copy_bios();
       init_copy_emoji_markdown();
@@ -53571,6 +53612,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_profile_names();
       init_copy_pronouns();
       init_copy_raw_text();
+      init_copy_replied_message_link();
       init_copy_role_color();
       init_copy_role_mention();
       init_copy_server_bio();
@@ -54513,6 +54555,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "CopyAttachmentLinks",
+            source: copy_attachment_links_default,
+            description: "Copy links to files attached to the selected message",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
             name: "CopyAttachmentNames",
             source: copy_attachment_names_default,
             description: "Copy the selected message\u2019s attachment filenames",
@@ -54614,6 +54664,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "Copy Raw Text",
             source: copy_raw_text_default,
             description: "Add Copy Raw Text to message menus",
+            categories: [
+              "Chat"
+            ]
+          },
+          {
+            name: "CopyRepliedMessageLink",
+            source: copy_replied_message_link_default,
+            description: "Copy the link to the message this reply references",
             categories: [
               "Chat"
             ]
@@ -62221,6 +62279,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-message-links":
           case "copy-message-code":
           case "copy-message-info":
+          case "copy-attachment-links":
+          case "copy-replied-message-link":
             return registerMessageMenuActions(enabled, ({ message, channel }, close) => getCxMessageClipboard(effect, message, channel).map(({ label: label2, text }) => ({
               label: label2,
               run() {
@@ -68089,7 +68149,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "515c80d51a3b6b485294d8b0b81e810c7383e6ca";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f0bfdaa78ca7865a709b9053b6e30f24ecd23fa8";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
