@@ -131,7 +131,8 @@ export function PluginsPage() {
     const cxByName = useMemo(() => new Map(allCxRows.map(entry => [entry.name.toLowerCase(), entry])), [allCxRows]);
     const nativeByName = useMemo(() => new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin])), [visible]);
 
-    const commandSearch = query.trimStart().startsWith("/");
+    const search = query.trim();
+    const commandSearch = search.startsWith("/");
     const nativeMatches = useMemo(() => searchCxCatalog(nativeSearchRows, query), [nativeSearchRows, query]);
     const shownNative = filter === "all" && !commandSearch ? nativeMatches.map(row => row.plugin)
         .filter(p => !cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name)) : [];
@@ -147,9 +148,9 @@ export function PluginsPage() {
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
         }).map(extension => ({ ...extension, plugin: undefined, extension })),
     ].filter(row => !enabledOnly || row.active);
-    const ranked = query.trim() && !commandSearch ? searchCxCatalog(eligible, query) : eligible;
+    const ranked = search && !commandSearch ? searchCxCatalog(eligible, query) : eligible;
     const shown = [...ranked].sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0)
-        || (query.trim() ? 0 : a.name.localeCompare(b.name)));
+        || (search ? 0 : a.name.localeCompare(b.name)));
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
 
@@ -190,7 +191,7 @@ export function PluginsPage() {
                     <label className={cl("select")}>
                         Sort by:
                         <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
-                            <option value="name">{commandSearch ? "Best match" : "Name"}</option>
+                            <option value="name">{search ? "Best match" : "Name"}</option>
                             <option value="enabled">Enabled first</option>
                         </select>
                     </label>
@@ -202,7 +203,7 @@ export function PluginsPage() {
             </div>
 
             {shown.length === 0
-                ? <div className={cl("empty")}>{q ? `No plugins match “${query}”.` : filter === "all" && enabledOnly ? "No plugins are enabled." : "No plugins match these filters."}</div>
+                ? <div className={cl("empty")}>{search ? `No plugins match “${search}”.` : filter === "all" && enabledOnly ? "No plugins are enabled." : "No plugins match these filters."}</div>
                 : (
                     <div className={cl("list", { grid })}>
                         {shown.slice(0, limit).map(({ plugin, extension }) => {

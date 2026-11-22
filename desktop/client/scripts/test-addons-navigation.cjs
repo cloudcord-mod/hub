@@ -136,6 +136,9 @@ catalog.plugin[0].active = false;
 catalog.plugin[0].commands = ["shared-command"];
 beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("/shared-command");
 assert.deepEqual(shownCards().map(node => node.props.name), ["Shared"], "an enabled native plugin cannot hide a CX command result");
+beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("  missing plugin  ");
+assert.deepEqual(shownCards(), []);
+assert.ok(renderList().some(node => node.props.children.includes("No plugins match “missing plugin”.")));
 
 const mobileModule = { exports: {} };
 let filterSheet;
