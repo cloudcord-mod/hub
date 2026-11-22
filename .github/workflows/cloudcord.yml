@@ -2081,21 +2081,22 @@ jobs:
               const candidates = [user?.displayProfile, user?.guildMemberProfile, user?.userProfile, user?.profile, user, safeStore("UserProfileStore")?.getUserProfile?.(user?.userId || user?.id)];
               // Badge hooks receive different profile shapes across Discord versions.
               // An empty wrapper must not hide the actual profile's colors.
-              const native = candidates.find(profile => {
+              const synced = sharedProfileColorPair(data);
+              let primary = profilePreviewColor(synced?.[0]);
+              for (const profile of candidates) {
+                  if (primary) break;
                   const colors = profile?.themeColors ?? profile?.theme_colors;
-                  return (Array.isArray(colors) && colors.some(value => value != null)) || profile?.primaryColor != null || profile?.primary_color != null || profile?.accentColor != null || profile?.accent_color != null;
+                  const [first, second] = Array.isArray(colors) ? colors : [];
+                  primary = profilePreviewColor(first) ?? profilePreviewColor(profile?.primaryColor ?? profile?.primary_color)
+                      ?? profilePreviewColor(second) ?? profilePreviewColor(profile?.accentColor ?? profile?.accent_color);
+              }
+              // Use the primary surface color to match Discord's profile theme.
+              const value = primary ? Number.parseInt(primary.slice(1), 16) : null;
+              const channels = value === null ? null : [(value >> 16) & 255, (value >> 8) & 255, value & 255].map(channel => {
+                  const c = channel / 255;
+                  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
               });
-              const colors = data?.profileColorsEnabled ? [data.primaryColor, data.accentColor] : native?.themeColors ?? native?.theme_colors ?? [native?.primaryColor ?? native?.primary_color ?? native?.accentColor ?? native?.accent_color];
-              // Discord picks a profile’s light or dark theme from the primary colour, so the badge
-              // contrasts with that one (averaging in the accent flipped it on dark profiles).
-              const values = colors.filter((value: any) => value != null).map((value: any) => typeof value === "string" ? parseInt(value.replace("#", ""), 16) : Number(value)).filter(Number.isFinite).slice(0, 1);
-              const luminance = values.length ? values.reduce((sum: number, value: number) => {
-                  const channels = [(value >> 16) & 255, (value >> 8) & 255, value & 255].map(channel => {
-                      const c = channel / 255;
-                      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-                  });
-                  return sum + channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
-              }, 0) / values.length : null;
+              const luminance = channels ? channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722 : null;
               const light = luminance !== null ? (luminance + 0.05) / 0.05 >= 1.05 / (luminance + 0.05) : safeStore("ThemeStore")?.theme === "light";
               const tintColor = light ? "#000000" : "#ffffff";
               // Render keys must not share tint across users or cached light/dark views.

@@ -5,6 +5,7 @@ const source = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
 const helper = source.slice(source.indexOf('          function addOfficialBadge('), source.indexOf('          function selectedBadgeObjects('));
 const rows = new Map();
 const context = { badgeRenderProps: rows, CLOUDCORD_BADGE_ICON: 'logo.png', safeStore: () => ({ theme: 'dark' }), addRenderedBadge: (result, id) => { result.push({ id }); rows.set(id, {}); } };
+Object.assign(context, require('./load-profile-appearance.cjs'));
 vm.createContext(context);
 const esbuild = require(process.env.CLOUDCORD_ESBUILD || 'esbuild');
 vm.runInContext(esbuild.transformSync(helper, { loader: 'ts' }).code, context);
@@ -21,12 +22,17 @@ for (const user of [
     { displayProfile: {}, profile: { themeColors: [0xffffff, 0xffffff] } },
     { userProfile: { theme_colors: [0xffffff, 0xffffff] } },
     { primaryColor: 0xffffff },
-    { guildMemberProfile: { primary_color: 0xffffff } }
+    { guildMemberProfile: { primary_color: 0xffffff } },
+    { displayProfile: { themeColors: {} }, profile: { themeColors: [0xffffff] } },
+    { displayProfile: { themeColors: [-1, '#abcXYZ'] }, profile: { themeColors: [0xffffff] } }
 ]) {
     const result = [];
     context.addOfficialBadge(result, { id: 'official' }, user, null);
     assert.equal(result[0].tintColor, '#000000');
 }
+const invalidSync = [];
+context.addOfficialBadge(invalidSync, { id: 'official' }, { primaryColor: 0xffffff }, { profileColorsEnabled: true, primaryColor: -1 });
+assert.equal(invalidSync[0].tintColor, '#000000');
 const darkUser = [];
 context.addOfficialBadge(darkUser, { id: 'official' }, { id: 'dark-user' }, { profileColorsEnabled: true, primaryColor: '#222222', accentColor: '#222222' });
 const lightUser = [];
