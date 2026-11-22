@@ -36621,6 +36621,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (props.resolveItem)
         values = values.map(props.resolveItem).filter(isNotNil);
       var items = values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
+      if (search.trimStart().startsWith("/") && props.searchCommands) {
+        return props.searchCommands(items, search).map((obj) => ({
+          obj
+        }));
+      }
       if (!search && sortFn)
         items.sort(sortFn);
       return import_fuzzysort.default.go(search, items, {
@@ -36629,7 +36634,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       });
     }, [
       props.items,
+      props.resolveItem,
       props.isEnabled,
+      props.searchCommands,
+      props.searchKeywords,
       sortFn,
       search,
       enabledOnly,
@@ -67775,6 +67783,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       title: Strings.PLUGINS,
       filterOptions: pluginFilters,
       defaultFilter: showDefaultRow,
+      searchCommands: searchPluginCommands,
       searchKeywords: [
         "name",
         "description",
@@ -67960,7 +67969,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, pluginFilters;
+  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, searchPluginCommands, pluginFilters;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -67993,6 +68002,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ({ AlertModal: AlertModal4, AlertActions: AlertActions2, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
       isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
       showDefaultRow = (item) => !("source" in item && item.alternate);
+      searchPluginCommands = (items, query) => searchCxCatalog(items.filter((item) => "source" in item), query);
       pluginFilters = {
         ...Object.fromEntries(CX_CATALOG_CATEGORIES.filter((category) => category !== "All" && category !== "Themes").map((category) => [
           category,
@@ -69723,7 +69733,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "92ac75181754de0d08d53fc2f3debd890f8f9e32";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ab48b4f44865df5abdf99e66df35e3e6e2472000";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
