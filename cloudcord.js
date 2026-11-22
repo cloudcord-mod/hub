@@ -21026,7 +21026,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }) : null;
   }
   function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }) {
-    var visibleStatus = status === "offline" ? "invisible" : status && Object.hasOwn(STATUS_COLORS, status) ? status : "online";
+    var visibleStatus = status === "offline" ? "invisible" : status && Object.prototype.hasOwnProperty.call(STATUS_COLORS, status) ? status : "online";
     var label2 = visibleStatus === "invisible" ? "offline" : visibleStatus === "dnd" ? "do not disturb" : visibleStatus;
     return /* @__PURE__ */ jsx(import_react_native24.View, {
       accessible: true,
@@ -71989,7 +71989,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "382b3941c4e490cb8ee531db0d5600b04bb2cf43";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "277df79b79e74f9b409cf5afe2c0cf80d7a4ce8d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
