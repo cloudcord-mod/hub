@@ -868,7 +868,8 @@ export function parseCx(source: string): CxDocument {
 export function reviewCx(source: string) {
     const document = parseCx(source);
     const numberOptions: CxNumberOption[] = [];
-    if (document.kind === "theme") return { kind: document.kind, name: document.name, permissions: [] as CxPermission[], effects: ["Change the app colors and background"], appearanceOptions: [] as CxAppearanceOption[], numberOptions };
+    const categories = getCxCatalogCategories(document);
+    if (document.kind === "theme") return { kind: document.kind, name: document.name, categories, permissions: [] as CxPermission[], effects: ["Change the app colors and background"], appearanceOptions: [] as CxAppearanceOption[], numberOptions };
     if (document.avatarCropOptions) numberOptions.push({
         effect: "avatar-crop-zoom", label: "Avatar crop zoom", value: document.avatarCropOptions.maxAvatarCropZoom, min: 2, max: 16, unit: "×",
     });
@@ -884,6 +885,7 @@ export function reviewCx(source: string) {
     return {
         kind: document.kind,
         name: document.name,
+        categories,
         permissions: document.permissions,
         numberOptions,
         appearanceOptions: [...document.optionalHides].map(([target, defaultOn]) => ({ target, defaultOn, label: "Hide " + cxAppearanceTargets[target].label })),
@@ -1308,11 +1310,15 @@ export function runCxIncomingRules(rules: readonly IncomingRule[], payload: Inco
 
 
 export function createCxSession() {
-    const active = new Map<string, { name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; privateCommand: boolean; commands?: readonly string[]; }>();
+    const active = new Map<string, {
+        name: string; source: string; options: CxAppearanceOption[]; binding: CxBinding; privateCommand: boolean;
+        commands?: readonly string[]; categories: readonly CxCatalogCategory[];
+    }>();
     return {
         list: () => [...active].map(([id, { name }]) => ({ id, name })),
         source: (id: string) => active.get(id)?.source,
         commands: (id: string) => active.get(id)?.commands,
+        categories: (id: string) => active.get(id)?.categories,
         isPrivateCommand: (id: string) => active.get(id)?.privateCommand ?? false,
         appearanceOptions(id: string) {
             const entry = active.get(id);
@@ -1334,7 +1340,7 @@ export function createCxSession() {
             }
             active.set(id, {
                 name: review.name, source, options: review.appearanceOptions, binding: bindCx(source, host, approved, selected),
-                privateCommand, commands: review.commands?.map(command => command.slice(1)),
+                privateCommand, commands: review.commands?.map(command => command.slice(1)), categories: review.categories,
             });
         },
         disable(id: string) {

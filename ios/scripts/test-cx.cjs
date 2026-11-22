@@ -6549,6 +6549,15 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.ok(local.categories.includes("Commands"));
         assert.equal(moduleBox.exports.searchCxCatalog([local], "/local-filter-test")[0], local);
         await disableCxAddon(local.id, local.name);
+        const editedSource = 'plugin "JSON Compact":\n  needs appearance.hide\n  hide profile-notes';
+        if (desktop) sourceEditor.props.onChange({ currentTarget: { value: editedSource } });
+        else sourceEditor.props.onChangeText(editedSource);
+        click(render(importPlugin), "Review");
+        click(render(importPlugin), "Allow for this session");
+        const edited = useCxAddonRows("plugin", "").find(row => row.name === "JSON Compact");
+        assert.deepEqual(Array.from(edited.categories), ["Appearance", "Profiles"]);
+        assert.equal(edited.commands.length, 0);
+        await disableCxAddon(edited.id, edited.name);
     }
     const { migrateCxPalette } = await import("../../desktop/client/scripts/cx-migrate-palette.mjs");
     assert.equal(parseCx(migrateCxPalette(":root { --background-primary: #123; --brand-500: #8765ab; }", "Test")).background, "#112233");

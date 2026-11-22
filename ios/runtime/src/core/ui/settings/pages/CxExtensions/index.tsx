@@ -3115,12 +3115,13 @@ export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
             const restoreFailed = !active && saved === entry.appearanceRevision && failedRestores.has(entry.name);
             const needsReview = !active && (restoreFailed || saved !== undefined && saved !== entry.appearanceRevision);
             return { ...entry, id, active, needsReview, restoreFailed, commands: active ? session.commands(id) : entry.commands,
+                categories: active ? session.categories(id) : entry.categories,
                 privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
             && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
                 id, name, source: session.source(id)!, active: true, commands: session.commands(id),
-                categories: session.commands(id)?.length ? ["Commands"] as const : undefined, privateCommands: session.isPrivateCommand(id),
+                categories: session.categories(id), privateCommands: session.isPrivateCommand(id),
             }));
         return [...catalog, ...imported];
     }, [kind, revision]);
