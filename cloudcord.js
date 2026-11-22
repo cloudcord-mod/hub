@@ -36739,20 +36739,25 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }, [
       navigation2
     ]);
+    var items = (0, import_react11.useMemo)(() => {
+      var values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
+      return values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
+    }, [
+      props.items,
+      props.resolveItem,
+      props.isEnabled,
+      enabledOnly,
+      matchesFilter
+    ]);
     var results = (0, import_react11.useMemo)(() => {
-      var values = props.items;
-      if (props.resolveItem)
-        values = values.map(props.resolveItem).filter(isNotNil);
-      var items = values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
       if (commandSearch) {
         return commandSearch(items, query).map((obj) => ({
           obj
         }));
       }
       if (!query) {
-        if (sortFn)
-          items.sort(sortFn);
-        return items.map((obj) => ({
+        var ordered = sortFn ? items.slice().sort(sortFn) : items;
+        return ordered.map((obj) => ({
           obj
         }));
       }
@@ -36760,14 +36765,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         keys: props.searchKeywords
       });
     }, [
-      props.items,
-      props.resolveItem,
-      props.isEnabled,
+      items,
       props.searchKeywords,
       sortFn,
       query,
-      enabledOnly,
-      matchesFilter,
       commandSearch
     ]);
     var onInstallPress = (0, import_react11.useCallback)(() => {
@@ -72333,7 +72334,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "77a384cba7537916f7ddb7ca7831d510886fa46a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b4735bbcfb5e98036e77ba40d1d2097ef21b68d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
