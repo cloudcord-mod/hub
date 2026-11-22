@@ -17106,6 +17106,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return data.profileColorsEnabled;
     return data?.primaryColor != null || data?.accentColor != null;
   }
+  function sharedProfileColorPair(data) {
+    if (!sharedProfileColorsEnabled(data))
+      return;
+    var parse = (value) => {
+      var hex = profilePreviewColor(value);
+      return hex === void 0 ? void 0 : Number.parseInt(hex.slice(1), 16);
+    };
+    var primary = parse(data?.primaryColor);
+    var accent = parse(data?.accentColor);
+    var first = primary ?? accent;
+    if (first === void 0)
+      return;
+    var second = data?.primaryColor != null ? accent : parse(data?.accentColor2);
+    return [
+      first,
+      second ?? first
+    ];
+  }
   function nativeProfilePreviewSurface(userId, profile, userBanner) {
     var colors = profile?.themeColors ?? profile?.theme_colors;
     return {
@@ -25813,16 +25831,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     applyAvatarDecoration(cloned, data);
     applyCollectibles(cloned, data);
-    if (data.profileColorsEnabled === true) {
-      if (data.primaryColor != null)
-        setOwnValue(cloned, "primaryColor", Number(data.primaryColor));
-      if (data.accentColor != null)
-        setOwnValue(cloned, "accentColor", Number(data.accentColor));
-      if (data.primaryColor != null || data.accentColor != null)
-        setOwnValue(cloned, "themeColors", [
-          Number(data.primaryColor ?? data.accentColor),
-          Number(data.accentColor ?? data.primaryColor)
-        ]);
+    var colors = sharedProfileColorPair(data);
+    if (colors) {
+      setOwnValue(cloned, "primaryColor", colors[0]);
+      setOwnValue(cloned, "accentColor", colors[1]);
+      setOwnValue(cloned, "themeColors", colors);
     }
     if (data.banner) {
       setOwnValue(cloned, "banner", data.banner);
@@ -25937,16 +25950,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       setOwnValue(cloned, "joinedAt", joinedAt);
       setOwnValue(cloned, "memberSince", joinedAt);
     }
-    if (data.profileColorsEnabled === true) {
-      if (data.accentColor != null)
-        setOwnValue(cloned, "accentColor", data.accentColor);
-      if (data.primaryColor != null)
-        setOwnValue(cloned, "primaryColor", data.primaryColor);
-      if (data.primaryColor != null || data.accentColor != null)
-        setOwnValue(cloned, "themeColors", [
-          Number(data.primaryColor ?? data.accentColor),
-          Number(data.accentColor ?? data.primaryColor)
-        ]);
+    var colors = sharedProfileColorPair(data);
+    if (colors) {
+      setOwnValue(cloned, "primaryColor", colors[0]);
+      setOwnValue(cloned, "accentColor", colors[1]);
+      setOwnValue(cloned, "themeColors", colors);
     }
     setOwnValue(cloned, "userId", userId);
     return cloned;
@@ -72225,7 +72233,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4e2d44f60b5331916ef8a324dbe0fbef288a515d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7577efbe3c14ed0de34795f27a80aacc283043ed";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
