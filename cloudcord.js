@@ -36920,6 +36920,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-channel-unread-count": hideMobileComponent("HideChannelUnreadCount", "numeric unread badges in the mobile channel list", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelUnreadBadge.tsx"),
+        "hide-recap-entry-badges": hideMobileComponent("HideRecapEntryBadges", "badges on content entries in the recap", "modules/icymi/native/content_inventory/Badges.tsx"),
         "hide-recap-custom-status": hideMobileComponent("HideRecapCustomStatus", "custom status updates in the recap", "modules/icymi/native/content_inventory/CustomStatusEntryRow.tsx"),
         "hide-recap-gaming-activity": hideMobileComponent("HideRecapGamingActivity", "gaming activity entries in the recap", "modules/icymi/native/content_inventory/GamingLikeEntryRow.tsx"),
         "hide-bounties-promo-header": hideMobileComponent("HideBountiesPromoHeader", "the Bounties call-to-action header", "modules/quests/native/BountiesCtaHeader.tsx"),
@@ -51129,6 +51131,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-channel-unread-count.cx
+  var hide_channel_unread_count_default;
+  var init_hide_channel_unread_count = __esm({
+    "../examples/cx/catalog/plugins/hide-channel-unread-count.cx"() {
+      hide_channel_unread_count_default = 'plugin "HideChannelUnreadCount":\n  needs appearance.hide\n  hide hide-channel-unread-count\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-character-count.cx
   var hide_character_count_default;
   var init_hide_character_count = __esm({
@@ -51806,6 +51816,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_recap_custom_status = __esm({
     "../examples/cx/catalog/plugins/hide-recap-custom-status.cx"() {
       hide_recap_custom_status_default = 'plugin "HideRecapCustomStatus":\n  needs appearance.hide\n  hide hide-recap-custom-status\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-recap-entry-badges.cx
+  var hide_recap_entry_badges_default;
+  var init_hide_recap_entry_badges = __esm({
+    "../examples/cx/catalog/plugins/hide-recap-entry-badges.cx"() {
+      hide_recap_entry_badges_default = 'plugin "HideRecapEntryBadges":\n  needs appearance.hide\n  hide hide-recap-entry-badges\n';
     }
   });
 
@@ -54918,6 +54936,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_call_buttons();
       init_hide_channel_list_tips();
       init_hide_channel_topic();
+      init_hide_channel_unread_count();
       init_hide_character_count();
       init_hide_chat_attachments();
       init_hide_chat_input_refresh_tip();
@@ -55003,6 +55022,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_quests_tab();
       init_hide_reactions();
       init_hide_recap_custom_status();
+      init_hide_recap_entry_badges();
       init_hide_recap_gaming_activity();
       init_hide_recap_new_content_pill();
       init_hide_recap_server_recommendations();
@@ -56911,6 +56931,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "79414d895258b347a6dc13cba58453948a75bb443e8bdc7ddc54f40e94b5a3c4"
           },
           {
+            name: "HideChannelUnreadCount",
+            source: hide_channel_unread_count_default,
+            description: "Hide numeric unread badges in the mobile channel list",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "32b8f58a4c15fc552cfa1f8f1f8f5585733111888cccbe5ddfebb8d7f369baa6"
+          },
+          {
             name: "HideCharacterCount",
             source: hide_character_count_default,
             description: "Hide the chat character counter",
@@ -57721,6 +57751,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "ab225e46d5889585cf028d9ac41a4683a8bf78d35579fcd4e3a728b1d828cfe2"
+          },
+          {
+            name: "HideRecapEntryBadges",
+            source: hide_recap_entry_badges_default,
+            description: "Hide badges on content entries in the recap",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "dbf0b9f5e811b87480a8b3515faec913a1ef29779db204169e83e5cb85b12da8"
           },
           {
             name: "HideRecapGamingActivity",
@@ -70331,7 +70371,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d02b3b2969562c6136e38bbf732763805cdb5b5e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8de414ad70320520e8161478fb9d52d14b864c8c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
