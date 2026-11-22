@@ -507,6 +507,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             useAttachmentGridLayout: true,
             edited: true, stickers: Object.freeze([{ id: "sticker" }]), content: "hello <t:12345>",
             reactions: Object.freeze([{ count: 3 }]),
+            attachments: Object.freeze([{ id: "file" }]),
+            roleIcon: Object.freeze({ id: "role" }), shouldShowRoleDot: true,
             embeds: Object.freeze([{ title: "Link preview" }]),
             safetyPolicyNoticeEmbed: Object.freeze({ title: "Safety notice" }),
             safetySystemNotificationEmbed: Object.freeze({ title: "Safety notification" }),
@@ -2344,12 +2346,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(rendered.stickers.length, rule.mobile.messagePresentation === "stickers" ? 0 : 1);
                 assert.equal(rendered.reactions.length, rule.mobile.messagePresentation === "reactions" ? 0 : 1);
                 assert.equal(rendered.embeds.length, rule.mobile.messagePresentation === "embeds" ? 0 : 1);
+                assert.equal(rendered.attachments.length, rule.mobile.messagePresentation === "attachments" ? 0 : 1);
+                assert.equal(rendered.shouldShowRoleDot, rule.mobile.messagePresentation !== "shouldShowRoleDot");
                 assert.equal(rendered.safetyPolicyNoticeEmbed, messagePresentation.safetyPolicyNoticeEmbed);
                 assert.equal(rendered.safetySystemNotificationEmbed, messagePresentation.safetySystemNotificationEmbed);
                 for (const field of ["timestamp", "timestampTooltip", "timestampAccessibilityLabel"]) {
                     assert.equal(rendered[field], rule.mobile.messagePresentation === "timestamps" ? undefined : messagePresentation[field]);
                 }
-                for (const field of ["referencedMessage", "avatarDecorationURL"]) {
+                for (const field of ["referencedMessage", "avatarDecorationURL", "roleIcon"]) {
                     assert.equal(rendered[field], rule.mobile.messagePresentation === field ? undefined : messagePresentation[field]);
                 }
                 for (const name of rule.mobile.legacyComponents ?? []) {

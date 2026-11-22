@@ -1,0 +1,3 @@
+plugin "HideChatRoleDots":
+  needs appearance.hide
+  hide hide-chat-role-dots

@@ -2279,13 +2279,14 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
             default(args, invoke) {
                 const presentation = invoke(args);
                 if (!presentation || typeof presentation !== "object") return presentation;
-                if (mobile.messagePresentation === "edited") {
-                    if ("edited" in presentation && presentation.edited === true) return { ...presentation, edited: false };
+                if (mobile.messagePresentation === "edited" || mobile.messagePresentation === "shouldShowRoleDot") {
+                    const field = mobile.messagePresentation;
+                    if ((presentation as Record<string, unknown>)[field] === true) return { ...presentation, [field]: false };
                 } else if (mobile.messagePresentation === "timestamps") {
                     if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
                         return { ...presentation, timestamp: undefined, timestampTooltip: undefined, timestampAccessibilityLabel: undefined };
                     }
-                } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL") {
+                } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL" || mobile.messagePresentation === "roleIcon") {
                     const field = mobile.messagePresentation;
                     if (field in presentation && (presentation as Record<string, unknown>)[field] != null) return { ...presentation, [field]: undefined };
                 } else {

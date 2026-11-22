@@ -189,7 +189,17 @@ export const cxAppearanceTargets = {
     "role-icons": {
         plugin: "HideRoleIcons", label: "role icons",
         css: 'img[class*="roleIcon"] { display: none !important; }',
-        mobile: ["RoleIcon"],
+        mobile: { messagePresentation: "roleIcon", legacyComponents: ["RoleIcon"] },
+    },
+    "hide-chat-attachments": {
+        plugin: "HideChatAttachments", label: "file and media attachments in chat",
+        css: "", mobileOnly: true,
+        mobile: { messagePresentation: "attachments" },
+    },
+    "hide-chat-role-dots": {
+        plugin: "HideChatRoleDots", label: "role color dots next to names in chat",
+        css: "", mobileOnly: true,
+        mobile: { messagePresentation: "shouldShowRoleDot" },
     },
     "server-tags": {
         plugin: "HideClanTags", label: "server tags",

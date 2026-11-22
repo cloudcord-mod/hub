@@ -1,0 +1,3 @@
+plugin "HideChatAttachments":
+  needs appearance.hide
+  hide hide-chat-attachments
