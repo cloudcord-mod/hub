@@ -38117,6 +38117,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }
           }
         },
+        "chat-link-focus-ring": {
+          plugin: "ChatLinkFocusRing",
+          label: "Outline chat links during keyboard navigation",
+          css: '[class*="messageContent_"] a[href]:focus-visible { outline: 2px solid var(--focus-primary, currentColor) !important; outline-offset: 2px; border-radius: 2px; }',
+          desktopOnly: true,
+          style: {}
+        },
         "floating-chat-bar": {
           plugin: "FloatingChatBar",
           label: "lift the chat bar above the bottom edge",
@@ -50347,6 +50354,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/chat-link-focus-ring.cx
+  var chat_link_focus_ring_default;
+  var init_chat_link_focus_ring = __esm({
+    "../examples/cx/catalog/plugins/chat-link-focus-ring.cx"() {
+      chat_link_focus_ring_default = 'plugin "ChatLinkFocusRing":\n  needs appearance.style\n  style chat-link-focus-ring\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/checklist-progress.cx
   var checklist_progress_default;
   var init_checklist_progress = __esm({
@@ -55726,6 +55741,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_call_time_counter();
       init_centered_chat();
       init_chat_buttons_begone();
+      init_chat_link_focus_ring();
       init_checklist_progress();
       init_clap_text();
       init_clean_channel_name();
@@ -56673,6 +56689,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Profiles"
             ],
             appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433"
+          },
+          {
+            name: "ChatLinkFocusRing",
+            source: chat_link_focus_ring_default,
+            description: "Outline chat links during keyboard navigation",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Checklist Progress",
@@ -72072,7 +72097,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "01196f1a49c154abbac8936e50a77129f91fb78c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3ab4bfd9e88beedb25a8e00cae96fd167310c434";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
