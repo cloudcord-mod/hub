@@ -11,6 +11,7 @@ on:
     paths:
       - "desktop/**"
       - "examples/cx/**"
+      - "ios/scripts/test-cx.cjs"
       - "ios/scripts/test-cx-testing.cjs"
       - "ios/scripts/test-custom-social-render.cjs"
       - "ios/scripts/test-profile-studio-preview.cjs"
