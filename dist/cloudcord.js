@@ -41020,8 +41020,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "jumbo-emoji-limit": {
           permission: "appearance.style",
-          label: "Change how many emoji can appear at jumbo size in an emoji-only message",
-          desktopOnly: true
+          label: "Change how many emoji can appear at jumbo size in an emoji-only message"
         },
         "stop-auto-unread": {
           permission: "notifications.preventautoupgrade",
@@ -47276,6 +47275,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   });
 
   // src/lib/api/cx.ts
+  function updateCxNumberOption(source, option, selected) {
+    var { effect, value, min, max } = option;
+    if (!Number.isInteger(selected) || selected < min || selected > max || selected === value)
+      return source;
+    var directive = new RegExp("^  use " + effect + "(?: \\d+)?(?= |\\r?$)", "m");
+    return source.replace(directive, "  use " + effect + " " + selected);
+  }
   function selectCxAppearanceOption(selected, target, checked) {
     return checked ? [
       .../* @__PURE__ */ new Set([
@@ -56062,10 +56068,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "MoreJumboEmoji",
             source: more_jumbo_emoji_default,
             description: "Change how many emoji can appear at jumbo size in an emoji-only message (50)",
-            desktopOnly: true,
             categories: [
               "Appearance"
-            ]
+            ],
+            appearanceRevision: "57138d95b6782f1ed3d13194e9a974ac1eac4baf35b4ba6838615083a57173ad"
           },
           {
             name: "MutedChannelsFaded",
@@ -58264,6 +58270,35 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     restoreRememberedCxAppearance: () => restoreRememberedCxAppearance,
     useCxAddonRows: () => useCxAddonRows
   });
+  function applyJumboEmojiLimit(content, limit) {
+    var first = content[0];
+    var paragraph = content.length === 1 && first?.type === "paragraph" && Array.isArray(first.content) ? first : null;
+    var nodes = paragraph ? paragraph.content : content;
+    var isEmoji = (node2) => node2?.type === "emoji" || node2?.type === "customEmoji";
+    var count = 0;
+    for (var node of nodes) {
+      if (isEmoji(node))
+        count++;
+      else if (typeof node?.content !== "string" || node.content.trim())
+        return content;
+    }
+    if (!count)
+      return content;
+    var jumboable = count <= limit;
+    var needsChange = (node2) => isEmoji(node2) && node2?.jumboable === true !== jumboable;
+    if (!nodes.some(needsChange))
+      return content;
+    var next = nodes.map((node2) => needsChange(node2) ? {
+      ...node2,
+      jumboable
+    } : node2);
+    return paragraph ? [
+      {
+        ...paragraph,
+        content: next
+      }
+    ] : next;
+  }
   function registerMessageLatency(options, enabled) {
     var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
     return overrideCxMethods(renderer, {
@@ -61719,6 +61754,29 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             throw new Error("Middle-click paste control is available on Linux.");
           case "avatar-crop-zoom":
             throw new Error("Avatar crop zoom is available on desktop and browser.");
+          case "jumbo-emoji-limit": {
+            if (!effectOptions || !("jumboEmojiLimit" in effectOptions))
+              throw new Error("Missing jumbo emoji limit");
+            var parser2 = findByFilePath("modules/messages/native/renderer/MarkupParsers.tsx");
+            var cache1 = /* @__PURE__ */ new WeakMap();
+            var limit = effectOptions.jumboEmojiLimit;
+            return overrideCxMethods(parser2, {
+              parseMessageMarkup(args, invoke) {
+                var row2 = invoke(args);
+                if (!Array.isArray(row2?.content) || row2.isInlineReplyPreview || row2.hasBailedAst)
+                  return row2;
+                if (cache1.has(row2))
+                  return cache1.get(row2);
+                var content = applyJumboEmojiLimit(row2.content, limit);
+                var result = content === row2.content ? row2 : {
+                  ...row2,
+                  content
+                };
+                cache1.set(row2, result);
+                return result;
+              }
+            }, enabled);
+          }
           case "notification-volume":
             throw new Error("Notification volume control is available on desktop and browser.");
           case "reveal-spoilers-shortcut":
@@ -62311,6 +62369,60 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   ...candidate.review.commands ?? []
                 ].join("\n")
               }),
+              candidate && candidate.review.numberOptions.filter((option) => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency").map((option) => /* @__PURE__ */ jsxs(import_react_native32.View, {
+                style: {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 12,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6
+                },
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native32.Text, {
+                    style: {
+                      color: "#fff",
+                      flex: 1
+                    },
+                    children: [
+                      option.label,
+                      " (",
+                      option.min,
+                      "\u2013",
+                      option.max,
+                      option.unit,
+                      ")"
+                    ]
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native32.TextInput, {
+                    accessibilityLabel: option.label,
+                    keyboardType: "number-pad",
+                    selectTextOnFocus: true,
+                    value: String(option.value),
+                    maxLength: String(option.max).length,
+                    style: {
+                      color: "#fff",
+                      backgroundColor: "#27282d",
+                      borderRadius: 8,
+                      minWidth: 54,
+                      padding: 8,
+                      textAlign: "center"
+                    },
+                    onChangeText: (text) => {
+                      if (!/^\d+$/.test(text))
+                        return;
+                      var next = updateCxNumberOption(candidate.source, option, Number(text));
+                      if (next === candidate.source)
+                        return;
+                      setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
+                      setCandidate({
+                        ...candidate,
+                        source: next,
+                        review: reviewCx(next)
+                      });
+                    }
+                  })
+                ]
+              }, option.effect)),
               candidate?.review.appearanceOptions.filter(supportsMobileHide).map(({ target, label: label2 }) => /* @__PURE__ */ jsx(TableSwitchRow, {
                 label: label2,
                 value: candidate.selected.includes(target),
@@ -67256,7 +67368,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fe2729e9f5894ce728bee64a6109f2ea9f05dbfe";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c7430c17f611e1fa5767896e678c8b33c8ae8ec5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
