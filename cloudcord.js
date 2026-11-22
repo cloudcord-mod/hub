@@ -31088,6 +31088,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       syncRevision: Date.now()
     };
   }
+  function sharedLookSnapshot(profile) {
+    return savedSnapshot({
+      ...defaultPreview(),
+      ...previewFromShared(profile || {})
+    });
+  }
   function ProfileTemplates({ ownerId, current, onUse, onPreview }) {
     var [previewing, setPreviewing] = (0, import_react9.useState)(null);
     (0, import_react9.useEffect)(() => {
@@ -31155,10 +31161,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         throw new Error("Your Discord account changed.");
       return {
         name: String(share.name || "Template").slice(0, 40),
-        data: savedSnapshot({
-          ...current,
-          ...Object.fromEntries(Object.entries(previewFromShared(share.profile || {})).filter(([, value]) => value !== "" && value !== void 0))
-        })
+        data: sharedLookSnapshot(share.profile)
       };
     })();
     var preview2 = (id) => run(() => _async_to_generator(function* () {
@@ -31617,10 +31620,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
       if (ownerId !== currentUserId)
         return;
-      var data = savedSnapshot({
-        ...current,
-        ...previewFromShared(share.profile || {})
-      });
+      var data = sharedLookSnapshot(share.profile);
       commit([
         {
           id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
@@ -32971,12 +32971,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             onUse: (data) => {
               if (!editorOwner.current || editorOwner.current !== currentUserId)
                 return;
-              rootSettings.fakeProfile = {
-                ...preview,
-                ...data,
-                enabled: preview.enabled,
-                syncRevision: Date.now()
-              };
+              var restored = loadSavedLook(preview, data);
+              for (var field of [
+                "avatarMedia",
+                "bannerMedia"
+              ]) {
+                if (restored[field])
+                  unmarkMediaCleared(field);
+                else
+                  markMediaCleared(field);
+              }
+              rootSettings.fakeProfile = restored;
               preview = rootSettings.fakeProfile;
               queueSharedPublish();
               clearCache();
@@ -72233,7 +72238,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "57d0c78484f46408ed634ce20317c5d9aece9359";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "10fdd92abb8f3cddff6b54f2e24d027224071102";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
