@@ -40586,6 +40586,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       if (action === "server-nickname" && guildId) {
         return nonBlankText(members?.getMember?.(guildId, id)?.nick);
       }
+      if (action === "server-joined") {
+        if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id))
+          return;
+        var member = members?.getMember?.(guildId, id);
+        var joined = member?.joinedAt ?? member?.joined_at;
+        if (typeof joined !== "string" || !/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/.test(joined))
+          return;
+        var timestamp = Date.parse(joined);
+        if (Number.isFinite(timestamp) && timestamp > 0)
+          return "<t:" + Math.floor(timestamp / 1e3) + ":F>";
+        return;
+      }
       if (action === "server-avatar-link" || action === "server-banner-link") {
         if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id))
           return;
@@ -40671,6 +40683,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "server-banner-link": {
           label: "Copy Server Profile Banner Link",
+          scope: "server"
+        },
+        "server-joined": {
+          label: "Copy Server Join Timestamp",
           scope: "server"
         },
         "profile-colors": {
@@ -49745,6 +49761,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-server-join-timestamp.cx
+  var copy_server_join_timestamp_default;
+  var init_copy_server_join_timestamp = __esm({
+    "../examples/cx/catalog/plugins/copy-server-join-timestamp.cx"() {
+      copy_server_join_timestamp_default = 'plugin "CopyServerJoinTimestamp":\n  needs profilemenu.copy\n  on profile menu copy server-joined\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-server-media-links.cx
   var copy_server_media_links_default;
   var init_copy_server_media_links = __esm({
@@ -53739,6 +53763,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_server_avatar_link();
       init_copy_server_bio();
       init_copy_server_details();
+      init_copy_server_join_timestamp();
       init_copy_server_media_links();
       init_copy_server_nickname();
       init_copy_server_profile_banner_link();
@@ -54862,6 +54887,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy the selected server's name or description",
             categories: [
               "Servers & channels"
+            ]
+          },
+          {
+            name: "CopyServerJoinTimestamp",
+            source: copy_server_join_timestamp_default,
+            description: "Copy Server Join Timestamp",
+            categories: [
+              "Profiles"
             ]
           },
           {
@@ -68325,7 +68358,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "250419a2a8b36f696d71be9f5c12ae802800377b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d46d6796e9c2eb8150cd0d62ad5913e06e309785";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
