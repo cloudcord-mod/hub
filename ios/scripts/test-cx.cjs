@@ -6027,6 +6027,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             { name: "Copy Notes" },
         ], "copy notes");
         assert.equal(searched[0].name, "Copy Notes", "name matches rank before feature descriptions");
+        const reordered = moduleBox.exports.searchCxCatalog([
+            { name: "Media tools", description: "Favorite GIF shortcuts" },
+            { name: "HideGIFFavoriteButton" },
+        ], "favorite gif");
+        assert.equal(reordered[0].name, "HideGIFFavoriteButton");
         const commandEntries = [
             { name: "Convert Duration", commands: ["convertduration"] },
             { name: "Duration Details", commands: ["durationdetails"] },

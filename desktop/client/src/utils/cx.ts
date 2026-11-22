@@ -328,6 +328,7 @@ const cxSearchIndex = new WeakMap<CxSearchEntry, {
     keywords?: string;
     lowerName: string;
     compactName: string;
+    nameWords: readonly string[];
     searchableText: string;
 }>();
 
@@ -354,6 +355,7 @@ function catalogSearchFields(entry: CxSearchEntry) {
         name, description, keywords,
         lowerName: name.toLowerCase(),
         compactName: normalizeCatalogSearch(name).replaceAll(" ", ""),
+        nameWords: normalizeCatalogSearch(name.replace(/([\p{Ll}\p{N}])(\p{Lu})/gu, "$1 $2").replace(/(\p{Lu})(\p{Lu}\p{Ll})/gu, "$1 $2")).split(" "),
         searchableText: normalizeCatalogSearch(name + " " + (description ?? "") + " " + (keywords ?? "")),
     };
     cxSearchIndex.set(entry, fields);
@@ -385,16 +387,18 @@ export function searchCxCatalog<T extends CxSearchEntry>(entries: readonly T[], 
     const normalized: T[] = [];
     const commandMatches: T[] = [];
     const partial: T[] = [];
+    const nameWordMatches: T[] = [];
     const feature: T[] = [];
     for (const entry of entries) {
-        const { lowerName, compactName, searchableText } = catalogSearchFields(entry);
+        const { lowerName, compactName, nameWords, searchableText } = catalogSearchFields(entry);
         if (lowerName === query) exact.push(entry);
         else if (compactQuery && compactName === compactQuery) normalized.push(entry);
         else if (compactQuery && catalogSearchCommands(entry.commands)?.includes(compactQuery)) commandMatches.push(entry);
         else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery)) partial.push(entry);
+        else if (terms.length > 1 && terms.every(term => nameWords.some(word => word.startsWith(term)))) nameWordMatches.push(entry);
         else if (terms.length && terms.every(term => searchableText.includes(term))) feature.push(entry);
     }
-    return exact.concat(normalized, commandMatches, partial, feature);
+    return exact.concat(normalized, commandMatches, partial, nameWordMatches, feature);
 }
 
 export function parseCx(source: string): CxDocument {
