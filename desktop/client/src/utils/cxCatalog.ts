@@ -504,6 +504,7 @@ import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plug
 import plugin_catalog_timestamp_difference from "../../../../examples/cx/catalog/plugins/timestamp-difference.cx";
 import plugin_catalog_timestamp_styles from "../../../../examples/cx/catalog/plugins/timestamp-styles.cx";
 import plugin_catalog_timestamp_time_zone_offset from "../../../../examples/cx/catalog/plugins/timestamp-time-zone-offset.cx";
+import plugin_catalog_timestamps_on_interaction from "../../../../examples/cx/catalog/plugins/timestamps-on-interaction.cx";
 import plugin_catalog_total_time from "../../../../examples/cx/catalog/plugins/total-time.cx";
 import plugin_catalog_transfer_duration from "../../../../examples/cx/catalog/plugins/transfer-duration.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
@@ -1160,6 +1161,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Timestamp Difference", source: plugin_catalog_timestamp_difference, description: "/timestampdiff", commands: ["timestampdiff"], categories: ["Commands"], appearanceRevision: "f322ad1f90489ea334f18706038470062328b80579da8eea741730784d3859d1", privateCommands: true },
         { name: "Timestamp Styles", source: plugin_catalog_timestamp_styles, description: "/timestampstyles", commands: ["timestampstyles"], categories: ["Commands"], appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4", privateCommands: true },
         { name: "Timestamp Time Zone Offset", source: plugin_catalog_timestamp_time_zone_offset, description: "/timestampoffset", commands: ["timestampoffset"], categories: ["Commands"], appearanceRevision: "587f054a27a9ebdc3b5d57872dcacabcbe690f66d46be6f16da314420056638f", privateCommands: true },
+        { name: "TimestampsOnInteraction", source: plugin_catalog_timestamps_on_interaction, description: "Show inline chat timestamps on hover or keyboard focus", desktopOnly: true, categories: ["Appearance"] },
         { name: "Total Time", source: plugin_catalog_total_time, description: "/totaltime", commands: ["totaltime"], categories: ["Commands"], appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca", privateCommands: true },
         { name: "Transfer Duration", source: plugin_catalog_transfer_duration, description: "/transfertime", commands: ["transfertime"], categories: ["Commands"], appearanceRevision: "4aee6915d955f7780f0f8ba3772a58ac53c33a4a8a4939d306659e0cdd161bd5", privateCommands: true },
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },

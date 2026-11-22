@@ -520,6 +520,11 @@ export const cxAppearanceTargets = {
         css: '[class*="messageListItem"] time, [class*="timestamp_"] { display: none !important; }',
         mobile: { messagePresentation: "timestamps" },
     },
+    "timestamps-on-interaction": {
+        plugin: "TimestampsOnInteraction", label: "Show inline chat timestamps on hover or keyboard focus",
+        css: '@media (hover: hover) { [id^="chat-messages-"]:not(:hover, :focus-within) :is([class^="timestampInline_"], [class*=" timestampInline_"]) { opacity: 0 !important; } }',
+        desktopOnly: true, style: {},
+    },
     "message-stickers": {
         plugin: "HideStickers", label: "stickers in chat",
         css: '[class*="stickerAsset"] { display: none !important; }',

@@ -1,0 +1,3 @@
+plugin "TimestampsOnInteraction":
+  needs appearance.style
+  style timestamps-on-interaction
