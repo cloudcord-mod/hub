@@ -122,7 +122,8 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     const [filter, setFilter] = useState("");
     const { bottom: bottomInset } = useSafeAreaInsets();
     const navigation = NavigationNative.useNavigation();
-    const matchesFilter = props.filterOptions?.[filter] ?? props.defaultFilter;
+    const commandSearch = query.startsWith("/") && props.searchCommands;
+    const matchesFilter = props.filterOptions?.[filter] ?? (commandSearch ? undefined : props.defaultFilter);
 
     useEffect(() => {
         if (props.OptionsActionSheetComponent) {
@@ -143,13 +144,13 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         const items = values.filter(item => isNotNil(item) && typeof item === "object"
             && (!matchesFilter || matchesFilter(item))
             && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
-        if (query.startsWith("/") && props.searchCommands) {
-            return props.searchCommands(items, query).map(obj => ({ obj }));
+        if (commandSearch) {
+            return commandSearch(items, query).map(obj => ({ obj }));
         }
         if (!query && sortFn) items.sort(sortFn);
 
         return fuzzysort.go(query, items, { keys: props.searchKeywords, all: true });
-    }, [props.items, props.resolveItem, props.isEnabled, props.searchCommands, props.searchKeywords, sortFn, query, enabledOnly, matchesFilter]);
+    }, [props.items, props.resolveItem, props.isEnabled, props.searchKeywords, sortFn, query, enabledOnly, matchesFilter, commandSearch]);
 
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };

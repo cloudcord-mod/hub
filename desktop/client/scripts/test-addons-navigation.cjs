@@ -166,7 +166,7 @@ const mobileList = () => {
     return walk(MobileAddonPage({
         CardComponent: "Card", title: "Plugins", items: mobileItems, searchKeywords: ["name"],
         getItemKey: row => row.name,
-        searchCommands: (rows, query) => query === "/changed" ? rows.filter(row => row.needsReview) : [],
+        searchCommands: (rows, query) => rows.filter(row => "/" + row.name.toLowerCase() === query),
         filterOptions: { "Private commands": row => row.privateCommands, "Needs review": row => row.needsReview },
         defaultFilter: row => !row.alternate,
     })).find(node => node.type === "FlashList");
@@ -188,6 +188,10 @@ selectMobileFilter("Private commands");
 assert.deepEqual(mobileRows(), [], "slash search respects the selected filter");
 walk(mobileList().props.ListEmptyComponent()).find(node => node.props.text === "Clear filters").props.onPress();
 assert.deepEqual(mobileRows(), ["Changed"], "clear filters keeps the current search");
+searchMobile("/command");
+assert.deepEqual(mobileRows(), ["Command"], "command search includes alternate plugins");
+selectMobileFilter("Needs review");
+assert.deepEqual(mobileRows(), [], "alternate command results still respect explicit filters");
 selectMobileFilter("Private commands");
 searchMobile("");
 assert.deepEqual(mobileRows(), ["Command"]);
