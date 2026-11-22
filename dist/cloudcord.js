@@ -38966,6 +38966,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return "This text contains an invalid URL escape.";
           }
         },
+        escapeRegex(text) {
+          if (!text)
+            return;
+          return planningBlock(text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&").replace(/\r/g, "\\r").replace(/\n/g, "\\n"));
+        },
+        countTextMatches(text, phrase) {
+          if (!text || !phrase)
+            return;
+          var count = 0;
+          var offset = 0;
+          while ((offset = text.indexOf(phrase, offset)) !== -1) {
+            count++;
+            offset += phrase.length;
+          }
+          return count + (count === 1 ? " exact match" : " exact matches");
+        },
         escapeMarkdown(text) {
           var escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
           return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
@@ -50626,6 +50642,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/count-text-matches.cx
+  var count_text_matches_default;
+  var init_count_text_matches = __esm({
+    "../examples/cx/catalog/plugins/count-text-matches.cx"() {
+      count_text_matches_default = 'plugin "Count Text Matches":\n  needs commands.register\n  needs reply.local\n  on command "countmatches":\n    input "text" text\n    input "phrase" text\n    reply "${countTextMatches(text, phrase)}" else "Enter text and a nonempty phrase to count."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/csv-column.cx
   var csv_column_default;
   var init_csv_column = __esm({
@@ -50859,6 +50883,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_eridan_typing_quirk = __esm({
     "../examples/cx/catalog/plugins/eridan-typing-quirk.cx"() {
       eridan_typing_quirk_default = 'plugin "EridanTypingQuirk":\n  needs messages.transform\n  before send rewrite-text:\n    replace ["v"] with "vv"\n    replace ["w"] with "ww"\n    replace ["V"] with "VV"\n    replace ["W"] with "WW"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/escape-regex.cx
+  var escape_regex_default;
+  var init_escape_regex = __esm({
+    "../examples/cx/catalog/plugins/escape-regex.cx"() {
+      escape_regex_default = 'plugin "Escape Regex":\n  needs commands.register\n  needs reply.local\n  on command "escaperegex":\n    input "text" text\n    reply "${escapeRegex(text)}" else "Enter text to escape for a regular expression."\n';
     }
   });
 
@@ -55491,6 +55523,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_user_mention();
       init_copy_user_urls();
       init_count_lines();
+      init_count_text_matches();
       init_csv_column();
       init_csv_to_markdown();
       init_csv_to_tsv();
@@ -55519,6 +55552,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_encode_base64();
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
+      init_escape_regex();
       init_event_window();
       init_expand_tabs();
       init_extract_line_range();
@@ -56866,6 +56900,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Count Text Matches",
+            source: count_text_matches_default,
+            description: "/countmatches",
+            commands: [
+              "countmatches"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c4ad9bf10c15aa9dd16232f23544b8ce36addec7aec9aff772c40ab43787dd67",
+            privateCommands: true
+          },
+          {
             name: "CSV Column",
             source: csv_column_default,
             description: "/csvcolumn",
@@ -57171,6 +57218,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Escape Regex",
+            source: escape_regex_default,
+            description: "/escaperegex",
+            commands: [
+              "escaperegex"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "39717d3c4cc4cc1ea826a8f705b930d7da3d660558a0cf6f14be118000576a29",
+            privateCommands: true
           },
           {
             name: "Event Window",
@@ -71589,7 +71649,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c11b23eba2dee3a8f99e4818f622d3f1e31916e1";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2d5509681925446ede587b9406211b74cd804f81";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
