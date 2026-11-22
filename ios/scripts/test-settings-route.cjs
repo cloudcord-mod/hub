@@ -62,19 +62,18 @@ vm.runInNewContext(esbuild.transformSync(fs.readFileSync('ios/runtime/src/core/u
     }
 });
 coreModule.exports.default();
-const diagnosticsRow = coreSections.CloudCord.find(row => row.key === 'CLOUDCORD_DIAGNOSTICS');
-coreSettings.cloudcordDiagnosticsEnabled = true;
+const toolsRow = coreSections.CloudCord.find(row => row.key === 'CLOUDCORD_TOOLS');
 proxyHooks = 0;
-assert.equal(diagnosticsRow.usePredicate(), true);
+assert.equal(toolsRow.usePredicate(), true);
 const visibleHookCount = proxyHooks;
 coreSettings.cloudcordSectionHidden = true;
 proxyHooks = 0;
-assert.equal(diagnosticsRow.usePredicate(), false);
+assert.equal(toolsRow.usePredicate(), false);
 assert.equal(proxyHooks, visibleHookCount, 'hiding a section must not skip the native row predicate hooks');
 coreSettings.cloudcordSectionHidden = false;
-coreSettings.cloudcordHiddenTabs = ['CLOUDCORD_DIAGNOSTICS'];
+coreSettings.cloudcordHiddenTabs = ['CLOUDCORD_TOOLS'];
 proxyHooks = 0;
-assert.equal(diagnosticsRow.usePredicate(), false);
+assert.equal(toolsRow.usePredicate(), false);
 assert.equal(proxyHooks, visibleHookCount, 'hiding a tab must keep the same hook count');
 const source = fs.readFileSync('ios/runtime/src/lib/ui/settings/patches/shared.tsx', 'utf8');
 let route;
