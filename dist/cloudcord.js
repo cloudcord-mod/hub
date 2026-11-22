@@ -39448,6 +39448,40 @@ Copy \`<t:${timestamp}:F>\``;
             size
           ]).join(" \xD7 ") + " px";
         },
+        fitImage(source, box, mode) {
+          var dimensions = /^\s*(\d{1,6})\s*[x×]\s*(\d{1,6})\s*$/i;
+          var image = dimensions.exec(source), target = dimensions.exec(box);
+          if (!image || !target || mode !== "contain" && mode !== "cover")
+            return;
+          var [w, h, targetW, targetH] = [
+            ...image.slice(1),
+            ...target.slice(1)
+          ].map(Number);
+          if ([
+            w,
+            h,
+            targetW,
+            targetH
+          ].some((value) => value < 1 || value > 1e5))
+            return;
+          var contain = mode === "contain";
+          var useWidth = contain ? targetW * h <= targetH * w : targetW * h >= targetH * w;
+          var round = contain ? Math.floor : Math.ceil;
+          var scaledW = useWidth ? targetW : Math.max(1, round(w * targetH / h));
+          var scaledH = useWidth ? Math.max(1, round(h * targetW / w)) : targetH;
+          var action = contain ? "Padding" : "Crop";
+          return "Resize to " + scaledW + " \xD7 " + scaledH + " px\n" + action + ": " + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
+        },
+        bitrateBudget(size, duration) {
+          var bytes = fileSizeBytes(size);
+          var seconds = durationSeconds(duration);
+          if (!bytes || !seconds)
+            return;
+          var bitsPerSecond = Math.floor(bytes * 8 / seconds);
+          if (!bitsPerSecond)
+            return "This file size allows less than 1 bit per second.";
+          return "Maximum average: " + displayNumber(bitsPerSecond / 1e3) + " kbps (video, audio, and container combined)";
+        },
         transferEta(size, megabits) {
           var bytes = fileSizeBytes(size);
           var value = megabits.trim();
@@ -49409,6 +49443,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/bitrate-budget.cx
+  var bitrate_budget_default;
+  var init_bitrate_budget = __esm({
+    "../examples/cx/catalog/plugins/bitrate-budget.cx"() {
+      bitrate_budget_default = 'plugin "Bitrate Budget":\n  needs commands.register\n  needs reply.local\n  on command "bitratebudget":\n    input "size" text\n    input "duration" text\n    reply "${bitrateBudget(size, duration)}" else "Enter a file size such as 30 MB and a duration such as 2m."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/block-keywords.cx
   var block_keywords_default;
   var init_block_keywords = __esm({
@@ -50333,6 +50375,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_file_transfer_estimate = __esm({
     "../examples/cx/catalog/plugins/file-transfer-estimate.cx"() {
       file_transfer_estimate_default = 'plugin "File Transfer Estimate":\n  needs commands.register\n  needs reply.local\n  on command "transferestimate":\n    input "size" text\n    input "megabits" text\n    reply "${transferEta(size, megabits)}" else "Enter a file size such as 300 MB and a connection speed in Mbps."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/fit-image.cx
+  var fit_image_default;
+  var init_fit_image = __esm({
+    "../examples/cx/catalog/plugins/fit-image.cx"() {
+      fit_image_default = 'plugin "Fit Image":\n  needs commands.register\n  needs reply.local\n  on command "fitimage":\n    input "source" text\n    input "box" text\n    input "mode" text\n    reply "${fitImage(source, box, mode)}" else "Enter dimensions such as 1920x1080 and use contain or cover."\n';
     }
   });
 
@@ -53807,6 +53857,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_bigger_code_blocks();
       init_bigger_jumbo_emojis();
       init_bigger_server_icons();
+      init_bitrate_budget();
       init_block_keywords();
       init_blur_images_until_hover();
       init_blur_nsfw();
@@ -53900,6 +53951,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_file_name_randomization();
       init_file_size_converter();
       init_file_transfer_estimate();
+      init_fit_image();
       init_fix_codeblock_gap();
       init_fix_file_extensions();
       init_fix_images_quality();
@@ -54499,6 +54551,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "f8130f30395716696cf844097fad053f7be44394cbf888bc1188bdd1e30e2432"
+          },
+          {
+            name: "Bitrate Budget",
+            source: bitrate_budget_default,
+            description: "/bitratebudget",
+            commands: [
+              "bitratebudget"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "cf5f3d94fccdfd64a7664b41ac357ffffde15dc078ead41cda06beb4eb01cbd0",
+            privateCommands: true
           },
           {
             name: "BlockKeywords",
@@ -55416,6 +55481,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736",
+            privateCommands: true
+          },
+          {
+            name: "Fit Image",
+            source: fit_image_default,
+            description: "/fitimage",
+            commands: [
+              "fitimage"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "5d1274609c71f256618b07102e5199ebdc822cf20323e89816e3b57a48ee4f1a",
             privateCommands: true
           },
           {
@@ -68502,7 +68580,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "214743197ec9ab63b608d1300b55e272120902ce";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cccd6f48ed099f783deac52c5e366b832be9539d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
