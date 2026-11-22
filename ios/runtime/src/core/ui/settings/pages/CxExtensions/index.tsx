@@ -2418,6 +2418,14 @@ const rememberedCatalog = new Map([
 ]);
 type RememberedAppearance = NonNullable<typeof settings.cxRememberedAppearance>[number];
 
+function applyRememberedNumbers(source: string, values?: Record<string, number>) {
+    if (!values || typeof values !== "object") return source;
+    return reviewCx(source).numberOptions.reduce((current, option) => {
+        const value = values[option.effect];
+        return typeof value === "number" ? updateCxNumberOption(current, option, value) : current;
+    }, source);
+}
+
 function readRememberedAppearance(): RememberedAppearance[] {
     const records = settings.cxRememberedAppearance;
     if (!Array.isArray(records)) return [];
@@ -3044,9 +3052,10 @@ export function restoreRememberedCxAppearance() {
         const entry = rememberedCatalog.get(saved.name);
         if (!entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== undefined) continue;
         try {
-            const review = reviewCx(entry.source);
+            const source = applyRememberedNumbers(entry.source, saved.numberValues);
+            const review = reviewCx(source);
             if (!canRememberCxExtension(review)) continue;
-            session.enable(entry.source, {
+            session.enable(source, {
                 ...createMobileCxHost(),
                 toast() {},
             }, review.permissions, saved.selected);
@@ -3150,7 +3159,10 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
     React.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
     const remembered = readRememberedAppearance();
     const catalogEntry = candidate && rememberedCatalog.get(candidate.review.name);
-    const rememberRevision = catalogEntry?.source === candidate?.source ? catalogEntry?.appearanceRevision : undefined;
+    const numberValues = candidate?.review.numberOptions.length
+        ? Object.fromEntries(candidate.review.numberOptions.map(option => [option.effect, option.value])) : undefined;
+    const rememberRevision = catalogEntry && applyRememberedNumbers(catalogEntry.source, numberValues) === candidate?.source
+        ? catalogEntry.appearanceRevision : undefined;
 
     function enable(remember = false) {
         if (!candidate) return;
@@ -3160,7 +3172,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
             if (remember && rememberRevision) {
-                rememberAppearance({ name: candidate.review.name, revision: rememberRevision, selected: candidate.selected }, candidate.review.kind === "theme");
+                rememberAppearance({ name: candidate.review.name, revision: rememberRevision, selected: candidate.selected, numberValues }, candidate.review.kind === "theme");
                 setStatus(`${candidate.review.name} is active and will reopen with CloudCord.`);
             }
         } catch (error) {
@@ -3257,7 +3269,8 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                 {candidate && !entry && !source && <TableRow label="Edit source" onPress={() => setSource(candidate.source)} />}
                 {session.list().filter(({ id, name }) => !kind || (entry?.id === id && entry.name === name)).flatMap(({ id, name }) => {
                     const entry = rememberedCatalog.get(name);
-                    const saved = entry?.source === session.source(id) ? remembered.find(item => item.name === name && item.revision === entry?.appearanceRevision) : undefined;
+                    const saved = entry && remembered.find(item => item.name === name && item.revision === entry.appearanceRevision
+                        && applyRememberedNumbers(entry.source, item.numberValues) === session.source(id));
                     return [
                         ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label, enabled }) => <TableSwitchRow key={`${id}:${target}`}
                             label={`${name} · ${label}`} value={enabled} onValueChange={(checked: boolean) => {

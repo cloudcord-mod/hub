@@ -6149,6 +6149,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const source = cxCatalog.themes.find(entry => entry.name === "Blue Hour").source;
             assert.equal(saved.revision, createHash("sha256").update(source.replaceAll("\r\n", "\n")).digest("hex"));
             assert.ok(!("source" in saved), "mobile stores only approval metadata and options");
+            selectCatalog("MoreJumboEmoji");
+            find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit").props.onChangeText("0");
+            click(render(), "Allow and remember on this device");
+            const jumboApproval = settings.cxRememberedAppearance.find(entry => entry.name === "MoreJumboEmoji");
+            assert.equal(jumboApproval.numberValues["jumbo-emoji-limit"], 0);
+            assert.ok(!("source" in jumboApproval));
             restore()();
             assert.equal(nativeTheme, selectedTheme);
             assert.equal(appearanceHooks.size, 0);
@@ -6159,6 +6165,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             settings.safeMode.enabled = false;
             const unload = restore();
             assert.equal(nativeTheme.name, "Blue Hour");
+            const emoji = { ast: [{ type: "emoji", jumboable: true }] };
+            assert.equal(markupParser.parseMessageMarkup(emoji, undefined, false).content[0].jumboable, false);
+            click(render(), "Disable MoreJumboEmoji");
+            assert.equal(markupParser.parseMessageMarkup(emoji, undefined, false).content[0].jumboable, true);
             assert.equal(button(render(), label).props.value, true);
             assert.ok(appearanceHooks.has("PremiumAnimatedGiftButton"));
             click(render(), "Disable ChatButtonsBegone");
