@@ -3221,7 +3221,8 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
         showToast(`Saved "${label}".`,  Toasts.Type.SUCCESS);
     };
     const load = (item: SavedProfile) => {
-        if (templatePreview?.ownerId === userId && activeUserId() === userId) stopTemplatePreview();
+        if (activeUserId() !== userId) return;
+        if (templatePreview?.ownerId === userId) stopTemplatePreview();
         onLoad(loadSavedLook(current, item.data));
         showToast(`Loaded "${item.name}". Press Save to use it.`, Toasts.Type.SUCCESS);
     };

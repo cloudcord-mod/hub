@@ -4896,7 +4896,7 @@ jobs:
                               </> : null}
                           </View>
                           <View style={{ flexDirection: "row", gap: 8 }}>
-                              <S.Button label={active ? "Current look" : "Use profile"} primary disabled={active} grow onPress={() => { onUse(item.data); redraw(); showToast("Now using \u201c" + item.name + "\u201d"); }} />
+                              <S.Button label={active ? "Current look" : "Use profile"} primary disabled={active} grow onPress={() => { if (!ownerId || ownerId !== currentUserId) return; onUse(item.data); redraw(); showToast("Now using \u201c" + item.name + "\u201d"); }} />
                               <S.Button label={expanded === item.id ? "Hide actions" : "Actions"} onPress={() => {
                                   setExpanded(expanded === item.id ? null : item.id);
                                   setRenaming(null);
