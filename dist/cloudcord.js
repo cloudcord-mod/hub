@@ -36920,6 +36920,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-shop-nitro-coin-art": hideMobileComponent("HideShopNitroCoinArt", "the fractional Nitro coin illustration in the Shop", "modules/collectibles/native/FractionalNitroCoinIllustration.tsx"),
+        "hide-mobile-header-gradient": hideMobileComponent("HideMobileHeaderGradient", "the themed gradient behind mobile panel headers", "modules/main_tabs_v2/native/panels/ThemedHeaderBackgroundGradient.tsx"),
+        "hide-bounties-banner-art": hideMobileComponent("HideBountiesBannerArt", "the decorative background behind the Bounties banner", "modules/quests/native/BountiesBannerBackground.tsx"),
+        "hide-quest-modal-clouds": hideMobileComponent("HideQuestModalClouds", "the cloud artwork in Quest modals", "modules/quests/native/QuestModalContentCloudBackground.tsx"),
+        "hide-premium-features-background": hideMobileComponent("HidePremiumFeaturesBackground", "the decorative background behind the Premium features list", "modules/user_settings/premium/native/PremiumFeaturesBackground.tsx"),
         "hide-gift-button-animation": hideMobileComponent("HideGiftButtonAnimation", "the decorative animation on the chat gift button", "modules/chat_input/native/GiftIconTrinketsAnimation.tsx"),
         "hide-app-launcher-button-animation": hideMobileComponent("HideAppLauncherButtonAnimation", "the app launcher button introduction animation", "modules/app_launcher/native/onboarding/AppLauncherOnboardingChatInputButtonAnimation.tsx"),
         "hide-super-reaction-animation": hideMobileComponent("HideSuperReactionAnimation", "the Super Reaction animation in chat", "modules/messages/native/burst_reactions/BurstReactionAnimation.tsx"),
@@ -51192,6 +51197,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-bounties-banner-art.cx
+  var hide_bounties_banner_art_default;
+  var init_hide_bounties_banner_art = __esm({
+    "../examples/cx/catalog/plugins/hide-bounties-banner-art.cx"() {
+      hide_bounties_banner_art_default = 'plugin "HideBountiesBannerArt":\n  needs appearance.hide\n  hide hide-bounties-banner-art\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-bounties-promo-header.cx
   var hide_bounties_promo_header_default;
   var init_hide_bounties_promo_header = __esm({
@@ -51656,6 +51669,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-mobile-header-gradient.cx
+  var hide_mobile_header_gradient_default;
+  var init_hide_mobile_header_gradient = __esm({
+    "../examples/cx/catalog/plugins/hide-mobile-header-gradient.cx"() {
+      hide_mobile_header_gradient_default = 'plugin "HideMobileHeaderGradient":\n  needs appearance.hide\n  hide hide-mobile-header-gradient\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-monthly-reward-promotions.cx
   var hide_monthly_reward_promotions_default;
   var init_hide_monthly_reward_promotions = __esm({
@@ -51757,6 +51778,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_powerup_unlock_tip = __esm({
     "../examples/cx/catalog/plugins/hide-powerup-unlock-tip.cx"() {
       hide_powerup_unlock_tip_default = 'plugin "HidePowerupUnlockTip":\n  needs appearance.hide\n  hide hide-powerup-unlock-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-premium-features-background.cx
+  var hide_premium_features_background_default;
+  var init_hide_premium_features_background = __esm({
+    "../examples/cx/catalog/plugins/hide-premium-features-background.cx"() {
+      hide_premium_features_background_default = 'plugin "HidePremiumFeaturesBackground":\n  needs appearance.hide\n  hide hide-premium-features-background\n';
     }
   });
 
@@ -51933,6 +51962,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_profile_your_friends_card = __esm({
     "../examples/cx/catalog/plugins/hide-profile-your-friends-card.cx"() {
       hide_profile_your_friends_card_default = 'plugin "HideProfileYourFriendsCard":\n  needs appearance.hide\n  hide hide-profile-your-friends-card\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-quest-modal-clouds.cx
+  var hide_quest_modal_clouds_default;
+  var init_hide_quest_modal_clouds = __esm({
+    "../examples/cx/catalog/plugins/hide-quest-modal-clouds.cx"() {
+      hide_quest_modal_clouds_default = 'plugin "HideQuestModalClouds":\n  needs appearance.hide\n  hide hide-quest-modal-clouds\n';
     }
   });
 
@@ -52149,6 +52186,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_shop_limited_time_badges = __esm({
     "../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx"() {
       hide_shop_limited_time_badges_default = 'plugin "HideShopLimitedTimeBadges":\n  needs appearance.hide\n  hide hide-shop-limited-time-badges\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-shop-nitro-coin-art.cx
+  var hide_shop_nitro_coin_art_default;
+  var init_hide_shop_nitro_coin_art = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-nitro-coin-art.cx"() {
+      hide_shop_nitro_coin_art_default = 'plugin "HideShopNitroCoinArt":\n  needs appearance.hide\n  hide hide-shop-nitro-coin-art\n';
     }
   });
 
@@ -55147,6 +55192,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_boost_recognition_cards();
       init_hide_boost_tier_cards();
       init_hide_bot_tags();
+      init_hide_bounties_banner_art();
       init_hide_bounties_promo_header();
       init_hide_bounties_scroll_prompt();
       init_hide_call_activities_tip();
@@ -55205,6 +55251,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_member_list_button();
       init_hide_mention_badges();
       init_hide_message_length_promotion();
+      init_hide_mobile_header_gradient();
       init_hide_monthly_reward_promotions();
       init_hide_nameplates();
       init_hide_new_channel_badge();
@@ -55218,6 +55265,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_outbound_promotion_cards();
       init_hide_pins_button();
       init_hide_powerup_unlock_tip();
+      init_hide_premium_features_background();
       init_hide_premium_group_promotion();
       init_hide_premium_marketing_banner();
       init_hide_premium_upsell_gradient();
@@ -55240,6 +55288,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_wishlist_suggestions();
       init_hide_profile_wishlist_tip();
       init_hide_profile_your_friends_card();
+      init_hide_quest_modal_clouds();
       init_hide_quest_orb_multiplier_pill();
       init_hide_quests_tab();
       init_hide_reactions();
@@ -55267,6 +55316,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_shop_button_tip();
       init_hide_shop_featured_collections();
       init_hide_shop_limited_time_badges();
+      init_hide_shop_nitro_coin_art();
       init_hide_shop_nitro_unlock_button();
       init_hide_shop_orbs_tip();
       init_hide_shop_tab();
@@ -57148,6 +57198,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e"
           },
           {
+            name: "HideBountiesBannerArt",
+            source: hide_bounties_banner_art_default,
+            description: "Hide the decorative background behind the Bounties banner",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "66091d1ef3317e0879f74d38f467f49df3590196c7b233b59ec88fcbedd1c0df"
+          },
+          {
             name: "HideBountiesPromoHeader",
             source: hide_bounties_promo_header_default,
             description: "Hide the Bounties call-to-action header",
@@ -57701,6 +57761,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "HideMobileHeaderGradient",
+            source: hide_mobile_header_gradient_default,
+            description: "Hide the themed gradient behind mobile panel headers",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "2195f7d2565a8ce8b3e4ca145aa4ff34ec200999fcb4c823a4cb457b9bc441d9"
+          },
+          {
             name: "HideMonthlyRewardPromotions",
             source: hide_monthly_reward_promotions_default,
             description: "Hide promotional cards in the monthly rewards panel",
@@ -57821,6 +57891,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "fc174f9df6d011b4f746ef1de2f5cb3678025bfbefad4048eda0cf49f5ef4dea"
+          },
+          {
+            name: "HidePremiumFeaturesBackground",
+            source: hide_premium_features_background_default,
+            description: "Hide the decorative background behind the Premium features list",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "78ea8485d5984a83997473d6ff3c257e6a474bd8d7cfec38eec843af9ea89027"
           },
           {
             name: "HidePremiumGroupPromotion",
@@ -58039,6 +58119,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389"
+          },
+          {
+            name: "HideQuestModalClouds",
+            source: hide_quest_modal_clouds_default,
+            description: "Hide the cloud artwork in Quest modals",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "2012c25e620bd5fe6dfd66d100633d0d84c8c7969045bd5dd72f656728f9f070"
           },
           {
             name: "HideQuestOrbMultiplierPill",
@@ -58301,6 +58391,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "768c11081eb04523c28f1e2fc2d7d3ab32317c4e142c32dff2132c2597ef329a"
+          },
+          {
+            name: "HideShopNitroCoinArt",
+            source: hide_shop_nitro_coin_art_default,
+            description: "Hide the fractional Nitro coin illustration in the Shop",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "66f721875f59d8701b615c0f9a23fcd57286113c4365cdf840324b8fd4c73f01"
           },
           {
             name: "HideShopNitroUnlockButton",
@@ -70789,7 +70889,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3529151ccc7374cb711b6c3e8eca55c9065f8e98";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c59c6aadd8b2ecc66dfb412e686611e7a038dd7c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
