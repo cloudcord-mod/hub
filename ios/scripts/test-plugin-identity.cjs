@@ -22,8 +22,15 @@ class PrivateStore {
     getUser() { return this.#user; }
     getCurrentUser() { return this.#user; }
     getNativeId() { return this.#user.id; }
+    get nativeId() { return this.#user.id; }
+    get shadowed() { throw new Error('Shadowed accessor must not run'); }
 }
-assert.equal(api.pluginIdentityModule(new PrivateStore()).getNativeId(), '123');
+const privateStore = new PrivateStore();
+Object.defineProperty(privateStore, 'shadowed', { value: 'own data' });
+const privateStoreView = api.pluginIdentityModule(privateStore);
+assert.equal(privateStoreView.getNativeId(), '123');
+assert.equal(privateStoreView.nativeId, '123');
+assert.equal(privateStoreView.shadowed, 'own data');
 assert.equal(pluginMetro.findByProps(), pluginMetro.findByStoreName());
 username = 'new_custom';
 assert.equal(pluginMetro.common.UserStore.getUser().username, 'new_custom');
@@ -85,7 +92,7 @@ username = '';
 assert.equal(api.presentationIdentity(row), row);
 const appearance = require('./load-profile-appearance.cjs');
 const tag = { tag: 'CC', guildId: '1540350369232850995', badge: 'a'.repeat(32) };
-assert.equal(appearance.serverTagIconURL(tag), `https://cdn.discordapp.com/guild-tag-badges/${tag.guildId}/${tag.badge}.png?size=64`);
+assert.equal(appearance.serverTagIconURL(tag), `https://cdn.discordapp.com/clan-badges/${tag.guildId}/${tag.badge}.png?size=64`);
 assert.equal(appearance.parseServerTagIcon(appearance.serverTagIconURL(tag)).badge, tag.badge);
 assert.equal(appearance.parseServerTagIcon('https://evil.test/guild-tag-badges/1540350369232850995/' + tag.badge + '.png'), null);
 assert.equal(appearance.availableServerTags({ one: { primaryGuild: { tag: 'CC', identityGuildId: tag.guildId, badge: tag.badge } }, two: { primary_guild: { tag: 'CC', identity_guild_id: tag.guildId, badge: tag.badge } } }).length, 1);
