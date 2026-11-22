@@ -42,6 +42,7 @@ export { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "./cxUs
 export { createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "./cxVoiceCount";
 export { bindCxCameraTone, type CxCameraToneOptions } from "./cxCameraTone";
 export { bindCxVoiceShareAlerts } from "./cxVoiceShareAlerts";
+export { getCxGuildAssetUrl, getCxServerMenuFields, getCxServerMenuValue, type CxServerMenuEffect } from "./cxServerMedia";
 export { createCxVoiceQueue, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "./cxVoiceQueue";
 export { createCxVoiceMemberClock, type CxVoiceMemberOptions } from "./cxVoiceMemberClock";
 export { createCxCallClock } from "./cxCallClock";

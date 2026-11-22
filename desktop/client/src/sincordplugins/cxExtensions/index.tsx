@@ -15,6 +15,7 @@ import { CopyIcon, UpArrowIcon } from "@components/Icons";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxUploadAnonymiser } from "@utils/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel } from "@utils/cx";
+import { getCxGuildAssetUrl, getCxServerMenuFields, getCxServerMenuValue, type CxServerMenuEffect } from "@utils/cx";
 import { bindCxCameraTone, bindCxMutedVoice, bindCxVoiceShareAlerts, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
@@ -200,22 +201,11 @@ function registerRoleMenuAction(effect: "copy-role-color" | "copy-role-mention" 
     return () => { active = false; removeContextMenuPatch("dev-context", patch); };
 }
 
-type ServerMenuEffect = "view-server-media" | "copy-server-media-links" | "copy-server-details" | "view-group-dm-icon";
-
-function getCxGuildAssetUrl(path: "icons" | "banners" | "channel-icons", id: string, hash: unknown) {
-    if (typeof hash !== "string" || !/^(?:a_)?[a-f0-9]{32}$/.test(hash)) return;
-    const format = hash.startsWith("a_") ? "gif" : "png";
-    return "https://cdn.discordapp.com/" + path + "/" + id + "/" + hash + "." + format + "?size=4096";
-}
-
-function registerServerMenuActions(effect: ServerMenuEffect) {
+function registerServerMenuActions(effect: CxServerMenuEffect) {
     // Server and group DM viewing adapted from ViewIcons (GPL-3.0-or-later).
     const group = effect === "view-group-dm-icon";
     const view = group || effect === "view-server-media";
-    const fields = group ? [{ key: "icon", label: "View Group Icon", width: 512 }] as const
-        : effect === "copy-server-details" ? [{ key: "name", label: "Copy Server Name" }, { key: "description", label: "Copy Server Description" }] as const
-            : [{ key: "icon", label: view ? "View Server Icon" : "Copy Server Icon Link", width: 512 },
-                { key: "banner", label: view ? "View Server Banner" : "Copy Server Banner Link", width: 1024 }] as const;
+    const fields = getCxServerMenuFields(effect);
     let active = true;
     const patch: NavContextMenuPatchCallback = (children, props) => {
         const id = group ? props?.channel?.id : props?.guild?.id;
@@ -228,12 +218,7 @@ function registerServerMenuActions(effect: ServerMenuEffect) {
                     const channel = ChannelStore.getChannel(id);
                     return channel?.id === id && channel.type === 3 ? getCxGuildAssetUrl("channel-icons", id, channel.icon) : undefined;
                 }
-                const guild = GuildStore.getGuild(id);
-                if (guild?.id !== id) return;
-                if (field.key === "icon" || field.key === "banner")
-                    return getCxGuildAssetUrl(field.key === "icon" ? "icons" : "banners", id, guild[field.key]);
-                const text = guild[field.key];
-                return typeof text === "string" && text.trim() ? text : undefined;
+                return getCxServerMenuValue(GuildStore.getGuild(id), id, field.key);
             };
             if (!getValue()) continue;
             children.push(<Menu.MenuItem id={itemId} label={field.label} action={() => {

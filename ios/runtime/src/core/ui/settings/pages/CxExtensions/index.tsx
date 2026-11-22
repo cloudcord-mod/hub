@@ -2,6 +2,7 @@ import { onEditMessage, onSendMessage } from "@core/plugins/shared/sendMessage";
 import { instead } from "@lib/api/patcher";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxProfileMenuAction, type CxUploadAnonymiser } from "@lib/api/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
+import { getCxGuildAssetUrl, getCxServerMenuFields, getCxServerMenuValue, type CxServerMenuEffect } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, bindCxVoiceShareAlerts, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
 import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, MAX_REMEMBERED_CX_EXTENSIONS, searchCxCatalog } from "@lib/api/cx";
@@ -1285,6 +1286,73 @@ function registerCopyChannelName(enabled: () => boolean) {
     });
 }
 
+function registerMobileServerMenu(effect: CxServerMenuEffect, enabled: () => boolean) {
+    const view = effect === "view-server-media" || effect === "view-group-dm-icon";
+    const viewer = view ? findByFilePath("modules/media_viewer/native/components/openMediaModal.tsx") : undefined;
+    if (view && !viewer?.openMediaModal) throw new Error("Discord's media viewer is unavailable");
+    let active = true;
+    const available = () => active && enabled();
+    const open = (url: string, width: number, height: number) => {
+        if (!available() || !viewer) return;
+        try {
+            viewer.openMediaModal({
+                initialSources: [{ uri: url, mediaIndex: 0, width, height, accessoryType: "embed" }],
+                analyticsSource: "user_profile_avatar", openAs: "action-sheet", shareable: false,
+                disableDownload: true, disableMediaOverlayButton: true, disableMediaOverlayFooter: true,
+            });
+        } catch { showToast("Couldn't open the selected image."); }
+    };
+
+    if (effect === "view-group-dm-icon") {
+        const getIcon = (id: string) => {
+            const channel = ChannelStore.getChannel(id);
+            if (channel?.id === id && channel.type === 3) return getCxGuildAssetUrl("channel-icons", id, channel.icon);
+        };
+        const stop = registerChannelSheetEntry("cx-group-dm-icon", available, channel => {
+            const { id } = channel;
+            if (!isCxProfileUserId(id) || !getIcon(id)) return;
+            return { label: "View Group Icon", action: () => {
+                const url = getIcon(id);
+                if (url) open(url, 512, 512);
+            } };
+        });
+        return () => { active = false; stop(); };
+    }
+
+    const module = findByFilePath("modules/guild_action_sheet/native/components/GuildActionSheetActions.tsx");
+    const target = module?.GuildActionSheetPrimaryActions;
+    const row = findByProps("ActionSheetRow")?.ActionSheetRow;
+    if (!target || !row?.Group) throw new Error("Discord's server actions are unavailable");
+    const Row = row;
+    const fields = getCxServerMenuFields(effect);
+    const stop = registerRenderedTree(target, (tree, props: { guild?: { id?: unknown; }; }) => {
+        const id = props.guild?.id;
+        if (!isCxProfileUserId(id)) return tree;
+        const getValue = (field: typeof fields[number]) => getCxServerMenuValue(GuildStore.getGuild(id), id, field.key);
+        const items = fields.filter(field => getValue(field));
+        if (!items.length) return tree;
+        return <>
+            {tree}
+            <Row.Group key={"cx-" + effect}>
+                {items.map(field => <Row key={field.key} label={field.label} onPress={() => {
+                    if (!available()) return;
+                    const value = getValue(field);
+                    if (!value) return;
+                    if (view && "width" in field) {
+                        if (field.key === "icon") open(value, field.width, field.width);
+                        else Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
+                    } else {
+                        void Promise.resolve().then(() => { if (available()) return clipboard.setString(value); })
+                            .then(() => { if (available()) showToast.showCopyToClipboard?.(); })
+                            .catch(() => { if (available()) showToast("Couldn't copy the selected information."); });
+                    }
+                }} />)}
+            </Row.Group>
+        </>;
+    });
+    return () => { active = false; stop(); };
+}
+
 function registerLongDrafts(enabled: () => boolean) {
     type DraftState = Record<string, Record<string, Record<number, { draft?: unknown; }>>>;
     type DraftPayload = { type?: string; channelId?: string; draft?: string; draftType?: number; };
@@ -2421,7 +2489,7 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "copy-server-media-links":
                 case "copy-server-details":
                 case "view-group-dm-icon":
-                    throw new Error("These server and group menu actions are available on desktop and browser.");
+                    return registerMobileServerMenu(effect, enabled);
                 case "hide-suggested-channels": {
                     const suggested = findByFilePath("modules/favorites/native/FavoritesGuildSuggestedChannels.tsx")?.default;
                     if (!suggested) throw new Error("Discord's suggested channels section is unavailable");

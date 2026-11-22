@@ -255,6 +255,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         function ChannelLongPressActionSheetConnected() {
             return jsx(NativeActionSheet, { children: jsx("OriginalAction", {}) });
         }
+        function GuildActionSheetPrimaryActions() { return jsx("OriginalGuildAction", {}); }
         const me = "100000000000000001", sender = "100000000000000002", other = "100000000000000003";
         const guildId = "100000000000000004";
         const roleId = "100000000000000005";
@@ -851,6 +852,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 : path.endsWith("/MediaShareActions.tsx") ? mediaShare
                 : path === "utils/MaskedLinkUtils.tsx" ? nativeSteamLinks
                 : path === "modules/blocked_domains/BlockedDomainStore.tsx" ? { default: { isBlockedDomain: url => url.endsWith("/blocked") ? { url } : null } }
+                : path.endsWith("/GuildActionSheetActions.tsx") ? { GuildActionSheetPrimaryActions }
                 : path.endsWith("/openMediaModal.tsx") ? { openMediaModal: options => viewedProfiles.push(options.initialSources[0]) }
                 : path.endsWith("/MediaSourceUtil.tsx") ? { downloadMediaAssetWithContentType: (...args) => savedProfileMedia.push(args) }
                 : path.endsWith("/SoundUtils.tsx") ? { playSound: name => queueSounds.push(name) }
@@ -1297,6 +1299,48 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             serverMenuData = undefined;
             groupMenuData = undefined;
         } else {
+            const plugins = ["View Server Media", "Copy Server Media Links", "Copy Server Details", "View Group DM Icon"];
+            for (const name of plugins) {
+                selectCatalog(name);
+                click(render(), "Allow for this session");
+            }
+            const icon = "c".repeat(32), banner = "a_" + "d".repeat(32);
+            const getMenu = (type, props) => {
+                const wrapper = appearanceHooks.get(type === ChannelLongPressActionSheetConnected ? "ChannelLongPressActionSheetConnected" : type);
+                const node = wrapper(type, jsx(type, props));
+                const layout = node.type(node.props);
+                return layout.type(layout.props);
+            };
+            const guild = { id: guildId, icon };
+            const serverMenu = () => getMenu(GuildActionSheetPrimaryActions, { guild });
+            assert.ok(!button(serverMenu(), "View Server Icon"), "only trusted store data is used, not menu props");
+            serverMenuData = { icon, banner, name: "Test server", description: "Server description" };
+            const menu = serverMenu();
+            assert.ok(find(menu, element => element.type === "OriginalGuildAction"));
+            const menuLabels = ["View Server Icon", "View Server Banner", "Copy Server Icon Link",
+                "Copy Server Banner Link", "Copy Server Name", "Copy Server Description"];
+            for (const label of menuLabels) button(menu, label).props.onPress();
+            await new Promise(setImmediate);
+            const iconUrl = "https://cdn.discordapp.com/icons/" + guildId + "/" + icon + ".png?size=4096";
+            const bannerUrl = "https://cdn.discordapp.com/banners/" + guildId + "/" + banner + ".gif?size=4096";
+            assert.deepEqual(clipboardWrites.splice(0), [iconUrl, bannerUrl, "Test server", "Server description"]);
+            assert.deepEqual(viewedProfiles.splice(0).map(item => [item.uri, item.width, item.height]), [[iconUrl, 512, 512], [bannerUrl, 1200, 480]]);
+            const groupProps = { channel: { id: menuGroupId } };
+            groupMenuData = { id: menuGroupId, type: 1, icon };
+            assert.ok(!button(getMenu(ChannelLongPressActionSheetConnected, groupProps), "View Group Icon"));
+            groupMenuData.type = 3;
+            button(getMenu(ChannelLongPressActionSheetConnected, groupProps), "View Group Icon").props.onPress();
+            assert.equal(viewedProfiles.pop().uri, "https://cdn.discordapp.com/channel-icons/" + menuGroupId + "/" + icon + ".png?size=4096");
+            settings.safeMode = { enabled: true };
+            button(menu, "Copy Server Name").props.onPress();
+            settings.safeMode = undefined;
+            for (const name of plugins) click(render(), "Disable " + name);
+            button(menu, "Copy Server Name").props.onPress();
+            await new Promise(setImmediate);
+            assert.equal(clipboardWrites.length, 0);
+            assert.equal(appearanceHooks.size, 0);
+            serverMenuData = undefined;
+            groupMenuData = undefined;
             const editor = find(render(), item => item.props.accessibilityLabel === "CX source");
             editor.props.onChangeText(read("examples/cx/catalog/plugins/no-masked-url-paste.cx"));
             click(render(), "Review CX");
