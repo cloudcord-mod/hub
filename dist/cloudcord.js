@@ -39871,6 +39871,27 @@ Copy \`<t:${timestamp}:F>\``;
           var action = contain ? "Padding" : "Crop";
           return "Resize to " + scaledW + " \xD7 " + scaledH + " px\n" + action + ": " + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
         },
+        imagePixelCount(width, height) {
+          var columns = integerText(width), rows = integerText(height);
+          if (columns === void 0 || rows === void 0 || columns < 1 || rows < 1 || columns > 1e6 || rows > 1e6)
+            return;
+          var count = columns * rows;
+          return count + " pixels \xB7 " + count / 1e6 + " MP";
+        },
+        pcmAudioSize(rate, bits, channels2, duration) {
+          var sampleRate = integerText(rate), bitDepth = integerText(bits), channelCount = integerText(channels2);
+          var seconds = durationSeconds(duration);
+          if (sampleRate === void 0 || sampleRate < 1 || sampleRate > 768e3 || bitDepth === void 0 || ![
+            8,
+            16,
+            24,
+            32
+          ].includes(bitDepth) || channelCount === void 0 || channelCount < 1 || channelCount > 32 || !seconds)
+            return;
+          var bytes = sampleRate * (bitDepth / 8) * channelCount * seconds;
+          if (Number.isSafeInteger(bytes))
+            return "PCM payload: " + bytes + " bytes \xB7 " + bytes / 1e6 + " MB";
+        },
         videoSizeEstimate(rate, duration) {
           var kbps = Number(rate);
           var seconds = durationSeconds(duration);
@@ -52746,6 +52767,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/image-pixel-count.cx
+  var image_pixel_count_default;
+  var init_image_pixel_count = __esm({
+    "../examples/cx/catalog/plugins/image-pixel-count.cx"() {
+      image_pixel_count_default = 'plugin "Image Pixel Count":\n  needs commands.register\n  needs reply.local\n  on command "pixelcount":\n    input "width" text\n    input "height" text\n    reply "${imagePixelCount(width, height)}" else "Enter whole-number image dimensions from 1 to 1000000."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/improve-contrast.cx
   var improve_contrast_default;
   var init_improve_contrast = __esm({
@@ -53423,6 +53452,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_ordered_line_diff = __esm({
     "../examples/cx/catalog/plugins/ordered-line-diff.cx"() {
       ordered_line_diff_default = 'plugin "Ordered Line Diff":\n  needs commands.register\n  needs reply.local\n  on command "linediff":\n    input "before" text optional\n    input "after" text optional\n    reply "${orderedLineDiff(before, after)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/pcm-audio-size.cx
+  var pcm_audio_size_default;
+  var init_pcm_audio_size = __esm({
+    "../examples/cx/catalog/plugins/pcm-audio-size.cx"() {
+      pcm_audio_size_default = 'plugin "PCM Audio Size":\n  needs commands.register\n  needs reply.local\n  on command "pcmsize":\n    input "rate" text\n    input "bits" text\n    input "channels" text\n    input "duration" text\n    reply "${pcmAudioSize(rate, bits, channels, duration)}" else "Enter sample rate in Hz, bit depth 8, 16, 24, or 32, 1 to 32 channels, and a duration."\n';
     }
   });
 
@@ -55581,6 +55618,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_ignore_calls();
       init_image_filename();
       init_image_link();
+      init_image_pixel_count();
       init_improve_contrast();
       init_in_role();
       init_indent_lines();
@@ -55645,6 +55683,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_opacity_contrast();
       init_open_steam_links_in_app();
       init_ordered_line_diff();
+      init_pcm_audio_size();
       init_percentage_change();
       init_pick_names();
       init_ping_notifications();
@@ -59195,6 +59234,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Image Pixel Count",
+            source: image_pixel_count_default,
+            description: "/pixelcount",
+            commands: [
+              "pixelcount"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "b7370fa1ee7f6e7422f8be5d8b9551705f5438c878d0fe239911bdfd3699ecae",
+            privateCommands: true
+          },
+          {
             name: "Improve Contrast",
             source: improve_contrast_default,
             description: "/improvecontrast",
@@ -59887,6 +59939,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302",
+            privateCommands: true
+          },
+          {
+            name: "PCM Audio Size",
+            source: pcm_audio_size_default,
+            description: "/pcmsize",
+            commands: [
+              "pcmsize"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "8f5b371208287d9131b6fb1ff3076a24c6173c17cc448232e63f1b22328ae4dc",
             privateCommands: true
           },
           {
@@ -71294,7 +71359,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "69d4fd3f3b426fcaa02dfaf3b293157e863e7838";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fb258f5db47f0400034e01b3b9a3cb158966d1eb";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
