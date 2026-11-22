@@ -23,6 +23,7 @@ interface AddonPageProps<T extends object, I = any> {
     items: I[];
     searchKeywords: SearchKeywords<T>;
     searchCommands?: (items: readonly T[], query: string) => readonly T[];
+    getItemKey?: (item: T) => string;
     sortOptions?: Record<string, (a: T, b: T) => number>;
     filterOptions?: Record<string, (item: T) => boolean>;
     defaultFilter?: (item: T) => boolean;
@@ -222,6 +223,8 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
             <FlashList
                 data={results}
                 extraData={search}
+                keyExtractor={props.getItemKey ? ({ obj }: { obj: T; }) => props.getItemKey!(obj) : undefined}
+                keyboardShouldPersistTaps="handled"
                 estimatedItemSize={136}
                 ListHeaderComponent={headerElement}
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>

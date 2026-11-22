@@ -42,6 +42,7 @@ type PluginRow = UnifiedPluginModel | (CxAddonRow & { alternate?: boolean });
 type PluginPageProps = Partial<ComponentProps<typeof AddonPage<PluginRow>>> & { useItems: () => PluginRow[]; };
 const isPluginRowEnabled = (item: PluginRow) => "source" in item ? item.active : item.isEnabled();
 const showDefaultRow = (item: PluginRow) => !("source" in item && item.alternate);
+const getPluginRowKey = (item: PluginRow) => ("source" in item ? "cx:" : "native:") + item.id;
 const searchPluginCommands = (items: readonly PluginRow[], query: string) =>
   searchCxCatalog(items.filter((item): item is CxAddonRow => "source" in item), query);
 const pluginFilters = {
@@ -68,6 +69,7 @@ function PluginPage(props: PluginPageProps) {
       filterOptions={pluginFilters}
       defaultFilter={showDefaultRow}
       searchCommands={searchPluginCommands}
+      getItemKey={getPluginRowKey}
       searchKeywords={[
         "name",
         "description",

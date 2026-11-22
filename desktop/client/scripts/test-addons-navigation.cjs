@@ -151,6 +151,7 @@ const mobileList = () => {
     cursor = 0;
     return walk(MobileAddonPage({
         CardComponent: "Card", title: "Plugins", items: mobileItems, searchKeywords: ["name"],
+        getItemKey: row => row.name,
         searchCommands: (rows, query) => query === "/changed" ? rows.filter(row => row.needsReview) : [],
         filterOptions: { "Private commands": row => row.privateCommands, "Needs review": row => row.needsReview },
         defaultFilter: row => !row.alternate,
@@ -163,6 +164,8 @@ const selectMobileFilter = label => {
     filterSheet.options.find(option => option.label === label).onPress();
 };
 assert.deepEqual(mobileRows(), ["Native", "Changed"]);
+assert.equal(mobileList().props.keyExtractor(mobileList().props.data[1]), "Changed");
+assert.equal(mobileList().props.keyboardShouldPersistTaps, "handled");
 const searchMobile = value => walk(mobileList().props.ListHeaderComponent)
     .find(node => node.type === "Search").props.onChangeText(value);
 searchMobile("/changed");
