@@ -1,0 +1,3 @@
+plugin "HideRecapCustomStatus":
+  needs appearance.hide
+  hide hide-recap-custom-status

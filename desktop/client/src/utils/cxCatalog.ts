@@ -148,6 +148,8 @@ import plugin_catalog_hide_boost_progress_tip from "../../../../examples/cx/cata
 import plugin_catalog_hide_boost_recognition_cards from "../../../../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx";
 import plugin_catalog_hide_boost_tier_cards from "../../../../examples/cx/catalog/plugins/hide-boost-tier-cards.cx";
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
+import plugin_catalog_hide_bounties_promo_header from "../../../../examples/cx/catalog/plugins/hide-bounties-promo-header.cx";
+import plugin_catalog_hide_bounties_scroll_prompt from "../../../../examples/cx/catalog/plugins/hide-bounties-scroll-prompt.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
 import plugin_catalog_hide_channel_list_tips from "../../../../examples/cx/catalog/plugins/hide-channel-list-tips.cx";
@@ -236,6 +238,8 @@ import plugin_catalog_hide_profile_your_friends_card from "../../../../examples/
 import plugin_catalog_hide_quest_orb_multiplier_pill from "../../../../examples/cx/catalog/plugins/hide-quest-orb-multiplier-pill.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
 import plugin_catalog_hide_reactions from "../../../../examples/cx/catalog/plugins/hide-reactions.cx";
+import plugin_catalog_hide_recap_custom_status from "../../../../examples/cx/catalog/plugins/hide-recap-custom-status.cx";
+import plugin_catalog_hide_recap_gaming_activity from "../../../../examples/cx/catalog/plugins/hide-recap-gaming-activity.cx";
 import plugin_catalog_hide_recap_new_content_pill from "../../../../examples/cx/catalog/plugins/hide-recap-new-content-pill.cx";
 import plugin_catalog_hide_recap_server_recommendations from "../../../../examples/cx/catalog/plugins/hide-recap-server-recommendations.cx";
 import plugin_catalog_hide_recap_shortcut from "../../../../examples/cx/catalog/plugins/hide-recap-shortcut.cx";
@@ -733,6 +737,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBoostRecognitionCards", source: plugin_catalog_hide_boost_recognition_cards, description: "Hide the booster recognition cards on the server boost marketing page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "54c3f3af4e1ca07a919192a5a7d05a8348b1a2a907353d62df351008bcae149c" },
         { name: "HideBoostTierCards", source: plugin_catalog_hide_boost_tier_cards, description: "Hide the tier comparison cards on the server boost page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c9c37273317baa20c2bf97f86e73de64c092c210ce4332455ebfd560776ab9e4" },
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags, description: "Hide APP and BOT tags", categories: ["Appearance"], appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e" },
+        { name: "HideBountiesPromoHeader", source: plugin_catalog_hide_bounties_promo_header, description: "Hide the Bounties call-to-action header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6990f7947a8f807783a8207e64b78bd3e661e08721992037e70300257b47e1c4" },
+        { name: "HideBountiesScrollPrompt", source: plugin_catalog_hide_bounties_scroll_prompt, description: "Hide the scroll prompt in the Bounties modal", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5396fe64555b90748fd34f964c37ace0d3d4ccd8c5e92173c00dd0b11e309d2f" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
         { name: "HideChannelListTips", source: plugin_catalog_hide_channel_list_tips, description: "Hide feature tips in the server channel list header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9b23014e616ac1c5e2008e72a500b01828d12f51d51c20b6841f6be8aefc3a56" },
@@ -821,6 +827,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideQuestOrbMultiplierPill", source: plugin_catalog_hide_quest_orb_multiplier_pill, description: "Hide the Orb multiplier perk label on quests", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "03f19a71805dbf9465f5644be6b64fd64e68a18e496d5aa9b25caf615d8b7b5b" },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry", categories: ["Appearance"], appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe" },
         { name: "HideReactions", source: plugin_catalog_hide_reactions, description: "Hide message reactions", categories: ["Appearance"], appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58" },
+        { name: "HideRecapCustomStatus", source: plugin_catalog_hide_recap_custom_status, description: "Hide custom status updates in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ab225e46d5889585cf028d9ac41a4683a8bf78d35579fcd4e3a728b1d828cfe2" },
+        { name: "HideRecapGamingActivity", source: plugin_catalog_hide_recap_gaming_activity, description: "Hide gaming activity entries in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c6aa1efbf0d46dde768c74d4d77b08df1a57d1a6fa39bbb554e9168306302895" },
         { name: "HideRecapNewContentPill", source: plugin_catalog_hide_recap_new_content_pill, description: "Hide the new-content pill in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e239a186a6a46a20ffc388a06fb118208fcc07140658a4b89ff83213d3e94962" },
         { name: "HideRecapServerRecommendations", source: plugin_catalog_hide_recap_server_recommendations, description: "Hide server recommendations in the In Case You Missed It recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "77aa33e16568aa2df33f63b467ae1a2fef42bafa503e49a6098fe7462146b474" },
         { name: "HideRecapShortcut", source: plugin_catalog_hide_recap_shortcut, description: "Hide the In Case You Missed It shortcut in the You bar", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cd5cfc69ca09ade37c4341985b1767ea4e1224386df158874cd7075dbb0e6017" },

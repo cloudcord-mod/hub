@@ -1,0 +1,3 @@
+plugin "HideRecapGamingActivity":
+  needs appearance.hide
+  hide hide-recap-gaming-activity

@@ -1,0 +1,3 @@
+plugin "HideBountiesPromoHeader":
+  needs appearance.hide
+  hide hide-bounties-promo-header

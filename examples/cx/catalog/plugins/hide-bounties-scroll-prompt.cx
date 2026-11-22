@@ -1,0 +1,3 @@
+plugin "HideBountiesScrollPrompt":
+  needs appearance.hide
+  hide hide-bounties-scroll-prompt
