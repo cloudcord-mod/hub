@@ -88,7 +88,13 @@ function validateAsar(data: Buffer) {
         throw new Error("Downloaded CloudCord update is missing required runtime files");
 }
 
-async function applyUpdates() {
+let applyingUpdate: Promise<boolean> | null = null;
+
+function applyUpdates(): Promise<boolean> {
+    return applyingUpdate ??= applyPendingUpdate().finally(() => { applyingUpdate = null; });
+}
+
+async function applyPendingUpdate() {
     if (!PendingUpdate) return true;
 
     const pending = PendingUpdate;
