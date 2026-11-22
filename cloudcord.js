@@ -36920,6 +36920,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-channel-list-dividers": hideMobileComponent("HideChannelListDividers", "separator lines in the server channel list", "modules/channel_list_v2/native/components/Divider.tsx"),
+        "hide-premium-offer-divider": hideMobileComponent("HidePremiumOfferDivider", "decorative separators in Premium offer sheets", "modules/premium/roadblocks/native/views/PremiumUpsellSectionDivider.tsx"),
+        "hide-channel-list-subtitles": hideMobileComponent("HideChannelListSubtitles", "secondary text below mobile channel names", "modules/launchpad/native/shared/ChannelSubtitle.tsx", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelSubtitle.tsx"),
         "hide-launcher-apps-intro": hideMobileComponent("HideLauncherAppsIntro", "the apps introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/AppsBanner.tsx"),
         "hide-launcher-bots-intro": hideMobileComponent("HideLauncherBotsIntro", "the bots introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/BotsBanner.tsx"),
         "hide-launcher-activities-intro": hideMobileComponent("HideLauncherActivitiesIntro", "the activities introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/ActivitiesBanner.tsx"),
@@ -51541,11 +51544,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-channel-list-dividers.cx
+  var hide_channel_list_dividers_default;
+  var init_hide_channel_list_dividers = __esm({
+    "../examples/cx/catalog/plugins/hide-channel-list-dividers.cx"() {
+      hide_channel_list_dividers_default = 'plugin "HideChannelListDividers":\n  needs appearance.hide\n  hide hide-channel-list-dividers\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-channel-list-style-promo.cx
   var hide_channel_list_style_promo_default;
   var init_hide_channel_list_style_promo = __esm({
     "../examples/cx/catalog/plugins/hide-channel-list-style-promo.cx"() {
       hide_channel_list_style_promo_default = 'plugin "HideChannelListStylePromo":\n  needs appearance.hide\n  hide hide-channel-list-style-promo\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-channel-list-subtitles.cx
+  var hide_channel_list_subtitles_default;
+  var init_hide_channel_list_subtitles = __esm({
+    "../examples/cx/catalog/plugins/hide-channel-list-subtitles.cx"() {
+      hide_channel_list_subtitles_default = 'plugin "HideChannelListSubtitles":\n  needs appearance.hide\n  hide hide-channel-list-subtitles\n';
     }
   });
 
@@ -52162,6 +52181,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_premium_marketing_banner = __esm({
     "../examples/cx/catalog/plugins/hide-premium-marketing-banner.cx"() {
       hide_premium_marketing_banner_default = 'plugin "HidePremiumMarketingBanner":\n  needs appearance.hide\n  hide hide-premium-marketing-banner\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-premium-offer-divider.cx
+  var hide_premium_offer_divider_default;
+  var init_hide_premium_offer_divider = __esm({
+    "../examples/cx/catalog/plugins/hide-premium-offer-divider.cx"() {
+      hide_premium_offer_divider_default = 'plugin "HidePremiumOfferDivider":\n  needs appearance.hide\n  hide hide-premium-offer-divider\n';
     }
   });
 
@@ -55673,7 +55700,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_bounties_scroll_prompt();
       init_hide_call_activities_tip();
       init_hide_call_buttons();
+      init_hide_channel_list_dividers();
       init_hide_channel_list_style_promo();
+      init_hide_channel_list_subtitles();
       init_hide_channel_list_tips();
       init_hide_channel_topic();
       init_hide_channel_unread_count();
@@ -55751,6 +55780,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_premium_features_background();
       init_hide_premium_group_promotion();
       init_hide_premium_marketing_banner();
+      init_hide_premium_offer_divider();
       init_hide_premium_upsell_gradient();
       init_hide_profile_about_me();
       init_hide_profile_activity_badges();
@@ -57879,6 +57909,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4"
           },
           {
+            name: "HideChannelListDividers",
+            source: hide_channel_list_dividers_default,
+            description: "Hide separator lines in the server channel list",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "7dd68cee61df799a8c7f5f6a959851dd93e96aa22ae6a320c89e26fb04d651d1"
+          },
+          {
             name: "HideChannelListStylePromo",
             source: hide_channel_list_style_promo_default,
             description: "Hide the Nitro upsell under channel list appearance previews",
@@ -57887,6 +57927,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "ab7d6aedb6dfce5fca4298fd2e90004c165c2ebb6636b552b5c81ad33d545a63"
+          },
+          {
+            name: "HideChannelListSubtitles",
+            source: hide_channel_list_subtitles_default,
+            description: "Hide secondary text below mobile channel names",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "ab516d98f15a999031006d696376d3370f99a90c0eac7781380d855cf65404c1"
           },
           {
             name: "HideChannelListTips",
@@ -58621,6 +58671,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "508126ef428933e2220d3d92219d41a375cf541c65f9fb3b88bc4b234baa907a"
+          },
+          {
+            name: "HidePremiumOfferDivider",
+            source: hide_premium_offer_divider_default,
+            description: "Hide decorative separators in Premium offer sheets",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "4288078d52ea3b18a53870ff0b97de78c772c6d6709dbb1f29f251ea2578edf3"
           },
           {
             name: "HidePremiumUpsellGradient",
@@ -71774,7 +71834,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3598c62f5d673f6f78a3620d8c749feddfe82bab";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c64814292c88cd2a4c0dda284976deca88a9bf21";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
