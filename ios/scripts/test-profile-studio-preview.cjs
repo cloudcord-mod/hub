@@ -184,6 +184,9 @@ assert.equal(bannerStyle(previewDesktop({})).backgroundImage, `url("${nativeBann
 assert.equal(frameColor(previewDesktop({ nitro: false, accentColor: 0xffffff })), "#000000");
 assert.equal(frameColor(previewDesktop({ nitro: true, accentColor: 0xffffff })), "#ffffff");
 assert.ok(previewDesktop({}).some(node => node.props["aria-label"] === "Status: idle"));
+assert.ok(!previewDesktop({ customStatus: {} }).some(node => node.props.className === "cpx-card-custom"));
+assert.ok(previewDesktop({ customStatus: { emoji: "☁" } }).find(node => node.props.className === "cpx-card-custom")?.props.children.includes("☁"));
+assert.ok(containsText(previewDesktop({ customActivity: { type: -1, name: "Test game" } }), "Playing"));
 assert.equal(previewDesktop({}).find(node => node.props.className === "cpx-card-bio").props.children, nativeProfile.bio);
 assert.equal(previewDesktop({ pronouns: "she/her" }).find(node => node.props.className === "cpx-card-username").props.children.at(-1), " · she/her");
 layout = "popout";

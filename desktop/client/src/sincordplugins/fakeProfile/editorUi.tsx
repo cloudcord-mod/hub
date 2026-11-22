@@ -213,7 +213,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     const tagIcon = profilePreviewTagIcon(tag);
     const status = profilePreviewStatus(data, fallbackSurface?.presenceStatus);
     const activity = data.customActivity;
-    const activityVerb = activity ? ACTIVITY_TYPES.find(type => type.value === activity.type)?.label : "";
+    const activityVerb = ACTIVITY_TYPES.find(type => type.value === activity?.type)?.label || "Playing";
     return <aside className={bare ? "cpx-preview cpx-preview-bare" : "cpx-preview"} aria-label="Preview">
         {!bare && <><div className="cpx-preview-title">Live preview</div>
             <div className="cpx-inline cpx-preview-modes" role="group" aria-label="Preview layout">
@@ -242,7 +242,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 </div>
                 <div className="cpx-card-username">@{username}{pronouns ? ` · ${pronouns}` : ""}</div>
                 {!!badges.length && <div className="cpx-live-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}
-                {data.customStatus && <div className="cpx-card-custom">{data.customStatus.emoji} {data.customStatus.text}</div>}
+                {data.customStatus?.text || data.customStatus?.emoji ? <div className="cpx-card-custom">{data.customStatus.emoji} {data.customStatus.text}</div> : null}
                 {activity?.name && <div className="cpx-card-activity"><span>{activityVerb}</span><strong>{activity.name}</strong>{activity.details && <span>{activity.details}</span>}</div>}
                 {bio && <p className="cpx-card-bio">{bio}</p>}
                 <PreviewCosmetics frameName={frameName} effectName={effectName} />
