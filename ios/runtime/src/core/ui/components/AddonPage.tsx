@@ -146,15 +146,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     }, [props.items, props.resolveItem, props.isEnabled, enabledOnly, matchesFilter]);
 
     const results = useMemo(() => {
-        if (commandSearch) {
-            return commandSearch(items, query).map(obj => ({ obj }));
-        }
-        if (!query) {
-            const ordered = sortFn ? items.slice().sort(sortFn) : items;
-            return ordered.map(obj => ({ obj }));
-        }
-
-        return fuzzysort.go(query, items, { keys: props.searchKeywords });
+        const matches = commandSearch
+            ? commandSearch(items, query).map(obj => ({ obj }))
+            : query
+                ? fuzzysort.go(query, items, { keys: props.searchKeywords })
+                : items.map(obj => ({ obj }));
+        return sortFn ? Array.from(matches).sort((a, b) => sortFn(a.obj, b.obj)) : matches;
     }, [items, props.searchKeywords, sortFn, query, commandSearch]);
 
     const onInstallPress = useCallback(() => {
