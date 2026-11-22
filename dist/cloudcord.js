@@ -40529,6 +40529,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function isCxProfileUserId(id) {
     return typeof id === "string" && /^\d{17,20}$/.test(id);
   }
+  function formatCxCreationTimestamp(id) {
+    if (!isCxProfileUserId(id) || id.startsWith("0"))
+      return;
+    var snowflake3 = BigInt(id);
+    if (snowflake3 > 0xffffffffffffffffn)
+      return;
+    return "<t:" + Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3) + ":F>";
+  }
   function getCxProfileMedia(id, user, banner) {
     if (!isCxProfileUserId(id))
       return [];
@@ -40642,14 +40650,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "account-created": {
           label: "Copy Account Creation Timestamp",
           scope: "none",
-          format: (id) => {
-            if (!isCxProfileUserId(id) || id.startsWith("0"))
-              return;
-            var snowflake3 = BigInt(id);
-            if (snowflake3 > 0xffffffffffffffffn)
-              return;
-            return "<t:" + Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3) + ":F>";
-          }
+          format: formatCxCreationTimestamp
         },
         "username": {
           label: "Copy Username",
@@ -41374,6 +41375,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "copy-channel-topic": {
           permission: "channels.clipboard",
           label: "Copy the selected channel\u2019s topic as text"
+        },
+        "copy-channel-created": {
+          permission: "channels.clipboard",
+          label: "Copy the selected server channel\u2019s creation timestamp"
         },
         "copy-role-color": {
           permission: "guild.roleclipboard",
@@ -45724,6 +45729,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       name: channel.topic
     };
   }
+  function getCxChannelCopy(effect, channel, username) {
+    if (effect === "copy-channel-name")
+      return getCxChannelNameCopy(channel, username);
+    if (effect === "copy-channel-topic")
+      return getCxChannelTopicCopy(channel);
+    if (!channel.guild_id)
+      return;
+    var name = formatCxCreationTimestamp(channel.id);
+    if (name)
+      return {
+        label: "Copy Channel Creation Timestamp",
+        name
+      };
+  }
   function getCxChannelNameCopy(channel, username) {
     if (typeof channel.id !== "string" || !/^\d{17,20}$/.test(channel.id))
       return;
@@ -45769,6 +45788,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
+      init_cxProfileMenu();
       smallCaps = Object.fromEntries([
         ..."\u1D00\u0299\u1D04\u1D05\u1D07\uA730\u0262\u029C\u026A\u1D0A\u1D0B\u029F\u1D0D\u0274\u1D0F\u1D18\u01EB\u0280\uA731\u1D1B\u1D1C\u1D20\u1D21x\u028F\u1D22"
       ].map((letter, index) => [
@@ -49606,6 +49626,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_bios = __esm({
     "../examples/cx/catalog/plugins/copy-bios.cx"() {
       copy_bios_default = 'plugin "CopyBios":\n  needs profilemenu.copy\n  on profile menu copy profile-bio\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-channel-creation-timestamp.cx
+  var copy_channel_creation_timestamp_default;
+  var init_copy_channel_creation_timestamp = __esm({
+    "../examples/cx/catalog/plugins/copy-channel-creation-timestamp.cx"() {
+      copy_channel_creation_timestamp_default = 'plugin "CopyChannelCreationTimestamp":\n  needs channels.clipboard\n  use copy-channel-created\n';
     }
   });
 
@@ -53744,6 +53772,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_attachment_links();
       init_copy_attachment_names();
       init_copy_bios();
+      init_copy_channel_creation_timestamp();
       init_copy_channel_topic();
       init_copy_emoji_markdown();
       init_copy_file_contents();
@@ -54733,6 +54762,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy Bio",
             categories: [
               "Profiles"
+            ]
+          },
+          {
+            name: "CopyChannelCreationTimestamp",
+            source: copy_channel_creation_timestamp_default,
+            description: "Copy the selected server channel\u2019s creation timestamp",
+            categories: [
+              "Servers & channels"
             ]
           },
           {
@@ -61012,9 +61049,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       stop();
     };
   }
-  function registerCopyChannelDetails(topic, enabled) {
-    return registerChannelSheetEntry(topic ? "cx-copy-channel-topic" : "cx-copy-channel-name", enabled, (channel) => {
-      var copy = topic ? getCxChannelTopicCopy(channel) : getCxChannelNameCopy(channel, (id) => UserStore2?.getUser?.(id)?.username);
+  function registerCopyChannelDetails(effect, enabled) {
+    return registerChannelSheetEntry("cx-" + effect, enabled, (channel) => {
+      var copy = getCxChannelCopy(effect, channel, (id) => UserStore2?.getUser?.(id)?.username);
       if (!copy)
         return;
       return {
@@ -62347,7 +62384,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerLocalText("channels");
           case "copy-channel-name":
           case "copy-channel-topic":
-            return registerCopyChannelDetails(effect === "copy-channel-topic", enabled);
+          case "copy-channel-created":
+            return registerCopyChannelDetails(effect, enabled);
           case "copy-role-color":
           case "copy-role-name":
           case "copy-role-mention":
@@ -68358,7 +68396,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d46d6796e9c2eb8150cd0d62ad5913e06e309785";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d00ed50364c2e9236f5f11a4cd8480da668368de";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
