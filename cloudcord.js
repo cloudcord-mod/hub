@@ -62845,13 +62845,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       option.value
     ])) : void 0;
     var rememberRevision = catalogEntry && applyRememberedNumbers(catalogEntry.source, numberValues) === candidate?.source ? catalogEntry.appearanceRevision : void 0;
+    var activeSource = entry?.active && candidate?.review.name === entry.name ? session.source(entry.id) : void 0;
     function enable(remember = false) {
       if (!candidate)
         return;
       try {
         if (settings.safeMode?.enabled)
           throw new Error("CX is unavailable in Safe Mode");
-        session.enable(candidate.source, createMobileCxHost(), candidate.review.permissions, candidate.selected);
+        var host = createMobileCxHost();
+        if (activeSource && entry) {
+          var previous = reviewCx(activeSource);
+          var selected = session.appearanceOptions(entry.id).filter((option) => option.enabled).map((option) => option.target);
+          try {
+            session.disable(entry.id);
+            session.enable(candidate.source, host, candidate.review.permissions, candidate.selected);
+          } catch (error) {
+            session.enable(activeSource, host, previous.permissions, selected);
+            throw error;
+          }
+        } else
+          session.enable(candidate.source, host, candidate.review.permissions, candidate.selected);
         setStatus(`${candidate.review.name} is active for this session.`);
         setCandidate(void 0);
         if (remember && rememberRevision) {
@@ -63121,11 +63134,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 }
               }, target)),
               candidate && /* @__PURE__ */ jsx(TableRow, {
-                label: "Allow for this session",
+                label: activeSource ? "Apply for this session" : "Allow for this session",
                 onPress: () => enable()
               }),
               candidate && rememberRevision && /* @__PURE__ */ jsx(TableRow, {
-                label: "Allow and remember on this device",
+                label: activeSource ? "Apply and remember on this device" : "Allow and remember on this device",
                 onPress: () => enable(true)
               }),
               candidate && !entry && !source && /* @__PURE__ */ jsx(TableRow, {
@@ -63135,7 +63148,23 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               session.list().filter(({ id, name }) => !kind || entry?.id === id && entry.name === name).flatMap(({ id, name }) => {
                 var _$entry = rememberedCatalog.get(name);
                 var saved = _$entry && remembered.find((item) => item.name === name && item.revision === _$entry.appearanceRevision && applyRememberedNumbers(_$entry.source, item.numberValues) === session.source(id));
+                var currentSource = session.source(id);
+                var current = currentSource && kind === "plugin" ? reviewCx(currentSource) : void 0;
                 return [
+                  ...currentSource && current?.numberOptions.some((option) => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency") ? [
+                    /* @__PURE__ */ jsx(TableRow, {
+                      label: "Edit numeric settings",
+                      onPress: () => {
+                        var selected = session.appearanceOptions(id).filter((option) => option.enabled).map((option) => option.target);
+                        setCandidate({
+                          source: currentSource,
+                          originalSource: saved && _$entry ? _$entry.source : currentSource,
+                          review: current,
+                          selected
+                        });
+                      }
+                    }, id + ":settings")
+                  ] : [],
                   ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label: label2, enabled }) => /* @__PURE__ */ jsx(TableSwitchRow, {
                     label: `${name} \xB7 ${label2}`,
                     value: enabled,
@@ -63172,7 +63201,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var _$entry = rememberedCatalog.get(saved.name);
                 if (kind && _$entry?.id === "theme" !== (kind === "theme"))
                   return false;
-                return !_$entry || _$entry.appearanceRevision !== saved.revision || session.source(_$entry.id) !== _$entry.source;
+                return !_$entry || _$entry.appearanceRevision !== saved.revision || session.source(_$entry.id) !== applyRememberedNumbers(_$entry.source, saved.numberValues);
               }).map((saved) => /* @__PURE__ */ jsx(TableRow, {
                 label: `Forget ${saved.name}`,
                 subLabel: settings.safeMode?.enabled ? "Paused in Safe Mode" : "Remembered extension is inactive",
@@ -68060,7 +68089,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c1ecda01e32ca972114b3158166ba2c3a70488ae";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "515c80d51a3b6b485294d8b0b81e810c7383e6ca";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
