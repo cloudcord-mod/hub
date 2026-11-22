@@ -19782,7 +19782,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
+  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon }) {
     var [layout, setLayout] = (0, import_react4.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
@@ -20130,23 +20130,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   effect
                 })
               ]
-            })
-          ]
-        }),
-        /* @__PURE__ */ jsxs(import_react_native23.View, {
-          style: {
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: GAP.sm
-          },
-          children: [
-            onBadges && /* @__PURE__ */ jsx(Action, {
-              label: "Badges",
-              onPress: onBadges
-            }),
-            onSaved && /* @__PURE__ */ jsx(Action, {
-              label: "Saved looks",
-              onPress: onSaved
             })
           ]
         })
@@ -30168,8 +30151,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 } : null,
                 badges: studioBadgeIcons(preview),
                 officialBadgeIcon: CLOUDCORD_BADGE_ICON,
-                onBadges: () => setActiveTab("badges"),
-                onSaved: () => setActiveTab("saved"),
                 frame: preview.profileFrame ? catalog?.frames.find((item) => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : void 0,
                 effect: preview.profileEffect ? catalog?.effects.find((item) => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : void 0
               })
@@ -74351,7 +74332,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "02d1ac594290d26b986474b7bec3a574655dafa7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4aa40c830408e5197e5e36dd1072e846b5b49d75";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
