@@ -31,6 +31,36 @@ globalThis.setTimeout = () => ++timerSequence;
 globalThis.clearTimeout = noop;
 globalThis.setInterval = () => { const id = ++timerSequence; intervals.add(id); return id; };
 globalThis.clearInterval = id => intervals.delete(id);
+// QuickJS has no DOM. Model cancellation locally without exposing host I/O.
+globalThis.AbortController = class {
+    constructor() {
+        const listeners = new Map();
+        this.signal = {
+            aborted: false, reason: undefined, onabort: null,
+            addEventListener(type, listener, options) {
+                if (type === "abort" && listener && !listeners.has(listener)) {
+                    listeners.set(listener, options?.once === true);
+                }
+            },
+            removeEventListener(type, listener) { if (type === "abort") listeners.delete(listener); },
+            throwIfAborted() { if (this.aborted) throw this.reason; },
+        };
+        this.abort = (reason = Object.assign(new Error("The operation was aborted"), { name: "AbortError" })) => {
+            const signal = this.signal;
+            if (signal.aborted) return;
+            signal.aborted = true;
+            signal.reason = reason;
+            const event = { type: "abort", target: signal, currentTarget: signal };
+            signal.onabort?.(event);
+            for (const [listener, once] of [...listeners]) {
+                if (!listeners.has(listener)) continue;
+                if (once) listeners.delete(listener);
+                if (typeof listener === "function") listener.call(signal, event);
+                else listener.handleEvent?.(event);
+            }
+        };
+    }
+};
 const subscriptions = new Set();
 const subscribe = () => { const key = {}; subscriptions.add(key); return () => subscriptions.delete(key); };
 const dispatchSubscriptions = new Map();

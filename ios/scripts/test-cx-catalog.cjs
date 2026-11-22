@@ -303,15 +303,18 @@ async function main(args) {
         entry[row.platform] = adapterResult(row);
         additional.set(row.sourceHash, entry);
     }
-    const totals = Object.fromEntries(["syntax", ...platforms].map(check => {
+    const summarize = entries => Object.fromEntries(["syntax", ...platforms].map(check => {
         const counts = { Pass: 0, Fail: 0, Blocked: 0 };
-        for (const entry of candidates) counts[entry[check].status]++;
+        for (const entry of entries) counts[entry[check].status]++;
         return [check, counts];
     }));
+    const totals = summarize(candidates);
+    const additionalSharedPlugins = [...additional.values()];
+    const additionalSharedTotals = summarize(additionalSharedPlugins);
     const report = {
         scope: "Syntax and fixture-based adapter activation and cleanup. Device behavior requires separate results.",
         candidateCount: candidates.length, totals, adapterSuite, desktopModuleLoad, desktopLifecycle, discoverFactory,
-        candidates, additionalSharedPlugins: [...additional.values()],
+        candidates, additionalSharedPlugins, additionalSharedTotals,
         configuration: {
             shared: Object.fromEntries(platforms.map(platform => {
                 const platformRows = rows.filter(row => row.platform === platform);
@@ -325,8 +328,8 @@ async function main(args) {
     };
     writeReport(output, report);
     console.log(JSON.stringify({ candidateCount: candidates.length, totals, desktopModuleLoad, desktopLifecycle, discoverFactory,
-        configuration: report.configuration, additionalSharedPlugins: additional.size, report: output }, null, 2));
-    if (adapterSuite.status === "Fail" || Object.values(totals).some(counts => counts.Fail) ||
+        configuration: report.configuration, additionalSharedPlugins: additional.size, additionalSharedTotals, report: output }, null, 2));
+    if (adapterSuite.status === "Fail" || [...Object.values(totals), ...Object.values(additionalSharedTotals)].some(counts => counts.Fail) ||
         desktopModuleLoad?.counts.Fail || desktopLifecycle?.counts.Fail || discoverFactory?.counts.Fail) process.exitCode = 1;
 }
 
