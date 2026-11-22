@@ -1,0 +1,7 @@
+plugin "Join Lines":
+  needs commands.register
+  needs reply.local
+  on command "joinlines":
+    input "text" text
+    input "separator" text
+    reply "${joinLines(text, separator)}" else "Use a separator of up to 32 characters and keep the result under 4,000 characters."

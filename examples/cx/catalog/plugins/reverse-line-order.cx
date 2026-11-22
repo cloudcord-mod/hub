@@ -1,0 +1,6 @@
+plugin "Reverse Line Order":
+  needs commands.register
+  needs reply.local
+  on command "reverselines":
+    input "text" text
+    reply "${reverseLineOrder(text)}" else "Enter text to reverse."

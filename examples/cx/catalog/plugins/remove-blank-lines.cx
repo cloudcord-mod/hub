@@ -1,0 +1,6 @@
+plugin "Remove Blank Lines":
+  needs commands.register
+  needs reply.local
+  on command "removeblanklines":
+    input "text" text
+    reply "${removeBlankLines(text)}" else "No nonblank lines."

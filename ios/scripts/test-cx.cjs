@@ -2879,6 +2879,19 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["commonlines", { first: "alpha\r\nbeta\r\nalpha", second: "beta\nother\nalpha" }, /^\x60\x60\x60\nalpha\nbeta\n\x60\x60\x60$/],
                 ["commonlines", { first: "Alpha\n", second: "alpha\n" }, /^No matching nonempty lines/],
             ]],
+            ["Remove Blank Lines", [
+                ["removeblanklines", { text: "  a\r\n\t\r\n b\n" }, /^  a\n b$/],
+            ]],
+            ["Reverse Line Order", [
+                ["reverselines", { text: "a\r\nb\n" }, /^b\na$/],
+            ]],
+            ["Join Lines", [
+                ["joinlines", { text: "a\r\n\r\nb\n", separator: "/" }, /^a\/\/b$/],
+            ]],
+            ["Wrap Text", [
+                ["wraptext", { text: "one two three\n\nfour five", width: 8 }, /^one two\nthree\n\nfour\nfive$/],
+                ["wraptext", { text: "abc", width: 7 }, /^Choose a width/],
+            ]],
             ["HSL Color Converter", [
                 ["hsltohex", { text: "hsl(120, 100%, 50%)" }, /^\x60#00ff00\x60$/],
                 ["hsltohex", { text: "hsl(-120deg 100% 50%)" }, /^\x60#0000ff\x60$/],

@@ -1,0 +1,7 @@
+plugin "Wrap Text":
+  needs commands.register
+  needs reply.local
+  on command "wraptext":
+    input "text" text
+    input "width" integer
+    reply "${wrapText(text, width)}" else "Choose a width from 8 to 120 and keep the result under 4,000 characters."

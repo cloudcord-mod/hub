@@ -240,6 +240,7 @@ import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/i
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
 import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso-week.cx";
+import plugin_catalog_join_lines from "../../../../examples/cx/catalog/plugins/join-lines.cx";
 import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
 import plugin_catalog_json_compact from "../../../../examples/cx/catalog/plugins/json-compact.cx";
 import plugin_catalog_json_format from "../../../../examples/cx/catalog/plugins/json-format.cx";
@@ -308,12 +309,14 @@ import plugin_catalog_realtime_timestamps from "../../../../examples/cx/catalog/
 import plugin_catalog_recurring_timestamps from "../../../../examples/cx/catalog/plugins/recurring-timestamps.cx";
 import plugin_catalog_redact_email_addresses from "../../../../examples/cx/catalog/plugins/redact-email-addresses.cx";
 import plugin_catalog_relationship_notifier from "../../../../examples/cx/catalog/plugins/relationship-notifier.cx";
+import plugin_catalog_remove_blank_lines from "../../../../examples/cx/catalog/plugins/remove-blank-lines.cx";
 import plugin_catalog_repeat_messages from "../../../../examples/cx/catalog/plugins/repeat-messages.cx";
 import plugin_catalog_reply_ping_control from "../../../../examples/cx/catalog/plugins/reply-ping-control.cx";
 import plugin_catalog_reply_timestamp from "../../../../examples/cx/catalog/plugins/reply-timestamp.cx";
 import plugin_catalog_resize_dimensions from "../../../../examples/cx/catalog/plugins/resize-dimensions.cx";
 import plugin_catalog_reveal_all_spoilers from "../../../../examples/cx/catalog/plugins/reveal-all-spoilers.cx";
 import plugin_catalog_reverse_image_search from "../../../../examples/cx/catalog/plugins/reverse-image-search.cx";
+import plugin_catalog_reverse_line_order from "../../../../examples/cx/catalog/plugins/reverse-line-order.cx";
 import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins/reverse-text.cx";
 import plugin_catalog_rot13_text from "../../../../examples/cx/catalog/plugins/rot13-text.cx";
 import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/plugins/round-server-icons.cx";
@@ -391,6 +394,7 @@ import plugin_catalog_wider_chat from "../../../../examples/cx/catalog/plugins/w
 import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/wiki-lookup.cx";
 import plugin_catalog_word_count from "../../../../examples/cx/catalog/plugins/word-count.cx";
 import plugin_catalog_word_frequency from "../../../../examples/cx/catalog/plugins/word-frequency.cx";
+import plugin_catalog_wrap_text from "../../../../examples/cx/catalog/plugins/wrap-text.cx";
 import plugin_catalog_write_upper_case from "../../../../examples/cx/catalog/plugins/write-upper-case.cx";
 import plugin_catalog_zero_width_sanitizer from "../../../../examples/cx/catalog/plugins/zero-width-sanitizer.cx";
 import theme_base_midnight from "../../../../examples/cx/midnight.cx";
@@ -741,6 +745,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ISO Week", source: plugin_catalog_iso_week, description: "/isoweek", commands: ["isoweek"], categories: ["Commands"], appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5", privateCommands: true },
+        { name: "Join Lines", source: plugin_catalog_join_lines, description: "/joinlines", commands: ["joinlines"], categories: ["Commands"], appearanceRevision: "7fe09a418a6341397253829916ab3fc523ae42d483a0c37a00c032d48430f135", privateCommands: true },
         { name: "JSON Check", source: plugin_catalog_json_check, description: "/jsoncheck", commands: ["jsoncheck"], categories: ["Commands"], appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f", privateCommands: true },
         { name: "JSON Compact", source: plugin_catalog_json_compact, description: "/compactjson", commands: ["compactjson"], categories: ["Commands"], appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb", privateCommands: true },
         { name: "JSON Format", source: plugin_catalog_json_format, description: "/formatjson", commands: ["formatjson"], categories: ["Commands"], appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c", privateCommands: true },
@@ -809,12 +814,14 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Recurring Timestamps", source: plugin_catalog_recurring_timestamps, description: "/recurringtimes", commands: ["recurringtimes"], categories: ["Commands"], appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7", privateCommands: true },
         { name: "Redact Email Addresses", source: plugin_catalog_redact_email_addresses, description: "/redactemails", commands: ["redactemails"], categories: ["Commands"], appearanceRevision: "c13ff42634dcacc33789c26c2b0fd0ffb7abae5138adefcabb6fb35120239d6b", privateCommands: true },
         { name: "RelationshipNotifier", source: plugin_catalog_relationship_notifier, description: "Show a local notification when a friend removes you", categories: ["Profiles"] },
+        { name: "Remove Blank Lines", source: plugin_catalog_remove_blank_lines, description: "/removeblanklines", commands: ["removeblanklines"], categories: ["Commands"], appearanceRevision: "fbdd3ecce06cfd9b56f5f8a3fc1164ddd43d97a98279f4c8edcb0af17a88b51d", privateCommands: true },
         { name: "RepeatMessages", source: plugin_catalog_repeat_messages, description: "Send the selected message again with its attachments and stickers", categories: ["Chat"] },
         { name: "ReplyPingControl", source: plugin_catalog_reply_ping_control, description: "Choose whether incoming replies ping you on this device", categories: ["Chat"] },
         { name: "ReplyTimestamp", source: plugin_catalog_reply_timestamp, description: "Show the original message's timestamp on loaded reply previews", categories: ["Chat"] },
         { name: "Resize Dimensions", source: plugin_catalog_resize_dimensions, description: "/resizedimensions", commands: ["resizedimensions"], categories: ["Commands"], appearanceRevision: "3120fff9dc0b3d5c7b10d5a36790889834e63855d918591628d837ac14c94ec6", privateCommands: true },
         { name: "RevealAllSpoilers", source: plugin_catalog_reveal_all_spoilers, description: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true, categories: ["Chat"] },
         { name: "ReverseImageSearch", source: plugin_catalog_reverse_image_search, description: "Add a Search Image action with a choice of search engines", categories: ["Media"] },
+        { name: "Reverse Line Order", source: plugin_catalog_reverse_line_order, description: "/reverselines", commands: ["reverselines"], categories: ["Commands"], appearanceRevision: "13108c795a0f1b9e7d63ac3d4245b666c3fe5395a601f48a8a0115e612b6f905", privateCommands: true },
         { name: "ReverseText", source: plugin_catalog_reverse_text, description: "/reverse", commands: ["reverse"], categories: ["Chat","Commands"] },
         { name: "ROT13 Text", source: plugin_catalog_rot13_text, description: "/rot13text", commands: ["rot13text"], categories: ["Commands"], appearanceRevision: "1a6cf1874ecf898df5517cccde97da90526624064f8515b8245c09926ff8f296", privateCommands: true },
         { name: "RoundServerIcons", source: plugin_catalog_round_server_icons, description: "round server icons", categories: ["Appearance"], appearanceRevision: "22777f8ac8216a937b033f1fdbf1c3d48c985ac2f75a6d1a6d5593ff180ff3fe" },
@@ -892,6 +899,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "WikiLookup", source: plugin_catalog_wiki_lookup, description: "/wiki", commands: ["wiki"], categories: ["Commands"] },
         { name: "WordCount", source: plugin_catalog_word_count, description: "Show word and character counts below messages longer than five words", categories: ["Chat"] },
         { name: "Word Frequency", source: plugin_catalog_word_frequency, description: "/wordfrequency", commands: ["wordfrequency"], categories: ["Commands"], appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065", privateCommands: true },
+        { name: "Wrap Text", source: plugin_catalog_wrap_text, description: "/wraptext", commands: ["wraptext"], categories: ["Commands"], appearanceRevision: "e60541db78f6a4d662c6501972181a629fc629e6acb5290275a0ea069a6a1834", privateCommands: true },
         { name: "WriteUpperCase", source: plugin_catalog_write_upper_case, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ZeroWidthSanitizer", source: plugin_catalog_zero_width_sanitizer, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
     ],

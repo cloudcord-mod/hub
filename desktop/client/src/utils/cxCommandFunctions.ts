@@ -199,6 +199,35 @@ export const cxCommandFunctions = {
         return left < right ? -1 : left > right ? 1 : 0;
     }).join("\n"),
     trimLines: (text: string) => text.split(/\r\n|\r|\n/).map(line => line.trim()).join("\n"),
+    removeBlankLines: (text: string) => text.split(/\r\n|\r|\n/).filter(line => line.trim()).join("\n"),
+    reverseLineOrder: (text: string) => text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).reverse().join("\n"),
+    joinLines(text: string, separator: string) {
+        if (separator.length > 32) return;
+        const output = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).join(separator);
+        if (output.length <= 4000) return output;
+    },
+    wrapText(text: string, width: string) {
+        const limit = Number(width);
+        if (!Number.isInteger(limit) || limit < 8 || limit > 120) return;
+        const output = text.split(/\r\n|\r|\n/).map(paragraph => {
+            const lines: string[] = [];
+            let current = "";
+            let length = 0;
+            for (const word of paragraph.trim().split(/\s+/)) {
+                const size = Array.from(word).length;
+                if (length && length + 1 + size > limit) {
+                    lines.push(current);
+                    current = "";
+                    length = 0;
+                }
+                current += (length ? " " : "") + word;
+                length += (length ? 1 : 0) + size;
+            }
+            lines.push(current);
+            return lines.join("\n");
+        }).join("\n");
+        if (output.length <= 4000) return output;
+    },
     linesToCsv: (text: string) => {
         const fields = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
         return fields.map(field => `"${field.replaceAll('"', '""')}"`).join(",");
