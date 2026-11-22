@@ -37601,9 +37601,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideEmbeds",
           label: "link embeds in chat",
           css: 'article[class*="embed"] { display: none !important; }',
-          mobile: [
-            "EmbedCard"
-          ]
+          mobile: {
+            messagePresentation: "embeds",
+            legacyComponents: [
+              "EmbedCard"
+            ]
+          }
         },
         "message-edited-label": {
           plugin: "HideEditedLabel",
@@ -68935,7 +68938,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "89677937ce237703a2b27b2001397d9589af3fdf";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0c4986151195edace80c8d0bf9864a593af4240a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
