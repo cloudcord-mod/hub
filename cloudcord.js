@@ -36724,11 +36724,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           obj
         }));
       }
-      if (!query && sortFn)
-        items.sort(sortFn);
+      if (!query) {
+        if (sortFn)
+          items.sort(sortFn);
+        return items.map((obj) => ({
+          obj
+        }));
+      }
       return import_fuzzysort.default.go(query, items, {
-        keys: props.searchKeywords,
-        all: true
+        keys: props.searchKeywords
       });
     }, [
       props.items,
@@ -69699,7 +69703,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function Title() {
     var styles2 = usePluginCardStyles();
     var { plugin: plugin2, result } = useCardContext();
-    var highlightedNode = result[0].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+    var highlightedNode = result?.[0]?.highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
       style: {
         backgroundColor: getHighlightColor()
       },
@@ -69709,7 +69713,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var textNode = /* @__PURE__ */ jsx(Text, {
       numberOfLines: 1,
       variant: "heading-lg/semibold",
-      children: highlightedNode.length ? highlightedNode : plugin2.name
+      children: highlightedNode?.length ? highlightedNode : plugin2.name
     });
     return /* @__PURE__ */ jsxs(import_react_native39.View, {
       style: {
@@ -69731,14 +69735,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var styles2 = usePluginCardStyles();
     if (!plugin2.authors)
       return null;
-    var highlightedNode = result[2].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+    var highlightedNode = result?.[2]?.highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
       style: {
         backgroundColor: getHighlightColor()
       },
       children: m2
     }, i));
     var badges = plugin2.getBadges();
-    var authorText = highlightedNode.length > 0 ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
+    var authorText = highlightedNode?.length ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
     return /* @__PURE__ */ jsxs(import_react_native39.View, {
       style: {
         flexDirection: "row",
@@ -69767,7 +69771,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   }
   function Description() {
     var { plugin: plugin2, result } = useCardContext();
-    var highlightedNode = result[1].highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
+    var highlightedNode = result?.[1]?.highlight((m2, i) => /* @__PURE__ */ jsx(Text, {
       style: {
         backgroundColor: getHighlightColor()
       },
@@ -69775,7 +69779,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }, i));
     return /* @__PURE__ */ jsx(Text, {
       variant: "text-md/medium",
-      children: highlightedNode.length ? highlightedNode : plugin2.description
+      children: highlightedNode?.length ? highlightedNode : plugin2.description
     });
   }
   function PluginCard2({ result, item: plugin2 }) {
@@ -72301,7 +72305,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "565b1b40468c35ef37e5fc4f82d6f59ad12612a3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b6b70983d3c60a73963037e4ccd47aac533ed1db";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
