@@ -32,7 +32,7 @@ function Title() {
   const { plugin, result } = useCardContext();
 
   // could be empty if the plugin name is irrelevant!
-  const highlightedNode = result[0].highlight((m, i) => (
+  const highlightedNode = result?.[0]?.highlight((m, i) => (
     <Text key={i} style={{ backgroundColor: getHighlightColor() }}>
       {m}
     </Text>
@@ -42,7 +42,7 @@ function Title() {
 
   const textNode = (
     <Text numberOfLines={1} variant="heading-lg/semibold">
-      {highlightedNode.length ? highlightedNode : plugin.name}
+      {highlightedNode?.length ? highlightedNode : plugin.name}
     </Text>
   );
 
@@ -61,7 +61,7 @@ function Authors() {
   if (!plugin.authors) return null;
 
   // could be empty if the author(s) are irrelevant with the search!
-  const highlightedNode = result[2].highlight((m, i) => (
+  const highlightedNode = result?.[2]?.highlight((m, i) => (
     <Text key={i} style={{ backgroundColor: getHighlightColor() }}>
       {m}
     </Text>
@@ -69,7 +69,7 @@ function Authors() {
 
   const badges = plugin.getBadges();
   const authorText =
-    highlightedNode.length > 0
+    highlightedNode?.length
       ? highlightedNode
       : plugin.authors.map((a) => a.name).join(", ");
 
@@ -95,7 +95,7 @@ function Description() {
   const { plugin, result } = useCardContext();
 
   // could be empty if the description is irrelevant with the search!
-  const highlightedNode = result[1].highlight((m, i) => (
+  const highlightedNode = result?.[1]?.highlight((m, i) => (
     <Text key={i} style={{ backgroundColor: getHighlightColor() }}>
       {m}
     </Text>
@@ -103,7 +103,7 @@ function Description() {
 
   return (
     <Text variant="text-md/medium">
-      {highlightedNode.length ? highlightedNode : plugin.description}
+      {highlightedNode?.length ? highlightedNode : plugin.description}
     </Text>
   );
 }

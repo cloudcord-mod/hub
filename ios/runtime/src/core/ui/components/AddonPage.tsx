@@ -147,9 +147,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         if (commandSearch) {
             return commandSearch(items, query).map(obj => ({ obj }));
         }
-        if (!query && sortFn) items.sort(sortFn);
+        if (!query) {
+            if (sortFn) items.sort(sortFn);
+            return items.map(obj => ({ obj }));
+        }
 
-        return fuzzysort.go(query, items, { keys: props.searchKeywords, all: true });
+        return fuzzysort.go(query, items, { keys: props.searchKeywords });
     }, [props.items, props.resolveItem, props.isEnabled, props.searchKeywords, sortFn, query, enabledOnly, matchesFilter, commandSearch]);
 
     const onInstallPress = useCallback(() => {
