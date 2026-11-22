@@ -37453,8 +37453,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-chat-attachments": {
           plugin: "HideChatAttachments",
           label: "file and media attachments in chat",
-          css: "",
-          mobileOnly: true,
+          css: '[id^="message-accessories-"] :is([class^="attachment_"], [class*=" attachment_"], [class^="newMosaicStyle_"], [class*=" newMosaicStyle_"], [class^="audioAttachment_"], [class*=" audioAttachment_"]) { display: none !important; }',
           mobile: {
             messagePresentation: "attachments"
           }
@@ -58074,7 +58073,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "HideChatAttachments",
             source: hide_chat_attachments_default,
             description: "Hide file and media attachments in chat",
-            mobileOnly: true,
             categories: [
               "Appearance"
             ],
@@ -71989,7 +71987,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b92a441883f98c36bf112f8d8a2d71eab845a50";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "99581defe42f5548dcfbc9347ec85081d561a1e7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
