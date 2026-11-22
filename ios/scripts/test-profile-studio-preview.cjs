@@ -196,6 +196,8 @@ assert.ok(!previewDesktop({ customStatus: {} }).some(node => node.props.classNam
 assert.ok(previewDesktop({ customStatus: { emoji: "☁" } }).find(node => node.props.className === "cpx-card-custom")?.props.children.includes("☁"));
 assert.ok(containsText(previewDesktop({ customActivity: { type: -1, name: "Test game" } }), "Playing"));
 assert.equal(previewDesktop({}).find(node => node.props.className === "cpx-card-bio").props.children, nativeProfile.bio);
+assert.ok(!previewDesktop({ bio: "", pronouns: "" }).some(node => node.props.className === "cpx-card-bio"));
+assert.equal(previewDesktop({ pronouns: "" }).find(node => node.props.className === "cpx-card-username").props.children.at(-1), "");
 assert.equal(previewDesktop({ pronouns: "she/her" }).find(node => node.props.className === "cpx-card-username").props.children.at(-1), " · she/her");
 layout = "popout";
 assert.ok(previewDesktop({ presenceStatus: "invisible" }).some(node => node.props.role === "img" && node.props["aria-label"] === "Status: offline"));

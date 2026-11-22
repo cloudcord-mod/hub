@@ -181,8 +181,8 @@ function previewSurface(data: { nitro?: boolean; banner?: string; accentColor?: 
     const primary = data.nitro ? profilePreviewColor(data.accentColor) : undefined;
     return {
         banner: data.banner || fallback?.banner,
-        bio: data.bio || fallback?.bio,
-        pronouns: data.pronouns || fallback?.pronouns,
+        bio: data.bio ?? fallback?.bio,
+        pronouns: data.pronouns ?? fallback?.pronouns,
         primary: primary ?? fallback?.primary,
         accent: primary ? profilePreviewColor(data.accentColor2) ?? primary : fallback?.accent ?? fallback?.primary,
         bannerColor: profilePreviewColor(data.accentColor) ?? fallback?.bannerColor ?? primary ?? fallback?.primary,

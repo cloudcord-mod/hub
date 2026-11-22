@@ -1255,8 +1255,8 @@ function decorateSharedProfile(profile: any, data: CustomProfileData) {
     if (profile.userProfile && profile.userProfile !== profile) merged.userProfile = decorateSharedIdentity(profile.userProfile, data, true);
     if (profile.displayProfile && profile.displayProfile !== profile) merged.displayProfile = decorateSharedIdentity(profile.displayProfile, data, true);
     if (data.nameplate !== undefined) merged.collectibles = profile.collectibles;
-    if (data.bio) merged.bio = data.bio;
-    if (data.pronouns) merged.pronouns = data.pronouns;
+    if (typeof data.bio === "string") merged.bio = data.bio;
+    if (typeof data.pronouns === "string") merged.pronouns = data.pronouns;
     if (data.banner) {
         merged.bannerURL = data.banner;
         merged.bannerUrl = data.banner;
@@ -2112,7 +2112,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                     const user = UserStore.getUser(userId);
                     if (!shared && !user) return null;
                     const profile = UserProfileStore.getUserProfile(userId) as any;
-                    return { username: shared?.username || user?.username || "", displayName: shared?.globalName || user?.globalName || "", avatar: shared?.avatar || (user ? IconUtils.getUserAvatarURL(user) : ""), banner: shared?.banner || customDiscordMediaURL("banners", userId, profile?.banner ?? (user as any)?.banner), bio: shared?.bio || profile?.bio || "", badges: user ? badgeLayoutRows(shared || {}, userId).map(badge => ({ name: badge.description || badge.key || "Badge", icon: badge.iconSrc || "" })) : [] };
+                    return { username: shared?.username || user?.username || "", displayName: shared?.globalName || user?.globalName || "", avatar: shared?.avatar || (user ? IconUtils.getUserAvatarURL(user) : ""), banner: shared?.banner || customDiscordMediaURL("banners", userId, profile?.banner ?? (user as any)?.banner), bio: shared?.bio ?? profile?.bio ?? "", badges: user ? badgeLayoutRows(shared || {}, userId).map(badge => ({ name: badge.description || badge.key || "Badge", icon: badge.iconSrc || "" })) : [] };
                 }} />
             </Section>
             <Section title="Custom images & badges" description="Upload your own badge, profile picture or banner on the CloudCord website.">
@@ -2483,8 +2483,8 @@ export default definePlugin({
             const overrides: any = nativeSocialProfile(profile, data);
             const { bio, pronouns, accentColor, banner, signupDate } = data;
             Object.assign(overrides,
-                bio ? { bio } : null,
-                pronouns ? { pronouns } : null,
+                typeof bio === "string" ? { bio } : null,
+                typeof pronouns === "string" ? { pronouns } : null,
                 accentColor != null ? { accentColor } : null,
                 // Discord reads the banner under several names depending on the component.
                 banner ? { bannerURL: banner, bannerUrl: banner, bannerSrc: banner, getBannerURL: () => storedData.banner } : null,
