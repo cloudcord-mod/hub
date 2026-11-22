@@ -69,6 +69,7 @@ export const cxNativeEffects = {
     "copy-message-info": { permission: "messages.copyreference", label: "Copy the selected message’s IDs and UTC timestamp as JSON" },
     "copy-attachment-links": { permission: "messages.copytext", label: "Copy links to files attached to the selected message" },
     "copy-replied-message-link": { permission: "messages.copyreference", label: "Copy the link to the message this reply references" },
+    "copy-mentioned-ids": { permission: "messages.copyreference", label: "Copy user, role, and channel IDs written as mentions in the selected message" },
     "reveal-spoilers-shortcut": { permission: "messages.revealspoilers", label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true },
     "reply-timestamp": { permission: "messages.replytimestamp", label: "Show the original message's timestamp on loaded reply previews" },
     "message-latency": { permission: "messages.senddelay", label: "Show an estimated send-delay indicator on messages" },
@@ -158,7 +159,7 @@ export type CxQuoteMessage = {
 };
 
 type CxMessageClipboardEffect = "copy-raw-text" | "copy-message-reference" | "copy-attachment-names"
-    | "copy-message-links" | "copy-message-code" | "copy-message-info" | "copy-attachment-links" | "copy-replied-message-link";
+    | "copy-message-links" | "copy-message-code" | "copy-message-info" | "copy-attachment-links" | "copy-replied-message-link" | "copy-mentioned-ids";
 
 export function getCxMessageClipboard(effect: CxMessageClipboardEffect, message?: CxQuoteMessage,
     channel?: { id: string; guild_id?: string | null }) {
@@ -166,6 +167,15 @@ export function getCxMessageClipboard(effect: CxMessageClipboardEffect, message?
     const content = typeof message?.content === "string" ? message.content : "";
     if (effect === "copy-raw-text") {
         return item("raw-text", "Copy Raw Text", content);
+    }
+    if (effect === "copy-mentioned-ids") {
+        const mentions = [...content.matchAll(/<(@&|@!?|#)([1-9]\d{16,19})>/g)];
+        return ([["users", /^@!?$/, "Copy Mentioned User IDs"], ["roles", /^@&$/, "Copy Mentioned Role IDs"],
+            ["channels", /^#$/, "Copy Mentioned Channel IDs"]] as const).flatMap(([key, kind, label]) => {
+            const ids = mentions.filter(([, type, id]) => kind.test(type) && BigInt(id) <= 0xffffffffffffffffn)
+                .map(([, , id]) => id);
+            return item("mentioned-" + key, label, [...new Set(ids)].join("\n"));
+        });
     }
     if (effect === "copy-attachment-names") {
         const names = (message?.attachments ?? []).flatMap(file =>

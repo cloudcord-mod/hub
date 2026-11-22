@@ -1175,6 +1175,7 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "copy-message-info":
                 case "copy-attachment-links":
                 case "copy-replied-message-link":
+                case "copy-mentioned-ids":
                     return registerMessageClipboard(effect);
                 case "message-word-count": {
                     const id = "cx-word-count-" + ++wordCountSequence;

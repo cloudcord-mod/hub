@@ -1,0 +1,3 @@
+plugin "CopyMentionedIds":
+  needs messages.copyreference
+  use copy-mentioned-ids

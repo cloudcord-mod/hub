@@ -1581,12 +1581,16 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ...message, attachments: [{ filename: "a.png" }, { filename: "b.pdf", url: "https://example.net/b.pdf" }],
                 messageReference: { channel_id: repeatChannel, message_id: other },
                 content: "[link](https://example.com/page_(test)). <https://example.com/page_(test)> https://[::1]\n"
-                    + "```js\nconst a = 1;\n```\n```sh\necho ok\n```",
+                    + "```js\nconst a = 1;\n```\n```sh\necho ok\n```\n"
+                    + "<@" + other + "> <@!" + other + "> <@&" + guildId + "> <#" + repeatChannel + ">",
             };
             for (const [name, label, expectedText] of [
                 ["CopyAttachmentNames", "Copy Attachment Names", "a.png\nb.pdf"],
                 ["CopyAttachmentLinks", "Copy Attachment Links", "https://example.net/b.pdf"],
                 ["CopyRepliedMessageLink", "Copy Replied Message Link", "https://discord.com/channels/" + guildId + "/" + repeatChannel + "/" + other],
+                ["CopyMentionedIds", "Copy Mentioned User IDs", other],
+                ["CopyMentionedIds", "Copy Mentioned Role IDs", guildId],
+                ["CopyMentionedIds", "Copy Mentioned Channel IDs", repeatChannel],
                 ["CopyMessageLinks", "Copy Links from Message", "https://example.com/page_(test)\nhttps://[::1]"],
                 ["CopyMessageCode", "Copy Code from Message", "const a = 1;\n\necho ok"],
                 ["CopyMessageInfo", "Copy Message Info", JSON.stringify({

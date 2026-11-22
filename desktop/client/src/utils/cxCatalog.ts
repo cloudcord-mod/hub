@@ -57,6 +57,7 @@ import plugin_catalog_copy_channel_topic from "../../../../examples/cx/catalog/p
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
 import plugin_catalog_copy_media_link from "../../../../examples/cx/catalog/plugins/copy-media-link.cx";
+import plugin_catalog_copy_mentioned_ids from "../../../../examples/cx/catalog/plugins/copy-mentioned-ids.cx";
 import plugin_catalog_copy_message_code from "../../../../examples/cx/catalog/plugins/copy-message-code.cx";
 import plugin_catalog_copy_message_info from "../../../../examples/cx/catalog/plugins/copy-message-info.cx";
 import plugin_catalog_copy_message_links from "../../../../examples/cx/catalog/plugins/copy-message-links.cx";
@@ -634,6 +635,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown, description: "Add a Copy Emoji Markdown action to the emoji menu", categories: ["Media"] },
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents, description: "Copy the contents of the selected text attachment", categories: ["Media"] },
         { name: "CopyMediaLink", source: plugin_catalog_copy_media_link, description: "Add a clipboard action to media and link menus", categories: ["Media"] },
+        { name: "CopyMentionedIds", source: plugin_catalog_copy_mentioned_ids, description: "Copy user, role, and channel IDs written as mentions in the selected message", categories: ["Chat"] },
         { name: "CopyMessageCode", source: plugin_catalog_copy_message_code, description: "Copy fenced code from the selected message", categories: ["Chat"] },
         { name: "CopyMessageInfo", source: plugin_catalog_copy_message_info, description: "Copy the selected message’s IDs and UTC timestamp as JSON", categories: ["Chat"] },
         { name: "CopyMessageLinks", source: plugin_catalog_copy_message_links, description: "Copy HTTP links from the selected message", categories: ["Chat"] },
