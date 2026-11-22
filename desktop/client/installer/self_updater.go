@@ -12,12 +12,15 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
+	"regexp"
 	"runtime"
 	"sinlotl/buildinfo"
+	"strings"
 	"time"
 )
 
+var regexpReleaseRevision = regexp.MustCompile(`^[0-9a-f]{40}$`)
 var IsSelfOutdated = false
 var SelfUpdateCheckDoneChan = make(chan bool, 1)
 
@@ -33,12 +36,20 @@ func init() {
 	go func() {
 		Log.Debug("Checking for Installer Updates...")
 
-		res, err := GetGithubRelease(InstallerReleaseUrl, InstallerReleaseUrlFallback)
+		releaseURL := InstallerReleaseUrl
+		if runtime.GOOS == "windows" {
+			releaseURL = ReleaseUrl
+		}
+		res, err := GetGithubRelease(releaseURL, InstallerReleaseUrlFallback)
 		if err != nil {
 			Log.Warn("Failed to check for self updates:", err)
 			SelfUpdateCheckDoneChan <- false
 		} else {
 			IsSelfOutdated = res.TagName != buildinfo.InstallerTag
+			if runtime.GOOS == "windows" {
+				revision := res.Name[strings.LastIndex(res.Name, " ")+1:]
+				IsSelfOutdated = regexpReleaseRevision.MatchString(revision) && revision != buildinfo.InstallerGitHash
+			}
 			Log.Debug("Is self outdated?", IsSelfOutdated)
 			SelfUpdateCheckDoneChan <- true
 		}
@@ -49,8 +60,10 @@ func GetInstallerDownloadLink() string {
 	const BaseUrl = "https://github.com/cloudcord-mod/release-hub/releases/latest/download/"
 	switch runtime.GOOS {
 	case "windows":
-		filename := Ternary(buildinfo.UiType == buildinfo.UiTypeCli, "cloudcord-cli.exe", "cloudcord.exe")
-		return BaseUrl + filename
+		if IsTestBuild {
+			return desktopDownloads + testDesktopTag + "/CloudCordSetup-Test.exe"
+		}
+		return desktopDownloads + stableDesktopTag + "/CloudCordSetup.exe"
 	case "darwin":
 		switch runtime.GOARCH {
 		case "amd64":
@@ -89,13 +102,16 @@ func UpdateSelf() error {
 		return err
 	}
 
-	ownExeDir := path.Dir(ownExePath)
+	ownExeDir := filepath.Dir(ownExePath)
 
-	res, err := http.Get(url)
+	res, err := runtimeClient.Get(url)
 	if err != nil {
 		return err
 	}
 	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("installer download failed: %s", res.Status)
+	}
 
 	tmp, err := os.CreateTemp(ownExeDir, "CloudCordSetupUpdate")
 	if err != nil {
@@ -109,22 +125,25 @@ func UpdateSelf() error {
 		return fmt.Errorf("failed to chmod 755 %s: %w", tmp.Name(), err)
 	}
 
-	if _, err = io.Copy(tmp, res.Body); err != nil {
+	const maxInstallerSize = 128 << 20
+	written, err := io.Copy(tmp, io.LimitReader(res.Body, maxInstallerSize+1))
+	if err != nil {
 		return err
+	}
+	if written == 0 || written > maxInstallerSize || (res.ContentLength >= 0 && written != res.ContentLength) {
+		return fmt.Errorf("incomplete installer download: received %d bytes", written)
 	}
 
 	if err = tmp.Close(); err != nil {
 		return err
 	}
 
-	if err = os.Remove(ownExePath); err != nil {
-		if err = os.Rename(ownExePath, ownExePath+".old"); err != nil {
-			return fmt.Errorf("Failed to remove/rename own executable: %w", err)
-		}
+	backup := ownExePath + ".old"
+	if err = os.Rename(ownExePath, backup); err != nil {
+		return fmt.Errorf("could not back up the current installer: %w", err)
 	}
-
 	if err = os.Rename(tmp.Name(), ownExePath); err != nil {
-		return fmt.Errorf("Failed to replace self with updated executable. Please manually redownload the installer: %w", err)
+		return errors.Join(fmt.Errorf("could not replace the installer: %w", err), os.Rename(backup, ownExePath))
 	}
 
 	return nil
