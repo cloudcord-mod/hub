@@ -17,6 +17,8 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-quest-dock-promo-backdrop": hideMobileComponent("HideQuestDockPromoBackdrop", "the Quest dock backdrop before joining a quest", "modules/quests/native/QuestDock/QuestDockUnenrolledBackground.tsx"),
+    "hide-activity-preview-backdrop": hideMobileComponent("HideActivityPreviewBackdrop", "background artwork in embedded activity previews", "modules/activities/native/EmbeddedActivityBackgroundImageWithOverlay.tsx"),
     "hide-quest-dock-backdrop": hideMobileComponent("HideQuestDockBackdrop", "the blurred backdrop of the Quest dock", "modules/quests/native/QuestDock/QuestDockBlurredContentBackground.tsx"),
     "hide-appearance-preview-gradient": hideMobileComponent("HideAppearancePreviewGradient", "the gradient behind Appearance settings previews", "modules/user_settings/appearance/native/components/SettingsAppearanceGradientBackground.tsx"),
     "hide-activity-shelf-artwork": hideMobileComponent("HideActivityShelfArtwork", "background artwork on voice activity shelf cards", "modules/voice_panel/native/controls/activities/ActivityShelfItemBackground.tsx"),

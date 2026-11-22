@@ -137,6 +137,7 @@ import plugin_catalog_grayscale_images from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hide_active_channel_cards from "../../../../examples/cx/catalog/plugins/hide-active-channel-cards.cx";
 import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plugins/hide-active-now.cx";
 import plugin_catalog_hide_activity_cards from "../../../../examples/cx/catalog/plugins/hide-activity-cards.cx";
+import plugin_catalog_hide_activity_preview_backdrop from "../../../../examples/cx/catalog/plugins/hide-activity-preview-backdrop.cx";
 import plugin_catalog_hide_activity_shelf_artwork from "../../../../examples/cx/catalog/plugins/hide-activity-shelf-artwork.cx";
 import plugin_catalog_hide_add_friend_hint from "../../../../examples/cx/catalog/plugins/hide-add-friend-hint.cx";
 import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catalog/plugins/hide-add-server-button.cx";
@@ -254,6 +255,7 @@ import plugin_catalog_hide_profile_wishlist_suggestions from "../../../../exampl
 import plugin_catalog_hide_profile_wishlist_tip from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx";
 import plugin_catalog_hide_profile_your_friends_card from "../../../../examples/cx/catalog/plugins/hide-profile-your-friends-card.cx";
 import plugin_catalog_hide_quest_dock_backdrop from "../../../../examples/cx/catalog/plugins/hide-quest-dock-backdrop.cx";
+import plugin_catalog_hide_quest_dock_promo_backdrop from "../../../../examples/cx/catalog/plugins/hide-quest-dock-promo-backdrop.cx";
 import plugin_catalog_hide_quest_modal_clouds from "../../../../examples/cx/catalog/plugins/hide-quest-modal-clouds.cx";
 import plugin_catalog_hide_quest_orb_multiplier_pill from "../../../../examples/cx/catalog/plugins/hide-quest-orb-multiplier-pill.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
@@ -757,6 +759,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideActiveChannelCards", source: plugin_catalog_hide_active_channel_cards, description: "Hide active text channel cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6764ad5a3e29345fe28106ff9d3d60ad23aaa67989756513ec1030e993be51ca" },
         { name: "HideActiveNow", source: plugin_catalog_hide_active_now, description: "Hide the active friends panel", categories: ["Appearance"], appearanceRevision: "3ea10b3241ba84c918d96f0c98c1b365c4e0f2c9a3014fa429ed7a3b2c5d4361" },
         { name: "HideActivityCards", source: plugin_catalog_hide_activity_cards, description: "Hide activity cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7" },
+        { name: "HideActivityPreviewBackdrop", source: plugin_catalog_hide_activity_preview_backdrop, description: "Hide background artwork in embedded activity previews", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "67488a9b799920034951de925a482ab779eeaf1c199f449a23ccf3f6c2779060" },
         { name: "HideActivityShelfArtwork", source: plugin_catalog_hide_activity_shelf_artwork, description: "Hide background artwork on voice activity shelf cards", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b0bb8b1cb3068b7accf280739a9d6fcbc14723036b0eedae1f0a758cf349882b" },
         { name: "HideAddFriendHint", source: plugin_catalog_hide_add_friend_hint, description: "Hide the hint below the Add Friend field", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideAddServerButton", source: plugin_catalog_hide_add_server_button, description: "Hide the add-a-server button", categories: ["Appearance"], appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f" },
@@ -874,6 +877,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideProfileWishlistTip", source: plugin_catalog_hide_profile_wishlist_tip, description: "Hide the wishlist viewing tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74d22841fc73e0f740b1819df239a6b3023720a18799b73e96b32cf90f67649f" },
         { name: "HideProfileYourFriendsCard", source: plugin_catalog_hide_profile_your_friends_card, description: "Hide the Your Friends card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389" },
         { name: "HideQuestDockBackdrop", source: plugin_catalog_hide_quest_dock_backdrop, description: "Hide the blurred backdrop of the Quest dock", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cc78b8ed69c32639c24c82065730f1ea0f3854e38e8173dc4b7b17a3c0e842bb" },
+        { name: "HideQuestDockPromoBackdrop", source: plugin_catalog_hide_quest_dock_promo_backdrop, description: "Hide the Quest dock backdrop before joining a quest", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d1ccae350149851130e7c69acd7ca9e0201bb8d8ac0162f0257fb6220113217e" },
         { name: "HideQuestModalClouds", source: plugin_catalog_hide_quest_modal_clouds, description: "Hide the cloud artwork in Quest modals", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2012c25e620bd5fe6dfd66d100633d0d84c8c7969045bd5dd72f656728f9f070" },
         { name: "HideQuestOrbMultiplierPill", source: plugin_catalog_hide_quest_orb_multiplier_pill, description: "Hide the Orb multiplier perk label on quests", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "03f19a71805dbf9465f5644be6b64fd64e68a18e496d5aa9b25caf615d8b7b5b" },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry", categories: ["Appearance"], appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe" },

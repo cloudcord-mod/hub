@@ -1,0 +1,3 @@
+plugin "HideActivityPreviewBackdrop":
+  needs appearance.hide
+  hide hide-activity-preview-backdrop
