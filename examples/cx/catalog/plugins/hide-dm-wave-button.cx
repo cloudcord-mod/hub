@@ -1,0 +1,3 @@
+plugin "HideDmWaveButton":
+  needs appearance.hide
+  hide hide-dm-wave-button

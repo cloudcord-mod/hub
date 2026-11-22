@@ -135,7 +135,10 @@ import plugin_catalog_hide_custom_statuses from "../../../../examples/cx/catalog
 import plugin_catalog_hide_disabled_emojis from "../../../../examples/cx/catalog/plugins/hide-disabled-emojis.cx";
 import plugin_catalog_hide_discover_button from "../../../../examples/cx/catalog/plugins/hide-discover-button.cx";
 import plugin_catalog_hide_display_name_styles_tip from "../../../../examples/cx/catalog/plugins/hide-display-name-styles-tip.cx";
+import plugin_catalog_hide_dm_add_friends_widget from "../../../../examples/cx/catalog/plugins/hide-dm-add-friends-widget.cx";
+import plugin_catalog_hide_dm_friend_suggestions from "../../../../examples/cx/catalog/plugins/hide-dm-friend-suggestions.cx";
 import plugin_catalog_hide_dm_search from "../../../../examples/cx/catalog/plugins/hide-dm-search.cx";
+import plugin_catalog_hide_dm_wave_button from "../../../../examples/cx/catalog/plugins/hide-dm-wave-button.cx";
 import plugin_catalog_hide_double_tap_reaction_tip from "../../../../examples/cx/catalog/plugins/hide-double-tap-reaction-tip.cx";
 import plugin_catalog_hide_download_apps_button from "../../../../examples/cx/catalog/plugins/hide-download-apps-button.cx";
 import plugin_catalog_hide_edited_label from "../../../../examples/cx/catalog/plugins/hide-edited-label.cx";
@@ -631,7 +634,10 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideDisabledEmojis", source: plugin_catalog_hide_disabled_emojis, description: "Hide unavailable emoji in Discord’s emoji picker", categories: ["Appearance"], appearanceRevision: "0e8e0b52055839b1fb48d75d078ff2945b3b7cc483df10b1939c0ebcd189785d" },
         { name: "HideDiscoverButton", source: plugin_catalog_hide_discover_button, description: "Hides the Discover button in the server list", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideDisplayNameStylesTip", source: plugin_catalog_hide_display_name_styles_tip, description: "Hide the display name styles tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b2f3e613dda86aa78c01940feeed87d0a2ef9e4f750df312df248c6b01e4ef50" },
+        { name: "HideDmAddFriendsWidget", source: plugin_catalog_hide_dm_add_friends_widget, description: "Hide the Add Friends widget in the DM list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d70d81c1c8f37e7b93193e2522ca9c5d43da4d77b09499cc268d3cfca3697c12" },
+        { name: "HideDmFriendSuggestions", source: plugin_catalog_hide_dm_friend_suggestions, description: "Hide suggested friends and their heading from the DM list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "55c07bd0119ea63f75e4206513e58c36a1e4514d502b79940509ec0a77adfa5a" },
         { name: "HideDmSearch", source: plugin_catalog_hide_dm_search, description: "Hide the search button in the DM list", categories: ["Appearance"], appearanceRevision: "79f297b8d184eb4122607ece68a542b4d27faf21f99acf347627bf7a223de877" },
+        { name: "HideDmWaveButton", source: plugin_catalog_hide_dm_wave_button, description: "Hide the wave shortcut on eligible DM rows", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "281c59021bcf9eb4a3658d10a5f83f3ec3f1f34a829ffec8c17084cf17b71f10" },
         { name: "HideDoubleTapReactionTip", source: plugin_catalog_hide_double_tap_reaction_tip, description: "Hide the double-tap reaction tip above the composer", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "21c1f2df489c54450585250e57c9f126df0cb7577935f1a84b576fe2fea756bd" },
         { name: "HideDownloadAppsButton", source: plugin_catalog_hide_download_apps_button, description: "Hides the download-apps button in the server list", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideEditedLabel", source: plugin_catalog_hide_edited_label, description: "Hide the edited label in chat", categories: ["Appearance"], appearanceRevision: "be1701f3faa67f91bd4235618a65a9b18df050c0f6650334a2c71687fecee447" },

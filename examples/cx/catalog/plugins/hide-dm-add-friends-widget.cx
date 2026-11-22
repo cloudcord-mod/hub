@@ -1,0 +1,3 @@
+plugin "HideDmAddFriendsWidget":
+  needs appearance.hide
+  hide hide-dm-add-friends-widget

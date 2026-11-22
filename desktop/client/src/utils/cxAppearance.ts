@@ -12,11 +12,14 @@ function hideDesktopClass(plugin: string, label: string, className: string) {
     } as const;
 }
 
-function hideMobileComponent(plugin: string, label: string, path: string) {
-    return { plugin, label, css: "", mobileOnly: true, mobile: { hideComponentPaths: [path] } } as const;
+function hideMobileComponent(plugin: string, label: string, ...paths: string[]) {
+    return { plugin, label, css: "", mobileOnly: true, mobile: { hideComponentPaths: paths } } as const;
 }
 
 export const cxAppearanceTargets = {
+    "hide-dm-friend-suggestions": hideMobileComponent("HideDmFriendSuggestions", "suggested friends and their heading from the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriend.tsx", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriendsHeader.tsx"),
+    "hide-dm-add-friends-widget": hideMobileComponent("HideDmAddFriendsWidget", "the Add Friends widget in the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemAddFriendsWidget.tsx"),
+    "hide-dm-wave-button": hideMobileComponent("HideDmWaveButton", "the wave shortcut on eligible DM rows", "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelWave.tsx"),
     "hide-server-feed-description": { plugin: "HideServerFeedDescription", label: "Hide the description in the server feed header", css: "", mobileOnly: true, style: { component: "GuildFeedBanner", props: { hideDescription: true } } },
     "hide-server-feed-member-count": { plugin: "HideServerFeedMemberCount", label: "Hide the member count in the server feed header", css: "", mobileOnly: true, style: { component: "GuildFeedBanner", props: { hideMemberCount: true } } },
     "hide-server-live-notice": hideMobileComponent("HideServerLiveNotice", "the live event notice above the server channel list", "modules/guild_scheduled_events/native/guild_sidebar/GuildLiveChannelNotice.tsx"),

@@ -1,0 +1,3 @@
+plugin "HideDmFriendSuggestions":
+  needs appearance.hide
+  hide hide-dm-friend-suggestions
