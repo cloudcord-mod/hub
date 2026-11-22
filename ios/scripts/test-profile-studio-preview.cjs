@@ -6,11 +6,9 @@ const { transformSync } = require(process.env.CLOUDCORD_ESBUILD || "esbuild");
 const jsx = (type, props) => ({ type, props });
 let layout;
 let theme;
-let avatarFailed = false;
 let avatarAttempt = 0;
-const react = { useState: initial => typeof initial === "boolean"
-    ? [avatarFailed, value => { avatarFailed = value; }]
-    : typeof initial === "number" ? [avatarAttempt, value => { avatarAttempt = value; }]
+const react = { useState: initial => typeof initial === "number"
+    ? [avatarAttempt, value => { avatarAttempt = value; }]
     : [layout ?? initial, value => { layout = value; }] };
 const requireMock = name => {
     if (name === "react/jsx-runtime") return { jsx, jsxs: jsx, Fragment: "Fragment" };
@@ -40,12 +38,15 @@ function flatten(value) {
 }
 
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
-const avatarPreview = { name: "Nova", username: "nova", avatar: "https://example.com/avatar.png" };
+const avatarPreview = { name: "Nova", username: "nova", avatar: "https://example.com/avatar.png", fallbackAvatar: "https://example.com/native-avatar.png" };
 const avatarImage = flatten(PreviewCard(avatarPreview)).find(node => node.type === "Image" && node.props.source?.uri === avatarPreview.avatar);
 assert.ok(avatarImage);
 avatarImage.props.onError();
+const mobileFallback = flatten(PreviewCard(avatarPreview)).find(node => node.type === "Image" && node.props.source?.uri === avatarPreview.fallbackAvatar);
+assert.ok(mobileFallback);
+mobileFallback.props.onError();
 assert.ok(flatten(PreviewCard(avatarPreview)).some(node => node.type === "Text" && node.props.children === "N"));
-avatarFailed = false;
+avatarAttempt = 0;
 const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
 const { encodePortableLook, decodePortableLook } = profileAppearance;
 const looks = [

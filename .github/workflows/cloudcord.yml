@@ -4673,6 +4673,7 @@ jobs:
                   name: data.displayName || realUser?.globalName || realUser?.global_name || realUser?.username || "You",
                   username: data.username || realUser?.username || "username",
                   avatar: data.avatarMedia?.uri || realAvatar,
+                  fallbackAvatar: realAvatar,
                   banner: data.bannerMedia?.uri || fallback.banner,
                   bio: data.bio ?? fallback.bio,
                   pronouns: data.pronouns ?? fallback.pronouns,

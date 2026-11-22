@@ -78,10 +78,11 @@ function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }: {
     }} />;
 }
 
-function StudioAvatar({ uri, name }: { uri?: string; name: string }) {
-    const [failed, setFailed] = useState(false);
-    if (uri && !failed) {
-        return <Image source={{ uri }} style={{ width: "100%", height: "100%" }} onError={() => setFailed(true)} />;
+function StudioAvatar({ uri, fallback, name }: { uri?: string; fallback?: string; name: string }) {
+    const [attempt, setAttempt] = useState(0);
+    const active = [uri || fallback, uri && uri !== fallback ? fallback : undefined][attempt];
+    if (active) {
+        return <Image key={active} source={{ uri: active }} style={{ width: "100%", height: "100%" }} onError={() => setAttempt(attempt + 1)} />;
     }
     const initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
     return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: C.raised() }}>
@@ -90,8 +91,8 @@ function StudioAvatar({ uri, name }: { uri?: string; name: string }) {
 }
 
 /** Hero header: banner, avatar, names, the main switch and preview buttons. */
-export function StudioHero({ name, username, avatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }: {
-    name: string; username: string; avatar?: string; banner?: string; accent?: string; status?: string;
+export function StudioHero({ name, username, avatar, fallbackAvatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }: {
+    name: string; username: string; avatar?: string; fallbackAvatar?: string; banner?: string; accent?: string; status?: string;
     enabled: boolean; onToggle: () => void; syncLabel: string; onPreview: () => void; quickLook: boolean; onQuickLook: () => void;
 }) {
     const tint = accent || C.raised();
@@ -107,7 +108,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
             <View style={{ flexDirection: "row", alignItems: "flex-end", gap: GAP.md, marginTop: -36 }}>
                 <View style={{ width: 80, height: 80 }}>
                     <View style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 5, borderColor: C.panel(), backgroundColor: C.raised(), overflow: "hidden" }}>
-                        <StudioAvatar key={avatar} uri={avatar} name={name} />
+                        <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
                     </View>
                     <StudioPresence status={status} borderColor={C.panel()} bottom={2} />
                 </View>
@@ -427,8 +428,8 @@ function PreviewCosmetics({ frame, effect }: { frame?: string; effect?: string }
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
-    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
+export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
+    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
     badges?: string[]; officialBadgeIcon?: string; onBadges?: () => void; onSaved?: () => void;
 }) {
@@ -442,7 +443,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
         </View>
         {layout === "Chat" ? <View style={{ flexDirection: "row", gap: GAP.md, padding: GAP.md, borderRadius: R.md, backgroundColor: card }}>
             <View style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
-                <StudioAvatar key={avatar} uri={avatar} name={name} />
+                <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
             </View>
             <View style={{ flex: 1, gap: 4 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
@@ -460,7 +461,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
             <View style={{ backgroundColor: card, borderBottomLeftRadius: R.lg - 3, borderBottomRightRadius: R.lg - 3, padding: GAP.md, paddingTop: 50, gap: 6 }}>
                 <View style={{ position: "absolute", top: -42, left: 14, width: 84, height: 84 }}>
                     <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: card, backgroundColor: C.raised(), overflow: "hidden" }}>
-                        <StudioAvatar key={avatar} uri={avatar} name={name} />
+                        <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
                     </View>
                     {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -10, left: -10, width: 104, height: 104 }} resizeMode="contain" /> : null}
                     <StudioPresence status={status} borderColor={card} />
@@ -505,8 +506,8 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
-    name: string; username: string; pronouns?: string; avatar?: string; banner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
+export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
+    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
     customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[]; officialBadgeIcon?: string;
     frame?: string; effect?: string;
 }) {
@@ -520,7 +521,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
         </View>
         <View style={{ position: "absolute", top: 54, left: 14, width: 84, height: 84 }}>
             <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: ring, backgroundColor: ring, overflow: "hidden" }}>
-                <StudioAvatar key={avatar} uri={avatar} name={name} />
+                <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
             </View>
             {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
             <StudioPresence status={status} borderColor={ring} borderWidth={5} />
