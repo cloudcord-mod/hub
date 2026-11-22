@@ -17101,6 +17101,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= 16777215)
       return "#" + value.toString(16).padStart(6, "0");
   }
+  function sharedProfileColorsEnabled(data) {
+    if (typeof data?.profileColorsEnabled === "boolean")
+      return data.profileColorsEnabled;
+    return data?.primaryColor != null || data?.accentColor != null;
+  }
   function nativeProfilePreviewSurface(userId, profile, userBanner) {
     var colors = profile?.themeColors ?? profile?.theme_colors;
     return {
@@ -25474,7 +25479,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           giftLevel: Number.isInteger(data.giftLevel) ? data.giftLevel : -1,
           avatarDecoration: String(data.avatarDecoration || ""),
           avatarDecorationSku: String(data.avatarDecorationSku || ""),
-          profileColorsEnabled: data.profileColorsEnabled === true || data.primaryColor != null || data.accentColor != null,
+          profileColorsEnabled: sharedProfileColorsEnabled(data),
           primaryColor: colorHex(data.primaryColor, preview.primaryColor),
           accentColor: colorHex(data.accentColor, preview.accentColor),
           bio: String(data.bio || ""),
@@ -32138,7 +32143,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       giftLevel: Number.isInteger(data.giftLevel) ? data.giftLevel : -1,
       avatarDecoration: String(data.avatarDecoration || ""),
       avatarDecorationSku: String(data.avatarDecorationSku || ""),
-      profileColorsEnabled: data.profileColorsEnabled === true || data.primaryColor != null || data.accentColor != null,
+      profileColorsEnabled: sharedProfileColorsEnabled(data),
       primaryColor: colorHex(data.primaryColor, ""),
       accentColor: colorHex(data.accentColor, ""),
       bio: String(data.bio || ""),
@@ -72220,7 +72225,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ce069b89ef8e7157a81b8cda787b19b6f6c1720e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "87f6f5f8bbfd0be76156e087f9ab534c998caca7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
