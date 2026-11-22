@@ -1799,6 +1799,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const originalStyles = Object.freeze(rule.style?.key ? { [rule.style.key]: baseStyle } : {});
             const original = Object.freeze({ type: "NativeTarget", props: Object.freeze({ value: "original", style: baseStyle, styles: originalStyles }) });
             const wraps = [];
+            if (desktop && target === "hide-profile-about-me") {
+                const native = Object.freeze({ userBio: "Native bio", disableInteractions: true });
+                const rewrite = module.exports.default.rewriteProfileBioProps;
+                assert.equal(rewrite(native).userBio, "");
+                click(render(), "Disable " + rule.plugin);
+                assert.equal(rewrite(native), native);
+                continue;
+            }
             if (desktop) assert.equal(stylesheet.textContent, rule.css);
             else if (rule.style?.centeredMessageList) {
                 const element = jsx(NativeMessages, { style: baseStyle });

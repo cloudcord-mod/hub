@@ -517,6 +517,7 @@ function ReadAllServersButton() {
     }}>Read All</TextButton>;
 }
 const profileBioTransforms = new Set<(bio: string) => string>();
+let hiddenProfileBioUsers = 0;
 const typingDotListeners = new Set<() => void>();
 let staticTypingDotUsers = 0;
 let codeBlockGapUsers = 0;
@@ -751,8 +752,12 @@ function registerStaticTypingDots() {
     };
 }
 
-function applyAppearanceCss(target: keyof typeof cxAppearanceTargets) {
+function applyAppearanceTarget(target: keyof typeof cxAppearanceTargets) {
     const rule = cxAppearanceTargets[target];
+    if (target === "hide-profile-about-me") {
+        hiddenProfileBioUsers++;
+        return () => { hiddenProfileBioUsers--; };
+    }
     if ("mobileOnly" in rule && rule.mobileOnly) throw new Error("This appearance option is available on mobile.");
     const style = document.createElement("style");
     style.textContent = rule.css;
@@ -1009,8 +1014,8 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 removeContextMenuPatch(menus, patch);
             };
         },
-        hideAppearanceTarget: applyAppearanceCss,
-        styleAppearanceTarget: applyAppearanceCss,
+        hideAppearanceTarget: applyAppearanceTarget,
+        styleAppearanceTarget: applyAppearanceTarget,
         registerTimestampFormats: timestamps.register,
         registerUploadAnonymiser(anonymiser) {
             if (uploadAnonymiser) throw new Error("An upload naming rule is already enabled");
@@ -2182,7 +2187,9 @@ export default definePlugin({
         return imageLinkUsers > 0;
     },
     rewriteProfileBioProps<T extends { userBio?: unknown; }>(props: T) {
-        if (!profileBioTransforms.size || typeof props?.userBio !== "string") return props;
+        if (typeof props?.userBio !== "string") return props;
+        if (hiddenProfileBioUsers) return props.userBio ? { ...props, userBio: "" } : props;
+        if (!profileBioTransforms.size) return props;
         let bio = props.userBio;
         for (const transform of profileBioTransforms) bio = transform(bio);
         return bio === props.userBio ? props : { ...props, userBio: bio };
