@@ -190,6 +190,9 @@ import plugin_catalog_hide_scrollbars from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_send_button from "../../../../examples/cx/catalog/plugins/hide-send-button.cx";
 import plugin_catalog_hide_server_banner from "../../../../examples/cx/catalog/plugins/hide-server-banner.cx";
 import plugin_catalog_hide_server_banners from "../../../../examples/cx/catalog/plugins/hide-server-banners.cx";
+import plugin_catalog_hide_server_feed_description from "../../../../examples/cx/catalog/plugins/hide-server-feed-description.cx";
+import plugin_catalog_hide_server_feed_member_count from "../../../../examples/cx/catalog/plugins/hide-server-feed-member-count.cx";
+import plugin_catalog_hide_server_live_notice from "../../../../examples/cx/catalog/plugins/hide-server-live-notice.cx";
 import plugin_catalog_hide_server_tag_promotion from "../../../../examples/cx/catalog/plugins/hide-server-tag-promotion.cx";
 import plugin_catalog_hide_shop_button_tip from "../../../../examples/cx/catalog/plugins/hide-shop-button-tip.cx";
 import plugin_catalog_hide_shop_orbs_tip from "../../../../examples/cx/catalog/plugins/hide-shop-orbs-tip.cx";
@@ -683,6 +686,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideSendButton", source: plugin_catalog_hide_send_button, description: "Hide the chat send button", categories: ["Appearance"], appearanceRevision: "2c963173d276b2197c7e2228e8e884b0561a6b26b52b219408a2369030346419" },
         { name: "HideServerBanner", source: plugin_catalog_hide_server_banner, description: "Hide the channel list server banner", categories: ["Appearance"], appearanceRevision: "825488db0fc80c0d1087857297d001e600e4f5a1d5df8f6d3c3c683800448993" },
         { name: "HideServerBanners", source: plugin_catalog_hide_server_banners, description: "Hide Hides banners at the top of server channel lists", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideServerFeedDescription", source: plugin_catalog_hide_server_feed_description, description: "Hide the description in the server feed header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0b91360c169d0ff361019736e7f075031ff7d83f65cde09c7636f749c8a1522e" },
+        { name: "HideServerFeedMemberCount", source: plugin_catalog_hide_server_feed_member_count, description: "Hide the member count in the server feed header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "39fe7b993c1c301b4582971ef276104114f0e634d667c0a7c79140b911dc92bc" },
+        { name: "HideServerLiveNotice", source: plugin_catalog_hide_server_live_notice, description: "Hide the live event notice above the server channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "02cedf54e3dcbd4628039da3c365116f739d2e1bfd79d50f992155546f1830df" },
         { name: "HideServerTagPromotion", source: plugin_catalog_hide_server_tag_promotion, description: "Hide the server tag upsell in server settings", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640" },
         { name: "HideShopButtonTip", source: plugin_catalog_hide_shop_button_tip, description: "Hide the Shop button introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848" },
         { name: "HideShopOrbsTip", source: plugin_catalog_hide_shop_orbs_tip, description: "Hide the Orbs badge introduction in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c85b6065539f13b9ef0db320e0202a52659ad7c1524c8630cf4bc2a4a81e31fe" },

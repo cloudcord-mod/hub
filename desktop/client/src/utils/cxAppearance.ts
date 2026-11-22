@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, path: string) {
 }
 
 export const cxAppearanceTargets = {
+    "hide-server-feed-description": { plugin: "HideServerFeedDescription", label: "Hide the description in the server feed header", css: "", mobileOnly: true, style: { component: "GuildFeedBanner", props: { hideDescription: true } } },
+    "hide-server-feed-member-count": { plugin: "HideServerFeedMemberCount", label: "Hide the member count in the server feed header", css: "", mobileOnly: true, style: { component: "GuildFeedBanner", props: { hideMemberCount: true } } },
+    "hide-server-live-notice": hideMobileComponent("HideServerLiveNotice", "the live event notice above the server channel list", "modules/guild_scheduled_events/native/guild_sidebar/GuildLiveChannelNotice.tsx"),
     "hide-gif-favorite-button": hideMobileComponent("HideGifFavoriteButton", "the favorite button when viewing GIFs", "modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"),
     "hide-composer-emoji-promo": hideMobileComponent("HideComposerEmojiPromo", "the premium emoji promotion in composer autocomplete", "modules/channel_text_area/native/ChannelAutocompleteEmojiUpsell.tsx"),
     "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),

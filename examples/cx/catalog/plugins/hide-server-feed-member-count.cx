@@ -1,0 +1,3 @@
+plugin "HideServerFeedMemberCount":
+  needs appearance.style
+  style hide-server-feed-member-count

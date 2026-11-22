@@ -570,7 +570,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "UserProfilePremiumUpsellCard", "BadgeCustomizationProfileCoachmark", "ActivitiesPrivateChannelCallTooltip",
             "UserProfileActivityBadges", "UserProfileActivityTimebar", "UserProfileWishlistSuggestionsGrid", "WishlistViewerCoachmark",
             "GuildHeaderCoachmarks", "GuildEventVoiceBanner", "VoicePanelStreamPreview",
-            "MediaViewerOverlayButtonFavoriteGIF", "ChannelAutocompleteEmojiUpsell"].map(name => [
+            "MediaViewerOverlayButtonFavoriteGIF", "ChannelAutocompleteEmojiUpsell", "GuildLiveChannelNotice"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>
@@ -1825,9 +1825,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 const next = wrapped.type(wrapped.props);
                 if (rule.style.props) {
                     for (const [prop, value] of Object.entries(rule.style.props)) assert.equal(next.props[prop], value);
-                    const excluded = jsx("NativeTarget", { [rule.style.skipWhenTrue]: true });
-                    const exclusion = appearanceHooks.get(rule.style.component)(null, excluded);
-                    assert.equal(exclusion.type(exclusion.props), excluded);
+                    if (rule.style.skipWhenTrue) {
+                        const excluded = jsx("NativeTarget", { [rule.style.skipWhenTrue]: true });
+                        const exclusion = appearanceHooks.get(rule.style.component)(null, excluded);
+                        assert.equal(exclusion.type(exclusion.props), excluded);
+                    }
                 } else {
                     const styles = rule.style.key ? next.props.styles[rule.style.key] : next.props.style;
                     assert.equal(styles[0], baseStyle);

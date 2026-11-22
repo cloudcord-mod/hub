@@ -1,0 +1,3 @@
+plugin "HideServerLiveNotice":
+  needs appearance.hide
+  hide hide-server-live-notice

@@ -1,0 +1,3 @@
+plugin "HideServerFeedDescription":
+  needs appearance.style
+  style hide-server-feed-description

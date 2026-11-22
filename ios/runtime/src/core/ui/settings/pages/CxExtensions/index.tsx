@@ -2376,7 +2376,8 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
         if ("component" in style) {
             return registerJsxAppearance([style.component], element => {
                 if ("props" in style) {
-                    return element.props[style.skipWhenTrue] === true ? element : React.cloneElement(element, style.props);
+                    return "skipWhenTrue" in style && element.props[style.skipWhenTrue] === true
+                        ? element : React.cloneElement(element, style.props);
                 }
                 if (!("key" in style)) return React.cloneElement(element, { style: [element.props.style, style.values] });
                 const styles = element.props.styles;
