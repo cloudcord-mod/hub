@@ -33883,6 +33883,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       query,
       commandSearch
     ]);
+    var getItemKey = props.getItemKey;
+    var keyExtractor = (0, import_react8.useCallback)(({ obj }, index) => getItemKey?.(obj) ?? String(index), [
+      getItemKey
+    ]);
+    var renderItem = (0, import_react8.useCallback)(({ item }) => /* @__PURE__ */ jsx(CardComponent, {
+      item: item.obj,
+      result: item
+    }), [
+      CardComponent
+    ]);
     var onInstallPress = (0, import_react8.useCallback)(() => {
       if (!props.installAction)
         return () => {
@@ -34019,7 +34029,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         /* @__PURE__ */ jsx(FlashList, {
           data: results,
           extraData: search,
-          keyExtractor: props.getItemKey ? ({ obj }) => props.getItemKey(obj) : void 0,
+          keyExtractor: getItemKey ? keyExtractor : void 0,
           keyboardShouldPersistTaps: "handled",
           estimatedItemSize: 136,
           ListHeaderComponent: headerElement,
@@ -34060,10 +34070,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }
           }),
           ListFooterComponent: props.ListFooterComponent,
-          renderItem: ({ item }) => /* @__PURE__ */ jsx(CardComponent, {
-            item: item.obj,
-            result: item
-          })
+          renderItem
         }),
         props.installAction && /* @__PURE__ */ jsx(FloatingActionButton, {
           positionBottom: bottomInset + 8,
@@ -74349,7 +74356,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "52624cd3b62c6fa65433d1ec8ba75871a6299650";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d8e116c3b1f26e123041a37a42d1a7998ad81aa5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
