@@ -19,6 +19,7 @@ import { getThemeInfo, stripBOM, type UserThemeHeader } from "@utils/themes/bd";
 import type { CxAddonKind, CxAddonRow } from "@sincordplugins/cxExtensions";
 import { SettingsTab } from "@components/settings/tabs/BaseTab";
 import { classNameFactory } from "@utils/css";
+import { searchCxCatalog } from "@utils/cx";
 import { promptToRestart } from "@utils/promptToRestart";
 import type { PluginNative } from "@utils/types";
 import { Alerts, showToast, useEffect, useMemo, useRef, useState } from "@webpack/common";
@@ -119,15 +120,21 @@ export function PluginsPage() {
     useEffect(() => setLimit(PAGE), [query, sort, enabledOnly, filter]);
 
     const visible = useMemo(listablePlugins, []);
+    const nativeSearchRows = useMemo(() => visible.map(plugin => ({
+        name: plugin.name,
+        description: plugin.description,
+        keywords: plugin.tags?.join(" "),
+        plugin,
+    })), [visible]);
     const cxRows = cxAddons().useCxAddonRows("plugin", query);
     const allCxRows = cxAddons().useCxAddonRows("plugin", "");
     const cxByName = new Map(allCxRows.map(entry => [entry.name.toLowerCase(), entry]));
     const nativeByName = new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin]));
 
-    const q = query.trim().toLowerCase();
-    const commandSearch = q.startsWith("/");
-    const shownNative = filter === "all" && !commandSearch ? visible.filter(p => (!cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name))
-        && (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags?.some(t => t.toLowerCase().includes(q)))) : [];
+    const commandSearch = query.trimStart().startsWith("/");
+    const nativeMatches = useMemo(() => searchCxCatalog(nativeSearchRows, query), [nativeSearchRows, query]);
+    const shownNative = filter === "all" && !commandSearch ? nativeMatches.map(row => row.plugin)
+        .filter(p => !cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name)) : [];
     const shownNames = new Set(shownNative.map(plugin => plugin.name.toLowerCase()));
     const shown = [
         ...shownNative.map(plugin => ({ name: plugin.name, active: isPluginEnabled(plugin.name), plugin, extension: undefined })),

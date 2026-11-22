@@ -1,5 +1,6 @@
 const fs = require("node:fs"), vm = require("node:vm"), assert = require("node:assert/strict");
 const esbuild = require("esbuild");
+const { loadCxRuntime } = require("./sync-cx-catalog.cjs");
 let active, visibility = {};
 const imported = [];
 const React = {
@@ -76,7 +77,7 @@ const commonHooks = {
 };
 const nativePlugins = {
     same: { name: "Shared", description: "Native version" },
-    disabled: { name: "Disabled", description: "Off" },
+    disabled: { name: "Disabled", description: "Off", tags: ["Local media", "History"] },
     hidden: { name: "Hidden", description: "Internal", required: true },
 };
 const catalog = {
@@ -90,7 +91,8 @@ const catalog = {
 const countMocks = {
     "@api/PluginManager": { plugins: nativePlugins, isPluginEnabled: name => name === "Shared" },
     "@api/Settings": { useSettings: () => ({ enabledThemes: ["a.css"], enabledThemeLinks: ["file"] }) },
-    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => query === "/off" ? catalog[kind].slice(1) : catalog[kind] },
+    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => query === "/off" ? catalog[kind].slice(1) : query ? [] : catalog[kind] },
+    "@utils/cx": loadCxRuntime(),
     "@utils/css": mocks["@utils/css"],
     "@webpack/common": commonHooks,
     "@components/settings/AddonCard": { AddonCard: "CatalogCard" },
@@ -122,6 +124,8 @@ assert.ok(renderList().some(node => node.props.name === "Shared" || node.props.p
 toggle.props.onChange(false);
 beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("/off");
 assert.deepEqual(shownCards().map(node => node.props.name), ["Local", "Disabled"]);
+beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("history média");
+assert.deepEqual(shownCards().map(node => node.props.plugin?.name), ["Disabled"]);
 
 const mobileModule = { exports: {} };
 let filterSheet;
