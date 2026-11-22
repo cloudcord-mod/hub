@@ -37116,6 +37116,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-gif-favorite-button": {
           plugin: "HideGifFavoriteButton",
           label: "the favorite button when viewing GIFs",
+          catalogOriginal: "hide-gif-favorite-button.cx",
           css: 'button:is([class^="gifFavoriteButton_"], [class*=" gifFavoriteButton_"]) { display: none !important; }',
           mobile: {
             hideComponentPaths: [
@@ -37462,6 +37463,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-chat-attachments": {
           plugin: "HideChatAttachments",
           label: "file and media attachments in chat",
+          catalogOriginal: "hide-chat-attachments.cx",
           css: '[id^="message-accessories-"] :is([class^="attachment_"], [class*=" attachment_"], [class^="newMosaicStyle_"], [class*=" newMosaicStyle_"], [class^="audioAttachment_"], [class*=" audioAttachment_"]) { display: none !important; }',
           mobile: {
             messagePresentation: "attachments"
@@ -71995,7 +71997,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f4c6ac0cc05c7db1c6bafc92c35a697ca0cd1c48";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "268dc82ef84bab3e285ecd1dbf21c60fc5fbdffd";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
