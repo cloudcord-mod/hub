@@ -183,7 +183,7 @@ const frameColor = nodes => nodes.find(node => node.props.className === "cpx-car
 assert.equal(bannerStyle(previewDesktop({})).backgroundImage, `url("${nativeBanner}")`);
 assert.equal(frameColor(previewDesktop({ nitro: false, accentColor: 0xffffff })), "#000000");
 assert.equal(frameColor(previewDesktop({ nitro: true, accentColor: 0xffffff })), "#ffffff");
-assert.ok(previewDesktop({}).some(node => node.props["aria-label"] === "Status: idle"));
+assert.ok(previewDesktop({}).some(node => node.props.role === "img" && node.props["aria-label"] === "Status: idle"));
 assert.ok(!previewDesktop({ customStatus: {} }).some(node => node.props.className === "cpx-card-custom"));
 assert.ok(previewDesktop({ customStatus: { emoji: "☁" } }).find(node => node.props.className === "cpx-card-custom")?.props.children.includes("☁"));
 assert.ok(containsText(previewDesktop({ customActivity: { type: -1, name: "Test game" } }), "Playing"));

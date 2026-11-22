@@ -233,7 +233,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
             <div className="cpx-card-avatar">
                 <PreviewAvatar key={avatarKey} src={avatar} fallback={fallbackAvatar} name={name} className="cpx-card-avatar-img" />
                 {decorationUrl && <img className="cpx-card-decoration" src={decorationUrl} alt="" />}
-                <span className="cpx-card-status" style={{ background: status === "streaming" ? "#593695" : STATUS_COLORS[status] }} aria-label={`Status: ${status}`} />
+                <span role="img" className="cpx-card-status" style={{ background: status === "streaming" ? "#593695" : STATUS_COLORS[status] }} aria-label={`Status: ${status}`} />
             </div>
             <div className="cpx-card-body">
                 <div className="cpx-card-name" style={nameplateUrl ? { backgroundImage: `url("${nameplateUrl}")` } : undefined}>
@@ -283,7 +283,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
             <div className="cpx-dc-avatar">
                 <PreviewAvatar key={JSON.stringify([data.avatar, fallbackAvatar])} src={data.avatar || fallbackAvatar} fallback={fallbackAvatar} name={data.globalName || fallbackName} className="cpx-dc-avatar-img" />
                 {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}
-                <span className={`cpx-dc-status cpx-dc-status-${status}`} aria-label={`Status: ${status}`} />
+                <span role="img" className={`cpx-dc-status cpx-dc-status-${status}`} aria-label={`Status: ${status}`} />
             </div>
             {badges.length > 0 && <div className="cpx-dc-badges">{badges.map(badge => <img key={badge.id} src={badge.icon} alt={badge.label} title={badge.label} data-cloudcord-official={badge.id.startsWith("cloudcord-official-") || undefined} />)}</div>}
             <div className="cpx-dc-body">
