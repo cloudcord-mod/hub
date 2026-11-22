@@ -49,6 +49,11 @@ const metro = {
     common: Object.assign(stub("metro.common"), {
         React: stub("metro.common.React"),
         ReactNative: stub("metro.common.ReactNative"),
+        stylesheet: { createThemedStyleSheet: stub("metro.common.stylesheet.createThemedStyleSheet") },
+        FluxDispatcher: {
+            subscribe: stub("metro.common.FluxDispatcher.subscribe"),
+            unsubscribe: stub("metro.common.FluxDispatcher.unsubscribe"),
+        },
     }),
     find: stub("metro.find"),
     findByName: stub("metro.findByName"),
