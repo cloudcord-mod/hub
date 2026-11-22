@@ -3106,7 +3106,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
     const [category, setCategory] = React.useState<CxCatalogCategory>("All");
     const [activeOnly, setActiveOnly] = React.useState(false);
     const [status, setStatus] = React.useState("");
-    const [candidate, setCandidate] = React.useState<{ source: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
+    const [candidate, setCandidate] = React.useState<{ source: string; originalSource: string; review: ReturnType<typeof reviewCx>; selected: string[]; }>();
     const [, refreshOptions] = React.useState(0);
     const selection = React.useRef(0);
 
@@ -3116,7 +3116,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
         try {
             const preview = reviewCx(next);
             if (kind && preview.kind !== kind) throw new Error(`Open this file from ${preview.kind === "theme" ? "Themes" : "Plugins"}.`);
-            setCandidate({ source: next, review: preview, selected: preview.appearanceOptions
+            setCandidate({ source: next, originalSource: next, review: preview, selected: preview.appearanceOptions
                 .filter(option => option.defaultOn && supportsMobileHide(option)).map(option => option.target) });
             setStatus("");
         } catch (error) {
@@ -3253,8 +3253,9 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                             style={{ color: "#fff", backgroundColor: "#27282d", borderRadius: 8, minWidth: 54, padding: 8, textAlign: "center" }}
                             onChangeText={(text: string) => {
                                 if (!/^\d+$/.test(text)) return;
-                                const next = updateCxNumberOption(candidate.source, option, Number(text));
-                                if (next === candidate.source) return;
+                                const selected = Number(text);
+                                if (selected < option.min || selected > option.max || selected === option.value) return;
+                                const next = applyRememberedNumbers(candidate.originalSource, { ...numberValues, [option.effect]: selected });
                                 setSource(next.length <= CX_INLINE_EDITOR_LIMIT ? next : "");
                                 setCandidate({ ...candidate, source: next, review: reviewCx(next) });
                             }} />

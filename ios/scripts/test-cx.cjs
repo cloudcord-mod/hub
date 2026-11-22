@@ -6152,6 +6152,9 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(saved.revision, createHash("sha256").update(source.replaceAll("\r\n", "\n")).digest("hex"));
             assert.ok(!("source" in saved), "mobile stores only approval metadata and options");
             selectCatalog("MoreJumboEmoji");
+            find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit").props.onChangeText("10");
+            find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit").props.onChangeText("50");
+            assert.ok(button(render(), "Allow and remember on this device"), "returning to the catalog default keeps the approval available");
             find(render(), item => item.props.accessibilityLabel === "Jumbo emoji limit").props.onChangeText("0");
             click(render(), "Allow and remember on this device");
             const jumboApproval = settings.cxRememberedAppearance.find(entry => entry.name === "MoreJumboEmoji");
