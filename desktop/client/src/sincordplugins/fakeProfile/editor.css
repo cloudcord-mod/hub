@@ -240,6 +240,10 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 
 .cpx-dc { --dc-bg: var(--background-floating, #111214); border-radius: 8px; overflow: hidden; background: var(--dc-bg); box-shadow: 0 8px 16px rgb(0 0 0 / 24%); transition: transform 0.12s ease, box-shadow 0.12s ease; }
 .cpx-saved-item:hover .cpx-dc { transform: translateY(-2px); box-shadow: 0 12px 24px rgb(0 0 0 / 32%); }
+@media (prefers-reduced-motion: reduce) {
+    .cpx-dc { transition: none; }
+    .cpx-saved-item:hover .cpx-dc { transform: none; }
+}
 .cpx-dc-themed { padding: 4px; background: linear-gradient(var(--dc-primary), var(--dc-secondary)); }
 .cpx-dc-inner { position: relative; border-radius: 4px; overflow: hidden; }
 .cpx-dc-themed .cpx-dc-inner { background: linear-gradient(rgb(0 0 0 / 45%), rgb(0 0 0 / 55%)); }
