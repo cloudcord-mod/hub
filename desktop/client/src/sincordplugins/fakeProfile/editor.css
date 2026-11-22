@@ -266,6 +266,13 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 .cpx-dc-activity { display: flex; flex-direction: column; gap: 1px; font-size: 12px; color: #b5bac1; }
 .cpx-dc-activity strong { color: #f2f3f5; font-size: 13px; }
 .cpx-dc-activity-verb { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+.cpx-dc:not(.cpx-dc-themed) :is(.cpx-dc-display, .cpx-dc-activity strong) { color: var(--header-primary, #f2f3f5); }
+.cpx-dc:not(.cpx-dc-themed) :is(.cpx-dc-username, .cpx-dc-bubble, .cpx-dc-bio) { color: var(--text-normal, #dbdee1); }
+.cpx-dc:not(.cpx-dc-themed) .cpx-dc-activity { color: var(--text-muted, #b5bac1); }
+.cpx-dc:not(.cpx-dc-themed) :is(.cpx-dc-badges, .cpx-dc-bubble, .cpx-dc-section, .cpx-dc-tag) {
+    background: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+}
+.cpx-dc-bio, .cpx-dc-activity, .cpx-dc-username { overflow-wrap: anywhere; }
 
 /* Templates tab */
 .cpx-tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
