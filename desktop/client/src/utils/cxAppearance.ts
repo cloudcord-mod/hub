@@ -530,6 +530,11 @@ export const cxAppearanceTargets = {
         css: '[id^="chat-messages-"] time:is([class^="timestampInline_"], [class*=" timestampInline_"]), [id^="chat-messages-"] :is([class^="timestampInline_"], [class*=" timestampInline_"]) time { color: var(--text-normal, currentColor) !important; font-size: 0.875rem !important; }',
         desktopOnly: true, style: {},
     },
+    "visible-keyboard-focus": {
+        plugin: "VisibleKeyboardFocus", label: "Show a stronger outline on controls reached with the keyboard",
+        css: ':where(button, a[href], input, textarea, select, [role="button"], [tabindex], [contenteditable="true"]):focus-visible { outline: 2px solid var(--focus-primary, #00a8fc) !important; outline-offset: -2px !important; }',
+        desktopOnly: true, style: {},
+    },
     "message-stickers": {
         plugin: "HideStickers", label: "stickers in chat",
         css: '[class*="stickerAsset"] { display: none !important; }',

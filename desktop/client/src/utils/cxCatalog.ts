@@ -537,6 +537,7 @@ import plugin_catalog_video_size_estimate from "../../../../examples/cx/catalog/
 import plugin_catalog_view_group_dm_icon from "../../../../examples/cx/catalog/plugins/view-group-dm-icon.cx";
 import plugin_catalog_view_role_icon from "../../../../examples/cx/catalog/plugins/view-role-icon.cx";
 import plugin_catalog_view_server_media from "../../../../examples/cx/catalog/plugins/view-server-media.cx";
+import plugin_catalog_visible_keyboard_focus from "../../../../examples/cx/catalog/plugins/visible-keyboard-focus.cx";
 import plugin_catalog_voice_count from "../../../../examples/cx/catalog/plugins/voice-count.cx";
 import plugin_catalog_voice_join_messages from "../../../../examples/cx/catalog/plugins/voice-join-messages.cx";
 import plugin_catalog_vote_tally from "../../../../examples/cx/catalog/plugins/vote-tally.cx";
@@ -1199,6 +1200,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "View Group DM Icon", source: plugin_catalog_view_group_dm_icon, description: "View the selected group DM's icon", categories: ["Media","Servers & channels"] },
         { name: "ViewRoleIcon", source: plugin_catalog_view_role_icon, description: "Open the selected server role's icon in Discord's image viewer", categories: ["Media","Servers & channels"] },
         { name: "View Server Media", source: plugin_catalog_view_server_media, description: "View the selected server's icon and banner", categories: ["Media","Servers & channels"] },
+        { name: "VisibleKeyboardFocus", source: plugin_catalog_visible_keyboard_focus, description: "Show a stronger outline on controls reached with the keyboard", desktopOnly: true, categories: ["Appearance"] },
         { name: "VoiceCount", source: plugin_catalog_voice_count, description: "Show occupancy and capacity in the channel list", categories: ["Voice & calls"] },
         { name: "VoiceJoinMessages", source: plugin_catalog_voice_join_messages, description: "Show local notifications when friends join or move between voice channels", categories: ["Voice & calls"] },
         { name: "Vote Tally", source: plugin_catalog_vote_tally, description: "/votetally", commands: ["votetally"], categories: ["Commands"], appearanceRevision: "fcdd4eaf96dbf42cf9f609779e3075adb301655718a356c662dcae1611540630", privateCommands: true },

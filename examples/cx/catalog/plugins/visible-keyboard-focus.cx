@@ -1,0 +1,3 @@
+plugin "VisibleKeyboardFocus":
+  needs appearance.style
+  style visible-keyboard-focus
