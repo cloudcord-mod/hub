@@ -2,6 +2,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const esbuild = require('esbuild');
+const { sharedProfileColorsEnabled } = require('./load-profile-appearance.cjs');
 const workflow = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
 const source = workflow.split("cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'")[1].split('\n          TSX')[0].replace(/^          /gm, '');
 const compile = text => esbuild.transformSync(text, { loader: 'tsx' }).code;
@@ -95,7 +96,7 @@ vm.runInContext(compile(publishedSource), refreshContext);
         customSocialValidationErrors: () => [], currentUserId: '123456789012345',
         Date, JSON, SHARED_PROFILE_API: 'https://example.test', BADGES: [],
         fetch: async () => ({ ok: true, json: async () => ({ profile }) }),
-        normalizeProfileAppearance: () => ({}), mediaClearPending: () => false,
+        normalizeProfileAppearance: () => ({}), mediaClearPending: () => false, sharedProfileColorsEnabled,
         remoteNitroEnabled: data => data.nitro === true, remoteReplaceBadges: () => false,
         colorHex: (value, fallback) => value ?? fallback, diagnostics: {},
         clearCache: () => clears++,
