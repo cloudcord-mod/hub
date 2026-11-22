@@ -715,7 +715,8 @@ let profileRuntimeActive = false;
 let profileRuntimeGeneration = 0;
 // Device-only settings that never belong in the shared profile.
 // Set while a template is previewed on your profile.
-let templatePreview: { ownerId: string; data: CustomProfileData; enabled: boolean; pullUntil: number; name: string; } | null = null;
+type ActiveTemplate = { id: string; name: string; data: CustomProfileData; };
+let templatePreview: { ownerId: string; data: CustomProfileData; enabled: boolean; pullUntil: number; template: ActiveTemplate; } | null = null;
 const LOCAL_ONLY_FIELDS = ["localOnly", "hideOtherProfiles", "nativeEditorImages", "hideBadgesWhenSyncOff", "copiedUserId"];
 const DESKTOP_PROFILE_FIELDS = new Set([
     ...LOCAL_ONLY_FIELDS, "username", "globalName", "displayName", "avatar", "banner", "bio", "pronouns",
@@ -2093,7 +2094,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
             </Section>
         </>,
         others: <OtherProfilesPanel />,
-        templates: <TemplatesPanel ownerId={selectedAccountId} current={data} onApply={value => setData({ ...data, ...value })} />,
+        templates: <TemplatesPanel ownerId={selectedAccountId} current={data} onApply={value => setData(current => loadSavedLook(current, value))} />,
         saved: <SavedProfilesPanel key={selectedAccountId} current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
             decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
             effectFor={skuId => catalogData?.effects.find(item => item.skuId === skuId)?.title} frameFor={skuId => catalogData?.frames.find(item => item.skuId === skuId)?.label} />,
@@ -3508,11 +3509,11 @@ function ShareControls({ ownerId, item, onChange }: { ownerId: string; item: Sav
 interface TemplateSummary { id: string; name: string; category?: string; description?: string; uses?: number; preview?: { name?: string; avatar?: string; banner?: string; bio?: string; accent?: string; }; }
 const countTemplateUse = (id: string) => { void fetch(`${SHARED_PROFILE_API}/v1/shares/${id}/use`, { method: "POST" }).catch(() => { }); };
 async function fetchTemplate(id: string, ownerId: string) {
+    if (activeUserId() !== ownerId) throw new Error("Switch to this Discord account to load the template.");
     const own = activeUserId() === ownerId ? readSavedProfiles(ownerId).find(item => item.share?.id === id) : undefined;
     const share = await shareRequest(`/${id}`, { method: "GET", token: own?.share?.token });
-    // Blank fields in a template (name, bio, picture) keep your own instead of clearing them.
-    const data = Object.fromEntries(Object.entries(fromSharedProfile(share.profile)).filter(([, value]) => value !== "" && value !== undefined)) as CustomProfileData;
-    return { name: String(share.name || "Template"), data };
+    if (activeUserId() !== ownerId) throw new Error("Your Discord account changed.");
+    return { id, name: String(share.name || "Template"), data: fromSharedProfile(share.profile) };
 }
 const newSavedId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
@@ -3523,19 +3524,19 @@ function refreshOwnProfile() {
     forceAccountPanelRerender();
     reloadDiscordProfile(activeUserId());
 }
-function startTemplatePreview(ownerId: string, name: string, data: CustomProfileData) {
+function startTemplatePreview(ownerId: string, template: ActiveTemplate) {
     if (activeUserId() !== ownerId) throw new Error("Switch to this Discord account to preview its profile.");
-    if (templatePreview?.ownerId !== ownerId) templatePreview = { ownerId, data: storedData, enabled: isEnabled, pullUntil: suppressOwnPullUntil, name };
-    templatePreview.name = name;
+    if (templatePreview?.ownerId !== ownerId) templatePreview = { ownerId, data: storedData, enabled: isEnabled, pullUntil: suppressOwnPullUntil, template };
+    else templatePreview.template = template;
     // Keep your own settings; take the template's whole look (colors, banner and cosmetics).
     // Cosmetics the template doesn't have are cleared so the preview matches it exactly.
-    const look: CustomProfileData = { nameplate: null, profileEffect: null, profileFrame: null, decorationAsset: undefined, decorationSkuId: undefined, banner: "", accentColor: undefined, accentColor2: undefined, ...data };
+    const look: CustomProfileData = { nameplate: null, profileEffect: null, profileFrame: null, ...template.data };
     // Device-only, so a preview is never published to other people.
-    storedData = { ...templatePreview.data, ...look, localOnly: true, hideBadgesWhenSyncOff: false };
+    storedData = { ...loadSavedLook(templatePreview.data, look), localOnly: true, hideBadgesWhenSyncOff: false };
     isEnabled = true;
     suppressOwnPullUntil = Number.MAX_SAFE_INTEGER;
     refreshOwnProfile();
-    try { popNotice(); showNotice(`Previewing the "${name}" template on your profile. Only you can see it.`, "Stop preview", () => stopTemplatePreview()); } catch (e) { logger.warn("Showing the preview notice failed", e); }
+    try { popNotice(); showNotice(`Previewing the "${template.name}" template on your profile. Only you can see it.`, "Stop preview", () => stopTemplatePreview()); } catch (e) { logger.warn("Showing the preview notice failed", e); }
 }
 function stopTemplatePreview() {
     const previous = templatePreview;
@@ -3582,11 +3583,11 @@ function TemplatesPanel({ ownerId, current, onApply }: { ownerId: string; curren
     const [pubDescription, setPubDescription] = React.useState("");
     const [pubVisibility, setPubVisibility] = React.useState<ShareVisibility>("public");
     const [published, setPublished] = React.useState<ProfileShare | null>(null);
-    const [previewing, setPreviewing] = React.useState<{ id: string; name: string; data: CustomProfileData; } | null>(null);
+    const [previewing, setPreviewing] = React.useState<ActiveTemplate | null>(null);
     // Pick up a preview that's still running from before the editor was reopened.
     React.useEffect(() => {
         const existing = templatePreview;
-        if (existing?.ownerId === ownerId) setPreviewing(value => value ?? { id: "", name: existing.name, data: existing.data });
+        if (existing?.ownerId === ownerId) setPreviewing(value => value ?? existing.template);
     }, [ownerId]);
 
     React.useEffect(() => {
@@ -3607,8 +3608,8 @@ function TemplatesPanel({ ownerId, current, onApply }: { ownerId: string; curren
         if (activeUserId() !== ownerId) throw new Error("Switch to this Discord account to preview its profile.");
         if (previewing?.id === id) { stopTemplatePreview(); setPreviewing(null); return; }
         const template = await fetchTemplate(id, ownerId);
-        startTemplatePreview(ownerId, template.name, template.data);
-        setPreviewing({ id, ...template });
+        startTemplatePreview(ownerId, template);
+        setPreviewing(template);
         showToast(`Previewing "${template.name}". Close the editor and open your profile to see it.`, Toasts.Type.SUCCESS);
     });
     const stopPreview = () => { if (activeUserId() !== ownerId) return; stopTemplatePreview(); setPreviewing(null); showToast("Preview stopped. Your profile is back.", Toasts.Type.SUCCESS); };

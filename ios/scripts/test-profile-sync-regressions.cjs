@@ -200,9 +200,9 @@ assert.equal(nativeSave.storedData.syncRevision, undefined, 'device-only saves n
         const saved = testContext({ ...profileAppearance, activeUserId: () => signedIn,
             readMirror: () => stored, profileStorage: { set: (_, value) => { stored = JSON.parse(value); } },
             toSharedProfile: data => data, shareRequest: async (...args) => { requests.push(args); return { id: 'published', editToken: 'fixture-only' }; },
-            storedData: { bio: 'owner profile' }, isEnabled: true, suppressOwnPullUntil: 0, templatePreview: null,
+            storedData: { bio: 'owner profile', avatar: 'old avatar', localOnly: false }, isEnabled: true, suppressOwnPullUntil: 0, templatePreview: null,
             refreshOwnProfile() {}, popNotice() {}, showNotice() {} });
-        vm.runInContext(compile(block(desktop, 'async function publishShare(', '// Only the look is saved')
+        vm.runInContext(compile(block(desktop, 'async function publishShare(', 'function SavedProfilesPanel(')
             + block(desktop, 'function startTemplatePreview(', 'function TemplateCard(')), saved);
         assert.equal(saved.readSavedProfiles(owner)[0].id, 'legacy');
         assert.equal(saved.readSavedProfiles(alternate).length, 0);
@@ -213,13 +213,17 @@ assert.equal(nativeSave.storedData.syncRevision, undefined, 'device-only saves n
         assert.equal(requests.length, 0);
         await saved.publishShare(owner, stored[owner][0], 'unlisted');
         assert.equal(JSON.parse(requests[0][1].body).ownerId, owner);
-        saved.startTemplatePreview(owner, 'sample', { bio: 'preview' });
+        saved.startTemplatePreview(owner, { id: 'share-id', name: 'sample', data: { bio: 'preview' } });
         assert.equal(saved.storedData.bio, 'preview');
+        assert.equal(saved.storedData.avatar, undefined);
+        assert.equal(saved.storedData.localOnly, true);
+        assert.equal(saved.templatePreview.template.id, 'share-id');
+        assert.equal(saved.templatePreview.data.avatar, 'old avatar');
         signedIn = alternate;
         saved.storedData = { bio: 'alternate profile' };
         saved.stopTemplatePreview();
         assert.equal(saved.storedData.bio, 'alternate profile');
-        assert.throws(() => saved.startTemplatePreview(owner, 'stale', { bio: 'wrong' }), /Switch to this Discord account/);
+        assert.throws(() => saved.startTemplatePreview(owner, { id: 'stale', name: 'stale', data: { bio: 'wrong' } }), /Switch to this Discord account/);
     }
     let modalError = '', modalWrites = 0;
     const modal = testContext({ myId: 'old-account', activeUserId: () => 'new-account',
