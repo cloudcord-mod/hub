@@ -37355,9 +37355,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideAvatarDecorations",
           label: "avatar decorations",
           css: '[class*="avatarDecoration"] { display: none !important; }',
-          mobile: [
-            "CutoutableAvatarDecoration"
-          ]
+          mobile: {
+            messagePresentation: "avatarDecorationURL",
+            legacyComponents: [
+              "CutoutableAvatarDecoration"
+            ]
+          }
         },
         "server-banner": {
           plugin: "HideServerBanner",
@@ -37503,9 +37506,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideReplyPreviews",
           label: "reply previews in chat",
           css: '[class*="repliedMessage"] { display: none !important; }',
-          mobile: [
-            "ReplyMessageContent"
-          ]
+          mobile: {
+            messagePresentation: "referencedMessage",
+            legacyComponents: [
+              "ReplyMessageContent"
+            ]
+          }
         },
         "chat-apps-button": {
           plugin: "HideAppsButton",
@@ -64285,7 +64291,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           if (!("messagePresentation" in mobile))
             return registerJsxAppearance(mobile, () => null);
           var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-          return overrideCxMethods(renderer, {
+          if (typeof renderer?.default !== "function" && "legacyComponents" in mobile)
+            return registerJsxAppearance(mobile.legacyComponents, () => null);
+          var stopRenderer = overrideCxMethods(renderer, {
             default(args, invoke) {
               var presentation = invoke(args);
               if (!presentation || typeof presentation !== "object")
@@ -64305,6 +64313,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     timestampAccessibilityLabel: void 0
                   };
                 }
+              } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL") {
+                var field = mobile.messagePresentation;
+                if (field in presentation && presentation[field] != null)
+                  return {
+                    ...presentation,
+                    [field]: void 0
+                  };
               } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
                 return {
                   ...presentation,
@@ -64314,6 +64329,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               return presentation;
             }
           }, () => !settings.safeMode?.enabled);
+          if (!("legacyComponents" in mobile))
+            return stopRenderer;
+          var stopLegacy1 = registerJsxAppearance(mobile.legacyComponents, () => null);
+          return () => runCxCleanups([
+            stopLegacy1,
+            stopRenderer
+          ]);
         },
         styleAppearanceTarget(target) {
           var definition = cxAppearanceTargets[target];
@@ -68907,7 +68929,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c04da7dc80183f3766a56d9794b3697253ec5ac5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a21472a98e25e28768fd4090607bad74354967d3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
