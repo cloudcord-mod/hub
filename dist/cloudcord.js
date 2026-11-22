@@ -17471,17 +17471,26 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       result.presenceStatus = data.presenceStatus;
     return result;
   }
-  function selectSavedLooks(looks, query, sort, limit) {
+  function selectSavedLooks(looks, query, sort, limit, favoritesOnly = false) {
     var searchKey = (value) => value.normalize("NFKD").replace(RegExp("\\p{M}", "gu"), "").toLowerCase();
     var needle = searchKey(query.trim());
     var matches = looks.map((look) => ({
       look,
       name: String(look.name ?? "")
-    })).filter((item) => !needle || searchKey(item.name).includes(needle));
+    })).filter(({ look, name }) => (!favoritesOnly || look.favorite === true) && (!needle || searchKey(name).includes(needle)));
     matches.sort((a, b3) => sort === "name" ? a.name.localeCompare(b3.name) : (b3.look.savedAt || 0) - (a.look.savedAt || 0));
     return {
       entries: matches.slice(0, limit).map(({ look }) => look),
       total: matches.length
+    };
+  }
+  function duplicateSavedLook(look, id, savedAt, data) {
+    var suffix = " copy";
+    return {
+      id,
+      name: look.name.slice(0, 40 - suffix.length) + suffix,
+      savedAt,
+      data
     };
   }
   function portableLookText(value, limit, multiline = false) {
@@ -31388,8 +31397,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [sort, setSort] = (0, import_react9.useState)("newest");
     var [limit, setLimit] = (0, import_react9.useState)(SAVED_LOOK_PAGE_SIZE);
     var items = readSavedProfiles(ownerId);
-    var visible = selectSavedLooks(items, query, sort, limit);
+    var [favoritesOnly, setFavoritesOnly] = (0, import_react9.useState)(false);
+    var visible = selectSavedLooks(items, query, sort, limit, favoritesOnly);
     var commit = (next) => {
+      if (!ownerId || ownerId !== currentUserId)
+        return;
       writeSavedProfiles(ownerId, next);
       redraw();
     };
@@ -31411,7 +31423,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [code, setCode] = (0, import_react9.useState)("");
     var [busy, setBusy] = (0, import_react9.useState)(false);
     var [sharing, setSharing] = (0, import_react9.useState)(null);
-    var [publicShares, setPublicShares] = (0, import_react9.useState)(null);
+    var [expanded2, setExpanded] = (0, import_react9.useState)(null);
     var run = (task, title = "Sharing") => _async_to_generator(function* () {
       if (busy || !ownerId || ownerId !== currentUserId)
         return;
@@ -31526,14 +31538,36 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       {
         text: "Delete",
         style: "destructive",
-        onPress: () => commit(items.filter((other) => other.id !== item.id))
+        onPress: () => {
+          if (ownerId === currentUserId)
+            commit(readSavedProfiles(ownerId).filter((other) => other.id !== item.id));
+        }
       }
     ]);
+    var toggleFavorite = (item) => {
+      if (ownerId !== currentUserId)
+        return;
+      commit(readSavedProfiles(ownerId).map((other) => other.id === item.id ? {
+        ...other,
+        favorite: !other.favorite
+      } : other));
+    };
+    var duplicateLook = (item) => {
+      if (ownerId !== currentUserId)
+        return;
+      var now = Date.now();
+      var copy = duplicateSavedLook(item, now.toString(36) + Math.random().toString(36).slice(2, 8), now, savedSnapshot(item.data));
+      commit([
+        copy,
+        ...readSavedProfiles(ownerId)
+      ]);
+      showToast("Saved \u201C" + copy.name + "\u201D.");
+    };
     var saveName = () => {
       var value = renaming?.name.trim();
       if (!renaming || !value)
         return;
-      commit(items.map((item) => item.id === renaming.id ? {
+      commit(readSavedProfiles(ownerId).map((item) => item.id === renaming.id ? {
         ...item,
         name: value
       } : item));
@@ -31607,6 +31641,23 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 setSort(value === "name" ? "name" : "newest");
                 setLimit(SAVED_LOOK_PAGE_SIZE);
               }
+            }),
+            /* @__PURE__ */ jsx(S2.Chips, {
+              options: [
+                {
+                  value: "all",
+                  label: "All looks"
+                },
+                {
+                  value: "favorites",
+                  label: "Favorites only"
+                }
+              ],
+              value: favoritesOnly ? "favorites" : "all",
+              onChange: (value) => {
+                setFavoritesOnly(value === "favorites");
+                setLimit(SAVED_LOOK_PAGE_SIZE);
+              }
             })
           ]
         }) : null,
@@ -31618,7 +31669,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         items.length && !visible.total ? /* @__PURE__ */ jsx(Text, {
           variant: "text-sm/medium",
           color: "text-muted",
-          children: "No saved looks match your search."
+          children: favoritesOnly && !query.trim() ? "No favorite looks yet." : "No saved looks match your search."
         }) : null,
         visible.entries.map((item) => {
           var data = item.data || {};
@@ -31668,18 +31719,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           name: value
                         }),
                         onSubmitEditing: saveName
-                      }) : /* @__PURE__ */ jsx(Text, {
+                      }) : /* @__PURE__ */ jsxs(Text, {
                         variant: "text-md/bold",
                         color: "text-normal",
                         numberOfLines: 1,
-                        children: item.name
+                        children: [
+                          item.favorite ? "\u2605 " : "",
+                          item.name
+                        ]
                       }),
                       active ? /* @__PURE__ */ jsx(Text, {
                         variant: "text-xs/bold",
                         style: {
                           color: "#23A55A"
                         },
-                        children: "\u25CF In use"
+                        children: "\u25CF Matches current look"
                       }) : /* @__PURE__ */ jsxs(Text, {
                         variant: "text-xs/medium",
                         color: "text-muted",
@@ -31702,13 +31756,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         onPress: () => setRenaming(null)
                       })
                     ]
-                  }) : /* @__PURE__ */ jsx(S2.Button, {
-                    label: "Rename",
-                    onPress: () => setRenaming({
-                      id: item.id,
-                      name: item.name
-                    })
-                  })
+                  }) : null
                 ]
               }),
               /* @__PURE__ */ jsxs(import_react_native28.View, {
@@ -31718,7 +31766,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 },
                 children: [
                   /* @__PURE__ */ jsx(S2.Button, {
-                    label: active ? "In use" : "Use profile",
+                    label: active ? "Current look" : "Use profile",
                     primary: true,
                     disabled: active,
                     grow: true,
@@ -31729,87 +31777,133 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     }
                   }),
                   /* @__PURE__ */ jsx(S2.Button, {
-                    label: "Update",
+                    label: expanded2 === item.id ? "Hide actions" : "Actions",
                     onPress: () => {
-                      commit(items.map((other) => other.id === item.id ? {
-                        ...other,
-                        data: savedSnapshot(current),
-                        savedAt: Date.now()
-                      } : other));
-                      showToast("Updated \u201C" + item.name + "\u201D");
+                      setExpanded(expanded2 === item.id ? null : item.id);
+                      setRenaming(null);
+                      setSharing(null);
                     }
-                  }),
-                  /* @__PURE__ */ jsx(S2.Button, {
-                    label: "Delete",
-                    danger: true,
-                    onPress: () => remove(item)
                   })
                 ]
               }),
-              /* @__PURE__ */ jsx(S2.Button, {
-                label: "Copy look",
-                disabled: busy,
-                onPress: () => copyLook(item)
-              }),
-              sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native28.View, {
-                style: {
-                  gap: 8
-                },
+              expanded2 === item.id ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsx(S2.Chips, {
-                    options: SHARE_VISIBILITIES,
-                    value: item.share?.visibility ?? "unlisted",
-                    onChange: (value) => shareItem(item, value)
-                  }),
-                  item.share && item.share.visibility !== "private" ? /* @__PURE__ */ jsx(Text, {
-                    variant: "text-sm/medium",
-                    color: "text-normal",
-                    selectable: true,
-                    children: shareLink(item.share.id)
-                  }) : null,
-                  item.share?.visibility === "private" ? /* @__PURE__ */ jsxs(Text, {
-                    variant: "text-xs/medium",
-                    color: "text-muted",
-                    children: [
-                      "Private: only this device can open it. Code ",
-                      item.share.id
-                    ]
-                  }) : null,
                   /* @__PURE__ */ jsxs(import_react_native28.View, {
                     style: {
                       flexDirection: "row",
+                      flexWrap: "wrap",
                       gap: 8
                     },
                     children: [
-                      !item.share ? /* @__PURE__ */ jsx(S2.Button, {
-                        label: busy ? "Sharing\u2026" : "Share unlisted",
-                        primary: true,
-                        disabled: busy,
-                        grow: true,
-                        onPress: () => shareItem(item, "unlisted")
-                      }) : null,
-                      item.share && item.share.visibility !== "private" ? /* @__PURE__ */ jsx(S2.Button, {
-                        label: "Copy link",
-                        grow: true,
-                        onPress: () => copyLink(item.share.id)
-                      }) : null,
-                      item.share ? /* @__PURE__ */ jsx(S2.Button, {
-                        label: "Stop sharing",
-                        danger: true,
-                        disabled: busy,
-                        onPress: () => stopSharing(item)
+                      renaming?.id !== item.id ? /* @__PURE__ */ jsx(S2.Button, {
+                        label: "Rename",
+                        onPress: () => setRenaming({
+                          id: item.id,
+                          name: item.name
+                        })
                       }) : null,
                       /* @__PURE__ */ jsx(S2.Button, {
-                        label: "Close",
-                        onPress: () => setSharing(null)
+                        label: "Update",
+                        onPress: () => {
+                          commit(readSavedProfiles(ownerId).map((other) => other.id === item.id ? {
+                            ...other,
+                            data: savedSnapshot(current),
+                            savedAt: Date.now()
+                          } : other));
+                          showToast("Updated \u201C" + item.name + "\u201D");
+                        }
+                      }),
+                      /* @__PURE__ */ jsx(S2.Button, {
+                        label: "Delete",
+                        danger: true,
+                        onPress: () => remove(item)
                       })
                     ]
+                  }),
+                  /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    style: {
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      gap: 8
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx(S2.Button, {
+                        label: item.favorite ? "Favorited" : "Favorite",
+                        primary: item.favorite === true,
+                        onPress: () => toggleFavorite(item)
+                      }),
+                      /* @__PURE__ */ jsx(S2.Button, {
+                        label: "Duplicate",
+                        onPress: () => duplicateLook(item)
+                      }),
+                      /* @__PURE__ */ jsx(S2.Button, {
+                        label: "Copy look",
+                        disabled: busy,
+                        onPress: () => copyLook(item)
+                      })
+                    ]
+                  }),
+                  sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    style: {
+                      gap: 8
+                    },
+                    children: [
+                      /* @__PURE__ */ jsx(S2.Chips, {
+                        options: SHARE_VISIBILITIES,
+                        value: item.share?.visibility ?? "unlisted",
+                        onChange: (value) => shareItem(item, value)
+                      }),
+                      item.share && item.share.visibility !== "private" ? /* @__PURE__ */ jsx(Text, {
+                        variant: "text-sm/medium",
+                        color: "text-normal",
+                        selectable: true,
+                        children: shareLink(item.share.id)
+                      }) : null,
+                      item.share?.visibility === "private" ? /* @__PURE__ */ jsxs(Text, {
+                        variant: "text-xs/medium",
+                        color: "text-muted",
+                        children: [
+                          "Private: only this device can open it. Code ",
+                          item.share.id
+                        ]
+                      }) : null,
+                      /* @__PURE__ */ jsxs(import_react_native28.View, {
+                        style: {
+                          flexDirection: "row",
+                          gap: 8
+                        },
+                        children: [
+                          !item.share ? /* @__PURE__ */ jsx(S2.Button, {
+                            label: busy ? "Sharing\u2026" : "Share unlisted",
+                            primary: true,
+                            disabled: busy,
+                            grow: true,
+                            onPress: () => shareItem(item, "unlisted")
+                          }) : null,
+                          item.share && item.share.visibility !== "private" ? /* @__PURE__ */ jsx(S2.Button, {
+                            label: "Copy link",
+                            grow: true,
+                            onPress: () => copyLink(item.share.id)
+                          }) : null,
+                          item.share ? /* @__PURE__ */ jsx(S2.Button, {
+                            label: "Stop sharing",
+                            danger: true,
+                            disabled: busy,
+                            onPress: () => stopSharing(item)
+                          }) : null,
+                          /* @__PURE__ */ jsx(S2.Button, {
+                            label: "Close",
+                            onPress: () => setSharing(null)
+                          })
+                        ]
+                      })
+                    ]
+                  }) : /* @__PURE__ */ jsx(S2.Button, {
+                    label: item.share ? "Shared \xB7 " + item.share.visibility : "Share",
+                    onPress: () => setSharing(item.id)
                   })
                 ]
-              }) : /* @__PURE__ */ jsx(S2.Button, {
-                label: item.share ? "Shared \xB7 " + item.share.visibility : "Share",
-                onPress: () => setSharing(item.id)
-              })
+              }) : null
             ]
           }, item.id);
         }),
@@ -65956,7 +66050,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6840fb3f3c89673c96c21f14f888920098fe6d80";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c08b7456f2be228dc44115da74eb8b888577cfe1";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
