@@ -127,7 +127,9 @@ import plugin_catalog_friend_invites from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_gamzee_s_typing_quirk from "../../../../examples/cx/catalog/plugins/gamzee-s-typing-quirk.cx";
 import plugin_catalog_google_that from "../../../../examples/cx/catalog/plugins/google-that.cx";
 import plugin_catalog_grayscale_images from "../../../../examples/cx/catalog/plugins/grayscale-images.cx";
+import plugin_catalog_hide_active_channel_cards from "../../../../examples/cx/catalog/plugins/hide-active-channel-cards.cx";
 import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plugins/hide-active-now.cx";
+import plugin_catalog_hide_activity_cards from "../../../../examples/cx/catalog/plugins/hide-activity-cards.cx";
 import plugin_catalog_hide_add_friend_hint from "../../../../examples/cx/catalog/plugins/hide-add-friend-hint.cx";
 import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catalog/plugins/hide-add-server-button.cx";
 import plugin_catalog_hide_app_launcher_intro from "../../../../examples/cx/catalog/plugins/hide-app-launcher-intro.cx";
@@ -187,6 +189,7 @@ import plugin_catalog_hide_inbox_button from "../../../../examples/cx/catalog/pl
 import plugin_catalog_hide_join_messages from "../../../../examples/cx/catalog/plugins/hide-join-messages.cx";
 import plugin_catalog_hide_jump_to_present from "../../../../examples/cx/catalog/plugins/hide-jump-to-present.cx";
 import plugin_catalog_hide_keyboard_tips from "../../../../examples/cx/catalog/plugins/hide-keyboard-tips.cx";
+import plugin_catalog_hide_live_stage_cards from "../../../../examples/cx/catalog/plugins/hide-live-stage-cards.cx";
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
 import plugin_catalog_hide_member_list_button from "../../../../examples/cx/catalog/plugins/hide-member-list-button.cx";
 import plugin_catalog_hide_mention_badges from "../../../../examples/cx/catalog/plugins/hide-mention-badges.cx";
@@ -269,8 +272,10 @@ import plugin_catalog_hide_timestamps from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_typing_indicator_profile_tip from "../../../../examples/cx/catalog/plugins/hide-typing-indicator-profile-tip.cx";
 import plugin_catalog_hide_typing_indicator from "../../../../examples/cx/catalog/plugins/hide-typing-indicator.cx";
 import plugin_catalog_hide_unread_pills from "../../../../examples/cx/catalog/plugins/hide-unread-pills.cx";
+import plugin_catalog_hide_upcoming_event_cards from "../../../../examples/cx/catalog/plugins/hide-upcoming-event-cards.cx";
 import plugin_catalog_hide_upload_button from "../../../../examples/cx/catalog/plugins/hide-upload-button.cx";
 import plugin_catalog_hide_user_panel_activity from "../../../../examples/cx/catalog/plugins/hide-user-panel-activity.cx";
+import plugin_catalog_hide_voice_activity_cards from "../../../../examples/cx/catalog/plugins/hide-voice-activity-cards.cx";
 import plugin_catalog_hide_voice_event_banner from "../../../../examples/cx/catalog/plugins/hide-voice-event-banner.cx";
 import plugin_catalog_hide_voice_panel_tips from "../../../../examples/cx/catalog/plugins/hide-voice-panel-tips.cx";
 import plugin_catalog_hide_voice_user_avatars from "../../../../examples/cx/catalog/plugins/hide-voice-user-avatars.cx";
@@ -696,7 +701,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Gamzee'sTypingQuirk", source: plugin_catalog_gamzee_s_typing_quirk, description: "Apply 1 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "GoogleThat", source: plugin_catalog_google_that, description: "/googlethat", commands: ["googlethat"], categories: ["Chat","Commands"] },
         { name: "GrayscaleImages", source: plugin_catalog_grayscale_images, description: "Shows images in grayscale until hovered", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideActiveChannelCards", source: plugin_catalog_hide_active_channel_cards, description: "Hide active text channel cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6764ad5a3e29345fe28106ff9d3d60ad23aaa67989756513ec1030e993be51ca" },
         { name: "HideActiveNow", source: plugin_catalog_hide_active_now, description: "Hide the active friends panel", categories: ["Appearance"], appearanceRevision: "3ea10b3241ba84c918d96f0c98c1b365c4e0f2c9a3014fa429ed7a3b2c5d4361" },
+        { name: "HideActivityCards", source: plugin_catalog_hide_activity_cards, description: "Hide activity cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7" },
         { name: "HideAddFriendHint", source: plugin_catalog_hide_add_friend_hint, description: "Hide the hint below the Add Friend field", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideAddServerButton", source: plugin_catalog_hide_add_server_button, description: "Hide the add-a-server button", categories: ["Appearance"], appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f" },
         { name: "HideAppLauncherIntro", source: plugin_catalog_hide_app_launcher_intro, description: "Hide the Apps launcher introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ce7dcfafd46c3e9a304f179a75d79c4305955819ddd5b53dfb683e5e5f652d93" },
@@ -756,6 +763,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideJoinMessages", source: plugin_catalog_hide_join_messages, description: "Hide system messages for joins", categories: ["Chat"] },
         { name: "HideJumpToPresent", source: plugin_catalog_hide_jump_to_present, description: "Hide the jump-to-present bar", categories: ["Appearance"], appearanceRevision: "25897139625060ef49ccc528560da8c0ddb33ff1db9b774e757ba40650703a7d" },
         { name: "HideKeyboardTips", source: plugin_catalog_hide_keyboard_tips, description: "Hides the keyboard tips under the chat bar", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideLiveStageCards", source: plugin_catalog_hide_live_stage_cards, description: "Hide live Stage cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6da62a057179f0765698517278064713d5c3824890881f7eda94cd60b27636a9" },
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities, description: "Hide game and music activity text in the member list", categories: ["Appearance"], appearanceRevision: "efcbd78248bb6f5d22c117a37c14dbf80295b01a55761aee8866dbba3a7f0dda" },
         { name: "HideMemberListButton", source: plugin_catalog_hide_member_list_button, description: "Hides the member list toggle in the channel header", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideMentionBadges", source: plugin_catalog_hide_mention_badges, description: "Hide mention count badges", categories: ["Appearance"], appearanceRevision: "71ff42f973686ad65b32085da67363ea82e0ddace83c2b3f3091f855bce2eaef" },
@@ -838,8 +846,10 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideTypingIndicatorProfileTip", source: plugin_catalog_hide_typing_indicator_profile_tip, description: "Hide the custom typing indicator tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "39a7b3e04b4075305e8dd260cec2d0d9178be84fed2cebf8220e8129351d2ca5" },
         { name: "HideTypingIndicator", source: plugin_catalog_hide_typing_indicator, description: "Hide the typing indicator", categories: ["Appearance"], appearanceRevision: "035f5b85de90d37291a4b4d18e5b93fad7fd1573a7c79c817cb385c63fbeefd4" },
         { name: "HideUnreadPills", source: plugin_catalog_hide_unread_pills, description: "Hide the server sidebar unread pills", categories: ["Appearance"], appearanceRevision: "56e95404c1b3e0a231fad41928c51b64335d1d860b05c6be59dc011565e6c67b" },
+        { name: "HideUpcomingEventCards", source: plugin_catalog_hide_upcoming_event_cards, description: "Hide event cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "09771f96a5794414e52729f8e08cbc566ea4e7aa570fc527a8b8ea833cc08764" },
         { name: "HideUploadButton", source: plugin_catalog_hide_upload_button, description: "Hide the chat attachment button", categories: ["Appearance"], appearanceRevision: "db36f02eba4a10f9e178f62ad8e1fc3e1c4dc9dfe6ad1bf6035b8865c4f75a50" },
         { name: "HideUserPanelActivity", source: plugin_catalog_hide_user_panel_activity, description: "Hides your activity line in the user panel", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideVoiceActivityCards", source: plugin_catalog_hide_voice_activity_cards, description: "Hide voice activity cards in Happening Now", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "66a985fb9c74f587966b7b00aae4fdd56acf3af5b05f511189ebb55b0f636bb0" },
         { name: "HideVoiceEventBanner", source: plugin_catalog_hide_voice_event_banner, description: "Hide the scheduled event banner in voice channels", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "1a6d421d15934212c4a4e66bc0ac31f15e3a23f33946a464be6faf07edea6576" },
         { name: "HideVoicePanelTips", source: plugin_catalog_hide_voice_panel_tips, description: "Hides tips in the voice connection panel", desktopOnly: true, categories: ["Appearance","Voice & calls"] },
         { name: "HideVoiceUserAvatars", source: plugin_catalog_hide_voice_user_avatars, description: "Hide avatars next to users in voice channels", categories: ["Appearance","Voice & calls"], appearanceRevision: "208bcea2901031db1d7d2886d1fd0f43d98dcfc3582575a4f0730e8dd1ff9703" },

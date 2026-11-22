@@ -1,0 +1,3 @@
+plugin "HideActiveChannelCards":
+  needs appearance.hide
+  hide hide-active-channel-cards

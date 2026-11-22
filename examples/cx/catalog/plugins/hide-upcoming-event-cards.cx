@@ -1,0 +1,3 @@
+plugin "HideUpcomingEventCards":
+  needs appearance.hide
+  hide hide-upcoming-event-cards

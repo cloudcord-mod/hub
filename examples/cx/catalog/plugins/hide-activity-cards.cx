@@ -1,0 +1,3 @@
+plugin "HideActivityCards":
+  needs appearance.hide
+  hide hide-activity-cards

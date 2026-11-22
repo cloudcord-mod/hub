@@ -1,0 +1,3 @@
+plugin "HideVoiceActivityCards":
+  needs appearance.hide
+  hide hide-voice-activity-cards

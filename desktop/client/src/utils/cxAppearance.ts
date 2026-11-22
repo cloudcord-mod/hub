@@ -17,6 +17,11 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-active-channel-cards": hideMobileComponent("HideActiveChannelCards", "active text channel cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActiveChannel.tsx"),
+    "hide-activity-cards": hideMobileComponent("HideActivityCards", "activity cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActivity.tsx"),
+    "hide-upcoming-event-cards": hideMobileComponent("HideUpcomingEventCards", "event cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardEvent.tsx"),
+    "hide-live-stage-cards": hideMobileComponent("HideLiveStageCards", "live Stage cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardLiveStage.tsx"),
+    "hide-voice-activity-cards": hideMobileComponent("HideVoiceActivityCards", "voice activity cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardVoice.tsx"),
     "hide-new-channel-badge": hideMobileComponent("HideNewChannelBadge", "the New label on recently added channels", "modules/channel_list_v2/native/components/NewBadge.tsx"),
     "hide-recap-new-content-pill": hideMobileComponent("HideRecapNewContentPill", "the new-content pill in the recap", "modules/icymi/native/NewContentPill.tsx"),
     "hide-quest-orb-multiplier-pill": hideMobileComponent("HideQuestOrbMultiplierPill", "the Orb multiplier perk label on quests", "modules/quests/native/QuestOrbMultiplierPerkPill.tsx"),
