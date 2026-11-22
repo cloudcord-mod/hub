@@ -28,3 +28,25 @@ export function getCxServerMenuValue(guild: {
     const text = guild[field];
     return typeof text === "string" && text.trim() ? text : undefined;
 }
+
+export const cxRoleMenuLabels = {
+    "copy-role-color": "Copy Role Color",
+    "copy-role-mention": "Copy Role Mention",
+    "view-role-icon": "View Role Icon",
+} as const;
+
+export type CxRoleMenuEffect = keyof typeof cxRoleMenuLabels;
+
+export function getCxRoleMenuValue(effect: CxRoleMenuEffect, id: string, role: {
+    id?: unknown; colorStrings?: { primaryColor?: unknown; }; colorString?: unknown; icon?: unknown;
+} | undefined) {
+    if (!role || role.id !== id || !isCxProfileUserId(id)) return;
+    if (effect === "copy-role-mention") return "<@&" + id + ">";
+    if (effect === "copy-role-color") {
+        const color = role.colorStrings?.primaryColor ?? role.colorString;
+        return typeof color === "string" && /^#[a-f0-9]{6}$/i.test(color) ? color : undefined;
+    }
+    if (typeof role.icon !== "string" || !/^(?:a_)?[a-f0-9]{32}$/i.test(role.icon)) return;
+    const format = role.icon.startsWith("a_") ? "gif" : "png";
+    return "https://cdn.discordapp.com/role-icons/" + id + "/" + role.icon + "." + format + "?size=256";
+}

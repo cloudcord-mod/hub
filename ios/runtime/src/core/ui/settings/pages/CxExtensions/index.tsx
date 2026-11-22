@@ -2,7 +2,7 @@ import { onEditMessage, onSendMessage } from "@core/plugins/shared/sendMessage";
 import { instead } from "@lib/api/patcher";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxProfileMenuAction, type CxUploadAnonymiser } from "@lib/api/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
-import { getCxGuildAssetUrl, getCxServerMenuFields, getCxServerMenuValue, type CxServerMenuEffect } from "@lib/api/cx";
+import { cxRoleMenuLabels, getCxGuildAssetUrl, getCxRoleMenuValue, getCxServerMenuFields, getCxServerMenuValue, type CxRoleMenuEffect, type CxServerMenuEffect } from "@lib/api/cx";
 import { bindCxCameraTone, bindCxMutedVoice, bindCxVoiceShareAlerts, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
 import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, MAX_REMEMBERED_CX_EXTENSIONS, searchCxCatalog } from "@lib/api/cx";
@@ -1286,14 +1286,10 @@ function registerCopyChannelName(enabled: () => boolean) {
     });
 }
 
-function registerMobileServerMenu(effect: CxServerMenuEffect, enabled: () => boolean) {
-    const view = effect === "view-server-media" || effect === "view-group-dm-icon";
-    const viewer = view ? findByFilePath("modules/media_viewer/native/components/openMediaModal.tsx") : undefined;
-    if (view && !viewer?.openMediaModal) throw new Error("Discord's media viewer is unavailable");
-    let active = true;
-    const available = () => active && enabled();
-    const open = (url: string, width: number, height: number) => {
-        if (!available() || !viewer) return;
+function getMobileAssetViewer() {
+    const viewer = findByFilePath("modules/media_viewer/native/components/openMediaModal.tsx");
+    if (typeof viewer?.openMediaModal !== "function") throw new Error("Discord's media viewer is unavailable");
+    return (url: string, width: number, height: number) => {
         try {
             viewer.openMediaModal({
                 initialSources: [{ uri: url, mediaIndex: 0, width, height, accessoryType: "embed" }],
@@ -1301,6 +1297,57 @@ function registerMobileServerMenu(effect: CxServerMenuEffect, enabled: () => boo
                 disableDownload: true, disableMediaOverlayButton: true, disableMediaOverlayFooter: true,
             });
         } catch { showToast("Couldn't open the selected image."); }
+    };
+}
+
+async function copyMobileMenuInformation(value: string, available: () => boolean) {
+    try {
+        if (!available()) return;
+        await clipboard.setString(value);
+        if (available()) showToast.showCopyToClipboard?.();
+    } catch { if (available()) showToast("Couldn't copy the selected information."); }
+}
+
+function registerMobileRoleMenu(effect: CxRoleMenuEffect, enabled: () => boolean) {
+    const module = findByFilePath("modules/messages/native/RoleMembersActionSheet.tsx");
+    const target = module?.default ?? module?.RoleMembersActionSheet;
+    const sheet = findByProps("BottomSheet")?.BottomSheet;
+    const row = findByProps("ActionSheetRow")?.ActionSheetRow;
+    const store = findByStoreName("GuildRoleStore");
+    if (!target || !sheet || !row?.Group || typeof store?.getRole !== "function")
+        throw new Error("Discord's role sheet is unavailable");
+    const open = effect === "view-role-icon" ? getMobileAssetViewer() : undefined;
+    const Row = row;
+    let active = true;
+    const available = () => active && enabled();
+    const stop = registerRenderedTree(target, (tree, props: { guildId?: unknown; roleId?: unknown; }) => {
+        const { guildId, roleId } = props;
+        if (!isCxProfileUserId(guildId) || !isCxProfileUserId(roleId)) return tree;
+        const getValue = () => getCxRoleMenuValue(effect, roleId, store.getRole(guildId, roleId));
+        if (!getValue()) return tree;
+        return mapAppearanceElements(tree, element => element.type === sheet ? React.cloneElement(element, { children: [
+            <Row.Group key={"cx-" + effect}>
+                <Row label={cxRoleMenuLabels[effect]} onPress={() => {
+                    if (!available()) return;
+                    const value = getValue();
+                    if (!value) return;
+                    if (open) open(value, 256, 256);
+                    else void copyMobileMenuInformation(value, available);
+                }} />
+            </Row.Group>,
+            ...React.Children.toArray(element.props.children),
+        ] }) : element);
+    });
+    return () => { active = false; stop(); };
+}
+
+function registerMobileServerMenu(effect: CxServerMenuEffect, enabled: () => boolean) {
+    const view = effect === "view-server-media" || effect === "view-group-dm-icon";
+    const viewer = view ? getMobileAssetViewer() : undefined;
+    let active = true;
+    const available = () => active && enabled();
+    const open = (url: string, width: number, height: number) => {
+        if (available()) viewer?.(url, width, height);
     };
 
     if (effect === "view-group-dm-icon") {
@@ -1342,9 +1389,7 @@ function registerMobileServerMenu(effect: CxServerMenuEffect, enabled: () => boo
                         if (field.key === "icon") open(value, field.width, field.width);
                         else Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
                     } else {
-                        void Promise.resolve().then(() => { if (available()) return clipboard.setString(value); })
-                            .then(() => { if (available()) showToast.showCopyToClipboard?.(); })
-                            .catch(() => { if (available()) showToast("Couldn't copy the selected information."); });
+                        void copyMobileMenuInformation(value, available);
                     }
                 }} />)}
             </Row.Group>
@@ -2484,7 +2529,7 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "copy-role-color":
                 case "copy-role-mention":
                 case "view-role-icon":
-                    throw new Error("Role menu actions are available on desktop and browser.");
+                    return registerMobileRoleMenu(effect, enabled);
                 case "view-server-media":
                 case "copy-server-media-links":
                 case "copy-server-details":

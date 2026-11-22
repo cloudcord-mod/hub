@@ -15,7 +15,7 @@ import { CopyIcon, UpArrowIcon } from "@components/Icons";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxUploadAnonymiser } from "@utils/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel } from "@utils/cx";
-import { getCxGuildAssetUrl, getCxServerMenuFields, getCxServerMenuValue, type CxServerMenuEffect } from "@utils/cx";
+import { cxRoleMenuLabels, getCxGuildAssetUrl, getCxRoleMenuValue, getCxServerMenuFields, getCxServerMenuValue, type CxRoleMenuEffect, type CxServerMenuEffect } from "@utils/cx";
 import { bindCxCameraTone, bindCxMutedVoice, bindCxVoiceShareAlerts, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
@@ -160,13 +160,8 @@ function registerCopyChannelName() {
     return () => { active = false; removeContextMenuPatch(menus, patch); };
 }
 
-function registerRoleMenuAction(effect: "copy-role-color" | "copy-role-mention" | "view-role-icon") {
+function registerRoleMenuAction(effect: CxRoleMenuEffect) {
     // BetterRoleContext by Vendicated and goodbee (GPL-3.0-or-later).
-    const labels = {
-        "copy-role-color": "Copy Role Color",
-        "copy-role-mention": "Copy Role Mention",
-        "view-role-icon": "View Role Icon",
-    };
     let active = true;
     const itemId = "cx-" + effect;
     const patch: NavContextMenuPatchCallback = (children, props) => {
@@ -175,21 +170,9 @@ function registerRoleMenuAction(effect: "copy-role-color" | "copy-role-mention" 
         const guild = explicitGuild ?? SelectedGuildStore.getGuildId();
         if (!active || !isCxProfileUserId(id) || !isCxProfileUserId(guild)
             || children.some(child => child?.props?.id === itemId)) return;
-        function getValue() {
-            const role = GuildRoleStore.getRole(guild, id);
-            if (!role || role.id !== id) return;
-            if (effect === "copy-role-mention") return "<@&" + id + ">";
-            if (effect === "copy-role-color") {
-                const color = role.colorStrings?.primaryColor ?? role.colorString;
-                return /^#[a-f0-9]{6}$/i.test(color ?? "") ? color : undefined;
-            }
-            if (typeof role.icon === "string" && /^(?:a_)?[a-f0-9]{32}$/i.test(role.icon)) {
-                const format = role.icon.startsWith("a_") ? "gif" : "png";
-                return "https://cdn.discordapp.com/role-icons/" + id + "/" + role.icon + "." + format + "?size=256";
-            }
-        }
+        const getValue = () => getCxRoleMenuValue(effect, id, GuildRoleStore.getRole(guild, id));
         if (!getValue()) return;
-        children.push(<Menu.MenuItem id={itemId} label={labels[effect]} action={() => {
+        children.push(<Menu.MenuItem id={itemId} label={cxRoleMenuLabels[effect]} action={() => {
             if (!active || explicitGuild == null && SelectedGuildStore.getGuildId() !== guild) return;
             const value = getValue();
             if (!value) return;

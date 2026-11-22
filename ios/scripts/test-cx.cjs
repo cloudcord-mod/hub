@@ -255,6 +255,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         function ChannelLongPressActionSheetConnected() {
             return jsx(NativeActionSheet, { children: jsx("OriginalAction", {}) });
         }
+        function RoleMembersActionSheet() { return jsx(expressionSheets.BottomSheet, { children: jsx("OriginalRoleMemberList", {}) }); }
         function GuildActionSheetPrimaryActions() { return jsx("OriginalGuildAction", {}); }
         const me = "100000000000000001", sender = "100000000000000002", other = "100000000000000003";
         const guildId = "100000000000000004";
@@ -852,6 +853,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 : path.endsWith("/MediaShareActions.tsx") ? mediaShare
                 : path === "utils/MaskedLinkUtils.tsx" ? nativeSteamLinks
                 : path === "modules/blocked_domains/BlockedDomainStore.tsx" ? { default: { isBlockedDomain: url => url.endsWith("/blocked") ? { url } : null } }
+                : path.endsWith("/RoleMembersActionSheet.tsx") ? { default: RoleMembersActionSheet }
                 : path.endsWith("/GuildActionSheetActions.tsx") ? { GuildActionSheetPrimaryActions }
                 : path.endsWith("/openMediaModal.tsx") ? { openMediaModal: options => viewedProfiles.push(options.initialSources[0]) }
                 : path.endsWith("/MediaSourceUtil.tsx") ? { downloadMediaAssetWithContentType: (...args) => savedProfileMedia.push(args) }
@@ -1299,6 +1301,36 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             serverMenuData = undefined;
             groupMenuData = undefined;
         } else {
+            const rolePlugins = ["CopyRoleColor", "CopyRoleMention", "ViewRoleIcon"];
+            for (const name of rolePlugins) {
+                selectCatalog(name);
+                click(render(), "Allow for this session");
+            }
+            const getRoleMenu = (props) => {
+                const wrap = appearanceHooks.get(RoleMembersActionSheet);
+                const node = wrap(RoleMembersActionSheet, jsx(RoleMembersActionSheet, props));
+                const layout = node.type(node.props);
+                return layout.type(layout.props);
+            };
+            const roles = getRoleMenu({ guildId, roleId });
+            assert.ok(find(roles, element => element.type === "OriginalRoleMemberList"));
+            assert.equal(button(getRoleMenu({ guildId: other, roleId }), "Copy Role Mention"), undefined);
+            assert.equal(button(getRoleMenu({ guildId, roleId: "../role" }), "View Role Icon"), undefined);
+            button(roles, "Copy Role Color").props.onPress();
+            button(roles, "Copy Role Mention").props.onPress();
+            button(roles, "View Role Icon").props.onPress();
+            await new Promise(setImmediate);
+            assert.deepEqual(clipboardWrites.splice(0), ["#12abcd", "<@&" + roleId + ">"]);
+            assert.equal(viewedProfiles.pop().uri, "https://cdn.discordapp.com/role-icons/" + roleId + "/" + roleIcon + ".png?size=256");
+            settings.safeMode = { enabled: true };
+            button(roles, "Copy Role Color").props.onPress();
+            settings.safeMode = undefined;
+            for (const name of rolePlugins) click(render(), "Disable " + name);
+            button(roles, "View Role Icon").props.onPress();
+            assert.equal(clipboardWrites.length, 0);
+            assert.equal(viewedProfiles.length, 0);
+            assert.equal(appearanceHooks.size, 0);
+
             const plugins = ["View Server Media", "Copy Server Media Links", "Copy Server Details", "View Group DM Icon"];
             for (const name of plugins) {
                 selectCatalog(name);
