@@ -65891,7 +65891,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, pluginFilters, showDefaultRow;
+  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, pluginFilters;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -65909,6 +65909,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_plugins4();
       init_assets();
       init_settings();
+      init_cx();
       init_storage2();
       init_toasts();
       init_constants();
@@ -65922,11 +65923,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
       ({ AlertModal: AlertModal4, AlertActions: AlertActions2, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
       isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
+      showDefaultRow = (item) => !("source" in item && item.alternate);
       pluginFilters = {
+        ...Object.fromEntries(CX_CATALOG_CATEGORIES.filter((category) => category !== "All" && category !== "Themes").map((category) => [
+          category,
+          (item) => "source" in item && item.categories?.includes(category) === true
+        ])),
         "Private commands": (item) => "source" in item && item.privateCommands === true,
         "Needs review": (item) => "source" in item && item.needsReview === true
       };
-      showDefaultRow = (item) => !("source" in item && item.alternate);
     }
   });
 
@@ -67632,7 +67637,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "16940e133ce5523eeb877efd65febb03602e4387";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "650cb9e0762772fbc9ba23aa87ad31f73f00b054";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
