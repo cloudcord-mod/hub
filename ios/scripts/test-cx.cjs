@@ -2983,6 +2983,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             ["Join Lines", [
                 ["joinlines", { text: "a\r\n\r\nb\n", separator: "/" }, /^a\/\/b$/],
             ]],
+            ["Markdown Outline", [
+                ["markdownoutline", { text: "# Project\n\x60\x60\x60ts\n## Ignore\n\x60\x60\x60\n### Release ###" }, /\n- Project\n    - Release\n/],
+                ["markdownoutline", { text: "~~~\n# Hidden\n~~~" }, /^No Markdown headings/],
+            ]],
+            ["Quote Draft", [
+                ["quotedraft", { text: "One\r\n\r\nTwo\n" }, /\n> One\n>\n> Two\n/],
+            ]],
             ["Wrap Text", [
                 ["wraptext", { text: "one two three\n\nfour five", width: 8 }, /^one two\nthree\n\nfour\nfive$/],
                 ["wraptext", { text: "abc", width: 7 }, /^Choose a width/],

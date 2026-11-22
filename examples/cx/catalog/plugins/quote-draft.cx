@@ -1,0 +1,5 @@
+plugin "Quote Draft":
+  needs commands.register
+  needs reply.local
+  on command "quotedraft" with text:
+    reply "${quoteDraft(text)}" else "Enter text to format."

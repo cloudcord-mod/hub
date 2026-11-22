@@ -207,6 +207,31 @@ export const cxCommandFunctions = {
         return left < right ? -1 : left > right ? 1 : 0;
     }).join("\n"),
     trimLines: (text: string) => text.split(/\r\n|\r|\n/).map(line => line.trim()).join("\n"),
+    markdownOutline(text: string) {
+        const headings: string[] = [];
+        let fence = "";
+        for (const line of text.split(/\r\n|\r|\n/)) {
+            const marker = /^[ ]{0,3}(\x60{3,}|~{3,})(.*)$/.exec(line);
+            if (fence) {
+                if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) fence = "";
+                continue;
+            }
+            if (marker) {
+                fence = marker[1];
+                continue;
+            }
+            const heading = /^[ ]{0,3}(#{1,6})\s+(\S.*)$/.exec(line);
+            if (heading) {
+                const title = heading[2].replace(/\s+#+\s*$/, "").trimEnd();
+                headings.push("  ".repeat(heading[1].length - 1) + "- " + title);
+            }
+        }
+        return headings.length ? planningBlock(headings.join("\n")) : "No Markdown headings found.";
+    },
+    quoteDraft(text: string) {
+        if (!text.trim()) return;
+        return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(line => line ? "> " + line : ">").join("\n"));
+    },
     removeBlankLines: (text: string) => text.split(/\r\n|\r|\n/).filter(line => line.trim()).join("\n"),
     reverseLineOrder: (text: string) => text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).reverse().join("\n"),
     joinLines(text: string, separator: string) {

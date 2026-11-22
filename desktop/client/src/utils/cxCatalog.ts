@@ -271,6 +271,7 @@ import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/plugins/local-channel-notes.cx";
 import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/plugins/markdown-checklist.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
+import plugin_catalog_markdown_outline from "../../../../examples/cx/catalog/plugins/markdown-outline.cx";
 import plugin_catalog_meeting_timestamp from "../../../../examples/cx/catalog/plugins/meeting-timestamp.cx";
 import plugin_catalog_message_budget from "../../../../examples/cx/catalog/plugins/message-budget.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
@@ -318,6 +319,7 @@ import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_poll_draft from "../../../../examples/cx/catalog/plugins/poll-draft.cx";
 import plugin_catalog_profile_media from "../../../../examples/cx/catalog/plugins/profile-media.cx";
 import plugin_catalog_quick_mention from "../../../../examples/cx/catalog/plugins/quick-mention.cx";
+import plugin_catalog_quote_draft from "../../../../examples/cx/catalog/plugins/quote-draft.cx";
 import plugin_catalog_quote_message from "../../../../examples/cx/catalog/plugins/quote-message.cx";
 import plugin_catalog_read_all_notifications_button from "../../../../examples/cx/catalog/plugins/read-all-notifications-button.cx";
 import plugin_catalog_read_all_notifications from "../../../../examples/cx/catalog/plugins/read-all-notifications.cx";
@@ -796,6 +798,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "LocalChannelNotes", source: plugin_catalog_local_channel_notes, description: "Add a local note editor to channel menus", categories: ["Servers & channels"] },
         { name: "Markdown Checklist", source: plugin_catalog_markdown_checklist, description: "/markdownchecklist", commands: ["markdownchecklist"], categories: ["Commands"], appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261", privateCommands: true },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"], appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b", privateCommands: true },
+        { name: "Markdown Outline", source: plugin_catalog_markdown_outline, description: "/markdownoutline", commands: ["markdownoutline"], categories: ["Commands"], appearanceRevision: "efbf7198f0c2ff46dd1f5fc1e30a0c5990c856fc821022f46c5855608811b28e", privateCommands: true },
         { name: "Meeting Timestamp", source: plugin_catalog_meeting_timestamp, description: "/meetingtimestamp", commands: ["meetingtimestamp"], categories: ["Commands"], appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce", privateCommands: true },
         { name: "Message Budget", source: plugin_catalog_message_budget, description: "/messagebudget", commands: ["messagebudget"], categories: ["Commands"], appearanceRevision: "871e9aef7a49228b859b27c889d33df5db666dd2a0e986542f90450951cb301f", privateCommands: true },
         { name: "MessageBurst", source: plugin_catalog_message_burst, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
@@ -843,6 +846,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Poll Draft", source: plugin_catalog_poll_draft, description: "/polldraft", commands: ["polldraft"], categories: ["Commands"], appearanceRevision: "e38274bea9f8c72f38a95b05ec57685bd1ef014a0388dca663e6694c6d1df879", privateCommands: true },
         { name: "ProfileMedia", source: plugin_catalog_profile_media, description: "Add View and Download actions for Discord avatars and banners", categories: ["Media","Profiles"] },
         { name: "QuickMention", source: plugin_catalog_quick_mention, description: "Insert the selected message author's mention into the current draft", categories: ["Chat"] },
+        { name: "Quote Draft", source: plugin_catalog_quote_draft, description: "/quotedraft", commands: ["quotedraft"], categories: ["Commands"], appearanceRevision: "073a4f0340adf8d6fc3400e0a73418fdc401ae35847002aa9c6a7b2dfc1a55e5", privateCommands: true },
         { name: "QuoteMessage", source: plugin_catalog_quote_message, description: "Add Quote and Copy as Quote actions to message menus", categories: ["Chat"] },
         { name: "ReadAllNotificationsButton", source: plugin_catalog_read_all_notifications_button, description: "Add a server list button to mark loaded server channels as read", categories: ["Servers & channels"] },
         { name: "ReadAllNotifications", source: plugin_catalog_read_all_notifications, description: "/readall", commands: ["readall"], categories: ["Commands","Servers & channels"] },

@@ -1,0 +1,5 @@
+plugin "Markdown Outline":
+  needs commands.register
+  needs reply.local
+  on command "markdownoutline" with text:
+    reply "${markdownOutline(text)}" else "Enter text to format."
