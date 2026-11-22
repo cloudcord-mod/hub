@@ -172,6 +172,12 @@ const id = "123456789012345678";
 const hash = "a_" + "1".repeat(32);
 const nativeProfile = { banner: hash, theme_colors: [0, 0x123456], accent_color: 0xabcdef, bio: "Native bio", pronouns: "they/them" };
 const nativeBanner = `https://cdn.discordapp.com/banners/${id}/${hash}.gif?size=512`;
+assert.equal(profileAppearance.nativePreviewDecoration({ avatarDecorationData: { asset: hash } }),
+    `https://cdn.discordapp.com/avatar-decoration-presets/${hash}.png?size=160&passthrough=true`);
+assert.equal(profileAppearance.nativePreviewDecoration({ avatarDecoration: { asset: "../bad" } },
+    { avatar_decoration_data: { asset: hash } }),
+    `https://cdn.discordapp.com/avatar-decoration-presets/${hash}.png?size=160&passthrough=true`);
+assert.equal(profileAppearance.nativePreviewDecoration({ avatarDecorationData: { asset: "https://example.com/a.png" } }), undefined);
 const fallbackSurface = { ...profileAppearance.nativeProfilePreviewSurface(id, nativeProfile), presenceStatus: "idle" };
 assert.equal(fallbackSurface.banner, nativeBanner);
 assert.equal(fallbackSurface.primary, "#000000");

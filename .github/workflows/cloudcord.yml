@@ -450,7 +450,7 @@ jobs:
           import { onJsxCreate } from "@lib/api/react/jsx";
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
-          import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
+          import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, nativePreviewDecoration, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
           import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon, SAVED_LOOK_PAGE_SIZE, selectSavedLooks, sharedProfileColorPair, sharedProfileColorsEnabled } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
@@ -4695,6 +4695,7 @@ jobs:
                   username: data.username || realUser?.username || "username",
                   avatar: data.avatarMedia?.uri || realAvatar,
                   fallbackAvatar: realAvatar,
+                  decoration: data.avatarDecoration || nativePreviewDecoration(realUser, profile),
                   banner: data.bannerMedia?.uri || fallback.banner,
                   fallbackBanner: fallback.banner,
                   bio: data.bio ?? fallback.bio,
@@ -4832,7 +4833,7 @@ jobs:
                       const badges = studioBadgeIcons(data, ownerId ?? "");
                       return <View key={item.id} style={{ gap: 10 }}>
                           <S.DiscordProfileCard {...appearance} secondary={appearance.accent}
-                              decoration={data.avatarDecoration || undefined} badges={badges} officialBadgeIcon={CLOUDCORD_BADGE_ICON}
+                              badges={badges} officialBadgeIcon={CLOUDCORD_BADGE_ICON}
                               frame={data.profileFrame ? catalog?.frames.find(item => item.skuId === data.profileFrame.skuId)?.label ?? "Selected" : undefined}
                               effect={data.profileEffect ? catalog?.effects.find(item => item.skuId === data.profileEffect.skuId)?.title ?? "Selected" : undefined}
                               customStatus={data.customStatus ? `${data.customStatus.emoji || ""} ${data.customStatus.text || ""}`.trim() : undefined}
@@ -5314,7 +5315,7 @@ jobs:
                               <K.Button label="Saved looks" grow onPress={() => setActiveTab("saved")} />
                           </View>
                           {showPreview ? <Card><View style={{ padding: 16 }}>
-                              <K.PreviewCard {...appearance} decoration={preview.avatarDecoration || undefined}
+                              <K.PreviewCard {...appearance}
                                   customStatus={preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : undefined}
                                   activity={preview.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === preview.customActivity?.type)?.label || "", name: preview.customActivity.name, details: preview.customActivity.details } : null}
                                   badges={studioBadgeIcons(preview)} officialBadgeIcon={CLOUDCORD_BADGE_ICON}

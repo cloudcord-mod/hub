@@ -149,6 +149,20 @@ export function sharedProfileColorPair(data?: { profileColorsEnabled?: unknown; 
     return [first, second ?? first];
 }
 
+export function nativePreviewDecoration(...sources: unknown[]): string | undefined {
+    for (const source of sources) {
+        if (!source || typeof source !== "object") continue;
+        const data = source as Record<string, unknown>;
+        for (const key of ["avatarDecorationData", "avatar_decoration_data", "avatarDecoration"]) {
+            const decoration = data[key];
+            const asset = decoration && typeof decoration === "object" ? (decoration as { asset?: unknown; }).asset : undefined;
+            if (typeof asset === "string" && /^(?:a_)?[a-f0-9]{32}$/i.test(asset)) {
+                return `https://cdn.discordapp.com/avatar-decoration-presets/${asset}.png?size=160&passthrough=true`;
+            }
+        }
+    }
+}
+
 export function nativeProfilePreviewSurface(userId: string, profile?: DiscordProfileSurface | null, userBanner?: unknown) {
     const colors = Array.isArray(profile?.themeColors) ? profile.themeColors
         : Array.isArray(profile?.theme_colors) ? profile.theme_colors : [];

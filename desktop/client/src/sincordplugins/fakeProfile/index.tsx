@@ -19,7 +19,7 @@ import { Current, installPresenceHooks, installTagIconSwap, loadCatalog, Namepla
 import { popNotice, showNotice } from "@api/Notices";
 import { installNativeSocialHooks } from "@utils/nativeSocialHooks";
 import { installConnectionSettings } from "@utils/connectionSettings";
-import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
+import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, nativePreviewDecoration, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
 import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks, sharedProfileColorPair } from "@utils/profileAppearance";
@@ -1989,8 +1989,9 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
     const selectedUser = (selectedAccountId === myId ? realGetCurrentUser?.() : undefined)
         ?? accounts.find(account => account.id === selectedAccountId) ?? UserStore.getUser(selectedAccountId);
     const fallbackAvatar = selectedUser ? (realGetUserAvatarURL ?? IconUtils.getUserAvatarURL)(selectedUser, true, 128) : "https://cdn.discordapp.com/embed/avatars/0.png";
+    const nativeProfile = realGetUserProfile?.(selectedAccountId);
     const fallbackSurface = {
-        ...nativeProfilePreviewSurface(selectedAccountId, realGetUserProfile?.(selectedAccountId), selectedUser?.banner),
+        ...nativeProfilePreviewSurface(selectedAccountId, nativeProfile, selectedUser?.banner),
         presenceStatus: readNativePresenceStatus(selectedAccountId),
     };
     const currentDecoration = decorations.find(item => item.id === data.decorationAsset) || ALL_DECORATIONS.find(item => item.id === data.decorationAsset) || liveDecorations.find(item => item.id === data.decorationAsset);
@@ -2148,7 +2149,8 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
                     badges={profilePreviewBadges(data, selectedAccountId)}
                     onBadges={() => { setTab("badges"); setPreviewExpanded(false); }}
                     onSaved={() => { setTab("saved"); setPreviewExpanded(false); }}
-                    decorationUrl={currentDecoration?.url} nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined}
+                    decorationUrl={data.decorationAsset ? currentDecoration?.url || getDecorationUrl(data.decorationAsset) : nativePreviewDecoration(selectedUser, nativeProfile)}
+                    nameplateUrl={data.nameplate ? nameplateAssetURL(data.nameplate.asset) : undefined}
                     effectName={data.profileEffect ? catalogData?.effects.find(item => item.skuId === data.profileEffect?.skuId)?.title || "Selected" : undefined}
                     frameName={data.profileFrame ? catalogData?.frames.find(item => item.skuId === data.profileFrame?.skuId)?.label || "Selected" : undefined} />
             </div>
