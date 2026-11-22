@@ -10,6 +10,8 @@ const code = esbuild.transformSync(source, { loader: 'ts', format: 'cjs' }).code
         const module = { exports: {} };
         let settings = 0, refreshes = 0, warnings = 0;
         const nativeLogs = [];
+        let finishFontRecovery;
+        const fontRecovery = new Promise(resolve => { finishFontRecovery = resolve; });
         const lib = { unload: [] };
         const noop = () => undefined;
         const context = {
@@ -17,6 +19,7 @@ const code = esbuild.transformSync(source, { loader: 'ts', format: 'cjs' }).code
             console: { log(message) { nativeLogs.push(message); }, warn() { warnings++; } },
             require(name) {
                 if (name === './lib') return lib;
+                if (name === '@lib/addons/fonts') return { restoreSelectedFontFiles: () => fontRecovery };
                 if (name === '@lib/utils/logger') return { logger: { log() {} } };
                 if (name === '@core/ui/settings') return { __esModule: true, default() { settings++; return noop; } };
                 if (name === '@lib/api/native/legacyRuntimeRefresh') return { initLegacyRuntimeRefresh() {
@@ -43,6 +46,10 @@ const code = esbuild.transformSync(source, { loader: 'ts', format: 'cjs' }).code
         assert.equal(warnings, !bridgeless && ['throw', 'reject'].includes(mode) ? 1 : 0);
         assert.ok(context.window.bunny, 'Runtime finishes despite a pending legacy updater');
         assert.equal(nativeLogs.at(-1), 'CloudCord is ready!', 'native readiness is emitted at completed startup');
+        assert.ok(nativeLogs.includes('CloudCord starting font files'));
+        finishFontRecovery();
+        await new Promise(setImmediate);
+        assert.equal(nativeLogs.at(-1), 'CloudCord started font files');
         assert.equal(nativeLogs.filter(message => message === 'CloudCord is ready!').length, 1);
     }
     for (const mode of ['restore', 'safe-mode', 'unload']) {
