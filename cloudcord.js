@@ -66544,7 +66544,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands
         };
       });
-      var imported = session.list().filter(({ id, name }) => id === "theme" === (kind === "theme") && !catalog.some((entry) => entry.name === name)).map(({ id, name }) => ({
+      var catalogNames = new Set(entries2.map((entry) => entry.name));
+      var imported = session.list().filter(({ id, name }) => id === "theme" === (kind === "theme") && !catalogNames.has(name)).map(({ id, name }) => ({
         id,
         name,
         source: session.source(id),
@@ -71954,7 +71955,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "024f128da33b4c097325395b17aa4eaaa0b75e47";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fdce66a90000a526e2996e9f618f546d75c26ad4";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
