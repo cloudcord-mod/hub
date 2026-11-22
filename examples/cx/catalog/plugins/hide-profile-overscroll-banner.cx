@@ -1,0 +1,3 @@
+plugin "HideProfileOverscrollBanner":
+  needs appearance.hide
+  hide hide-profile-overscroll-banner

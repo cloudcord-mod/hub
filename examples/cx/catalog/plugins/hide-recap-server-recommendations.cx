@@ -1,0 +1,3 @@
+plugin "HideRecapServerRecommendations":
+  needs appearance.hide
+  hide hide-recap-server-recommendations

@@ -1,0 +1,3 @@
+plugin "HideAppSearchIntro":
+  needs appearance.hide
+  hide hide-app-search-intro

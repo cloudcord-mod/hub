@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-app-search-intro": hideMobileComponent("HideAppSearchIntro", "the app search introduction banner", "modules/app_launcher/native/onboarding/banner/AppLauncherGlobalSearchOnboardingBanner.tsx"),
+    "hide-recap-server-recommendations": hideMobileComponent("HideRecapServerRecommendations", "server recommendations in the In Case You Missed It recap", "modules/icymi/native/ICYMIServerRecommendationRow.tsx"),
+    "hide-profile-overscroll-banner": hideMobileComponent("HideProfileOverscrollBanner", "the profile banner extension shown during overscroll", "modules/user_profile/native/UserProfileOverscrollBanner.tsx"),
     "hide-chat-thread-previews": {
         plugin: "HideChatThreadPreviews", label: "thread preview cards below chat messages",
         css: "", mobileOnly: true,
