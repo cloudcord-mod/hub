@@ -132,6 +132,10 @@ beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("
 assert.deepEqual(shownCards().map(node => node.props.plugin?.name), ["Disabled"]);
 beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("local");
 assert.deepEqual(shownCards().map(node => node.props.name ?? node.props.plugin?.name), ["Local", "Disabled"]);
+catalog.plugin[0].active = false;
+catalog.plugin[0].commands = ["shared-command"];
+beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("/shared-command");
+assert.deepEqual(shownCards().map(node => node.props.name), ["Shared"], "an enabled native plugin cannot hide a CX command result");
 
 const mobileModule = { exports: {} };
 let filterSheet;

@@ -141,6 +141,7 @@ export function PluginsPage() {
         ...cxRows.filter(entry => {
             if (filter === "private") return entry.privateCommands;
             if (filter === "review") return entry.needsReview;
+            if (commandSearch) return true;
             const name = entry.name.toLowerCase();
             const native = nativeByName.get(name);
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
