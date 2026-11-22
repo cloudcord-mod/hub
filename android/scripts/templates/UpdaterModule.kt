@@ -177,7 +177,9 @@ object UpdaterModule : Module() {
         // Revalidate the moving manifest. The checksum-verified payload URL is immutable.
         val response = client.get(DEFAULT_MANIFEST_URL) {
             header(HttpHeaders.CacheControl, "no-cache")
-            parameter("refresh", System.currentTimeMillis() / MANIFEST_REFRESH_INTERVAL_MS)
+            val now = System.currentTimeMillis()
+            if (officialOnly) parameter("recovery", now)
+            else parameter("refresh", now / MANIFEST_REFRESH_INTERVAL_MS)
         }
         if (response.status != HttpStatusCode.OK) throw ResponseException(response, "Could not fetch CloudCord runtime manifest")
         val manifest = JSON.decodeFromString<RuntimeManifest>(response.bodyAsText())
