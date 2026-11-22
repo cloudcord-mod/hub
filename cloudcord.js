@@ -36902,6 +36902,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-gif-favorite-button": hideMobileComponent("HideGifFavoriteButton", "the favorite button when viewing GIFs", "modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"),
+        "hide-composer-emoji-promo": hideMobileComponent("HideComposerEmojiPromo", "the premium emoji promotion in composer autocomplete", "modules/channel_text_area/native/ChannelAutocompleteEmojiUpsell.tsx"),
         "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),
         "hide-voice-event-banner": hideMobileComponent("HideVoiceEventBanner", "the scheduled event banner in voice channels", "modules/guild_scheduled_events/native/components/GuildEventVoiceBanner.tsx"),
         "hide-profile-activity-badges": hideMobileComponent("HideProfileActivityBadges", "activity badges on profiles", "modules/user_profile/native/UserProfileActivityBadges.tsx"),
@@ -50154,6 +50156,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-composer-emoji-promo.cx
+  var hide_composer_emoji_promo_default;
+  var init_hide_composer_emoji_promo = __esm({
+    "../examples/cx/catalog/plugins/hide-composer-emoji-promo.cx"() {
+      hide_composer_emoji_promo_default = 'plugin "HideComposerEmojiPromo":\n  needs appearance.hide\n  hide hide-composer-emoji-promo\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-contact-sync-promotion.cx
   var hide_contact_sync_promotion_default;
   var init_hide_contact_sync_promotion = __esm({
@@ -50271,6 +50281,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_gif_button = __esm({
     "../examples/cx/catalog/plugins/hide-gif-button.cx"() {
       hide_gif_button_default = 'plugin "HideGifButton":\n  needs appearance.hide\n  hide chat-gif-picker\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-gif-favorite-button.cx
+  var hide_gif_favorite_button_default;
+  var init_hide_gif_favorite_button = __esm({
+    "../examples/cx/catalog/plugins/hide-gif-favorite-button.cx"() {
+      hide_gif_favorite_button_default = 'plugin "HideGifFavoriteButton":\n  needs appearance.hide\n  hide hide-gif-favorite-button\n';
     }
   });
 
@@ -53332,6 +53350,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_character_count();
       init_hide_chat_input_refresh_tip();
       init_hide_clan_tags();
+      init_hide_composer_emoji_promo();
       init_hide_contact_sync_promotion();
       init_hide_custom_statuses();
       init_hide_disabled_emojis();
@@ -53347,6 +53366,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_empty_folders();
       init_hide_friend_requests_badge();
       init_hide_gif_button();
+      init_hide_gif_favorite_button();
       init_hide_gif_search_suggestions();
       init_hide_gift_badge_progress();
       init_hide_gift_button();
@@ -54976,6 +54996,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "6d2231275be6c0e73ae8d96c0540194b7f13e1b24703a1ae7b979a930091d921"
           },
           {
+            name: "HideComposerEmojiPromo",
+            source: hide_composer_emoji_promo_default,
+            description: "Hide the premium emoji promotion in composer autocomplete",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "74f9ba1b6c628e3e2fdd215363186334b12e201a140ab9a6b668cf4ba745b0df"
+          },
+          {
             name: "HideContactSyncPromotion",
             source: hide_contact_sync_promotion_default,
             description: "Hide the contact sync promotion",
@@ -55113,6 +55143,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "d7af74fc801892989cd4bed7856bf4f73b673f8e14548316368442fd81e166cf"
+          },
+          {
+            name: "HideGifFavoriteButton",
+            source: hide_gif_favorite_button_default,
+            description: "Hide the favorite button when viewing GIFs",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "5133bb74db5017212d71f4cd4eec44be922f2ae2257f7877de07baf7ba1d6d8e"
           },
           {
             name: "HideGifSearchSuggestions",
@@ -67510,7 +67550,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "29a2bed7742c65ae02a9b0e58882ebc699d7ce16";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b4d38f08617069f866e61340f6134e98a6604c68";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
