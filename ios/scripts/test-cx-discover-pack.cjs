@@ -52,9 +52,16 @@ const metro = {
         return stub("metro.findByProps()");
     },
 };
-const vendetta = new Proxy({ metro: new Proxy(metro, {
+const metroFixture = new Proxy(metro, {
     get: (target, key) => key in target ? target[key] : stub("metro." + String(key)),
-}) }, { get: (target, key) => key in target ? target[key] : stub(String(key)) });
+});
+const runtimeFixture = name => new Proxy({ metro: metroFixture }, {
+    get: (target, key) => key in target ? target[key] : stub(name + "." + String(key)),
+});
+const vendetta = runtimeFixture("vendetta");
+globalThis.window = globalThis;
+globalThis.vendetta = vendetta;
+globalThis.bunny = runtimeFixture("bunny");
 const module = { exports: {} };
 const require = name => {
     if (name !== "@cloudcord/mobile-vendetta") throw new Error("Unexpected external module: " + name);
