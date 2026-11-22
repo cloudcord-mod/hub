@@ -41337,6 +41337,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "channels.clipboard",
           label: "Add Copy Channel Name and Copy Category Name actions"
         },
+        "copy-channel-topic": {
+          permission: "channels.clipboard",
+          label: "Copy the selected channel\u2019s topic as text"
+        },
         "copy-role-color": {
           permission: "guild.roleclipboard",
           label: "Copy the selected server role's hex color"
@@ -45678,6 +45682,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   });
 
   // src/lib/api/cxChannelNames.ts
+  function getCxChannelTopicCopy(channel) {
+    if (!channel.id || !/^\d{17,20}$/.test(channel.id) || !channel.guild_id || typeof channel.topic !== "string" || !channel.topic.trim())
+      return;
+    return {
+      label: "Copy Channel Topic",
+      name: channel.topic
+    };
+  }
   function getCxChannelNameCopy(channel, username) {
     if (typeof channel.id !== "string" || !/^\d{17,20}$/.test(channel.id))
       return;
@@ -49018,7 +49030,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "channels.searchjump": "Look up the first or last matching Discord message in the selected channel when you choose a jump action",
         "messages.jumpblocked": "Jump to messages without changing your block or ignore list",
         "channels.jump": "Jump within the current channel when you choose the navigation control",
-        "channels.clipboard": "Copy the selected channel or category name when you choose its menu action",
+        "channels.clipboard": "Copy the selected channel or category details when you choose a menu action",
         "channels.notes": "Read and edit your private channel notes stored on this device",
         "profilemenu.copy": "Add the listed copy actions to user menus, including profile colors when specified. Writes to the clipboard only when selected.",
         "profilemenu.media": "Open or download the selected user's Discord avatar or banner when you choose a profile menu action.",
@@ -49560,6 +49572,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_bios = __esm({
     "../examples/cx/catalog/plugins/copy-bios.cx"() {
       copy_bios_default = 'plugin "CopyBios":\n  needs profilemenu.copy\n  on profile menu copy profile-bio\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-channel-topic.cx
+  var copy_channel_topic_default;
+  var init_copy_channel_topic = __esm({
+    "../examples/cx/catalog/plugins/copy-channel-topic.cx"() {
+      copy_channel_topic_default = 'plugin "CopyChannelTopic":\n  needs channels.clipboard\n  use copy-channel-topic\n';
     }
   });
 
@@ -53666,6 +53686,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_attachment_links();
       init_copy_attachment_names();
       init_copy_bios();
+      init_copy_channel_topic();
       init_copy_emoji_markdown();
       init_copy_file_contents();
       init_copy_media_link();
@@ -54651,6 +54672,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy Bio",
             categories: [
               "Profiles"
+            ]
+          },
+          {
+            name: "CopyChannelTopic",
+            source: copy_channel_topic_default,
+            description: "Copy the selected channel\u2019s topic as text",
+            categories: [
+              "Servers & channels"
             ]
           },
           {
@@ -60898,9 +60927,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       stop();
     };
   }
-  function registerCopyChannelName(enabled) {
-    return registerChannelSheetEntry("cx-copy-channel-name", enabled, (channel) => {
-      var copy = getCxChannelNameCopy(channel, (id) => UserStore2?.getUser?.(id)?.username);
+  function registerCopyChannelDetails(topic, enabled) {
+    return registerChannelSheetEntry(topic ? "cx-copy-channel-topic" : "cx-copy-channel-name", enabled, (channel) => {
+      var copy = topic ? getCxChannelTopicCopy(channel) : getCxChannelNameCopy(channel, (id) => UserStore2?.getUser?.(id)?.username);
       if (!copy)
         return;
       return {
@@ -62232,7 +62261,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "channel-notes":
             return registerLocalText("channels");
           case "copy-channel-name":
-            return registerCopyChannelName(enabled);
+          case "copy-channel-topic":
+            return registerCopyChannelDetails(effect === "copy-channel-topic", enabled);
           case "copy-role-color":
           case "copy-role-name":
           case "copy-role-mention":
@@ -68243,7 +68273,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "9fab51e11dfb5934595b55017c003ea3fc137fad";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d6c0adea8cf53f74ebd025e72cc6fd9075b9b7ea";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
