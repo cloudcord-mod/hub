@@ -1,7 +1,6 @@
 /*
  * Vencord, a Discord client mod
  * Copyright (c) 2026 Vendicated and contributors
- * Source: https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/equicordplugins/betterMutualServers
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 

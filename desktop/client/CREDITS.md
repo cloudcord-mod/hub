@@ -14,3 +14,10 @@ Desktop plugin adaptations (GPL-3.0-or-later), sourced through [Illegalcord](htt
 
 - Duplicate Category by lethied.
 - Disable Animations by seth.
+- [BetterMutualServers](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/equicordplugins/betterMutualServers).
+- [BetterPollDetails](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/equicordplugins/betterPollDetails).
+- [BetterSearch](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/plugins/betterSearch).
+- [ConsoleCleaner](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/illegalcordplugins/ConsoleCleaner).
+- [ExpandedWidgets](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/illegalcordplugins/expandedWidgets).
+- [MutedServersActivityBadge](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/plugins/mutedServersActivityBadge).
+- [ScreenShareAlert](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/illegalcordplugins/ScreenShareAlert).
