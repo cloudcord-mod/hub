@@ -352,7 +352,8 @@ function registerMessageClipboard(effect: Parameters<typeof getCxMessageClipboar
     let active = true;
     const patch: NavContextMenuPatchCallback = (children, { message, channel }) => {
         if (!active || !message) return;
-        const selectedChannel = effect === "copy-message-reference" ? channel ?? ChannelStore.getChannel(message.channel_id) : undefined;
+        const selectedChannel = effect === "copy-message-reference" || effect === "copy-replied-message-link"
+            ? channel ?? ChannelStore.getChannel(message.channel_id) : undefined;
         const items = getCxMessageClipboard(effect, message, selectedChannel);
         for (const { key, label, text } of items) {
             const id = "cx-copy-" + key;
@@ -1167,6 +1168,8 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "copy-message-links":
                 case "copy-message-code":
                 case "copy-message-info":
+                case "copy-attachment-links":
+                case "copy-replied-message-link":
                     return registerMessageClipboard(effect);
                 case "message-word-count": {
                     const id = "cx-word-count-" + ++wordCountSequence;

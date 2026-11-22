@@ -2719,6 +2719,8 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "copy-message-links":
                 case "copy-message-code":
                 case "copy-message-info":
+                case "copy-attachment-links":
+                case "copy-replied-message-link":
                     return registerMessageMenuActions(enabled, ({ message, channel }, close) =>
                         getCxMessageClipboard(effect, message, channel).map(({ label, text }) => ({ label, run() {
                             try {

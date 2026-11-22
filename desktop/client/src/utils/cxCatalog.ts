@@ -47,6 +47,7 @@ import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/
 import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
 import plugin_catalog_compare_lines from "../../../../examples/cx/catalog/plugins/compare-lines.cx";
+import plugin_catalog_copy_attachment_links from "../../../../examples/cx/catalog/plugins/copy-attachment-links.cx";
 import plugin_catalog_copy_attachment_names from "../../../../examples/cx/catalog/plugins/copy-attachment-names.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
@@ -60,6 +61,7 @@ import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/
 import plugin_catalog_copy_profile_names from "../../../../examples/cx/catalog/plugins/copy-profile-names.cx";
 import plugin_catalog_copy_pronouns from "../../../../examples/cx/catalog/plugins/copy-pronouns.cx";
 import plugin_catalog_copy_raw_text from "../../../../examples/cx/catalog/plugins/copy-raw-text.cx";
+import plugin_catalog_copy_replied_message_link from "../../../../examples/cx/catalog/plugins/copy-replied-message-link.cx";
 import plugin_catalog_copy_role_color from "../../../../examples/cx/catalog/plugins/copy-role-color.cx";
 import plugin_catalog_copy_role_mention from "../../../../examples/cx/catalog/plugins/copy-role-mention.cx";
 import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plugins/copy-server-bio.cx";
@@ -557,6 +559,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CompactMessages", source: plugin_catalog_compact_messages, description: "Tighter spacing between messages", desktopOnly: true, categories: ["Appearance"] },
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, description: "Makes the server list narrower", desktopOnly: true, categories: ["Appearance"] },
         { name: "Compare Lines", source: plugin_catalog_compare_lines, description: "/comparelines", commands: ["comparelines"], categories: ["Commands"], appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20", privateCommands: true },
+        { name: "CopyAttachmentLinks", source: plugin_catalog_copy_attachment_links, description: "Copy links to files attached to the selected message", categories: ["Chat"] },
         { name: "CopyAttachmentNames", source: plugin_catalog_copy_attachment_names, description: "Copy the selected message’s attachment filenames", categories: ["Chat"] },
         { name: "CopyBios", source: plugin_catalog_copy_bios, description: "Copy Bio", categories: ["Profiles"] },
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown, description: "Add a Copy Emoji Markdown action to the emoji menu", categories: ["Media"] },
@@ -570,6 +573,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyProfileNames", source: plugin_catalog_copy_profile_names, description: "Copy Username", keywords: "Copy Display Name", categories: ["Profiles"] },
         { name: "CopyPronouns", source: plugin_catalog_copy_pronouns, description: "Copy Pronouns", categories: ["Profiles"] },
         { name: "Copy Raw Text", source: plugin_catalog_copy_raw_text, description: "Add Copy Raw Text to message menus", categories: ["Chat"] },
+        { name: "CopyRepliedMessageLink", source: plugin_catalog_copy_replied_message_link, description: "Copy the link to the message this reply references", categories: ["Chat"] },
         { name: "CopyRoleColor", source: plugin_catalog_copy_role_color, description: "Copy the selected server role's hex color", categories: ["Servers & channels"] },
         { name: "CopyRoleMention", source: plugin_catalog_copy_role_mention, description: "Copy mention markup for the selected server role", categories: ["Servers & channels"] },
         { name: "CopyServerBio", source: plugin_catalog_copy_server_bio, description: "Copy Server Bio", categories: ["Profiles"] },

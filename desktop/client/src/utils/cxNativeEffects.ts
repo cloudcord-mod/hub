@@ -1,4 +1,5 @@
 import { isCxProfileUserId } from "./cxProfileMenu";
+import { validateCxMediaLink } from "./cxExpressionLinks";
 
 export const cxNativeEffects = {
     "user-notes": { permission: "profile.localnotes", label: "Add a local user note editor to profile menus" },
@@ -61,6 +62,8 @@ export const cxNativeEffects = {
     "copy-message-links": { permission: "messages.copytext", label: "Copy HTTP links from the selected message" },
     "copy-message-code": { permission: "messages.copytext", label: "Copy fenced code from the selected message" },
     "copy-message-info": { permission: "messages.copyreference", label: "Copy the selected message’s IDs and UTC timestamp as JSON" },
+    "copy-attachment-links": { permission: "messages.copytext", label: "Copy links to files attached to the selected message" },
+    "copy-replied-message-link": { permission: "messages.copyreference", label: "Copy the link to the message this reply references" },
     "reveal-spoilers-shortcut": { permission: "messages.revealspoilers", label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true },
     "reply-timestamp": { permission: "messages.replytimestamp", label: "Show the original message's timestamp on loaded reply previews" },
     "message-latency": { permission: "messages.senddelay", label: "Show an estimated send-delay indicator on messages" },
@@ -138,16 +141,19 @@ export function getCxEmbedToggle(message: CxEmbedMessage, channelId: string, use
 }
 
 type RepeatAttachment = { filename?: string; url?: string; size?: number; };
+type CxMessageReference = { guild_id?: string; channel_id?: string; message_id?: string; };
 export type CxQuoteMessage = {
     id?: string;
     channel_id?: string;
     content?: string;
-    attachments?: readonly { filename?: string; }[];
+    attachments?: readonly { filename?: string; url?: string; }[];
+    messageReference?: CxMessageReference;
+    message_reference?: CxMessageReference;
     author?: { id?: string; username?: string; globalName?: string | null; global_name?: string | null; };
 };
 
 type CxMessageClipboardEffect = "copy-raw-text" | "copy-message-reference" | "copy-attachment-names"
-    | "copy-message-links" | "copy-message-code" | "copy-message-info";
+    | "copy-message-links" | "copy-message-code" | "copy-message-info" | "copy-attachment-links" | "copy-replied-message-link";
 
 export function getCxMessageClipboard(effect: CxMessageClipboardEffect, message?: CxQuoteMessage,
     channel?: { id: string; guild_id?: string | null }) {
@@ -160,6 +166,17 @@ export function getCxMessageClipboard(effect: CxMessageClipboardEffect, message?
         const names = (message?.attachments ?? []).flatMap(file =>
             typeof file?.filename === "string" && file.filename.trim() ? [file.filename.replace(/[\r\n]+/g, " ")] : []);
         return item("attachment-names", "Copy Attachment Names", names.join("\n"));
+    }
+    if (effect === "copy-attachment-links") {
+        const links = (message?.attachments ?? []).map(file => validateCxMediaLink(file?.url)).filter(Boolean);
+        return item("attachment-links", "Copy Attachment Links", [...new Set(links)].join("\n"));
+    }
+    if (effect === "copy-replied-message-link") {
+        const reference = message?.messageReference ?? message?.message_reference;
+        if (!isCxProfileUserId(reference?.message_id) || !isCxProfileUserId(reference?.channel_id)) return [];
+        const guildId = reference.guild_id ?? (channel?.id === reference.channel_id ? channel.guild_id ?? "@me" : undefined);
+        if (guildId !== "@me" && !isCxProfileUserId(guildId)) return [];
+        return item("replied-message-link", "Copy Replied Message Link", "https://discord.com/channels/" + guildId + "/" + reference.channel_id + "/" + reference.message_id);
     }
     if (effect === "copy-message-links") {
         const links = new Set<string>();

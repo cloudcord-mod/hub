@@ -1,0 +1,3 @@
+plugin "CopyRepliedMessageLink":
+  needs messages.copyreference
+  use copy-replied-message-link

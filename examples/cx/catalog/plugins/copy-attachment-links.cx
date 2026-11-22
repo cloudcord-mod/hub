@@ -1,0 +1,3 @@
+plugin "CopyAttachmentLinks":
+  needs messages.copytext
+  use copy-attachment-links
