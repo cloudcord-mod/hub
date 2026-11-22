@@ -38640,6 +38640,39 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return left < right ? -1 : left > right ? 1 : 0;
         }).join("\n"),
         trimLines: (text) => text.split(/\r\n|\r|\n/).map((line) => line.trim()).join("\n"),
+        removeBlankLines: (text) => text.split(/\r\n|\r|\n/).filter((line) => line.trim()).join("\n"),
+        reverseLineOrder: (text) => text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).reverse().join("\n"),
+        joinLines(text, separator) {
+          if (separator.length > 32)
+            return;
+          var output = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).join(separator);
+          if (output.length <= 4e3)
+            return output;
+        },
+        wrapText(text, width) {
+          var limit = Number(width);
+          if (!Number.isInteger(limit) || limit < 8 || limit > 120)
+            return;
+          var output = text.split(/\r\n|\r|\n/).map((paragraph) => {
+            var lines = [];
+            var current = "";
+            var length = 0;
+            for (var word of paragraph.trim().split(/\s+/)) {
+              var size = Array.from(word).length;
+              if (length && length + 1 + size > limit) {
+                lines.push(current);
+                current = "";
+                length = 0;
+              }
+              current += (length ? " " : "") + word;
+              length += (length ? 1 : 0) + size;
+            }
+            lines.push(current);
+            return lines.join("\n");
+          }).join("\n");
+          if (output.length <= 4e3)
+            return output;
+        },
         linesToCsv: (text) => {
           var fields = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
           return fields.map((field) => `"${field.replaceAll('"', '""')}"`).join(",");
@@ -51078,6 +51111,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/join-lines.cx
+  var join_lines_default;
+  var init_join_lines = __esm({
+    "../examples/cx/catalog/plugins/join-lines.cx"() {
+      join_lines_default = 'plugin "Join Lines":\n  needs commands.register\n  needs reply.local\n  on command "joinlines":\n    input "text" text\n    input "separator" text\n    reply "${joinLines(text, separator)}" else "Use a separator of up to 32 characters and keep the result under 4,000 characters."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/json-check.cx
   var json_check_default;
   var init_json_check = __esm({
@@ -51790,6 +51831,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/remove-blank-lines.cx
+  var remove_blank_lines_default;
+  var init_remove_blank_lines = __esm({
+    "../examples/cx/catalog/plugins/remove-blank-lines.cx"() {
+      remove_blank_lines_default = 'plugin "Remove Blank Lines":\n  needs commands.register\n  needs reply.local\n  on command "removeblanklines":\n    input "text" text\n    reply "${removeBlankLines(text)}" else "No nonblank lines."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/repeat-messages.cx
   var repeat_messages_default;
   var init_repeat_messages = __esm({
@@ -51835,6 +51884,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_reverse_image_search = __esm({
     "../examples/cx/catalog/plugins/reverse-image-search.cx"() {
       reverse_image_search_default = 'plugin "ReverseImageSearch":\n  needs media.search\n  use reverse-image-search\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/reverse-line-order.cx
+  var reverse_line_order_default;
+  var init_reverse_line_order = __esm({
+    "../examples/cx/catalog/plugins/reverse-line-order.cx"() {
+      reverse_line_order_default = 'plugin "Reverse Line Order":\n  needs commands.register\n  needs reply.local\n  on command "reverselines":\n    input "text" text\n    reply "${reverseLineOrder(text)}" else "Enter text to reverse."\n';
     }
   });
 
@@ -52492,6 +52549,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_word_frequency = __esm({
     "../examples/cx/catalog/plugins/word-frequency.cx"() {
       word_frequency_default = 'plugin "Word Frequency":\n  needs commands.register\n  needs reply.local\n  on command "wordfrequency" with text:\n    reply "${wordFrequency(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/wrap-text.cx
+  var wrap_text_default;
+  var init_wrap_text = __esm({
+    "../examples/cx/catalog/plugins/wrap-text.cx"() {
+      wrap_text_default = 'plugin "Wrap Text":\n  needs commands.register\n  needs reply.local\n  on command "wraptext":\n    input "text" text\n    input "width" integer\n    reply "${wrapText(text, width)}" else "Choose a width from 8 to 120 and keep the result under 4,000 characters."\n';
     }
   });
 
@@ -53559,6 +53624,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_in_role();
       init_ingtoninator();
       init_iso_week();
+      init_join_lines();
       init_json_check();
       init_json_compact();
       init_json_format();
@@ -53627,12 +53693,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_recurring_timestamps();
       init_redact_email_addresses();
       init_relationship_notifier();
+      init_remove_blank_lines();
       init_repeat_messages();
       init_reply_ping_control();
       init_reply_timestamp();
       init_resize_dimensions();
       init_reveal_all_spoilers();
       init_reverse_image_search();
+      init_reverse_line_order();
       init_reverse_text();
       init_rot13_text();
       init_round_server_icons();
@@ -53710,6 +53778,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_wiki_lookup();
       init_word_count();
       init_word_frequency();
+      init_wrap_text();
       init_write_upper_case();
       init_zero_width_sanitizer();
       init_midnight();
@@ -56142,6 +56211,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Join Lines",
+            source: join_lines_default,
+            description: "/joinlines",
+            commands: [
+              "joinlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "7fe09a418a6341397253829916ab3fc523ae42d483a0c37a00c032d48430f135",
+            privateCommands: true
+          },
+          {
             name: "JSON Check",
             source: json_check_default,
             description: "/jsoncheck",
@@ -56849,6 +56931,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Remove Blank Lines",
+            source: remove_blank_lines_default,
+            description: "/removeblanklines",
+            commands: [
+              "removeblanklines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fbdd3ecce06cfd9b56f5f8a3fc1164ddd43d97a98279f4c8edcb0af17a88b51d",
+            privateCommands: true
+          },
+          {
             name: "RepeatMessages",
             source: repeat_messages_default,
             description: "Send the selected message again with its attachments and stickers",
@@ -56901,6 +56996,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Media"
             ]
+          },
+          {
+            name: "Reverse Line Order",
+            source: reverse_line_order_default,
+            description: "/reverselines",
+            commands: [
+              "reverselines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "13108c795a0f1b9e7d63ac3d4245b666c3fe5395a601f48a8a0115e612b6f905",
+            privateCommands: true
           },
           {
             name: "ReverseText",
@@ -57687,6 +57795,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065",
+            privateCommands: true
+          },
+          {
+            name: "Wrap Text",
+            source: wrap_text_default,
+            description: "/wraptext",
+            commands: [
+              "wraptext"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "e60541db78f6a4d662c6501972181a629fc629e6acb5290275a0ea069a6a1834",
             privateCommands: true
           },
           {
@@ -67741,7 +67862,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "25e0147a5dd03a5175cc22b3c26dc59714273208";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "77443aeb27dcfd4b2f7fb5955439dbe49572dd54";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
