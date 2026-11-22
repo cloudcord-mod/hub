@@ -21025,6 +21025,38 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       resizeMode: "contain"
     }) : null;
   }
+  function StudioAvatar({ uri, name }) {
+    var [failed, setFailed] = (0, import_react6.useState)(false);
+    if (uri && !failed) {
+      return /* @__PURE__ */ jsx(import_react_native24.Image, {
+        source: {
+          uri
+        },
+        style: {
+          width: "100%",
+          height: "100%"
+        },
+        onError: () => setFailed(true)
+      });
+    }
+    var initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
+    return /* @__PURE__ */ jsx(import_react_native24.View, {
+      style: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: C3.raised()
+      },
+      children: /* @__PURE__ */ jsx(Text, {
+        variant: "text-md/bold",
+        style: {
+          color: C3.text()
+        },
+        numberOfLines: 1,
+        children: initial
+      })
+    });
+  }
   function StudioHero({ name, username, avatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
     var tint = accent || C3.raised();
     return /* @__PURE__ */ jsxs(import_react_native24.View, {
@@ -21116,15 +21148,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         backgroundColor: C3.raised(),
                         overflow: "hidden"
                       },
-                      children: avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-                        source: {
-                          uri: avatar
-                        },
-                        style: {
-                          width: "100%",
-                          height: "100%"
-                        }
-                      }) : null
+                      children: /* @__PURE__ */ jsx(StudioAvatar, {
+                        uri: avatar,
+                        name
+                      }, avatar)
                     }),
                     /* @__PURE__ */ jsx(import_react_native24.View, {
                       style: {
@@ -22439,16 +22466,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             backgroundColor: card
           },
           children: [
-            avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-              source: {
-                uri: avatar
-              },
+            /* @__PURE__ */ jsx(import_react_native24.View, {
               style: {
                 width: 38,
                 height: 38,
-                borderRadius: 19
-              }
-            }) : null,
+                borderRadius: 19,
+                overflow: "hidden"
+              },
+              children: /* @__PURE__ */ jsx(StudioAvatar, {
+                uri: avatar,
+                name
+              }, avatar)
+            }),
             /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
                 flex: 1,
@@ -22577,15 +22606,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         backgroundColor: C3.raised(),
                         overflow: "hidden"
                       },
-                      children: avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-                        source: {
-                          uri: avatar
-                        },
-                        style: {
-                          width: "100%",
-                          height: "100%"
-                        }
-                      }) : null
+                      children: /* @__PURE__ */ jsx(StudioAvatar, {
+                        uri: avatar,
+                        name
+                      }, avatar)
                     }),
                     decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
                       source: {
@@ -22821,15 +22845,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: ring,
                 overflow: "hidden"
               },
-              children: avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-                source: {
-                  uri: avatar
-                },
-                style: {
-                  width: "100%",
-                  height: "100%"
-                }
-              }) : null
+              children: /* @__PURE__ */ jsx(StudioAvatar, {
+                uri: avatar,
+                name
+              }, avatar)
             }),
             decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
               source: {
@@ -71980,7 +71999,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4d9b4579784385a75b46158a91ccb995c22a2c36";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "773a72a896f9c4c389de00cf3fafbaed5436aa83";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
