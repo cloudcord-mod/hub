@@ -22,6 +22,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import java.io.File
@@ -43,7 +45,9 @@ data class RuntimeManifest(val schema: Int = 1, val version: String, val url: St
 data class ResolvedBundle(val url: String, val sha256: String? = null, val size: Long? = null, val version: String? = null)
 
 object UpdaterModule : Module() {
-    private lateinit var config: LoaderConfig
+    @Volatile private lateinit var config: LoaderConfig
+    private lateinit var configFile: File
+    private val downloadMutex = Mutex()
     val isCustomUrlEnabled: Boolean
         get() = config.customLoadUrl.enabled
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -72,7 +76,7 @@ object UpdaterModule : Module() {
         bundle = File(cacheDir, Constants.MAIN_SCRIPT_FILE)
         etag = File(cacheDir, ETAG_FILE)
 
-        val configFile = File(filesDir, CONFIG_FILE)
+        configFile = File(filesDir, CONFIG_FILE)
         config = runCatching {
             if (configFile.exists()) JSON.decodeFromString<LoaderConfig>(configFile.readText()) else LoaderConfig()
         }.getOrDefault(LoaderConfig())
@@ -84,7 +88,10 @@ object UpdaterModule : Module() {
         }
     }
 
-    fun downloadScript(activity: Activity? = null, showUpdateDialog: Boolean = true): Job = scope.launch {
+    fun downloadScript(activity: Activity? = null, showUpdateDialog: Boolean = true, officialOnly: Boolean = false): Job =
+        scope.launch { downloadMutex.withLock { download(activity, showUpdateDialog, officialOnly) } }
+
+    private suspend fun download(activity: Activity?, showUpdateDialog: Boolean, officialOnly: Boolean) {
         try {
             HttpClient(CIO) {
                 expectSuccess = false
@@ -96,7 +103,7 @@ object UpdaterModule : Module() {
                 install(UserAgent) { agent = Constants.USER_AGENT }
                 install(HttpRedirect) { checkHttpMethod = false }
             }.use { client ->
-                val target = resolveTargetBundle(client)
+                val target = resolveTargetBundle(client, officialOnly)
                 val revision = target.version?.takeIf { it.matches(Regex("[a-fA-F0-9]{40}")) }?.take(12)
                 Log.i(if (revision != null) "Checking stable CloudCord runtime $revision" else "Checking CloudCord runtime from the configured source")
 
@@ -133,6 +140,7 @@ object UpdaterModule : Module() {
 
                         response.headers[HttpHeaders.ETag]?.let { etag.writeText(it) } ?: etag.delete()
                         Log.i("Verified CloudCord bundle updated: ${bytes.size} bytes")
+                        if (officialOnly) selectStableSource()
 
                         if (activity != null && showUpdateDialog) {
                             withContext(Dispatchers.Main) {
@@ -148,6 +156,10 @@ object UpdaterModule : Module() {
                     HttpStatusCode.NotModified -> {
                         if (!localMatches || !bundle.exists()) throw Exception("Server returned 304 without a verified local runtime.")
                         Log.i("Verified CloudCord bundle is up to date (304)")
+                        if (officialOnly) {
+                            selectStableSource()
+                            if (activity != null) withContext(Dispatchers.Main) { reloadApp() }
+                        }
                     }
                     else -> throw ResponseException(response, "HTTP ${response.status}")
                 }
@@ -160,8 +172,8 @@ object UpdaterModule : Module() {
         }
     }
 
-    private suspend fun resolveTargetBundle(client: HttpClient): ResolvedBundle {
-        if (config.customLoadUrl.enabled && config.customLoadUrl.url.isNotEmpty()) return ResolvedBundle(config.customLoadUrl.url)
+    private suspend fun resolveTargetBundle(client: HttpClient, officialOnly: Boolean): ResolvedBundle {
+        if (!officialOnly && config.customLoadUrl.enabled && config.customLoadUrl.url.isNotEmpty()) return ResolvedBundle(config.customLoadUrl.url)
         // Revalidate the moving manifest. The checksum-verified payload URL is immutable.
         val response = client.get(DEFAULT_MANIFEST_URL) {
             header(HttpHeaders.CacheControl, "no-cache")
@@ -176,6 +188,25 @@ object UpdaterModule : Module() {
         return ResolvedBundle(manifest.url, manifest.sha256.lowercase(), manifest.size, manifest.version)
     }
 
+    @Synchronized
+    private fun selectStableSource() {
+        if (!config.customLoadUrl.enabled) return
+        saveConfig(config.copy(customLoadUrl = CustomLoadUrl()))
+    }
+
+    private fun saveConfig(next: LoaderConfig) {
+        val file = AtomicFile(configFile)
+        val stream = file.startWrite()
+        try {
+            stream.write(JSON.encodeToString(next).toByteArray(Charsets.UTF_8))
+            file.finishWrite(stream)
+        } catch (error: Exception) {
+            file.failWrite(stream)
+            throw error
+        }
+        config = next
+    }
+
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
         .digest(bytes)
         .joinToString("") { "%02x".format(it.toInt() and 0xff) }
@@ -184,12 +215,9 @@ object UpdaterModule : Module() {
         lastActivity = WeakReference(activity)
     }
 
+    @Synchronized
     fun setDisableInjection(context: Context, disabled: Boolean) {
-        val filesDir = File(context.dataDir, Constants.FILES_DIR).apply { mkdirs() }
-        val configFile = File(filesDir, CONFIG_FILE)
-        val newCfg = config.copy(disableInjection = disabled)
-        configFile.writeText(JSON.encodeToString(newCfg))
-        config = newCfg
+        saveConfig(config.copy(disableInjection = disabled))
         Toast.makeText(context, "Injection ${if (disabled) "disabled" else "enabled"}", Toast.LENGTH_SHORT).show()
     }
 
