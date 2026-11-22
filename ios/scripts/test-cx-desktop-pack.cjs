@@ -23,6 +23,14 @@ function loadModule(file) {
 
 const bootstrap = `
 globalThis.window = globalThis;
+// QuickJS 0.23 predates this method available in the desktop Chromium host.
+if (typeof Object.hasOwn !== "function") {
+    Object.defineProperty(Object, "hasOwn", {
+        configurable: true,
+        writable: true,
+        value(object, key) { return Object.prototype.hasOwnProperty.call(object, key); },
+    });
+}
 const noop = () => {};
 globalThis.console = { log: noop, info: noop, debug: noop, warn: noop, error: noop, trace: noop };
 const intervals = new Set();
@@ -96,9 +104,29 @@ function storage() {
 }
 globalThis.localStorage = storage();
 globalThis.sessionStorage = storage();
+const listeners = new Set();
+function eventTarget() {
+    const target = {};
+    const capture = options => options === true || options?.capture === true;
+    function find(type, callback, options) {
+        return [...listeners].find(item => item.target === target && item.type === type &&
+            item.callback === callback && item.capture === capture(options));
+    }
+    return {
+        addEventListener(type, callback, options) {
+            if (callback && !find(type, callback, options)) {
+                listeners.add({ target, type, callback, capture: capture(options) });
+            }
+        },
+        removeEventListener(type, callback, options) {
+            listeners.delete(find(type, callback, options));
+        },
+    };
+}
+Object.assign(globalThis, eventTarget());
 globalThis.document = {
     documentElement: container(), head: container(), body: container(),
-    addEventListener() {}, removeEventListener() {},
+    ...eventTarget(),
     getElementById(id) { return [...styles].find(element => element.id === id) ?? null; },
     createElement(tag) {
         const attributes = new Map();
@@ -121,6 +149,22 @@ const react = {
     memo: fn => fn, forwardRef: fn => fn, createContext: value => ({ _currentValue: value }),
     isValidElement: value => Boolean(value?.type),
 };
+const mountedRoots = new Set();
+const reactDomClient = {
+    createRoot(container) {
+        if (!container || mountedRoots.has(container)) throw new Error("Invalid or already mounted root container");
+        mountedRoots.add(container);
+        let mounted = true;
+        return {
+            render() { if (!mounted) throw new Error("Cannot render an unmounted root"); },
+            unmount() {
+                if (!mounted) return;
+                mounted = false;
+                mountedRoots.delete(container);
+            },
+        };
+    },
+};
 const stopWarnings = [];
 const lifecycleTraces = [];
 function recordTrace(stage, error) {
@@ -136,7 +180,7 @@ const logger = { logger: () => ({ warn(message, error) {
 }, error() {}, debug() {}, info() {} }) };
 const webpack = ${loadModule("webpack.js")}(() => logger);
 const cloudcord = window.CloudCord = {
-    webpack, discord: { React: react, Dispatcher: dispatcher, store() {} },
+    webpack, discord: { React: react, ReactDOMClient: reactDomClient, Dispatcher: dispatcher, store() {} },
     settings: { getData: (_key, fallback) => fallback, setData() {} },
     settingsPage: { registerSettingsPage: subscribe },
     menus: { Menu: { types: () => ({}) }, addMenuHook: subscribe },
@@ -169,7 +213,7 @@ const lifecycleProbe = `
 const lifecycleErrors = [];
 let unfinished = 0;
 let dispose;
-const resources = () => intervals.size + subscriptions.size + dispatchSubscriptions.size + styles.size;
+const resources = () => intervals.size + subscriptions.size + dispatchSubscriptions.size + styles.size + listeners.size + mountedRoots.size;
 const resourceBaseline = resources();
 for (const target of new Set([rec.def, rec.plugin])) {
     for (const method of ["start", "stop"]) {
@@ -287,7 +331,7 @@ async function main() {
                 }
             }
             setup.value.dispose();
-            deadline = Date.now() + 250;
+            deadline = Date.now() + 1_000;
             const checked = context.evalCode(`const rec = scripts.loadScript(${JSON.stringify(entry.id)}, ${JSON.stringify(code)}, { patches: false });
 const patches = rec.plugin?.patches ?? [];
 const textTargets = patches.map(patch => patch.find).filter(target => typeof target === "string" && target.length <= 4096);
