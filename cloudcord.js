@@ -17125,14 +17125,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ];
   }
   function nativeProfilePreviewSurface(userId, profile, userBanner) {
-    var colors = profile?.themeColors ?? profile?.theme_colors;
+    var colors = Array.isArray(profile?.themeColors) ? profile.themeColors : Array.isArray(profile?.theme_colors) ? profile.theme_colors : [];
+    var bannerColor = profilePreviewColor(profile?.accentColor) ?? profilePreviewColor(profile?.accent_color);
+    var primary = profilePreviewColor(colors[0]) ?? profilePreviewColor(profile?.primaryColor) ?? profilePreviewColor(profile?.primary_color);
+    var accent = profilePreviewColor(colors[1]);
     return {
       banner: customDiscordMediaURL("banners", userId, profile?.banner) || customDiscordMediaURL("banners", userId, userBanner) || void 0,
       bio: typeof profile?.bio === "string" ? profile.bio : void 0,
       pronouns: typeof profile?.pronouns === "string" ? profile.pronouns : void 0,
-      primary: Array.isArray(colors) ? profilePreviewColor(colors[0]) : void 0,
-      accent: Array.isArray(colors) ? profilePreviewColor(colors[1]) : void 0,
-      bannerColor: profilePreviewColor(profile?.accentColor ?? profile?.accent_color)
+      primary: primary ?? accent,
+      accent: accent ?? primary,
+      bannerColor
     };
   }
   function setProfilePresentationFields(target, fields) {
@@ -72230,7 +72233,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6d5fe7e96c96faea22ff78dc4808821fb1e580b6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "57d0c78484f46408ed634ce20317c5d9aece9359";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
