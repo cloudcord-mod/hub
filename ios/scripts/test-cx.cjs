@@ -3010,6 +3010,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["formatcodeblock", { text: "let x = 1;", language: "js" }, /^\x60{3}js\nlet x = 1;\n\x60{3}$/],
                 ["formatcodeblock", { text: "let x = 1;", language: "js\nhello" }, /^Enter code/],
             ]],
+            ["Compare CSV Cells", [
+                ["comparecsv", { before: 'A,B\n1,"x,y"', after: 'A,B\n2,"x,y"' }, /^1 changed cell · R2C1$/],
+                ["comparecsv", { before: "A,B", after: "A" }, /^Paste two rectangular/],
+            ]],
+            ["TSV to CSV", [
+                ["tsvtocsv", { text: 'A\tB\nC,D\tE"F' }, /"A","B"\n"C,D","E""F"/],
+                ["tsvtocsv", { text: "A\tB\nC" }, /^Paste a rectangular/],
+            ]],
             ["CSV to TSV", [
                 ["csvtotsv", { text: 'A,B\n"C,D",E' }, /A\tB\nC,D\tE/],
                 ["csvtotsv", { text: 'A,B\n"C\nD",E' }, /^Paste rectangular CSV/],

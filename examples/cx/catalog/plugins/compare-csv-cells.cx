@@ -1,0 +1,7 @@
+plugin "Compare CSV Cells":
+  needs commands.register
+  needs reply.local
+  on command "comparecsv":
+    input "before" text
+    input "after" text
+    reply "${compareCsvCells(before, after)}" else "Paste two rectangular CSV tables of equal dimensions, up to 64 rows and 32 columns."

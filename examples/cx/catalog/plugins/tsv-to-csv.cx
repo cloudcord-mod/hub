@@ -1,0 +1,6 @@
+plugin "TSV to CSV":
+  needs commands.register
+  needs reply.local
+  on command "tsvtocsv":
+    input "text" text
+    reply "${tsvToCsv(text)}" else "Paste a rectangular tab-separated table."

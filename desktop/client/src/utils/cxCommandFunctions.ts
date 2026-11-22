@@ -1053,6 +1053,25 @@ export const cxCommandFunctions = {
         if (!columns || rows.some(row => row.length !== columns || row.some(field => /[\t\r\n]/.test(field)))) return;
         return planningBlock(rows.map(row => row.join("\t")).join("\n"));
     },
+    tsvToCsv(input: string) {
+        if (!input.trim() || input.length > 12000) return;
+        const rows = input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(row => row.split("\t"));
+        const columns = rows[0].length;
+        if (rows.some(row => row.length !== columns)) return;
+        return planningBlock(rows.map(row => row.map(cell => '"' + cell.replaceAll('"', '""') + '"').join(",")).join("\n"));
+    },
+    compareCsvCells(before: string, after: string) {
+        if (before.length > 12000 || after.length > 12000) return;
+        const left = csvRows(before), right = csvRows(after);
+        const columns = left[0]?.length;
+        if (!columns || columns > 32 || left.length > 64 || left.length !== right.length
+            || left.some(row => row.length !== columns) || right.some(row => row.length !== columns)) return;
+        const locations = left.flatMap((row, y) => row.flatMap((cell, x) => cell !== right[y][x] ? [`R${y + 1}C${x + 1}`] : []));
+        if (!locations.length) return "No CSV cells changed.";
+        const listed = locations.slice(0, 100).join(", ");
+        return locations.length + (locations.length === 1 ? " changed cell · " : " changed cells · ") + listed
+            + (locations.length > 100 ? " (first 100 shown)" : "");
+    },
     surroundLines(text: string, prefix: string, suffix: string) {
         if (!text || !(prefix || suffix) || /[\r\n]/.test(prefix + suffix) || prefix.length + suffix.length > 64) return;
         return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(line => prefix + line + suffix).join("\n"));

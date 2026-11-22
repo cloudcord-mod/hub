@@ -48,6 +48,7 @@ import plugin_catalog_compact_compose from "../../../../examples/cx/catalog/plug
 import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/plugins/compact-member-list.cx";
 import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
+import plugin_catalog_compare_csv_cells from "../../../../examples/cx/catalog/plugins/compare-csv-cells.cx";
 import plugin_catalog_compare_lines from "../../../../examples/cx/catalog/plugins/compare-lines.cx";
 import plugin_catalog_copy_account_creation_timestamp from "../../../../examples/cx/catalog/plugins/copy-account-creation-timestamp.cx";
 import plugin_catalog_copy_attachment_links from "../../../../examples/cx/catalog/plugins/copy-attachment-links.cx";
@@ -482,6 +483,7 @@ import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/tr
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_transpose_csv from "../../../../examples/cx/catalog/plugins/transpose-csv.cx";
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
+import plugin_catalog_tsv_to_csv from "../../../../examples/cx/catalog/plugins/tsv-to-csv.cx";
 import plugin_catalog_tsv_to_markdown from "../../../../examples/cx/catalog/plugins/tsv-to-markdown.cx";
 import plugin_catalog_unicode_inspector from "../../../../examples/cx/catalog/plugins/unicode-inspector.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
@@ -670,6 +672,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CompactMemberList", source: plugin_catalog_compact_member_list, description: "reduce the spacing in the server member list", categories: ["Appearance"], appearanceRevision: "21cb8ff0a28cec1a5d7a550d3ac698ae54d2cdcea9824ab27c8767945fea0eba" },
         { name: "CompactMessages", source: plugin_catalog_compact_messages, description: "Tighter spacing between messages", desktopOnly: true, categories: ["Appearance"] },
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, description: "Makes the server list narrower", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Compare CSV Cells", source: plugin_catalog_compare_csv_cells, description: "/comparecsv", commands: ["comparecsv"], categories: ["Commands"], appearanceRevision: "01283845ff190f8429780e75501c85a7318bf5c5bdf2fdee25e35e2bff2f3c42", privateCommands: true },
         { name: "Compare Lines", source: plugin_catalog_compare_lines, description: "/comparelines", commands: ["comparelines"], categories: ["Commands"], appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20", privateCommands: true },
         { name: "CopyAccountCreationTimestamp", source: plugin_catalog_copy_account_creation_timestamp, description: "Copy Account Creation Timestamp", categories: ["Profiles"] },
         { name: "CopyAttachmentLinks", source: plugin_catalog_copy_attachment_links, description: "Copy links to files attached to the selected message", categories: ["Chat"] },
@@ -1104,6 +1107,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar, description: "make the chat input background translucent", categories: ["Appearance"], appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e" },
         { name: "Transpose CSV", source: plugin_catalog_transpose_csv, description: "/transposecsv", commands: ["transposecsv"], categories: ["Commands"], appearanceRevision: "3bd1c5b25daeeda2b83a92591289182ee31e8321201bbf94d57433875f5ac7cd", privateCommands: true },
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"], appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849", privateCommands: true },
+        { name: "TSV to CSV", source: plugin_catalog_tsv_to_csv, description: "/tsvtocsv", commands: ["tsvtocsv"], categories: ["Commands"], appearanceRevision: "fd03053374fa9b987c7037a3ef839d6b74524cb54d62b9cff8bc7a3c90a39def", privateCommands: true },
         { name: "TSV to Markdown", source: plugin_catalog_tsv_to_markdown, description: "/tsvtomarkdown", commands: ["tsvtomarkdown"], categories: ["Commands"], appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a", privateCommands: true },
         { name: "Unicode Inspector", source: plugin_catalog_unicode_inspector, description: "/unicodeinfo", commands: ["unicodeinfo"], categories: ["Commands"], appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f", privateCommands: true },
         { name: "Unindent", source: plugin_catalog_unindent, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
