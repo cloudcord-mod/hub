@@ -90,7 +90,7 @@ const catalog = {
 const countMocks = {
     "@api/PluginManager": { plugins: nativePlugins, isPluginEnabled: name => name === "Shared" },
     "@api/Settings": { useSettings: () => ({ enabledThemes: ["a.css"], enabledThemeLinks: ["file"] }) },
-    "@sincordplugins/cxExtensions": { useCxAddonRows: kind => catalog[kind] },
+    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => query === "/off" ? catalog[kind].slice(1) : catalog[kind] },
     "@utils/css": mocks["@utils/css"],
     "@webpack/common": commonHooks,
     "@components/settings/AddonCard": { AddonCard: "CatalogCard" },
@@ -119,6 +119,9 @@ const toggle = beforeFiltering.find(node => node.type?.name === "EnabledOnly");
 toggle.props.onChange(true);
 assert.ok(!renderList().some(node => node.props.name === "Local" || node.props.plugin?.name === "Disabled"));
 assert.ok(renderList().some(node => node.props.name === "Shared" || node.props.plugin?.name === "Shared"));
+toggle.props.onChange(false);
+beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("/off");
+assert.deepEqual(shownCards().map(node => node.props.name), ["Local", "Disabled"]);
 
 const mobileModule = { exports: {} };
 let filterSheet;

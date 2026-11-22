@@ -125,7 +125,8 @@ export function PluginsPage() {
     const nativeByName = new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin]));
 
     const q = query.trim().toLowerCase();
-    const shownNative = filter === "all" ? visible.filter(p => (!cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name))
+    const commandSearch = q.startsWith("/");
+    const shownNative = filter === "all" && !commandSearch ? visible.filter(p => (!cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name))
         && (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || p.tags?.some(t => t.toLowerCase().includes(q)))) : [];
     const shownNames = new Set(shownNative.map(plugin => plugin.name.toLowerCase()));
     const shown = [
@@ -138,7 +139,8 @@ export function PluginsPage() {
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
         }).map(extension => ({ name: extension.name, active: extension.active, plugin: undefined, extension })),
     ].filter(row => !enabledOnly || row.active)
-        .sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0) || a.name.localeCompare(b.name));
+        .sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0)
+            || (commandSearch ? 0 : a.name.localeCompare(b.name)));
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
 
@@ -179,7 +181,7 @@ export function PluginsPage() {
                     <label className={cl("select")}>
                         Sort by:
                         <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
-                            <option value="name">Name</option>
+                            <option value="name">{commandSearch ? "Best match" : "Name"}</option>
                             <option value="enabled">Enabled first</option>
                         </select>
                     </label>
