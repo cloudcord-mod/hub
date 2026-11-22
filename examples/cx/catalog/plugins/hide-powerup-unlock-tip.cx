@@ -1,0 +1,3 @@
+plugin "HidePowerupUnlockTip":
+  needs appearance.hide
+  hide hide-powerup-unlock-tip

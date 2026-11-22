@@ -136,6 +136,7 @@ import plugin_catalog_hide_badge_customization_tip from "../../../../examples/cx
 import plugin_catalog_hide_badges from "../../../../examples/cx/catalog/plugins/hide-badges.cx";
 import plugin_catalog_hide_blocked_and_ignored_messages from "../../../../examples/cx/catalog/plugins/hide-blocked-and-ignored-messages.cx";
 import plugin_catalog_hide_boost_goal from "../../../../examples/cx/catalog/plugins/hide-boost-goal.cx";
+import plugin_catalog_hide_boost_progress_tip from "../../../../examples/cx/catalog/plugins/hide-boost-progress-tip.cx";
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
@@ -183,10 +184,12 @@ import plugin_catalog_hide_monthly_reward_promotions from "../../../../examples/
 import plugin_catalog_hide_nameplates from "../../../../examples/cx/catalog/plugins/hide-nameplates.cx";
 import plugin_catalog_hide_new_messages_bar from "../../../../examples/cx/catalog/plugins/hide-new-messages-bar.cx";
 import plugin_catalog_hide_nitro_tab from "../../../../examples/cx/catalog/plugins/hide-nitro-tab.cx";
+import plugin_catalog_hide_nitro_tenure_tip from "../../../../examples/cx/catalog/plugins/hide-nitro-tenure-tip.cx";
 import plugin_catalog_hide_notification_bell from "../../../../examples/cx/catalog/plugins/hide-notification-bell.cx";
 import plugin_catalog_hide_orb_wallet_nitro_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-nitro-promotion.cx";
 import plugin_catalog_hide_orb_wallet_seasonal_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-seasonal-promotion.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
+import plugin_catalog_hide_powerup_unlock_tip from "../../../../examples/cx/catalog/plugins/hide-powerup-unlock-tip.cx";
 import plugin_catalog_hide_premium_group_promotion from "../../../../examples/cx/catalog/plugins/hide-premium-group-promotion.cx";
 import plugin_catalog_hide_profile_activity_badges from "../../../../examples/cx/catalog/plugins/hide-profile-activity-badges.cx";
 import plugin_catalog_hide_profile_activity_timebar from "../../../../examples/cx/catalog/plugins/hide-profile-activity-timebar.cx";
@@ -212,6 +215,7 @@ import plugin_catalog_hide_server_feed_description from "../../../../examples/cx
 import plugin_catalog_hide_server_feed_member_count from "../../../../examples/cx/catalog/plugins/hide-server-feed-member-count.cx";
 import plugin_catalog_hide_server_live_notice from "../../../../examples/cx/catalog/plugins/hide-server-live-notice.cx";
 import plugin_catalog_hide_server_tag_promotion from "../../../../examples/cx/catalog/plugins/hide-server-tag-promotion.cx";
+import plugin_catalog_hide_server_theme_tip from "../../../../examples/cx/catalog/plugins/hide-server-theme-tip.cx";
 import plugin_catalog_hide_shop_button_tip from "../../../../examples/cx/catalog/plugins/hide-shop-button-tip.cx";
 import plugin_catalog_hide_shop_featured_collections from "../../../../examples/cx/catalog/plugins/hide-shop-featured-collections.cx";
 import plugin_catalog_hide_shop_limited_time_badges from "../../../../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx";
@@ -665,6 +669,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBadges", source: plugin_catalog_hide_badges, description: "Hide profile badge rows", categories: ["Appearance","Profiles"], appearanceRevision: "7534988c55ea4ec909649c757c024e770e0257e7fbb301c010fce5cd98f3d9a2" },
         { name: "HideBlockedAndIgnoredMessages", source: plugin_catalog_hide_blocked_and_ignored_messages, description: "Hide matching incoming messages and history on this device", categories: ["Chat"] },
         { name: "HideBoostGoal", source: plugin_catalog_hide_boost_goal, description: "Hide the server boost progress bar", categories: ["Appearance"], appearanceRevision: "812688497568203e8e885e392fdfce9b4797a09ad2ceaf1d970a7b863f9e9b03" },
+        { name: "HideBoostProgressTip", source: plugin_catalog_hide_boost_progress_tip, description: "Hide the server boost progress tooltip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "1d6378a948edebe2f07e6390da4e0dff29121bcc249e40d38a8a058e1b8ca0de" },
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags, description: "Hide APP and BOT tags", categories: ["Appearance"], appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
@@ -712,10 +717,12 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideNameplates", source: plugin_catalog_hide_nameplates, description: "Hide nameplates", categories: ["Appearance"], appearanceRevision: "a1a4921ec50253e74f70cee18c4210151654b56ab3af47085be01cb56028aa58" },
         { name: "HideNewMessagesBar", source: plugin_catalog_hide_new_messages_bar, description: "Hide the new messages bar", categories: ["Appearance"], appearanceRevision: "ef764695aecc37b3f4bb92bddd58eb030ea64d1afe8dc32b1c4c00281bec0b70" },
         { name: "HideNitroTab", source: plugin_catalog_hide_nitro_tab, description: "Hide the Nitro entry", categories: ["Appearance"], appearanceRevision: "77819d3881314900b8285f3145480dda07dbb4dd98a136765979e14f1e2d2706" },
+        { name: "HideNitroTenureTip", source: plugin_catalog_hide_nitro_tenure_tip, description: "Hide the Nitro tenure badge tooltip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "130f18839eeb09b4ca99876555483be7a16ad14d5321ecb52b3b7bf329e58e13" },
         { name: "HideNotificationBell", source: plugin_catalog_hide_notification_bell, description: "Hide the channel notification settings shortcut", categories: ["Appearance"], appearanceRevision: "7ba7ebf67f69bf87b478780c25dc22ee79e44f0f381e0339fbc78c50ace61320" },
         { name: "HideOrbWalletNitroPromotion", source: plugin_catalog_hide_orb_wallet_nitro_promotion, description: "Hide the Nitro promotion in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideOrbWalletSeasonalPromotion", source: plugin_catalog_hide_orb_wallet_seasonal_promotion, description: "Hide the Black Friday card in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button, description: "Hide the pinned messages shortcut", categories: ["Appearance"], appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67" },
+        { name: "HidePowerupUnlockTip", source: plugin_catalog_hide_powerup_unlock_tip, description: "Hide the boost-to-unlock tooltip for server powerups", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "fc174f9df6d011b4f746ef1de2f5cb3678025bfbefad4048eda0cf49f5ef4dea" },
         { name: "HidePremiumGroupPromotion", source: plugin_catalog_hide_premium_group_promotion, description: "Hide the premium group promotion in the offer dialog", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideProfileActivityBadges", source: plugin_catalog_hide_profile_activity_badges, description: "Hide activity badges on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5eb45da8e6b8f4b64553b82a09ba64b96f22ac4ab0faf9d8ae00b93eda857a40" },
         { name: "HideProfileActivityTimebar", source: plugin_catalog_hide_profile_activity_timebar, description: "Hide the elapsed-time bar on profile activity cards", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "a4f2b8a3365692099cd125181785282a06e13d22e28ec0c5a546686646d822da" },
@@ -741,6 +748,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideServerFeedMemberCount", source: plugin_catalog_hide_server_feed_member_count, description: "Hide the member count in the server feed header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "39fe7b993c1c301b4582971ef276104114f0e634d667c0a7c79140b911dc92bc" },
         { name: "HideServerLiveNotice", source: plugin_catalog_hide_server_live_notice, description: "Hide the live event notice above the server channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "02cedf54e3dcbd4628039da3c365116f739d2e1bfd79d50f992155546f1830df" },
         { name: "HideServerTagPromotion", source: plugin_catalog_hide_server_tag_promotion, description: "Hide the server tag upsell in server settings", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640" },
+        { name: "HideServerThemeTip", source: plugin_catalog_hide_server_theme_tip, description: "Hide the server theme introduction for members", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "fcf3ec61162e3f78d941d24c2b2ffec00e111bbb1cca794bce45461c77443b4e" },
         { name: "HideShopButtonTip", source: plugin_catalog_hide_shop_button_tip, description: "Hide the Shop button introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848" },
         { name: "HideShopFeaturedCollections", source: plugin_catalog_hide_shop_featured_collections, description: "Hide featured collections in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "daa25863e067d4624b5affaded88ee76ce45516516f3aae7958b773166a1c00c" },
         { name: "HideShopLimitedTimeBadges", source: plugin_catalog_hide_shop_limited_time_badges, description: "Hide limited-time labels on Shop collectibles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "768c11081eb04523c28f1e2fc2d7d3ab32317c4e142c32dff2132c2597ef329a" },

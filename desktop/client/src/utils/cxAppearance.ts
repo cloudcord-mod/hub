@@ -17,6 +17,10 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-boost-progress-tip": hideMobileComponent("HideBoostProgressTip", "the server boost progress tooltip", "modules/premium/powerups/native/BoostProgressBarCoachmark.tsx"),
+    "hide-powerup-unlock-tip": hideMobileComponent("HidePowerupUnlockTip", "the boost-to-unlock tooltip for server powerups", "modules/premium/powerups/native/GuildPowerupsBoostToUnlockCoachmark.tsx"),
+    "hide-server-theme-tip": hideMobileComponent("HideServerThemeTip", "the server theme introduction for members", "modules/premium/powerups/native/GuildThemeMemberCoachmark.tsx"),
+    "hide-nitro-tenure-tip": hideMobileComponent("HideNitroTenureTip", "the Nitro tenure badge tooltip", "modules/premium/tiered_tenure_badging/native/TieredTenureBadgeCoachmark.tsx"),
     "hide-shop-featured-collections": hideMobileComponent("HideShopFeaturedCollections", "featured collections in the Shop", "modules/collectibles/native/FeaturedBlock.tsx"),
     "hide-shop-limited-time-badges": hideMobileComponent("HideShopLimitedTimeBadges", "limited-time labels on Shop collectibles", "modules/collectibles/native/LimitedTimeBadge.tsx"),
     "hide-dm-friend-suggestions": hideMobileComponent("HideDmFriendSuggestions", "suggested friends and their heading from the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriend.tsx", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriendsHeader.tsx"),

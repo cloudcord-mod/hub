@@ -1,0 +1,3 @@
+plugin "HideNitroTenureTip":
+  needs appearance.hide
+  hide hide-nitro-tenure-tip

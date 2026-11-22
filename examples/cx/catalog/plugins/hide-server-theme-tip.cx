@@ -1,0 +1,3 @@
+plugin "HideServerThemeTip":
+  needs appearance.hide
+  hide hide-server-theme-tip
