@@ -22893,30 +22893,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }),
         badges.length ? /* @__PURE__ */ jsx(import_react_native24.View, {
           style: {
-            alignSelf: "flex-end",
-            flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "flex-end",
-            gap: 2,
-            maxWidth: "58%",
             marginTop: 8,
-            marginRight: 10,
-            paddingHorizontal: 4,
-            paddingVertical: 3,
-            borderRadius: 8,
-            backgroundColor: colors.panel
+            marginLeft: 110,
+            marginRight: 10
           },
-          children: badges.map((icon3, index) => /* @__PURE__ */ jsx(import_react_native24.Image, {
-            source: {
-              uri: icon3
-            },
+          children: /* @__PURE__ */ jsx(import_react_native24.View, {
             style: {
-              width: 20,
-              height: 20,
-              tintColor: icon3 === officialBadgeIcon ? colors === LIGHT ? "#000000" : "#ffffff" : void 0
+              alignSelf: "flex-end",
+              flexDirection: "row",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+              gap: 2,
+              maxWidth: "100%",
+              paddingHorizontal: 4,
+              paddingVertical: 3,
+              borderRadius: 8,
+              backgroundColor: colors.panel
             },
-            resizeMode: "contain"
-          }, index))
+            children: badges.map((icon3, index) => /* @__PURE__ */ jsx(import_react_native24.Image, {
+              source: {
+                uri: icon3
+              },
+              style: {
+                width: 20,
+                height: 20,
+                tintColor: icon3 === officialBadgeIcon ? colors === LIGHT ? "#000000" : "#ffffff" : void 0
+              },
+              resizeMode: "contain"
+            }, index))
+          })
         }) : null,
         /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
@@ -72041,7 +72046,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "847f62c2ca7b27f09c75d34f586f0949ea083af9";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "be09a3ee84d9923a5ab1089a1deec321bbaacd7f";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
