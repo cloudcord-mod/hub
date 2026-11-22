@@ -442,7 +442,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ? bit === embedPermissions.MOVE_MEMBERS ? canBypassQueue : canJoinQueue
                 : canSend },
             GuildMemberStore: {
-                getMember: (guild, id) => guild === guildId && id === sender ? { nick: "Server nickname" } : undefined,
+                getMember: (guild, id) => guild === guildId && id === sender ? { nick: "Server nickname", avatar: "a_" + "f".repeat(32) } : undefined,
                 getMemberIds: () => [me, sender],
                 getMembers: () => [{ userId: sender, roles: [roleId], nick: "Tester@everyone" }],
             },
@@ -2476,20 +2476,22 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         click(render(), "Disable CopyServerBio");
         includeProfileNames = false;
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
-        for (const name of ["CopyPronouns", "CopyServerNickname"]) {
+        for (const name of ["CopyPronouns", "CopyServerNickname", "CopyServerAvatarLink"]) {
             selectCatalog(name);
             click(render(), "Allow for this session");
         }
         assert.deepEqual(Array.from(actionList(sender), item => item.label), ["Copy Pronouns"]);
         assert.deepEqual(Array.from(actionList(sender, other), item => item.label), ["Copy Pronouns"]);
         const profileDetails = actionList(sender, guildId);
-        assert.deepEqual(Array.from(profileDetails, item => item.label), ["Copy Pronouns", "Copy Server Nickname"]);
+        assert.deepEqual(Array.from(profileDetails, item => item.label), ["Copy Pronouns", "Copy Server Nickname", "Copy Server Avatar Link"]);
         for (const action of profileDetails) action.action();
-        assert.deepEqual(clipboardWrites.slice(-2), ["they/them", "Server nickname"]);
+        assert.deepEqual(clipboardWrites.slice(-3), ["they/them", "Server nickname",
+            "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + sender + "/avatars/a_" + "f".repeat(32) + ".webp?size=4096&animated=true"]);
         actionList(other, guildId)[0].action();
         assert.equal(notifications.pop(), "No profile pronouns found.");
         click(render(), "Disable CopyPronouns");
         click(render(), "Disable CopyServerNickname");
+        click(render(), "Disable CopyServerAvatarLink");
         assert.equal(menuPatches.size + appearanceHooks.size, 0);
         {
             const port = cxCatalog.plugins.find(entry => entry.name === "UserNotes").source;

@@ -13,6 +13,7 @@ export const cxProfileMenuActions = {
     "server-profile-bio": { label: "Copy Server Bio", scope: "server" },
     "profile-pronouns": { label: "Copy Pronouns", scope: "user", unavailable: "No profile pronouns found." },
     "server-nickname": { label: "Copy Server Nickname", scope: "server" },
+    "server-avatar-link": { label: "Copy Server Avatar Link", scope: "server" },
     "profile-colors": { label: "Copy Profile Colors", scope: "user", unavailable: "No profile colors found." },
     "server-profile-colors": { label: "Copy Server Profile Colors", scope: "server" },
 } as const;
@@ -51,7 +52,7 @@ type ProfileStore = {
 };
 type UserStore = { getUser?: (id: string) => { username?: unknown; globalName?: unknown; } | null | undefined; };
 type MemberStore = {
-    getMember?: (guildId: string, id: string) => { nick?: unknown; } | null | undefined;
+    getMember?: (guildId: string, id: string) => { nick?: unknown; avatar?: unknown; } | null | undefined;
 };
 
 function nonBlankText(value: unknown) {
@@ -69,6 +70,13 @@ export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, pr
         }
         if (action === "server-nickname" && guildId) {
             return nonBlankText(members?.getMember?.(guildId, id)?.nick);
+        }
+        if (action === "server-avatar-link") {
+            if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id)) return;
+            const hash = members?.getMember?.(guildId, id)?.avatar;
+            if (typeof hash !== "string" || !/^(?:a_)?[0-9a-f]{32}$/.test(hash)) return;
+            const format = hash.startsWith("a_") ? "webp?size=4096&animated=true" : "png?size=4096";
+            return "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + id + "/avatars/" + hash + "." + format;
         }
         const profile = entry.scope === "server"
             ? profiles?.getGuildMemberProfile?.(id, guildId!) : profiles?.getUserProfile?.(id);

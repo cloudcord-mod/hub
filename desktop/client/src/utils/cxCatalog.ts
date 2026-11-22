@@ -67,6 +67,7 @@ import plugin_catalog_copy_replied_message_link from "../../../../examples/cx/ca
 import plugin_catalog_copy_role_color from "../../../../examples/cx/catalog/plugins/copy-role-color.cx";
 import plugin_catalog_copy_role_mention from "../../../../examples/cx/catalog/plugins/copy-role-mention.cx";
 import plugin_catalog_copy_role_name from "../../../../examples/cx/catalog/plugins/copy-role-name.cx";
+import plugin_catalog_copy_server_avatar_link from "../../../../examples/cx/catalog/plugins/copy-server-avatar-link.cx";
 import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plugins/copy-server-bio.cx";
 import plugin_catalog_copy_server_details from "../../../../examples/cx/catalog/plugins/copy-server-details.cx";
 import plugin_catalog_copy_server_media_links from "../../../../examples/cx/catalog/plugins/copy-server-media-links.cx";
@@ -583,6 +584,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyRoleColor", source: plugin_catalog_copy_role_color, description: "Copy the selected server role's hex color", categories: ["Servers & channels"] },
         { name: "CopyRoleMention", source: plugin_catalog_copy_role_mention, description: "Copy mention markup for the selected server role", categories: ["Servers & channels"] },
         { name: "CopyRoleName", source: plugin_catalog_copy_role_name, description: "Copy the selected server role’s name as plain text", categories: ["Servers & channels"] },
+        { name: "CopyServerAvatarLink", source: plugin_catalog_copy_server_avatar_link, description: "Copy Server Avatar Link", categories: ["Profiles"] },
         { name: "CopyServerBio", source: plugin_catalog_copy_server_bio, description: "Copy Server Bio", categories: ["Profiles"] },
         { name: "Copy Server Details", source: plugin_catalog_copy_server_details, description: "Copy the selected server's name or description", categories: ["Servers & channels"] },
         { name: "Copy Server Media Links", source: plugin_catalog_copy_server_media_links, description: "Copy links to the selected server's icon and banner", categories: ["Media","Servers & channels"] },
