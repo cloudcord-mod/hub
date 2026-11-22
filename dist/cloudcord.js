@@ -39871,6 +39871,31 @@ Copy \`<t:${timestamp}:F>\``;
           var action = contain ? "Padding" : "Crop";
           return "Resize to " + scaledW + " \xD7 " + scaledH + " px\n" + action + ": " + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
         },
+        imagePrintSize(width, height, ppi) {
+          var columns = integerText(width), rows = integerText(height), density = integerText(ppi);
+          if (!columns || !rows || !density || columns < 1 || rows < 1 || density < 1)
+            return;
+          var dimensions = (factor) => [
+            columns,
+            rows
+          ].map((pixels) => String(Number((pixels / density * factor).toPrecision(6)))).join(" \xD7 ");
+          return dimensions(1) + " in \xB7 " + dimensions(2.54) + " cm";
+        },
+        videoFramePosition(index, fps) {
+          var frame = integerText(index), rate = Number(fps);
+          if (frame === void 0 || frame < 0 || !/^\d{1,4}(?:\.\d{1,3})?$/.test(fps) || rate < 1 || rate > 1e3)
+            return;
+          var milliseconds = Math.round(frame / rate * 1e3);
+          if (!Number.isSafeInteger(milliseconds))
+            return;
+          var seconds = Math.floor(milliseconds / 1e3);
+          var clock = [
+            Math.floor(seconds / 3600),
+            Math.floor(seconds / 60) % 60,
+            seconds % 60
+          ].map((part) => String(part).padStart(2, "0")).join(":");
+          return clock + "." + String(milliseconds % 1e3).padStart(3, "0");
+        },
         imagePixelCount(width, height) {
           var columns = integerText(width), rows = integerText(height);
           if (columns === void 0 || rows === void 0 || columns < 1 || rows < 1 || columns > 1e6 || rows > 1e6)
@@ -52775,6 +52800,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/image-print-size.cx
+  var image_print_size_default;
+  var init_image_print_size = __esm({
+    "../examples/cx/catalog/plugins/image-print-size.cx"() {
+      image_print_size_default = 'plugin "Image Print Size":\n  needs commands.register\n  needs reply.local\n  on command "printsize":\n    input "width" text\n    input "height" text\n    input "ppi" text\n    reply "${imagePrintSize(width, height, ppi)}" else "Enter pixel dimensions and a positive pixels-per-inch value."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/improve-contrast.cx
   var improve_contrast_default;
   var init_improve_contrast = __esm({
@@ -54279,6 +54312,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/video-frame-position.cx
+  var video_frame_position_default;
+  var init_video_frame_position = __esm({
+    "../examples/cx/catalog/plugins/video-frame-position.cx"() {
+      video_frame_position_default = 'plugin "Video Frame Position":\n  needs commands.register\n  needs reply.local\n  on command "frameposition":\n    input "index" text\n    input "fps" text\n    reply "${videoFramePosition(index, fps)}" else "Enter a zero-based frame index and a frame rate from 1 to 1000."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/video-size-estimate.cx
   var video_size_estimate_default;
   var init_video_size_estimate = __esm({
@@ -55619,6 +55660,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_image_filename();
       init_image_link();
       init_image_pixel_count();
+      init_image_print_size();
       init_improve_contrast();
       init_in_role();
       init_indent_lines();
@@ -55786,6 +55828,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_utf_8_byte_count();
       init_vibe_check();
       init_video_frame_count();
+      init_video_frame_position();
       init_video_size_estimate();
       init_view_group_dm_icon();
       init_view_role_icon();
@@ -59247,6 +59290,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Image Print Size",
+            source: image_print_size_default,
+            description: "/printsize",
+            commands: [
+              "printsize"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "a223ac136df378fba61cd2fd33ef04c30995c8918389861f81d84bd32a043343",
+            privateCommands: true
+          },
+          {
             name: "Improve Contrast",
             source: improve_contrast_default,
             description: "/improvecontrast",
@@ -61042,6 +61098,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "05bbc7b2a9de22b4b85f1792f5b967269fc9dc356581b753d84da9049a942cf0",
+            privateCommands: true
+          },
+          {
+            name: "Video Frame Position",
+            source: video_frame_position_default,
+            description: "/frameposition",
+            commands: [
+              "frameposition"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "0ea8362e6e24695d1f4f497fd64870848b18a683ae47815afdfad4d6877d9d32",
             privateCommands: true
           },
           {
@@ -71359,7 +71428,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fb258f5db47f0400034e01b3b9a3cb158966d1eb";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ec959caef69abce938c5802a108c6b1194536ebe";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
