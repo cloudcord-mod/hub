@@ -47,6 +47,10 @@ function stub(name) {
 }
 const metro = {
     common: stub("metro.common"),
+    find: stub("metro.find"),
+    findByName: stub("metro.findByName"),
+    findByStoreName: stub("metro.findByStoreName"),
+    findByDisplayName: stub("metro.findByDisplayName"),
     findByProps: (...keys) => {
         if (keys.length && keys.every(key => typeof key === "string")) requests.set(JSON.stringify(keys), keys);
         return stub("metro.findByProps()");
@@ -60,6 +64,7 @@ const runtimeFixture = name => new Proxy({ metro: metroFixture }, {
 });
 const vendetta = runtimeFixture("vendetta");
 globalThis.window = globalThis;
+globalThis.nativeModuleProxy = Object.create(null);
 globalThis.vendetta = vendetta;
 globalThis.bunny = runtimeFixture("bunny");
 const module = { exports: {} };
