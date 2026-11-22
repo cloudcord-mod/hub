@@ -1,0 +1,3 @@
+plugin "HideActivityShelfArtwork":
+  needs appearance.hide
+  hide hide-activity-shelf-artwork

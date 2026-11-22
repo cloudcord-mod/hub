@@ -605,7 +605,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "PremiumUpsellGradientBackground", "GiftIconTrinketsAnimation",
             "AppLauncherOnboardingChatInputButtonAnimation", "BurstReactionAnimation", "FractionalNitroCoinIllustration",
             "ThemedHeaderBackgroundGradient", "BountiesBannerBackground", "QuestModalContentCloudBackground",
-            "PremiumFeaturesBackground"].map(name => [
+            "PremiumFeaturesBackground", "QuestDockBlurredContentBackground", "SettingsAppearanceGradientBackground",
+            "ActivityShelfItemBackground"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>

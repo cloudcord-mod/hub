@@ -1,0 +1,3 @@
+plugin "HideQuestDockBackdrop":
+  needs appearance.hide
+  hide hide-quest-dock-backdrop

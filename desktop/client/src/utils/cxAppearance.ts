@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-quest-dock-backdrop": hideMobileComponent("HideQuestDockBackdrop", "the blurred backdrop of the Quest dock", "modules/quests/native/QuestDock/QuestDockBlurredContentBackground.tsx"),
+    "hide-appearance-preview-gradient": hideMobileComponent("HideAppearancePreviewGradient", "the gradient behind Appearance settings previews", "modules/user_settings/appearance/native/components/SettingsAppearanceGradientBackground.tsx"),
+    "hide-activity-shelf-artwork": hideMobileComponent("HideActivityShelfArtwork", "background artwork on voice activity shelf cards", "modules/voice_panel/native/controls/activities/ActivityShelfItemBackground.tsx"),
     "hide-shop-nitro-coin-art": hideMobileComponent("HideShopNitroCoinArt", "the fractional Nitro coin illustration in the Shop", "modules/collectibles/native/FractionalNitroCoinIllustration.tsx"),
     "hide-mobile-header-gradient": hideMobileComponent("HideMobileHeaderGradient", "the themed gradient behind mobile panel headers", "modules/main_tabs_v2/native/panels/ThemedHeaderBackgroundGradient.tsx"),
     "hide-bounties-banner-art": hideMobileComponent("HideBountiesBannerArt", "the decorative background behind the Bounties banner", "modules/quests/native/BountiesBannerBackground.tsx"),

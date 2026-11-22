@@ -137,6 +137,7 @@ import plugin_catalog_grayscale_images from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hide_active_channel_cards from "../../../../examples/cx/catalog/plugins/hide-active-channel-cards.cx";
 import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plugins/hide-active-now.cx";
 import plugin_catalog_hide_activity_cards from "../../../../examples/cx/catalog/plugins/hide-activity-cards.cx";
+import plugin_catalog_hide_activity_shelf_artwork from "../../../../examples/cx/catalog/plugins/hide-activity-shelf-artwork.cx";
 import plugin_catalog_hide_add_friend_hint from "../../../../examples/cx/catalog/plugins/hide-add-friend-hint.cx";
 import plugin_catalog_hide_add_server_button from "../../../../examples/cx/catalog/plugins/hide-add-server-button.cx";
 import plugin_catalog_hide_app_launcher_button_animation from "../../../../examples/cx/catalog/plugins/hide-app-launcher-button-animation.cx";
@@ -144,6 +145,7 @@ import plugin_catalog_hide_app_launcher_intro from "../../../../examples/cx/cata
 import plugin_catalog_hide_app_launcher_recommendations from "../../../../examples/cx/catalog/plugins/hide-app-launcher-recommendations.cx";
 import plugin_catalog_hide_app_recommendation_rows from "../../../../examples/cx/catalog/plugins/hide-app-recommendation-rows.cx";
 import plugin_catalog_hide_app_search_intro from "../../../../examples/cx/catalog/plugins/hide-app-search-intro.cx";
+import plugin_catalog_hide_appearance_preview_gradient from "../../../../examples/cx/catalog/plugins/hide-appearance-preview-gradient.cx";
 import plugin_catalog_hide_apps_button from "../../../../examples/cx/catalog/plugins/hide-apps-button.cx";
 import plugin_catalog_hide_avatar_decorations from "../../../../examples/cx/catalog/plugins/hide-avatar-decorations.cx";
 import plugin_catalog_hide_badge_customization_tip from "../../../../examples/cx/catalog/plugins/hide-badge-customization-tip.cx";
@@ -251,6 +253,7 @@ import plugin_catalog_hide_profile_upsell_card from "../../../../examples/cx/cat
 import plugin_catalog_hide_profile_wishlist_suggestions from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx";
 import plugin_catalog_hide_profile_wishlist_tip from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx";
 import plugin_catalog_hide_profile_your_friends_card from "../../../../examples/cx/catalog/plugins/hide-profile-your-friends-card.cx";
+import plugin_catalog_hide_quest_dock_backdrop from "../../../../examples/cx/catalog/plugins/hide-quest-dock-backdrop.cx";
 import plugin_catalog_hide_quest_modal_clouds from "../../../../examples/cx/catalog/plugins/hide-quest-modal-clouds.cx";
 import plugin_catalog_hide_quest_orb_multiplier_pill from "../../../../examples/cx/catalog/plugins/hide-quest-orb-multiplier-pill.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
@@ -754,6 +757,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideActiveChannelCards", source: plugin_catalog_hide_active_channel_cards, description: "Hide active text channel cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6764ad5a3e29345fe28106ff9d3d60ad23aaa67989756513ec1030e993be51ca" },
         { name: "HideActiveNow", source: plugin_catalog_hide_active_now, description: "Hide the active friends panel", categories: ["Appearance"], appearanceRevision: "3ea10b3241ba84c918d96f0c98c1b365c4e0f2c9a3014fa429ed7a3b2c5d4361" },
         { name: "HideActivityCards", source: plugin_catalog_hide_activity_cards, description: "Hide activity cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7" },
+        { name: "HideActivityShelfArtwork", source: plugin_catalog_hide_activity_shelf_artwork, description: "Hide background artwork on voice activity shelf cards", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b0bb8b1cb3068b7accf280739a9d6fcbc14723036b0eedae1f0a758cf349882b" },
         { name: "HideAddFriendHint", source: plugin_catalog_hide_add_friend_hint, description: "Hide the hint below the Add Friend field", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideAddServerButton", source: plugin_catalog_hide_add_server_button, description: "Hide the add-a-server button", categories: ["Appearance"], appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f" },
         { name: "HideAppLauncherButtonAnimation", source: plugin_catalog_hide_app_launcher_button_animation, description: "Hide the app launcher button introduction animation", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "dbe46592775b83cb2865f691d4a17e9f502bf4a84d9c249614982db5a883f7b4" },
@@ -761,6 +765,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideAppLauncherRecommendations", source: plugin_catalog_hide_app_launcher_recommendations, description: "Hide recommendations in the Apps launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "3578c09c61c7bd97ca8d3e6d627476cf7633d5e4de2f50203bf84bab6673566c" },
         { name: "HideAppRecommendationRows", source: plugin_catalog_hide_app_recommendation_rows, description: "Hide individual recommended app rows in the launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "38bf86f99da339d0fd91838f1b241bbafb6b0a68086e34d43b5234b43b29f0ba" },
         { name: "HideAppSearchIntro", source: plugin_catalog_hide_app_search_intro, description: "Hide the app search introduction banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "139066a6c48a5295ea0c7e0387b823aa332a0c1c7ee93340cc85b59ff7ab603b" },
+        { name: "HideAppearancePreviewGradient", source: plugin_catalog_hide_appearance_preview_gradient, description: "Hide the gradient behind Appearance settings previews", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9910562a7295e8b1988248fa64fc77739b2b5df8ad868f971b0f42ca28d06c20" },
         { name: "HideAppsButton", source: plugin_catalog_hide_apps_button, description: "Hide the chat apps button", categories: ["Appearance"], appearanceRevision: "fb41efeee2bee264d504b42efa8f3db918e48e61a9db15519f3c180eeebbbae6" },
         { name: "HideAvatarDecorations", source: plugin_catalog_hide_avatar_decorations, description: "Hide avatar decorations", categories: ["Appearance","Profiles"], appearanceRevision: "af04631611ed161cb774835f80057bedb39a04a347cc9c7862a25db7ec22af1f" },
         { name: "HideBadgeCustomizationTip", source: plugin_catalog_hide_badge_customization_tip, description: "Hide the badge customization tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "a87e71ce4ff7f7c60574ab43187c45329ff88f0d9f260605112721f12f8f912b" },
@@ -868,6 +873,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideProfileWishlistSuggestions", source: plugin_catalog_hide_profile_wishlist_suggestions, description: "Hide suggested items on profile wishlists", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d23c4eb8f183ca2a7f49fc9086f59dd68e5f6c031b000430c0670ea2754d0622" },
         { name: "HideProfileWishlistTip", source: plugin_catalog_hide_profile_wishlist_tip, description: "Hide the wishlist viewing tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74d22841fc73e0f740b1819df239a6b3023720a18799b73e96b32cf90f67649f" },
         { name: "HideProfileYourFriendsCard", source: plugin_catalog_hide_profile_your_friends_card, description: "Hide the Your Friends card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389" },
+        { name: "HideQuestDockBackdrop", source: plugin_catalog_hide_quest_dock_backdrop, description: "Hide the blurred backdrop of the Quest dock", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cc78b8ed69c32639c24c82065730f1ea0f3854e38e8173dc4b7b17a3c0e842bb" },
         { name: "HideQuestModalClouds", source: plugin_catalog_hide_quest_modal_clouds, description: "Hide the cloud artwork in Quest modals", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2012c25e620bd5fe6dfd66d100633d0d84c8c7969045bd5dd72f656728f9f070" },
         { name: "HideQuestOrbMultiplierPill", source: plugin_catalog_hide_quest_orb_multiplier_pill, description: "Hide the Orb multiplier perk label on quests", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "03f19a71805dbf9465f5644be6b64fd64e68a18e496d5aa9b25caf615d8b7b5b" },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry", categories: ["Appearance"], appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe" },
