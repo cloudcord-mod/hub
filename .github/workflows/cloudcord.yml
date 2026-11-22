@@ -5362,7 +5362,6 @@ jobs:
                                   customStatus={preview.customStatus ? `${preview.customStatus.emoji || ""} ${preview.customStatus.text || ""}`.trim() : undefined}
                                   activity={preview.customActivity ? { verb: ACTIVITY_TYPES.find(type => type.value === preview.customActivity?.type)?.label || "", name: preview.customActivity.name, details: preview.customActivity.details } : null}
                                   badges={studioBadgeIcons(preview)} officialBadgeIcon={CLOUDCORD_BADGE_ICON}
-                                  onBadges={() => setActiveTab("badges")} onSaved={() => setActiveTab("saved")}
                                   frame={preview.profileFrame ? catalog?.frames.find(item => item.skuId === preview.profileFrame?.skuId)?.label || "Selected" : undefined}
                                   effect={preview.profileEffect ? catalog?.effects.find(item => item.skuId === preview.profileEffect?.skuId)?.title || "Selected" : undefined} />
                           </View></Card> : null}

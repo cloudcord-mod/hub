@@ -435,10 +435,10 @@ function PreviewCosmetics({ frame, effect }: { frame?: string; effect?: string }
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }: {
+export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon }: {
     name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
-    badges?: string[]; officialBadgeIcon?: string; onBadges?: () => void; onSaved?: () => void;
+    badges?: string[]; officialBadgeIcon?: string;
 }) {
     const [layout, setLayout] = useState<"Profile" | "Popout" | "Chat">("Profile");
     const edge = primary || C.page();
@@ -496,10 +496,6 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
                 <PreviewCosmetics frame={frame} effect={effect} />
             </View>
         </View>}
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: GAP.sm }}>
-            {onBadges && <Action label="Badges" onPress={onBadges} />}
-            {onSaved && <Action label="Saved looks" onPress={onSaved} />}
-        </View>
     </View>;
 }
 
