@@ -3044,6 +3044,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             ["Escape Regex", [
                 ["escaperegex", { text: "a+b[0]/c" }, /a\\\+b\\\[0\\\]\\\/c/],
             ]],
+            ["Truncate Text", [
+                ["truncatetext", { text: "A😀BC", limit: "3" }, /A😀…/],
+                ["truncatetext", { text: "abc", limit: "0" }, /^Enter text/],
+            ]],
+            ["Find Long Lines", [
+                ["findlonglines", { text: "ab\r\n😀abc\nfghij", limit: "3" }, /^Line 2 · 4 code points\nLine 3 · 5 code points$/],
+                ["findlonglines", { text: "abc", limit: "3" }, /^No lines exceed/],
+            ]],
             ["Count Text Matches", [
                 ["countmatches", { text: "ababABab", phrase: "ab" }, /^3 exact matches$/],
                 ["countmatches", { text: "aaaa", phrase: "aaa" }, /^1 exact match$/],

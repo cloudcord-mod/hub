@@ -317,6 +317,22 @@ export const cxCommandFunctions = {
         return planningBlock(text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")
             .replace(/\r/g, "\\r").replace(/\n/g, "\\n"));
     },
+    truncateText(text: string, limit: string) {
+        const length = integerText(limit);
+        if (!text || length === undefined || length < 1 || length > 2000) return;
+        const points = Array.from(text);
+        return planningBlock(points.length > length ? points.slice(0, length - 1).join("") + "…" : text);
+    },
+    findLongLines(text: string, limit: string) {
+        const length = integerText(limit);
+        if (!text || length === undefined || length < 1) return;
+        const lines = text.split(/\r\n|\r|\n/).flatMap((line, index) => {
+            const size = Array.from(line).length;
+            return size > length ? ["Line " + (index + 1) + " · " + size + " code points"] : [];
+        });
+        if (!lines.length) return "No lines exceed the limit.";
+        return lines.slice(0, 50).join("\n") + (lines.length > 50 ? "\n" + (lines.length - 50) + " more" : "");
+    },
     countTextMatches(text: string, phrase: string) {
         if (!text || !phrase) return;
         let count = 0;

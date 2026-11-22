@@ -1,0 +1,7 @@
+plugin "Truncate Text":
+  needs commands.register
+  needs reply.local
+  on command "truncatetext":
+    input "text" text
+    input "limit" text
+    reply "${truncateText(text, limit)}" else "Enter text and a code-point limit from 1 to 2000."

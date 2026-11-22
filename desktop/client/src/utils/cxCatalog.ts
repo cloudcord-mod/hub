@@ -125,6 +125,7 @@ import plugin_catalog_file_name_randomization from "../../../../examples/cx/cata
 import plugin_catalog_file_size_converter from "../../../../examples/cx/catalog/plugins/file-size-converter.cx";
 import plugin_catalog_file_transfer_estimate from "../../../../examples/cx/catalog/plugins/file-transfer-estimate.cx";
 import plugin_catalog_filter_lines from "../../../../examples/cx/catalog/plugins/filter-lines.cx";
+import plugin_catalog_find_long_lines from "../../../../examples/cx/catalog/plugins/find-long-lines.cx";
 import plugin_catalog_fit_image from "../../../../examples/cx/catalog/plugins/fit-image.cx";
 import plugin_catalog_fix_codeblock_gap from "../../../../examples/cx/catalog/plugins/fix-codeblock-gap.cx";
 import plugin_catalog_fix_file_extensions from "../../../../examples/cx/catalog/plugins/fix-file-extensions.cx";
@@ -500,6 +501,7 @@ import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/tr
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_transpose_csv from "../../../../examples/cx/catalog/plugins/transpose-csv.cx";
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
+import plugin_catalog_truncate_text from "../../../../examples/cx/catalog/plugins/truncate-text.cx";
 import plugin_catalog_tsv_to_csv from "../../../../examples/cx/catalog/plugins/tsv-to-csv.cx";
 import plugin_catalog_tsv_to_markdown from "../../../../examples/cx/catalog/plugins/tsv-to-markdown.cx";
 import plugin_catalog_unicode_from_code_points from "../../../../examples/cx/catalog/plugins/unicode-from-code-points.cx";
@@ -770,6 +772,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "File Size Converter", source: plugin_catalog_file_size_converter, description: "/convertfilesize", commands: ["convertfilesize"], categories: ["Commands"], appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7", privateCommands: true },
         { name: "File Transfer Estimate", source: plugin_catalog_file_transfer_estimate, description: "/transferestimate", commands: ["transferestimate"], categories: ["Commands"], appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736", privateCommands: true },
         { name: "Filter Lines", source: plugin_catalog_filter_lines, description: "/filterlines", commands: ["filterlines"], categories: ["Commands"], appearanceRevision: "d0d8fa478df843e609eb1e2a81205c822db438d5f0d1d31f596b7e0d4964da8a", privateCommands: true },
+        { name: "Find Long Lines", source: plugin_catalog_find_long_lines, description: "/findlonglines", commands: ["findlonglines"], categories: ["Commands"], appearanceRevision: "498ac253d635245b4b0ce06b19ffc86eacdedbde1e8387aa13d40ba34ac9a77d", privateCommands: true },
         { name: "Fit Image", source: plugin_catalog_fit_image, description: "/fitimage", commands: ["fitimage"], categories: ["Commands"], appearanceRevision: "5d1274609c71f256618b07102e5199ebdc822cf20323e89816e3b57a48ee4f1a", privateCommands: true },
         { name: "FixCodeblockGap", source: plugin_catalog_fix_codeblock_gap, description: "Remove the extra blank line after fenced code blocks", categories: ["Appearance"], appearanceRevision: "38be5817842b779d1c8c9dcd688ef0755dbc9370e7832efbbe90c72399c1074b" },
         { name: "FixFileExtensions", source: plugin_catalog_fix_file_extensions, description: "Use supported filename extensions for listed attachment formats", categories: ["Media"] },
@@ -1145,6 +1148,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar, description: "make the chat input background translucent", categories: ["Appearance"], appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e" },
         { name: "Transpose CSV", source: plugin_catalog_transpose_csv, description: "/transposecsv", commands: ["transposecsv"], categories: ["Commands"], appearanceRevision: "3bd1c5b25daeeda2b83a92591289182ee31e8321201bbf94d57433875f5ac7cd", privateCommands: true },
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"], appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849", privateCommands: true },
+        { name: "Truncate Text", source: plugin_catalog_truncate_text, description: "/truncatetext", commands: ["truncatetext"], categories: ["Commands"], appearanceRevision: "fb3353fcfa8814176a2068c522a13e2e7a73148ca0c9ee768e327770595abf43", privateCommands: true },
         { name: "TSV to CSV", source: plugin_catalog_tsv_to_csv, description: "/tsvtocsv", commands: ["tsvtocsv"], categories: ["Commands"], appearanceRevision: "fd03053374fa9b987c7037a3ef839d6b74524cb54d62b9cff8bc7a3c90a39def", privateCommands: true },
         { name: "TSV to Markdown", source: plugin_catalog_tsv_to_markdown, description: "/tsvtomarkdown", commands: ["tsvtomarkdown"], categories: ["Commands"], appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a", privateCommands: true },
         { name: "Unicode From Code Points", source: plugin_catalog_unicode_from_code_points, description: "/unicodefrompoints", commands: ["unicodefrompoints"], categories: ["Commands"], appearanceRevision: "dd0e87b09b264ba6e9ab74eb257ec86da227e2578ffc5a85eac879a90a99515f", privateCommands: true },

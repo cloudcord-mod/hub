@@ -1,0 +1,7 @@
+plugin "Find Long Lines":
+  needs commands.register
+  needs reply.local
+  on command "findlonglines":
+    input "text" text
+    input "limit" text
+    reply "${findLongLines(text, limit)}" else "Enter text and a positive whole-number line limit."
