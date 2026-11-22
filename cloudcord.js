@@ -40586,14 +40586,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       if (action === "server-nickname" && guildId) {
         return nonBlankText(members?.getMember?.(guildId, id)?.nick);
       }
-      if (action === "server-avatar-link") {
+      if (action === "server-avatar-link" || action === "server-banner-link") {
         if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id))
           return;
-        var hash = members?.getMember?.(guildId, id)?.avatar;
+        var avatar = action === "server-avatar-link";
+        var hash = avatar ? members?.getMember?.(guildId, id)?.avatar : profiles?.getGuildMemberProfile?.(id, guildId)?.banner;
         if (typeof hash !== "string" || !/^(?:a_)?[0-9a-f]{32}$/.test(hash))
           return;
         var format = hash.startsWith("a_") ? "webp?size=4096&animated=true" : "png?size=4096";
-        return "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + id + "/avatars/" + hash + "." + format;
+        return "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + id + (avatar ? "/avatars/" : "/banners/") + hash + "." + format;
       }
       var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
       if (action === "profile-bio" || action === "server-profile-bio")
@@ -40666,6 +40667,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "server-avatar-link": {
           label: "Copy Server Avatar Link",
+          scope: "server"
+        },
+        "server-banner-link": {
+          label: "Copy Server Profile Banner Link",
           scope: "server"
         },
         "profile-colors": {
@@ -49756,6 +49761,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-server-profile-banner-link.cx
+  var copy_server_profile_banner_link_default;
+  var init_copy_server_profile_banner_link = __esm({
+    "../examples/cx/catalog/plugins/copy-server-profile-banner-link.cx"() {
+      copy_server_profile_banner_link_default = 'plugin "CopyServerProfileBannerLink":\n  needs profilemenu.copy\n  on profile menu copy server-banner-link\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-server-splash-links.cx
   var copy_server_splash_links_default;
   var init_copy_server_splash_links = __esm({
@@ -53728,6 +53741,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_server_details();
       init_copy_server_media_links();
       init_copy_server_nickname();
+      init_copy_server_profile_banner_link();
       init_copy_server_splash_links();
       init_copy_sticker_links();
       init_copy_user_mention();
@@ -54863,6 +54877,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "CopyServerNickname",
             source: copy_server_nickname_default,
             description: "Copy Server Nickname",
+            categories: [
+              "Profiles"
+            ]
+          },
+          {
+            name: "CopyServerProfileBannerLink",
+            source: copy_server_profile_banner_link_default,
+            description: "Copy Server Profile Banner Link",
             categories: [
               "Profiles"
             ]
@@ -68303,7 +68325,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "26bf05ea9fe6cedb4ad194ed2d34bfc3b79e6af2";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "250419a2a8b36f696d71be9f5c12ae802800377b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
