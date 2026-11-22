@@ -789,6 +789,29 @@ export const cxCommandFunctions = {
         if (other > 100000) return;
         return (axis === "width" ? [size, other] : [other, size]).join(" × ") + " px";
     },
+    fitImage(source: string, box: string, mode: string) {
+        const dimensions = /^\s*(\d{1,6})\s*[x×]\s*(\d{1,6})\s*$/i;
+        const image = dimensions.exec(source), target = dimensions.exec(box);
+        if (!image || !target || (mode !== "contain" && mode !== "cover")) return;
+        const [w, h, targetW, targetH] = [...image.slice(1), ...target.slice(1)].map(Number);
+        if ([w, h, targetW, targetH].some(value => value < 1 || value > 100000)) return;
+        const contain = mode === "contain";
+        const useWidth = contain ? targetW * h <= targetH * w : targetW * h >= targetH * w;
+        const round = contain ? Math.floor : Math.ceil;
+        const scaledW = useWidth ? targetW : Math.max(1, round(w * targetH / h));
+        const scaledH = useWidth ? Math.max(1, round(h * targetW / w)) : targetH;
+        const action = contain ? "Padding" : "Crop";
+        return "Resize to " + scaledW + " × " + scaledH + " px\n" + action + ": "
+            + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
+    },
+    bitrateBudget(size: string, duration: string) {
+        const bytes = fileSizeBytes(size);
+        const seconds = durationSeconds(duration);
+        if (!bytes || !seconds) return;
+        const bitsPerSecond = Math.floor(bytes * 8 / seconds);
+        if (!bitsPerSecond) return "This file size allows less than 1 bit per second.";
+        return "Maximum average: " + displayNumber(bitsPerSecond / 1000) + " kbps (video, audio, and container combined)";
+    },
     transferEta(size: string, megabits: string) {
         const bytes = fileSizeBytes(size);
         const value = megabits.trim();

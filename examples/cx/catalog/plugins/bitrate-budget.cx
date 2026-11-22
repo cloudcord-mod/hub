@@ -1,0 +1,7 @@
+plugin "Bitrate Budget":
+  needs commands.register
+  needs reply.local
+  on command "bitratebudget":
+    input "size" text
+    input "duration" text
+    reply "${bitrateBudget(size, duration)}" else "Enter a file size such as 30 MB and a duration such as 2m."

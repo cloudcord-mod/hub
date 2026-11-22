@@ -18,6 +18,7 @@ import plugin_catalog_bigger_chat_text from "../../../../examples/cx/catalog/plu
 import plugin_catalog_bigger_code_blocks from "../../../../examples/cx/catalog/plugins/bigger-code-blocks.cx";
 import plugin_catalog_bigger_jumbo_emojis from "../../../../examples/cx/catalog/plugins/bigger-jumbo-emojis.cx";
 import plugin_catalog_bigger_server_icons from "../../../../examples/cx/catalog/plugins/bigger-server-icons.cx";
+import plugin_catalog_bitrate_budget from "../../../../examples/cx/catalog/plugins/bitrate-budget.cx";
 import plugin_catalog_block_keywords from "../../../../examples/cx/catalog/plugins/block-keywords.cx";
 import plugin_catalog_blur_images_until_hover from "../../../../examples/cx/catalog/plugins/blur-images-until-hover.cx";
 import plugin_catalog_blur_nsfw from "../../../../examples/cx/catalog/plugins/blur-nsfw.cx";
@@ -111,6 +112,7 @@ import plugin_catalog_feferi_typing_quirk from "../../../../examples/cx/catalog/
 import plugin_catalog_file_name_randomization from "../../../../examples/cx/catalog/plugins/file-name-randomization.cx";
 import plugin_catalog_file_size_converter from "../../../../examples/cx/catalog/plugins/file-size-converter.cx";
 import plugin_catalog_file_transfer_estimate from "../../../../examples/cx/catalog/plugins/file-transfer-estimate.cx";
+import plugin_catalog_fit_image from "../../../../examples/cx/catalog/plugins/fit-image.cx";
 import plugin_catalog_fix_codeblock_gap from "../../../../examples/cx/catalog/plugins/fix-codeblock-gap.cx";
 import plugin_catalog_fix_file_extensions from "../../../../examples/cx/catalog/plugins/fix-file-extensions.cx";
 import plugin_catalog_fix_images_quality from "../../../../examples/cx/catalog/plugins/fix-images-quality.cx";
@@ -541,6 +543,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "BiggerCodeBlocks", source: plugin_catalog_bigger_code_blocks, description: "increase code block text size", categories: ["Appearance"], appearanceRevision: "efb77c30e8dd184ced6e1426a7834003f56516d087dbec5e777d8e1b0b594b9b" },
         { name: "BiggerJumboEmojis", source: plugin_catalog_bigger_jumbo_emojis, description: "Makes emoji-only messages bigger", desktopOnly: true, categories: ["Appearance"] },
         { name: "BiggerServerIcons", source: plugin_catalog_bigger_server_icons, description: "make server icons larger", categories: ["Appearance"], appearanceRevision: "f8130f30395716696cf844097fad053f7be44394cbf888bc1188bdd1e30e2432" },
+        { name: "Bitrate Budget", source: plugin_catalog_bitrate_budget, description: "/bitratebudget", commands: ["bitratebudget"], categories: ["Commands"], appearanceRevision: "cf5f3d94fccdfd64a7664b41ac357ffffde15dc078ead41cda06beb4eb01cbd0", privateCommands: true },
         { name: "BlockKeywords", source: plugin_catalog_block_keywords, description: "Edit the source to enter keywords", categories: ["Chat"] },
         { name: "BlurImagesUntilHover", source: plugin_catalog_blur_images_until_hover, description: "conceal chat images and videos until you reveal them", categories: ["Appearance"], appearanceRevision: "cc7408046bf4b402423ea2b0819358ff2ab9c3da9848a1e514985907aaca0598" },
         { name: "BlurNSFW", source: plugin_catalog_blur_nsfw, description: "conceal attachments in age-restricted channels until you reveal them", categories: ["Appearance"], appearanceRevision: "e3edcc2c4aa6e765b04dcb42f0c57c97847f458f856da79368398f677b71b128" },
@@ -634,6 +637,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "FileNameRandomization", source: plugin_catalog_file_name_randomization, description: "Use format upload names when selected for a file", categories: ["Media"] },
         { name: "File Size Converter", source: plugin_catalog_file_size_converter, description: "/convertfilesize", commands: ["convertfilesize"], categories: ["Commands"], appearanceRevision: "069b23fc43848f9dbcf2f86fd1d3b384d2b85c9001059e4f484608fa1bc1b9f7", privateCommands: true },
         { name: "File Transfer Estimate", source: plugin_catalog_file_transfer_estimate, description: "/transferestimate", commands: ["transferestimate"], categories: ["Commands"], appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736", privateCommands: true },
+        { name: "Fit Image", source: plugin_catalog_fit_image, description: "/fitimage", commands: ["fitimage"], categories: ["Commands"], appearanceRevision: "5d1274609c71f256618b07102e5199ebdc822cf20323e89816e3b57a48ee4f1a", privateCommands: true },
         { name: "FixCodeblockGap", source: plugin_catalog_fix_codeblock_gap, description: "Remove the extra blank line after fenced code blocks", categories: ["Appearance"], appearanceRevision: "38be5817842b779d1c8c9dcd688ef0755dbc9370e7832efbbe90c72399c1074b" },
         { name: "FixFileExtensions", source: plugin_catalog_fix_file_extensions, description: "Use supported filename extensions for listed attachment formats", categories: ["Media"] },
         { name: "FixImagesQuality", source: plugin_catalog_fix_images_quality, description: "Improve attachment previews and load originals in the media viewer", categories: ["Media"] },

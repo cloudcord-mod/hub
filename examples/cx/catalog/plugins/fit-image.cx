@@ -1,0 +1,8 @@
+plugin "Fit Image":
+  needs commands.register
+  needs reply.local
+  on command "fitimage":
+    input "source" text
+    input "box" text
+    input "mode" text
+    reply "${fitImage(source, box, mode)}" else "Enter dimensions such as 1920x1080 and use contain or cover."
