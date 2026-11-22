@@ -49313,6 +49313,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         name
       })),
       source: (id) => active.get(id)?.source,
+      commands: (id) => active.get(id)?.commands,
       isPrivateCommand: (id) => active.get(id)?.privateCommand ?? false,
       appearanceOptions(id) {
         var entry = active.get(id);
@@ -49344,7 +49345,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           source,
           options: review.appearanceOptions,
           binding: bindCx(source, host, approved, selected),
-          privateCommand
+          privateCommand,
+          commands: review.commands?.map((command) => command.slice(1))
         });
       },
       disable(id) {
@@ -64651,6 +64653,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           active,
           needsReview,
           restoreFailed,
+          commands: active ? session.commands(id) : entry.commands,
           privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands
         };
       });
@@ -64659,6 +64662,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         name,
         source: session.source(id),
         active: true,
+        commands: session.commands(id),
+        categories: session.commands(id)?.length ? [
+          "Commands"
+        ] : void 0,
         privateCommands: session.isPrivateCommand(id)
       }));
       return [
@@ -70039,7 +70046,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "bc603af098aeadc9379ebde0137da2d42c96a74d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5fda227b94faa938755cd318e2748f0b2b7bccd6";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
