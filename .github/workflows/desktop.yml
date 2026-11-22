@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - "desktop/**"
+      - "examples/cx/**"
       - "ios/scripts/test-cx-testing.cjs"
       - "ios/scripts/test-custom-social-render.cjs"
       - "ios/scripts/test-profile-studio-preview.cjs"
@@ -82,6 +83,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          node scripts/sync-cx-catalog.cjs --check
           node scripts/test-connection-settings.cjs
           node scripts/test-ccp.cjs
           node scripts/test-local-relationship-actions.cjs
