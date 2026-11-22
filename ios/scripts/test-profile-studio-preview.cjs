@@ -37,6 +37,15 @@ function flatten(value) {
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
 const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
 const { encodePortableLook, decodePortableLook } = profileAppearance;
+const looks = [
+    { name: "Néon", savedAt: 3 }, { name: "Blue", savedAt: 2 },
+    { name: "Night Neon", savedAt: 1 }, { name: "Amber", savedAt: 4 },
+];
+assert.deepEqual(Array.from(profileAppearance.selectSavedLooks(looks, "  neon ", "newest", 1).entries, look => look.name), ["Néon"]);
+assert.equal(profileAppearance.selectSavedLooks(looks, "neon", "newest", 1).total, 2);
+assert.deepEqual(Array.from(profileAppearance.selectSavedLooks(looks, "", "name", 2).entries, look => look.name), ["Amber", "Blue"]);
+assert.equal(profileAppearance.selectSavedLooks(looks, "no match", "newest", 8).total, 0);
+assert.deepEqual(looks.map(look => look.name), ["Néon", "Blue", "Night Neon", "Amber"]);
 const portablePicture = "data:image/png;base64,aW1hZ2U=";
 const portableLook = encodePortableLook("My saved look", {
     username: "preview", globalName: "Preview User", bio: "First line\nSecond line",
@@ -150,6 +159,8 @@ const mobileAppearance = vm.runInNewContext(transformSync(mobileSource + "\nstud
         readNativePresence: userId => userId === id ? "dnd" : undefined });
 assert.match(page, /<K\.PreviewCard \{\.\.\.appearance\}/);
 assert.match(page, /<S\.DiscordProfileCard \{\.\.\.appearance\}/);
+assert.match(page, /visible\.entries\.map\(item =>/);
+assert.match(page, /label="Show more looks"/);
 assert.match(page, /frame=\{data\.profileFrame \? catalog\?\.frames\.find/);
 assert.match(page, /effect=\{data\.profileEffect \? catalog\?\.effects\.find/);
 const account = { id, username: "real", getAvatarURL: () => "avatar" };
@@ -220,6 +231,7 @@ let savedRows;
 let lookName = "Main";
 const savedMessages = [];
 const savedPanel = vm.runInNewContext(transformSync(savedPanelSource + "\nSavedProfilesPanel;", { loader: "tsx" }).code, {
+    ...profileAppearance,
     React: {
         createElement: (type, props, ...children) => jsx(type, { ...props, children: children.flat() }),
         useState: initial => typeof initial === "function" ? [initial(), rows => { savedRows = rows; }]

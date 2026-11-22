@@ -443,7 +443,7 @@ jobs:
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
           import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
-          import { decodePortableLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon } from "@lib/api/profileAppearance";
+          import { decodePortableLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -4690,7 +4690,11 @@ jobs:
               const [, redraw] = useReducer((x: number) => x + 1, 0);
               const [name, setName] = useState("");
               const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null);
+              const [query, setQuery] = useState("");
+              const [sort, setSort] = useState<"newest" | "name">("newest");
+              const [limit, setLimit] = useState(SAVED_LOOK_PAGE_SIZE);
               const items = readSavedProfiles(ownerId);
+              const visible = selectSavedLooks(items, query, sort, limit);
               const commit = (next: SavedProfile[]) => { writeSavedProfiles(ownerId, next); redraw(); };
               const currentJson = JSON.stringify(savedSnapshot(current));
               const saveCurrent = () => {
@@ -4771,8 +4775,15 @@ jobs:
                           <S.Button label="Import from clipboard" disabled={busy} onPress={importLook} />
                       </S.Section>
                   </S.Panel>
+                  {items.length ? <S.Panel>
+                      <S.Field label="Search saved looks"><TextInput value={query} placeholder="Search by name" autoCorrect={false}
+                          onChangeText={value => { setQuery(value); setLimit(SAVED_LOOK_PAGE_SIZE); }} /></S.Field>
+                      <S.Chips options={[{ value: "newest", label: "Newest first" }, { value: "name", label: "Name (A-Z)" }]}
+                          value={sort} onChange={value => { setSort(value === "name" ? "name" : "newest"); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
+                  </S.Panel> : null}
                   {!items.length ? <Text variant="text-sm/medium" color="text-muted">No saved profiles yet. Set up your profile, then save it here to come back to it later.</Text> : null}
-                  {items.map(item => {
+                  {items.length && !visible.total ? <Text variant="text-sm/medium" color="text-muted">No saved looks match your search.</Text> : null}
+                  {visible.entries.map(item => {
                       const data = item.data || {};
                       const active = JSON.stringify(savedSnapshot(data)) === currentJson;
                       const appearance = studioPreviewAppearance(data, realUser);
@@ -4815,6 +4826,7 @@ jobs:
                   </View> : <S.Button label={item.share ? "Shared · " + item.share.visibility : "Share"} onPress={() => setSharing(item.id)} />}
                       </View>;
                   })}
+                  {visible.entries.length < visible.total ? <S.Button label="Show more looks" onPress={() => setLimit(value => value + SAVED_LOOK_PAGE_SIZE)} /> : null}
               </View>;
           }
 
@@ -5317,7 +5329,7 @@ jobs:
                               rootSettings.fakeProfile = { ...preview, ...data, enabled: preview.enabled, syncRevision: Date.now() };
                               preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw();
                           }} /> : null}
-                          {(activeTab as string) === "saved" ? <SavedProfiles ownerId={editorOwner.current} current={preview} realUser={realCurrentUser} catalog={catalog} onUse={(data: any) => {
+                          {(activeTab as string) === "saved" ? <SavedProfiles key={editorOwner.current ?? ""} ownerId={editorOwner.current} current={preview} realUser={realCurrentUser} catalog={catalog} onUse={(data: any) => {
                               if (!editorOwner.current || editorOwner.current !== currentUserId) return;
                               const backup = ownedTemplateBackup(editorOwner.current);
                               const restored = loadSavedLook(backup || preview, data);

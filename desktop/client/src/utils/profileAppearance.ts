@@ -357,6 +357,19 @@ const portableLookFormat = "cloudcord.saved-look";
 const portableLookLimit = 3_450_000;
 const portableImageLimit = 1_700_000;
 
+export const SAVED_LOOK_PAGE_SIZE = 8;
+
+export function selectSavedLooks<T extends { name: string; savedAt: number; }>(
+    looks: readonly T[], query: string, sort: "newest" | "name", limit: number,
+) {
+    const searchKey = (value: string) => value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
+    const needle = searchKey(query.trim());
+    const matches = looks.map(look => ({ look, name: String(look.name ?? "") }))
+        .filter(item => !needle || searchKey(item.name).includes(needle));
+    matches.sort((a, b) => sort === "name" ? a.name.localeCompare(b.name) : (b.look.savedAt || 0) - (a.look.savedAt || 0));
+    return { entries: matches.slice(0, limit).map(({ look }) => look), total: matches.length };
+}
+
 function portableLookText(value: unknown, limit: number, multiline = false) {
     if (typeof value !== "string") return "";
     const clean = value.replace(/[\x00-\x08\x0b-\x1f\x7f\u202a-\u202e\u2066-\u2069]/g, "");

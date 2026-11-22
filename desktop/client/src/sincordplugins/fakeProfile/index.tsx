@@ -22,7 +22,7 @@ import { installConnectionSettings } from "@utils/connectionSettings";
 import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
-import { decodePortableLook, encodePortableLook, profileMentionAliasScore } from "@utils/profileAppearance";
+import { decodePortableLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@utils/profileAppearance";
 
 import { CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, ProfileBadge } from "@api/Badges";
 import { applyBadgeLayout, badgeLayoutKey, defaultBadgeOrder, moveBadgeOrder } from "@api/BadgeLayout";
@@ -2093,7 +2093,7 @@ function CustomProfileModal({ rootProps }: { rootProps: any; }) {
         </>,
         others: <OtherProfilesPanel />,
         templates: <TemplatesPanel ownerId={selectedAccountId} current={data} onApply={value => setData({ ...data, ...value })} />,
-        saved: <SavedProfilesPanel current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
+        saved: <SavedProfilesPanel key={selectedAccountId} current={data} userId={selectedAccountId} onLoad={setData} fallbackName={selectedUser?.globalName || selectedUser?.username || "You"} fallbackUsername={selectedUser?.username || "username"} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
             decorationFor={asset => (decorations.find(item => item.id === asset) || ALL_DECORATIONS.find(item => item.id === asset) || liveDecorations.find(item => item.id === asset))?.url}
             effectFor={skuId => catalogData?.effects.find(item => item.skuId === skuId)?.title} frameFor={skuId => catalogData?.frames.find(item => item.skuId === skuId)?.label} />,
         connections: <>
@@ -3197,6 +3197,10 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
     const [renaming, setRenaming] = React.useState<string | null>(null);
     const [renameText, setRenameText] = React.useState("");
     const [transferring, setTransferring] = React.useState(false);
+    const [query, setQuery] = React.useState("");
+    const [sort, setSort] = React.useState<"newest" | "name">("newest");
+    const [limit, setLimit] = React.useState(SAVED_LOOK_PAGE_SIZE);
+    const visible = selectSavedLooks(items, query, sort, limit);
     const commit = (next: SavedProfile[]) => {
         if (!writeSavedProfiles(userId, next)) return false;
         setItems(next);
@@ -3246,9 +3250,16 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
         <Section title="Move a saved look" description="Copy a look, transfer the copied text, then import it on the other device.">
             <button type="button" className="cpx-btn" disabled={transferring} onClick={importLook}>Import from clipboard</button>
         </Section>
+        {!!items.length && <div className="cpx-inline">
+            <input className="cpx-input" aria-label="Search saved looks" placeholder="Search saved looks" value={query}
+                onChange={event => { setQuery(event.currentTarget.value); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
+            <SelectField label="Sort saved looks" options={[{ value: "newest", label: "Newest first" }, { value: "name", label: "Name (A-Z)" }]}
+                value={sort} onChange={value => { setSort(value === "name" ? "name" : "newest"); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
+        </div>}
         {!items.length && <span className="cpx-hint">No saved profiles yet. Set up your profile, then save it here to come back to it later.</span>}
+        {!!items.length && !visible.total && <span className="cpx-hint" role="status">No saved looks match your search.</span>}
         <div className="cpx-saved-grid">
-            {items.map(item => {
+            {visible.entries.map(item => {
                 const data = item.data;
                 const active = JSON.stringify(savedSnapshot(data)) === currentJson;
                 const badges = profilePreviewBadges(data, userId);
@@ -3284,6 +3295,8 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 </div>;
             })}
         </div>
+        {visible.entries.length < visible.total && <button type="button" className="cpx-btn"
+            onClick={() => setLimit(value => value + SAVED_LOOK_PAGE_SIZE)}>Show more looks</button>}
     </>;
 }
 
