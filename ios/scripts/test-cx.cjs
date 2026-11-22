@@ -3896,6 +3896,21 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             currentVoice = savedVoice;
             clockTime = undefined;
         }
+        if (desktop) {
+            const source = [
+                'plugin "Cross-platform option fixture":',
+                "  needs appearance.hide",
+                "  hide bot-tags",
+                "  option hide hide-home-drawer-mention-subtitle default-on",
+            ].join("\n");
+            const editor = find(render(), element => element.props["aria-label"] === "CX source");
+            editor.props.onChange({ currentTarget: { value: source } });
+            click(render(), "Review CX");
+            assert.equal(find(render(), element => element.props["aria-label"] === "Hide mention status text in the home drawer"), undefined);
+            click(render(), "Allow for this session");
+            assert.match(stylesheet.textContent, /botTag/);
+            click(render(), "Disable Cross-platform option fixture");
+        }
         {
             const port = cxCatalog.plugins.find(entry => entry.name === "ShowPing").source;
             assert.throws(() => activateCx(port, host, ["voice.latency"]), /approval/);
