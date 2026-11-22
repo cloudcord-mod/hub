@@ -21127,7 +21127,25 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  function StudioHero({ name, username, avatar, fallbackAvatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
+  function StudioBanner({ uri, fallback }) {
+    var [attempt, setAttempt] = (0, import_react6.useState)(0);
+    var active = [
+      uri || fallback,
+      uri && uri !== fallback ? fallback : void 0
+    ][attempt];
+    return active ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+      source: {
+        uri: active
+      },
+      style: {
+        width: "100%",
+        height: "100%"
+      },
+      resizeMode: "cover",
+      onError: () => setAttempt(attempt + 1)
+    }, active) : null;
+  }
+  function StudioHero({ name, username, avatar, fallbackAvatar, banner, fallbackBanner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
     var tint = accent || C3.raised();
     return /* @__PURE__ */ jsxs(import_react_native24.View, {
       style: {
@@ -21144,16 +21162,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             backgroundColor: tint
           },
           children: [
-            banner ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-              source: {
-                uri: banner
-              },
-              style: {
-                width: "100%",
-                height: "100%"
-              },
-              resizeMode: "cover"
-            }) : null,
+            /* @__PURE__ */ jsx(StudioBanner, {
+              uri: banner,
+              fallback: fallbackBanner
+            }, JSON.stringify([
+              banner,
+              fallbackBanner
+            ])),
             /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
                 position: "absolute",
@@ -22490,7 +22505,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
+  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
@@ -22594,6 +22609,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           avatar,
           fallbackAvatar,
           banner,
+          fallbackBanner,
           primary,
           secondary: accent,
           bannerColor,
@@ -22637,16 +22653,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 overflow: "hidden",
                 backgroundColor: bannerColor || primary || C3.raised()
               },
-              children: banner ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-                source: {
-                  uri: banner
-                },
-                style: {
-                  width: "100%",
-                  height: "100%"
-                },
-                resizeMode: "cover"
-              }) : null
+              children: /* @__PURE__ */ jsx(StudioBanner, {
+                uri: banner,
+                fallback: fallbackBanner
+              }, JSON.stringify([
+                banner,
+                fallbackBanner
+              ]))
             }),
             /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
@@ -22862,7 +22875,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
     var themed = !!primary;
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
@@ -22879,16 +22892,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             height: 96,
             backgroundColor: bannerColor || primary || colors.raised
           },
-          children: banner ? /* @__PURE__ */ jsx(import_react_native24.Image, {
-            source: {
-              uri: banner
-            },
-            style: {
-              width: "100%",
-              height: "100%"
-            },
-            resizeMode: "cover"
-          }) : null
+          children: /* @__PURE__ */ jsx(StudioBanner, {
+            uri: banner,
+            fallback: fallbackBanner
+          }, JSON.stringify([
+            banner,
+            fallbackBanner
+          ]))
         }),
         /* @__PURE__ */ jsxs(import_react_native24.View, {
           style: {
@@ -31522,6 +31532,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       avatar: data.avatarMedia?.uri || realAvatar,
       fallbackAvatar: realAvatar,
       banner: data.bannerMedia?.uri || fallback.banner,
+      fallbackBanner: fallback.banner,
       bio: data.bio ?? fallback.bio,
       pronouns: data.pronouns ?? fallback.pronouns,
       primary: primary ?? accent ?? fallback.primary,
@@ -72305,7 +72316,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b6b70983d3c60a73963037e4ccd47aac533ed1db";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "13d72552772d58dc7159c11c0979a29d57162636";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
