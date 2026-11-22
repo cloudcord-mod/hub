@@ -213,6 +213,13 @@ export default function PluginSettings() {
     const [searchValue, setSearchValue] = useState({ value: "", tags: [] as PluginTag[], status: SearchStatus.ALL });
 
     const search = searchValue.value.toLowerCase();
+    const compactSearch = search.replace(/\s+/g, "");
+    const pluginSearchIndex = useMemo(() => new Map(sortedPlugins.map(plugin => [plugin, {
+        name: plugin.name.toLowerCase(),
+        acronym: plugin.name.match(/[A-Z]/g)?.join("").toLowerCase(),
+        description: plugin.description.toLowerCase(),
+        terms: plugin.searchTerms?.map(term => term.toLowerCase()),
+    }])), [sortedPlugins]);
     const onSearch = (query: string) => setSearchValue(prev => ({ ...prev, value: query }));
 
     const pluginFilter = useCallback((plugin: typeof Plugins[keyof typeof Plugins], newPluginsSet: Set<string> | null) => {
@@ -240,13 +247,14 @@ export default function PluginSettings() {
 
         if (!search.length) return true;
 
+        const indexed = pluginSearchIndex.get(plugin)!;
         return (
-            plugin.name.toLowerCase().includes(search.replace(/\s+/g, "")) ||
-            plugin.name.match(/[A-Z]/g)?.join("").toLowerCase().includes(search) || // acronyms like BF for BetterFolders
-            plugin.description.toLowerCase().includes(search) ||
-            plugin.searchTerms?.some(t => t.toLowerCase().includes(search))
+            indexed.name.includes(compactSearch) ||
+            indexed.acronym?.includes(search) || // acronyms like BF for BetterFolders
+            indexed.description.includes(search) ||
+            indexed.terms?.some(term => term.includes(search))
         );
-    }, [searchValue, search]);
+    }, [searchValue, search, compactSearch, pluginSearchIndex]);
 
     const [newPluginsSet] = useAwaiter(() => DataStore.get("Vencord_existingPlugins").then((cachedPlugins: Record<string, number> | undefined) => {
         const now = Date.now() / 1000;
