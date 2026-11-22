@@ -526,8 +526,10 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackA
             {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
             <StudioPresence status={status} borderColor={ring} borderWidth={5} />
         </View>
-        {badges.length ? <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "58%", marginTop: 8, marginRight: 10, paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.panel }}>
-            {badges.map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20, tintColor: icon === officialBadgeIcon ? (colors === LIGHT ? "#000000" : "#ffffff") : undefined }} resizeMode="contain" />)}
+        {badges.length ? <View style={{ marginTop: 8, marginLeft: 110, marginRight: 10 }}>
+            <View style={{ alignSelf: "flex-end", flexDirection: "row", flexWrap: "wrap", justifyContent: "flex-end", gap: 2, maxWidth: "100%", paddingHorizontal: 4, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.panel }}>
+                {badges.map((icon, index) => <Image key={index} source={{ uri: icon }} style={{ width: 20, height: 20, tintColor: icon === officialBadgeIcon ? (colors === LIGHT ? "#000000" : "#ffffff") : undefined }} resizeMode="contain" />)}
+            </View>
         </View> : null}
         <View style={{ paddingHorizontal: 14, paddingBottom: 14, paddingTop: badges.length ? 22 : 46, gap: 10 }}>
             <View style={{ gap: 2, borderRadius: 8, overflow: "hidden" }}>
