@@ -276,7 +276,7 @@ export default function PluginSettings() {
     const handleRestartNeeded = useCallback((name: string, key: string) => changes.handleChange(`${name}:${key}`), [changes]);
 
     const { plugins, requiredPlugins } = useMemo(() => {
-        const plugins = [] as JSX.Element[];
+        const plugins: typeof sortedPlugins[number][] = [];
         const requiredPlugins = [] as JSX.Element[];
 
         const showApi = searchValue.status === SearchStatus.API_PLUGINS;
@@ -307,15 +307,7 @@ export default function PluginSettings() {
                     </Tooltip>
                 );
             } else {
-                plugins.push(
-                    <PluginCard
-                        onRestartNeeded={handleRestartNeeded}
-                        disabled={false}
-                        plugin={p}
-                        isNew={newPluginsSet?.has(p.name)}
-                        key={p.name}
-                    />
-                );
+                plugins.push(p);
             }
         }
         return { plugins, requiredPlugins };
@@ -378,7 +370,15 @@ export default function PluginSettings() {
     const filterKey = JSON.stringify([search, searchValue.status, searchValue.tags]);
     const { visibleCount, loadMore } = usePluginPagination(plugins.length, filterKey, isSentinelVisible);
 
-    const visiblePlugins = plugins.slice(0, visibleCount);
+    const visiblePlugins = plugins.slice(0, visibleCount).map(plugin => (
+        <PluginCard
+            key={plugin.name}
+            plugin={plugin}
+            disabled={false}
+            isNew={newPluginsSet?.has(plugin.name)}
+            onRestartNeeded={handleRestartNeeded}
+        />
+    ));
 
     return (
         <SettingsTab>
