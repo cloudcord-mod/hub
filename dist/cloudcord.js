@@ -41412,6 +41412,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "servers.detailscopy",
           label: "Copy the selected server's name or description"
         },
+        "copy-server-created": {
+          permission: "servers.detailscopy",
+          label: "Copy the selected server\u2019s creation timestamp"
+        },
         "view-group-dm-icon": {
           permission: "channels.iconview",
           label: "View the selected group DM's icon"
@@ -46850,6 +46854,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Copy Server Description"
         }
       ];
+    if (effect === "copy-server-created")
+      return [
+        {
+          key: "created",
+          label: "Copy Server Creation Timestamp"
+        }
+      ];
     if (effect === "copy-server-splash-links")
       return [
         {
@@ -46886,6 +46897,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function getCxServerMenuValue(guild, id, field) {
     if (!guild || guild.id !== id || !isCxProfileUserId(id))
       return;
+    if (field === "created")
+      return formatCxCreationTimestamp(id);
     if (field === "icon" || field === "banner")
       return getCxGuildAssetUrl(field === "icon" ? "icons" : "banners", id, guild[field]);
     if (field === "splash")
@@ -49078,7 +49091,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "servers.markread": "Mark unread server channels as read when you run the listed command",
         "servers.mediaview": "Open an icon or banner from the selected server in Discord\u2019s image viewer",
         "servers.mediacopy": "Copy links to the selected server's images when you choose a menu action",
-        "servers.detailscopy": "Copy the selected server's name or description when you choose the corresponding menu action",
+        "servers.detailscopy": "Copy the selected server's details when you choose a menu action",
         "channels.iconview": "Open the selected group DM's icon when you choose View Group Icon",
         "channels.markonopen": "Mark the channel you open as read through its newest known message",
         "channels.searchjump": "Look up the first or last matching Discord message in the selected channel when you choose a jump action",
@@ -49778,6 +49791,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_server_bio = __esm({
     "../examples/cx/catalog/plugins/copy-server-bio.cx"() {
       copy_server_bio_default = 'plugin "CopyServerBio":\n  needs profilemenu.copy\n  on profile menu copy server-profile-bio\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-server-creation-timestamp.cx
+  var copy_server_creation_timestamp_default;
+  var init_copy_server_creation_timestamp = __esm({
+    "../examples/cx/catalog/plugins/copy-server-creation-timestamp.cx"() {
+      copy_server_creation_timestamp_default = 'plugin "Copy Server Creation Timestamp":\n  needs servers.detailscopy\n  use copy-server-created\n';
     }
   });
 
@@ -53791,6 +53812,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_role_name();
       init_copy_server_avatar_link();
       init_copy_server_bio();
+      init_copy_server_creation_timestamp();
       init_copy_server_details();
       init_copy_server_join_timestamp();
       init_copy_server_media_links();
@@ -54916,6 +54938,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy Server Bio",
             categories: [
               "Profiles"
+            ]
+          },
+          {
+            name: "Copy Server Creation Timestamp",
+            source: copy_server_creation_timestamp_default,
+            description: "Copy the selected server\u2019s creation timestamp",
+            categories: [
+              "Servers & channels"
             ]
           },
           {
@@ -62395,6 +62425,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-server-media-links":
           case "copy-server-splash-links":
           case "copy-server-details":
+          case "copy-server-created":
           case "view-group-dm-icon":
             return registerMobileServerMenu(effect, enabled);
           case "hide-suggested-channels": {
@@ -68396,7 +68427,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d00ed50364c2e9236f5f11a4cd8480da668368de";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b21b84d8fdc8a0e9c5e501c0893bd36bcd722228";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
