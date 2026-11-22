@@ -372,7 +372,7 @@ export const cxAppearanceTargets = {
     "message-embeds": {
         plugin: "HideEmbeds", label: "link embeds in chat",
         css: 'article[class*="embed"] { display: none !important; }',
-        mobile: ["EmbedCard"],
+        mobile: { messagePresentation: "embeds", legacyComponents: ["EmbedCard"] },
     },
     "message-edited-label": {
         plugin: "HideEditedLabel", label: "the edited label in chat",
