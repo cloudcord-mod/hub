@@ -67741,10 +67741,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     fonts: () => fonts,
     installFont: () => installFont,
     removeFont: () => removeFont,
+    restoreSelectedFontFiles: () => restoreSelectedFontFiles,
     saveFont: () => saveFont,
     selectFont: () => selectFont,
     updateFont: () => updateFont,
-    updateFonts: () => updateFonts,
     validateFont: () => validateFont
   });
   function writeFont(font) {
@@ -67776,6 +67776,20 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     if (font.name in fonts)
       throw new Error(`There is already a font named '${font.name}' installed`);
   }
+  function ensureFontFiles(font) {
+    return _async_to_generator(function* () {
+      var errors = yield allSettled(Object.entries(font.main).map(([face, url2]) => _async_to_generator(function* () {
+        var ext = url2.split(".").pop();
+        if (ext !== "ttf" && ext !== "otf")
+          ext = "ttf";
+        var path = `downloads/fonts/${font.name}/${face}.${ext}`;
+        if (!(yield fileExists(path)))
+          yield downloadFile(url2, path);
+      })())).then((it) => it.map((it2) => it2.status === "fulfilled" ? void 0 : it2.reason));
+      if (errors.some((it) => it))
+        throw errors;
+    })();
+  }
   function saveFont(data, selected = false) {
     return _async_to_generator(function* () {
       var fontDefJson;
@@ -67791,16 +67805,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         fontDefJson = data;
       }
       validateFont(fontDefJson);
-      var errors = yield allSettled(Object.entries(fontDefJson.main).map(([font, url2]) => _async_to_generator(function* () {
-        var ext = url2.split(".").pop();
-        if (ext !== "ttf" && ext !== "otf")
-          ext = "ttf";
-        var path = `downloads/fonts/${fontDefJson.name}/${font}.${ext}`;
-        if (!(yield fileExists(path)))
-          yield downloadFile(url2, path);
-      })())).then((it) => it.map((it2) => it2.status === "fulfilled" ? void 0 : it2.reason));
-      if (errors.some((it) => it))
-        throw errors;
+      yield ensureFontFiles(fontDefJson);
       fonts[fontDefJson.name] = fontDefJson;
       if (selected)
         writeFont(fonts[fontDefJson.name]);
@@ -67855,10 +67860,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     })();
   }
-  function updateFonts() {
+  function restoreSelectedFontFiles() {
     return _async_to_generator(function* () {
       yield awaitStorage(fonts);
-      allSettled(Object.keys(fonts).map((name) => saveFont(fonts[name], fonts.__selected === name)));
+      var selected = fonts.__selected;
+      if (!selected || !fonts[selected])
+        return;
+      yield ensureFontFiles(fonts[selected]);
     })();
   }
   var fonts;
@@ -74285,7 +74293,6 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         cloudCordCoreUnloads.push(...globalThis.__CLOUDCORD_CORE_SETTINGS_BOOTSTRAP__?.unloads ?? []);
         yield Promise.all([
           runStartupTask("themes", () => initThemes()),
-          runStartupTask("fonts", () => updateFonts()),
           runStartupTask("events", () => injectFluxInterceptor()),
           runStartupTask("logging", () => patchLogHook()),
           runStartupTask("commands", () => patchCommands()),
@@ -74304,6 +74311,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           ...cloudCordCoreUnloads,
           ...u
         ].forEach((f) => f && unload.push(f)));
+        void runStartupTask("font files", restoreSelectedFontFiles);
         var cancelled = false;
         var restoreTimer;
         unload.push(() => {
@@ -74343,7 +74351,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "304862df8d2a3270d8dce1943c76ca3ef5b20f8e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "02d1ac594290d26b986474b7bec3a574655dafa7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
