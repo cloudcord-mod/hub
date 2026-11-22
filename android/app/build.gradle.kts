@@ -31,6 +31,11 @@ android {
     }
 
     buildTypes {
+        named("debug") {
+            if (providers.gradleProperty("cloudcordQa").orNull == "true") {
+                applicationIdSuffix = ".qa"
+            }
+        }
         named("release") {
             isCrunchPngs = true
             isMinifyEnabled = true
