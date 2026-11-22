@@ -38972,6 +38972,77 @@ Copy \`<t:${timestamp}:F>\``;
           }, (_2, index) => `<t:${seconds + index * step}:F>`);
           return times.map((timestamp, index) => `${index + 1}. ${timestamp} \xB7 \`${timestamp}\``).join("\n");
         },
+        eventWindow(start, end) {
+          var from = isoUnixMilliseconds(start), to = isoUnixMilliseconds(end);
+          if (from === void 0 || to === void 0 || to <= from)
+            return;
+          var seconds = Math.floor((to - from) / 1e3);
+          var duration = seconds < 1 ? "<1s" : Math.floor(seconds / 3600) + "h " + Math.floor(seconds % 3600 / 60) + "m " + seconds % 60 + "s";
+          return "Start <t:" + Math.floor(from / 1e3) + ":F>\nEnd <t:" + Math.floor(to / 1e3) + ":F>\nDuration " + duration;
+        },
+        voteTally(input) {
+          if (input.length > 12e3)
+            return;
+          var votes = planningRows(input);
+          if (!votes.length || votes.length > 500 || votes.some((vote) => vote.length > 100))
+            return;
+          var choices = /* @__PURE__ */ new Map();
+          for (var label2 of votes) {
+            var key = label2.normalize("NFC").toLowerCase();
+            var existing = choices.get(key);
+            if (existing)
+              existing.count++;
+            else
+              choices.set(key, {
+                label: label2,
+                count: 1
+              });
+          }
+          if (choices.size > 30)
+            return;
+          var rows = [
+            ...choices.values()
+          ].sort((a, b3) => b3.count - a.count);
+          return planningBlock(rows.map(({ label: label3, count }) => count + " \xB7 " + label3).join("\n") + "\n\nTotal votes: " + votes.length);
+        },
+        redactEmails(input) {
+          if (!input.trim() || input.length > 3600)
+            return;
+          var addresses = /[a-z0-9.!#$%&'*+\/=?^_{}|~-]+@[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?)+/gi;
+          var redacted = input.replace(addresses, "[email removed]");
+          return redacted === input ? "No email addresses found." : planningBlock(redacted);
+        },
+        cleanDiscordInvite(input) {
+          var value = input.trim().replace(/^<([^<>]+)>$/, "$1");
+          var invite = /^(?:https?:\/\/)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)([a-z0-9-]{2,40})\/?(?:[?#][^\s<>]{0,1000})?$/i.exec(value);
+          if (!invite)
+            return;
+          return "<https://discord.gg/" + invite[1] + ">";
+        },
+        customEmojiMarkup(name, id, kind) {
+          var label2 = name.trim(), snowflake3 = id.trim();
+          if (!/^[a-z0-9_]{2,32}$/i.test(label2) || !discordId(snowflake3) || kind !== "static" && kind !== "animated")
+            return;
+          return planningBlock("<" + (kind === "animated" ? "a" : "") + ":" + label2 + ":" + snowflake3 + ">");
+        },
+        pollDraft(question, options) {
+          var title = question.trim();
+          var choices = planningRows(options);
+          var distinct = new Set(choices.map((value) => value.normalize("NFC").toLowerCase()));
+          if (!title || title.length > 160 || /[\r\n]/.test(title) || choices.length < 2 || choices.length > 10 || distinct.size !== choices.length || choices.some((choice) => choice.length > 150))
+            return;
+          return planningBlock(title + "\n\n" + choices.map((choice, index) => index + 1 + ". " + choice).join("\n"));
+        },
+        splitPoints(total, people) {
+          var points = integerText(total), count = integerText(people);
+          if (points === void 0 || points < 0 || count === void 0 || count < 1 || count > 1e4)
+            return;
+          var per = Math.floor(points / count);
+          var remainder = points % count;
+          if (!remainder)
+            return count + " \xD7 " + per + " points";
+          return remainder + " \xD7 " + (per + 1) + " points\n" + (count - remainder) + " \xD7 " + per + " points";
+        },
         buildMessageLink(server, channel, message) {
           var scope = server.trim(), channelId = channel.trim(), messageId = message.trim();
           if (scope !== "@me" && !discordId(scope) || !discordId(channelId) || messageId && !discordId(messageId))
@@ -48628,6 +48699,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/clean-discord-invite.cx
+  var clean_discord_invite_default;
+  var init_clean_discord_invite = __esm({
+    "../examples/cx/catalog/plugins/clean-discord-invite.cx"() {
+      clean_discord_invite_default = 'plugin "Clean Discord Invite":\n  needs commands.register\n  needs reply.local\n  on command "cleaninvite":\n    input "text" text\n    reply "${cleanDiscordInvite(text)}" else "Enter a Discord invite link."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/clear-urls.cx
   var clear_urls_default;
   var init_clear_urls = __esm({
@@ -48908,6 +48987,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/custom-emoji-markup.cx
+  var custom_emoji_markup_default;
+  var init_custom_emoji_markup = __esm({
+    "../examples/cx/catalog/plugins/custom-emoji-markup.cx"() {
+      custom_emoji_markup_default = 'plugin "Custom Emoji Markup":\n  needs commands.register\n  needs reply.local\n  on command "emojimarkup":\n    input "name" text\n    input "id" text\n    input "kind" choice "static,animated"\n    reply "${customEmojiMarkup(name, id, kind)}" else "Enter a valid emoji name and Discord emoji ID."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/custom-timestamps.cx
   var custom_timestamps_default;
   var init_custom_timestamps = __esm({
@@ -49069,6 +49156,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_eridan_typing_quirk = __esm({
     "../examples/cx/catalog/plugins/eridan-typing-quirk.cx"() {
       eridan_typing_quirk_default = 'plugin "EridanTypingQuirk":\n  needs messages.transform\n  before send rewrite-text:\n    replace ["v"] with "vv"\n    replace ["w"] with "ww"\n    replace ["V"] with "VV"\n    replace ["W"] with "WW"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/event-window.cx
+  var event_window_default;
+  var init_event_window = __esm({
+    "../examples/cx/catalog/plugins/event-window.cx"() {
+      event_window_default = 'plugin "Event Window":\n  needs commands.register\n  needs reply.local\n  on command "eventwindow":\n    input "start" text\n    input "end" text\n    reply "${eventWindow(start, end)}" else "Enter a start and end as ISO dates with timezones. End must be after start."\n';
     }
   });
 
@@ -50751,6 +50846,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/poll-draft.cx
+  var poll_draft_default;
+  var init_poll_draft = __esm({
+    "../examples/cx/catalog/plugins/poll-draft.cx"() {
+      poll_draft_default = 'plugin "Poll Draft":\n  needs commands.register\n  needs reply.local\n  on command "polldraft":\n    input "question" text\n    input "options" text\n    reply "${pollDraft(question, options)}" else "Enter a one-line question and 2\u201310 distinct choices, one per line."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/profile-media.cx
   var profile_media_default;
   var init_profile_media = __esm({
@@ -50828,6 +50931,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_recurring_timestamps = __esm({
     "../examples/cx/catalog/plugins/recurring-timestamps.cx"() {
       recurring_timestamps_default = 'plugin "Recurring Timestamps":\n  needs commands.register\n  needs reply.local\n  on command "recurringtimes":\n    input "start" text\n    input "interval" text\n    input "count" text\n    reply "${recurringTimestamps(start, interval, count)}" else "Enter an ISO date and timezone, an interval such as 7d, and a count from 2 to 20."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/redact-email-addresses.cx
+  var redact_email_addresses_default;
+  var init_redact_email_addresses = __esm({
+    "../examples/cx/catalog/plugins/redact-email-addresses.cx"() {
+      redact_email_addresses_default = 'plugin "Redact Email Addresses":\n  needs commands.register\n  needs reply.local\n  on command "redactemails":\n    input "text" text\n    reply "${redactEmails(text)}" else "Enter text up to 3,600 characters."\n';
     }
   });
 
@@ -51116,6 +51227,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_split_large_messages = __esm({
     "../examples/cx/catalog/plugins/split-large-messages.cx"() {
       split_large_messages_default = 'plugin "SplitLargeMessages":\n  needs messages.split\n  use split-long-messages\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/split-points.cx
+  var split_points_default;
+  var init_split_points = __esm({
+    "../examples/cx/catalog/plugins/split-points.cx"() {
+      split_points_default = 'plugin "Split Points":\n  needs commands.register\n  needs reply.local\n  on command "splitpoints":\n    input "total" text\n    input "people" text\n    reply "${splitPoints(total, people)}" else "Enter a non-negative whole point total and 1\u201310,000 people."\n';
     }
   });
 
@@ -51412,6 +51531,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_voice_join_messages = __esm({
     "../examples/cx/catalog/plugins/voice-join-messages.cx"() {
       voice_join_messages_default = 'plugin "VoiceJoinMessages":\n  needs voice.notifyfriends\n  on incoming friends-voice ""\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/vote-tally.cx
+  var vote_tally_default;
+  var init_vote_tally = __esm({
+    "../examples/cx/catalog/plugins/vote-tally.cx"() {
+      vote_tally_default = 'plugin "Vote Tally":\n  needs commands.register\n  needs reply.local\n  on command "votetally":\n    input "text" text\n    reply "${voteTally(text)}" else "Paste one vote per line, with up to 30 distinct choices."\n';
     }
   });
 
@@ -52375,6 +52502,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_checklist_progress();
       init_clap_text();
       init_clean_channel_name();
+      init_clean_discord_invite();
       init_clear_urls();
       init_client_side_block();
       init_cloud_cord_accent();
@@ -52410,6 +52538,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_count_lines();
       init_csv_column();
       init_csv_to_markdown();
+      init_custom_emoji_markup();
       init_custom_timestamps();
       init_dashless();
       init_date_offset();
@@ -52429,6 +52558,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_encode_base64();
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
+      init_event_window();
       init_extract_mentions();
       init_fake_profile_themes();
       init_feferi_typing_quirk();
@@ -52596,6 +52726,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_ping_notifications();
       init_plain_folder_icon();
       init_polish_wording();
+      init_poll_draft();
       init_profile_media();
       init_quick_mention();
       init_quote_message();
@@ -52606,6 +52737,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_readable_spoilers();
       init_realtime_timestamps();
       init_recurring_timestamps();
+      init_redact_email_addresses();
       init_relationship_notifier();
       init_repeat_messages();
       init_reply_ping_control();
@@ -52642,6 +52774,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_space_out();
       init_spacious_messages();
       init_split_large_messages();
+      init_split_points();
       init_spotify_share_commands();
       init_square_avatars();
       init_starify();
@@ -52679,6 +52812,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_view_server_media();
       init_voice_count();
       init_voice_join_messages();
+      init_vote_tally();
       init_vriska_s_typing_quirk();
       init_wait_for_slot();
       init_webcam_start_notifier();
@@ -53115,6 +53249,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "c8c232817b30c0a5dd3cd694d9a1da0fbb7156039cdf59dbb1b932a124c004cc"
           },
           {
+            name: "Clean Discord Invite",
+            source: clean_discord_invite_default,
+            description: "/cleaninvite",
+            commands: [
+              "cleaninvite"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "52158b8a89e62ff14798bd9b847ebf944cf61c1b86c14e7bb26439d68657f14e",
+            privateCommands: true
+          },
+          {
             name: "ClearURLs",
             source: clear_urls_default,
             description: "Change text before Discord sends messages you compose",
@@ -53453,6 +53600,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Custom Emoji Markup",
+            source: custom_emoji_markup_default,
+            description: "/emojimarkup",
+            commands: [
+              "emojimarkup"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "7414afa57a6076f4838a837cece00a881b1713f9a88b7dc1d489370b13467cde",
+            privateCommands: true
+          },
+          {
             name: "CustomTimestamps",
             source: custom_timestamps_default,
             description: "Format cozy timestamps as [calendar]",
@@ -53653,6 +53813,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Event Window",
+            source: event_window_default,
+            description: "/eventwindow",
+            commands: [
+              "eventwindow"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "2b493a66f732896ad09e295f4ebdcdd2cff9375cc7b045d97269f351d91b2f3e",
+            privateCommands: true
           },
           {
             name: "Extract Mentions",
@@ -55266,6 +55439,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Poll Draft",
+            source: poll_draft_default,
+            description: "/polldraft",
+            commands: [
+              "polldraft"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "e38274bea9f8c72f38a95b05ec57685bd1ef014a0388dca663e6694c6d1df879",
+            privateCommands: true
+          },
+          {
             name: "ProfileMedia",
             source: profile_media_default,
             description: "Add View and Download actions for Discord avatars and banners",
@@ -55362,6 +55548,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7",
+            privateCommands: true
+          },
+          {
+            name: "Redact Email Addresses",
+            source: redact_email_addresses_default,
+            description: "/redactemails",
+            commands: [
+              "redactemails"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c13ff42634dcacc33789c26c2b0fd0ffb7abae5138adefcabb6fb35120239d6b",
             privateCommands: true
           },
           {
@@ -55707,6 +55906,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Split Points",
+            source: split_points_default,
+            description: "/splitpoints",
+            commands: [
+              "splitpoints"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "12cc96cd1648c8f74a39587d2ab67e9d9d3100dfab5a7ca413361b956836a774",
+            privateCommands: true
           },
           {
             name: "SpotifyShareCommands",
@@ -56108,6 +56320,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Voice & calls"
             ]
+          },
+          {
+            name: "Vote Tally",
+            source: vote_tally_default,
+            description: "/votetally",
+            commands: [
+              "votetally"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fcdd4eaf96dbf42cf9f609779e3075adb301655718a356c662dcae1611540630",
+            privateCommands: true
           },
           {
             name: "Vriska'sTypingQuirk",
@@ -66130,7 +66355,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "30032563e8e2fe52cddb174fe46768726d37439c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "909bae87a6b33dc22e8fe87430ee3ab109a2e67e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
