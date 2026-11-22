@@ -13346,6 +13346,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     useProxy(settings);
     var debugInfo = getDebugInfo();
     var navigation2 = NavigationNative.useNavigation();
+    var canFetchRuntime = typeof BundleUpdaterManager?.checkForUpdates === "function" || typeof BundleUpdaterManager?.download === "function";
+    var recoveryInstructions = import_react_native21.Platform.OS === "android" ? "Hold Volume Up in Discord, then choose Use stable runtime. This is available on current CloudCord Manager installs." : "Shake the device in Discord, then choose Refetch Bundle in the recovery menu.";
     return /* @__PURE__ */ jsx(import_react_native21.ScrollView, {
       style: {
         flex: 1
@@ -13428,21 +13430,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           /* @__PURE__ */ jsxs(TableRowGroup, {
             title: Strings.ACTIONS,
             children: [
-              /* @__PURE__ */ jsx(TableSwitchRow, {
+              canFetchRuntime && globalThis.__CLOUDCORD_ORIGINAL_RAIN__ && /* @__PURE__ */ jsx(TableSwitchRow, {
                 label: "Auto-update",
                 subLabel: "Check every five minutes. Saved updates apply after Discord restarts.",
                 value: settings.cloudcordAutoUpdate !== false,
                 onValueChange: (value) => settings.cloudcordAutoUpdate = value
               }),
-              /* @__PURE__ */ jsx(TableRow, {
+              canFetchRuntime && /* @__PURE__ */ jsx(TableRow, {
                 label: "Update status",
-                subLabel: settings.cloudcordUpdateStatus || "Waiting for the next update check"
+                subLabel: settings.cloudcordUpdateStatus || "No update check yet"
               }),
               /* @__PURE__ */ jsx(TableRow, {
                 label: "Loaded runtime",
                 subLabel: String(globalThis.__CLOUDCORD_RUNTIME_REVISION__ ?? "Unknown").slice(0, 12)
               }),
-              /* @__PURE__ */ jsx(TableRow, {
+              canFetchRuntime ? /* @__PURE__ */ jsx(TableRow, {
                 label: "Fetch Runtime",
                 subLabel: "Download the latest runtime. Reopen Discord to apply it.",
                 onPress: () => _async_to_generator(function* () {
@@ -13456,6 +13458,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     showToast(message);
                   }
                 })()
+              }) : /* @__PURE__ */ jsx(TableRow, {
+                label: "Update through recovery",
+                subLabel: recoveryInstructions
               }),
               /* @__PURE__ */ jsx(TableRow, {
                 label: "Copy CCP runtime report",
@@ -36719,7 +36724,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [search, setSearch] = (0, import_react11.useState)("");
     var query = search.trim();
     var [enabledOnly, setEnabledOnly] = (0, import_react11.useState)(false);
-    var [sortFn, setSortFn] = (0, import_react11.useState)(() => null);
+    var [sort, setSort] = (0, import_react11.useState)();
+    var sortFn = sort ? props.sortOptions?.[sort] : void 0;
+    var defaultSortLabel = query ? "Relevance" : "Default order";
+    var activeSortLabel = sort ?? defaultSortLabel;
     var [filter, setFilter] = (0, import_react11.useState)("");
     var { bottom: bottomInset } = useSafeAreaInsets();
     var navigation2 = NavigationNative.useNavigation();
@@ -36839,7 +36847,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           children: [
             /* @__PURE__ */ jsx(Search_default, {
               style: {
-                flexGrow: 1
+                flex: 1,
+                minWidth: 0
               },
               isRound: !!props.sortOptions,
               onChangeText: (v2) => setSearch(v2)
@@ -36847,17 +36856,23 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             props.sortOptions && /* @__PURE__ */ jsx(IconButton, {
               icon: findAssetId("ArrowsUpDownIcon"),
               variant: "tertiary",
-              disabled: !!query,
+              accessibilityLabel: `Sort add-ons, current order: ${activeSortLabel}`,
               onPress: () => showSimpleActionSheet2({
                 key: "AddonListSortOptions",
                 header: {
-                  title: "Sort Options",
+                  title: `Sort add-ons \xB7 ${activeSortLabel}`,
                   onClose: () => hideActionSheet("AddonListSortOptions")
                 },
-                options: Object.entries(props.sortOptions).map(([name, fn]) => ({
-                  label: name,
-                  onPress: () => setSortFn(() => fn)
-                }))
+                options: [
+                  {
+                    label: defaultSortLabel,
+                    onPress: () => setSort(void 0)
+                  },
+                  ...Object.keys(props.sortOptions).map((name) => ({
+                    label: name,
+                    onPress: () => setSort(name)
+                  }))
+                ]
               })
             })
           ]
@@ -38829,6 +38844,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       base ** exponent
     ]));
   }
+  function decimalNumber(text) {
+    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text))
+      return;
+    var value = Number(text);
+    return Number.isFinite(value) ? value : void 0;
+  }
   function fileSizeBytes(text) {
     var match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
     if (!match)
@@ -39444,14 +39465,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return output.length <= 3900 ? output : "The mention list is too long for one reply.";
         },
         percentChange(before3, after2) {
-          var values = [
-            before3.trim(),
-            after2.trim()
-          ];
-          if (values.some((value) => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)))
-            return;
-          var [original, updated] = values.map(Number);
-          if (!Number.isFinite(original) || !Number.isFinite(updated))
+          var original = decimalNumber(before3.trim());
+          var updated = decimalNumber(after2.trim());
+          if (original === void 0 || updated === void 0)
             return;
           if (!original)
             return "Percentage change from zero is undefined.";
@@ -39459,6 +39475,335 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           if (!Number.isFinite(change))
             return;
           return (change > 0 ? "+" : "") + displayNumber(change) + "%";
+        },
+        scaleRecipe(original, servings, ingredients) {
+          var from = decimalNumber(original.trim());
+          var to = decimalNumber(servings.trim());
+          if (from === void 0 || to === void 0 || from <= 0 || to <= 0)
+            return;
+          var rows = ingredients.trim().split(/\r\n|\r|\n/);
+          if (rows.length > 40)
+            return;
+          var scaled = [];
+          for (var row of rows) {
+            var [amountText, name, extra] = row.split("|").map((part) => part.trim());
+            if (!amountText || !name || extra !== void 0)
+              return;
+            var amount = decimalNumber(amountText);
+            if (amount === void 0 || amount <= 0)
+              return;
+            var quantity = amount * (to / from);
+            if (!Number.isFinite(quantity) || quantity <= 0)
+              return;
+            scaled.push(displayNumber(quantity) + " " + name);
+          }
+          var result = scaled.join("\n").replace(/`(?=``)/g, "`\u200B");
+          return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Scaled ingredients are too long for one reply.";
+        },
+        displayPixelDensity(width, height, diagonal) {
+          var columns = integerText(width);
+          var rows = integerText(height);
+          var inches = decimalNumber(diagonal.trim());
+          if (columns === void 0 || columns < 1 || rows === void 0 || rows < 1 || inches === void 0 || inches <= 0)
+            return;
+          var density = Math.hypot(columns, rows) / inches;
+          if (Number.isFinite(density))
+            return displayNumber(density) + " pixels per inch";
+        },
+        splitBillEvenly(total, people) {
+          var amount = /^(\d{1,10})(?:\.(\d{1,2}))?$/.exec(total.trim());
+          var count = integerText(people);
+          if (!amount || count === void 0 || count < 1 || count > 1e3)
+            return;
+          var cents = Number(amount[1]) * 100 + Number((amount[2] ?? "").padEnd(2, "0"));
+          var share = Math.floor(cents / count);
+          var remainder = cents % count;
+          var format = (value) => (value / 100).toFixed(2);
+          return remainder ? `${remainder} pay ${format(share + 1)} each, ${count - remainder} pay ${format(share)} each.` : `${format(share)} each for ${count} ${count === 1 ? "person" : "people"}.`;
+        },
+        whitespaceReport(text) {
+          if (!text)
+            return;
+          var lines = text.split(/\r\n|\r|\n/);
+          var tabs2 = (text.match(/\t/g) ?? []).length;
+          var nonbreaking = (text.match(/\u00a0/g) ?? []).length;
+          var trailing = lines.filter((line) => /[ \t]+$/.test(line)).length;
+          var empty = lines.filter((line) => !line.trim()).length;
+          return `${lines.length} lines \xB7 ${empty} blank \xB7 ${trailing} with trailing spaces or tabs \xB7 ${tabs2} tabs \xB7 ${nonbreaking} nonbreaking spaces`;
+        },
+        reduceFraction(numerator, denominator) {
+          var top = integerText(numerator), bottom = integerText(denominator);
+          if (top === void 0 || bottom === void 0 || !bottom)
+            return;
+          var a = Math.abs(top), b3 = Math.abs(bottom);
+          while (b3)
+            [a, b3] = [
+              b3,
+              a % b3
+            ];
+          var sign = bottom < 0 ? -1 : 1;
+          return `${sign * top / a}/${Math.abs(bottom) / a}`;
+        },
+        primeFactors(text) {
+          var value = integerText(text);
+          if (value === void 0 || value < 2 || value > 1e9)
+            return;
+          var factors = [];
+          var remaining = value;
+          for (var divisor = 2; divisor * divisor <= remaining; divisor++) {
+            while (remaining % divisor === 0) {
+              factors.push(divisor);
+              remaining /= divisor;
+            }
+          }
+          if (remaining > 1)
+            factors.push(remaining);
+          return `${value} = ${factors.join(" \xD7 ")}`;
+        },
+        baseConverter(input, from, to) {
+          var source = integerText(from), target = integerText(to);
+          if (source === void 0 || source < 2 || source > 36 || target === void 0 || target < 2 || target > 36)
+            return;
+          var text = input.trim().toLowerCase();
+          if (!/^-?[0-9a-z]{1,96}$/.test(text))
+            return;
+          var negative = text.startsWith("-");
+          var value = 0n;
+          for (var digit of negative ? text.slice(1) : text) {
+            var index = "0123456789abcdefghijklmnopqrstuvwxyz".indexOf(digit);
+            if (index >= source)
+              return;
+            value = value * BigInt(source) + BigInt(index);
+          }
+          return (negative ? -value : value).toString(target).toUpperCase();
+        },
+        audioPitchRatio(frequency, semitones) {
+          var hz = decimalNumber(frequency.trim()), shift = decimalNumber(semitones.trim());
+          if (hz === void 0 || hz <= 0 || shift === void 0 || Math.abs(shift) > 48)
+            return;
+          var ratio = 2 ** (shift / 12), changed = hz * ratio;
+          if (Number.isFinite(changed) && changed > 0)
+            return `${displayNumber(changed)} Hz \xB7 ratio ${displayNumber(ratio)}\xD7`;
+        },
+        mapScaleDistance(centimeters, scale) {
+          var distance = decimalNumber(centimeters.trim()), denominator = integerText(scale);
+          if (distance === void 0 || distance < 0 || denominator === void 0 || denominator < 1)
+            return;
+          var meters = distance * (denominator / 100);
+          if (Number.isFinite(meters))
+            return `${displayNumber(meters)} m \xB7 ${displayNumber(meters / 1e3)} km`;
+        },
+        htmlEscapeDraft(text) {
+          if (!text)
+            return;
+          return planningBlock(text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;"));
+        },
+        hexByteFormat(text, width) {
+          var columns = integerText(width), data = text.replace(/\s/g, "").toUpperCase();
+          if (columns === void 0 || columns < 1 || columns > 32 || !/^(?:[0-9A-F]{2}){1,1024}$/.test(data))
+            return;
+          var bytes = data.match(/../g);
+          var rows = [];
+          for (var i = 0; i < bytes.length; i += columns) {
+            rows.push(i.toString(16).toUpperCase().padStart(4, "0") + "  " + bytes.slice(i, i + columns).join(" "));
+          }
+          return planningBlock(rows.join("\n"));
+        },
+        dateDayLabel(text) {
+          var instant = utcMidnight(text);
+          if (instant === void 0)
+            return;
+          var date = new Date(instant);
+          var names = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ];
+          return names[date.getUTCDay()] + " \xB7 " + date.toISOString().slice(0, 10);
+        },
+        percentagePoints(before3, after2) {
+          var from = decimalNumber(before3.trim().replace(/%$/, "")), to = decimalNumber(after2.trim().replace(/%$/, ""));
+          if (from === void 0 || to === void 0 || from < 0 || from > 100 || to < 0 || to > 100)
+            return;
+          var delta = to - from;
+          return `${delta > 0 ? "+" : ""}${displayNumber(delta)} percentage points`;
+        },
+        monthCalendar(text) {
+          var _loop2 = function(index2) {
+            lines.push(Array.from({
+              length: 7
+            }, (_2, day) => {
+              var value = index2 + day + 1;
+              return value > 0 && value <= days ? String(value).padStart(2, " ") : "  ";
+            }).join(" ").trimEnd());
+          };
+          var month = text.trim();
+          if (!/^\d{4}-(?:0[1-9]|1[0-2])$/.test(month))
+            return;
+          var first = /* @__PURE__ */ new Date(month + "-01T00:00:00Z");
+          var next = new Date(first);
+          next.setUTCMonth(next.getUTCMonth() + 1);
+          var days = (next.getTime() - first.getTime()) / dayMilliseconds;
+          var offset = (first.getUTCDay() + 6) % 7;
+          var lines = [
+            month,
+            "Mo Tu We Th Fr Sa Su"
+          ];
+          for (var index = -offset; index < days; index += 7)
+            _loop2(index);
+          return planningBlock(lines.join("\n"));
+        },
+        pageRangeCount(text) {
+          var parts = text.trim().split(/[,\s]+/);
+          if (parts.length > 128)
+            return;
+          var ranges = [];
+          for (var part of parts) {
+            var match = /^(\d{1,6})(?:-(\d{1,6}))?$/.exec(part);
+            if (!match)
+              return;
+            var start = Number(match[1]), end = Number(match[2] ?? match[1]);
+            if (!start || end < start)
+              return;
+            ranges.push({
+              start,
+              end
+            });
+          }
+          ranges.sort((a, b3) => a.start - b3.start);
+          var count = 0, last = 0;
+          for (var { start: start1, end: end1 } of ranges) {
+            count += Math.max(0, end1 - Math.max(start1 - 1, last));
+            last = Math.max(last, end1);
+          }
+          return count + (count === 1 ? " distinct page" : " distinct pages");
+        },
+        bitmapMemory(width, height, channels2) {
+          var columns = integerText(width), rows = integerText(height), channelCount = integerText(channels2);
+          if (columns === void 0 || columns < 1 || rows === void 0 || rows < 1 || channelCount === void 0 || channelCount < 1 || channelCount > 4)
+            return;
+          var bytes = columns * rows * channelCount;
+          if (Number.isSafeInteger(bytes))
+            return `${bytes} bytes \xB7 ${displayNumber(bytes / 1048576)} MiB uncompressed`;
+        },
+        typographyScale(base, ratio, steps) {
+          var size = decimalNumber(base.trim()), multiplier = decimalNumber(ratio.trim()), count = integerText(steps);
+          if (size === void 0 || size <= 0 || size > 1e3 || multiplier === void 0 || multiplier < 1 || multiplier > 3 || count === void 0 || count < 1 || count > 12)
+            return;
+          return Array.from({
+            length: count
+          }, (_2, index) => Number((size * multiplier ** index).toFixed(2)) + " px").join(" \xB7 ");
+        },
+        safeAreaInset(width, height, inset) {
+          var columns = integerText(width), rows = integerText(height), margin = integerText(inset);
+          if (columns === void 0 || rows === void 0 || margin === void 0 || margin < 0 || columns <= 2 * margin || rows <= 2 * margin)
+            return;
+          return `${columns - margin * 2} \xD7 ${rows - margin * 2} px usable \xB7 begins at (${margin}, ${margin})`;
+        },
+        teamRotation(names, shift) {
+          var roster = planningRows(names), amount = integerText(shift);
+          if (roster.length < 2 || roster.length > 80 || amount === void 0)
+            return;
+          var offset = (amount % roster.length + roster.length) % roster.length;
+          var ordered = [
+            ...roster.slice(offset),
+            ...roster.slice(0, offset)
+          ];
+          return planningBlock(ordered.map((name, index) => `${index + 1}. ${name}`).join("\n"));
+        },
+        jsonArrayFilter(json, key, filter) {
+          try {
+            var rows = JSON.parse(json);
+            var value = JSON.parse(filter);
+            if (!Array.isArray(rows) || !key || value !== null && typeof value === "object")
+              return;
+            var matches = rows.filter((row) => row !== null && typeof row === "object" && !Array.isArray(row) && Object.prototype.hasOwnProperty.call(row, key) && row[key] === value);
+            return planningBlock(JSON.stringify(matches, null, 2));
+          } catch (e) {
+            return;
+          }
+        },
+        csvToJson(text) {
+          var [header, ...rows] = csvRows(text);
+          if (!header || header.some((key) => !key.trim()) || new Set(header).size !== header.length || rows.some((row) => row.length !== header.length))
+            return;
+          return planningBlock(JSON.stringify(rows.map((row) => Object.fromEntries(header.map((key, i) => [
+            key,
+            row[i]
+          ]))), null, 2));
+        },
+        calendarQuarter(text) {
+          var instant = utcMidnight(text);
+          if (instant === void 0)
+            return;
+          var date = new Date(instant);
+          var year = date.toISOString().slice(0, 4);
+          var quarter = Math.floor(date.getUTCMonth() / 3);
+          var start = String(quarter * 3 + 1).padStart(2, "0") + "-01";
+          var end = [
+            "03-31",
+            "06-30",
+            "09-30",
+            "12-31"
+          ][quarter];
+          return `Q${quarter + 1} ${year} \xB7 ${year}-${start} to ${year}-${end}`;
+        },
+        weightedAverage(text) {
+          var rows = text.trim().split(/\r\n|\r|\n/);
+          if (rows.length > 128)
+            return;
+          var weightedTotal = 0;
+          var totalWeight = 0;
+          for (var row of rows) {
+            var [valueText, weightText, extra] = row.split("|").map((part) => part.trim());
+            if (!valueText || !weightText || extra !== void 0)
+              return;
+            var value = decimalNumber(valueText);
+            var weight = decimalNumber(weightText);
+            if (value === void 0 || weight === void 0 || weight < 0)
+              return;
+            weightedTotal += value * weight;
+            totalWeight += weight;
+          }
+          if (totalWeight <= 0 || !Number.isFinite(totalWeight) || !Number.isFinite(weightedTotal))
+            return;
+          var average = weightedTotal / totalWeight;
+          if (Number.isFinite(average))
+            return "Weighted average: " + displayNumber(average);
+        },
+        unitPriceComparison(first, second) {
+          var unitPrice = (offer) => {
+            var [priceText, quantityText, extra] = offer.split("/").map((part) => part.trim());
+            if (!priceText || !quantityText || extra !== void 0)
+              return;
+            var price = decimalNumber(priceText);
+            var quantity = decimalNumber(quantityText);
+            if (price === void 0 || price < 0 || quantity === void 0 || quantity <= 0)
+              return;
+            var rate = price / quantity;
+            return Number.isFinite(rate) ? rate : void 0;
+          };
+          var a = unitPrice(first);
+          var b3 = unitPrice(second);
+          if (a === void 0 || b3 === void 0)
+            return;
+          var firstPrice = displayNumber(a);
+          var secondPrice = displayNumber(b3);
+          var verdict = firstPrice === secondPrice ? "Same price per unit" : a < b3 ? "First offer is cheaper" : "Second offer is cheaper";
+          return firstPrice + " vs " + secondPrice + " per unit. " + verdict + ".";
+        },
+        pairLines(labels, values) {
+          var lines = (text) => text.trim().split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+          var left = lines(labels);
+          var right = lines(values);
+          if (!left.length || left.length !== right.length)
+            return;
+          var result = left.map((label2, index) => label2 + ": " + right[index]).join("\n").replace(/`(?=``)/g, "`\u200B");
+          return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Paired lines are too long for one reply.";
         },
         commonLines(first, second) {
           var otherLines = new Set(second.split(/\r\n|\r|\n/));
@@ -39682,6 +40027,55 @@ WCAG AA large text ${ratio >= 3 ? "passes" : "fails"}`;
             8,
             4
           ].map(component).join("") + "`";
+        },
+        weekdayCount(start, end) {
+          var first = utcMidnight(start), last = utcMidnight(end);
+          if (first === void 0 || last === void 0 || last < first)
+            return;
+          var days = (last - first) / dayMilliseconds + 1;
+          var weekdays = Math.floor(days / 7) * 5;
+          var weekday = new Date(first).getUTCDay();
+          for (var offset = 0; offset < days % 7; offset++) {
+            var day = (weekday + offset) % 7;
+            if (day > 0 && day < 6)
+              weekdays++;
+          }
+          return `${weekdays} weekdays \xB7 ${days - weekdays} weekend days (inclusive)`;
+        },
+        eventOverlap(first, second) {
+          var parseRange = (text) => {
+            var parts = text.split("|").map((part) => part.trim());
+            if (parts.length !== 2)
+              return;
+            var start2 = isoUnixMilliseconds(parts[0]), end2 = isoUnixMilliseconds(parts[1]);
+            if (start2 !== void 0 && end2 !== void 0 && end2 > start2)
+              return {
+                start: start2,
+                end: end2
+              };
+          };
+          var left = parseRange(first), right = parseRange(second);
+          if (!left || !right)
+            return;
+          var start = Math.max(left.start, right.start), end = Math.min(left.end, right.end);
+          if (end <= start)
+            return "The events do not overlap.";
+          var seconds = (end - start) / 1e3;
+          var duration = Number.isInteger(seconds) ? readableDuration(seconds) : displayNumber(seconds) + "s";
+          return `Overlap: ${duration} \xB7 <t:${Math.floor(start / 1e3)}:F> to <t:${Math.floor(end / 1e3)}:F>`;
+        },
+        roundRobinCount(teams, meetings) {
+          var count = integerText(teams), rounds = integerText(meetings);
+          if (count === void 0 || count < 2 || count > 1e3 || rounds === void 0 || rounds < 1 || rounds > 20)
+            return;
+          return `${count * (count - 1) / 2 * rounds} total matches \xB7 ${(count - 1) * rounds} per team`;
+        },
+        packingCapacity(items, capacity) {
+          var count = integerText(items), perContainer = integerText(capacity);
+          if (count === void 0 || count < 0 || perContainer === void 0 || perContainer < 1)
+            return;
+          var full = Math.floor(count / perContainer), remaining = count % perContainer;
+          return `${full + (remaining ? 1 : 0)} containers \xB7 ${full} full \xB7 ${remaining} remaining items`;
         },
         daysBetween(start, end) {
           var first = utcMidnight(start), last = utcMidnight(end);
@@ -40206,6 +40600,48 @@ Copy \`<t:${timestamp}:F>\``;
           var count = columns * rows;
           return count + " pixels \xB7 " + count / 1e6 + " MP";
         },
+        tempoLoopLength(bpm, bars, beats) {
+          var tempo = decimalNumber(bpm.trim()), measureCount = integerText(bars), beatsPerMeasure = integerText(beats);
+          if (tempo === void 0 || tempo < 20 || tempo > 400 || measureCount === void 0 || measureCount < 1 || measureCount > 1e4 || beatsPerMeasure === void 0 || beatsPerMeasure < 1 || beatsPerMeasure > 32)
+            return;
+          var totalBeats = measureCount * beatsPerMeasure;
+          return `${totalBeats} beats \xB7 ${displayNumber(totalBeats * 60 / tempo)} seconds`;
+        },
+        imageMegapixels(width, height) {
+          var columns = integerText(width), rows = integerText(height);
+          if (columns === void 0 || rows === void 0 || columns < 1 || rows < 1)
+            return;
+          var pixels = columns * rows;
+          if (Number.isSafeInteger(pixels))
+            return `${pixels} pixels \xB7 ${displayNumber(pixels / 1e6)} MP`;
+        },
+        compressionBudget(original, target) {
+          var size = fileSizeBytes(original), limit = fileSizeBytes(target);
+          if (size === void 0 || limit === void 0 || limit <= 0 || limit >= size)
+            return;
+          return `Remove ${size - limit} bytes (${displayNumber((size - limit) * 100 / size)}%) \xB7 keep at most ${displayNumber(limit * 100 / size)}%`;
+        },
+        audioSampleCount(rate, duration) {
+          var sampleRate = integerText(rate), seconds = durationSeconds(duration);
+          if (sampleRate === void 0 || sampleRate < 1 || sampleRate > 768e3 || !seconds)
+            return;
+          var samples = sampleRate * seconds;
+          if (Number.isSafeInteger(samples))
+            return samples + " samples per channel";
+        },
+        playlistDuration(text) {
+          var tracks = planningRows(text);
+          if (!tracks.length || tracks.length > 200)
+            return;
+          var total = 0;
+          for (var track of tracks) {
+            var match = /^(?:(\d{1,4}):)?(\d{1,4}):([0-5]\d)$/.exec(track);
+            if (!match || match[1] && !/^[0-5]\d$/.test(match[2]))
+              return;
+            total += Number(match[1] ?? 0) * 3600 + Number(match[2]) * 60 + Number(match[3]);
+          }
+          return tracks.length + (tracks.length === 1 ? " track \xB7 " : " tracks \xB7 ") + readableDuration(total);
+        },
         pcmAudioSize(rate, bits, channels2, duration) {
           var sampleRate = integerText(rate), bitDepth = integerText(bits), channelCount = integerText(channels2);
           var seconds = durationSeconds(duration);
@@ -40373,6 +40809,222 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           var transposed = rows[0].map((_2, column) => rows.map((row) => '"' + row[column].replaceAll('"', '""') + '"').join(","));
           return planningBlock(transposed.join("\n"));
         },
+        csvShape(text) {
+          var rows = csvRows(text);
+          if (!rows.length)
+            return;
+          var expected = rows[0].length;
+          var mismatched = rows.flatMap((row, index) => row.length === expected ? [] : [
+            index + 1
+          ]);
+          return `${rows.length} rows \xB7 ${expected} columns in the first row` + (mismatched.length ? ` \xB7 Different width in ${mismatched.length} rows (first: ${mismatched[0]})` : " \xB7 All rows have the same width");
+        },
+        jsonValueShape(text) {
+          try {
+            var value = JSON.parse(text);
+            var kind = (item) => item === null ? "null" : Array.isArray(item) ? "array" : typeof item;
+            var type = kind(value);
+            if (Array.isArray(value))
+              return `Array \xB7 ${value.length} entries \xB7 ${[
+                ...new Set(value.map(kind))
+              ].join(", ") || "empty"}`;
+            if (value !== null && typeof value === "object")
+              return `Object \xB7 ${Object.keys(value).length} top-level keys`;
+            return "JSON type: " + type;
+          } catch (e) {
+            return;
+          }
+        },
+        lineLengthReport(text, limit) {
+          var maximum = integerText(limit);
+          if (!text.trim() || maximum === void 0 || maximum < 1 || maximum > 4e3)
+            return;
+          var lines = text.split(/\r\n|\r|\n/);
+          var over = lines.flatMap((line, index) => {
+            var length = Array.from(line).length;
+            return length > maximum ? [
+              `Line ${index + 1}: ${length}`
+            ] : [];
+          });
+          return over.length ? `${over.length} lines exceed ${maximum} characters
+${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maximum} characters.`;
+        },
+        romanNumerals(text) {
+          var symbols = [
+            [
+              1e3,
+              "M"
+            ],
+            [
+              900,
+              "CM"
+            ],
+            [
+              500,
+              "D"
+            ],
+            [
+              400,
+              "CD"
+            ],
+            [
+              100,
+              "C"
+            ],
+            [
+              90,
+              "XC"
+            ],
+            [
+              50,
+              "L"
+            ],
+            [
+              40,
+              "XL"
+            ],
+            [
+              10,
+              "X"
+            ],
+            [
+              9,
+              "IX"
+            ],
+            [
+              5,
+              "V"
+            ],
+            [
+              4,
+              "IV"
+            ],
+            [
+              1,
+              "I"
+            ]
+          ];
+          var format = (value2) => {
+            var output = "";
+            for (var [amount2, symbol2] of symbols) {
+              var count = Math.floor(value2 / amount2);
+              output += symbol2.repeat(count);
+              value2 %= amount2;
+            }
+            return output;
+          };
+          var integer = integerText(text);
+          if (integer !== void 0)
+            return integer >= 1 && integer <= 3999 ? format(integer) : void 0;
+          var roman = text.trim().toUpperCase();
+          if (!/^[MDCLXVI]{1,15}$/.test(roman))
+            return;
+          var value = 0, position = 0;
+          for (var [amount, symbol] of symbols) {
+            while (roman.startsWith(symbol, position)) {
+              value += amount;
+              position += symbol.length;
+            }
+          }
+          if (position === roman.length && value <= 3999 && format(value) === roman)
+            return String(value);
+        },
+        hexTextDecode(text) {
+          var hex = text.replace(/\s/g, "");
+          if (!/^(?:[0-9a-f]{2}){1,1900}$/i.test(hex))
+            return;
+          try {
+            var decoded = decodeURIComponent(hex.replace(/../g, "%$&"));
+            return planningBlock(decoded.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, (char) => "\\x" + char.charCodeAt(0).toString(16).padStart(2, "0")));
+          } catch (e) {
+            return;
+          }
+        },
+        gridCellSize(width, columns, gap) {
+          var canvas = decimalNumber(width.trim()), count = integerText(columns), spacing = decimalNumber(gap.trim());
+          if (canvas === void 0 || canvas <= 0 || count === void 0 || count < 1 || count > 1e3 || spacing === void 0 || spacing < 0)
+            return;
+          var available = canvas - (count - 1) * spacing;
+          if (available <= 0 || !Number.isFinite(available))
+            return;
+          return `${displayNumber(available / count)} px per column \xB7 ${displayNumber(available)} px usable width`;
+        },
+        arithmeticSequence(start, step, count) {
+          var first = decimalNumber(start.trim()), delta = decimalNumber(step.trim()), length = integerText(count);
+          if (first === void 0 || delta === void 0 || length === void 0 || length < 1 || length > 50)
+            return;
+          var values = Array.from({
+            length
+          }, (_2, index) => first + index * delta);
+          if (values.every(Number.isFinite))
+            return values.map(displayNumber).join(", ");
+        },
+        csvRowFilter(input, column, value) {
+          var position = integerText(column);
+          if (position === void 0 || position < 1 || position > 64)
+            return;
+          var [header, ...rows] = csvRows(input);
+          if (!header || header[position - 1] === void 0 || rows.some((row) => row.length !== header.length))
+            return;
+          var matches = rows.filter((row) => row[position - 1] === value);
+          if (!matches.length)
+            return "No matching rows.";
+          return planningBlock([
+            header,
+            ...matches
+          ].map((row) => row.map((cell) => '"' + cell.replaceAll('"', '""') + '"').join(",")).join("\n"));
+        },
+        csvColumnFrequency(input, column) {
+          var position = integerText(column);
+          if (position === void 0 || position < 1 || position > 64 || input.length > 12e3)
+            return;
+          var [header, ...rows] = csvRows(input);
+          if (!header || !rows.length || rows.length > 150 || header[position - 1] === void 0 || rows.some((row2) => row2.length !== header.length))
+            return;
+          var counts = /* @__PURE__ */ new Map();
+          for (var row of rows) {
+            var value = row[position - 1];
+            counts.set(value, (counts.get(value) ?? 0) + 1);
+          }
+          var top = [
+            ...counts
+          ].sort((a, b3) => b3[1] - a[1]).slice(0, 20);
+          return planningBlock(top.map(([value2, count]) => count + " \xD7 " + JSON.stringify(value2)).join("\n"));
+        },
+        checkIsbn(text) {
+          var isbn = text.toUpperCase().replace(/[\s-]/g, "");
+          if (/^\d{9}[\dX]$/.test(isbn)) {
+            var sum = Array.from(isbn, (digit, index) => (digit === "X" ? 10 : Number(digit)) * (10 - index)).reduce((total, value) => total + value, 0);
+            return sum % 11 === 0 ? "Valid ISBN-10 checksum." : "Invalid ISBN-10 checksum.";
+          }
+          if (/^97[89]\d{10}$/.test(isbn)) {
+            var sum1 = Array.from(isbn, (digit, index) => Number(digit) * (index % 2 ? 3 : 1)).reduce((total, value) => total + value, 0);
+            return sum1 % 10 === 0 ? "Valid ISBN-13 checksum." : "Invalid ISBN-13 checksum.";
+          }
+        },
+        releaseNotesOutline(added, fixed, changed) {
+          var sections = [
+            [
+              "Added",
+              added
+            ],
+            [
+              "Fixed",
+              fixed
+            ],
+            [
+              "Changed",
+              changed
+            ]
+          ].flatMap(([heading, text]) => {
+            var lines = planningRows(text);
+            return lines.length ? [
+              "## " + heading + "\n" + lines.map((line) => "- " + line.replace(/^[-*+]\s+/, "")).join("\n")
+            ] : [];
+          });
+          if (sections.length)
+            return planningBlock(sections.join("\n\n"));
+        },
         csvColumn(input, column) {
           var position = integerText(column);
           if (position === void 0 || position < 1 || position > 64 || input.length > 12e3)
@@ -40478,6 +41130,55 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           var number = randomInteger(Math.min(min, max), Math.max(min, max));
           if (number !== void 0)
             return String(number);
+        },
+        readingTime(text, rate) {
+          var words = text.trim().split(/\s+/).filter(Boolean).length;
+          var speed = integerText(rate);
+          if (!words || speed === void 0 || speed < 50 || speed > 1e3)
+            return;
+          return `${words} words \xB7 about ${readableDuration(Math.ceil(words * 60 / speed))} at ${speed} words/min`;
+        },
+        openChecklistItems(text) {
+          var rows = text.split(/\r\n|\r|\n/);
+          var pattern = /^[ \t]*(?:[-*+]|\d+\.)[ \t]+\[([ xX])\][ \t]+(.+)$/;
+          var items = rows.flatMap((row) => {
+            var match = pattern.exec(row);
+            return match ? [
+              match
+            ] : [];
+          });
+          if (!items.length)
+            return;
+          var open = items.filter(([, state2]) => state2 === " ").map(([, , item]) => "- [ ] " + item.trim());
+          return open.length ? planningBlock(open.join("\n")) : "All checklist items are complete.";
+        },
+        altTextDraft(subject, context, visible) {
+          var description = subject.trim().replace(/\s+/g, " ");
+          if (!description)
+            return;
+          var details = [
+            description,
+            context.trim().replace(/\s+/g, " "),
+            visible.trim() && "Visible text: " + visible.trim().replace(/\s+/g, " ")
+          ].filter(Boolean);
+          var draft = details.map((line) => /[.!?]$/.test(line) ? line : line + ".").join(" ");
+          if (draft.length <= 500)
+            return planningBlock(draft);
+        },
+        linesToSpoilers(text) {
+          var rows = text.trim().split(/\r\n|\r|\n/);
+          if (!rows.some((row) => row.trim()))
+            return;
+          var result = rows.map((row) => row.trim() ? "||" + row.replaceAll("|", "\\|") + "||" : "").join("\n");
+          if (result.length <= 3900)
+            return planningBlock(result);
+        },
+        quoteWithAttribution(text, author) {
+          var source = author.trim();
+          if (!source || source.length > 160 || /[\r\n]/.test(source) || !text.trim())
+            return;
+          var quote = text.trim().split(/\r\n|\r|\n/).map((line) => "> " + line).join("\n");
+          return planningBlock(quote + "\n\n\u2014 " + source);
         },
         wordCount(text) {
           var words = text.trim().split(/\s+/).filter(Boolean).length;
@@ -50240,6 +50941,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/alt-text-draft.cx
+  var alt_text_draft_default;
+  var init_alt_text_draft = __esm({
+    "../examples/cx/catalog/plugins/alt-text-draft.cx"() {
+      alt_text_draft_default = 'plugin "Alt Text Draft":\n  needs commands.register\n  needs reply.local\n  on command "alttextdraft":\n    input "subject" text\n    input "context" text optional\n    input "visible" text optional\n    reply "${altTextDraft(subject, context, visible)}" else "Enter a subject and keep the draft below 500 characters."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/always-animate.cx
   var always_animate_default;
   var init_always_animate = __esm({
@@ -50264,6 +50973,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/arithmetic-sequence.cx
+  var arithmetic_sequence_default;
+  var init_arithmetic_sequence = __esm({
+    "../examples/cx/catalog/plugins/arithmetic-sequence.cx"() {
+      arithmetic_sequence_default = 'plugin "Arithmetic Sequence":\n  needs commands.register\n  needs reply.local\n  on command "arithmeticsequence":\n    input "start" text\n    input "step" text\n    input "count" text\n    reply "${arithmeticSequence(start, step, count)}" else "Enter a starting value, step, and a count from 1 to 50."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/aspect-ratio.cx
   var aspect_ratio_default;
   var init_aspect_ratio = __esm({
@@ -50277,6 +50994,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_at_someone = __esm({
     "../examples/cx/catalog/plugins/at-someone.cx"() {
       at_someone_default = 'plugin "AtSomeone":\n  needs commands.register\n  needs guild.randommember\n  needs messages.send\n  needs reply.local\n  on command "someone":\n    input "message" text optional\n    send "${randomMember(message)}" else "No other loaded members in this server."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/audio-pitch-ratio.cx
+  var audio_pitch_ratio_default;
+  var init_audio_pitch_ratio = __esm({
+    "../examples/cx/catalog/plugins/audio-pitch-ratio.cx"() {
+      audio_pitch_ratio_default = 'plugin "Audio Pitch Ratio":\n  needs commands.register\n  needs reply.local\n  on command "pitchratio":\n    input "frequency" text\n    input "semitones" text\n    reply "${audioPitchRatio(frequency, semitones)}" else "Enter a positive frequency and a shift between -48 and 48 semitones."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/audio-sample-count.cx
+  var audio_sample_count_default;
+  var init_audio_sample_count = __esm({
+    "../examples/cx/catalog/plugins/audio-sample-count.cx"() {
+      audio_sample_count_default = 'plugin "Audio Sample Count":\n  needs commands.register\n  needs reply.local\n  on command "audiosamples":\n    input "rate" text\n    input "duration" text\n    reply "${audioSampleCount(rate, duration)}" else "Enter a sample rate in Hz and a duration such as 1m 30s."\n';
     }
   });
 
@@ -50301,6 +51034,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_balanced_groups = __esm({
     "../examples/cx/catalog/plugins/balanced-groups.cx"() {
       balanced_groups_default = 'plugin "Balanced Groups":\n  needs commands.register\n  needs reply.local\n  on command "balancegroups":\n    input "text" text\n    input "count" text\n    reply "${balanceGroups(text, count)}" else "Enter one participant or item per line, then choose 2 to 20 groups."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/base-converter.cx
+  var base_converter_default;
+  var init_base_converter = __esm({
+    "../examples/cx/catalog/plugins/base-converter.cx"() {
+      base_converter_default = 'plugin "Base Converter":\n  needs commands.register\n  needs reply.local\n  on command "baseconvert":\n    input "value" text\n    input "from" text\n    input "to" text\n    reply "${baseConverter(value, from, to)}" else "Enter a number and bases between 2 and 36."\n';
     }
   });
 
@@ -50365,6 +51106,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_bigger_server_icons = __esm({
     "../examples/cx/catalog/plugins/bigger-server-icons.cx"() {
       bigger_server_icons_default = 'plugin "BiggerServerIcons":\n  needs appearance.style\n  style bigger-server-icons\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/bitmap-memory.cx
+  var bitmap_memory_default;
+  var init_bitmap_memory = __esm({
+    "../examples/cx/catalog/plugins/bitmap-memory.cx"() {
+      bitmap_memory_default = 'plugin "Bitmap Memory":\n  needs commands.register\n  needs reply.local\n  on command "bitmapmemory":\n    input "width" text\n    input "height" text\n    input "channels" text\n    reply "${bitmapMemory(width, height, channels)}" else "Enter positive pixel dimensions and 1 to 4 eight-bit channels."\n';
     }
   });
 
@@ -50445,6 +51194,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_calendar_day_difference = __esm({
     "../examples/cx/catalog/plugins/calendar-day-difference.cx"() {
       calendar_day_difference_default = 'plugin "Calendar Day Difference":\n  needs commands.register\n  needs reply.local\n  on command "calendardays":\n    input "start" text\n    input "end" text\n    reply "${calendarDayDifference(start, end)}" else "Enter two calendar dates in YYYY-MM-DD format."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/calendar-quarter.cx
+  var calendar_quarter_default;
+  var init_calendar_quarter = __esm({
+    "../examples/cx/catalog/plugins/calendar-quarter.cx"() {
+      calendar_quarter_default = 'plugin "Calendar Quarter":\n  needs commands.register\n  needs reply.local\n  on command "calendarquarter" with text:\n    reply "${calendarQuarter(text)}" else "Enter a calendar date in YYYY-MM-DD format."\n';
     }
   });
 
@@ -50637,6 +51394,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_compare_lines = __esm({
     "../examples/cx/catalog/plugins/compare-lines.cx"() {
       compare_lines_default = 'plugin "Compare Lines":\n  needs commands.register\n  needs reply.local\n  on command "comparelines":\n    input "before" text optional\n    input "after" text optional\n    reply "${compareLines(before, after)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/compression-budget.cx
+  var compression_budget_default;
+  var init_compression_budget = __esm({
+    "../examples/cx/catalog/plugins/compression-budget.cx"() {
+      compression_budget_default = 'plugin "Compression Budget":\n  needs commands.register\n  needs reply.local\n  on command "compressionbudget":\n    input "original" text\n    input "target" text\n    reply "${compressionBudget(original, target)}" else "Enter two sizes such as 40 MB and 10 MB, with a smaller target."\n';
     }
   });
 
@@ -50928,11 +51693,43 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/csv-column-frequency.cx
+  var csv_column_frequency_default;
+  var init_csv_column_frequency = __esm({
+    "../examples/cx/catalog/plugins/csv-column-frequency.cx"() {
+      csv_column_frequency_default = 'plugin "CSV Column Frequency":\n  needs commands.register\n  needs reply.local\n  on command "csvcolumnfrequency":\n    input "csv" text\n    input "column" text\n    reply "${csvColumnFrequency(csv, column)}" else "Enter CSV and a 1-based column number."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/csv-column.cx
   var csv_column_default;
   var init_csv_column = __esm({
     "../examples/cx/catalog/plugins/csv-column.cx"() {
       csv_column_default = 'plugin "CSV Column":\n  needs commands.register\n  needs reply.local\n  on command "csvcolumn":\n    input "document" text\n    input "column" text\n    reply "${csvColumn(document, column)}" else "Paste up to 150 CSV rows and choose a column number starting at 1."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/csv-row-filter.cx
+  var csv_row_filter_default;
+  var init_csv_row_filter = __esm({
+    "../examples/cx/catalog/plugins/csv-row-filter.cx"() {
+      csv_row_filter_default = 'plugin "CSV Row Filter":\n  needs commands.register\n  needs reply.local\n  on command "csvrowfilter":\n    input "csv" text\n    input "column" text\n    input "value" text\n    reply "${csvRowFilter(csv, column, value)}" else "Enter CSV, a 1-based column number, and an exact cell value."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/csv-shape.cx
+  var csv_shape_default;
+  var init_csv_shape = __esm({
+    "../examples/cx/catalog/plugins/csv-shape.cx"() {
+      csv_shape_default = 'plugin "CSV Shape":\n  needs commands.register\n  needs reply.local\n  on command "csvshape" with text:\n    reply "${csvShape(text)}" else "Paste CSV with at least one row."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/csv-to-json.cx
+  var csv_to_json_default;
+  var init_csv_to_json = __esm({
+    "../examples/cx/catalog/plugins/csv-to-json.cx"() {
+      csv_to_json_default = 'plugin "CSV to JSON":\n  needs commands.register\n  needs reply.local\n  on command "csvtojson" with text:\n    reply "${csvToJson(text)}" else "Enter rectangular CSV with a unique, nonempty header for each column."\n';
     }
   });
 
@@ -50973,6 +51770,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_dashless = __esm({
     "../examples/cx/catalog/plugins/dashless.cx"() {
       dashless_default = 'plugin "Dashless":\n  needs appearance.style\n  use dashless-channel-names\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/date-day-label.cx
+  var date_day_label_default;
+  var init_date_day_label = __esm({
+    "../examples/cx/catalog/plugins/date-day-label.cx"() {
+      date_day_label_default = 'plugin "Date Day Label":\n  needs commands.register\n  needs reply.local\n  on command "datedaylabel" with text:\n    reply "${dateDayLabel(text)}" else "Enter a date as YYYY-MM-DD."\n';
     }
   });
 
@@ -51080,6 +51885,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/display-pixel-density.cx
+  var display_pixel_density_default;
+  var init_display_pixel_density = __esm({
+    "../examples/cx/catalog/plugins/display-pixel-density.cx"() {
+      display_pixel_density_default = 'plugin "Display Pixel Density":\n  needs commands.register\n  needs reply.local\n  on command "displayppi":\n    input "width" text\n    input "height" text\n    input "diagonal" text\n    reply "${displayPixelDensity(width, height, diagonal)}" else "Enter the width and height in pixels and the diagonal in inches."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/dont-round-my-timestamps.cx
   var dont_round_my_timestamps_default;
   var init_dont_round_my_timestamps = __esm({
@@ -51169,6 +51982,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_escape_regex = __esm({
     "../examples/cx/catalog/plugins/escape-regex.cx"() {
       escape_regex_default = 'plugin "Escape Regex":\n  needs commands.register\n  needs reply.local\n  on command "escaperegex":\n    input "text" text\n    reply "${escapeRegex(text)}" else "Enter text to escape for a regular expression."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/event-overlap.cx
+  var event_overlap_default;
+  var init_event_overlap = __esm({
+    "../examples/cx/catalog/plugins/event-overlap.cx"() {
+      event_overlap_default = 'plugin "Event Overlap":\n  needs commands.register\n  needs reply.local\n  on command "eventoverlap":\n    input "first" text\n    input "second" text\n    reply "${eventOverlap(first, second)}" else "Enter two ranges, each as start | end, using ISO date-times with a time zone."\n';
     }
   });
 
@@ -51560,6 +52381,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_grayscale_images = __esm({
     "../examples/cx/catalog/plugins/grayscale-images.cx"() {
       grayscale_images_default = 'plugin "GrayscaleImages":\n  needs appearance.style\n  style grayscale-images\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/grid-cell-size.cx
+  var grid_cell_size_default;
+  var init_grid_cell_size = __esm({
+    "../examples/cx/catalog/plugins/grid-cell-size.cx"() {
+      grid_cell_size_default = 'plugin "Grid Cell Size":\n  needs commands.register\n  needs reply.local\n  on command "gridcellsize":\n    input "width" text\n    input "columns" text\n    input "gap" text\n    reply "${gridCellSize(width, columns, gap)}" else "Enter a canvas width, a column count and a nonnegative gap in pixels."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hex-byte-format.cx
+  var hex_byte_format_default;
+  var init_hex_byte_format = __esm({
+    "../examples/cx/catalog/plugins/hex-byte-format.cx"() {
+      hex_byte_format_default = 'plugin "Hex Byte Format":\n  needs commands.register\n  needs reply.local\n  on command "hexbyteformat":\n    input "text" text\n    input "width" text\n    reply "${hexByteFormat(text, width)}" else "Enter hexadecimal bytes and a row width from 1 to 32."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hex-text-decode.cx
+  var hex_text_decode_default;
+  var init_hex_text_decode = __esm({
+    "../examples/cx/catalog/plugins/hex-text-decode.cx"() {
+      hex_text_decode_default = 'plugin "Hex Text Decode":\n  needs commands.register\n  needs reply.local\n  on command "hextext" with text:\n    reply "${hexTextDecode(text)}" else "Enter UTF-8 bytes in hexadecimal, optionally separated by spaces."\n';
     }
   });
 
@@ -53267,6 +54112,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/html-escape-draft.cx
+  var html_escape_draft_default;
+  var init_html_escape_draft = __esm({
+    "../examples/cx/catalog/plugins/html-escape-draft.cx"() {
+      html_escape_draft_default = 'plugin "HTML Escape Draft":\n  needs commands.register\n  needs reply.local\n  on command "htmlescape" with text:\n    reply "${htmlEscapeDraft(text)}" else "Paste text short enough to fit in one reply after escaping."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/html-escape.cx
   var html_escape_default;
   var init_html_escape = __esm({
@@ -53296,6 +54149,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_image_link = __esm({
     "../examples/cx/catalog/plugins/image-link.cx"() {
       image_link_default = 'plugin "ImageLink":\n  needs media.labels\n  use preserve-image-links\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/image-megapixels.cx
+  var image_megapixels_default;
+  var init_image_megapixels = __esm({
+    "../examples/cx/catalog/plugins/image-megapixels.cx"() {
+      image_megapixels_default = 'plugin "Image Megapixels":\n  needs commands.register\n  needs reply.local\n  on command "megapixels":\n    input "width" text\n    input "height" text\n    reply "${imageMegapixels(width, height)}" else "Enter positive integer pixel dimensions."\n';
     }
   });
 
@@ -53355,6 +54216,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/isbn-check.cx
+  var isbn_check_default;
+  var init_isbn_check = __esm({
+    "../examples/cx/catalog/plugins/isbn-check.cx"() {
+      isbn_check_default = 'plugin "ISBN Check":\n  needs commands.register\n  needs reply.local\n  on command "isbncheck" with text:\n    reply "${checkIsbn(text)}" else "Enter an ISBN-10 or ISBN-13, with optional hyphens or spaces."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/iso-week.cx
   var iso_week_default;
   var init_iso_week = __esm({
@@ -53368,6 +54237,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_join_lines = __esm({
     "../examples/cx/catalog/plugins/join-lines.cx"() {
       join_lines_default = 'plugin "Join Lines":\n  needs commands.register\n  needs reply.local\n  on command "joinlines":\n    input "text" text\n    input "separator" text\n    reply "${joinLines(text, separator)}" else "Use a separator of up to 32 characters and keep the result under 4,000 characters."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/json-array-filter.cx
+  var json_array_filter_default;
+  var init_json_array_filter = __esm({
+    "../examples/cx/catalog/plugins/json-array-filter.cx"() {
+      json_array_filter_default = 'plugin "JSON Array Filter":\n  needs commands.register\n  needs reply.local\n  on command "jsonarrayfilter":\n    input "json" text\n    input "key" text\n    input "value" text\n    reply "${jsonArrayFilter(json, key, value)}" else "Enter an object array, a property name, and a JSON string, number, boolean, or null."\n';
     }
   });
 
@@ -53411,6 +54288,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/json-value-shape.cx
+  var json_value_shape_default;
+  var init_json_value_shape = __esm({
+    "../examples/cx/catalog/plugins/json-value-shape.cx"() {
+      json_value_shape_default = 'plugin "JSON Value Shape":\n  needs commands.register\n  needs reply.local\n  on command "jsonvalueshape" with text:\n    reply "${jsonValueShape(text)}" else "Paste a valid JSON value."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/jump-to-top.cx
   var jump_to_top_default;
   var init_jump_to_top = __esm({
@@ -53451,11 +54336,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/line-length-report.cx
+  var line_length_report_default;
+  var init_line_length_report = __esm({
+    "../examples/cx/catalog/plugins/line-length-report.cx"() {
+      line_length_report_default = 'plugin "Line Length Report":\n  needs commands.register\n  needs reply.local\n  on command "linelengths":\n    input "text" text\n    input "limit" text\n    reply "${lineLengthReport(text, limit)}" else "Enter text and a positive character limit."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/lines-to-csv.cx
   var lines_to_csv_default;
   var init_lines_to_csv = __esm({
     "../examples/cx/catalog/plugins/lines-to-csv.cx"() {
       lines_to_csv_default = 'plugin "Lines to CSV":\n  needs commands.register\n  needs reply.local\n  on command "linestocsv" with text:\n    reply "${linesToCsv(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/lines-to-spoilers.cx
+  var lines_to_spoilers_default;
+  var init_lines_to_spoilers = __esm({
+    "../examples/cx/catalog/plugins/lines-to-spoilers.cx"() {
+      lines_to_spoilers_default = 'plugin "Lines to Spoilers":\n  needs commands.register\n  needs reply.local\n  on command "spoilerlines" with text:\n    reply "${linesToSpoilers(text)}" else "Paste at least one line. The result must fit in one reply."\n';
     }
   });
 
@@ -53472,6 +54373,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_local_channel_notes = __esm({
     "../examples/cx/catalog/plugins/local-channel-notes.cx"() {
       local_channel_notes_default = 'plugin "LocalChannelNotes":\n  needs channels.notes\n  use channel-notes\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/map-scale-distance.cx
+  var map_scale_distance_default;
+  var init_map_scale_distance = __esm({
+    "../examples/cx/catalog/plugins/map-scale-distance.cx"() {
+      map_scale_distance_default = 'plugin "Map Scale Distance":\n  needs commands.register\n  needs reply.local\n  on command "mapdistance":\n    input "centimeters" text\n    input "scale" text\n    reply "${mapScaleDistance(centimeters, scale)}" else "Enter centimeters on the map and the denominator of a 1:n scale."\n';
     }
   });
 
@@ -53552,6 +54461,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_monospace_chat = __esm({
     "../examples/cx/catalog/plugins/monospace-chat.cx"() {
       monospace_chat_default = 'plugin "MonospaceChat":\n  needs appearance.style\n  style monospace-chat\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/month-calendar.cx
+  var month_calendar_default;
+  var init_month_calendar = __esm({
+    "../examples/cx/catalog/plugins/month-calendar.cx"() {
+      month_calendar_default = 'plugin "Month Calendar":\n  needs commands.register\n  needs reply.local\n  on command "monthcalendar" with text:\n    reply "${monthCalendar(text)}" else "Enter a month as YYYY-MM."\n';
     }
   });
 
@@ -53979,6 +54896,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/open-checklist-items.cx
+  var open_checklist_items_default;
+  var init_open_checklist_items = __esm({
+    "../examples/cx/catalog/plugins/open-checklist-items.cx"() {
+      open_checklist_items_default = 'plugin "Open Checklist Items":\n  needs commands.register\n  needs reply.local\n  on command "openchecklist" with text:\n    reply "${openChecklistItems(text)}" else "Paste a Markdown checklist."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/open-steam-links-in-app.cx
   var open_steam_links_in_app_default;
   var init_open_steam_links_in_app = __esm({
@@ -53995,6 +54920,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/packing-capacity.cx
+  var packing_capacity_default;
+  var init_packing_capacity = __esm({
+    "../examples/cx/catalog/plugins/packing-capacity.cx"() {
+      packing_capacity_default = 'plugin "Packing Capacity":\n  needs commands.register\n  needs reply.local\n  on command "packingcapacity":\n    input "items" text\n    input "capacity" text\n    reply "${packingCapacity(items, capacity)}" else "Enter a nonnegative item count and positive container capacity."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/page-range-count.cx
+  var page_range_count_default;
+  var init_page_range_count = __esm({
+    "../examples/cx/catalog/plugins/page-range-count.cx"() {
+      page_range_count_default = 'plugin "Page Range Count":\n  needs commands.register\n  needs reply.local\n  on command "pagerangecount" with text:\n    reply "${pageRangeCount(text)}" else "Enter page numbers and ranges such as 1-4, 8, 10-12."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/pair-lines.cx
+  var pair_lines_default;
+  var init_pair_lines = __esm({
+    "../examples/cx/catalog/plugins/pair-lines.cx"() {
+      pair_lines_default = 'plugin "Pair Lines":\n  needs commands.register\n  needs reply.local\n  on command "pairlines":\n    input "labels" text\n    input "values" text\n    reply "${pairLines(labels, values)}" else "Enter the same number of nonempty lines in labels and values."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/pcm-audio-size.cx
   var pcm_audio_size_default;
   var init_pcm_audio_size = __esm({
@@ -54008,6 +54957,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_percentage_change = __esm({
     "../examples/cx/catalog/plugins/percentage-change.cx"() {
       percentage_change_default = 'plugin "Percentage Change":\n  needs commands.register\n  needs reply.local\n  on command "percentchange":\n    input "before" text\n    input "after" text\n    reply "${percentChange(before, after)}" else "Enter two decimal numbers."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/percentage-points.cx
+  var percentage_points_default;
+  var init_percentage_points = __esm({
+    "../examples/cx/catalog/plugins/percentage-points.cx"() {
+      percentage_points_default = 'plugin "Percentage Points":\n  needs commands.register\n  needs reply.local\n  on command "percentagepoints":\n    input "before" text\n    input "after" text\n    reply "${percentagePoints(before, after)}" else "Enter two percentages between 0 and 100."\n';
     }
   });
 
@@ -54043,6 +55000,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/playlist-duration.cx
+  var playlist_duration_default;
+  var init_playlist_duration = __esm({
+    "../examples/cx/catalog/plugins/playlist-duration.cx"() {
+      playlist_duration_default = 'plugin "Playlist Duration":\n  needs commands.register\n  needs reply.local\n  on command "playlistduration" with text:\n    reply "${playlistDuration(text)}" else "Enter one track time per line in M:SS or H:MM:SS format."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/polish-wording.cx
   var polish_wording_default;
   var init_polish_wording = __esm({
@@ -54056,6 +55021,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_poll_draft = __esm({
     "../examples/cx/catalog/plugins/poll-draft.cx"() {
       poll_draft_default = 'plugin "Poll Draft":\n  needs commands.register\n  needs reply.local\n  on command "polldraft":\n    input "question" text\n    input "options" text\n    reply "${pollDraft(question, options)}" else "Enter a one-line question and 2\u201310 distinct choices, one per line."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/prime-factors.cx
+  var prime_factors_default;
+  var init_prime_factors = __esm({
+    "../examples/cx/catalog/plugins/prime-factors.cx"() {
+      prime_factors_default = 'plugin "Prime Factors":\n  needs commands.register\n  needs reply.local\n  on command "primefactors" with text:\n    reply "${primeFactors(text)}" else "Enter an integer between 2 and 1000000000."\n';
     }
   });
 
@@ -54088,6 +55061,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_quote_message = __esm({
     "../examples/cx/catalog/plugins/quote-message.cx"() {
       quote_message_default = 'plugin "QuoteMessage":\n  needs messages.quote\n  use quote-message\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/quote-with-attribution.cx
+  var quote_with_attribution_default;
+  var init_quote_with_attribution = __esm({
+    "../examples/cx/catalog/plugins/quote-with-attribution.cx"() {
+      quote_with_attribution_default = 'plugin "Quote with Attribution":\n  needs commands.register\n  needs reply.local\n  on command "attributedquote":\n    input "text" text\n    input "author" text\n    reply "${quoteWithAttribution(text, author)}" else "Enter a quote and a one-line attribution."\n';
     }
   });
 
@@ -54139,11 +55120,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/reading-time.cx
+  var reading_time_default;
+  var init_reading_time = __esm({
+    "../examples/cx/catalog/plugins/reading-time.cx"() {
+      reading_time_default = 'plugin "Reading Time":\n  needs commands.register\n  needs reply.local\n  on command "readingtime":\n    input "text" text\n    input "rate" text\n    reply "${readingTime(text, rate)}" else "Enter text and a reading rate between 50 and 1000 words per minute."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/realtime-timestamps.cx
   var realtime_timestamps_default;
   var init_realtime_timestamps = __esm({
     "../examples/cx/catalog/plugins/realtime-timestamps.cx"() {
       realtime_timestamps_default = 'plugin "RealtimeTimestamps":\n  needs appearance.style\n  format timestamp cozy "HH:mm:ss"\n  format timestamp compact "HH:mm:ss"\n  format timestamp tooltip "dddd, MMMM D, YYYY [at] HH:mm:ss"\n  format timestamp markdown "dddd, MMMM D, YYYY [at] HH:mm:ss"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/recipe-scaler.cx
+  var recipe_scaler_default;
+  var init_recipe_scaler = __esm({
+    "../examples/cx/catalog/plugins/recipe-scaler.cx"() {
+      recipe_scaler_default = 'plugin "Recipe Scaler":\n  needs commands.register\n  needs reply.local\n  on command "recipescale":\n    input "original" text\n    input "servings" text\n    input "ingredients" text\n    reply "${scaleRecipe(original, servings, ingredients)}" else "Enter positive serving counts and one amount | ingredient per line, like 200 | g flour."\n';
     }
   });
 
@@ -54163,11 +55160,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/reduce-fraction.cx
+  var reduce_fraction_default;
+  var init_reduce_fraction = __esm({
+    "../examples/cx/catalog/plugins/reduce-fraction.cx"() {
+      reduce_fraction_default = 'plugin "Reduce Fraction":\n  needs commands.register\n  needs reply.local\n  on command "reducefraction":\n    input "numerator" text\n    input "denominator" text\n    reply "${reduceFraction(numerator, denominator)}" else "Enter integer numerator and a nonzero denominator."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/relationship-notifier.cx
   var relationship_notifier_default;
   var init_relationship_notifier = __esm({
     "../examples/cx/catalog/plugins/relationship-notifier.cx"() {
       relationship_notifier_default = 'plugin "RelationshipNotifier":\n  needs friends.notifyremoval\n  on incoming friend-removals ""\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/release-notes-outline.cx
+  var release_notes_outline_default;
+  var init_release_notes_outline = __esm({
+    "../examples/cx/catalog/plugins/release-notes-outline.cx"() {
+      release_notes_outline_default = 'plugin "Release Notes Outline":\n  needs commands.register\n  needs reply.local\n  on command "releaseoutline":\n    input "added" text optional\n    input "fixed" text optional\n    input "changed" text optional\n    reply "${releaseNotesOutline(added, fixed, changed)}" else "Keep the release notes short enough for one reply."\n';
     }
   });
 
@@ -54243,11 +55256,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/roman-numerals.cx
+  var roman_numerals_default;
+  var init_roman_numerals = __esm({
+    "../examples/cx/catalog/plugins/roman-numerals.cx"() {
+      roman_numerals_default = 'plugin "Roman Numerals":\n  needs commands.register\n  needs reply.local\n  on command "romannumerals" with text:\n    reply "${romanNumerals(text)}" else "Enter an integer from 1 to 3999 or a Roman numeral in canonical form."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/rot13-text.cx
   var rot13_text_default;
   var init_rot13_text = __esm({
     "../examples/cx/catalog/plugins/rot13-text.cx"() {
       rot13_text_default = 'plugin "ROT13 Text":\n  needs commands.register\n  needs reply.local\n  on command "rot13text" with text:\n    reply "${rot13(text)}"\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/round-robin-count.cx
+  var round_robin_count_default;
+  var init_round_robin_count = __esm({
+    "../examples/cx/catalog/plugins/round-robin-count.cx"() {
+      round_robin_count_default = 'plugin "Round Robin Count":\n  needs commands.register\n  needs reply.local\n  on command "roundrobincount":\n    input "teams" text\n    input "meetings" text\n    reply "${roundRobinCount(teams, meetings)}" else "Enter 2\u20131000 teams and 1\u201320 meetings per pairing."\n';
     }
   });
 
@@ -54288,6 +55317,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_running_pace = __esm({
     "../examples/cx/catalog/plugins/running-pace.cx"() {
       running_pace_default = 'plugin "Running Pace":\n  needs commands.register\n  needs reply.local\n  on command "runningpace":\n    input "distance" text\n    input "duration" text\n    reply "${runningPace(distance, duration)}" else "Enter a positive distance in kilometers and a duration such as 25m."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/safe-area-inset.cx
+  var safe_area_inset_default;
+  var init_safe_area_inset = __esm({
+    "../examples/cx/catalog/plugins/safe-area-inset.cx"() {
+      safe_area_inset_default = 'plugin "Safe Area Inset":\n  needs commands.register\n  needs reply.local\n  on command "safeareainset":\n    input "width" text\n    input "height" text\n    input "inset" text\n    reply "${safeAreaInset(width, height, inset)}" else "Enter width, height, and a uniform inset that fits inside the image."\n';
     }
   });
 
@@ -54491,6 +55528,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/split-bill-evenly.cx
+  var split_bill_evenly_default;
+  var init_split_bill_evenly = __esm({
+    "../examples/cx/catalog/plugins/split-bill-evenly.cx"() {
+      split_bill_evenly_default = 'plugin "Split Bill Evenly":\n  needs commands.register\n  needs reply.local\n  on command "splitbill":\n    input "total" text\n    input "people" text\n    reply "${splitBillEvenly(total, people)}" else "Enter an amount with up to two decimal places and a group of 1 to 1000 people."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/split-large-messages.cx
   var split_large_messages_default;
   var init_split_large_messages = __esm({
@@ -54576,6 +55621,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_talk_in_reverse = __esm({
     "../examples/cx/catalog/plugins/talk-in-reverse.cx"() {
       talk_in_reverse_default = 'plugin "TalkInReverse":\n  needs messages.transform\n  before send reverse\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/team-rotation.cx
+  var team_rotation_default;
+  var init_team_rotation = __esm({
+    "../examples/cx/catalog/plugins/team-rotation.cx"() {
+      team_rotation_default = 'plugin "Team Rotation":\n  needs commands.register\n  needs reply.local\n  on command "teamrotation":\n    input "names" text\n    input "shift" text\n    reply "${teamRotation(names, shift)}" else "Enter one name per line and a whole-number rotation."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/tempo-loop-length.cx
+  var tempo_loop_length_default;
+  var init_tempo_loop_length = __esm({
+    "../examples/cx/catalog/plugins/tempo-loop-length.cx"() {
+      tempo_loop_length_default = 'plugin "Tempo Loop Length":\n  needs commands.register\n  needs reply.local\n  on command "tempoloop":\n    input "bpm" text\n    input "bars" text\n    input "beats" text\n    reply "${tempoLoopLength(bpm, bars, beats)}" else "Enter a tempo from 20 to 400 BPM, bars, and beats per bar."\n';
     }
   });
 
@@ -54723,6 +55784,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/typography-scale.cx
+  var typography_scale_default;
+  var init_typography_scale = __esm({
+    "../examples/cx/catalog/plugins/typography-scale.cx"() {
+      typography_scale_default = 'plugin "Typography Scale":\n  needs commands.register\n  needs reply.local\n  on command "typescale":\n    input "base" text\n    input "ratio" text\n    input "steps" text\n    reply "${typographyScale(base, ratio, steps)}" else "Enter a base size, a ratio from 1 to 3, and 1 to 12 sizes."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/unicode-from-code-points.cx
   var unicode_from_code_points_default;
   var init_unicode_from_code_points = __esm({
@@ -54760,6 +55829,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_unit_converter = __esm({
     "../examples/cx/catalog/plugins/unit-converter.cx"() {
       unit_converter_default = 'plugin "UnitConverter":\n  needs commands.register\n  needs messages.send\n  needs reply.local\n  on command "convert" with text:\n    reply or send "${convert(text)}" else "Try something like 5 km, 70 F or 2 lb."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/unit-price-comparison.cx
+  var unit_price_comparison_default;
+  var init_unit_price_comparison = __esm({
+    "../examples/cx/catalog/plugins/unit-price-comparison.cx"() {
+      unit_price_comparison_default = 'plugin "Unit Price Comparison":\n  needs commands.register\n  needs reply.local\n  on command "unitprice":\n    input "first" text\n    input "second" text\n    reply "${unitPriceComparison(first, second)}" else "Enter each offer as price / quantity, using the same currency and unit."\n';
     }
   });
 
@@ -54977,6 +56054,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_webcam_start_notifier = __esm({
     "../examples/cx/catalog/plugins/webcam-start-notifier.cx"() {
       webcam_start_notifier_default = 'plugin "WebcamStartNotifier":\n  needs voice.cameratone\n  use webcam-start-notifier\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/weekday-count.cx
+  var weekday_count_default;
+  var init_weekday_count = __esm({
+    "../examples/cx/catalog/plugins/weekday-count.cx"() {
+      weekday_count_default = 'plugin "Weekday Count":\n  needs commands.register\n  needs reply.local\n  on command "weekdaycount":\n    input "start" text\n    input "end" text\n    reply "${weekdayCount(start, end)}" else "Enter an ordered start and end date in YYYY-MM-DD format."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/weighted-average.cx
+  var weighted_average_default;
+  var init_weighted_average = __esm({
+    "../examples/cx/catalog/plugins/weighted-average.cx"() {
+      weighted_average_default = 'plugin "Weighted Average":\n  needs commands.register\n  needs reply.local\n  on command "weightedaverage" with text:\n    reply "${weightedAverage(text)}" else "Enter one value | weight pair per line, with at least one positive weight."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/whitespace-report.cx
+  var whitespace_report_default;
+  var init_whitespace_report = __esm({
+    "../examples/cx/catalog/plugins/whitespace-report.cx"() {
+      whitespace_report_default = 'plugin "Whitespace Report":\n  needs commands.register\n  needs reply.local\n  on command "whitespacereport" with text:\n    reply "${whitespaceReport(text)}" else "Paste text to inspect."\n';
     }
   });
 
@@ -55878,14 +56979,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_character_counter2();
       init_agenda_draft();
       init_all_call_time_counter();
+      init_alt_text_draft();
       init_always_animate();
       init_amoled_mode();
       init_anonymise_file_names();
+      init_arithmetic_sequence();
       init_aspect_ratio();
       init_at_someone();
+      init_audio_pitch_ratio();
+      init_audio_sample_count();
       init_auto_vaporwave();
       init_avatar_grabber();
       init_balanced_groups();
+      init_base_converter();
       init_better_chat_names();
       init_better_gif_alt_text();
       init_better_plus_reacts();
@@ -55894,6 +57000,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_bigger_code_blocks();
       init_bigger_jumbo_emojis();
       init_bigger_server_icons();
+      init_bitmap_memory();
       init_bitrate_budget();
       init_block_keywords();
       init_blur_images_until_hover();
@@ -55904,6 +57011,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_bypass_pin_prompt();
       init_calculator();
       init_calendar_day_difference();
+      init_calendar_quarter();
       init_call_time_counter();
       init_centered_chat();
       init_chat_buttons_begone();
@@ -55928,6 +57036,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_compact_server_list();
       init_compare_csv_cells();
       init_compare_lines();
+      init_compression_budget();
       init_copy_account_creation_timestamp();
       init_copy_attachment_links();
       init_copy_attachment_names();
@@ -55964,12 +57073,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_user_urls();
       init_count_lines();
       init_count_text_matches();
+      init_csv_column_frequency();
       init_csv_column();
+      init_csv_row_filter();
+      init_csv_shape();
+      init_csv_to_json();
       init_csv_to_markdown();
       init_csv_to_tsv();
       init_custom_emoji_markup();
       init_custom_timestamps();
       init_dashless();
+      init_date_day_label();
       init_date_offset();
       init_days_between();
       init_decision_draft();
@@ -55983,6 +57097,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_discord_countdown();
       init_discord_link_details();
       init_discord_timestamp();
+      init_display_pixel_density();
       init_dont_round_my_timestamps();
       init_double_click_edit();
       init_double_click_to_reply();
@@ -55993,6 +57108,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
       init_escape_regex();
+      init_event_overlap();
       init_event_window();
       init_expand_tabs();
       init_extract_line_range();
@@ -56020,6 +57136,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_gamzee_s_typing_quirk();
       init_google_that();
       init_grayscale_images();
+      init_grid_cell_size();
+      init_hex_byte_format();
+      init_hex_text_decode();
       init_hide_active_channel_cards();
       init_hide_active_now();
       init_hide_activity_cards();
@@ -56233,10 +57352,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hop_on();
       init_hover_highlight_messages();
       init_hsl_color_converter();
+      init_html_escape_draft();
       init_html_escape();
       init_ignore_calls();
       init_image_filename();
       init_image_link();
+      init_image_megapixels();
       init_image_pixel_count();
       init_image_print_size();
       init_improve_contrast();
@@ -56244,21 +57365,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_indent_lines();
       init_ingtoninator();
       init_inspect_discord_timestamp();
+      init_isbn_check();
       init_iso_week();
       init_join_lines();
+      init_json_array_filter();
       init_json_check();
       init_json_compact();
       init_json_format();
       init_json_keys();
       init_json_pointer();
+      init_json_value_shape();
       init_jump_to_top();
       init_jump_to();
       init_keyword_notify();
       init_larger_chat_text();
       init_leet_text();
+      init_line_length_report();
       init_lines_to_csv();
+      init_lines_to_spoilers();
       init_link_converter();
       init_local_channel_notes();
+      init_map_scale_distance();
       init_markdown_checklist();
       init_markdown_escape();
       init_markdown_outline();
@@ -56269,6 +57396,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_message_latency();
       init_message_notifier();
       init_monospace_chat();
+      init_month_calendar();
       init_more_commands();
       init_more_jumbo_emoji();
       init_mute_in_app_message_sounds();
@@ -56301,30 +57429,42 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_number_lines();
       init_number_summary();
       init_opacity_contrast();
+      init_open_checklist_items();
       init_open_steam_links_in_app();
       init_ordered_line_diff();
+      init_packing_capacity();
+      init_page_range_count();
+      init_pair_lines();
       init_pcm_audio_size();
       init_percentage_change();
+      init_percentage_points();
       init_pick_names();
       init_ping_notifications();
       init_plain_folder_icon();
       init_playback_duration();
+      init_playlist_duration();
       init_polish_wording();
       init_poll_draft();
+      init_prime_factors();
       init_profile_media();
       init_quick_mention();
       init_quote_draft();
       init_quote_message();
+      init_quote_with_attribution();
       init_read_all_notifications_button();
       init_read_all_notifications();
       init_readable_chat_timestamps();
       init_readable_ink();
       init_readable_line_length();
       init_readable_spoilers();
+      init_reading_time();
       init_realtime_timestamps();
+      init_recipe_scaler();
       init_recurring_timestamps();
       init_redact_email_addresses();
+      init_reduce_fraction();
       init_relationship_notifier();
+      init_release_notes_outline();
       init_remove_blank_lines();
       init_repeat_messages();
       init_reply_ping_control();
@@ -56334,12 +57474,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_reverse_image_search();
       init_reverse_line_order();
       init_reverse_text();
+      init_roman_numerals();
       init_rot13_text();
+      init_round_robin_count();
       init_round_server_icons();
       init_rounded_avatars_square();
       init_rounded_chat_bar();
       init_rounded_images();
       init_running_pace();
+      init_safe_area_inset();
       init_scheduled_messages();
       init_screen_share_alert();
       init_scroll_to_latest();
@@ -56365,6 +57508,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_sort_reactions();
       init_space_out();
       init_spacious_messages();
+      init_split_bill_evenly();
       init_split_large_messages();
       init_split_points();
       init_spotify_share_commands();
@@ -56376,6 +57520,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_strip_url_tracking();
       init_surround_lines();
       init_talk_in_reverse();
+      init_team_rotation();
+      init_tempo_loop_length();
       init_terezi_typing_quirk();
       init_test_result_summary();
       init_text_replace();
@@ -56394,11 +57540,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_truncate_text();
       init_tsv_to_csv();
       init_tsv_to_markdown();
+      init_typography_scale();
       init_unicode_from_code_points();
       init_unicode_inspector();
       init_unindent();
       init_unique_lines();
       init_unit_converter();
+      init_unit_price_comparison();
       init_unix_date_converter();
       init_unlocked_avatar_zoom();
       init_unsuppress_embeds();
@@ -56421,6 +57569,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_vriska_s_typing_quirk();
       init_wait_for_slot();
       init_webcam_start_notifier();
+      init_weekday_count();
+      init_weighted_average();
+      init_whitespace_report();
       init_wider_channel_list();
       init_wider_chat();
       init_wiki_lookup();
@@ -56568,6 +57719,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Alt Text Draft",
+            source: alt_text_draft_default,
+            description: "/alttextdraft",
+            commands: [
+              "alttextdraft"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "b2bb0ed808c71a80754975bdc61c48cace2a844dcff0d56bc50ee800c17c8e3f",
+            privateCommands: true
+          },
+          {
             name: "AlwaysAnimate",
             source: always_animate_default,
             description: "Animate avatars, banners, and server icons",
@@ -56598,6 +57762,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Arithmetic Sequence",
+            source: arithmetic_sequence_default,
+            description: "/arithmeticsequence",
+            commands: [
+              "arithmeticsequence"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fa4da91dd2b07fdcef4e8d7eedb9a5d45cce8b0f93e517bd345aac0657c91395",
+            privateCommands: true
+          },
+          {
             name: "Aspect Ratio",
             source: aspect_ratio_default,
             description: "/aspectratio",
@@ -56622,6 +57799,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands",
               "Servers & channels"
             ]
+          },
+          {
+            name: "Audio Pitch Ratio",
+            source: audio_pitch_ratio_default,
+            description: "/pitchratio",
+            commands: [
+              "pitchratio"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "cf5ea22edfe68b967f60293a188c23e299462cba7853e0dcbaff867132df2515",
+            privateCommands: true
+          },
+          {
+            name: "Audio Sample Count",
+            source: audio_sample_count_default,
+            description: "/audiosamples",
+            commands: [
+              "audiosamples"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "98566f584c63aa95ce7203c01f2407e97b96a6413847c72ea8dbfb2577823925",
+            privateCommands: true
           },
           {
             name: "AutoVaporwave",
@@ -56656,6 +57859,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "9f44d571612fa60f9dfcfedb1cb7ec791b3c58422f07e9f2c7fa260477f74f6e",
+            privateCommands: true
+          },
+          {
+            name: "Base Converter",
+            source: base_converter_default,
+            description: "/baseconvert",
+            commands: [
+              "baseconvert"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "a86bb46287cfaf9ccb697d27fc405323e720ade010c3ec4e55ffdac093544cd9",
             privateCommands: true
           },
           {
@@ -56727,6 +57943,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "f8130f30395716696cf844097fad053f7be44394cbf888bc1188bdd1e30e2432"
+          },
+          {
+            name: "Bitmap Memory",
+            source: bitmap_memory_default,
+            description: "/bitmapmemory",
+            commands: [
+              "bitmapmemory"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "05b8e6431b3129e5c05b790b7fb6e8deb479a07d9f093f3d9b3ff1ad29c20649",
+            privateCommands: true
           },
           {
             name: "Bitrate Budget",
@@ -56832,6 +58061,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "1d1617b39231f10b323258cd7c4f39b4cd228d360e1b93a8adb3f11a9aeba72a",
+            privateCommands: true
+          },
+          {
+            name: "Calendar Quarter",
+            source: calendar_quarter_default,
+            description: "/calendarquarter",
+            commands: [
+              "calendarquarter"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "51e7105cde632148954c137bffae029b7a77b06b9eb2b213c7a248d89c8d4e22",
             privateCommands: true
           },
           {
@@ -57086,6 +58328,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20",
+            privateCommands: true
+          },
+          {
+            name: "Compression Budget",
+            source: compression_budget_default,
+            description: "/compressionbudget",
+            commands: [
+              "compressionbudget"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "7929cb38329f8f1f16829748642f7f47e94ab91d0c4eb45fd67d0187e7944dea",
             privateCommands: true
           },
           {
@@ -57391,6 +58646,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "CSV Column Frequency",
+            source: csv_column_frequency_default,
+            description: "/csvcolumnfrequency",
+            commands: [
+              "csvcolumnfrequency"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c27f3287e9f52371685be868c70ee452199cfde15c3266254adee23e64c7f6b4",
+            privateCommands: true
+          },
+          {
             name: "CSV Column",
             source: csv_column_default,
             description: "/csvcolumn",
@@ -57401,6 +58669,45 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5",
+            privateCommands: true
+          },
+          {
+            name: "CSV Row Filter",
+            source: csv_row_filter_default,
+            description: "/csvrowfilter",
+            commands: [
+              "csvrowfilter"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "f9963d7680c4364783bf134b2436efc4076542c8f3b1f285de94546daab498dd",
+            privateCommands: true
+          },
+          {
+            name: "CSV Shape",
+            source: csv_shape_default,
+            description: "/csvshape",
+            commands: [
+              "csvshape"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "9326380cd4bd8b906ede27fb9076e19a15a6150386f9a809b7c6ee5a708a950c",
+            privateCommands: true
+          },
+          {
+            name: "CSV to JSON",
+            source: csv_to_json_default,
+            description: "/csvtojson",
+            commands: [
+              "csvtojson"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "f1cdab86c46e9a8cba0371a99bf021d6972d7c10a866f6a77836263fc387c641",
             privateCommands: true
           },
           {
@@ -57460,6 +58767,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9"
+          },
+          {
+            name: "Date Day Label",
+            source: date_day_label_default,
+            description: "/datedaylabel",
+            commands: [
+              "datedaylabel"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "3c0e24b463492804464f98f1613389edd6ef4ce3476669522a8fa851c09a5baa",
+            privateCommands: true
           },
           {
             name: "Date Offset",
@@ -57609,6 +58929,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Display Pixel Density",
+            source: display_pixel_density_default,
+            description: "/displayppi",
+            commands: [
+              "displayppi"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "f1c1bb48efce453dff3ecf55a8964a3d4fc3d6a93b1303fb0afb4ec4259d062e",
+            privateCommands: true
+          },
+          {
             name: "DontRoundMyTimestamps",
             source: dont_round_my_timestamps_default,
             description: "Round relative timestamps down",
@@ -57708,6 +59041,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "39717d3c4cc4cc1ea826a8f705b930d7da3d660558a0cf6f14be118000576a29",
+            privateCommands: true
+          },
+          {
+            name: "Event Overlap",
+            source: event_overlap_default,
+            description: "/eventoverlap",
+            commands: [
+              "eventoverlap"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "1c953cc8b0404cbc9f4a4748c3af4a0d1a0811dc82813905b1d668ca78ec2df2",
             privateCommands: true
           },
           {
@@ -58004,6 +59350,45 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Grid Cell Size",
+            source: grid_cell_size_default,
+            description: "/gridcellsize",
+            commands: [
+              "gridcellsize"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "0ba38c38428719dd43760d96c07ebcf533612d0814a467e5e8d4e1fc74449c45",
+            privateCommands: true
+          },
+          {
+            name: "Hex Byte Format",
+            source: hex_byte_format_default,
+            description: "/hexbyteformat",
+            commands: [
+              "hexbyteformat"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "0e27ee1005e2ea23fa7ac641f3e0321c6b3b534cdbc05113f3421e605adb4d2d",
+            privateCommands: true
+          },
+          {
+            name: "Hex Text Decode",
+            source: hex_text_decode_default,
+            description: "/hextext",
+            commands: [
+              "hextext"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "5384f1f17c906917047b86f3a7980f8df63ba3e13ba64f1ddef604ce677b7a7d",
+            privateCommands: true
           },
           {
             name: "HideActiveChannelCards",
@@ -60055,6 +61440,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "HTML Escape Draft",
+            source: html_escape_draft_default,
+            description: "/htmlescape",
+            commands: [
+              "htmlescape"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "9ed4320d3490a9e33786fe97094103fb7a2935e07afc5e83f05ddcb88e6fd7f5",
+            privateCommands: true
+          },
+          {
             name: "HTML Escape",
             source: html_escape_default,
             description: "/escapehtml",
@@ -60090,6 +61488,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Media"
             ]
+          },
+          {
+            name: "Image Megapixels",
+            source: image_megapixels_default,
+            description: "/megapixels",
+            commands: [
+              "megapixels"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "659fdf0e697a7493a367ea98459b53cb071642fc13e502b17249426c2757a9cc",
+            privateCommands: true
           },
           {
             name: "Image Pixel Count",
@@ -60177,6 +61588,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "ISBN Check",
+            source: isbn_check_default,
+            description: "/isbncheck",
+            commands: [
+              "isbncheck"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "d8e4aa3354ed4cfcb1659e6d31a09cf58bcc603f599ae02b4255e8f424ae21de",
+            privateCommands: true
+          },
+          {
             name: "ISO Week",
             source: iso_week_default,
             description: "/isoweek",
@@ -60200,6 +61624,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "7fe09a418a6341397253829916ab3fc523ae42d483a0c37a00c032d48430f135",
+            privateCommands: true
+          },
+          {
+            name: "JSON Array Filter",
+            source: json_array_filter_default,
+            description: "/jsonarrayfilter",
+            commands: [
+              "jsonarrayfilter"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "855d51bc34364a8e9ebc193dcad9626b0273472725cf6075ed97d1d55777339d",
             privateCommands: true
           },
           {
@@ -60268,6 +61705,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "JSON Value Shape",
+            source: json_value_shape_default,
+            description: "/jsonvalueshape",
+            commands: [
+              "jsonvalueshape"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c13fec4573fdfec223f4c3523a89a14ebebf65349d94d3241c2e3a3a1c5210ed",
+            privateCommands: true
+          },
+          {
             name: "JumpToTop",
             source: jump_to_top_default,
             description: "Add a channel header button to jump to the first message",
@@ -60313,6 +61763,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Line Length Report",
+            source: line_length_report_default,
+            description: "/linelengths",
+            commands: [
+              "linelengths"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "985966d0ffaf46b547ffb9e100ec98e5d229a7eeca96a811d5d846f3f1b0c684",
+            privateCommands: true
+          },
+          {
             name: "Lines to CSV",
             source: lines_to_csv_default,
             description: "/linestocsv",
@@ -60323,6 +61786,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "3544e3d0cff90a35a71d6453fb16294daeff812e5daef57c7132b74666db017f",
+            privateCommands: true
+          },
+          {
+            name: "Lines to Spoilers",
+            source: lines_to_spoilers_default,
+            description: "/spoilerlines",
+            commands: [
+              "spoilerlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "635fabbfdce045d1ca532ff5deb0eb2038595552c2ce91385186e6b93809b72f",
             privateCommands: true
           },
           {
@@ -60342,6 +61818,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Servers & channels"
             ]
+          },
+          {
+            name: "Map Scale Distance",
+            source: map_scale_distance_default,
+            description: "/mapdistance",
+            commands: [
+              "mapdistance"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "24f6fe380ef56f4b4077a1c681d6445395173deaa122a68a2523fc5a2e78eac4",
+            privateCommands: true
           },
           {
             name: "Markdown Checklist",
@@ -60453,6 +61942,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Month Calendar",
+            source: month_calendar_default,
+            description: "/monthcalendar",
+            commands: [
+              "monthcalendar"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "57ae876ca6f8e6840e9232092b6961e6555bf2e6c66d9b5684e549f4d4ff35b0",
+            privateCommands: true
           },
           {
             name: "MoreCommands",
@@ -60792,6 +62294,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Open Checklist Items",
+            source: open_checklist_items_default,
+            description: "/openchecklist",
+            commands: [
+              "openchecklist"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "2e98774f3cdbe167036cfa98b80466f9f3fea9c2fe0344d1a9b8658a7348ab56",
+            privateCommands: true
+          },
+          {
             name: "OpenSteamLinksInApp",
             source: open_steam_links_in_app_default,
             description: "Send clicked Steam links to the Steam app",
@@ -60810,6 +62325,45 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302",
+            privateCommands: true
+          },
+          {
+            name: "Packing Capacity",
+            source: packing_capacity_default,
+            description: "/packingcapacity",
+            commands: [
+              "packingcapacity"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fdbde452743a5c27233f3c8f8a445cd11a8865af18434871ae21a3a308c4abd8",
+            privateCommands: true
+          },
+          {
+            name: "Page Range Count",
+            source: page_range_count_default,
+            description: "/pagerangecount",
+            commands: [
+              "pagerangecount"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "4f83ce973c55b353110e1ec7f1c7b87103a541920552cd24d0a168a202a81c6a",
+            privateCommands: true
+          },
+          {
+            name: "Pair Lines",
+            source: pair_lines_default,
+            description: "/pairlines",
+            commands: [
+              "pairlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "40f28e15b209c77a8da7265ab50dbbdfde576b0f9010dcf486bc337e1a740c3d",
             privateCommands: true
           },
           {
@@ -60836,6 +62390,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e",
+            privateCommands: true
+          },
+          {
+            name: "Percentage Points",
+            source: percentage_points_default,
+            description: "/percentagepoints",
+            commands: [
+              "percentagepoints"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "de7fa51e6cd08ce265f204cbe1872757641f76d80490deff8a25c87743c58880",
             privateCommands: true
           },
           {
@@ -60882,6 +62449,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Playlist Duration",
+            source: playlist_duration_default,
+            description: "/playlistduration",
+            commands: [
+              "playlistduration"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "938888c7440feeaa4c722e9cc01c9f4e035942d3739e92433fd20166221667d5",
+            privateCommands: true
+          },
+          {
             name: "PolishWording",
             source: polish_wording_default,
             description: "Change text before Discord sends messages you compose",
@@ -60900,6 +62480,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "e38274bea9f8c72f38a95b05ec57685bd1ef014a0388dca663e6694c6d1df879",
+            privateCommands: true
+          },
+          {
+            name: "Prime Factors",
+            source: prime_factors_default,
+            description: "/primefactors",
+            commands: [
+              "primefactors"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "d101d2d5f87470318d9b14bb20d4a80c828ec24b89099e2b8f6e885f9c3b29fb",
             privateCommands: true
           },
           {
@@ -60939,6 +62532,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Quote with Attribution",
+            source: quote_with_attribution_default,
+            description: "/attributedquote",
+            commands: [
+              "attributedquote"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "2daac56fca237009adf6adeb4377edb3280158e997df29c251c5bc810a0a34c1",
+            privateCommands: true
           },
           {
             name: "ReadAllNotificationsButton",
@@ -61001,6 +62607,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "47032e939cf4992d24d2cebdf4ffb7e2d8afe49fffa2dcba7d9a08921cf75853"
           },
           {
+            name: "Reading Time",
+            source: reading_time_default,
+            description: "/readingtime",
+            commands: [
+              "readingtime"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fcd20f99564c039202a2eec246997f6293cbfae8942a83aa280f551a77f9026e",
+            privateCommands: true
+          },
+          {
             name: "RealtimeTimestamps",
             source: realtime_timestamps_default,
             description: "Format cozy timestamps as HH:mm:ss",
@@ -61009,6 +62628,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "f1714e6be55c954394bb91974ab838b366e4cc70f0428848bfcef46a51aca753"
+          },
+          {
+            name: "Recipe Scaler",
+            source: recipe_scaler_default,
+            description: "/recipescale",
+            commands: [
+              "recipescale"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "dd56ec5ed266d228b4f313efa1e9f46f6a8d8eb43913691e6fa66738d29989fd",
+            privateCommands: true
           },
           {
             name: "Recurring Timestamps",
@@ -61037,12 +62669,38 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Reduce Fraction",
+            source: reduce_fraction_default,
+            description: "/reducefraction",
+            commands: [
+              "reducefraction"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "839caef680eaa738fcc30c87a62387d477c9fb0a05ebcb00ab8b3091cac0c9d0",
+            privateCommands: true
+          },
+          {
             name: "RelationshipNotifier",
             source: relationship_notifier_default,
             description: "Show a local notification when a friend removes you",
             categories: [
               "Profiles"
             ]
+          },
+          {
+            name: "Release Notes Outline",
+            source: release_notes_outline_default,
+            description: "/releaseoutline",
+            commands: [
+              "releaseoutline"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fb7857d2a5b2a275a0a4ec372da75709ebbce65688c00cd09e094df67c7cf572",
+            privateCommands: true
           },
           {
             name: "Remove Blank Lines",
@@ -61137,6 +62795,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Roman Numerals",
+            source: roman_numerals_default,
+            description: "/romannumerals",
+            commands: [
+              "romannumerals"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "a4f08d71ba50414553e1c7b65b74049a1553e61ba6547d37c0495ff8bf379f31",
+            privateCommands: true
+          },
+          {
             name: "ROT13 Text",
             source: rot13_text_default,
             description: "/rot13text",
@@ -61147,6 +62818,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "1a6cf1874ecf898df5517cccde97da90526624064f8515b8245c09926ff8f296",
+            privateCommands: true
+          },
+          {
+            name: "Round Robin Count",
+            source: round_robin_count_default,
+            description: "/roundrobincount",
+            commands: [
+              "roundrobincount"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "24830953a4ef4d3d7935e8077c45b01c5cc031fd0a708f18d005dc6799d8ddb3",
             privateCommands: true
           },
           {
@@ -61196,6 +62880,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "b794b4fdbe1057c769279550e44e090065bf29cafc0deb63f6751c33d2e0591c",
+            privateCommands: true
+          },
+          {
+            name: "Safe Area Inset",
+            source: safe_area_inset_default,
+            description: "/safeareainset",
+            commands: [
+              "safeareainset"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "56cad9c71cfdc44c3e7872835fdbfa8e95fa5810627427794fc2b87080f7f7bf",
             privateCommands: true
           },
           {
@@ -61445,6 +63142,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Split Bill Evenly",
+            source: split_bill_evenly_default,
+            description: "/splitbill",
+            commands: [
+              "splitbill"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "ed4474280cde22f07cc8d14355aadfc9c6706c81fba5188e5ee982f56f25fc32",
+            privateCommands: true
+          },
+          {
             name: "SplitLargeMessages",
             source: split_large_messages_default,
             description: "Split long drafts into at most eight messages when slowmode is off",
@@ -61559,6 +63269,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Team Rotation",
+            source: team_rotation_default,
+            description: "/teamrotation",
+            commands: [
+              "teamrotation"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "3b5fd019108f8051571ad7a83b2807a51819cad9eee39f45c8ea1e881ce96b3d",
+            privateCommands: true
+          },
+          {
+            name: "Tempo Loop Length",
+            source: tempo_loop_length_default,
+            description: "/tempoloop",
+            commands: [
+              "tempoloop"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fd77b878ef4203e7111a5ff0843ff1e8e7e0f01dde85984a3e380291087b0be0",
+            privateCommands: true
           },
           {
             name: "TereziTypingQuirk",
@@ -61772,6 +63508,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Typography Scale",
+            source: typography_scale_default,
+            description: "/typescale",
+            commands: [
+              "typescale"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "4ecca44f20e8e3095ea5f0a618c7f2d95870889a2289632e963c4617fdf12c17",
+            privateCommands: true
+          },
+          {
             name: "Unicode From Code Points",
             source: unicode_from_code_points_default,
             description: "/unicodefrompoints",
@@ -61829,6 +63578,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Chat",
               "Commands"
             ]
+          },
+          {
+            name: "Unit Price Comparison",
+            source: unit_price_comparison_default,
+            description: "/unitprice",
+            commands: [
+              "unitprice"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "93f9835058f6ce3a8831d1ea058d76e11b8e486e999040a1e190c2b8c4847fa6",
+            privateCommands: true
           },
           {
             name: "Unix Date Converter",
@@ -62060,6 +63822,45 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Voice & calls"
             ]
+          },
+          {
+            name: "Weekday Count",
+            source: weekday_count_default,
+            description: "/weekdaycount",
+            commands: [
+              "weekdaycount"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "5c87b6a22ec4da3b23a241b88771d67074316e2413234605fbede5d7b6ea3d10",
+            privateCommands: true
+          },
+          {
+            name: "Weighted Average",
+            source: weighted_average_default,
+            description: "/weightedaverage",
+            commands: [
+              "weightedaverage"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c66c97d0fb371bb9b17e6d37dd8206dad539278b2ed264477ba3f646dc12d74f",
+            privateCommands: true
+          },
+          {
+            name: "Whitespace Report",
+            source: whitespace_report_default,
+            description: "/whitespacereport",
+            commands: [
+              "whitespacereport"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c243bc446217a68d2fd1ef55399398e1032d4c3d1e7cbe114f973af79d9aa8ef",
+            privateCommands: true
           },
           {
             name: "WiderChannelList",
@@ -67982,12 +69783,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var styles2 = useStyles3();
     return /* @__PURE__ */ jsx(Card, {
       children: /* @__PURE__ */ jsxs(Stack, {
-        spacing: 16,
+        spacing: 6,
         children: [
           /* @__PURE__ */ jsxs(import_react_native34.View, {
             style: {
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              gap: 8
             },
             children: [
               /* @__PURE__ */ jsxs(import_react_native34.View, {
@@ -68004,12 +69806,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 ]
               }),
               /* @__PURE__ */ jsxs(import_react_native34.View, {
-                style: [
-                  styles2.headerTrailing,
-                  {
-                    marginLeft: "auto"
-                  }
-                ],
+                style: styles2.headerTrailing,
                 children: [
                   /* @__PURE__ */ jsxs(import_react_native34.View, {
                     style: styles2.actions,
@@ -68036,19 +69833,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                         variant: "secondary",
                         icon: findAssetId("CircleInformationIcon-primary")
                       }),
-                      props.actions?.map(({ icon: icon3, onPress, disabled }) => /* @__PURE__ */ jsx(IconButton, {
+                      props.actions?.map(({ icon: icon3, onPress, disabled, accessibilityLabel }, index) => /* @__PURE__ */ jsx(IconButton, {
                         onPress,
                         disabled,
+                        accessibilityLabel,
                         size: "sm",
                         variant: "secondary",
                         icon: findAssetId(icon3)
-                      }))
+                      }, icon3 + index))
                     ]
                   }),
                   props.toggleType && (props.toggleType === "switch" ? /* @__PURE__ */ jsx(FormSwitch, {
                     value: props.toggleValue(),
+                    accessibilityLabel: props.headerLabel,
                     onValueChange: props.onToggleChange
                   }) : /* @__PURE__ */ jsx(import_react_native34.TouchableOpacity, {
+                    accessibilityRole: "radio",
+                    accessibilityLabel: props.headerLabel,
+                    accessibilityState: {
+                      checked: props.toggleValue()
+                    },
                     onPress: () => {
                       props.onToggleChange?.(!props.toggleValue());
                     },
@@ -68060,8 +69864,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               })
             ]
           }),
+          props.preview,
           props.descriptionLabel && /* @__PURE__ */ jsx(Text, {
-            variant: "text-md/medium",
+            variant: "text-sm/medium",
+            color: "text-muted",
             children: props.descriptionLabel
           })
         ]
@@ -68085,53 +69891,29 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ({ hideActionSheet: hideActionSheet2 } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet")));
       ({ showSimpleActionSheet: showSimpleActionSheet3 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
       useStyles3 = createStyles({
-        card: {
-          backgroundColor: semanticColors?.CARD_SECONDARY_BG,
-          borderRadius: 12,
-          overflow: "hidden"
-        },
-        header: {
-          padding: 0
-        },
         headerLeading: {
           flex: 1,
-          flexDirection: "column",
-          justifyContent: "center",
-          scale: 1.2
+          minWidth: 0,
+          gap: 2
         },
         headerTrailing: {
-          display: "flex",
           flexDirection: "row",
-          gap: 15,
+          flexShrink: 0,
+          gap: 8,
           alignItems: "center"
         },
         headerLabel: {
-          ...TextStyleSheet["heading-lg/semibold"]
-        },
-        headerLabelCompact: {
-          ...TextStyleSheet["text-md/semibold"]
+          ...TextStyleSheet["heading-md/semibold"],
+          color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY
         },
         headerSubtitle: {
-          ...TextStyleSheet["text-sm/semibold"],
+          ...TextStyleSheet["text-sm/medium"],
           color: semanticColors.TEXT_MUTED
-        },
-        descriptionLabel: {
-          ...TextStyleSheet["text-md/semibold"],
-          color: "text-strong"
         },
         actions: {
           flexDirection: "row-reverse",
           alignItems: "center",
           gap: 5
-        },
-        iconStyle: {
-          tintColor: semanticColors.LOGO_PRIMARY,
-          opacity: 0.2,
-          height: 64,
-          width: 64,
-          left: void 0,
-          right: "30%",
-          top: "-10%"
         }
       });
     }
@@ -69599,14 +71381,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function useAddonReview(kind, entry) {
     var navigation2 = NavigationNative.useNavigation();
     var title = entry?.name ?? `Import ${kind}`;
-    return wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+    return React2.useMemo(() => wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
       return {
         default: () => /* @__PURE__ */ jsx(CxExtensions, {
           kind,
           entry
         })
       };
-    })(), title, void 0, "push");
+    })(), title, void 0, "push"), [
+      navigation2,
+      title,
+      kind,
+      entry
+    ]);
   }
   function AddonActions({ kind }) {
     var navigation2 = NavigationNative.useNavigation();
@@ -69646,18 +71433,58 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   }
   function CxAddonCard({ kind, entry }) {
     var review = useAddonReview(kind, entry);
+    var palette2 = React2.useMemo(() => {
+      if (kind !== "theme")
+        return [];
+      try {
+        var theme = parseCx(entry.source);
+        if (theme.kind !== "theme")
+          return [];
+        return [
+          .../* @__PURE__ */ new Set([
+            theme.sidebar,
+            theme.background,
+            theme.surface,
+            theme.accent,
+            theme.text
+          ])
+        ].filter((color) => Boolean(color));
+      } catch (e) {
+        return [];
+      }
+    }, [
+      kind,
+      entry.source
+    ]);
     return /* @__PURE__ */ jsx(AddonCard, {
       headerLabel: entry.name,
       descriptionLabel: entry.description,
+      preview: palette2.length > 0 ? /* @__PURE__ */ jsx(import_react_native39.View, {
+        accessible: true,
+        accessibilityLabel: `Theme colors: ${palette2.join(", ")}`,
+        style: {
+          flexDirection: "row",
+          height: 18,
+          overflow: "hidden",
+          borderRadius: 5
+        },
+        children: palette2.map((color) => /* @__PURE__ */ jsx(import_react_native39.View, {
+          style: {
+            flex: 1,
+            backgroundColor: color
+          }
+        }, color))
+      }) : void 0,
       headerSublabel: entry.restoreFailed ? "Couldn\u2019t start automatically" : entry.needsReview ? "Review update to enable" : void 0,
       toggleType: kind === "theme" ? "radio" : "switch",
       toggleValue: () => entry.active,
-      actions: entry.active || entry.needsReview ? [
+      actions: [
         {
-          icon: "SettingsIcon",
+          icon: entry.active ? "SettingsIcon" : "CircleInformationIcon-primary",
+          accessibilityLabel: entry.active ? `Configure ${entry.name}` : `Review ${entry.name}`,
           onPress: review
         }
-      ] : void 0,
+      ],
       onToggleChange: (enabled) => {
         if (enabled)
           return review();
@@ -69678,6 +71505,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_async_to_generator();
       init_jsxRuntime();
       init_AddonCard();
+      init_cx();
       init_loader();
       init_shared();
       init_toasts();
@@ -70896,6 +72724,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var themeName = (theme) => "source" in theme ? theme.name : theme.data.name;
     return /* @__PURE__ */ jsx(AddonPage, {
       title: Strings.THEMES,
+      getItemKey: (theme) => "source" in theme ? "cx:" + theme.name : "native:" + theme.id,
       isEnabled: (theme) => "source" in theme ? theme.active : !activeCxTheme && theme.selected,
       searchKeywords: [
         themeName,
@@ -71150,6 +72979,72 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/core/ui/settings/pages/Tools/index.tsx
+  var Tools_exports = {};
+  __export(Tools_exports, {
+    default: () => Tools
+  });
+  function Tools() {
+    var hidden = useProxy(settings).cloudcordHiddenTabs ?? [];
+    var navigation2 = NavigationNative.useNavigation();
+    var actions = React2.useMemo(() => ({
+      previews: wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+        return {
+          default: (yield Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))).PreviewsPage
+        };
+      })(), "Previews", void 0, "push"),
+      account: wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+        return {
+          default: (yield Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))).AccountToolsPage
+        };
+      })(), "Account Tools", void 0, "push")
+    }), [
+      navigation2
+    ]);
+    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
+      contentContainerStyle: {
+        paddingBottom: 38
+      },
+      children: /* @__PURE__ */ jsx(Stack, {
+        style: {
+          paddingVertical: 24,
+          paddingHorizontal: 12
+        },
+        children: /* @__PURE__ */ jsxs(TableRowGroup, {
+          title: "Tools",
+          children: [
+            !hidden.includes("CLOUDCORD_PREVIEWS") && /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Previews",
+              onPress: actions.previews
+            }),
+            !hidden.includes("CLOUDCORD_ACCOUNT_TOOLS") && /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: "Account Tools",
+              onPress: actions.account
+            })
+          ]
+        })
+      })
+    });
+  }
+  var import_react_native47;
+  var init_Tools = __esm({
+    "src/core/ui/settings/pages/Tools/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_storage();
+      init_settings();
+      init_shared();
+      init_common();
+      init_components();
+      import_react_native47 = __toESM(require_react_native());
+    }
+  });
+
   // src/core/ui/settings/pages/TestingPlugins/index.tsx
   var TestingPlugins_exports = {};
   __export(TestingPlugins_exports, {
@@ -71213,7 +73108,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         })
       ]
     });
-    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16,
@@ -71262,7 +73157,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 ]
               }),
               field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native47.View, {
+              /* @__PURE__ */ jsxs(import_react_native48.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -71292,7 +73187,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native47.View, {
+              /* @__PURE__ */ jsxs(import_react_native48.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -71344,7 +73239,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       assignment
     }, assignment.userId) : null;
   }
-  var import_react_native47;
+  var import_react_native48;
   var init_TestingPlugins = __esm({
     "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
       "use strict";
@@ -71359,7 +73254,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_pluginTesting();
       init_common();
       init_components();
-      import_react_native47 = __toESM(require_react_native());
+      import_react_native48 = __toESM(require_react_native());
     }
   });
 
@@ -71429,20 +73324,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         render: () => Promise.resolve().then(() => (init_Addons(), Addons_exports))
       },
       {
-        key: "CLOUDCORD_PREVIEWS",
-        title: () => "Previews",
-        icon: safeAsset("EyeIcon", "GiftIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports)).then((module) => ({
-          default: module.PreviewsPage
-        }))
-      },
-      {
-        key: "CLOUDCORD_ACCOUNT_TOOLS",
-        title: () => "Account Tools",
+        key: "CLOUDCORD_TOOLS",
+        title: () => "Tools",
         icon: safeAsset("WrenchIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports)).then((module) => ({
-          default: module.AccountToolsPage
-        }))
+        render: () => Promise.resolve().then(() => (init_Tools(), Tools_exports)),
+        usePredicate: () => {
+          var hidden = useProxy(settings).cloudcordHiddenTabs ?? [];
+          return !hidden.includes("CLOUDCORD_PREVIEWS") || !hidden.includes("CLOUDCORD_ACCOUNT_TOOLS");
+        }
       },
       {
         key: "CLOUDCORD_TESTING_PLUGINS",
@@ -71463,8 +73352,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       "CLOUDCORD",
       "FAKE_PROFILE",
       "BUNNY_PLUGINS",
-      "CLOUDCORD_PREVIEWS",
-      "CLOUDCORD_ACCOUNT_TOOLS",
+      "CLOUDCORD_TOOLS",
       "STORE_CLOUD",
       "BOTCORD",
       "CLOUDCORD_TESTING_PLUGINS",
@@ -71567,7 +73455,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         children: /* @__PURE__ */ jsxs(SafeAreaView, {
           style: styles2.container,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native48.View, {
+            /* @__PURE__ */ jsxs(import_react_native49.View, {
               style: {
                 gap: 4
               },
@@ -71595,7 +73483,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native48.ScrollView, {
+            /* @__PURE__ */ jsxs(import_react_native49.ScrollView, {
               fadingEdgeLength: 64,
               contentContainerStyle: {
                 gap: 12
@@ -71638,7 +73526,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native48, useStyles4;
+  var import_react_native49, useStyles4;
   var init_ErrorBoundaryScreen = __esm({
     "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
       "use strict";
@@ -71653,7 +73541,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_styles();
       init_common();
       init_components();
-      import_react_native48 = __toESM(require_react_native());
+      import_react_native49 = __toESM(require_react_native());
       init_ErrorComponentStackCard();
       init_ErrorStackCard();
       useStyles4 = createStyles({
@@ -71742,7 +73630,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   });
 
   // src/core/vendetta/api.tsx
-  var import_react16, import_react_native49, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
+  var import_react16, import_react_native50, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
   var init_api3 = __esm({
     "src/core/vendetta/api.tsx"() {
       "use strict";
@@ -71773,7 +73661,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_toasts();
       init_dist();
       import_react16 = __toESM(require_react());
-      import_react_native49 = __toESM(require_react_native());
+      import_react_native50 = __toESM(require_react_native());
       init_plugins();
       makeIcon = (leading) => leading;
       CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
@@ -71838,7 +73726,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     ActionSheetTitleHeader: module.BottomSheetTitleHeader,
                     ActionSheetContentContainer: ({ children }) => {
                       (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
-                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native49.View, null, children);
+                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native50.View, null, children);
                     }
                   };
                 }
@@ -72025,7 +73913,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   // src/lib/api/native/legacyRuntimeRefresh.ts
   function invokeLegacyReload() {
     return _async_to_generator(function* () {
-      var reader = import_react_native50.NativeModules.FileReaderModule ?? import_react_native50.NativeModules.RCTFileReaderModule;
+      var reader = import_react_native51.NativeModules.FileReaderModule ?? import_react_native51.NativeModules.RCTFileReaderModule;
       if (typeof reader?.readAsDataURL !== "function")
         return false;
       yield reader.readAsDataURL({
@@ -72062,7 +73950,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     })();
   }
-  var import_react_native50, CURRENT_RUNTIME_URL;
+  var import_react_native51, CURRENT_RUNTIME_URL;
   var init_legacyRuntimeRefresh = __esm({
     "src/lib/api/native/legacyRuntimeRefresh.ts"() {
       "use strict";
@@ -72071,7 +73959,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_async_to_generator();
       init_storage();
       init_settings();
-      import_react_native50 = __toESM(require_react_native());
+      import_react_native51 = __toESM(require_react_native());
       CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
     }
   });
@@ -72328,7 +74216,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "972a9738d34562377213e93e2aed728e6fb734bf";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f77e2119804dd6d2ec56b9898929b2afd5b2b061";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
