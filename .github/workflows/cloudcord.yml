@@ -443,7 +443,7 @@ jobs:
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
           import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
-          import { decodePortableLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@lib/api/profileAppearance";
+          import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -4496,7 +4496,7 @@ jobs:
           // Saved profiles: named copies of your custom profile, shown like Discord's profile cards.
           type ShareVisibility = "public" | "unlisted" | "private";
           type ProfileShare = { id: string; token: string; visibility: ShareVisibility };
-          type SavedProfile = { id: string; name: string; savedAt: number; data: any; share?: ProfileShare };
+          type SavedProfile = { id: string; name: string; savedAt: number; data: any; favorite?: boolean; share?: ProfileShare };
           // Sharing saved profiles through getcloudcord.com.
           const SHARE_VISIBILITIES: { value: ShareVisibility; label: string }[] = [{ value: "unlisted", label: "Unlisted" }, { value: "public", label: "Public" }, { value: "private", label: "Private" }];
           const shareLink = (id: string) => SHARED_PROFILE_API + "/p/" + id;
@@ -4694,8 +4694,13 @@ jobs:
               const [sort, setSort] = useState<"newest" | "name">("newest");
               const [limit, setLimit] = useState(SAVED_LOOK_PAGE_SIZE);
               const items = readSavedProfiles(ownerId);
-              const visible = selectSavedLooks(items, query, sort, limit);
-              const commit = (next: SavedProfile[]) => { writeSavedProfiles(ownerId, next); redraw(); };
+              const [favoritesOnly, setFavoritesOnly] = useState(false);
+              const visible = selectSavedLooks(items, query, sort, limit, favoritesOnly);
+              const commit = (next: SavedProfile[]) => {
+                  if (!ownerId || ownerId !== currentUserId) return;
+                  writeSavedProfiles(ownerId, next);
+                  redraw();
+              };
               const currentJson = JSON.stringify(savedSnapshot(current));
               const saveCurrent = () => {
                   const label = (name.trim() || "Profile " + (items.length + 1)).slice(0, 40);
@@ -4706,7 +4711,7 @@ jobs:
               const [code, setCode] = useState("");
               const [busy, setBusy] = useState(false);
               const [sharing, setSharing] = useState<string | null>(null);
-              const [publicShares, setPublicShares] = useState<any[] | null>(null);
+              const [expanded, setExpanded] = useState<string | null>(null);
               const run = async (task: () => Promise<void>, title = "Sharing") => { if (busy || !ownerId || ownerId !== currentUserId) return; setBusy(true); try { await task(); } catch (error: any) { if (ownerId === currentUserId) Alert.alert(title, error?.message || "Something went wrong."); } finally { setBusy(false); } };
               const copyLook = (item: SavedProfile) => run(async () => {
                   const clipboard = findByProps("getString", "setString") as any;
@@ -4757,12 +4762,23 @@ jobs:
               const copyLink = (id: string) => { if (!ownerId || ownerId !== currentUserId) return; try { (findByProps("setString", "getString") as any)?.setString?.(shareLink(id)); showToast("Link copied"); } catch {} };
               const remove = (item: SavedProfile) => Alert.alert("Delete \u201c" + item.name + "\u201d?", "This saved copy is removed. Your current profile stays as it is.", [
                   { text: "Cancel", style: "cancel" },
-                  { text: "Delete", style: "destructive", onPress: () => commit(items.filter(other => other.id !== item.id)) }
+                  { text: "Delete", style: "destructive", onPress: () => { if (ownerId === currentUserId) commit(readSavedProfiles(ownerId).filter(other => other.id !== item.id)); } }
               ]);
+              const toggleFavorite = (item: SavedProfile) => {
+                  if (ownerId !== currentUserId) return;
+                  commit(readSavedProfiles(ownerId).map(other => other.id === item.id ? { ...other, favorite: !other.favorite } : other));
+              };
+              const duplicateLook = (item: SavedProfile) => {
+                  if (ownerId !== currentUserId) return;
+                  const now = Date.now();
+                  const copy = duplicateSavedLook(item, now.toString(36) + Math.random().toString(36).slice(2, 8), now, savedSnapshot(item.data));
+                  commit([copy, ...readSavedProfiles(ownerId)]);
+                  showToast("Saved “" + copy.name + "”.");
+              };
               const saveName = () => {
                   const value = renaming?.name.trim();
                   if (!renaming || !value) return;
-                  commit(items.map(item => item.id === renaming.id ? { ...item, name: value } : item));
+                  commit(readSavedProfiles(ownerId).map(item => item.id === renaming.id ? { ...item, name: value } : item));
                   setRenaming(null);
               };
               return <View style={{ gap: 20 }}>
@@ -4780,9 +4796,12 @@ jobs:
                           onChangeText={value => { setQuery(value); setLimit(SAVED_LOOK_PAGE_SIZE); }} /></S.Field>
                       <S.Chips options={[{ value: "newest", label: "Newest first" }, { value: "name", label: "Name (A-Z)" }]}
                           value={sort} onChange={value => { setSort(value === "name" ? "name" : "newest"); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
+                      <S.Chips options={[{ value: "all", label: "All looks" }, { value: "favorites", label: "Favorites only" }]}
+                          value={favoritesOnly ? "favorites" : "all"}
+                          onChange={value => { setFavoritesOnly(value === "favorites"); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
                   </S.Panel> : null}
                   {!items.length ? <Text variant="text-sm/medium" color="text-muted">No saved profiles yet. Set up your profile, then save it here to come back to it later.</Text> : null}
-                  {items.length && !visible.total ? <Text variant="text-sm/medium" color="text-muted">No saved looks match your search.</Text> : null}
+                  {items.length && !visible.total ? <Text variant="text-sm/medium" color="text-muted">{favoritesOnly && !query.trim() ? "No favorite looks yet." : "No saved looks match your search."}</Text> : null}
                   {visible.entries.map(item => {
                       const data = item.data || {};
                       const active = JSON.stringify(savedSnapshot(data)) === currentJson;
@@ -4799,31 +4818,45 @@ jobs:
                               <View style={{ flex: 1, gap: 2 }}>
                                   {renaming?.id === item.id
                                       ? <TextInput accessibilityLabel="Look name" value={renaming.name} maxLength={40} onChangeText={value => setRenaming({ id: item.id, name: value })} onSubmitEditing={saveName} />
-                                      : <Text variant="text-md/bold" color="text-normal" numberOfLines={1}>{item.name}</Text>}
-                                  {active ? <Text variant="text-xs/bold" style={{ color: "#23A55A" }}>● In use</Text> : <Text variant="text-xs/medium" color="text-muted">Saved {new Date(item.savedAt).toLocaleDateString()}</Text>}
+                                      : <Text variant="text-md/bold" color="text-normal" numberOfLines={1}>{item.favorite ? "★ " : ""}{item.name}</Text>}
+                                  {active ? <Text variant="text-xs/bold" style={{ color: "#23A55A" }}>● Matches current look</Text> : <Text variant="text-xs/medium" color="text-muted">Saved {new Date(item.savedAt).toLocaleDateString()}</Text>}
                               </View>
                               {renaming?.id === item.id ? <>
                                   <S.Button label="Save name" disabled={!renaming.name.trim()} onPress={saveName} />
                                   <S.Button label="Cancel" onPress={() => setRenaming(null)} />
-                              </> : <S.Button label="Rename" onPress={() => setRenaming({ id: item.id, name: item.name })} />}
+                              </> : null}
                           </View>
                           <View style={{ flexDirection: "row", gap: 8 }}>
-                              <S.Button label={active ? "In use" : "Use profile"} primary disabled={active} grow onPress={() => { onUse(item.data); redraw(); showToast("Now using \u201c" + item.name + "\u201d"); }} />
-                              <S.Button label="Update" onPress={() => { commit(items.map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)); showToast("Updated \u201c" + item.name + "\u201d"); }} />
-                              <S.Button label="Delete" danger onPress={() => remove(item)} />
+                              <S.Button label={active ? "Current look" : "Use profile"} primary disabled={active} grow onPress={() => { onUse(item.data); redraw(); showToast("Now using \u201c" + item.name + "\u201d"); }} />
+                              <S.Button label={expanded === item.id ? "Hide actions" : "Actions"} onPress={() => {
+                                  setExpanded(expanded === item.id ? null : item.id);
+                                  setRenaming(null);
+                                  setSharing(null);
+                              }} />
                           </View>
-                          <S.Button label="Copy look" disabled={busy} onPress={() => copyLook(item)} />
-                  {sharing === item.id ? <View style={{ gap: 8 }}>
-                      <S.Chips options={SHARE_VISIBILITIES} value={item.share?.visibility ?? "unlisted"} onChange={(value: ShareVisibility) => shareItem(item, value)} />
-                      {item.share && item.share.visibility !== "private" ? <Text variant="text-sm/medium" color="text-normal" selectable>{shareLink(item.share.id)}</Text> : null}
-                      {item.share?.visibility === "private" ? <Text variant="text-xs/medium" color="text-muted">Private: only this device can open it. Code {item.share.id}</Text> : null}
-                      <View style={{ flexDirection: "row", gap: 8 }}>
-                          {!item.share ? <S.Button label={busy ? "Sharing…" : "Share unlisted"} primary disabled={busy} grow onPress={() => shareItem(item, "unlisted")} /> : null}
-                          {item.share && item.share.visibility !== "private" ? <S.Button label="Copy link" grow onPress={() => copyLink(item.share!.id)} /> : null}
-                          {item.share ? <S.Button label="Stop sharing" danger disabled={busy} onPress={() => stopSharing(item)} /> : null}
-                          <S.Button label="Close" onPress={() => setSharing(null)} />
-                      </View>
-                  </View> : <S.Button label={item.share ? "Shared · " + item.share.visibility : "Share"} onPress={() => setSharing(item.id)} />}
+                          {expanded === item.id ? <>
+                              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                                  {renaming?.id !== item.id ? <S.Button label="Rename" onPress={() => setRenaming({ id: item.id, name: item.name })} /> : null}
+                                  <S.Button label="Update" onPress={() => { commit(readSavedProfiles(ownerId).map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)); showToast("Updated \u201c" + item.name + "\u201d"); }} />
+                                  <S.Button label="Delete" danger onPress={() => remove(item)} />
+                              </View>
+                              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                                  <S.Button label={item.favorite ? "Favorited" : "Favorite"} primary={item.favorite === true} onPress={() => toggleFavorite(item)} />
+                                  <S.Button label="Duplicate" onPress={() => duplicateLook(item)} />
+                                  <S.Button label="Copy look" disabled={busy} onPress={() => copyLook(item)} />
+                              </View>
+                              {sharing === item.id ? <View style={{ gap: 8 }}>
+                                  <S.Chips options={SHARE_VISIBILITIES} value={item.share?.visibility ?? "unlisted"} onChange={(value: ShareVisibility) => shareItem(item, value)} />
+                                  {item.share && item.share.visibility !== "private" ? <Text variant="text-sm/medium" color="text-normal" selectable>{shareLink(item.share.id)}</Text> : null}
+                                  {item.share?.visibility === "private" ? <Text variant="text-xs/medium" color="text-muted">Private: only this device can open it. Code {item.share.id}</Text> : null}
+                                  <View style={{ flexDirection: "row", gap: 8 }}>
+                                      {!item.share ? <S.Button label={busy ? "Sharing…" : "Share unlisted"} primary disabled={busy} grow onPress={() => shareItem(item, "unlisted")} /> : null}
+                                      {item.share && item.share.visibility !== "private" ? <S.Button label="Copy link" grow onPress={() => copyLink(item.share!.id)} /> : null}
+                                      {item.share ? <S.Button label="Stop sharing" danger disabled={busy} onPress={() => stopSharing(item)} /> : null}
+                                      <S.Button label="Close" onPress={() => setSharing(null)} />
+                                  </View>
+                              </View> : <S.Button label={item.share ? "Shared · " + item.share.visibility : "Share"} onPress={() => setSharing(item.id)} />}
+                          </> : null}
                       </View>;
                   })}
                   {visible.entries.length < visible.total ? <S.Button label="Show more looks" onPress={() => setLimit(value => value + SAVED_LOOK_PAGE_SIZE)} /> : null}

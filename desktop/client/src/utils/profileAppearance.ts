@@ -359,15 +359,22 @@ const portableImageLimit = 1_700_000;
 
 export const SAVED_LOOK_PAGE_SIZE = 8;
 
-export function selectSavedLooks<T extends { name: string; savedAt: number; }>(
-    looks: readonly T[], query: string, sort: "newest" | "name", limit: number,
+export function selectSavedLooks<T extends { name: string; savedAt: number; favorite?: boolean; }>(
+    looks: readonly T[], query: string, sort: "newest" | "name", limit: number, favoritesOnly = false,
 ) {
     const searchKey = (value: string) => value.normalize("NFKD").replace(/\p{M}/gu, "").toLowerCase();
     const needle = searchKey(query.trim());
     const matches = looks.map(look => ({ look, name: String(look.name ?? "") }))
-        .filter(item => !needle || searchKey(item.name).includes(needle));
+        .filter(({ look, name }) => (!favoritesOnly || look.favorite === true) && (!needle || searchKey(name).includes(needle)));
     matches.sort((a, b) => sort === "name" ? a.name.localeCompare(b.name) : (b.look.savedAt || 0) - (a.look.savedAt || 0));
     return { entries: matches.slice(0, limit).map(({ look }) => look), total: matches.length };
+}
+
+export function duplicateSavedLook<T>(
+    look: { name: string; }, id: string, savedAt: number, data: T,
+) {
+    const suffix = " copy";
+    return { id, name: look.name.slice(0, 40 - suffix.length) + suffix, savedAt, data };
 }
 
 function portableLookText(value: unknown, limit: number, multiline = false) {

@@ -22,7 +22,7 @@ import { installConnectionSettings } from "@utils/connectionSettings";
 import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
-import { decodePortableLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@utils/profileAppearance";
+import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@utils/profileAppearance";
 
 import { CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, ProfileBadge } from "@api/Badges";
 import { applyBadgeLayout, badgeLayoutKey, defaultBadgeOrder, moveBadgeOrder } from "@api/BadgeLayout";
@@ -41,7 +41,7 @@ const ModalContent = _ModalContent as any;
 const ModalFooter = _ModalFooter as any;
 import { Devs, SincordDevs } from "@utils/constants";
 import definePlugin, { OptionType } from "@utils/types";
-import { AuthenticationStore, RelationshipStore, Button, ChannelActionCreators, FluxDispatcher, RestAPI, FriendsStore, IconUtils, Menu, Popout, React, Select, showToast, SnowflakeUtils, Toasts, UserProfileActions, UserProfileStore, UserStore } from "@webpack/common";
+import { Alerts, AuthenticationStore, RelationshipStore, Button, ChannelActionCreators, FluxDispatcher, RestAPI, FriendsStore, IconUtils, Menu, Popout, React, Select, showToast, SnowflakeUtils, Toasts, UserProfileActions, UserProfileStore, UserStore } from "@webpack/common";
 
 import nitroBronze from "file://../../../../../assets/NitroMilestones/bronze.png?base64";
 import nitroDiamond from "file://../../../../../assets/NitroMilestones/diamond.png?base64";
@@ -3121,7 +3121,7 @@ function OtherProfilesPanel() {
 // ---- Saved profiles: named copies of your custom profile you can switch between ----
 type ShareVisibility = "public" | "unlisted" | "private";
 interface ProfileShare { id: string; token: string; visibility: ShareVisibility; }
-interface SavedProfile { id: string; name: string; savedAt: number; data: CustomProfileData; share?: ProfileShare; }
+interface SavedProfile { id: string; name: string; savedAt: number; data: CustomProfileData; favorite?: boolean; share?: ProfileShare; }
 
 // ---- Sharing saved profiles through getcloudcord.com ----
 const SHARE_VISIBILITIES: { value: ShareVisibility; label: string; }[] = [
@@ -3195,14 +3195,16 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
     const [items, setItems] = React.useState(() => readSavedProfiles(userId));
     const [name, setName] = React.useState("");
     const [renaming, setRenaming] = React.useState<string | null>(null);
+    const [expanded, setExpanded] = React.useState<string | null>(null);
     const [renameText, setRenameText] = React.useState("");
     const [transferring, setTransferring] = React.useState(false);
     const [query, setQuery] = React.useState("");
     const [sort, setSort] = React.useState<"newest" | "name">("newest");
     const [limit, setLimit] = React.useState(SAVED_LOOK_PAGE_SIZE);
-    const visible = selectSavedLooks(items, query, sort, limit);
+    const [favoritesOnly, setFavoritesOnly] = React.useState(false);
+    const visible = selectSavedLooks(items, query, sort, limit, favoritesOnly);
     const commit = (next: SavedProfile[]) => {
-        if (!writeSavedProfiles(userId, next)) return false;
+        if (activeUserId() !== userId || !writeSavedProfiles(userId, next)) return false;
         setItems(next);
         return true;
     };
@@ -3211,7 +3213,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
         const label = name.trim() || `Profile ${items.length + 1}`;
         if (!commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(current) }, ...items])) return;
         setName("");
-        showToast(`Saved "${label}".`, Toasts.Type.SUCCESS);
+        showToast(`Saved "${label}".`,  Toasts.Type.SUCCESS);
     };
     const load = (item: SavedProfile) => {
         if (templatePreview?.ownerId === userId && activeUserId() === userId) stopTemplatePreview();
@@ -3255,15 +3257,26 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 onChange={event => { setQuery(event.currentTarget.value); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
             <SelectField label="Sort saved looks" options={[{ value: "newest", label: "Newest first" }, { value: "name", label: "Name (A-Z)" }]}
                 value={sort} onChange={value => { setSort(value === "name" ? "name" : "newest"); setLimit(SAVED_LOOK_PAGE_SIZE); }} />
+            <button type="button" className="cpx-btn" aria-pressed={favoritesOnly}
+                onClick={() => { setFavoritesOnly(!favoritesOnly); setLimit(SAVED_LOOK_PAGE_SIZE); }}>Favorites only</button>
         </div>}
         {!items.length && <span className="cpx-hint">No saved profiles yet. Set up your profile, then save it here to come back to it later.</span>}
-        {!!items.length && !visible.total && <span className="cpx-hint" role="status">No saved looks match your search.</span>}
+        {!!items.length && !visible.total && <span className="cpx-hint" role="status">{favoritesOnly && !query.trim() ? "No favorite looks yet." : "No saved looks match your search."}</span>}
         <div className="cpx-saved-grid">
             {visible.entries.map(item => {
                 const data = item.data;
                 const active = JSON.stringify(savedSnapshot(data)) === currentJson;
                 const badges = profilePreviewBadges(data, userId);
-                const rename = () => { if (commit(items.map(other => other.id === item.id ? { ...other, name: renameText.trim() || other.name } : other))) setRenaming(null); };
+                const rename = () => {
+                    const label = renameText.trim();
+                    if (label && commit(readSavedProfiles(userId).map(other => other.id === item.id ? { ...other, name: label } : other))) setRenaming(null);
+                };
+                const favorite = () => commit(readSavedProfiles(userId).map(other => other.id === item.id ? { ...other, favorite: !other.favorite } : other));
+                const duplicate = () => {
+                    const now = Date.now();
+                    const copy = duplicateSavedLook(item, now.toString(36) + Math.random().toString(36).slice(2, 8), now, savedSnapshot(data));
+                    if (commit([copy, ...readSavedProfiles(userId)])) showToast(`Saved "${copy.name}".`, Toasts.Type.SUCCESS);
+                };
                 return <div key={item.id} className="cpx-saved-item">
                     <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface}
                         decorationUrl={data.decorationAsset ? decorationFor(data.decorationAsset) : undefined}
@@ -3273,25 +3286,50 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                     <div className="cpx-saved-foot">
                         <div className="cpx-saved-meta">
                             {renaming === item.id
-                                ? <input className="cpx-input" autoFocus value={renameText} maxLength={40} onChange={event => setRenameText(event.currentTarget.value)} onKeyDown={event => { if (event.key === "Enter") rename(); if (event.key === "Escape") setRenaming(null); }} onBlur={rename} />
-                                : <span className="cpx-saved-name" title="Click to rename" onClick={() => { setRenaming(item.id); setRenameText(item.name); }}>{item.name}</span>}
-                            <span className="cpx-saved-sub">{active ? <span className="cpx-saved-live">In use</span> : <span>Saved {date(item.savedAt)}</span>}</span>
+                                ? <div className="cpx-inline">
+                                    <input className="cpx-input" aria-label="Look name" autoFocus value={renameText} maxLength={40}
+                                        onChange={event => setRenameText(event.currentTarget.value)}
+                                        onKeyDown={event => { if (event.key === "Enter") rename(); if (event.key === "Escape") setRenaming(null); }} />
+                                    <button type="button" className="cpx-btn" disabled={!renameText.trim()} onClick={rename}>Save name</button>
+                                    <button type="button" className="cpx-btn cpx-btn-ghost" onClick={() => setRenaming(null)}>Cancel</button>
+                                </div>
+                                : <span className="cpx-saved-name">{item.favorite ? <span aria-hidden="true">★ </span> : null}{item.name}</span>}
+                            <span className="cpx-saved-sub">{active ? <span className="cpx-saved-live">Matches current look</span> : <span>Saved {date(item.savedAt)}</span>}</span>
                         </div>
                     </div>
                     <div className="cpx-saved-actions">
-                        <button type="button" className="cpx-btn cpx-btn-primary" disabled={active} onClick={() => load(item)}>{active ? "In use" : "Use profile"}</button>
-                        <button type="button" className="cpx-btn cpx-btn-ghost" disabled={transferring} onClick={() => copyLook(item)}>Copy look</button>
-                        <button type="button" className="cpx-icon-btn" aria-label="Update with current profile" title="Replace with your current profile" onClick={() => {
-                            if (commit(items.map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)))
-                                showToast(`Updated "${item.name}".`, Toasts.Type.SUCCESS);
-                        }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg>
-                        </button>
-                        <button type="button" className="cpx-icon-btn cpx-danger" aria-label="Delete saved profile" title="Delete" onClick={() => commit(items.filter(other => other.id !== item.id))}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>
-                        </button>
+                        <button type="button" className="cpx-btn cpx-btn-primary" disabled={active} onClick={() => load(item)}>{active ? "Current look" : "Use profile"}</button>
+                        <button type="button" className="cpx-btn cpx-btn-ghost" aria-expanded={expanded === item.id} onClick={() => {
+                            setExpanded(expanded === item.id ? null : item.id);
+                            setRenaming(null);
+                        }}>Actions</button>
                     </div>
-                    {activeUserId() === userId && <ShareControls ownerId={userId} item={item} onChange={share => commit(readSavedProfiles(userId).map(other => other.id === item.id ? { ...other, share } : other))} />}
+                    {expanded === item.id && <>
+                        <div className="cpx-saved-actions">
+                            {renaming !== item.id && <button type="button" className="cpx-btn cpx-btn-ghost" onClick={() => { setRenaming(item.id); setRenameText(item.name); }}>Rename</button>}
+                            <button type="button" className="cpx-btn cpx-btn-ghost" aria-pressed={item.favorite === true} onClick={favorite}>{item.favorite ? "Favorited" : "Favorite"}</button>
+                            <button type="button" className="cpx-btn cpx-btn-ghost" onClick={duplicate}>Duplicate</button>
+                            <button type="button" className="cpx-btn cpx-btn-ghost" disabled={transferring} onClick={() => copyLook(item)}>Copy look</button>
+                            <button type="button" className="cpx-icon-btn" aria-label="Update with current profile" title="Replace with your current profile" onClick={() => {
+                                if (commit(readSavedProfiles(userId).map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)))
+                                    showToast(`Updated "${item.name}".`, Toasts.Type.SUCCESS);
+                            }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg>
+                            </button>
+                            <button type="button" className="cpx-icon-btn cpx-danger" aria-label="Delete saved profile" title="Delete" onClick={() => Alerts.show({
+                                title: `Delete "${item.name}"?`,
+                                body: "This removes the copy from Saved Looks.",
+                                confirmText: "Delete",
+                                cancelText: "Cancel",
+                                onConfirm: () => {
+                                    if (activeUserId() === userId) commit(readSavedProfiles(userId).filter(other => other.id !== item.id));
+                                },
+                            })}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>
+                            </button>
+                        </div>
+                        {activeUserId() === userId && <ShareControls ownerId={userId} item={item} onChange={share => commit(readSavedProfiles(userId).map(other => other.id === item.id ? { ...other, share } : other))} />}
+                    </>}
                 </div>;
             })}
         </div>

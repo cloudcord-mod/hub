@@ -45,6 +45,19 @@ assert.deepEqual(Array.from(profileAppearance.selectSavedLooks(looks, "  neon ",
 assert.equal(profileAppearance.selectSavedLooks(looks, "neon", "newest", 1).total, 2);
 assert.deepEqual(Array.from(profileAppearance.selectSavedLooks(looks, "", "name", 2).entries, look => look.name), ["Amber", "Blue"]);
 assert.equal(profileAppearance.selectSavedLooks(looks, "no match", "newest", 8).total, 0);
+const starredLooks = looks.map((look, index) => ({ ...look, favorite: index === 0 }));
+assert.equal(profileAppearance.selectSavedLooks(starredLooks, "", "newest", 8, true).total, 1);
+assert.equal(profileAppearance.selectSavedLooks(starredLooks, "no match", "name", 8, true).total, 0);
+assert.equal(profileAppearance.selectSavedLooks(starredLooks, "", "name", 8, true).entries[0].name, looks[0].name);
+const originalLook = { name: "A".repeat(40), id: "original", favorite: true, share: { token: "edit-token" } };
+const lookCopy = profileAppearance.duplicateSavedLook(originalLook, "duplicate", 123, { bio: "A look" });
+assert.equal(lookCopy.name, "A".repeat(35) + " copy");
+assert.equal(lookCopy.id, "duplicate");
+assert.equal(lookCopy.savedAt, 123);
+assert.equal(lookCopy.data.bio, "A look");
+assert.equal(lookCopy.favorite, undefined);
+assert.equal(lookCopy.share, undefined);
+
 assert.deepEqual(looks.map(look => look.name), ["Néon", "Blue", "Night Neon", "Amber"]);
 const portablePicture = "data:image/png;base64,aW1hZ2U=";
 const portableLook = encodePortableLook("My saved look", {
@@ -237,7 +250,7 @@ const savedPanel = vm.runInNewContext(transformSync(savedPanelSource + "\nSavedP
         useState: initial => typeof initial === "function" ? [initial(), rows => { savedRows = rows; }]
             : [initial === "" ? lookName : initial, value => { if (initial === "") lookName = value; }],
     },
-    Section: "Section", readSavedProfiles: () => [], writeSavedProfiles: () => canSave, savedSnapshot: data => data,
+    Section: "Section", activeUserId: () => id, readSavedProfiles: () => [], writeSavedProfiles: () => canSave, savedSnapshot: data => data,
     showToast: message => savedMessages.push(message), Toasts: { Type: { SUCCESS: "success" } },
 });
 const pressSave = () => flatten(savedPanel({ current: {}, userId: id })).find(node => node.type === "button").props.onClick();
