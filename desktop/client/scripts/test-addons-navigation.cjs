@@ -168,10 +168,13 @@ assert.equal(mobileList().props.keyExtractor(mobileList().props.data[1]), "Chang
 assert.equal(mobileList().props.keyboardShouldPersistTaps, "handled");
 const searchMobile = value => walk(mobileList().props.ListHeaderComponent)
     .find(node => node.type === "Search").props.onChangeText(value);
-searchMobile("/changed");
+searchMobile("  /changed  ");
 assert.deepEqual(mobileRows(), ["Changed"], "slash search uses the command matcher");
 selectMobileFilter("Private commands");
 assert.deepEqual(mobileRows(), [], "slash search respects the selected filter");
+walk(mobileList().props.ListEmptyComponent()).find(node => node.props.text === "Clear filters").props.onPress();
+assert.deepEqual(mobileRows(), ["Changed"], "clear filters keeps the current search");
+selectMobileFilter("Private commands");
 searchMobile("");
 assert.deepEqual(mobileRows(), ["Command"]);
 selectMobileFilter("Needs review");

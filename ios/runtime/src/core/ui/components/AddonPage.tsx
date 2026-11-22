@@ -116,6 +116,7 @@ function InputAlert(props: { label: string, fetchFn: (url: string) => Promise<vo
 
 export default function AddonPage<T extends object>({ CardComponent, ...props }: AddonPageProps<T>) {
     const [search, setSearch] = useState("");
+    const query = search.trim();
     const [enabledOnly, setEnabledOnly] = useState(false);
     const [sortFn, setSortFn] = useState<((a: T, b: T) => number) | null>(() => null);
     const [filter, setFilter] = useState("");
@@ -142,13 +143,13 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         const items = values.filter(item => isNotNil(item) && typeof item === "object"
             && (!matchesFilter || matchesFilter(item))
             && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
-        if (search.trimStart().startsWith("/") && props.searchCommands) {
-            return props.searchCommands(items, search).map(obj => ({ obj }));
+        if (query.startsWith("/") && props.searchCommands) {
+            return props.searchCommands(items, query).map(obj => ({ obj }));
         }
-        if (!search && sortFn) items.sort(sortFn);
+        if (!query && sortFn) items.sort(sortFn);
 
-        return fuzzysort.go(search, items, { keys: props.searchKeywords, all: true });
-    }, [props.items, props.resolveItem, props.isEnabled, props.searchCommands, props.searchKeywords, sortFn, search, enabledOnly, matchesFilter]);
+        return fuzzysort.go(query, items, { keys: props.searchKeywords, all: true });
+    }, [props.items, props.resolveItem, props.isEnabled, props.searchCommands, props.searchKeywords, sortFn, query, enabledOnly, matchesFilter]);
 
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };
@@ -160,7 +161,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         }
     }, []);
 
-    if (results.length === 0 && !search && !enabledOnly && !filter && !props.ListHeaderComponent) {
+    if (results.length === 0 && !query && !enabledOnly && !filter && !props.ListHeaderComponent) {
         return <View style={{ gap: 32, flexGrow: 1, justifyContent: "center", alignItems: "center" }}>
             <View style={{ gap: 8, alignItems: "center" }}>
                 <Image source={findAssetId("empty_quick_switcher")!} />
@@ -190,7 +191,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 {props.sortOptions && <IconButton
                     icon={findAssetId("ArrowsUpDownIcon")}
                     variant="tertiary"
-                    disabled={!!search}
+                    disabled={!!query}
                     onPress={() => showSimpleActionSheet({
                         key: "AddonListSortOptions",
                         header: {
@@ -230,8 +231,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>
                     <Image source={findAssetId("devices_not_found")!} />
                     <Text variant="text-lg/semibold" color="text-default">
-                        {filter ? "No plugins match these filters." : enabledOnly && !search ? "No add-ons are enabled." : "No add-ons found."}
+                        {filter ? "No plugins match these filters." : enabledOnly && !query ? "No add-ons are enabled." : "No add-ons found."}
                     </Text>
+                    {(filter || enabledOnly) && <Button variant="secondary" size="sm" text="Clear filters" onPress={() => {
+                        setFilter("");
+                        setEnabledOnly(false);
+                    }} />}
                 </View>}
                 contentContainerStyle={{ padding: 8, paddingHorizontal: 12, paddingBottom: 90 }}
                 ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
