@@ -734,7 +734,7 @@ export const cxAppearanceTargets = {
     },
     "readable-line-length": {
         plugin: "ReadableLineLength", label: "limit the width of long message lines",
-        css: '[class*="messageContent"] { max-width: 80ch; }',
+        css: '[class*="messageContent"] { max-width: min(100%, 80ch); min-width: 0; overflow-wrap: anywhere; }',
         style: { messageWidthRenderer: "modules/messages/native/renderer/createMessageContent.tsx", width: 640 },
     },
     "wider-channel-list": {
