@@ -37504,8 +37504,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-chat-role-name-colors": {
           plugin: "HideChatRoleNameColors",
           label: "role colors on names in chat",
-          css: "",
-          mobileOnly: true,
+          catalogOriginal: "hide-chat-role-name-colors.cx",
+          css: '[id^="chat-messages-"] :is([class^="username_"], [class*=" username_"]) { color: var(--text-default, var(--text-normal)) !important; }',
           mobile: {
             messagePresentation: "shouldShowRoleOnName"
           }
@@ -58160,7 +58160,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "HideChatRoleNameColors",
             source: hide_chat_role_name_colors_default,
             description: "Hide role colors on names in chat",
-            mobileOnly: true,
             categories: [
               "Appearance"
             ],
@@ -72024,7 +72023,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1e773d18abfcfed2438794de18c0450156bf1eb2";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8e90449fab400a20d95db95f7fb937b4b206d6f7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
