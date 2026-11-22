@@ -17471,6 +17471,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       result.presenceStatus = data.presenceStatus;
     return result;
   }
+  function selectSavedLooks(looks, query, sort, limit) {
+    var searchKey = (value) => value.normalize("NFKD").replace(RegExp("\\p{M}", "gu"), "").toLowerCase();
+    var needle = searchKey(query.trim());
+    var matches = looks.map((look) => ({
+      look,
+      name: String(look.name ?? "")
+    })).filter((item) => !needle || searchKey(item.name).includes(needle));
+    matches.sort((a, b3) => sort === "name" ? a.name.localeCompare(b3.name) : (b3.look.savedAt || 0) - (a.look.savedAt || 0));
+    return {
+      entries: matches.slice(0, limit).map(({ look }) => look),
+      total: matches.length
+    };
+  }
   function portableLookText(value, limit, multiline = false) {
     if (typeof value !== "string")
       return "";
@@ -17840,7 +17853,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return "";
   }
-  var ACTIVITY_TYPES, PRESENCE_STATUSES, SNOWFLAKE, TAG_ICON_DATA, TAG_ICON_MAX_LENGTH, textField, portableLookFormat, portableLookLimit, portableImageLimit, DISCORD_STREAM_URL, customTagIcons, ITEM_DECORATION, ITEM_EFFECT, ITEM_NAMEPLATE, ITEM_FRAME, camel;
+  var ACTIVITY_TYPES, PRESENCE_STATUSES, SNOWFLAKE, TAG_ICON_DATA, TAG_ICON_MAX_LENGTH, textField, portableLookFormat, portableLookLimit, portableImageLimit, SAVED_LOOK_PAGE_SIZE, DISCORD_STREAM_URL, customTagIcons, ITEM_DECORATION, ITEM_EFFECT, ITEM_NAMEPLATE, ITEM_FRAME, camel;
   var init_profileAppearance = __esm({
     "src/lib/api/profileAppearance.ts"() {
       "use strict";
@@ -17882,6 +17895,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       portableLookFormat = "cloudcord.saved-look";
       portableLookLimit = 345e4;
       portableImageLimit = 17e5;
+      SAVED_LOOK_PAGE_SIZE = 8;
       DISCORD_STREAM_URL = /^https?:\/\/(?:www\.)?(twitch\.tv\/(.+)|youtube.com\/watch\?v=)/;
       customTagIcons = /* @__PURE__ */ new Map();
       ITEM_DECORATION = 0;
@@ -31370,7 +31384,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [, redraw] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
     var [name, setName] = (0, import_react9.useState)("");
     var [renaming, setRenaming] = (0, import_react9.useState)(null);
+    var [query, setQuery] = (0, import_react9.useState)("");
+    var [sort, setSort] = (0, import_react9.useState)("newest");
+    var [limit, setLimit] = (0, import_react9.useState)(SAVED_LOOK_PAGE_SIZE);
     var items = readSavedProfiles(ownerId);
+    var visible = selectSavedLooks(items, query, sort, limit);
     var commit = (next) => {
       writeSavedProfiles(ownerId, next);
       redraw();
@@ -31559,12 +31577,50 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
+        items.length ? /* @__PURE__ */ jsxs(S2.Panel, {
+          children: [
+            /* @__PURE__ */ jsx(S2.Field, {
+              label: "Search saved looks",
+              children: /* @__PURE__ */ jsx(TextInput4, {
+                value: query,
+                placeholder: "Search by name",
+                autoCorrect: false,
+                onChangeText: (value) => {
+                  setQuery(value);
+                  setLimit(SAVED_LOOK_PAGE_SIZE);
+                }
+              })
+            }),
+            /* @__PURE__ */ jsx(S2.Chips, {
+              options: [
+                {
+                  value: "newest",
+                  label: "Newest first"
+                },
+                {
+                  value: "name",
+                  label: "Name (A-Z)"
+                }
+              ],
+              value: sort,
+              onChange: (value) => {
+                setSort(value === "name" ? "name" : "newest");
+                setLimit(SAVED_LOOK_PAGE_SIZE);
+              }
+            })
+          ]
+        }) : null,
         !items.length ? /* @__PURE__ */ jsx(Text, {
           variant: "text-sm/medium",
           color: "text-muted",
           children: "No saved profiles yet. Set up your profile, then save it here to come back to it later."
         }) : null,
-        items.map((item) => {
+        items.length && !visible.total ? /* @__PURE__ */ jsx(Text, {
+          variant: "text-sm/medium",
+          color: "text-muted",
+          children: "No saved looks match your search."
+        }) : null,
+        visible.entries.map((item) => {
           var data = item.data || {};
           var active = JSON.stringify(savedSnapshot(data)) === currentJson;
           var appearance = studioPreviewAppearance(data, realUser);
@@ -31756,7 +31812,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               })
             ]
           }, item.id);
-        })
+        }),
+        visible.entries.length < visible.total ? /* @__PURE__ */ jsx(S2.Button, {
+          label: "Show more looks",
+          onPress: () => setLimit((value) => value + SAVED_LOOK_PAGE_SIZE)
+        }) : null
       ]
     });
   }
@@ -32729,7 +32789,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               refreshPreview();
               redraw();
             }
-          }) : null,
+          }, editorOwner.current ?? "") : null,
           activeTab === "others" ? /* @__PURE__ */ jsx(Card2, {
             children: /* @__PURE__ */ jsx(LocalProfiles2, {
               badges: BADGES,
@@ -65896,7 +65956,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7bf3dc2fc8651537f07b16dba9831e9bd3296d81";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6840fb3f3c89673c96c21f14f888920098fe6d80";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
