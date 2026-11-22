@@ -37889,6 +37889,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             messagePresentation: "timestamps"
           }
         },
+        "timestamps-on-interaction": {
+          plugin: "TimestampsOnInteraction",
+          label: "Show inline chat timestamps on hover or keyboard focus",
+          css: '@media (hover: hover) { [id^="chat-messages-"]:not(:hover, :focus-within) :is([class^="timestampInline_"], [class*=" timestampInline_"]) { opacity: 0 !important; } }',
+          desktopOnly: true,
+          style: {}
+        },
         "message-stickers": {
           plugin: "HideStickers",
           label: "stickers in chat",
@@ -54479,6 +54486,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/timestamps-on-interaction.cx
+  var timestamps_on_interaction_default;
+  var init_timestamps_on_interaction = __esm({
+    "../examples/cx/catalog/plugins/timestamps-on-interaction.cx"() {
+      timestamps_on_interaction_default = 'plugin "TimestampsOnInteraction":\n  needs appearance.style\n  style timestamps-on-interaction\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/total-time.cx
   var total_time_default;
   var init_total_time = __esm({
@@ -56184,6 +56199,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_timestamp_difference();
       init_timestamp_styles();
       init_timestamp_time_zone_offset();
+      init_timestamps_on_interaction();
       init_total_time();
       init_transfer_duration();
       init_translate();
@@ -61409,6 +61425,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             appearanceRevision: "587f054a27a9ebdc3b5d57872dcacabcbe690f66d46be6f16da314420056638f",
             privateCommands: true
+          },
+          {
+            name: "TimestampsOnInteraction",
+            source: timestamps_on_interaction_default,
+            description: "Show inline chat timestamps on hover or keyboard focus",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "Total Time",
@@ -72047,7 +72072,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "febaa4ecf374332f85e8034d034324ae59731077";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "01196f1a49c154abbac8936e50a77129f91fb78c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
