@@ -1,0 +1,6 @@
+plugin "CSV to TSV":
+  needs commands.register
+  needs reply.local
+  on command "csvtotsv":
+    input "text" text
+    reply "${csvToTsv(text)}" else "Paste rectangular CSV with no tabs or line breaks inside fields."

@@ -86,6 +86,7 @@ import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
 import plugin_catalog_csv_column from "../../../../examples/cx/catalog/plugins/csv-column.cx";
 import plugin_catalog_csv_to_markdown from "../../../../examples/cx/catalog/plugins/csv-to-markdown.cx";
+import plugin_catalog_csv_to_tsv from "../../../../examples/cx/catalog/plugins/csv-to-tsv.cx";
 import plugin_catalog_custom_emoji_markup from "../../../../examples/cx/catalog/plugins/custom-emoji-markup.cx";
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
@@ -460,6 +461,7 @@ import plugin_catalog_sticker_blocker from "../../../../examples/cx/catalog/plug
 import plugin_catalog_sticky_date_dividers from "../../../../examples/cx/catalog/plugins/sticky-date-dividers.cx";
 import plugin_catalog_stop_auto_unread from "../../../../examples/cx/catalog/plugins/stop-auto-unread.cx";
 import plugin_catalog_strip_url_tracking from "../../../../examples/cx/catalog/plugins/strip-url-tracking.cx";
+import plugin_catalog_surround_lines from "../../../../examples/cx/catalog/plugins/surround-lines.cx";
 import plugin_catalog_talk_in_reverse from "../../../../examples/cx/catalog/plugins/talk-in-reverse.cx";
 import plugin_catalog_terezi_typing_quirk from "../../../../examples/cx/catalog/plugins/terezi-typing-quirk.cx";
 import plugin_catalog_test_result_summary from "../../../../examples/cx/catalog/plugins/test-result-summary.cx";
@@ -701,6 +703,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Count Lines", source: plugin_catalog_count_lines, description: "/countlines", commands: ["countlines"], categories: ["Commands"], appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18", privateCommands: true },
         { name: "CSV Column", source: plugin_catalog_csv_column, description: "/csvcolumn", commands: ["csvcolumn"], categories: ["Commands"], appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5", privateCommands: true },
         { name: "CSV to Markdown", source: plugin_catalog_csv_to_markdown, description: "/csvtomarkdown", commands: ["csvtomarkdown"], categories: ["Commands"], appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1", privateCommands: true },
+        { name: "CSV to TSV", source: plugin_catalog_csv_to_tsv, description: "/csvtotsv", commands: ["csvtotsv"], categories: ["Commands"], appearanceRevision: "a2bb7ff2aaaf7cf411a5f76068115e98a6c209fe5dc0a58d8b1af87caf10f81c", privateCommands: true },
         { name: "Custom Emoji Markup", source: plugin_catalog_custom_emoji_markup, description: "/emojimarkup", commands: ["emojimarkup"], categories: ["Commands"], appearanceRevision: "7414afa57a6076f4838a837cece00a881b1713f9a88b7dc1d489370b13467cde", privateCommands: true },
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps, description: "Format cozy timestamps as [calendar]", keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL • [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL • [relative]", categories: ["Appearance"], appearanceRevision: "5f19c067a66226d3e35e1a88bbdffa11e01b993a315630ad0e5c9c18de0e803e" },
         { name: "Dashless", source: plugin_catalog_dashless, description: "Replace hyphens with spaces in text channel names", categories: ["Appearance"], appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9" },
@@ -1075,6 +1078,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "StickyDateDividers", source: plugin_catalog_sticky_date_dividers, description: "Keeps the current day label at the top while scrolling", desktopOnly: true, categories: ["Appearance"] },
         { name: "StopAutoUnread", source: plugin_catalog_stop_auto_unread, description: "Keep your chosen channel notification settings", categories: ["Chat"] },
         { name: "Strip URL Tracking", source: plugin_catalog_strip_url_tracking, description: "/striptracking", commands: ["striptracking"], categories: ["Commands"], appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40", privateCommands: true },
+        { name: "Surround Lines", source: plugin_catalog_surround_lines, description: "/surroundlines", commands: ["surroundlines"], categories: ["Commands"], appearanceRevision: "71e06ef1a3d96e5376cb5e6833af5b4a08b3f484cfcc746d3fe5933dfd42363d", privateCommands: true },
         { name: "TalkInReverse", source: plugin_catalog_talk_in_reverse, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "TereziTypingQuirk", source: plugin_catalog_terezi_typing_quirk, description: "Apply 3 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "Test Result Summary", source: plugin_catalog_test_result_summary, description: "/testresultsummary", commands: ["testresultsummary"], categories: ["Commands"], appearanceRevision: "af2bfbac3d600fd166703c4a2c13b91075a9fb497c568c7d400048bcf1fe1f9a", privateCommands: true },

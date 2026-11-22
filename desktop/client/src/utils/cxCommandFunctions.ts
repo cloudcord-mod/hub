@@ -1046,6 +1046,17 @@ export const cxCommandFunctions = {
     csvToMarkdown(input: string) {
         return markdownTable(csvRows(input));
     },
+    csvToTsv(input: string) {
+        if (input.length > 12000) return;
+        const rows = csvRows(input);
+        const columns = rows[0]?.length;
+        if (!columns || rows.some(row => row.length !== columns || row.some(field => /[\t\r\n]/.test(field)))) return;
+        return planningBlock(rows.map(row => row.join("\t")).join("\n"));
+    },
+    surroundLines(text: string, prefix: string, suffix: string) {
+        if (!text || !(prefix || suffix) || /[\r\n]/.test(prefix + suffix) || prefix.length + suffix.length > 64) return;
+        return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map(line => prefix + line + suffix).join("\n"));
+    },
     transposeCsv(input: string) {
         if (input.length > 12000) return;
         const rows = csvRows(input);

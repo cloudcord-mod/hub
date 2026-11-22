@@ -3009,6 +3009,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["formatcodeblock", { text: "let x = 1;", language: "js" }, /^\x60{3}js\nlet x = 1;\n\x60{3}$/],
                 ["formatcodeblock", { text: "let x = 1;", language: "js\nhello" }, /^Enter code/],
             ]],
+            ["CSV to TSV", [
+                ["csvtotsv", { text: 'A,B\n"C,D",E' }, /A\tB\nC,D\tE/],
+                ["csvtotsv", { text: 'A,B\n"C\nD",E' }, /^Paste rectangular CSV/],
+            ]],
+            ["Surround Lines", [
+                ["surroundlines", { text: "A\r\nB\r\n", prefix: "[", suffix: "]" }, /\[A\]\n\[B\]/],
+                ["surroundlines", { text: "A", prefix: "[".repeat(65), suffix: "]" }, /^Enter text/],
+            ]],
             ["Transpose CSV", [
                 ["transposecsv", { text: 'A,B\n"C,D","E""F"' }, /"A","C,D"\n"B","E""F"/],
                 ["transposecsv", { text: "A,B\nC" }, /^Paste a rectangular/],

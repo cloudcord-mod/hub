@@ -1,0 +1,8 @@
+plugin "Surround Lines":
+  needs commands.register
+  needs reply.local
+  on command "surroundlines":
+    input "text" text
+    input "prefix" text
+    input "suffix" text
+    reply "${surroundLines(text, prefix, suffix)}" else "Enter text and a prefix or suffix without line breaks."
