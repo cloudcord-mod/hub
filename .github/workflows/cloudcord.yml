@@ -20,6 +20,7 @@ concurrency:
       - "desktop/client/scripts/cx-migrate-palette.mjs"
       - "desktop/client/scripts/cx-migrate-vendetta.mjs"
       - "desktop/client/scripts/sync-cx-catalog.cjs"
+      - "desktop/client/scripts/test-addons-navigation.cjs"
       - "examples/cx/**"
       - "desktop/client/src/utils/ccp.ts"
       - "desktop/client/src/utils/ccpInspect.ts"
@@ -82,6 +83,7 @@ jobs:
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-settings-route.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-settings-deferred.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-addon-loading.cjs
+          (cd desktop/client && NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node scripts/test-addons-navigation.cjs)
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-mobile-account-isolation.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-modal-compatibility.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-media-load-races.cjs
