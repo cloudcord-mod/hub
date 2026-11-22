@@ -25,7 +25,12 @@ assert.match(source, /<ModalRoot \{\.\.\.rootProps\}/);
 assert.match(source, /Couldn't save your profile/);
 for (const file of ['src/components/settings/SettingsModal.tsx', 'src/components/settings/tabs/updater/index.tsx', 'src/components/settings/tabs/vencord/NotificationSettings.tsx', 'src/components/settings/tabs/changelog/index.tsx', 'src/components/settings/tabs/changelog/NewPluginsSection.tsx', 'src/components/settings/tabs/plugins/PluginModal.tsx']) esbuild.transformSync(fs.readFileSync(file, 'utf8'), { loader: 'tsx' });
 const layout = fs.readFileSync('src/plugins/_core/settings.tsx', 'utf8');
-for (const title of ['Overview', 'Botcord', 'Profile', 'Add-ons', 'Diagnostics']) assert.ok(layout.includes(`title: "${title}"`));
+for (const title of ['Overview', 'Profile', 'Add-ons', 'Tools']) assert.ok(layout.includes(`title: "${title}"`));
+const tools = fs.readFileSync('src/components/settings/tabs/extras/index.tsx', 'utf8');
+for (const label of ['Botcord', 'CloudSync', 'Diagnostics']) {
+    assert.ok(tools.includes(`label: "${label}"`));
+    assert.ok(!layout.includes(`title: "${label}"`));
+}
 assert.ok(!layout.includes('key: "cloudcord_plugins"'));
 assert.ok(!layout.includes('key: "cloudcord_themes"'));
 for (const file of ['src/plugins/_core/settings.tsx', 'src/components/settings/tabs/addons/index.tsx', 'src/components/settings/tabs/diagnostics/index.tsx', 'src/components/settings/tabs/fakeProfile/index.tsx']) esbuild.transformSync(fs.readFileSync(file, 'utf8'), { loader: 'tsx' });
