@@ -38649,6 +38649,33 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return left < right ? -1 : left > right ? 1 : 0;
         }).join("\n"),
         trimLines: (text) => text.split(/\r\n|\r|\n/).map((line) => line.trim()).join("\n"),
+        markdownOutline(text) {
+          var headings = [];
+          var fence = "";
+          for (var line of text.split(/\r\n|\r|\n/)) {
+            var marker = /^[ ]{0,3}(\x60{3,}|~{3,})(.*)$/.exec(line);
+            if (fence) {
+              if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim())
+                fence = "";
+              continue;
+            }
+            if (marker) {
+              fence = marker[1];
+              continue;
+            }
+            var heading = /^[ ]{0,3}(#{1,6})\s+(\S.*)$/.exec(line);
+            if (heading) {
+              var title = heading[2].replace(/\s+#+\s*$/, "").trimEnd();
+              headings.push("  ".repeat(heading[1].length - 1) + "- " + title);
+            }
+          }
+          return headings.length ? planningBlock(headings.join("\n")) : "No Markdown headings found.";
+        },
+        quoteDraft(text) {
+          if (!text.trim())
+            return;
+          return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((line) => line ? "> " + line : ">").join("\n"));
+        },
         removeBlankLines: (text) => text.split(/\r\n|\r|\n/).filter((line) => line.trim()).join("\n"),
         reverseLineOrder: (text) => text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).reverse().join("\n"),
         joinLines(text, separator) {
@@ -51654,6 +51681,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/markdown-outline.cx
+  var markdown_outline_default;
+  var init_markdown_outline = __esm({
+    "../examples/cx/catalog/plugins/markdown-outline.cx"() {
+      markdown_outline_default = 'plugin "Markdown Outline":\n  needs commands.register\n  needs reply.local\n  on command "markdownoutline" with text:\n    reply "${markdownOutline(text)}" else "Enter text to format."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/meeting-timestamp.cx
   var meeting_timestamp_default;
   var init_meeting_timestamp = __esm({
@@ -52195,6 +52230,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_quick_mention = __esm({
     "../examples/cx/catalog/plugins/quick-mention.cx"() {
       quick_mention_default = 'plugin "QuickMention":\n  needs messages.insertmention\n  use quick-mention\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/quote-draft.cx
+  var quote_draft_default;
+  var init_quote_draft = __esm({
+    "../examples/cx/catalog/plugins/quote-draft.cx"() {
+      quote_draft_default = 'plugin "Quote Draft":\n  needs commands.register\n  needs reply.local\n  on command "quotedraft" with text:\n    reply "${quoteDraft(text)}" else "Enter text to format."\n';
     }
   });
 
@@ -54110,6 +54153,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_local_channel_notes();
       init_markdown_checklist();
       init_markdown_escape();
+      init_markdown_outline();
       init_meeting_timestamp();
       init_message_budget();
       init_message_burst();
@@ -54157,6 +54201,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_poll_draft();
       init_profile_media();
       init_quick_mention();
+      init_quote_draft();
       init_quote_message();
       init_read_all_notifications_button();
       init_read_all_notifications();
@@ -57007,6 +57052,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Markdown Outline",
+            source: markdown_outline_default,
+            description: "/markdownoutline",
+            commands: [
+              "markdownoutline"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "efbf7198f0c2ff46dd1f5fc1e30a0c5990c856fc821022f46c5855608811b28e",
+            privateCommands: true
+          },
+          {
             name: "Meeting Timestamp",
             source: meeting_timestamp_default,
             description: "/meetingtimestamp",
@@ -57490,6 +57548,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Chat"
             ]
+          },
+          {
+            name: "Quote Draft",
+            source: quote_draft_default,
+            description: "/quotedraft",
+            commands: [
+              "quotedraft"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "073a4f0340adf8d6fc3400e0a73418fdc401ae35847002aa9c6a7b2dfc1a55e5",
+            privateCommands: true
           },
           {
             name: "QuoteMessage",
@@ -68580,7 +68651,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cccd6f48ed099f783deac52c5e366b832be9539d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "73b464220e06a32ac90661abe4bfb19949e33b09";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
