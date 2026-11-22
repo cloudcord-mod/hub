@@ -12063,12 +12063,53 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // src/core/debug/safeMode.ts
+  function requestDiscordReload() {
+    return _async_to_generator(function* () {
+      try {
+        if (typeof BundleUpdaterManager?.reload === "function") {
+          yield BundleUpdaterManager.reload();
+          return;
+        }
+      } catch (e) {
+      }
+      import_react_native16.Alert.alert("Restart Discord", "Fully close and reopen Discord to apply the change.");
+    })();
+  }
+  function isSafeMode() {
+    return settings.safeMode?.enabled === true;
+  }
+  function toggleSafeMode() {
+    return _async_to_generator(function* ({ to = !isSafeMode(), reload = true } = {}) {
+      var enabled = (settings.safeMode ??= {
+        enabled: to
+      }).enabled = to;
+      var currentColor = getCurrentTheme();
+      yield writeThemeToNative(enabled ? {} : currentColor?.data ?? {});
+      if (reload)
+        setTimeout(requestDiscordReload, 500);
+    }).apply(this, arguments);
+  }
+  var import_react_native16;
+  var init_safeMode = __esm({
+    "src/core/debug/safeMode.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_themes();
+      init_modules();
+      init_settings();
+      import_react_native16 = __toESM(require_react_native());
+    }
+  });
+
   // src/lib/ui/toasts.ts
   var toasts_exports = {};
   __export(toasts_exports, {
     showToast: () => showToast
   });
-  var import_react_native16, uuid4, showToast;
+  var import_react_native17, uuid4, showToast;
   var init_toasts = __esm({
     "src/lib/ui/toasts.ts"() {
       "use strict";
@@ -12079,18 +12120,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_lazy();
       init_common();
       init_wrappers();
-      import_react_native16 = __toESM(require_react_native());
+      import_react_native17 = __toESM(require_react_native());
       ({ uuid4 } = lazyDestructure(() => findByProps("uuid4")));
       showToast = (content, asset) => {
-        if (import_react_native16.Platform.OS === "android") {
+        if (import_react_native17.Platform.OS === "android") {
           try {
-            if (typeof import_react_native16.ToastAndroid?.show === "function") {
-              import_react_native16.ToastAndroid.show(content, import_react_native16.ToastAndroid.SHORT);
+            if (typeof import_react_native17.ToastAndroid?.show === "function") {
+              import_react_native17.ToastAndroid.show(content, import_react_native17.ToastAndroid.SHORT);
               return;
             }
           } catch (e) {
           }
-          import_react_native16.Alert.alert("CloudCord", content);
+          import_react_native17.Alert.alert("CloudCord", content);
           return;
         }
         return toasts.open({
@@ -12121,11 +12162,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     patchLogHook: () => patchLogHook,
     rdtClient: () => rdtClient,
     rdtConnected: () => rdtConnected,
-    toggleSafeMode: () => toggleSafeMode,
+    toggleSafeMode: () => toggleSafeMode2,
     useIsRdtConnected: () => useIsRdtConnected,
     versionHash: () => versionHash
   });
-  function toggleSafeMode() {
+  function toggleSafeMode2() {
     return _async_to_generator(function* () {
       settings.safeMode = {
         ...settings.safeMode,
@@ -12139,7 +12180,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           yield selectTheme(themes[settings.safeMode.currentThemeId] ?? null);
         }
       }
-      setTimeout(BundleUpdaterManager.reload, 400);
+      setTimeout(requestDiscordReload, 400);
     })();
   }
   function serializeMessage2(msg) {
@@ -12318,7 +12359,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (devTools?.connectToDevTools) {
       devTools.connectToDevTools({
         websocket: ws,
-        resolveRNStyle: import_react_native17.StyleSheet.flatten
+        resolveRNStyle: import_react_native18.StyleSheet.flatten
       });
     }
   }
@@ -12349,7 +12390,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var hermesProps = globalThis.HermesInternal.getRuntimeProperties();
     var hermesVer = hermesProps["OSS Release Version"];
     var padding = "for RN ";
-    var PlatformConstants = import_react_native17.Platform.constants;
+    var PlatformConstants = import_react_native18.Platform.constants;
     var rnVer = PlatformConstants.reactNativeVersion;
     return {
       vendetta: {
@@ -12376,7 +12417,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         buildType: hermesProps.Build,
         bytecodeVersion: hermesProps["Bytecode Version"]
       },
-      ...import_react_native17.Platform.select({
+      ...import_react_native18.Platform.select({
         android: {
           os: {
             name: "Android",
@@ -12391,7 +12432,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         }
       }),
-      ...import_react_native17.Platform.select({
+      ...import_react_native18.Platform.select({
         android: {
           device: {
             manufacturer: PlatformConstants.Manufacturer,
@@ -12429,13 +12470,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }
   }
-  var import_react_native17, socket2, originalConsoleLog2, originalConsoleError2, originalConsoleWarn2, originalLoggerLog2, originalLoggerError2, originalLoggerWarn2, VERSION2, rdtPort, rdtClient, rdtConnected, changeHooks, versionHash;
+  var import_react_native18, socket2, originalConsoleLog2, originalConsoleError2, originalConsoleWarn2, originalLoggerLog2, originalLoggerError2, originalLoggerWarn2, VERSION2, rdtPort, rdtClient, rdtConnected, changeHooks, versionHash;
   var init_debug = __esm({
     "src/lib/api/debug.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_async_to_generator();
+      init_safeMode();
       init_themes();
       init_assets();
       init_loader();
@@ -12444,7 +12486,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_settings();
       init_logger();
       init_toasts();
-      import_react_native17 = __toESM(require_react_native());
+      import_react_native18 = __toESM(require_react_native());
       VERSION2 = 1;
       rdtPort = 8097;
       rdtClient = null;
@@ -12741,7 +12783,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         showToast(`Could not copy module report: ${String(error?.message || error).slice(0, 100)}`, findAssetId("Small"));
       }
     };
-    return /* @__PURE__ */ jsx(import_react_native18.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native19.ScrollView, {
       style: {
         flex: 1
       },
@@ -12817,7 +12859,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 onValueChange: (value) => loaderConfig.customLoadUrl.enabled = value
               }),
               loaderConfig.customLoadUrl.enabled && /* @__PURE__ */ jsx(TableRow, {
-                label: /* @__PURE__ */ jsx(import_react_native18.View, {
+                label: /* @__PURE__ */ jsx(import_react_native19.View, {
                   style: {
                     width: "100%",
                     gap: 10
@@ -12880,11 +12922,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   ]
                 })
               }),
-              order.map((key) => /* @__PURE__ */ jsx(import_react_native18.Pressable, {
+              order.map((key) => /* @__PURE__ */ jsx(import_react_native19.Pressable, {
                 delayLongPress: 350,
                 onLongPress: () => setMovingKey(key),
                 onPress: () => movingKey && placeBefore(key),
-                children: /* @__PURE__ */ jsx(import_react_native18.View, {
+                children: /* @__PURE__ */ jsx(import_react_native19.View, {
                   style: movingKey === key ? {
                     borderWidth: 1,
                     borderColor: "#5865f2",
@@ -12917,7 +12959,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react3, import_react_native18, requestEvents, uiEvents, runtimeErrors, lastUiEvent, fetchWrapped, uiCaptureInstalled, errorCaptureInstalled, requestSequence, NITRO_COMPONENTS, SAFE_UI_KEYS, TAB_KEYS, TAB_LABELS;
+  var import_react3, import_react_native19, requestEvents, uiEvents, runtimeErrors, lastUiEvent, fetchWrapped, uiCaptureInstalled, errorCaptureInstalled, requestSequence, NITRO_COMPONENTS, SAFE_UI_KEYS, TAB_KEYS, TAB_LABELS;
   var init_Diagnostics = __esm({
     "src/core/ui/settings/pages/Diagnostics/index.tsx"() {
       "use strict";
@@ -12938,7 +12980,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_modules2();
       init_toasts();
       import_react3 = __toESM(require_react());
-      import_react_native18 = __toESM(require_react_native());
+      import_react_native19 = __toESM(require_react_native());
       requestEvents = [];
       uiEvents = [];
       runtimeErrors = [];
@@ -12976,33 +13018,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         BUNNY_THEMES: "Themes",
         BUNNY_FONTS: "Fonts"
       };
-    }
-  });
-
-  // src/core/debug/safeMode.ts
-  function isSafeMode() {
-    return settings.safeMode?.enabled === true;
-  }
-  function toggleSafeMode2() {
-    return _async_to_generator(function* ({ to = !isSafeMode(), reload = true } = {}) {
-      var enabled = (settings.safeMode ??= {
-        enabled: to
-      }).enabled = to;
-      var currentColor = getCurrentTheme();
-      yield writeThemeToNative(enabled ? {} : currentColor?.data ?? {});
-      if (reload)
-        setTimeout(() => BundleUpdaterManager.reload(), 500);
-    }).apply(this, arguments);
-  }
-  var init_safeMode = __esm({
-    "src/core/debug/safeMode.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_themes();
-      init_modules();
-      init_settings();
     }
   });
 
@@ -13091,7 +13106,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         version: debugInfo.device.manufacturer,
         icon: "WrenchIcon"
       },
-      ...import_react_native19.Platform.OS !== "ios" ? [
+      ...import_react_native20.Platform.OS !== "ios" ? [
         {
           label: Strings.BRAND,
           version: debugInfo.device.brand,
@@ -13104,9 +13119,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         icon: "MobilePhoneIcon"
       },
       // this is renamed now on android but i cant be bothered to find it
-      ...import_react_native19.Platform.OS !== "android" ? [
+      ...import_react_native20.Platform.OS !== "android" ? [
         {
-          label: import_react_native19.Platform.select({
+          label: import_react_native20.Platform.select({
             android: Strings.CODENAME,
             ios: Strings.MODELID
           }),
@@ -13115,7 +13130,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       ] : []
     ];
-    return /* @__PURE__ */ jsx(import_react_native19.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native20.ScrollView, {
       style: {
         flex: 1
       },
@@ -13149,7 +13164,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native19;
+  var import_react_native20;
   var init_About = __esm({
     "src/core/ui/settings/pages/General/About.tsx"() {
       "use strict";
@@ -13163,7 +13178,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_debug();
       init_settings();
       init_components();
-      import_react_native19 = __toESM(require_react_native());
+      import_react_native20 = __toESM(require_react_native());
     }
   });
 
@@ -13331,7 +13346,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     useProxy(settings);
     var debugInfo = getDebugInfo();
     var navigation2 = NavigationNative.useNavigation();
-    return /* @__PURE__ */ jsx(import_react_native20.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native21.ScrollView, {
       style: {
         flex: 1
       },
@@ -13390,7 +13405,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("Discord")
                 }),
-                onPress: () => import_react_native20.Linking.openURL("https://discord.gg/EBEZJ84zBT")
+                onPress: () => import_react_native21.Linking.openURL("https://discord.gg/EBEZJ84zBT")
               }),
               /* @__PURE__ */ jsx(TableRow, {
                 arrow: true,
@@ -13398,7 +13413,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("GlobeIcon") || findAssetId("CircleInformationIcon-primary")
                 }),
-                onPress: () => import_react_native20.Linking.openURL("https://getcloudcord.com")
+                onPress: () => import_react_native21.Linking.openURL("https://getcloudcord.com")
               }),
               /* @__PURE__ */ jsx(TableRow, {
                 arrow: true,
@@ -13406,7 +13421,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("img_account_sync_github_white")
                 }),
-                onPress: () => import_react_native20.Linking.openURL(GITHUB)
+                onPress: () => import_react_native21.Linking.openURL(GITHUB)
               })
             ]
           }),
@@ -13483,11 +13498,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("RetryIcon")
                 }),
-                onPress: () => {
-                  Promise.resolve(BundleUpdaterManager.reload()).catch((error) => {
-                    require_react_native().Alert.alert("Update failed", error?.message ?? "Try again later.");
-                  });
-                }
+                onPress: requestDiscordReload
               }),
               /* @__PURE__ */ jsx(TableSwitchRow, {
                 label: "Safe Mode",
@@ -13497,7 +13508,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 }),
                 value: isSafeMode(),
                 onValueChange: (to) => {
-                  toggleSafeMode2({
+                  toggleSafeMode({
                     to,
                     reload: false
                   });
@@ -13509,7 +13520,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         /* @__PURE__ */ jsx(AlertActionButton, {
                           text: "Reload Now",
                           variant: "destructive",
-                          onPress: () => BundleUpdaterManager.reload()
+                          onPress: requestDiscordReload
                         }),
                         /* @__PURE__ */ jsx(AlertActionButton, {
                           text: "Later",
@@ -13551,7 +13562,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native20;
+  var import_react_native21;
   var init_General = __esm({
     "src/core/ui/settings/pages/General/index.tsx"() {
       "use strict";
@@ -13575,7 +13586,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_toasts();
       init_common();
       init_components();
-      import_react_native20 = __toESM(require_react_native());
+      import_react_native21 = __toESM(require_react_native());
     }
   });
 
@@ -13595,7 +13606,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ])
       ];
     };
-    return /* @__PURE__ */ jsx(import_react_native21.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native22.ScrollView, {
       style: {
         flex: 1
       },
@@ -13639,7 +13650,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native21, tabs;
+  var import_react_native22, tabs;
   var init_Customization = __esm({
     "src/core/ui/settings/pages/Customization/index.tsx"() {
       "use strict";
@@ -13651,7 +13662,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_modules();
       init_settings();
       init_components();
-      import_react_native21 = __toESM(require_react_native());
+      import_react_native22 = __toESM(require_react_native());
       tabs = [
         [
           "BOTCORD",
@@ -14119,7 +14130,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var uri = avatarUrl(user, 128);
     var colors = getNativeColors();
     if (uri)
-      return /* @__PURE__ */ jsx(import_react_native22.Image, {
+      return /* @__PURE__ */ jsx(import_react_native23.Image, {
         source: {
           uri
         },
@@ -14130,7 +14141,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       });
     var label2 = displayName(user).trim().slice(0, 2).toUpperCase() || "?";
-    return /* @__PURE__ */ jsx(import_react_native22.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         width: size,
         height: size,
@@ -14153,17 +14164,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       minute: "2-digit"
     }) : "";
     var reactionCount = message.reactions?.reduce((sum, reaction) => sum + (reaction.count || 0), 0) || 0;
-    return /* @__PURE__ */ jsxs(import_react_native22.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: styles2.row,
       children: [
         /* @__PURE__ */ jsx(ApiAvatar, {
           user: author,
           size: 40
         }),
-        /* @__PURE__ */ jsxs(import_react_native22.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: styles2.messageBody,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native22.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: styles2.nameLine,
               children: [
                 /* @__PURE__ */ jsx(Text, {
@@ -14187,7 +14198,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               variant: "text-md/normal",
               children: message.content
             }),
-            !!message.attachments?.length && /* @__PURE__ */ jsx(import_react_native22.View, {
+            !!message.attachments?.length && /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 marginTop: 6,
                 gap: 6
@@ -14196,7 +14207,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 var uri = attachment.url || attachment.proxy_url;
                 var type = String(attachment.content_type || "");
                 var isImage = type.startsWith("image/") || /\.(png|jpe?g|gif|webp)(?:$|\?)/i.test(String(uri || attachment.filename || ""));
-                return isImage && uri ? /* @__PURE__ */ jsx(import_react_native22.Image, {
+                return isImage && uri ? /* @__PURE__ */ jsx(import_react_native23.Image, {
                   source: {
                     uri
                   },
@@ -14239,7 +14250,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function AccountSheet({ accounts, active, onMain }) {
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native22.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native23.View, {
         style: {
           paddingHorizontal: 12,
           paddingBottom: 20
@@ -14597,15 +14608,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     };
     if (channel) {
       var dmUser = channel.recipients?.[0];
-      return /* @__PURE__ */ jsxs(import_react_native22.KeyboardAvoidingView, {
+      return /* @__PURE__ */ jsxs(import_react_native23.KeyboardAvoidingView, {
         style: styles2.root,
-        behavior: import_react_native22.Platform.OS === "ios" ? "padding" : void 0,
+        behavior: import_react_native23.Platform.OS === "ios" ? "padding" : void 0,
         keyboardVerticalOffset: 0,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native22.View, {
+          /* @__PURE__ */ jsxs(import_react_native23.View, {
             style: styles2.header,
             children: [
-              /* @__PURE__ */ jsx(import_react_native22.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: "Back",
                 onPress: returnFromChat,
@@ -14621,7 +14632,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   opacity: pressed ? 0.7 : 1,
                   zIndex: 20
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native22.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
                   style: {
                     color: nativeColors2.text,
                     fontSize: 15,
@@ -14634,7 +14645,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 user: dmUser,
                 size: 32
               }) : null,
-              /* @__PURE__ */ jsxs(import_react_native22.View, {
+              /* @__PURE__ */ jsxs(import_react_native23.View, {
                 style: {
                   flex: 1
                 },
@@ -14661,7 +14672,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               })
             ]
           }),
-          error ? /* @__PURE__ */ jsx(import_react_native22.View, {
+          error ? /* @__PURE__ */ jsx(import_react_native23.View, {
             style: {
               paddingHorizontal: 12,
               paddingVertical: 8
@@ -14681,7 +14692,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             },
             children: "Loading"
           }) : null,
-          /* @__PURE__ */ jsx(import_react_native22.FlatList, {
+          /* @__PURE__ */ jsx(import_react_native23.FlatList, {
             ref: listRef,
             style: {
               flex: 1
@@ -14694,13 +14705,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             contentContainerStyle: {
               paddingVertical: 6
             },
-            keyboardDismissMode: import_react_native22.Platform.OS === "ios" ? "interactive" : "on-drag",
+            keyboardDismissMode: import_react_native23.Platform.OS === "ios" ? "interactive" : "on-drag",
             keyboardShouldPersistTaps: "handled",
             onContentSizeChange: () => listRef.current?.scrollToEnd?.({
               animated: false
             })
           }),
-          selectedImage ? /* @__PURE__ */ jsxs(import_react_native22.View, {
+          selectedImage ? /* @__PURE__ */ jsxs(import_react_native23.View, {
             style: {
               height: 72,
               paddingHorizontal: 10,
@@ -14711,7 +14722,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               backgroundColor: tokens.colors.BACKGROUND_PRIMARY
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native22.Image, {
+              /* @__PURE__ */ jsx(import_react_native23.Image, {
                 source: {
                   uri: selectedImage.uri
                 },
@@ -14722,7 +14733,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: tokens.colors.BACKGROUND_SECONDARY
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native22.Text, {
+              /* @__PURE__ */ jsx(import_react_native23.Text, {
                 numberOfLines: 1,
                 style: {
                   flex: 1,
@@ -14731,7 +14742,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 },
                 children: selectedImage.name
               }),
-              /* @__PURE__ */ jsx(import_react_native22.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
                 onPress: () => setSelectedImage(null),
                 hitSlop: 8,
                 style: ({ pressed }) => ({
@@ -14743,7 +14754,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: nativeColors2.selected,
                   opacity: pressed ? 0.7 : 1
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native22.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
                   style: {
                     color: nativeColors2.text,
                     fontSize: 13,
@@ -14754,10 +14765,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               })
             ]
           }) : null,
-          /* @__PURE__ */ jsxs(import_react_native22.View, {
+          /* @__PURE__ */ jsxs(import_react_native23.View, {
             style: styles2.composer,
             children: [
-              /* @__PURE__ */ jsx(import_react_native22.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: "Add photo",
                 onPress: pickImage,
@@ -14772,7 +14783,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: nativeColors2.selected,
                   opacity: pressed ? 0.7 : 1
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native22.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
                   style: {
                     color: nativeColors2.text,
                     fontSize: 13,
@@ -14781,7 +14792,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   children: "Photo"
                 })
               }),
-              /* @__PURE__ */ jsx(import_react_native22.TextInput, {
+              /* @__PURE__ */ jsx(import_react_native23.TextInput, {
                 value: composer,
                 placeholder: channel.botcordDM ? `Message ${displayName(dmUser)}` : `Message #${channel.name}`,
                 placeholderTextColor: nativeColors2.muted,
@@ -14806,7 +14817,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   fontSize: 16
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native22.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: "Send message",
                 disabled: !composer.trim() && !selectedImage,
@@ -14822,7 +14833,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   opacity: !composer.trim() && !selectedImage ? 0.45 : pressed ? 0.72 : 1,
                   backgroundColor: nativeColors2.brand
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native22.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
                   style: {
                     color: nativeColors2.inverse,
                     fontSize: 13,
@@ -14836,13 +14847,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ]
       });
     }
-    return /* @__PURE__ */ jsxs(import_react_native22.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: styles2.root,
       children: [
-        /* @__PURE__ */ jsxs(import_react_native22.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: styles2.header,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native22.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 flex: 1
               },
@@ -14860,7 +14871,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            screen === "members" ? /* @__PURE__ */ jsx(import_react_native22.Pressable, {
+            screen === "members" ? /* @__PURE__ */ jsx(import_react_native23.Pressable, {
               accessibilityRole: "button",
               accessibilityLabel: "Back",
               onPress: openMessages,
@@ -14871,7 +14882,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 justifyContent: "center",
                 opacity: pressed ? 0.65 : 1
               }),
-              children: /* @__PURE__ */ jsx(import_react_native22.Text, {
+              children: /* @__PURE__ */ jsx(import_react_native23.Text, {
                 style: {
                   color: nativeColors2.text,
                   fontSize: 16,
@@ -14894,7 +14905,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        error ? /* @__PURE__ */ jsx(import_react_native22.View, {
+        error ? /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             paddingHorizontal: 12,
             paddingVertical: 8
@@ -14914,10 +14925,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           children: "Loading"
         }) : null,
-        /* @__PURE__ */ jsxs(import_react_native22.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: styles2.navigator,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native22.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: styles2.guildRail,
               children: [
                 /* @__PURE__ */ jsx(PressableScale, {
@@ -14930,7 +14941,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     onPress: openMessages
                   })
                 }),
-                /* @__PURE__ */ jsx(import_react_native22.FlatList, {
+                /* @__PURE__ */ jsx(import_react_native23.FlatList, {
                   data: guilds,
                   keyExtractor: (g2) => g2.id,
                   showsVerticalScrollIndicator: false,
@@ -14939,12 +14950,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     return /* @__PURE__ */ jsx(PressableScale, {
                       onPress: () => openGuild(item),
                       style: styles2.guildButton,
-                      children: uri ? /* @__PURE__ */ jsx(import_react_native22.Image, {
+                      children: uri ? /* @__PURE__ */ jsx(import_react_native23.Image, {
                         source: {
                           uri
                         },
                         style: styles2.guildImage
-                      }) : /* @__PURE__ */ jsx(import_react_native22.View, {
+                      }) : /* @__PURE__ */ jsx(import_react_native23.View, {
                         style: styles2.guildImage,
                         children: /* @__PURE__ */ jsx(Text, {
                           variant: "text-sm/semibold",
@@ -14956,11 +14967,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            /* @__PURE__ */ jsx(import_react_native22.View, {
+            /* @__PURE__ */ jsx(import_react_native23.View, {
               style: styles2.sidebar,
               children: screen === "messages" ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native22.View, {
+                  /* @__PURE__ */ jsxs(import_react_native23.View, {
                     style: styles2.sidebarHeader,
                     children: [
                       /* @__PURE__ */ jsx(Text, {
@@ -14978,7 +14989,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native22.FlatList, {
+                  /* @__PURE__ */ jsx(import_react_native23.FlatList, {
                     data: recentDMs,
                     keyExtractor: (dm) => dm.channelId,
                     renderItem: ({ item }) => /* @__PURE__ */ jsxs(PressableScale, {
@@ -14989,7 +15000,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           user: item.recipient,
                           size: 36
                         }),
-                        /* @__PURE__ */ jsxs(import_react_native22.View, {
+                        /* @__PURE__ */ jsxs(import_react_native23.View, {
                           style: {
                             flex: 1
                           },
@@ -15008,7 +15019,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         })
                       ]
                     }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native22.View, {
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native23.View, {
                       style: styles2.listEmpty,
                       children: /* @__PURE__ */ jsx(Text, {
                         variant: "text-md/normal",
@@ -15020,7 +15031,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 ]
               }) : screen === "members" ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native22.View, {
+                  /* @__PURE__ */ jsxs(import_react_native23.View, {
                     style: styles2.sidebarHeader,
                     children: [
                       /* @__PURE__ */ jsx(Button, {
@@ -15029,7 +15040,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         text: "Back",
                         onPress: openMessages
                       }),
-                      /* @__PURE__ */ jsxs(import_react_native22.View, {
+                      /* @__PURE__ */ jsxs(import_react_native23.View, {
                         style: {
                           flex: 1
                         },
@@ -15047,7 +15058,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native22.View, {
+                  /* @__PURE__ */ jsx(import_react_native23.View, {
                     style: styles2.search,
                     children: /* @__PURE__ */ jsx(TextInput, {
                       size: "md",
@@ -15056,7 +15067,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       onChange: (value) => setMemberSearch(typeof value === "string" ? value : value?.nativeEvent?.text ?? "")
                     })
                   }),
-                  /* @__PURE__ */ jsx(import_react_native22.FlatList, {
+                  /* @__PURE__ */ jsx(import_react_native23.FlatList, {
                     data: filteredMembers,
                     keyExtractor: (member, i) => member.user?.id || String(i),
                     keyboardShouldPersistTaps: "handled",
@@ -15072,7 +15083,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           user: item.user,
                           size: 36
                         }),
-                        /* @__PURE__ */ jsxs(import_react_native22.View, {
+                        /* @__PURE__ */ jsxs(import_react_native23.View, {
                           style: {
                             flex: 1
                           },
@@ -15096,7 +15107,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         })
                       ]
                     }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native22.View, {
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native23.View, {
                       style: styles2.listEmpty,
                       children: /* @__PURE__ */ jsx(Text, {
                         variant: "text-md/normal",
@@ -15108,7 +15119,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 ]
               }) : /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsx(import_react_native22.View, {
+                  /* @__PURE__ */ jsx(import_react_native23.View, {
                     style: styles2.sidebarHeader,
                     children: /* @__PURE__ */ jsx(Text, {
                       variant: "heading-md/semibold",
@@ -15116,7 +15127,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       children: guild?.name
                     })
                   }),
-                  /* @__PURE__ */ jsx(import_react_native22.FlatList, {
+                  /* @__PURE__ */ jsx(import_react_native23.FlatList, {
                     data: [
                       ...textChannels(null),
                       ...categories.flatMap((cat) => [
@@ -15142,7 +15153,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         children: item.name
                       })
                     }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native22.View, {
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native23.View, {
                       style: styles2.listEmpty,
                       children: /* @__PURE__ */ jsx(Text, {
                         variant: "text-md/normal",
@@ -15176,7 +15187,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         activeId: active.id,
         onExit: () => setOpened(false)
       });
-    return /* @__PURE__ */ jsx(import_react_native22.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native23.ScrollView, {
       style: {
         flex: 1
       },
@@ -15190,7 +15201,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         },
         spacing: 16,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native22.View, {
+          /* @__PURE__ */ jsxs(import_react_native23.View, {
             children: [
               /* @__PURE__ */ jsx(Text, {
                 variant: "heading-xl/bold",
@@ -15234,7 +15245,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           /* @__PURE__ */ jsx(TableRowGroup, {
             title: "Add Bot Account",
             children: /* @__PURE__ */ jsx(TableRow, {
-              label: /* @__PURE__ */ jsxs(import_react_native22.View, {
+              label: /* @__PURE__ */ jsxs(import_react_native23.View, {
                 style: {
                   width: "100%",
                   gap: 10
@@ -15282,7 +15293,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react5, import_react_native22, useStyles2, avatarUrl, guildIconUrl, displayName, getNativeColors;
+  var import_react5, import_react_native23, useStyles2, avatarUrl, guildIconUrl, displayName, getNativeColors;
   var init_BotCord = __esm({
     "src/core/ui/settings/pages/BotCord/index.tsx"() {
       "use strict";
@@ -15299,7 +15310,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_common();
       init_components();
       import_react5 = __toESM(require_react());
-      import_react_native22 = __toESM(require_react_native());
+      import_react_native23 = __toESM(require_react_native());
       useStyles2 = createStyles({
         root: {
           flex: 1,
@@ -19618,7 +19629,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       showToast(e.message, findAssetId("Small"));
     });
   }
-  var import_react_native23, showSimpleActionSheet, handleClick, getChannelId, getChannel, url_default;
+  var import_react_native24, showSimpleActionSheet, handleClick, getChannelId, getChannel, url_default;
   var init_url = __esm({
     "src/core/plugins/quickinstall/url.tsx"() {
       "use strict";
@@ -19639,7 +19650,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_finders();
       init_wrappers();
       init_toasts();
-      import_react_native23 = __toESM(require_react_native());
+      import_react_native24 = __toESM(require_react_native());
       showSimpleActionSheet = findExports(byMutableProp("showSimpleActionSheet"));
       handleClick = findByPropsLazy("handleClick");
       ({ getChannelId } = lazyDestructure(() => channels));
@@ -19675,7 +19686,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               confirmText: Strings.INSTALL,
               cancelText: Strings.CANCEL,
               secondaryConfirmText: Strings.OPEN_IN_BROWSER,
-              onConfirmSecondary: () => import_react_native23.Linking.openURL(url2)
+              onConfirmSecondary: () => import_react_native24.Linking.openURL(url2)
             });
           }).call(this);
         }));
@@ -21065,7 +21076,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...tabInfo(tab).icons,
       "SettingsIcon"
     ]);
-    return source ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+    return source ? /* @__PURE__ */ jsx(import_react_native25.Image, {
       source,
       style: {
         width: size,
@@ -21078,7 +21089,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }) {
     var visibleStatus = status === "offline" ? "invisible" : status && Object.prototype.hasOwnProperty.call(STATUS_COLORS, status) ? status : "online";
     var label2 = visibleStatus === "invisible" ? "offline" : visibleStatus === "dnd" ? "do not disturb" : visibleStatus;
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       accessible: true,
       accessibilityLabel: `Status: ${label2}`,
       style: {
@@ -21101,7 +21112,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       uri && uri !== fallback ? fallback : void 0
     ][attempt];
     if (active) {
-      return /* @__PURE__ */ jsx(import_react_native24.Image, {
+      return /* @__PURE__ */ jsx(import_react_native25.Image, {
         source: {
           uri: active
         },
@@ -21113,7 +21124,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }, active);
     }
     var initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         flex: 1,
         alignItems: "center",
@@ -21136,7 +21147,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       uri || fallback,
       uri && uri !== fallback ? fallback : void 0
     ][attempt];
-    return active ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+    return active ? /* @__PURE__ */ jsx(import_react_native25.Image, {
       source: {
         uri: active
       },
@@ -21150,7 +21161,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function StudioHero({ name, username, avatar, fallbackAvatar, banner, fallbackBanner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
     var tint = accent || C3.raised();
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         borderRadius: R2.lg,
         overflow: "hidden",
@@ -21159,7 +21170,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         borderColor: C3.line()
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             height: 96,
             backgroundColor: tint
@@ -21172,7 +21183,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               banner,
               fallbackBanner
             ])),
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 position: "absolute",
                 top: 12,
@@ -21186,7 +21197,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: "rgba(0,0,0,0.55)"
               },
               children: [
-                /* @__PURE__ */ jsx(import_react_native24.View, {
+                /* @__PURE__ */ jsx(import_react_native25.View, {
                   style: {
                     width: 8,
                     height: 8,
@@ -21205,14 +21216,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             paddingHorizontal: GAP.lg,
             paddingBottom: GAP.lg,
             gap: GAP.md
           },
           children: [
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 flexDirection: "row",
                 alignItems: "flex-end",
@@ -21220,13 +21231,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 marginTop: -36
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     width: 80,
                     height: 80
                   },
                   children: [
-                    /* @__PURE__ */ jsx(import_react_native24.View, {
+                    /* @__PURE__ */ jsx(import_react_native25.View, {
                       style: {
                         width: 80,
                         height: 80,
@@ -21252,7 +21263,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     })
                   ]
                 }),
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     flex: 1,
                     paddingBottom: 4
@@ -21281,7 +21292,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+            /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
               accessibilityRole: "switch",
               accessibilityLabel: "Custom profile",
               accessibilityState: {
@@ -21297,7 +21308,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: enabled ? C3.brandSoft : C3.raised()
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     flex: 1,
                     gap: 2
@@ -21324,7 +21335,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -21351,7 +21362,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function Action({ label: label2, onPress, primary, danger, disabled, grow, selected }) {
     var wrap = grow && selected === void 0;
-    return /* @__PURE__ */ jsx(import_react_native24.Pressable, {
+    return /* @__PURE__ */ jsx(import_react_native25.Pressable, {
       accessibilityRole: selected === void 0 ? "button" : "tab",
       accessibilityState: {
         disabled: !!disabled,
@@ -21384,7 +21395,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function StudioNav({ selected, onSelect }) {
-    return /* @__PURE__ */ jsx(import_react_native24.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native25.ScrollView, {
       horizontal: true,
       showsHorizontalScrollIndicator: false,
       contentContainerStyle: {
@@ -21393,7 +21404,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       },
       children: STUDIO_TABS.map((tab) => {
         var on = tab.id === selected;
-        return /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+        return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
           accessibilityRole: "tab",
           accessibilityState: {
             selected: on
@@ -21431,7 +21442,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function StudioTitle({ tab }) {
     var info = tabInfo(tab);
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
@@ -21439,7 +21450,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         paddingHorizontal: 2
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             width: 40,
             height: 40,
@@ -21454,7 +21465,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             size: 20
           })
         }),
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flex: 1
           },
@@ -21479,7 +21490,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Panel({ children, padded = true }) {
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         borderRadius: R2.lg,
         backgroundColor: C3.panel(),
@@ -21503,22 +21514,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var tileRows = [];
     for (var i1 = 0; i1 < tiles.length; i1 += 3)
       tileRows.push(tiles.slice(i1, i1 + 3));
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         gap: GAP.lg
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             gap: GAP.sm
           },
-          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native24.View, {
+          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
             style: {
               flexDirection: "row",
               gap: GAP.sm
             },
             children: [
-              row.map((stat) => /* @__PURE__ */ jsxs(import_react_native24.View, {
+              row.map((stat) => /* @__PURE__ */ jsxs(import_react_native25.View, {
                 style: {
                   flex: 1,
                   padding: GAP.md,
@@ -21555,7 +21566,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   })
                 ]
               }, stat.label)),
-              row.length === 1 ? /* @__PURE__ */ jsx(import_react_native24.View, {
+              row.length === 1 ? /* @__PURE__ */ jsx(import_react_native25.View, {
                 style: {
                   flex: 1
                 }
@@ -21565,14 +21576,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }),
         /* @__PURE__ */ jsxs(Panel, {
           children: [
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 flexDirection: "row",
                 alignItems: "center",
                 gap: GAP.md
               },
               children: [
-                /* @__PURE__ */ jsx(import_react_native24.View, {
+                /* @__PURE__ */ jsx(import_react_native25.View, {
                   style: {
                     width: 56,
                     height: 56,
@@ -21593,7 +21604,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     ]
                   })
                 }),
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     flex: 1,
                     gap: 2
@@ -21622,11 +21633,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            todo.length ? /* @__PURE__ */ jsx(import_react_native24.View, {
+            todo.length ? /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 gap: GAP.xs
               },
-              children: todo.map((task) => /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+              children: todo.map((task) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
                 accessibilityRole: "button",
                 onPress: () => onSelect(task.tab),
                 style: ({ pressed }) => ({
@@ -21638,7 +21649,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: pressed ? C3.raised() : "transparent"
                 }),
                 children: [
-                  /* @__PURE__ */ jsx(import_react_native24.View, {
+                  /* @__PURE__ */ jsx(import_react_native25.View, {
                     style: {
                       width: 20,
                       height: 20,
@@ -21667,17 +21678,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }) : null
           ]
         }),
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             gap: GAP.sm
           },
-          children: tileRows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native24.View, {
+          children: tileRows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
             style: {
               flexDirection: "row",
               gap: GAP.sm
             },
             children: [
-              row.map((tab) => /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+              row.map((tab) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
                 accessibilityRole: "button",
                 onPress: () => onSelect(tab.id),
                 style: ({ pressed }) => ({
@@ -21692,7 +21703,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   justifyContent: "space-between"
                 }),
                 children: [
-                  /* @__PURE__ */ jsx(import_react_native24.View, {
+                  /* @__PURE__ */ jsx(import_react_native25.View, {
                     style: {
                       width: 32,
                       height: 32,
@@ -21718,7 +21729,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }, tab.id)),
               Array.from({
                 length: 3 - row.length
-              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native24.View, {
+              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native25.View, {
                 style: {
                   flex: 1
                 }
@@ -21730,7 +21741,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Switch({ value }) {
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         width: 44,
         height: 26,
@@ -21739,7 +21750,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: value ? C3.green : C3.off,
         alignItems: value ? "flex-end" : "flex-start"
       },
-      children: /* @__PURE__ */ jsx(import_react_native24.View, {
+      children: /* @__PURE__ */ jsx(import_react_native25.View, {
         style: {
           width: 20,
           height: 20,
@@ -21750,7 +21761,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Toggle({ label: label2, subLabel, value, onPress }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
       accessibilityRole: "switch",
       accessibilityState: {
         checked: value
@@ -21767,7 +21778,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: pressed ? C3.raised() : C3.page()
       }),
       children: [
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flex: 1,
             gap: 2
@@ -21796,7 +21807,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PickRow({ label: label2, subLabel, value, onPress }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
       accessibilityRole: "button",
       onPress,
       style: ({ pressed }) => ({
@@ -21808,7 +21819,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: pressed ? C3.raised() : C3.page()
       }),
       children: [
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flex: 1,
             gap: 2
@@ -21851,7 +21862,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function Input({ value, defaultValue, onChangeText, style, multiline, ...props }) {
     var [focused, setFocused] = (0, import_react6.useState)(false);
-    return /* @__PURE__ */ jsx(import_react_native24.TextInput, {
+    return /* @__PURE__ */ jsx(import_react_native25.TextInput, {
       ...props,
       value,
       defaultValue: value === void 0 ? defaultValue : void 0,
@@ -21884,7 +21895,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Row({ label: label2, subLabel, icon: icon3, trailing, value, arrow, selected, onPress }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
       accessibilityRole: "button",
       accessibilityState: {
         selected: !!selected
@@ -21903,7 +21914,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }),
       children: [
         icon3,
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flex: 1,
             gap: 2
@@ -21953,7 +21964,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function RowIcon({ source }) {
-    return source ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+    return source ? /* @__PURE__ */ jsx(import_react_native25.Image, {
       source,
       style: {
         width: 24,
@@ -21976,19 +21987,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Section({ title, description, children }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         gap: GAP.md
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flexDirection: "row",
             alignItems: "center",
             gap: GAP.sm
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native24.View, {
+            /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 width: 4,
                 height: 18,
@@ -22013,7 +22024,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           children: description
         }) : null,
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             gap: GAP.md
           },
@@ -22023,7 +22034,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Divider() {
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         height: 1,
         backgroundColor: C3.line()
@@ -22031,7 +22042,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Field({ label: label2, hint, error, children }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         gap: 6
       },
@@ -22062,7 +22073,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Chips({ options, value, onChange }) {
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       accessibilityRole: "radiogroup",
       style: {
         flexDirection: "row",
@@ -22071,7 +22082,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       },
       children: options.map((option) => {
         var on = option.value === value;
-        return /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+        return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
           accessibilityRole: "radio",
           accessibilityState: {
             checked: on
@@ -22089,7 +22100,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             borderColor: on ? C3.brand : C3.line()
           },
           children: [
-            option.dot ? /* @__PURE__ */ jsx(import_react_native24.View, {
+            option.dot ? /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 width: 10,
                 height: 10,
@@ -22110,7 +22121,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Tick() {
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         position: "absolute",
         top: 6,
@@ -22132,7 +22143,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function CurrentRow({ label: label2, image, wide, onRemove }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
@@ -22145,7 +22156,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         minHeight: 56
       },
       children: [
-        label2 && image ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+        label2 && image ? /* @__PURE__ */ jsx(import_react_native25.Image, {
           source: {
             uri: image
           },
@@ -22156,7 +22167,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             borderRadius: 8
           }
         }) : null,
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flex: 1,
             gap: 2
@@ -22179,7 +22190,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        label2 ? /* @__PURE__ */ jsx(import_react_native24.Pressable, {
+        label2 ? /* @__PURE__ */ jsx(import_react_native25.Pressable, {
           accessibilityRole: "button",
           onPress: onRemove,
           style: {
@@ -22214,7 +22225,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ]);
     var columns = wide ? 2 : 3;
     var cells = [];
-    var cell = (key, label2, image, selected, onPress, none = false) => /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+    var cell = (key, label2, image, selected, onPress, none = false) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
       accessibilityRole: "button",
       accessibilityState: {
         selected
@@ -22231,7 +22242,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         gap: 6
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             width: "100%",
             aspectRatio: wide ? 4 : 1,
@@ -22247,7 +22258,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               color: C3.muted()
             },
             children: "\u2205"
-          }) : image ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+          }) : image ? /* @__PURE__ */ jsx(import_react_native25.Image, {
             source: {
               uri: image
             },
@@ -22278,7 +22289,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         children: "Loading Discord's catalog\u2026"
       });
     if (status?.error)
-      return /* @__PURE__ */ jsxs(import_react_native24.View, {
+      return /* @__PURE__ */ jsxs(import_react_native25.View, {
         style: {
           gap: GAP.sm
         },
@@ -22303,7 +22314,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var rows = [];
     for (var i = 0; i < cells.length; i += columns)
       rows.push(cells.slice(i, i + columns));
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         gap: GAP.md
       },
@@ -22317,11 +22328,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             setLimit(18);
           }
         }),
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             gap: GAP.sm
           },
-          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native24.View, {
+          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
             style: {
               flexDirection: "row",
               gap: GAP.sm
@@ -22330,7 +22341,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               row,
               Array.from({
                 length: columns - row.length
-              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native24.View, {
+              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native25.View, {
                 style: {
                   flex: 1
                 }
@@ -22360,17 +22371,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var rows = [];
     for (var i = 0; i < items.length; i += 2)
       rows.push(items.slice(i, i + 2));
-    return /* @__PURE__ */ jsx(import_react_native24.View, {
+    return /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         gap: GAP.sm
       },
-      children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native24.View, {
+      children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
         style: {
           flexDirection: "row",
           gap: GAP.sm
         },
         children: [
-          row.map((item) => /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
+          row.map((item) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
             accessibilityRole: "checkbox",
             accessibilityState: {
               checked: item.active
@@ -22390,7 +22401,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               backgroundColor: item.active ? C3.brandSoft : C3.page()
             },
             children: [
-              item.icon ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+              item.icon ? /* @__PURE__ */ jsx(import_react_native25.Image, {
                 source: {
                   uri: item.icon
                 },
@@ -22399,7 +22410,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   height: 24
                 },
                 resizeMode: "contain"
-              }) : /* @__PURE__ */ jsx(import_react_native24.View, {
+              }) : /* @__PURE__ */ jsx(import_react_native25.View, {
                 style: {
                   width: 24,
                   height: 24
@@ -22416,7 +22427,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               })
             ]
           }, item.key)),
-          row.length === 1 ? /* @__PURE__ */ jsx(import_react_native24.View, {
+          row.length === 1 ? /* @__PURE__ */ jsx(import_react_native25.View, {
             style: {
               flex: 1
             }
@@ -22426,7 +22437,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PreviewTag({ label: label2, icon: icon3 }) {
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
@@ -22437,7 +22448,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: C3.line()
       },
       children: [
-        icon3 ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+        icon3 ? /* @__PURE__ */ jsx(import_react_native25.Image, {
           source: {
             uri: icon3
           },
@@ -22459,7 +22470,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PreviewNameplate({ uri }) {
-    return /* @__PURE__ */ jsx(import_react_native24.Image, {
+    return /* @__PURE__ */ jsx(import_react_native25.Image, {
       source: {
         uri
       },
@@ -22477,7 +22488,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function PreviewCosmetics({ frame, effect }) {
     if (!frame && !effect)
       return null;
-    var chip = (label2, value) => /* @__PURE__ */ jsx(import_react_native24.View, {
+    var chip = (label2, value) => /* @__PURE__ */ jsx(import_react_native25.View, {
       style: {
         paddingHorizontal: 8,
         paddingVertical: 3,
@@ -22496,7 +22507,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ]
       })
     });
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -22512,7 +22523,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         gap: GAP.sm
       },
@@ -22524,7 +22535,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           children: "Live preview"
         }),
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             flexDirection: "row",
             gap: GAP.sm
@@ -22541,7 +22552,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             onPress: () => setLayout(mode)
           }, mode))
         }),
-        layout === "Chat" ? /* @__PURE__ */ jsxs(import_react_native24.View, {
+        layout === "Chat" ? /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flexDirection: "row",
             gap: GAP.md,
@@ -22550,7 +22561,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             backgroundColor: card
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native24.View, {
+            /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 width: 38,
                 height: 38,
@@ -22566,13 +22577,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 fallbackAvatar
               ]))
             }),
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 flex: 1,
                 gap: 4
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
@@ -22628,14 +22639,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           officialBadgeIcon,
           frame,
           effect
-        }) : /* @__PURE__ */ jsxs(import_react_native24.View, {
+        }) : /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             borderRadius: R2.lg,
             padding: 3,
             backgroundColor: edge
           },
           children: [
-            primary && accent && accent !== primary ? /* @__PURE__ */ jsx(import_react_native24.View, {
+            primary && accent && accent !== primary ? /* @__PURE__ */ jsx(import_react_native25.View, {
               pointerEvents: "none",
               style: {
                 position: "absolute",
@@ -22648,7 +22659,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: accent
               }
             }) : null,
-            /* @__PURE__ */ jsx(import_react_native24.View, {
+            /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 height: 88,
                 borderTopLeftRadius: R2.lg - 3,
@@ -22664,7 +22675,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 fallbackBanner
               ]))
             }),
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 backgroundColor: card,
                 borderBottomLeftRadius: R2.lg - 3,
@@ -22674,7 +22685,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 gap: 6
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     position: "absolute",
                     top: -42,
@@ -22683,7 +22694,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     height: 84
                   },
                   children: [
-                    /* @__PURE__ */ jsx(import_react_native24.View, {
+                    /* @__PURE__ */ jsx(import_react_native25.View, {
                       style: {
                         width: 84,
                         height: 84,
@@ -22702,7 +22713,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         fallbackAvatar
                       ]))
                     }),
-                    decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+                    decoration ? /* @__PURE__ */ jsx(import_react_native25.Image, {
                       source: {
                         uri: decoration
                       },
@@ -22721,7 +22732,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     })
                   ]
                 }),
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
@@ -22762,13 +22773,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     pronouns ? ` \xB7 ${pronouns}` : ""
                   ]
                 }),
-                badges.length ? /* @__PURE__ */ jsx(import_react_native24.View, {
+                badges.length ? /* @__PURE__ */ jsx(import_react_native25.View, {
                   style: {
                     flexDirection: "row",
                     flexWrap: "wrap",
                     gap: 6
                   },
-                  children: badges.map((uri) => /* @__PURE__ */ jsx(import_react_native24.Image, {
+                  children: badges.map((uri) => /* @__PURE__ */ jsx(import_react_native25.Image, {
                     source: {
                       uri
                     },
@@ -22788,7 +22799,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: customStatus
                 }) : null,
-                activity?.name ? /* @__PURE__ */ jsxs(import_react_native24.View, {
+                activity?.name ? /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     padding: GAP.sm,
                     borderRadius: R2.sm,
@@ -22837,7 +22848,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             flexDirection: "row",
             flexWrap: "wrap",
@@ -22883,14 +22894,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
     var themedSurface = colors === LIGHT ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.55)";
-    var inner = /* @__PURE__ */ jsxs(import_react_native24.View, {
+    var inner = /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         borderRadius: themed ? 6 : 10,
         overflow: "hidden",
         backgroundColor: themed ? themedSurface : colors.page
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             height: 96,
             backgroundColor: bannerColor || primary || colors.raised
@@ -22903,7 +22914,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             fallbackBanner
           ]))
         }),
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             position: "absolute",
             top: 54,
@@ -22912,7 +22923,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             height: 84
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native24.View, {
+            /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 width: 84,
                 height: 84,
@@ -22931,7 +22942,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 fallbackAvatar
               ]))
             }),
-            decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
+            decoration ? /* @__PURE__ */ jsx(import_react_native25.Image, {
               source: {
                 uri: decoration
               },
@@ -22951,13 +22962,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        badges.length ? /* @__PURE__ */ jsx(import_react_native24.View, {
+        badges.length ? /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             marginTop: 8,
             marginLeft: 110,
             marginRight: 10
           },
-          children: /* @__PURE__ */ jsx(import_react_native24.View, {
+          children: /* @__PURE__ */ jsx(import_react_native25.View, {
             style: {
               alignSelf: "flex-end",
               flexDirection: "row",
@@ -22970,7 +22981,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               borderRadius: 8,
               backgroundColor: colors.panel
             },
-            children: badges.map((icon3, index) => /* @__PURE__ */ jsx(import_react_native24.Image, {
+            children: badges.map((icon3, index) => /* @__PURE__ */ jsx(import_react_native25.Image, {
               source: {
                 uri: icon3
               },
@@ -22983,7 +22994,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }, index))
           })
         }) : null,
-        /* @__PURE__ */ jsxs(import_react_native24.View, {
+        /* @__PURE__ */ jsxs(import_react_native25.View, {
           style: {
             paddingHorizontal: 14,
             paddingBottom: 14,
@@ -22991,7 +23002,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             gap: 10
           },
           children: [
-            /* @__PURE__ */ jsxs(import_react_native24.View, {
+            /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 gap: 2,
                 borderRadius: 8,
@@ -23009,7 +23020,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: name
                 }),
-                /* @__PURE__ */ jsxs(import_react_native24.View, {
+                /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
@@ -23046,7 +23057,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            customStatus ? /* @__PURE__ */ jsx(import_react_native24.View, {
+            customStatus ? /* @__PURE__ */ jsx(import_react_native25.View, {
               style: {
                 alignSelf: "flex-start",
                 maxWidth: "100%",
@@ -23064,7 +23075,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 children: customStatus
               })
             }) : null,
-            bio || activity?.name ? /* @__PURE__ */ jsxs(import_react_native24.View, {
+            bio || activity?.name ? /* @__PURE__ */ jsxs(import_react_native25.View, {
               style: {
                 gap: 8,
                 padding: 10,
@@ -23080,7 +23091,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: bio
                 }) : null,
-                activity?.name ? /* @__PURE__ */ jsxs(import_react_native24.View, {
+                activity?.name ? /* @__PURE__ */ jsxs(import_react_native25.View, {
                   style: {
                     gap: 1
                   },
@@ -23121,14 +23132,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
     if (!themed)
-      return /* @__PURE__ */ jsx(import_react_native24.View, {
+      return /* @__PURE__ */ jsx(import_react_native25.View, {
         style: {
           borderRadius: 10,
           overflow: "hidden"
         },
         children: inner
       });
-    return /* @__PURE__ */ jsxs(import_react_native24.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         borderRadius: 10,
         overflow: "hidden",
@@ -23136,7 +23147,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: primary
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native24.View, {
+        /* @__PURE__ */ jsx(import_react_native25.View, {
           style: {
             position: "absolute",
             left: 0,
@@ -23150,7 +23161,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react6, import_react_native24, DARK, LIGHT, palette, C3, R2, GAP, STUDIO_TABS, tabInfo, STATUS_COLORS;
+  var import_react6, import_react_native25, DARK, LIGHT, palette, C3, R2, GAP, STUDIO_TABS, tabInfo, STATUS_COLORS;
   var init_ProfileStudio = __esm({
     "src/core/ui/settings/components/ProfileStudio.tsx"() {
       "use strict";
@@ -23158,7 +23169,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_promiseAllSettled();
       init_jsxRuntime();
       import_react6 = __toESM(require_react());
-      import_react_native24 = __toESM(require_react_native());
+      import_react_native25 = __toESM(require_react_native());
       init_components();
       init_assets();
       init_metro();
@@ -23400,7 +23411,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "banner"
       ]) {
         if (draft[field] && !/^https:\/\//i.test(draft[field]))
-          return import_react_native25.Alert.alert("Image link needed", "Use an HTTPS image link for the picture and banner.");
+          return import_react_native26.Alert.alert("Image link needed", "Use an HTTPS image link for the picture and banner.");
       }
       var clean = Object.fromEntries(Object.entries(draft).filter(([, value]) => value !== "" && value !== void 0 && value !== null));
       state2.cloudcordLocalProfiles = {
@@ -23412,9 +23423,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
       refresh();
       redraw();
-      import_react_native25.Alert.alert("Saved on this device", "Open their profile to see it. Nobody else sees these changes.");
+      import_react_native26.Alert.alert("Saved on this device", "Open their profile to see it. Nobody else sees these changes.");
     };
-    var restore = (target2) => import_react_native25.Alert.alert("Restore this profile?", "Your changes for this person are removed. Their real profile stays as it is.", [
+    var restore = (target2) => import_react_native26.Alert.alert("Restore this profile?", "Your changes for this person are removed. Their real profile stays as it is.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -23464,7 +23475,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
     var target = editing ? labelOf(editing, draft) : null;
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native26.View, {
       style: {
         gap: 24
       },
@@ -23511,7 +23522,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 data.avatar ? "Picture" : "",
                 data.bio ? "Bio" : ""
               ].filter(Boolean).join(" \xB7 ");
-              return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+              return /* @__PURE__ */ jsxs(import_react_native26.Pressable, {
                 accessibilityRole: "button",
                 onPress: () => open(userId),
                 style: {
@@ -23525,7 +23536,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: "rgba(0,0,0,0.25)"
                 },
                 children: [
-                  avatar ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+                  avatar ? /* @__PURE__ */ jsx(import_react_native26.Image, {
                     source: {
                       uri: avatar
                     },
@@ -23534,7 +23545,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       height: 40,
                       borderRadius: 20
                     }
-                  }) : /* @__PURE__ */ jsx(import_react_native25.View, {
+                  }) : /* @__PURE__ */ jsx(import_react_native26.View, {
                     style: {
                       width: 40,
                       height: 40,
@@ -23542,7 +23553,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       backgroundColor: "#4E5058"
                     }
                   }),
-                  /* @__PURE__ */ jsxs(import_react_native25.View, {
+                  /* @__PURE__ */ jsxs(import_react_native26.View, {
                     style: {
                       flex: 1,
                       gap: 2
@@ -23566,7 +23577,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native25.Pressable, {
+                  /* @__PURE__ */ jsx(import_react_native26.Pressable, {
                     accessibilityRole: "button",
                     accessibilityLabel: "Restore " + label2.name,
                     onPress: () => restore(userId),
@@ -23708,7 +23719,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               })
             }),
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native26.View, {
               style: {
                 gap: 8
               },
@@ -23737,7 +23748,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react7, import_react_native25, hexToNumber, numberToHex;
+  var import_react7, import_react_native26, hexToNumber, numberToHex;
   var init_LocalProfiles = __esm({
     "src/core/ui/settings/components/LocalProfiles.tsx"() {
       "use strict";
@@ -23745,7 +23756,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_promiseAllSettled();
       init_jsxRuntime();
       import_react7 = __toESM(require_react());
-      import_react_native25 = __toESM(require_react_native());
+      import_react_native26 = __toESM(require_react_native());
       init_components();
       init_metro();
       init_settings();
@@ -23766,12 +23777,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function CustomBadgeBeta() {
     var open = () => _async_to_generator(function* () {
       try {
-        yield import_react_native26.Linking.openURL("https://getcloudcord.com/upload");
+        yield import_react_native27.Linking.openURL("https://getcloudcord.com/upload");
       } catch (e) {
-        import_react_native26.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser.");
+        import_react_native27.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser.");
       }
     })();
-    return /* @__PURE__ */ jsxs(import_react_native26.View, {
+    return /* @__PURE__ */ jsxs(import_react_native27.View, {
       style: {
         gap: 14
       },
@@ -23793,7 +23804,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react_native26;
+  var import_react_native27;
   var init_CustomBadgeBeta = __esm({
     "src/core/ui/settings/components/CustomBadgeBeta.tsx"() {
       "use strict";
@@ -23801,7 +23812,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
-      import_react_native26 = __toESM(require_react_native());
+      import_react_native27 = __toESM(require_react_native());
       init_components();
       init_ProfileStudio();
     }
@@ -23818,7 +23829,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     (0, import_react8.useEffect)(() => setFailed(false), [
       uri
     ]);
-    return uri && !failed ? /* @__PURE__ */ jsx(import_react_native27.Image, {
+    return uri && !failed ? /* @__PURE__ */ jsx(import_react_native28.Image, {
       source: {
         uri
       },
@@ -23837,9 +23848,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var connection = "service" in entry;
     var [linkError, setLinkError] = (0, import_react8.useState)("");
     var openLink = (url2) => {
-      void import_react_native27.Linking.openURL(url2).catch(() => setLinkError("Couldn't open this link. Try opening it in your browser."));
+      void import_react_native28.Linking.openURL(url2).catch(() => setLinkError("Couldn't open this link. Try opening it in your browser."));
     };
-    return /* @__PURE__ */ jsxs(import_react_native27.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native28.ScrollView, {
       contentContainerStyle: {
         padding: 16,
         gap: 14
@@ -23849,7 +23860,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           uri: entry.banner,
           banner: true
         }),
-        /* @__PURE__ */ jsxs(import_react_native27.View, {
+        /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             flexDirection: "row",
             alignItems: "center",
@@ -23859,7 +23870,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             /* @__PURE__ */ jsx(Picture, {
               uri: entry.avatar
             }),
-            /* @__PURE__ */ jsxs(import_react_native27.View, {
+            /* @__PURE__ */ jsxs(import_react_native28.View, {
               style: {
                 flex: 1
               },
@@ -23893,7 +23904,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           color: "text-normal",
           children: entry.bio
         }),
-        !connection && /* @__PURE__ */ jsxs(import_react_native27.View, {
+        !connection && /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             gap: 8
           },
@@ -23926,20 +23937,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }) : null
           ]
         }),
-        !connection && /* @__PURE__ */ jsx(import_react_native27.View, {
+        !connection && /* @__PURE__ */ jsx(import_react_native28.View, {
           style: {
             flexDirection: "row",
             gap: 8,
             flexWrap: "wrap"
           },
-          children: entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native27.View, {
+          children: entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
             style: {
               flexDirection: "row",
               gap: 4,
               alignItems: "center"
             },
             children: [
-              badge.icon ? /* @__PURE__ */ jsx(import_react_native27.Image, {
+              badge.icon ? /* @__PURE__ */ jsx(import_react_native28.Image, {
                 source: {
                   uri: badge.icon
                 },
@@ -23957,7 +23968,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }),
         connection && /* @__PURE__ */ jsxs(Fragment, {
           children: [
-            entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native27.View, {
+            entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
               children: [
                 /* @__PURE__ */ jsx(Text, {
                   color: "text-muted",
@@ -24016,7 +24027,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       });
   }
   function Input2({ label: label2, value, onChange }) {
-    return /* @__PURE__ */ jsxs(import_react_native27.View, {
+    return /* @__PURE__ */ jsxs(import_react_native28.View, {
       style: {
         gap: 4
       },
@@ -24154,7 +24165,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         customFriends: items
       });
     };
-    return /* @__PURE__ */ jsxs(import_react_native27.View, {
+    return /* @__PURE__ */ jsxs(import_react_native28.View, {
       style: {
         padding: 14,
         gap: 12
@@ -24177,7 +24188,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         [
           ...friends,
           ...connections
-        ].map((item) => /* @__PURE__ */ jsxs(import_react_native27.View, {
+        ].map((item) => /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             gap: 8,
             paddingVertical: 12,
@@ -24199,7 +24210,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 setError("");
               }
             }),
-            /* @__PURE__ */ jsxs(import_react_native27.View, {
+            /* @__PURE__ */ jsxs(import_react_native28.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -24239,7 +24250,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }, item.id)),
-        entry && /* @__PURE__ */ jsxs(import_react_native27.View, {
+        entry && /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             gap: 10
           },
@@ -24293,7 +24304,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   subLabel: customConnectionServiceName(entry.service),
                   onPress: () => navigation2.push("PUPU_CUSTOM_PAGE", {
                     title: "Connection service",
-                    render: () => /* @__PURE__ */ jsx(import_react_native27.ScrollView, {
+                    render: () => /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
                       children: [
                         "steam",
                         "youtube",
@@ -24411,7 +24422,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }),
             !("service" in entry) && /* @__PURE__ */ jsxs(Fragment, {
               children: [
-                entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native27.View, {
+                entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
                   style: {
                     gap: 6
                   },
@@ -24461,7 +24472,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }),
             "service" in entry && /* @__PURE__ */ jsxs(Fragment, {
               children: [
-                entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native27.View, {
+                entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
                   style: {
                     gap: 6
                   },
@@ -24511,7 +24522,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        entry && "service" in entry && /* @__PURE__ */ jsxs(import_react_native27.View, {
+        entry && "service" in entry && /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             gap: 10
           },
@@ -24560,7 +24571,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   });
               }
             }, item.id)),
-            (entry.items || []).map((item, index) => /* @__PURE__ */ jsxs(import_react_native27.View, {
+            (entry.items || []).map((item, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
               style: {
                 gap: 6
               },
@@ -24645,7 +24656,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react8, import_react_native27, createId;
+  var import_react8, import_react_native28, createId;
   var init_CustomSocial = __esm({
     "src/core/ui/settings/components/CustomSocial.tsx"() {
       "use strict";
@@ -24659,7 +24670,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_components();
       init_ProfileStudio();
       import_react8 = __toESM(require_react());
-      import_react_native27 = __toESM(require_react_native());
+      import_react_native28 = __toESM(require_react_native());
       createId = () => `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
     }
   });
@@ -24734,7 +24745,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var list = (Array.isArray(children) ? children.flat() : [
       children
     ]).filter(import_react9.isValidElement);
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       style: {
         gap: 8
       },
@@ -24897,7 +24908,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return _async_to_generator(function* () {
       if (globalThis.__CLOUDCORD_LOADER__?.loaderName !== "RealCord")
         return;
-      var reader = import_react_native28.NativeModules.FileReaderModule ?? import_react_native28.NativeModules.RCTFileReaderModule;
+      var reader = import_react_native29.NativeModules.FileReaderModule ?? import_react_native29.NativeModules.RCTFileReaderModule;
       if (typeof reader?.readAsDataURL !== "function")
         return;
       try {
@@ -25555,7 +25566,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return;
     sharedRenderTimer = setTimeout(() => {
       sharedRenderTimer = null;
-      if (import_react_native28.AppState.currentState !== "active")
+      if (import_react_native29.AppState.currentState !== "active")
         return;
       for (var refresh of identityRefreshers) {
         try {
@@ -25591,7 +25602,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function requestSharedProfile(userId, force = false) {
     var id = String(userId || "");
-    if (import_react_native28.AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId)
+    if (import_react_native29.AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId)
       return false;
     var now = Date.now();
     var seenAt = sharedProfileSeenAt.get(id);
@@ -25817,7 +25828,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return value;
   }
   function refreshSharedProfiles() {
-    if (import_react_native28.AppState.currentState !== "active")
+    if (import_react_native29.AppState.currentState !== "active")
       return;
     var now = Date.now();
     var budget = 4;
@@ -26666,7 +26677,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function refreshPublishedBadges(force = false) {
     return _async_to_generator(function* () {
-      if (import_react_native28.AppState.currentState !== "active" || publishedBadgeRequest || !force && Date.now() - publishedBadgeFetchedAt < 6e4)
+      if (import_react_native29.AppState.currentState !== "active" || publishedBadgeRequest || !force && Date.now() - publishedBadgeFetchedAt < 6e4)
         return;
       publishedBadgeRequest = true;
       publishedBadgeFetchedAt = Date.now();
@@ -27311,7 +27322,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var label2 = String(props?.label || rendered.props.accessibilityLabel || rendered.props.label || rendered.props.description || "Badge");
           if (props) {
             if (String(props.id || "").startsWith("cloudcord-official-")) {
-              var image = /* @__PURE__ */ jsx(import_react_native28.Image, {
+              var image = /* @__PURE__ */ jsx(import_react_native29.Image, {
                 source: props.source,
                 resizeMode: "contain",
                 style: {
@@ -27320,10 +27331,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   tintColor: props.tintColor
                 }
               });
-              return /* @__PURE__ */ jsx(import_react_native28.Pressable, {
+              return /* @__PURE__ */ jsx(import_react_native29.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: label2,
-                onPress: rendered.props.onPress ?? (() => import_react_native28.Alert.alert(label2)),
+                onPress: rendered.props.onPress ?? (() => import_react_native29.Alert.alert(label2)),
                 children: image
               });
             }
@@ -27480,7 +27491,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var open = () => {
             var link = detail && "service" in detail && typeof detail.url === "string" && /^https:/;
             if (link) {
-              void import_react_native28.Linking.openURL(link).catch(() => showToast("Couldn't open this link."));
+              void import_react_native29.Linking.openURL(link).catch(() => showToast("Couldn't open this link."));
               return;
             }
             if (detail)
@@ -28381,12 +28392,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function addFakeFriendRequest(input) {
     return _async_to_generator(function* () {
       if (!localRequestActions?.ready) {
-        import_react_native28.Alert.alert("Fake friend request", "Local request previews are unavailable on this build.");
+        import_react_native29.Alert.alert("Fake friend request", "Local request previews are unavailable on this build.");
         return false;
       }
       var id = parseUserId(input);
       if (!id) {
-        import_react_native28.Alert.alert("Fake friend request", "Paste a user ID, mention or profile link.");
+        import_react_native29.Alert.alert("Fake friend request", "Paste a user ID, mention or profile link.");
         return false;
       }
       var user = findByStoreName("UserStore")?.getUser?.(id);
@@ -28399,11 +28410,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       }
       if (!user) {
-        import_react_native28.Alert.alert("Fake friend request", "Couldn't find that user.");
+        import_react_native29.Alert.alert("Fake friend request", "Couldn't find that user.");
         return false;
       }
       if ((findByStoreName("RelationshipStore")?.getRelationshipType?.(id) ?? 0) !== 0) {
-        import_react_native28.Alert.alert("Fake friend request", "You already have a request or friendship with this user.");
+        import_react_native29.Alert.alert("Fake friend request", "You already have a request or friendship with this user.");
         return false;
       }
       var item = {
@@ -29021,7 +29032,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var channel = channelId ? findByStoreName("ChannelStore")?.getChannel?.(channelId) : null;
     var me = findByStoreName("UserStore")?.getCurrentUser?.();
     if (!channel?.guild_id || !me) {
-      import_react_native28.Alert.alert("Fake boost", "Open a server text channel first, then come back.");
+      import_react_native29.Alert.alert("Fake boost", "Open a server text channel first, then come back.");
       return;
     }
     var snowflake3 = findByProps("fromTimestamp", "extractTimestamp");
@@ -29272,7 +29283,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 placeholderTextColor: "#777"
               })
             }),
-            /* @__PURE__ */ jsxs(import_react_native28.View, {
+            /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -29281,7 +29292,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               children: [
                 shownRoles.map((role) => {
                   var on = chosenRoles.has(role.id);
-                  return /* @__PURE__ */ jsxs(import_react_native28.Pressable, {
+                  return /* @__PURE__ */ jsxs(import_react_native29.Pressable, {
                     onPress: () => toggleRole(role.id),
                     style: {
                       flexDirection: "row",
@@ -29295,7 +29306,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       backgroundColor: on ? "rgba(88,101,242,0.18)" : "rgba(128,128,128,0.16)"
                     },
                     children: [
-                      /* @__PURE__ */ jsx(import_react_native28.View, {
+                      /* @__PURE__ */ jsx(import_react_native29.View, {
                         style: {
                           width: 10,
                           height: 10,
@@ -29373,7 +29384,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       });
     };
     var validColor = (text) => /^#?[0-9a-f]{6}$/i.test(text.trim()) ? "#" + text.trim().replace(/^#/, "").toUpperCase() : void 0;
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       style: {
         gap: 12
       },
@@ -29389,7 +29400,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 role.top ? "Top" : "",
                 role.admin ? "Administrator" : ""
               ].filter(Boolean).join(" \xB7 "),
-              icon: /* @__PURE__ */ jsx(import_react_native28.View, {
+              icon: /* @__PURE__ */ jsx(import_react_native29.View, {
                 style: {
                   width: 12,
                   height: 12,
@@ -29397,7 +29408,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: role.color
                 }
               }),
-              onPress: () => import_react_native28.Alert.alert("Delete " + role.name + "?", "", [
+              onPress: () => import_react_native29.Alert.alert("Delete " + role.name + "?", "", [
                 {
                   text: "Cancel",
                   style: "cancel"
@@ -29588,7 +29599,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var me = findByStoreName("UserStore")?.getCurrentUser?.()?.id;
     var guilds = Object.values(findByStoreName("GuildStore")?.getGuilds?.() ?? {}).filter((guild) => guild && guild.ownerId !== me);
     if (!guilds.length) {
-      import_react_native28.Alert.alert("Leave all servers", "No servers to leave. Servers you own are skipped.");
+      import_react_native29.Alert.alert("Leave all servers", "No servers to leave. Servers you own are skipped.");
       return;
     }
     var run = () => _async_to_generator(function* () {
@@ -29630,7 +29641,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
       showToast("Left " + left + " of " + guilds.length + " servers.");
     })();
-    import_react_native28.Alert.alert("Leave all servers?", "You will leave " + guilds.length + " servers. Servers you own are skipped. You'll need new invites to rejoin.", [
+    import_react_native29.Alert.alert("Leave all servers?", "You will leave " + guilds.length + " servers. Servers you own are skipped. You'll need new invites to rejoin.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -29638,7 +29649,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       {
         text: "Leave all",
         style: "destructive",
-        onPress: () => import_react_native28.Alert.alert("Are you sure?", "Last chance to cancel.", [
+        onPress: () => import_react_native29.Alert.alert("Are you sure?", "Last chance to cancel.", [
           {
             text: "Cancel",
             style: "cancel"
@@ -29653,7 +29664,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ]);
   }
   function confirmResetCloudCordProfile(onDone) {
-    import_react_native28.Alert.alert("Reset CloudCord?", "Deletes your custom profile, badges, other-profile edits and Nitro & tools settings on this device, like a fresh install. Your Discord account is not touched.", [
+    import_react_native29.Alert.alert("Reset CloudCord?", "Deletes your custom profile, badges, other-profile edits and Nitro & tools settings on this device, like a fresh install. Your Discord account is not touched.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -29694,7 +29705,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return /* @__PURE__ */ jsx(K2.Section, {
       title: "All your fake conversations (" + list.length + ")",
       description: "Delete one to remove its messages (and its DM, if it made one) from this device.",
-      children: list.map((item) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+      children: list.map((item) => /* @__PURE__ */ jsxs(import_react_native29.View, {
         style: {
           flexDirection: "row",
           alignItems: "center",
@@ -29897,7 +29908,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           size: "sm",
           onPress: addFromInput
         }),
-        draft.lines.map((line, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+        draft.lines.map((line, index) => /* @__PURE__ */ jsxs(import_react_native29.View, {
           style: {
             gap: 6
           },
@@ -29924,7 +29935,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               placeholderTextColor: "#777"
             }),
-            /* @__PURE__ */ jsxs(import_react_native28.View, {
+            /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 flexDirection: "row",
                 gap: 8,
@@ -29958,7 +29969,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }, line.key)),
-        /* @__PURE__ */ jsxs(import_react_native28.View, {
+        /* @__PURE__ */ jsxs(import_react_native29.View, {
           style: {
             flexDirection: "row",
             flexWrap: "wrap",
@@ -30090,7 +30101,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             placeholderTextColor: "#777"
           })
         }),
-        /* @__PURE__ */ jsx(import_react_native28.View, {
+        /* @__PURE__ */ jsx(import_react_native29.View, {
           style: {
             flexDirection: "row",
             flexWrap: "wrap",
@@ -30141,7 +30152,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       applyFakeNitro();
       force();
     };
-    return /* @__PURE__ */ jsx(import_react_native28.View, {
+    return /* @__PURE__ */ jsx(import_react_native29.View, {
       style: {
         padding: 16,
         gap: 24
@@ -30228,7 +30239,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 selectable: true,
                 children: link
               }) : null,
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -30253,7 +30264,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         findByProps("setString", "getString")?.setString?.(link);
                         showToast("Copied gift link.");
                       } catch (e) {
-                        import_react_native28.Alert.alert("Gift link", link);
+                        import_react_native29.Alert.alert("Gift link", link);
                       }
                     }
                   }) : null,
@@ -30290,7 +30301,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   placeholderTextColor: "#777"
                 }, inputKey)
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -30346,7 +30357,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           /* @__PURE__ */ jsx(ServerCloneSection, {}),
           /* @__PURE__ */ jsx(K2.Section, {
             title: "Account tools",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -30373,7 +30384,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function ExtrasPage({ section }) {
-    return /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       keyboardDismissMode: "on-drag",
       automaticallyAdjustKeyboardInsets: true,
@@ -30603,19 +30614,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         connectRealProfileMenu();
         yield pullOwnSharedProfile();
         void refreshPublishedBadges(true);
-        import_react_native28.AppState.addEventListener("change", (state2) => {
+        import_react_native29.AppState.addEventListener("change", (state2) => {
           if (state2 === "active")
             void refreshPublishedBadges(true);
         });
         if (!sharedSyncTimer)
           sharedSyncTimer = setInterval(() => {
-            if (import_react_native28.AppState.currentState !== "active")
+            if (import_react_native29.AppState.currentState !== "active")
               return;
             void pullOwnSharedProfile().catch((error) => {
               diagnostics.last = error?.message || "Could not refresh Fake Profile";
             });
             refreshSharedProfiles();
-            if (import_react_native28.AppState.currentState === "active")
+            if (import_react_native29.AppState.currentState === "active")
               void refreshPublishedBadges();
           }, 15e3);
         if (preview.enabled) {
@@ -30637,7 +30648,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           height: Number(asset.height)
         };
       return yield withTimeout(new Promise((resolve, reject) => {
-        import_react_native28.Image.getSize(uri, (width, height) => resolve({
+        import_react_native29.Image.getSize(uri, (width, height) => resolve({
           width,
           height
         }), reject);
@@ -30823,7 +30834,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [url2, setUrl] = (0, import_react9.useState)("");
     var [error, setError] = (0, import_react9.useState)("");
     var tags = availableServerTags(safeStore("UserStore")?.getUsers?.());
-    return /* @__PURE__ */ jsxs(import_react_native28.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native29.ScrollView, {
       contentContainerStyle: {
         padding: 16,
         gap: 16
@@ -30888,7 +30899,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function NameStylePreview({ styles: styles2 = preview.displayNameStyles || null }) {
     var NativeName = findByProps("AVERAGE_FONT_WIDTH_RATIO")?.default;
     var name = preview.displayName || preview.username || realCurrentUser?.globalName || realCurrentUser?.username || "Your name";
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       style: {
         padding: 16,
         borderRadius: 12,
@@ -30936,7 +30947,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
     var NativeName = findByProps("AVERAGE_FONT_WIDTH_RATIO")?.default;
     var name = preview.displayName || preview.username || realCurrentUser?.globalName || realCurrentUser?.username || "Your name";
-    return /* @__PURE__ */ jsxs(import_react_native28.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native29.ScrollView, {
       contentContainerStyle: {
         padding: 16,
         gap: 12
@@ -30950,7 +30961,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ...selected,
             [field]: option.value
           };
-          return /* @__PURE__ */ jsx(import_react_native28.View, {
+          return /* @__PURE__ */ jsx(import_react_native29.View, {
             style: {
               borderRadius: 12,
               borderWidth: selected[field] === option.value ? 2 : 0,
@@ -31169,7 +31180,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         yield task();
       } catch (error) {
         if (ownerId === currentUserId)
-          import_react_native28.Alert.alert("Templates", /not found/i.test(String(error?.message)) ? "That template doesn't exist or is private." : error?.message || "Something went wrong.");
+          import_react_native29.Alert.alert("Templates", /not found/i.test(String(error?.message)) ? "That template doesn't exist or is private." : error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
@@ -31252,7 +31263,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       showToast(pubVisibility === "public" ? "Published to templates" : "Template link created");
     })());
     var codeId = shareCodeFrom(code);
-    var pill = (label2, on, onPress) => /* @__PURE__ */ jsx(import_react_native28.Pressable, {
+    var pill = (label2, on, onPress) => /* @__PURE__ */ jsx(import_react_native29.Pressable, {
       onPress,
       style: {
         paddingHorizontal: 12,
@@ -31269,7 +31280,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         children: label2
       })
     }, label2);
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       style: {
         gap: 20
       },
@@ -31278,7 +31289,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           children: /* @__PURE__ */ jsx(S2.Section, {
             title: "Previewing \u201C" + previewing.name + "\u201D",
             description: "Your profile shows this template right now, only for you. Nothing is saved or synced until you choose Use.",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 flexDirection: "row",
                 gap: 8
@@ -31317,7 +31328,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   onChangeText: setQuery
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31328,7 +31339,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   pill("New", sort === "new", () => setSort("new"))
                 ]
               }),
-              /* @__PURE__ */ jsx(import_react_native28.View, {
+              /* @__PURE__ */ jsx(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31353,7 +31364,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }) : null,
         (items || []).map((template) => {
           var p = template.preview || {};
-          return /* @__PURE__ */ jsxs(import_react_native28.View, {
+          return /* @__PURE__ */ jsxs(import_react_native29.View, {
             style: {
               gap: 8
             },
@@ -31368,14 +31379,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 bio: template.description || p.bio || void 0,
                 badges: []
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 8
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native28.View, {
+                  /* @__PURE__ */ jsxs(import_react_native29.View, {
                     style: {
                       flex: 1
                     },
@@ -31429,7 +31440,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   onChangeText: setCode
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -31476,7 +31487,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   onChangeText: setPubDescription
                 })
               }),
-              /* @__PURE__ */ jsx(import_react_native28.View, {
+              /* @__PURE__ */ jsx(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31484,7 +31495,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 },
                 children: TEMPLATE_CATEGORIES.map((name) => pill(name, pubCategory === name, () => setPubCategory(name)))
               }),
-              /* @__PURE__ */ jsx(import_react_native28.View, {
+              /* @__PURE__ */ jsx(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31593,7 +31604,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         yield task();
       } catch (error) {
         if (ownerId === currentUserId)
-          import_react_native28.Alert.alert(title, error?.message || "Something went wrong.");
+          import_react_native29.Alert.alert(title, error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
@@ -31688,7 +31699,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (e) {
       }
     };
-    var remove = (item) => import_react_native28.Alert.alert("Delete \u201C" + item.name + "\u201D?", "This saved copy is removed. Your current profile stays as it is.", [
+    var remove = (item) => import_react_native29.Alert.alert("Delete \u201C" + item.name + "\u201D?", "This saved copy is removed. Your current profile stays as it is.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -31731,7 +31742,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } : item));
       setRenaming(null);
     };
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       style: {
         gap: 20
       },
@@ -31834,7 +31845,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var active = JSON.stringify(savedSnapshot(data)) === currentJson;
           var appearance = studioPreviewAppearance(data, realUser);
           var badges = studioBadgeIcons(data, ownerId ?? "");
-          return /* @__PURE__ */ jsxs(import_react_native28.View, {
+          return /* @__PURE__ */ jsxs(import_react_native29.View, {
             style: {
               gap: 10
             },
@@ -31854,7 +31865,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   details: data.customActivity.details
                 } : null
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -31862,7 +31873,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   paddingHorizontal: 2
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native28.View, {
+                  /* @__PURE__ */ jsxs(import_react_native29.View, {
                     style: {
                       flex: 1,
                       gap: 2
@@ -31917,7 +31928,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }) : null
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -31946,7 +31957,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }),
               expanded2 === item.id ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native28.View, {
+                  /* @__PURE__ */ jsxs(import_react_native29.View, {
                     style: {
                       flexDirection: "row",
                       flexWrap: "wrap",
@@ -31978,7 +31989,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsxs(import_react_native28.View, {
+                  /* @__PURE__ */ jsxs(import_react_native29.View, {
                     style: {
                       flexDirection: "row",
                       flexWrap: "wrap",
@@ -32001,7 +32012,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native28.View, {
+                  sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native29.View, {
                     style: {
                       gap: 8
                     },
@@ -32025,7 +32036,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           item.share.id
                         ]
                       }) : null,
-                      /* @__PURE__ */ jsxs(import_react_native28.View, {
+                      /* @__PURE__ */ jsxs(import_react_native29.View, {
                         style: {
                           flexDirection: "row",
                           gap: 8
@@ -32312,7 +32323,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function CustomColorPicker({ title, initialColor, onApply }) {
     var [color, setColor] = (0, import_react9.useState)(initialColor);
-    return /* @__PURE__ */ jsxs(import_react_native28.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native29.ScrollView, {
       contentContainerStyle: {
         padding: 12,
         paddingBottom: 48,
@@ -32321,7 +32332,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       keyboardShouldPersistTaps: "handled",
       children: [
         /* @__PURE__ */ jsx(Card2, {
-          children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+          children: /* @__PURE__ */ jsxs(import_react_native29.View, {
             style: {
               padding: 16,
               gap: 12
@@ -32424,7 +32435,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (error) {
         diagnostics.last = error?.message || "Could not open the picker.";
         redraw();
-        import_react_native28.Alert.alert("FakeProfile", diagnostics.last);
+        import_react_native29.Alert.alert("FakeProfile", diagnostics.last);
       }
     })();
     var clearMedia = (field) => {
@@ -32520,7 +32531,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ]
         });
       } catch (error) {
-        import_react_native28.Alert.alert("Couldn't open badges", error?.message || "Try opening the editor again.");
+        import_react_native29.Alert.alert("Couldn't open badges", error?.message || "Try opening the editor again.");
       }
     };
     var chooseGiftBadge = () => {
@@ -32556,7 +32567,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     };
     var MediaEditor = ({ label: label2, field, banner = false }) => {
       var value = preview[field];
-      return /* @__PURE__ */ jsxs(import_react_native28.View, {
+      return /* @__PURE__ */ jsxs(import_react_native29.View, {
         style: {
           width: "100%",
           gap: 9,
@@ -32573,7 +32584,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             color: "text-muted",
             children: "Choose your file, then refresh here to load it."
           }),
-          /* @__PURE__ */ jsxs(import_react_native28.View, {
+          /* @__PURE__ */ jsxs(import_react_native29.View, {
             style: {
               width: "100%",
               gap: 8
@@ -32582,7 +32593,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(ActionButton, {
                 label: "Upload",
                 onPress: () => {
-                  void require_react_native().Linking.openURL("https://getcloudcord.com/upload").catch(() => import_react_native28.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser."));
+                  void require_react_native().Linking.openURL("https://getcloudcord.com/upload").catch(() => import_react_native29.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser."));
                 }
               }),
               /* @__PURE__ */ jsx(ActionButton, {
@@ -32597,13 +32608,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     refreshPreview();
                     redraw();
                   } catch (error) {
-                    import_react_native28.Alert.alert("Couldn't refresh", error?.message || "Try again later.");
+                    import_react_native29.Alert.alert("Couldn't refresh", error?.message || "Try again later.");
                   }
                 })())()
               })
             ]
           }),
-          value?.uri && /* @__PURE__ */ jsxs(import_react_native28.View, {
+          value?.uri && /* @__PURE__ */ jsxs(import_react_native29.View, {
             style: {
               width: "100%",
               borderRadius: 12,
@@ -32611,7 +32622,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               backgroundColor: "#1e1f22"
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native28.View, {
+              /* @__PURE__ */ jsx(import_react_native29.View, {
                 style: banner ? {
                   width: "100%",
                   aspectRatio: 2.5,
@@ -32624,7 +32635,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   alignSelf: "center",
                   marginVertical: 12
                 },
-                children: /* @__PURE__ */ jsx(import_react_native28.Image, {
+                children: /* @__PURE__ */ jsx(import_react_native29.Image, {
                   source: {
                     uri: value.uri
                   },
@@ -32635,7 +32646,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native28.View, {
+              /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -32754,7 +32765,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var appearance = studioPreviewAppearance(preview, realCurrentUser);
     var syncLabel = profileSyncLabel();
     var canSync = Boolean(currentUserId && preview.enabled && !Reflect.get(rootSettings, "fakeProfilePreviewBackup") && syncLabel !== "Syncing\u2026" && syncLabel !== "Retry scheduled");
-    return /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
       style: {
         flex: 1,
         width: "100%"
@@ -32768,7 +32779,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         paddingBottom: 48
       },
       keyboardShouldPersistTaps: "handled",
-      children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native29.View, {
         style: {
           width: "100%",
           gap: 24
@@ -32784,7 +32795,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             quickLook: showPreview,
             onQuickLook: () => setShowPreview(!showPreview)
           }),
-          /* @__PURE__ */ jsxs(import_react_native28.View, {
+          /* @__PURE__ */ jsxs(import_react_native29.View, {
             style: {
               flexDirection: "row",
               gap: 8
@@ -32803,7 +32814,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ]
           }),
           showPreview ? /* @__PURE__ */ jsx(Card2, {
-            children: /* @__PURE__ */ jsx(import_react_native28.View, {
+            children: /* @__PURE__ */ jsx(import_react_native29.View, {
               style: {
                 padding: 16
               },
@@ -33071,7 +33082,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "custom" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native28.View, {
+            children: /* @__PURE__ */ jsx(import_react_native29.View, {
               style: {
                 padding: 16
               },
@@ -33080,7 +33091,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "profile" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33123,7 +33134,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       onPress: () => _async_to_generator(function* () {
                         var target = resolveCopyTarget(copyId);
                         if (!target) {
-                          import_react_native28.Alert.alert("Couldn't find that person", "Use their user ID (long-press them \u2192 Copy User ID), or the username of someone you share a server with.");
+                          import_react_native29.Alert.alert("Couldn't find that person", "Use their user ID (long-press them \u2192 Copy User ID), or the username of someone you share a server with.");
                           return;
                         }
                         setCopying(true);
@@ -33143,7 +33154,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           redraw();
                           showToast("Copied " + (copied.displayName || copied.username || "their profile"));
                         } catch (error) {
-                          import_react_native28.Alert.alert("Couldn't copy", error?.message || "Try again.");
+                          import_react_native29.Alert.alert("Couldn't copy", error?.message || "Try again.");
                         } finally {
                           setCopying(false);
                         }
@@ -33203,7 +33214,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           }
                         }
                         if (!uri) {
-                          import_react_native28.Alert.alert("No profile picture", "Set a profile picture first.");
+                          import_react_native29.Alert.alert("No profile picture", "Set a profile picture first.");
                           return;
                         }
                         update("bannerMedia", {
@@ -33304,7 +33315,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "cosmetics" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33439,7 +33450,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "name" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33450,7 +33461,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   description: "Font, effect and colors for your display name.",
                   children: [
                     /* @__PURE__ */ jsx(NameStylePreview, {}),
-                    /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    /* @__PURE__ */ jsxs(import_react_native29.View, {
                       style: {
                         borderRadius: 16,
                         overflow: "hidden"
@@ -33564,7 +33575,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                             placeholderTextColor: "#777"
                           })
                         }),
-                        /* @__PURE__ */ jsx(import_react_native28.View, {
+                        /* @__PURE__ */ jsx(import_react_native29.View, {
                           style: {
                             borderRadius: 16,
                             overflow: "hidden"
@@ -33609,7 +33620,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "status" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33756,7 +33767,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "dates" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native28.View, {
+            children: /* @__PURE__ */ jsx(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33781,7 +33792,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "badges" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33815,7 +33826,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         }, true)
                       }))
                     }),
-                    preview.selectedBadges?.oldname ? /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    preview.selectedBadges?.oldname ? /* @__PURE__ */ jsxs(import_react_native29.View, {
                       style: {
                         gap: 8,
                         marginTop: 4
@@ -33868,7 +33879,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         }))
                       ]
                     }),
-                    preview.nitroEnabled ? /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    preview.nitroEnabled ? /* @__PURE__ */ jsxs(import_react_native29.View, {
                       style: {
                         gap: 8
                       },
@@ -33949,7 +33960,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     var badge = ACTIVITY_BADGES.find((item) => item.key === group.id);
                     var tierIndex = picked && badge ? badge.tiers.findIndex(([name]) => name === picked.name) : -1;
                     var unit = group.id === "account_age" ? "Years" : group.id === "game_variety" ? "Games played" : "Hours";
-                    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    return /* @__PURE__ */ jsxs(import_react_native29.View, {
                       style: {
                         gap: 8
                       },
@@ -33987,7 +33998,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   title: "Badge order",
                   description: "Top to bottom is the order on your profile.",
                   children: [
-                    editableBadgeRows().map((badge, index, rows) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+                    editableBadgeRows().map((badge, index, rows) => /* @__PURE__ */ jsxs(import_react_native29.View, {
                       style: {
                         flexDirection: "row",
                         alignItems: "center",
@@ -33995,7 +34006,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         paddingVertical: 6
                       },
                       children: [
-                        /* @__PURE__ */ jsx(import_react_native28.Image, {
+                        /* @__PURE__ */ jsx(import_react_native29.Image, {
                           source: badge.source || {
                             uri: badge.iconSrc || (/^[a-f0-9]{32}$/i.test(badge.icon || "") ? `https://cdn.discordapp.com/badge-icons/${badge.icon}.png` : badge.icon)
                           },
@@ -34009,7 +34020,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           },
                           resizeMode: "contain"
                         }),
-                        /* @__PURE__ */ jsx(import_react_native28.View, {
+                        /* @__PURE__ */ jsx(import_react_native29.View, {
                           style: {
                             flex: 1
                           },
@@ -34019,7 +34030,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                             children: badge.description || badge.id
                           })
                         }),
-                        /* @__PURE__ */ jsx(import_react_native28.Pressable, {
+                        /* @__PURE__ */ jsx(import_react_native29.Pressable, {
                           accessibilityRole: "button",
                           accessibilityLabel: preview.hiddenBadgeIds.includes(badge.id) ? "Show badge" : "Hide badge",
                           onPress: () => update("hiddenBadgeIds", preview.hiddenBadgeIds.includes(badge.id) ? preview.hiddenBadgeIds.filter((id) => id !== badge.id) : [
@@ -34038,7 +34049,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         [
                           -1,
                           1
-                        ].map((direction) => /* @__PURE__ */ jsx(import_react_native28.Pressable, {
+                        ].map((direction) => /* @__PURE__ */ jsx(import_react_native29.Pressable, {
                           accessibilityRole: "button",
                           accessibilityLabel: direction === -1 ? "Move badge up" : "Move badge down",
                           disabled: direction === -1 ? index === 0 : index === rows.length - 1,
@@ -34077,7 +34088,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             "dates"
           ].includes(activeTab) ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 16,
                 gap: 12
@@ -34136,12 +34147,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     try {
                       var confirmed = yield publishSharedProfile();
                       if (confirmed && currentUserId === ownerId && profileSyncLabel() === "Synced")
-                        import_react_native28.Alert.alert("Profile synced", "CloudCord accepted the current profile for sharing.");
+                        import_react_native29.Alert.alert("Profile synced", "CloudCord accepted the current profile for sharing.");
                     } catch (error) {
                       if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
                         return;
                       diagnostics.last = error?.message || "Could not sync this profile";
-                      import_react_native28.Alert.alert("FakeProfile", diagnostics.last);
+                      import_react_native29.Alert.alert("FakeProfile", diagnostics.last);
                     }
                     redraw();
                   })())()
@@ -34156,7 +34167,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }),
           showDetails ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
               style: {
                 padding: 14,
                 gap: 5
@@ -34246,7 +34257,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native28, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react9, import_react_native29, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -34280,7 +34291,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_common();
       init_components();
       import_react9 = __toESM(require_react());
-      import_react_native28 = __toESM(require_react_native());
+      import_react_native29 = __toESM(require_react_native());
       TableRow3.Icon = function TableRowIcon2(props) {
         var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
         return /* @__PURE__ */ jsx(S2.RowIcon, {
@@ -35481,7 +35492,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             key: "render",
             value: function render() {
-              return this.state.failed ? /* @__PURE__ */ jsxs(import_react_native28.View, {
+              return this.state.failed ? /* @__PURE__ */ jsxs(import_react_native29.View, {
                 children: [
                   /* @__PURE__ */ jsx(Text, {
                     variant: "heading-lg/bold",
@@ -35581,11 +35592,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   // src/core/ui/settings/components/ScaledPluginSettings.tsx
   function ScaledPluginSettings({ component: Component2 }) {
     if (typeof Component2 !== "function") {
-      return /* @__PURE__ */ jsx(import_react_native29.View, {
+      return /* @__PURE__ */ jsx(import_react_native30.View, {
         style: {
           padding: 16
         },
-        children: /* @__PURE__ */ jsx(import_react_native29.Text, {
+        children: /* @__PURE__ */ jsx(import_react_native30.Text, {
           style: {
             color: "#ffffff"
           },
@@ -35593,7 +35604,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         })
       });
     }
-    return /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native30.ScrollView, {
       style: {
         flex: 1
       },
@@ -35602,7 +35613,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         paddingHorizontal: 12
       },
       showsVerticalScrollIndicator: true,
-      children: /* @__PURE__ */ jsx(import_react_native29.View, {
+      children: /* @__PURE__ */ jsx(import_react_native30.View, {
         style: {
           width: "100%",
           paddingRight: 24,
@@ -35612,14 +35623,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native29;
+  var import_react_native30;
   var init_ScaledPluginSettings = __esm({
     "src/core/ui/settings/components/ScaledPluginSettings.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_jsxRuntime();
-      import_react_native29 = __toESM(require_react_native());
+      import_react_native30 = __toESM(require_react_native());
     }
   });
 
@@ -35703,7 +35714,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         component: SettingsComponent
       }, `storecloud-settings-${refresh}`);
     }
-    return /* @__PURE__ */ jsx(import_react_native30.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native31.ScrollView, {
       style: {
         flex: 1
       },
@@ -35720,7 +35731,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           /* @__PURE__ */ jsxs(TableRowGroup, {
             title: "CloudSync",
             children: [
-              /* @__PURE__ */ jsxs(import_react_native30.View, {
+              /* @__PURE__ */ jsxs(import_react_native31.View, {
                 style: {
                   paddingHorizontal: 12,
                   paddingBottom: 12
@@ -35771,7 +35782,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }),
           /* @__PURE__ */ jsx(Card, {
             border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native30.View, {
+            children: /* @__PURE__ */ jsx(import_react_native31.View, {
               style: {
                 padding: 12
               },
@@ -35786,7 +35797,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react10, import_react_native30, PLUGIN_URL, STORECLOUD_ICON;
+  var import_react10, import_react_native31, PLUGIN_URL, STORECLOUD_ICON;
   var init_StoreCloud = __esm({
     "src/core/ui/settings/pages/StoreCloud/index.tsx"() {
       "use strict";
@@ -35801,7 +35812,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_toasts();
       init_components();
       import_react10 = __toESM(require_react());
-      import_react_native30 = __toESM(require_react_native());
+      import_react_native31 = __toESM(require_react_native());
       PLUGIN_URL = "https://revenge.nexpid.xyz/cloud-sync/";
       STORECLOUD_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
     }
@@ -36670,7 +36681,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             state: error ? "error" : void 0,
             errorMessage: error || void 0
           }),
-          /* @__PURE__ */ jsx(import_react_native31.ScrollView, {
+          /* @__PURE__ */ jsx(import_react_native32.ScrollView, {
             horizontal: true,
             showsHorizontalScrollIndicator: false,
             style: {
@@ -36774,7 +36785,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }, []);
     if (results.length === 0 && !query && !enabledOnly && !filter && !props.ListHeaderComponent) {
-      return /* @__PURE__ */ jsxs(import_react_native31.View, {
+      return /* @__PURE__ */ jsxs(import_react_native32.View, {
         style: {
           gap: 32,
           flexGrow: 1,
@@ -36782,13 +36793,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           alignItems: "center"
         },
         children: [
-          /* @__PURE__ */ jsxs(import_react_native31.View, {
+          /* @__PURE__ */ jsxs(import_react_native32.View, {
             style: {
               gap: 8,
               alignItems: "center"
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native31.Image, {
+              /* @__PURE__ */ jsx(import_react_native32.Image, {
                 source: findAssetId("empty_quick_switcher")
               }),
               /* @__PURE__ */ jsx(Text, {
@@ -36807,12 +36818,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ]
       });
     }
-    var headerElement = /* @__PURE__ */ jsxs(import_react_native31.View, {
+    var headerElement = /* @__PURE__ */ jsxs(import_react_native32.View, {
       style: {
         paddingBottom: 8
       },
       children: [
-        settings.safeMode?.enabled && /* @__PURE__ */ jsxs(import_react_native31.View, {
+        settings.safeMode?.enabled && /* @__PURE__ */ jsxs(import_react_native32.View, {
           style: {
             marginBottom: 10
           },
@@ -36825,7 +36836,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             props.safeModeHint?.footer
           ]
         }),
-        /* @__PURE__ */ jsxs(import_react_native31.View, {
+        /* @__PURE__ */ jsxs(import_react_native32.View, {
           style: {
             flexDirection: "row",
             gap: 8
@@ -36892,14 +36903,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           keyboardShouldPersistTaps: "handled",
           estimatedItemSize: 136,
           ListHeaderComponent: headerElement,
-          ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native31.View, {
+          ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native32.View, {
             style: {
               gap: 12,
               padding: 12,
               alignItems: "center"
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native31.Image, {
+              /* @__PURE__ */ jsx(import_react_native32.Image, {
                 source: findAssetId("devices_not_found")
               }),
               /* @__PURE__ */ jsx(Text, {
@@ -36923,7 +36934,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             paddingHorizontal: 12,
             paddingBottom: 90
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native31.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native32.View, {
             style: {
               height: 8
             }
@@ -36942,7 +36953,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_fuzzysort, import_react11, import_react_native31, showSimpleActionSheet2, hideActionSheet;
+  var import_fuzzysort, import_react11, import_react_native32, showSimpleActionSheet2, hideActionSheet;
   var init_AddonPage = __esm({
     "src/core/ui/components/AddonPage.tsx"() {
       "use strict";
@@ -36962,7 +36973,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_dist();
       import_fuzzysort = __toESM(require_fuzzysort());
       import_react11 = __toESM(require_react());
-      import_react_native31 = __toESM(require_react_native());
+      import_react_native32 = __toESM(require_react_native());
       ({ showSimpleActionSheet: showSimpleActionSheet2, hideActionSheet } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
     }
   });
@@ -63292,7 +63303,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     };
   }
   function NavigationButton({ label: label2, text, onPress }) {
-    return /* @__PURE__ */ jsx(import_react_native32.Pressable, {
+    return /* @__PURE__ */ jsx(import_react_native33.Pressable, {
       accessibilityRole: "button",
       accessibilityLabel: label2,
       onPress,
@@ -63302,7 +63313,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         alignItems: "center",
         justifyContent: "center"
       },
-      children: /* @__PURE__ */ jsx(import_react_native32.Text, {
+      children: /* @__PURE__ */ jsx(import_react_native33.Text, {
         style: {
           color: resolveSemanticColor(semanticColors.INTERACTIVE_TEXT_DEFAULT),
           fontSize: text === "\u2191" ? 20 : 10,
@@ -63316,7 +63327,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var latency = React2.useSyncExternalStore(voicePing.subscribe, () => voicePing.read(channelId));
     if (!latency || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsx(import_react_native32.Text, {
+    return /* @__PURE__ */ jsx(import_react_native33.Text, {
       accessibilityLabel: "Voice latency",
       style: {
         textAlign: "center",
@@ -63333,7 +63344,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var elapsed = React2.useSyncExternalStore(callClock.subscribe, () => callClock.read(channelId));
     if (!elapsed || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsxs(import_react_native32.Text, {
+    return /* @__PURE__ */ jsxs(import_react_native33.Text, {
       style: {
         textAlign: "center",
         fontSize: 12,
@@ -63353,7 +63364,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       userId
     ]);
     var elapsed = React2.useSyncExternalStore(subscribe, () => voiceMemberClock.read(userId, channelId));
-    return elapsed ? /* @__PURE__ */ jsx(import_react_native32.Text, {
+    return elapsed ? /* @__PURE__ */ jsx(import_react_native33.Text, {
       accessibilityLabel: "Call time " + elapsed,
       style: {
         marginStart: 6,
@@ -63370,20 +63381,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var count = React2.useSyncExternalStore(voiceCounts.subscribe, () => voiceCounts.read(channel));
     if (!count)
       return content;
-    return /* @__PURE__ */ jsxs(import_react_native32.View, {
+    return /* @__PURE__ */ jsxs(import_react_native33.View, {
       style: {
         flex: 1,
         flexDirection: "row",
         alignItems: "center"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native32.View, {
+        /* @__PURE__ */ jsx(import_react_native33.View, {
           style: {
             flex: 1
           },
           children: content
         }),
-        /* @__PURE__ */ jsx(import_react_native32.Text, {
+        /* @__PURE__ */ jsx(import_react_native33.Text, {
           accessibilityLabel: "Voice occupancy " + count,
           style: {
             marginStart: 4,
@@ -63702,7 +63713,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             pending2 = void 0;
         };
         try {
-          import_react_native32.Alert.alert("Confirm message", body, [
+          import_react_native33.Alert.alert("Confirm message", body, [
             {
               text: "Cancel",
               style: "cancel",
@@ -63858,7 +63869,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   label: "Open Sticker Link",
                   onPress: () => {
                     if (enabled())
-                      void import_react_native32.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
+                      void import_react_native33.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
                   }
                 })
               ]
@@ -63969,7 +63980,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             label: label2,
             onPress: () => {
               if (enabled())
-                void import_react_native32.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
+                void import_react_native33.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
             }
           }))
         });
@@ -63988,7 +63999,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var name = getCxImageTitle(link, full);
       return name ? () => {
         if (enabled())
-          import_react_native32.Alert.alert(label2, name);
+          import_react_native33.Alert.alert(label2, name);
       } : void 0;
     });
     return () => {
@@ -64392,20 +64403,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           borderRadius: 3,
           backgroundColor
         };
-        return /* @__PURE__ */ jsxs(import_react_native32.View, {
+        return /* @__PURE__ */ jsxs(import_react_native33.View, {
           style: {
             flexDirection: "row",
             gap: 4
           },
           accessible: false,
           children: [
-            /* @__PURE__ */ jsx(import_react_native32.View, {
+            /* @__PURE__ */ jsx(import_react_native33.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native32.View, {
+            /* @__PURE__ */ jsx(import_react_native33.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native32.View, {
+            /* @__PURE__ */ jsx(import_react_native33.View, {
               style: dot
             })
           ]
@@ -64509,7 +64520,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     ], (element) => {
       if (element.key !== "guild-channel-user-list" || element.props.getItemSize != null)
         return element;
-      if (import_react_native32.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
+      if (import_react_native33.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
         return element;
       return React2.cloneElement(element, {
         getItemSize: 44
@@ -64798,7 +64809,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         return getCxVoiceQueueRoom(channel, voice.getVoiceStatesForChannel(id));
       },
       join: (id) => actions.selectVoiceChannel(id),
-      prompt: (title, body, label2, confirm, cancel) => import_react_native32.Alert.alert(title, body, [
+      prompt: (title, body, label2, confirm, cancel) => import_react_native33.Alert.alert(title, body, [
         {
           text: "Cancel",
           style: "cancel",
@@ -65060,7 +65071,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   if (field.key === "icon")
                     open(value, field.width, field.width);
                   else
-                    import_react_native32.Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
+                    import_react_native33.Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
                 } else {
                   void copyMobileMenuInformation(value, available);
                 }
@@ -65768,9 +65779,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var pageSize = 8;
     var search = query.trim().toLowerCase();
     var matches = items.filter((item) => item.name.toLowerCase().includes(search));
-    return /* @__PURE__ */ jsxs(import_react_native32.View, {
+    return /* @__PURE__ */ jsxs(import_react_native33.View, {
       children: [
-        /* @__PURE__ */ jsx(import_react_native32.TextInput, {
+        /* @__PURE__ */ jsx(import_react_native33.TextInput, {
           accessibilityLabel: "Search saved channels",
           placeholder: "Search saved channels",
           value: query,
@@ -65783,7 +65794,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
           }
         }),
-        /* @__PURE__ */ jsx(import_react_native32.ScrollView, {
+        /* @__PURE__ */ jsx(import_react_native33.ScrollView, {
           style: {
             maxHeight: 270
           },
@@ -65834,7 +65845,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var draft = initial;
       openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
         title: label2,
-        extraContent: /* @__PURE__ */ jsx(import_react_native32.TextInput, {
+        extraContent: /* @__PURE__ */ jsx(import_react_native33.TextInput, {
           accessibilityLabel: tags ? "Private tags" : "Private note",
           defaultValue: initial,
           multiline: true,
@@ -65917,7 +65928,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       findLocalUserTags = notes.search;
     else
       clearLocalNotes[kind] = () => {
-        void notes.clear(() => new Promise((resolve) => import_react_native32.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
+        void notes.clear(() => new Promise((resolve) => import_react_native33.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
           {
             text: "Cancel",
             style: "cancel",
@@ -65989,7 +66000,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               if (asset.kind === "Avatar")
                 open(512, 512);
               else
-                import_react_native32.Image.getSize(asset.url, open, () => open(1024, 384));
+                import_react_native33.Image.getSize(asset.url, open, () => open(1024, 384));
             }
           },
           {
@@ -66077,7 +66088,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           },
           openLink: (link, channel, user) => setTimeout(() => {
             if (active && !settings.safeMode?.enabled && context.currentUser() === user && context.selectedChannel() === channel)
-              void import_react_native32.Linking.openURL(link).catch(() => {
+              void import_react_native33.Linking.openURL(link).catch(() => {
               });
           }, 0),
           notify: (body) => setTimeout(() => {
@@ -66300,7 +66311,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var link = getCxSteamLink(options.href);
                 if (!link?.mobile || blockedDomains.isBlockedDomain(link.https) !== null)
                   return invoke(args);
-                void import_react_native32.Linking.openURL(link.https).catch(() => {
+                void import_react_native33.Linking.openURL(link.https).catch(() => {
                   if (enabled())
                     showToast("Couldn't open the Steam link.");
                 });
@@ -66422,7 +66433,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   label: "Decode Base64",
                   run() {
                     close();
-                    import_react_native32.Alert.alert("Decoded Base64", decoded, [
+                    import_react_native33.Alert.alert("Decoded Base64", decoded, [
                       {
                         text: "Close",
                         style: "cancel"
@@ -67050,7 +67061,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         refreshRememberedAppearance();
       }
     }
-    return /* @__PURE__ */ jsx(import_react_native32.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native33.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16
@@ -67068,7 +67079,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }),
           !kind && showCatalog && /* @__PURE__ */ jsxs(Fragment, {
             children: [
-              /* @__PURE__ */ jsx(import_react_native32.TextInput, {
+              /* @__PURE__ */ jsx(import_react_native33.TextInput, {
                 accessibilityLabel: "Search CX catalog",
                 placeholder: "Search name, feature or /command",
                 placeholderTextColor: "#b5bac1",
@@ -67087,13 +67098,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   padding: 12
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native32.View, {
+              /* @__PURE__ */ jsx(import_react_native33.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 6
                 },
-                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native32.Pressable, {
+                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native33.Pressable, {
                   accessibilityRole: "button",
                   accessibilityLabel: `Filter by ${value}`,
                   accessibilityState: {
@@ -67115,7 +67126,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     borderColor: resolveSemanticColor(category === value ? semanticColors.INTERACTIVE_TEXT_DEFAULT : semanticColors.BORDER_SUBTLE),
                     backgroundColor: resolveSemanticColor(semanticColors.CARD_BACKGROUND_DEFAULT)
                   },
-                  children: /* @__PURE__ */ jsx(import_react_native32.Text, {
+                  children: /* @__PURE__ */ jsx(import_react_native33.Text, {
                     style: {
                       color: resolveSemanticColor(semanticColors.TEXT_DEFAULT),
                       fontWeight: category === value ? "700" : "400"
@@ -67188,13 +67199,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               })
             ]
           }),
-          !entry && /* @__PURE__ */ jsx(import_react_native32.Text, {
+          !entry && /* @__PURE__ */ jsx(import_react_native33.Text, {
             style: {
               color: "#b5bac1"
             },
             children: "Paste the contents of a .cx file to review it."
           }),
-          !entry && /* @__PURE__ */ jsx(import_react_native32.TextInput, {
+          !entry && /* @__PURE__ */ jsx(import_react_native33.TextInput, {
             accessibilityLabel: "CX source",
             placeholder: kind === "plugin" ? 'plugin "My Plugin":' : 'theme "Midnight":',
             placeholderTextColor: "#b5bac1",
@@ -67233,7 +67244,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   ...candidate.review.commands ?? []
                 ].join("\n")
               }),
-              candidate && candidate.review.numberOptions.filter((option) => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency").map((option) => /* @__PURE__ */ jsxs(import_react_native32.View, {
+              candidate && candidate.review.numberOptions.filter((option) => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency").map((option) => /* @__PURE__ */ jsxs(import_react_native33.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -67242,7 +67253,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   paddingVertical: 6
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native32.Text, {
+                  /* @__PURE__ */ jsxs(import_react_native33.Text, {
                     style: {
                       color: "#fff",
                       flex: 1
@@ -67257,7 +67268,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                       ")"
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native32.TextInput, {
+                  /* @__PURE__ */ jsx(import_react_native33.TextInput, {
                     accessibilityLabel: option.label,
                     keyboardType: "number-pad",
                     selectTextOnFocus: true,
@@ -67402,7 +67413,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               })
             ]
           }),
-          /* @__PURE__ */ jsx(import_react_native32.Text, {
+          /* @__PURE__ */ jsx(import_react_native33.Text, {
             accessibilityLiveRegion: "polite",
             style: {
               color: "#b5bac1"
@@ -67413,7 +67424,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native32, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore2, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, failedRestores, rememberedAppearanceListeners, rememberedAppearanceUpdates;
+  var import_react_native33, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore2, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, failedRestores, rememberedAppearanceListeners, rememberedAppearanceUpdates;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -67459,7 +67470,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cx();
       init_common();
       init_components();
-      import_react_native32 = __toESM(require_react_native());
+      import_react_native33 = __toESM(require_react_native());
       session = createCxSession();
       callClock = createCxCallClock();
       voiceMemberClock = createCxVoiceMemberClock();
@@ -67560,12 +67571,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerHiddenAppearancePaths(mobile.hideComponentPaths);
           if ("scrollIndicators" in mobile) {
             var scrollViews = /* @__PURE__ */ new Set([
-              import_react_native32.ScrollView,
-              import_react_native32.FlatList,
-              import_react_native32.SectionList,
-              import_react_native32.Animated?.ScrollView,
-              import_react_native32.Animated?.FlatList,
-              import_react_native32.Animated?.SectionList
+              import_react_native33.ScrollView,
+              import_react_native33.FlatList,
+              import_react_native33.SectionList,
+              import_react_native33.Animated?.ScrollView,
+              import_react_native33.Animated?.FlatList,
+              import_react_native33.Animated?.SectionList
             ]);
             var components = [
               ...scrollViews
@@ -67741,7 +67752,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerReducedMotion();
           if ("mentionHighlight" in style) {
             var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-            var highlightColor = (0, import_react_native32.processColor)(style.mentionHighlight);
+            var highlightColor = (0, import_react_native33.processColor)(style.mentionHighlight);
             if (typeof highlightColor !== "number")
               throw new Error("Discord's message highlight color is unavailable");
             return overrideCxMethods(renderer, {
@@ -67782,7 +67793,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 var input = args[0];
                 if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number")
                   return presentation;
-                var width = style.width * import_react_native32.PixelRatio.getFontScale();
+                var width = style.width * import_react_native33.PixelRatio.getFontScale();
                 return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width ? {
                   ...presentation,
                   constrainedWidth: width
@@ -67823,7 +67834,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               }
               if (typeof icon3.value === "string" && "size" in icon3 && typeof icon3.animate === "boolean") {
                 return React2.cloneElement(element, {
-                  children: /* @__PURE__ */ jsx(import_react_native32.View, {
+                  children: /* @__PURE__ */ jsx(import_react_native33.View, {
                     style: iconStyle,
                     children
                   })
@@ -67978,13 +67989,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 16,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native33.View, {
+          /* @__PURE__ */ jsxs(import_react_native34.View, {
             style: {
               flexDirection: "row",
               alignItems: "center"
             },
             children: [
-              /* @__PURE__ */ jsxs(import_react_native33.View, {
+              /* @__PURE__ */ jsxs(import_react_native34.View, {
                 style: styles2.headerLeading,
                 children: [
                   /* @__PURE__ */ jsx(Text, {
@@ -67997,7 +68008,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native33.View, {
+              /* @__PURE__ */ jsxs(import_react_native34.View, {
                 style: [
                   styles2.headerTrailing,
                   {
@@ -68005,7 +68016,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   }
                 ],
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native33.View, {
+                  /* @__PURE__ */ jsxs(import_react_native34.View, {
                     style: styles2.actions,
                     children: [
                       props.overflowActions && /* @__PURE__ */ jsx(IconButton, {
@@ -68042,7 +68053,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   props.toggleType && (props.toggleType === "switch" ? /* @__PURE__ */ jsx(FormSwitch, {
                     value: props.toggleValue(),
                     onValueChange: props.onToggleChange
-                  }) : /* @__PURE__ */ jsx(import_react_native33.TouchableOpacity, {
+                  }) : /* @__PURE__ */ jsx(import_react_native34.TouchableOpacity, {
                     onPress: () => {
                       props.onToggleChange?.(!props.toggleValue());
                     },
@@ -68062,7 +68073,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native33, hideActionSheet2, showSimpleActionSheet3, useStyles3;
+  var import_react_native34, hideActionSheet2, showSimpleActionSheet3, useStyles3;
   var init_AddonCard = __esm({
     "src/core/ui/components/AddonCard.tsx"() {
       "use strict";
@@ -68075,7 +68086,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_wrappers();
       init_color();
       init_styles();
-      import_react_native33 = __toESM(require_react_native());
+      import_react_native34 = __toESM(require_react_native());
       ({ hideActionSheet: hideActionSheet2 } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet")));
       ({ showSimpleActionSheet: showSimpleActionSheet3 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
       useStyles3 = createStyles({
@@ -68235,7 +68246,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             color: "text-muted",
             children: addon.warningMessage
           }),
-          /* @__PURE__ */ jsxs(import_react_native34.View, {
+          /* @__PURE__ */ jsxs(import_react_native35.View, {
             style: {
               flexDirection: "row",
               flexWrap: "wrap",
@@ -68329,12 +68340,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       shown.sort((a, b3) => a.name.localeCompare(b3.name));
     else
       shown.reverse();
-    return /* @__PURE__ */ jsxs(import_react_native34.View, {
+    return /* @__PURE__ */ jsxs(import_react_native35.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native34.View, {
+        /* @__PURE__ */ jsxs(import_react_native35.View, {
           style: {
             paddingHorizontal: 12,
             paddingVertical: 8,
@@ -68346,7 +68357,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               isRound: true,
               onChangeText: setSearch
             }),
-            /* @__PURE__ */ jsxs(import_react_native34.View, {
+            /* @__PURE__ */ jsxs(import_react_native35.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -68388,7 +68399,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               color: "text-muted",
               children: "Third-party plugins run code in your client. Install plugins from authors you trust."
             }),
-            !!error && /* @__PURE__ */ jsxs(import_react_native34.View, {
+            !!error && /* @__PURE__ */ jsxs(import_react_native35.View, {
               style: {
                 gap: 6
               },
@@ -68419,7 +68430,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             paddingHorizontal: 12,
             paddingBottom: 48
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native34.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native35.View, {
             style: {
               height: 8
             }
@@ -68443,7 +68454,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ]
     });
   }
-  var import_react_native34, pluginIndex;
+  var import_react_native35, pluginIndex;
   var init_PluginBrowser = __esm({
     "src/core/ui/settings/pages/PluginBrowser/index.tsx"() {
       "use strict";
@@ -68461,7 +68472,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_common();
       init_components();
       init_Search();
-      import_react_native34 = __toESM(require_react_native());
+      import_react_native35 = __toESM(require_react_native());
       pluginIndex = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
     }
   });
@@ -68532,12 +68543,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       preview2.accent,
       preview2.text
     ];
-    return /* @__PURE__ */ jsx(import_react_native35.View, {
+    return /* @__PURE__ */ jsx(import_react_native36.View, {
       style: {
         flexDirection: "row",
         gap: 6
       },
-      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native35.View, {
+      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native36.View, {
         style: {
           width: 22,
           height: 22,
@@ -68560,7 +68571,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 8,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native35.View, {
+          /* @__PURE__ */ jsxs(import_react_native36.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -68568,7 +68579,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               gap: 12
             },
             children: [
-              /* @__PURE__ */ jsxs(import_react_native35.View, {
+              /* @__PURE__ */ jsxs(import_react_native36.View, {
                 style: {
                   flex: 1
                 },
@@ -68600,13 +68611,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             numberOfLines: 2,
             children: theme.description
           }),
-          /* @__PURE__ */ jsxs(import_react_native35.View, {
+          /* @__PURE__ */ jsxs(import_react_native36.View, {
             style: {
               flexDirection: "row",
               gap: 8
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native35.View, {
+              /* @__PURE__ */ jsx(import_react_native36.View, {
                 style: {
                   flex: 1
                 },
@@ -68618,7 +68629,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   onPress: () => change(theme, active ? "reset" : "use")
                 })
               }),
-              installed && /* @__PURE__ */ jsx(import_react_native35.View, {
+              installed && /* @__PURE__ */ jsx(import_react_native36.View, {
                 style: {
                   flex: 1
                 },
@@ -68703,12 +68714,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     ].some((value) => value.toLowerCase().includes(q3))));
     if (alphabetical)
       shown.sort((a, b3) => a.name.localeCompare(b3.name));
-    return /* @__PURE__ */ jsxs(import_react_native35.View, {
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native35.View, {
+        /* @__PURE__ */ jsxs(import_react_native36.View, {
           style: {
             paddingHorizontal: 12,
             paddingTop: 12,
@@ -68719,7 +68730,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               placeholder: "Search themes or authors",
               onChangeText: setQuery
             }),
-            !!list && /* @__PURE__ */ jsxs(import_react_native35.View, {
+            !!list && /* @__PURE__ */ jsxs(import_react_native36.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -68749,7 +68760,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             })
           ]
         }),
-        error ? /* @__PURE__ */ jsxs(import_react_native35.View, {
+        error ? /* @__PURE__ */ jsxs(import_react_native36.View, {
           style: {
             alignItems: "center",
             gap: 8,
@@ -68791,7 +68802,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             padding: 12,
             paddingBottom: 48
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native35.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native36.View, {
             style: {
               height: 10
             }
@@ -68814,7 +68825,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ]
     });
   }
-  var import_react_native35, CLOUDCORD_INDEX, MARKETPLACE;
+  var import_react_native36, CLOUDCORD_INDEX, MARKETPLACE;
   var init_ThemeStore = __esm({
     "src/core/ui/settings/pages/ThemeStore/index.tsx"() {
       "use strict";
@@ -68829,7 +68840,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_components();
       init_Search();
       init_toasts();
-      import_react_native35 = __toESM(require_react_native());
+      import_react_native36 = __toESM(require_react_native());
       CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/hub/main/themes/mobile/index.json";
       MARKETPLACE = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
     }
@@ -69017,7 +69028,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var themeFonts = currentTheme.fonts;
     var [fontName, setFontName] = (0, import_react12.useState)(guessFontName(Object.values(themeFonts)));
     var [error, setError] = (0, import_react12.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native36.View, {
+    return /* @__PURE__ */ jsxs(import_react_native37.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -69070,7 +69081,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var [fontLink, setFontLink] = (0, import_react12.useState)("");
     var [saving, setSaving] = (0, import_react12.useState)(false);
     var [error, setError] = (0, import_react12.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native36.View, {
+    return /* @__PURE__ */ jsxs(import_react_native37.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -69113,7 +69124,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function EntryEditorActionSheet(props) {
     var [familyName, setFamilyName] = (0, import_react12.useState)(props.name);
     var [fontUrl, setFontUrl] = (0, import_react12.useState)(props.fontEntries[props.name]);
-    return /* @__PURE__ */ jsxs(import_react_native36.View, {
+    return /* @__PURE__ */ jsxs(import_react_native37.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -69171,14 +69182,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var urlRef = (0, import_react12.useRef)();
     var [nameSet, setNameSet] = (0, import_react12.useState)(false);
     var [error, setError] = (0, import_react12.useState)();
-    return /* @__PURE__ */ jsxs(import_react_native36.View, {
+    return /* @__PURE__ */ jsxs(import_react_native37.View, {
       style: {
         flexDirection: "row",
         gap: 8,
         justifyContent: "flex-start"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native36.View, {
+        /* @__PURE__ */ jsx(import_react_native37.View, {
           style: {
             flex: 1
           },
@@ -69246,7 +69257,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var fontEntries = useProxy(memoEntry);
     var navigation2 = NavigationNative.useNavigation();
     var [, forceUpdate] = React.useReducer(() => ({}), 0);
-    return /* @__PURE__ */ jsx(import_react_native36.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native37.ScrollView, {
       style: {
         flex: 1
       },
@@ -69377,7 +69388,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             color: "text-feedback-critical",
             children: "Some font entries cannot be imported. Please modify the entries and try again."
           }),
-          /* @__PURE__ */ jsx(import_react_native36.View, {
+          /* @__PURE__ */ jsx(import_react_native37.View, {
             style: {
               flexDirection: "row",
               justifyContent: "flex-end",
@@ -69420,7 +69431,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react12, import_react_native36, actionSheet2, openAlert2, AlertModal3, AlertActionButton3;
+  var import_react12, import_react_native37, actionSheet2, openAlert2, AlertModal3, AlertActionButton3;
   var init_FontEditor = __esm({
     "src/core/ui/settings/pages/Fonts/FontEditor.tsx"() {
       "use strict";
@@ -69440,7 +69451,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_wrappers();
       init_components2();
       import_react12 = __toESM(require_react());
-      import_react_native36 = __toESM(require_react_native());
+      import_react_native37 = __toESM(require_react_native());
       actionSheet2 = findByPropsLazy("hideActionSheet");
       ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
       ({ AlertModal: AlertModal3, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
@@ -69455,19 +69466,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return /* @__PURE__ */ jsx(Card, {
       children: /* @__PURE__ */ jsx(Stack, {
         spacing: 16,
-        children: /* @__PURE__ */ jsxs(import_react_native37.View, {
+        children: /* @__PURE__ */ jsxs(import_react_native38.View, {
           style: {
             flexDirection: "row",
             alignItems: "center"
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native37.View, {
+            /* @__PURE__ */ jsx(import_react_native38.View, {
               children: /* @__PURE__ */ jsx(Text, {
                 variant: "heading-lg/semibold",
                 children: font.name
               })
             }),
-            /* @__PURE__ */ jsx(import_react_native37.View, {
+            /* @__PURE__ */ jsx(import_react_native38.View, {
               style: {
                 marginLeft: "auto"
               },
@@ -69513,7 +69524,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native37, useToken2;
+  var import_react_native38, useToken2;
   var init_FontCard = __esm({
     "src/core/ui/settings/pages/Fonts/FontCard.tsx"() {
       "use strict";
@@ -69531,7 +69542,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_metro();
       init_common();
       init_components();
-      import_react_native37 = __toESM(require_react_native());
+      import_react_native38 = __toESM(require_react_native());
       init_FontEditor();
       ({ useToken: useToken2 } = lazyDestructure(() => findByProps("useToken")));
     }
@@ -69609,7 +69620,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var discoverLabel = isPlugin ? "Discover plugins" : "Discover themes";
     var discover = wrapOnPress(void 0, navigation2, () => isPlugin ? Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports)) : Promise.resolve().then(() => (init_ThemeStore(), ThemeStore_exports)), discoverLabel, void 0, "push");
     var openFonts = wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_Fonts(), Fonts_exports)), "Fonts", void 0, "push");
-    return /* @__PURE__ */ jsxs(import_react_native38.View, {
+    return /* @__PURE__ */ jsxs(import_react_native39.View, {
       style: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -69663,7 +69674,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native38;
+  var import_react_native39;
   var init_AddonCard2 = __esm({
     "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"() {
       "use strict";
@@ -69677,7 +69688,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_toasts();
       init_common();
       init_components();
-      import_react_native38 = __toESM(require_react_native());
+      import_react_native39 = __toESM(require_react_native());
       init_CxExtensions();
     }
   });
@@ -69732,14 +69743,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       variant: "heading-lg/semibold",
       children: highlightedNode?.length ? highlightedNode : plugin2.name
     });
-    return /* @__PURE__ */ jsxs(import_react_native39.View, {
+    return /* @__PURE__ */ jsxs(import_react_native40.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
         gap: 6
       },
       children: [
-        icon3 && /* @__PURE__ */ jsx(import_react_native39.Image, {
+        icon3 && /* @__PURE__ */ jsx(import_react_native40.Image, {
           style: styles2.smallIcon,
           source: icon3
         }),
@@ -69760,7 +69771,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }, i));
     var badges = plugin2.getBadges();
     var authorText = highlightedNode?.length ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
-    return /* @__PURE__ */ jsxs(import_react_native39.View, {
+    return /* @__PURE__ */ jsxs(import_react_native40.View, {
       style: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -69776,9 +69787,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             authorText
           ]
         }),
-        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native39.View, {
+        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native40.View, {
           style: styles2.badgesContainer,
-          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native39.Image, {
+          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native40.Image, {
             source: b3.source,
             style: styles2.badgeIcon
           }, i))
@@ -69816,13 +69827,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         children: /* @__PURE__ */ jsxs(Stack, {
           spacing: 16,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native39.View, {
+            /* @__PURE__ */ jsxs(import_react_native40.View, {
               style: {
                 flexDirection: "row",
                 justifyContent: "space-between"
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native39.View, {
+                /* @__PURE__ */ jsxs(import_react_native40.View, {
                   style: {
                     flexShrink: 1
                   },
@@ -69831,13 +69842,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     /* @__PURE__ */ jsx(Authors, {})
                   ]
                 }),
-                /* @__PURE__ */ jsx(import_react_native39.View, {
+                /* @__PURE__ */ jsx(import_react_native40.View, {
                   children: /* @__PURE__ */ jsxs(Stack, {
                     spacing: 12,
                     direction: "horizontal",
                     children: [
                       /* @__PURE__ */ jsx(Actions, {}),
-                      /* @__PURE__ */ jsx(import_react_native39.View, {
+                      /* @__PURE__ */ jsx(import_react_native40.View, {
                         style: core ? {
                           opacity: 0.5
                         } : void 0,
@@ -69869,7 +69880,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_chroma_js4, import_react13, import_react_native39, CardContext, useCardContext, Actions;
+  var import_chroma_js4, import_react13, import_react_native40, CardContext, useCardContext, Actions;
   var init_PluginCard = __esm({
     "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"() {
       "use strict";
@@ -69885,14 +69896,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_sheets();
       import_chroma_js4 = __toESM(require_chroma());
       import_react13 = __toESM(require_react());
-      import_react_native39 = __toESM(require_react_native());
+      import_react_native40 = __toESM(require_react_native());
       init_plugins4();
       CardContext = /* @__PURE__ */ (0, import_react13.createContext)(null);
       useCardContext = () => (0, import_react13.useContext)(CardContext);
       Actions = () => {
         var { plugin: plugin2 } = useCardContext();
         var navigation2 = NavigationNative.useNavigation();
-        return /* @__PURE__ */ jsxs(import_react_native39.View, {
+        return /* @__PURE__ */ jsxs(import_react_native40.View, {
           style: {
             flexDirection: "row",
             gap: 6
@@ -69960,23 +69971,23 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         _loop2(author);
       authorTextNode.pop();
     }
-    return /* @__PURE__ */ jsxs(import_react_native40.View, {
+    return /* @__PURE__ */ jsxs(import_react_native41.View, {
       style: {
         gap: 4
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native40.View, {
+        /* @__PURE__ */ jsx(import_react_native41.View, {
           children: /* @__PURE__ */ jsx(Text, {
             variant: "heading-xl/semibold",
             children: plugin2.name
           })
         }),
-        /* @__PURE__ */ jsx(import_react_native40.View, {
+        /* @__PURE__ */ jsx(import_react_native41.View, {
           style: {
             flexDirection: "row",
             flexShrink: 1
           },
-          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native40.View, {
+          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native41.View, {
             style: {
               flexDirection: "row",
               gap: 8,
@@ -70006,7 +70017,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ]
     });
   }
-  var import_react_native40, showUserProfileActionSheet, maybeFetchUser;
+  var import_react_native41, showUserProfileActionSheet, maybeFetchUser;
   var init_TitleComponent = __esm({
     "src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx"() {
       "use strict";
@@ -70018,7 +70029,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_common();
       init_components();
       init_stores();
-      import_react_native40 = __toESM(require_react_native());
+      import_react_native41 = __toESM(require_react_native());
       showUserProfileActionSheet = findByNameLazy("showUserProfileActionSheet");
       ({ getUser: maybeFetchUser } = lazyDestructure(() => findByProps("getUser", "fetchProfile")));
     }
@@ -70137,13 +70148,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       });
     };
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native41.ScrollView, {
+      children: /* @__PURE__ */ jsxs(import_react_native42.ScrollView, {
         contentContainerStyle: {
           gap: 12,
           marginBottom: 12
         },
         children: [
-          /* @__PURE__ */ jsx(import_react_native41.View, {
+          /* @__PURE__ */ jsx(import_react_native42.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -70156,7 +70167,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               plugin: plugin2
             })
           }),
-          /* @__PURE__ */ jsxs(import_react_native41.View, {
+          /* @__PURE__ */ jsxs(import_react_native42.View, {
             style: {
               flexDirection: "row",
               justifyContent: "center",
@@ -70228,7 +70239,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react14, import_react_native41;
+  var import_react14, import_react_native42;
   var init_PluginInfoActionSheet = __esm({
     "src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx"() {
       "use strict";
@@ -70246,7 +70257,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_storage2();
       init_assets();
       import_react14 = __toESM(require_react());
-      import_react_native41 = __toESM(require_react_native());
+      import_react_native42 = __toESM(require_react_native());
       init_TitleComponent();
       init_ScaledPluginSettings();
     }
@@ -70429,7 +70440,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           return /* @__PURE__ */ jsx(AddonActions, {
             kind: "plugin"
           });
-        return /* @__PURE__ */ jsxs(import_react_native42.View, {
+        return /* @__PURE__ */ jsxs(import_react_native43.View, {
           style: {
             marginVertical: 12,
             marginHorizontal: 10
@@ -70440,7 +70451,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             }),
             /* @__PURE__ */ jsx(Card, {
               border: "strong",
-              children: /* @__PURE__ */ jsxs(import_react_native42.View, {
+              children: /* @__PURE__ */ jsxs(import_react_native43.View, {
                 style: {
                   flex: 1,
                   justifyContent: "center",
@@ -70448,7 +70459,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   flexDirection: "row"
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native42.View, {
+                  /* @__PURE__ */ jsxs(import_react_native43.View, {
                     style: {
                       gap: 6,
                       flexShrink: 1
@@ -70465,7 +70476,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native42.View, {
+                  /* @__PURE__ */ jsx(import_react_native43.View, {
                     style: {
                       marginLeft: "auto"
                     },
@@ -70485,7 +70496,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                               contentContainerStyle: {
                                 padding: 8
                               },
-                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native42.View, {
+                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native43.View, {
                                 style: {
                                   height: 8
                                 }
@@ -70557,7 +70568,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
+  var import_react_native43, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -70583,7 +70594,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_metro();
       init_common();
       init_components();
-      import_react_native42 = __toESM(require_react_native());
+      import_react_native43 = __toESM(require_react_native());
       init_bunny();
       init_vendetta();
       ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
@@ -70621,23 +70632,23 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   }
   function TitleComponent2({ theme }) {
     var { authors } = theme.data;
-    return /* @__PURE__ */ jsxs(import_react_native43.View, {
+    return /* @__PURE__ */ jsxs(import_react_native44.View, {
       style: {
         gap: 4
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native43.View, {
+        /* @__PURE__ */ jsx(import_react_native44.View, {
           children: /* @__PURE__ */ jsx(Text, {
             variant: "heading-xl/semibold",
             children: theme.data.name
           })
         }),
-        /* @__PURE__ */ jsx(import_react_native43.View, {
+        /* @__PURE__ */ jsx(import_react_native44.View, {
           style: {
             flexDirection: "row",
             flexShrink: 1
           },
-          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native43.TouchableOpacity, {
+          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native44.TouchableOpacity, {
             style: {
               flexDirection: "row",
               gap: 8,
@@ -70729,13 +70740,13 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     };
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native43.ScrollView, {
+      children: /* @__PURE__ */ jsxs(import_react_native44.ScrollView, {
         contentContainerStyle: {
           gap: 12,
           marginBottom: 12
         },
         children: [
-          /* @__PURE__ */ jsx(import_react_native43.View, {
+          /* @__PURE__ */ jsx(import_react_native44.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -70748,7 +70759,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               theme: themeState
             })
           }),
-          /* @__PURE__ */ jsxs(import_react_native43.View, {
+          /* @__PURE__ */ jsxs(import_react_native44.View, {
             style: {
               flexDirection: "row",
               justifyContent: "center",
@@ -70799,7 +70810,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react15, import_react_native43;
+  var import_react15, import_react_native44;
   var init_ThemeInfoActionSheet = __esm({
     "src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx"() {
       "use strict";
@@ -70812,7 +70823,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_components();
       init_common();
       import_react15 = __toESM(require_react());
-      import_react_native43 = __toESM(require_react_native());
+      import_react_native44 = __toESM(require_react_native());
       init_toasts();
       init_alerts2();
       init_themes();
@@ -70945,7 +70956,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
               title: "Options"
             }),
-            /* @__PURE__ */ jsxs(import_react_native44.View, {
+            /* @__PURE__ */ jsxs(import_react_native45.View, {
               style: {
                 paddingVertical: 20,
                 gap: 12
@@ -71031,7 +71042,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native44;
+  var import_react_native45;
   var init_Themes = __esm({
     "src/core/ui/settings/pages/Themes/index.tsx"() {
       "use strict";
@@ -71051,7 +71062,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_settings();
       init_storage2();
       init_components();
-      import_react_native44 = __toESM(require_react_native());
+      import_react_native45 = __toESM(require_react_native());
     }
   });
 
@@ -71088,7 +71099,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       navigation2
     ]);
     var hasThemes = isThemeSupported();
-    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
       contentContainerStyle: {
         paddingBottom: 38
       },
@@ -71127,7 +71138,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native45;
+  var import_react_native46;
   var init_Addons = __esm({
     "src/core/ui/settings/pages/Addons/index.tsx"() {
       "use strict";
@@ -71135,7 +71146,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
-      import_react_native45 = __toESM(require_react_native());
+      import_react_native46 = __toESM(require_react_native());
       init_common();
       init_components();
       init_loader();
@@ -71207,7 +71218,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         })
       ]
     });
-    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16,
@@ -71256,7 +71267,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 ]
               }),
               field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native46.View, {
+              /* @__PURE__ */ jsxs(import_react_native47.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -71286,7 +71297,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native46.View, {
+              /* @__PURE__ */ jsxs(import_react_native47.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -71338,7 +71349,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       assignment
     }, assignment.userId) : null;
   }
-  var import_react_native46;
+  var import_react_native47;
   var init_TestingPlugins = __esm({
     "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
       "use strict";
@@ -71353,7 +71364,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_pluginTesting();
       init_common();
       init_components();
-      import_react_native46 = __toESM(require_react_native());
+      import_react_native47 = __toESM(require_react_native());
     }
   });
 
@@ -71561,7 +71572,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         children: /* @__PURE__ */ jsxs(SafeAreaView, {
           style: styles2.container,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native47.View, {
+            /* @__PURE__ */ jsxs(import_react_native48.View, {
               style: {
                 gap: 4
               },
@@ -71589,7 +71600,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native47.ScrollView, {
+            /* @__PURE__ */ jsxs(import_react_native48.ScrollView, {
               fadingEdgeLength: 64,
               contentContainerStyle: {
                 gap: 12
@@ -71614,11 +71625,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               children: [
                 /* @__PURE__ */ jsx(Button, {
                   text: "Reload Discord",
-                  onPress: () => BundleUpdaterManager.reload()
+                  onPress: requestDiscordReload
                 }),
                 !settings.safeMode?.enabled && /* @__PURE__ */ jsx(Button, {
                   text: "Reload in Safe Mode",
-                  onPress: () => toggleSafeMode()
+                  onPress: () => toggleSafeMode2()
                 }),
                 /* @__PURE__ */ jsx(Button, {
                   variant: "destructive",
@@ -71632,22 +71643,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native47, useStyles4;
+  var import_react_native48, useStyles4;
   var init_ErrorBoundaryScreen = __esm({
     "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_jsxRuntime();
+      init_safeMode();
       init_isStack();
       init_debug();
-      init_modules();
       init_settings();
       init_components2();
       init_styles();
       init_common();
       init_components();
-      import_react_native47 = __toESM(require_react_native());
+      import_react_native48 = __toESM(require_react_native());
       init_ErrorComponentStackCard();
       init_ErrorStackCard();
       useStyles4 = createStyles({
@@ -71736,7 +71747,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   });
 
   // src/core/vendetta/api.tsx
-  var import_react16, import_react_native48, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
+  var import_react16, import_react_native49, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
   var init_api3 = __esm({
     "src/core/vendetta/api.tsx"() {
       "use strict";
@@ -71767,7 +71778,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_toasts();
       init_dist();
       import_react16 = __toESM(require_react());
-      import_react_native48 = __toESM(require_react_native());
+      import_react_native49 = __toESM(require_react_native());
       init_plugins();
       makeIcon = (leading) => leading;
       CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
@@ -71832,7 +71843,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     ActionSheetTitleHeader: module.BottomSheetTitleHeader,
                     ActionSheetContentContainer: ({ children }) => {
                       (0, import_react16.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
-                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native48.View, null, children);
+                      return /* @__PURE__ */ (0, import_react16.createElement)(import_react_native49.View, null, children);
                     }
                   };
                 }
@@ -72019,7 +72030,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   // src/lib/api/native/legacyRuntimeRefresh.ts
   function invokeLegacyReload() {
     return _async_to_generator(function* () {
-      var reader = import_react_native49.NativeModules.FileReaderModule ?? import_react_native49.NativeModules.RCTFileReaderModule;
+      var reader = import_react_native50.NativeModules.FileReaderModule ?? import_react_native50.NativeModules.RCTFileReaderModule;
       if (typeof reader?.readAsDataURL !== "function")
         return false;
       yield reader.readAsDataURL({
@@ -72056,7 +72067,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     })();
   }
-  var import_react_native49, CURRENT_RUNTIME_URL;
+  var import_react_native50, CURRENT_RUNTIME_URL;
   var init_legacyRuntimeRefresh = __esm({
     "src/lib/api/native/legacyRuntimeRefresh.ts"() {
       "use strict";
@@ -72065,7 +72076,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_async_to_generator();
       init_storage();
       init_settings();
-      import_react_native49 = __toESM(require_react_native());
+      import_react_native50 = __toESM(require_react_native());
       CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
     }
   });
@@ -72322,7 +72333,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "54498695c39d5e233b0b4a7828d295d1be5c7737";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "77a384cba7537916f7ddb7ca7831d510886fa46a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
