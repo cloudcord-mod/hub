@@ -329,13 +329,16 @@ jobs:
           echo "publish=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload binaries to GitHub Release (Production)
+        id: production_upload
         if: github.ref == 'refs/heads/main' && steps.desktop_release.outputs.publish == 'true'
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
-        with:
+        with: &production_release
           tag_name: new_beta_t_desktop
           name: CloudCord Desktop ${{ github.sha }}
           make_latest: true
-          files: |
+          fail_on_unmatched_files: true
+          files: &production_files |
             desktop/client/dist/desktop.asar
             desktop/client/dist/cloudcord.asar
             desktop/client/dist/cloudcord.asar.sha256
@@ -355,6 +358,32 @@ jobs:
             desktop/client/dist/CloudCord.user.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Retry desktop release upload
+        if: steps.production_upload.outcome == 'failure'
+        uses: softprops/action-gh-release@v2
+        with: *production_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify desktop release assets
+        if: github.ref == 'refs/heads/main' && steps.desktop_release.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRODUCTION_FILES: *production_files
+        run: |
+          set -euo pipefail
+          release="repos/$GITHUB_REPOSITORY/releases/tags/new_beta_t_desktop"
+          [[ "$(gh api "$release" --jq .name)" == "CloudCord Desktop $GITHUB_SHA" ]]
+          assets=$(gh api "$release" --jq '.assets[] | [.name, .digest, .state] | @tsv')
+          while IFS= read -r file; do
+            [[ -n "$file" ]] || continue
+            digest=$(sha256sum "$file" | cut -d' ' -f1)
+            if ! grep -Fxq "$(printf '%s\tsha256:%s\tuploaded' "${file##*/}" "$digest")" <<< "$assets"; then
+              echo "::error::Missing or mismatched release asset: ${file##*/}"
+              exit 1
+            fi
+          done <<< "$PRODUCTION_FILES"
 
       - name: Upload binaries to GitHub Release (Isolated Test Channel)
         if: github.ref == 'refs/heads/main' && steps.desktop_release.outputs.publish == 'true'
