@@ -18422,6 +18422,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       onError: () => setAttempt(attempt + 1)
     }, active) : null;
   }
+  function StudioDecoration({ uri, fallback, size, inset }) {
+    var [attempt, setAttempt] = (0, import_react4.useState)(0);
+    var active = [
+      uri || fallback,
+      uri && uri !== fallback ? fallback : void 0
+    ][attempt];
+    return active ? /* @__PURE__ */ jsx(import_react_native23.Image, {
+      source: {
+        uri: active
+      },
+      accessible: false,
+      resizeMode: "contain",
+      style: {
+        position: "absolute",
+        top: inset,
+        left: inset,
+        width: size,
+        height: size
+      },
+      onError: () => setAttempt(attempt + 1)
+    }, active) : null;
+  }
   function StudioHero({ name, username, avatar, fallbackAvatar, banner, fallbackBanner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
     var tint = accent || C3.raised();
     return /* @__PURE__ */ jsxs(import_react_native23.View, {
@@ -19782,7 +19804,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon }) {
+  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, fallbackDecoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon }) {
     var [layout, setLayout] = (0, import_react4.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
@@ -19846,20 +19868,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     fallbackAvatar
                   ]))
                 }),
-                decoration ? /* @__PURE__ */ jsx(import_react_native23.Image, {
-                  source: {
-                    uri: decoration
-                  },
-                  style: {
-                    position: "absolute",
-                    top: -5,
-                    left: -5,
-                    width: 48,
-                    height: 48
-                  },
-                  resizeMode: "contain",
-                  accessible: false
-                }) : null
+                /* @__PURE__ */ jsx(StudioDecoration, {
+                  uri: decoration,
+                  fallback: fallbackDecoration,
+                  size: 48,
+                  inset: -5
+                }, JSON.stringify([
+                  decoration,
+                  fallbackDecoration
+                ]))
               ]
             }),
             /* @__PURE__ */ jsxs(import_react_native23.View, {
@@ -19913,6 +19930,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           secondary: accent,
           bannerColor,
           decoration,
+          fallbackDecoration,
           nameplate,
           status,
           customStatus,
@@ -19998,19 +20016,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         fallbackAvatar
                       ]))
                     }),
-                    decoration ? /* @__PURE__ */ jsx(import_react_native23.Image, {
-                      source: {
-                        uri: decoration
-                      },
-                      style: {
-                        position: "absolute",
-                        top: -10,
-                        left: -10,
-                        width: 104,
-                        height: 104
-                      },
-                      resizeMode: "contain"
-                    }) : null,
+                    /* @__PURE__ */ jsx(StudioDecoration, {
+                      uri: decoration,
+                      fallback: fallbackDecoration,
+                      size: 104,
+                      inset: -10
+                    }, JSON.stringify([
+                      decoration,
+                      fallbackDecoration
+                    ])),
                     /* @__PURE__ */ jsx(StudioPresence, {
                       status,
                       borderColor: card
@@ -20157,7 +20171,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, secondary, bannerColor, decoration, fallbackDecoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
     var themed = !!primary;
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
@@ -20210,19 +20224,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 fallbackAvatar
               ]))
             }),
-            decoration ? /* @__PURE__ */ jsx(import_react_native23.Image, {
-              source: {
-                uri: decoration
-              },
-              style: {
-                position: "absolute",
-                top: -6,
-                left: -6,
-                width: 96,
-                height: 96
-              },
-              resizeMode: "contain"
-            }) : null,
+            /* @__PURE__ */ jsx(StudioDecoration, {
+              uri: decoration,
+              fallback: fallbackDecoration,
+              size: 96,
+              inset: -6
+            }, JSON.stringify([
+              decoration,
+              fallbackDecoration
+            ])),
             /* @__PURE__ */ jsx(StudioPresence, {
               status,
               borderColor: ring,
@@ -28865,12 +28875,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       realAvatar = realUser?.getAvatarURL?.(void 0, 128);
     } catch (e) {
     }
+    var fallbackDecoration = nativePreviewDecoration(realUser, profile);
     return {
       name: data.displayName || realUser?.globalName || realUser?.global_name || realUser?.username || "You",
       username: data.username || realUser?.username || "username",
       avatar: data.avatarMedia?.uri || realAvatar,
       fallbackAvatar: realAvatar,
-      decoration: data.avatarDecoration || nativePreviewDecoration(realUser, profile),
+      decoration: data.avatarDecoration || fallbackDecoration,
+      fallbackDecoration,
       banner: data.bannerMedia?.uri || fallback.banner,
       fallbackBanner: fallback.banner,
       bio: data.bio ?? fallback.bio,
@@ -74337,7 +74349,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2085ae2cb1a2b8cc06f7993fd5d9d783cb30aef7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "24330138496efe9ed2cf0ceecc0dcd8a7fa39322";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
