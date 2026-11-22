@@ -2875,6 +2875,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["jsonkeys", { text: '{"id":9007199254740993,"x":{"private":true},"__proto__":1}' }, /"id",\n  "x",\n  "__proto__"/],
                 ["jsonkeys", { text: '[{"id":1}]' }, /^Enter a JSON object/],
             ]],
+            ["Agenda Draft", [
+                ["agendadraft", { title: "Sprint", items: "5 | Updates\n15 | Planning" }, /0 min · Updates \(5 min\)\n5 min · Planning \(15 min\)\n\nTotal: 20 min/],
+                ["agendadraft", { title: "Sprint", items: "0 | Updates" }, /^Enter a title/],
+            ]],
+            ["Decision Draft", [
+                ["decisiondraft", { topic: "Release", decision: "Ship Friday", actions: "Run tests\nWrite notes" }, /Decision\nShip Friday\n\nNext actions\n- \[ \] Run tests\n- \[ \] Write notes/],
+            ]],
+            ["Pick Names", [
+                ["picknames", { text: "Alex\nalex", count: 1 }, /\nAlex\n/],
+                ["picknames", { text: "Alex\nalex", count: 2 }, /^Enter one name/],
+            ]],
             ["Common Lines", [
                 ["commonlines", { first: "alpha\r\nbeta\r\nalpha", second: "beta\nother\nalpha" }, /^\x60\x60\x60\nalpha\nbeta\n\x60\x60\x60$/],
                 ["commonlines", { first: "Alpha\n", second: "alpha\n" }, /^No matching nonempty lines/],

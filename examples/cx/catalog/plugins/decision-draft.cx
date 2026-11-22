@@ -1,0 +1,8 @@
+plugin "Decision Draft":
+  needs commands.register
+  needs reply.local
+  on command "decisiondraft":
+    input "topic" text
+    input "decision" text
+    input "actions" text optional
+    reply "${decisionDraft(topic, decision, actions)}" else "Enter a topic, a decision, and up to 15 optional action items."

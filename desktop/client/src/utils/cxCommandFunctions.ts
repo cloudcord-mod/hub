@@ -635,6 +635,46 @@ export const cxCommandFunctions = {
             || distinct.size !== choices.length || choices.some(choice => choice.length > 150)) return;
         return planningBlock(title + "\n\n" + choices.map((choice, index) => (index + 1) + ". " + choice).join("\n"));
     },
+    agendaDraft(title: string, items: string) {
+        const heading = title.trim();
+        const rows = planningRows(items);
+        if (!heading || heading.length > 120 || /[\r\n]/.test(heading) || !rows.length || rows.length > 30) return;
+        let total = 0;
+        const agenda: string[] = [];
+        for (const row of rows) {
+            const match = /^(\d{1,3})\s*\|\s*(.+)$/.exec(row);
+            if (!match || Number(match[1]) < 1 || match[2].length > 150) return;
+            agenda.push(total + " min · " + match[2] + " (" + Number(match[1]) + " min)");
+            total += Number(match[1]);
+        }
+        return planningBlock(heading + "\n\n" + agenda.join("\n") + "\n\nTotal: " + total + " min");
+    },
+    decisionDraft(topic: string, decision: string, actions: string) {
+        const title = topic.trim();
+        const body = decision.trim();
+        const tasks = planningRows(actions);
+        if (!title || title.length > 120 || /[\r\n]/.test(title) || !body || body.length > 1500
+            || tasks.length > 15 || tasks.some(task => task.length > 120)) return;
+        const next = tasks.length ? "\n\nNext actions\n" + tasks.map(task => "- [ ] " + task).join("\n") : "";
+        return planningBlock(title + "\n\nDecision\n" + body + next);
+    },
+    pickNames(text: string, count: string) {
+        const rows = planningRows(text);
+        const number = integerText(count);
+        const remaining = new Map<string, string>();
+        if (rows.length > 150 || rows.some(row => row.length > 100)) return;
+        for (const name of rows) {
+            const key = name.normalize("NFC").toLowerCase();
+            if (!remaining.has(key)) remaining.set(key, name);
+        }
+        if (number === undefined || number < 1 || number > 20 || number > remaining.size) return;
+        const names = [...remaining.values()];
+        for (let i = 0; i < number; i++) {
+            const next = randomInteger(i, names.length - 1)!;
+            [names[i], names[next]] = [names[next], names[i]];
+        }
+        return planningBlock(names.slice(0, number).join("\n"));
+    },
     splitPoints(total: string, people: string) {
         const points = integerText(total), count = integerText(people);
         if (points === undefined || points < 0 || count === undefined || count < 1 || count > 10000) return;

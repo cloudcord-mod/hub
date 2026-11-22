@@ -1,0 +1,7 @@
+plugin "Agenda Draft":
+  needs commands.register
+  needs reply.local
+  on command "agendadraft":
+    input "title" text
+    input "items" text
+    reply "${agendaDraft(title, items)}" else "Enter a title and one item per line in the form 15 | Topic."

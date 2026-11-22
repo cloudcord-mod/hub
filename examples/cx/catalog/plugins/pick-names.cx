@@ -1,0 +1,7 @@
+plugin "Pick Names":
+  needs commands.register
+  needs reply.local
+  on command "picknames":
+    input "text" text
+    input "count" integer
+    reply "${pickNames(text, count)}" else "Enter one name per line and a count from 1 to 20 that fits the number of distinct names."
