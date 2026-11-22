@@ -36920,6 +36920,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-media-message-preview": hideMobileComponent("HideMediaMessagePreview", "the source-message preview in the media viewer", "modules/media_viewer/native/components/message_preview/MediaMessagePreview.tsx"),
+        "hide-sticker-pack-banner": hideMobileComponent("HideStickerPackBanner", "the banner in sticker pack details", "modules/stickers/native/StickerPackBanner.tsx"),
         "hide-channel-list-style-promo": hideMobileComponent("HideChannelListStylePromo", "the Nitro upsell under channel list appearance previews", "modules/user_settings/appearance/native/components/SettingsAppearanceChannelListPreviewNitroUpsell.tsx"),
         "hide-settings-gift-badge-progress": hideMobileComponent("HideSettingsGiftBadgeProgress", "gifting badge progress in Premium settings", "modules/user_settings/premium/native/UserSettingsGiftingBadgeProgress.tsx"),
         "hide-dismissible-profile-upsells": hideMobileComponent("HideDismissibleProfileUpsells", "dismissible offers on profiles", "modules/user_profile/native/UserProfileDismissibleUpsells.tsx"),
@@ -51537,6 +51539,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-media-message-preview.cx
+  var hide_media_message_preview_default;
+  var init_hide_media_message_preview = __esm({
+    "../examples/cx/catalog/plugins/hide-media-message-preview.cx"() {
+      hide_media_message_preview_default = 'plugin "HideMediaMessagePreview":\n  needs appearance.hide\n  hide hide-media-message-preview\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-member-activities.cx
   var hide_member_activities_default;
   var init_hide_member_activities = __esm({
@@ -52134,6 +52144,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_sticker_button = __esm({
     "../examples/cx/catalog/plugins/hide-sticker-button.cx"() {
       hide_sticker_button_default = 'plugin "HideStickerButton":\n  needs appearance.hide\n  hide chat-sticker-picker\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-sticker-pack-banner.cx
+  var hide_sticker_pack_banner_default;
+  var init_hide_sticker_pack_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-sticker-pack-banner.cx"() {
+      hide_sticker_pack_banner_default = 'plugin "HideStickerPackBanner":\n  needs appearance.hide\n  hide hide-sticker-pack-banner\n';
     }
   });
 
@@ -55053,6 +55071,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_jump_to_present();
       init_hide_keyboard_tips();
       init_hide_live_stage_cards();
+      init_hide_media_message_preview();
       init_hide_member_activities();
       init_hide_member_list_button();
       init_hide_mention_badges();
@@ -55128,6 +55147,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_status_emojis();
       init_hide_sticker_autocomplete();
       init_hide_sticker_button();
+      init_hide_sticker_pack_banner();
       init_hide_sticker_picker_promotions();
       init_hide_sticker_search_suggestions();
       init_hide_stickers();
@@ -57457,6 +57477,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "6da62a057179f0765698517278064713d5c3824890881f7eda94cd60b27636a9"
           },
           {
+            name: "HideMediaMessagePreview",
+            source: hide_media_message_preview_default,
+            description: "Hide the source-message preview in the media viewer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "b38b32c928f3ded6619a8bdd5a23bbd7f2022fcafe34bae370ffcb232f503bfa"
+          },
+          {
             name: "HideMemberActivities",
             source: hide_member_activities_default,
             description: "Hide game and music activity text in the member list",
@@ -58177,6 +58207,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "7aa0a5bdf382195bf48b3579640eb8a1ab819a0b8e480fe8b34f6a571e2542db"
+          },
+          {
+            name: "HideStickerPackBanner",
+            source: hide_sticker_pack_banner_default,
+            description: "Hide the banner in sticker pack details",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "1868a3d8725ce179b775d047a2155669ce77279fe66bd70272a4c2d7085958a3"
           },
           {
             name: "HideStickerPickerPromotions",
@@ -70502,7 +70542,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7a005dfc0738813eea276d23b8beabbb8b3d2ff7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e6f8d592094732d2da18ceffea1a15d99aa25a23";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
