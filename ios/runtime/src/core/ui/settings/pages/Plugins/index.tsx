@@ -10,6 +10,7 @@ import { isCorePlugin, isPluginInstalled, pluginSettings, registeredPlugins, cor
 import { Author } from "@lib/addons/types";
 import { findAssetId } from "@lib/api/assets";
 import { settings } from "@lib/api/settings";
+import { CX_CATALOG_CATEGORIES } from "@lib/api/cx";
 import { useObservable } from "@lib/api/storage";
 import { showToast } from "@lib/ui/toasts";
 import { BUNNY_PROXY_PREFIX, VD_PROXY_PREFIX } from "@lib/utils/constants";
@@ -40,11 +41,13 @@ const { AlertModal, AlertActions, AlertActionButton } = lazyDestructure(() =>
 type PluginRow = UnifiedPluginModel | (CxAddonRow & { alternate?: boolean });
 type PluginPageProps = Partial<ComponentProps<typeof AddonPage<PluginRow>>> & { useItems: () => PluginRow[]; };
 const isPluginRowEnabled = (item: PluginRow) => "source" in item ? item.active : item.isEnabled();
+const showDefaultRow = (item: PluginRow) => !("source" in item && item.alternate);
 const pluginFilters = {
+  ...Object.fromEntries(CX_CATALOG_CATEGORIES.filter(category => category !== "All" && category !== "Themes")
+    .map(category => [category, (item: PluginRow) => "source" in item && item.categories?.includes(category) === true])),
   "Private commands": (item: PluginRow) => "source" in item && item.privateCommands === true,
   "Needs review": (item: PluginRow) => "source" in item && item.needsReview === true,
 };
-const showDefaultRow = (item: PluginRow) => !("source" in item && item.alternate);
 
 function PluginListCard({ item, result }: CardWrapper<PluginRow>) {
   return "source" in item

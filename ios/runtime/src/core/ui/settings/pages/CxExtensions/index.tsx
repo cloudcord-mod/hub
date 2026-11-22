@@ -3070,7 +3070,7 @@ export function restoreRememberedCxAppearance() {
 }
 
 export type CxAddonKind = "plugin" | "theme";
-export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
+export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; categories?: readonly CxCatalogCategory[]; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
 
 export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
     const revision = React.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
