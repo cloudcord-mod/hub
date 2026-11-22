@@ -1510,7 +1510,7 @@ const failedAppearanceRestores = new Map<string, string>();
 
 export type CxAddonKind = "plugin" | "theme";
 type CxAddonSource = string | (() => Promise<string>);
-export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; active: boolean; privateCommands?: boolean; needsReview?: boolean; restoreFailed?: boolean; };
+export type CxAddonRow = { name: string; id: string; source: CxAddonSource; description?: string; keywords?: string; commands?: readonly string[]; active: boolean; privateCommands?: boolean; needsReview?: boolean; restoreFailed?: boolean; };
 const desktopCatalogPlugins = cxCatalog.plugins.filter(entry => !entry.mobileOnly);
 const nonLinuxCatalogPlugins = desktopCatalogPlugins.filter(entry => !entry.linuxOnly);
 

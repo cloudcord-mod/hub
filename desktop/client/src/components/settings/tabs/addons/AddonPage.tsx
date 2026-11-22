@@ -136,18 +136,19 @@ export function PluginsPage() {
     const shownNative = filter === "all" && !commandSearch ? nativeMatches.map(row => row.plugin)
         .filter(p => !cxByName.get(p.name.toLowerCase())?.active || isPluginEnabled(p.name)) : [];
     const shownNames = new Set(shownNative.map(plugin => plugin.name.toLowerCase()));
-    const shown = [
-        ...shownNative.map(plugin => ({ name: plugin.name, active: isPluginEnabled(plugin.name), plugin, extension: undefined })),
+    const eligible = [
+        ...shownNative.map(plugin => ({ name: plugin.name, description: plugin.description, keywords: plugin.tags?.join(" "), active: isPluginEnabled(plugin.name), plugin, extension: undefined })),
         ...cxRows.filter(entry => {
             if (filter === "private") return entry.privateCommands;
             if (filter === "review") return entry.needsReview;
             const name = entry.name.toLowerCase();
             const native = nativeByName.get(name);
             return entry.active || (!shownNames.has(name) && (!native || !isPluginEnabled(native.name)));
-        }).map(extension => ({ name: extension.name, active: extension.active, plugin: undefined, extension })),
-    ].filter(row => !enabledOnly || row.active)
-        .sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0)
-            || (commandSearch ? 0 : a.name.localeCompare(b.name)));
+        }).map(extension => ({ ...extension, plugin: undefined, extension })),
+    ].filter(row => !enabledOnly || row.active);
+    const ranked = query.trim() && !commandSearch ? searchCxCatalog(eligible, query) : eligible;
+    const shown = [...ranked].sort((a, b) => (sort === "enabled" ? Number(b.active) - Number(a.active) : 0)
+        || (query.trim() ? 0 : a.name.localeCompare(b.name)));
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
 

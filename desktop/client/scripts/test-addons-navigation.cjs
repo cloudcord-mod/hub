@@ -88,11 +88,12 @@ const catalog = {
     ],
     theme: [{ id: "theme", name: "Palette", active: true }],
 };
+const cxSearch = loadCxRuntime();
 const countMocks = {
     "@api/PluginManager": { plugins: nativePlugins, isPluginEnabled: name => name === "Shared" },
     "@api/Settings": { useSettings: () => ({ enabledThemes: ["a.css"], enabledThemeLinks: ["file"] }) },
-    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => query === "/off" ? catalog[kind].slice(1) : query ? [] : catalog[kind] },
-    "@utils/cx": loadCxRuntime(),
+    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => query === "/off" ? catalog[kind].slice(1) : cxSearch.searchCxCatalog(catalog[kind], query) },
+    "@utils/cx": cxSearch,
     "@utils/css": mocks["@utils/css"],
     "@webpack/common": commonHooks,
     "@components/settings/AddonCard": { AddonCard: "CatalogCard" },
@@ -126,6 +127,8 @@ beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("
 assert.deepEqual(shownCards().map(node => node.props.name), ["Local", "Disabled"]);
 beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("history média");
 assert.deepEqual(shownCards().map(node => node.props.plugin?.name), ["Disabled"]);
+beforeFiltering.find(node => node.type?.name === "AddonHeader").props.setQuery("local");
+assert.deepEqual(shownCards().map(node => node.props.name ?? node.props.plugin?.name), ["Local", "Disabled"]);
 
 const mobileModule = { exports: {} };
 let filterSheet;
