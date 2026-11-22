@@ -1,0 +1,3 @@
+plugin "ChatLinkFocusRing":
+  needs appearance.style
+  style chat-link-focus-ring
