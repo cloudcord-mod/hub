@@ -39385,6 +39385,16 @@ Milliseconds \`${ms}\``;
           if (Number.isSafeInteger(seconds))
             return "Estimated transfer time: " + readableDuration(seconds);
         },
+        runningPace(distance, duration) {
+          var kilometers = Number(distance);
+          var seconds = durationSeconds(duration);
+          if (!/^\d+(?:\.\d+)?$/.test(distance) || !Number.isFinite(kilometers) || kilometers <= 0 || !seconds)
+            return;
+          var pace = Math.round(seconds / kilometers);
+          if (!Number.isSafeInteger(pace) || pace < 1)
+            return;
+          return Math.floor(pace / 60) + ":" + String(pace % 60).padStart(2, "0") + " per km";
+        },
         countdownTimestamp(input) {
           var duration = durationSeconds(input);
           if (!duration)
@@ -53193,6 +53203,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/running-pace.cx
+  var running_pace_default;
+  var init_running_pace = __esm({
+    "../examples/cx/catalog/plugins/running-pace.cx"() {
+      running_pace_default = 'plugin "Running Pace":\n  needs commands.register\n  needs reply.local\n  on command "runningpace":\n    input "distance" text\n    input "duration" text\n    reply "${runningPace(distance, duration)}" else "Enter a positive distance in kilometers and a duration such as 25m."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/scheduled-messages.cx
   var scheduled_messages_default;
   var init_scheduled_messages = __esm({
@@ -55064,6 +55082,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_rounded_avatars_square();
       init_rounded_chat_bar();
       init_rounded_images();
+      init_running_pace();
       init_scheduled_messages();
       init_screen_share_alert();
       init_scroll_to_latest();
@@ -59211,6 +59230,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Running Pace",
+            source: running_pace_default,
+            description: "/runningpace",
+            commands: [
+              "runningpace"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "b794b4fdbe1057c769279550e44e090065bf29cafc0deb63f6751c33d2e0591c",
+            privateCommands: true
           },
           {
             name: "ScheduledMessages",
@@ -70147,7 +70179,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f22f0dcef2623946772b89a575a8c26d4414e04a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "9e5ba9482f504af2c391a74d89e5d478912e8085";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
