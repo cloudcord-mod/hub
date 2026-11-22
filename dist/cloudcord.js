@@ -36908,6 +36908,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-active-channel-cards": hideMobileComponent("HideActiveChannelCards", "active text channel cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActiveChannel.tsx"),
+        "hide-activity-cards": hideMobileComponent("HideActivityCards", "activity cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActivity.tsx"),
+        "hide-upcoming-event-cards": hideMobileComponent("HideUpcomingEventCards", "event cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardEvent.tsx"),
+        "hide-live-stage-cards": hideMobileComponent("HideLiveStageCards", "live Stage cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardLiveStage.tsx"),
+        "hide-voice-activity-cards": hideMobileComponent("HideVoiceActivityCards", "voice activity cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardVoice.tsx"),
         "hide-new-channel-badge": hideMobileComponent("HideNewChannelBadge", "the New label on recently added channels", "modules/channel_list_v2/native/components/NewBadge.tsx"),
         "hide-recap-new-content-pill": hideMobileComponent("HideRecapNewContentPill", "the new-content pill in the recap", "modules/icymi/native/NewContentPill.tsx"),
         "hide-quest-orb-multiplier-pill": hideMobileComponent("HideQuestOrbMultiplierPill", "the Orb multiplier perk label on quests", "modules/quests/native/QuestOrbMultiplierPerkPill.tsx"),
@@ -50743,11 +50748,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-active-channel-cards.cx
+  var hide_active_channel_cards_default;
+  var init_hide_active_channel_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-active-channel-cards.cx"() {
+      hide_active_channel_cards_default = 'plugin "HideActiveChannelCards":\n  needs appearance.hide\n  hide hide-active-channel-cards\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-active-now.cx
   var hide_active_now_default;
   var init_hide_active_now = __esm({
     "../examples/cx/catalog/plugins/hide-active-now.cx"() {
       hide_active_now_default = 'plugin "HideActiveNow":\n  needs appearance.hide\n  hide active-now\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-activity-cards.cx
+  var hide_activity_cards_default;
+  var init_hide_activity_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-activity-cards.cx"() {
+      hide_activity_cards_default = 'plugin "HideActivityCards":\n  needs appearance.hide\n  hide hide-activity-cards\n';
     }
   });
 
@@ -51220,6 +51241,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_keyboard_tips = __esm({
     "../examples/cx/catalog/plugins/hide-keyboard-tips.cx"() {
       hide_keyboard_tips_default = 'plugin "HideKeyboardTips":\n  needs appearance.style\n  style hide-keyboard-tips\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-live-stage-cards.cx
+  var hide_live_stage_cards_default;
+  var init_hide_live_stage_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-live-stage-cards.cx"() {
+      hide_live_stage_cards_default = 'plugin "HideLiveStageCards":\n  needs appearance.hide\n  hide hide-live-stage-cards\n';
     }
   });
 
@@ -51879,6 +51908,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-upcoming-event-cards.cx
+  var hide_upcoming_event_cards_default;
+  var init_hide_upcoming_event_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-upcoming-event-cards.cx"() {
+      hide_upcoming_event_cards_default = 'plugin "HideUpcomingEventCards":\n  needs appearance.hide\n  hide hide-upcoming-event-cards\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-upload-button.cx
   var hide_upload_button_default;
   var init_hide_upload_button = __esm({
@@ -51892,6 +51929,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_user_panel_activity = __esm({
     "../examples/cx/catalog/plugins/hide-user-panel-activity.cx"() {
       hide_user_panel_activity_default = 'plugin "HideUserPanelActivity":\n  needs appearance.style\n  style hide-user-panel-activity\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-voice-activity-cards.cx
+  var hide_voice_activity_cards_default;
+  var init_hide_voice_activity_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-voice-activity-cards.cx"() {
+      hide_voice_activity_cards_default = 'plugin "HideVoiceActivityCards":\n  needs appearance.hide\n  hide hide-voice-activity-cards\n';
     }
   });
 
@@ -54559,7 +54604,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_gamzee_s_typing_quirk();
       init_google_that();
       init_grayscale_images();
+      init_hide_active_channel_cards();
       init_hide_active_now();
+      init_hide_activity_cards();
       init_hide_add_friend_hint();
       init_hide_add_server_button();
       init_hide_app_launcher_intro();
@@ -54619,6 +54666,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_join_messages();
       init_hide_jump_to_present();
       init_hide_keyboard_tips();
+      init_hide_live_stage_cards();
       init_hide_member_activities();
       init_hide_member_list_button();
       init_hide_mention_badges();
@@ -54701,8 +54749,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_typing_indicator_profile_tip();
       init_hide_typing_indicator();
       init_hide_unread_pills();
+      init_hide_upcoming_event_cards();
       init_hide_upload_button();
       init_hide_user_panel_activity();
+      init_hide_voice_activity_cards();
       init_hide_voice_event_banner();
       init_hide_voice_panel_tips();
       init_hide_voice_user_avatars();
@@ -56271,6 +56321,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "HideActiveChannelCards",
+            source: hide_active_channel_cards_default,
+            description: "Hide active text channel cards in Happening Now",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "6764ad5a3e29345fe28106ff9d3d60ad23aaa67989756513ec1030e993be51ca"
+          },
+          {
             name: "HideActiveNow",
             source: hide_active_now_default,
             description: "Hide the active friends panel",
@@ -56278,6 +56338,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "3ea10b3241ba84c918d96f0c98c1b365c4e0f2c9a3014fa429ed7a3b2c5d4361"
+          },
+          {
+            name: "HideActivityCards",
+            source: hide_activity_cards_default,
+            description: "Hide activity cards in Happening Now",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7"
           },
           {
             name: "HideAddFriendHint",
@@ -56838,6 +56908,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideLiveStageCards",
+            source: hide_live_stage_cards_default,
+            description: "Hide live Stage cards in Happening Now",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "6da62a057179f0765698517278064713d5c3824890881f7eda94cd60b27636a9"
           },
           {
             name: "HideMemberActivities",
@@ -57621,6 +57701,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "56e95404c1b3e0a231fad41928c51b64335d1d860b05c6be59dc011565e6c67b"
           },
           {
+            name: "HideUpcomingEventCards",
+            source: hide_upcoming_event_cards_default,
+            description: "Hide event cards in Happening Now",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "09771f96a5794414e52729f8e08cbc566ea4e7aa570fc527a8b8ea833cc08764"
+          },
+          {
             name: "HideUploadButton",
             source: hide_upload_button_default,
             description: "Hide the chat attachment button",
@@ -57637,6 +57727,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideVoiceActivityCards",
+            source: hide_voice_activity_cards_default,
+            description: "Hide voice activity cards in Happening Now",
+            mobileOnly: true,
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ],
+            appearanceRevision: "66a985fb9c74f587966b7b00aae4fdd56acf3af5b05f511189ebb55b0f636bb0"
           },
           {
             name: "HideVoiceEventBanner",
@@ -69733,7 +69834,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ab48b4f44865df5abdf99e66df35e3e6e2472000";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b624e9d45a647e8ee5e2418b7544d7da0bf17783";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
