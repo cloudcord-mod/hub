@@ -1,0 +1,7 @@
+plugin "Video Frame Count":
+  needs commands.register
+  needs reply.local
+  on command "framecount":
+    input "fps" text
+    input "duration" text
+    reply "${videoFrameCount(fps, duration)}" else "Enter a frame rate from 1 to 1000 and a positive duration."

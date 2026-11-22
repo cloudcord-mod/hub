@@ -1,0 +1,7 @@
+plugin "Video Size Estimate":
+  needs commands.register
+  needs reply.local
+  on command "videosize":
+    input "rate" text
+    input "duration" text
+    reply "${videoSizeEstimate(rate, duration)}" else "Enter a positive total bitrate in kbps and a duration such as 2m."

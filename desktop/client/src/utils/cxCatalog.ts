@@ -498,6 +498,8 @@ import plugin_catalog_user_notes from "../../../../examples/cx/catalog/plugins/u
 import plugin_catalog_user_tags from "../../../../examples/cx/catalog/plugins/user-tags.cx";
 import plugin_catalog_utf_8_byte_count from "../../../../examples/cx/catalog/plugins/utf-8-byte-count.cx";
 import plugin_catalog_vibe_check from "../../../../examples/cx/catalog/plugins/vibe-check.cx";
+import plugin_catalog_video_frame_count from "../../../../examples/cx/catalog/plugins/video-frame-count.cx";
+import plugin_catalog_video_size_estimate from "../../../../examples/cx/catalog/plugins/video-size-estimate.cx";
 import plugin_catalog_view_group_dm_icon from "../../../../examples/cx/catalog/plugins/view-group-dm-icon.cx";
 import plugin_catalog_view_role_icon from "../../../../examples/cx/catalog/plugins/view-role-icon.cx";
 import plugin_catalog_view_server_media from "../../../../examples/cx/catalog/plugins/view-server-media.cx";
@@ -1122,6 +1124,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "UserTags", source: plugin_catalog_user_tags, description: "Tag users in profile menus and search those tags on this device", commands: ["find-user-tags"], categories: ["Commands","Profiles"] },
         { name: "UTF-8 Byte Count", source: plugin_catalog_utf_8_byte_count, description: "/utf8size", commands: ["utf8size"], categories: ["Commands"], appearanceRevision: "8780ff0a5aa64eab83768a7a9b7d2335dd22e2162c7c944c327ff06be5a9bdfc", privateCommands: true },
         { name: "VibeCheck", source: plugin_catalog_vibe_check, description: "/vibe", commands: ["vibe"], categories: ["Chat","Commands"] },
+        { name: "Video Frame Count", source: plugin_catalog_video_frame_count, description: "/framecount", commands: ["framecount"], categories: ["Commands"], appearanceRevision: "05bbc7b2a9de22b4b85f1792f5b967269fc9dc356581b753d84da9049a942cf0", privateCommands: true },
+        { name: "Video Size Estimate", source: plugin_catalog_video_size_estimate, description: "/videosize", commands: ["videosize"], categories: ["Commands"], appearanceRevision: "97d0539fc2b4f0f2846916d89aa7527a5a1f2cadd478c519a29e4554475f991e", privateCommands: true },
         { name: "View Group DM Icon", source: plugin_catalog_view_group_dm_icon, description: "View the selected group DM's icon", categories: ["Media","Servers & channels"] },
         { name: "ViewRoleIcon", source: plugin_catalog_view_role_icon, description: "Open the selected server role's icon in Discord's image viewer", categories: ["Media","Servers & channels"] },
         { name: "View Server Media", source: plugin_catalog_view_server_media, description: "View the selected server's icon and banner", categories: ["Media","Servers & channels"] },

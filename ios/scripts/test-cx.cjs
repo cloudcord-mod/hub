@@ -2967,6 +2967,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["fitimage", { source: "1920x1080", box: "1000×1000", mode: "contain" }, /1000 × 562 px\nPadding: 0 px horizontally, 438 px vertically/],
                 ["fitimage", { source: "1920x1080", box: "1000x1000", mode: "cover" }, /1778 × 1000 px\nCrop: 778 px horizontally, 0 px vertically/],
             ]],
+            ["Video Size Estimate", [
+                ["videosize", { rate: "2000", duration: "2m" }, /^Estimated payload: 30 MB$/],
+                ["videosize", { rate: "0", duration: "1m" }, /^Enter a positive total/],
+            ]],
+            ["Video Frame Count", [
+                ["framecount", { fps: "29.97", duration: "2m" }, /^Estimated frames: 3596$/],
+                ["framecount", { fps: "1001", duration: "2m" }, /^Enter a frame rate/],
+            ]],
             ["Bitrate Budget", [
                 ["bitratebudget", { size: "30 MB", duration: "2m" }, /^Maximum average: 2000 kbps/],
                 ["bitratebudget", { size: "30 MB", duration: "0s" }, /^Enter a file size/],

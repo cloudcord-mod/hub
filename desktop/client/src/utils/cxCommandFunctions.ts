@@ -973,6 +973,20 @@ export const cxCommandFunctions = {
         return "Resize to " + scaledW + " × " + scaledH + " px\n" + action + ": "
             + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
     },
+    videoSizeEstimate(rate: string, duration: string) {
+        const kbps = Number(rate);
+        const seconds = durationSeconds(duration);
+        if (!/^\d{1,8}(?:\.\d{1,3})?$/.test(rate) || kbps <= 0 || !seconds) return;
+        const megabytes = kbps * seconds / 8000;
+        return "Estimated payload: " + Number(megabytes.toPrecision(8)) + " MB";
+    },
+    videoFrameCount(fps: string, duration: string) {
+        const rate = Number(fps);
+        const seconds = durationSeconds(duration);
+        if (!/^\d{1,4}(?:\.\d{1,3})?$/.test(fps) || rate < 1 || rate > 1000 || !seconds) return;
+        const frames = Math.round(rate * seconds);
+        if (Number.isSafeInteger(frames)) return "Estimated frames: " + frames;
+    },
     bitrateBudget(size: string, duration: string) {
         const bytes = fileSizeBytes(size);
         const seconds = durationSeconds(duration);
