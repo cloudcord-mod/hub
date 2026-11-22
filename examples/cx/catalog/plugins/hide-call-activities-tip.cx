@@ -1,0 +1,3 @@
+plugin "HideCallActivitiesTip":
+  needs appearance.hide
+  hide hide-call-activities-tip

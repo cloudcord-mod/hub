@@ -1,0 +1,3 @@
+plugin "HideTypingIndicatorProfileTip":
+  needs appearance.hide
+  hide hide-typing-indicator-profile-tip

@@ -1,0 +1,3 @@
+plugin "HideShopWishlistTip":
+  needs appearance.hide
+  hide hide-shop-wishlist-tip

@@ -1,0 +1,3 @@
+plugin "HideDisplayNameStylesTip":
+  needs appearance.hide
+  hide hide-display-name-styles-tip

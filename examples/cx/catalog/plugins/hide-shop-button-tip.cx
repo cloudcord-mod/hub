@@ -1,0 +1,3 @@
+plugin "HideShopButtonTip":
+  needs appearance.hide
+  hide hide-shop-button-tip

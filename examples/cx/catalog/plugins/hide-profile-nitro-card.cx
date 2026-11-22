@@ -1,0 +1,3 @@
+plugin "HideProfileNitroCard":
+  needs appearance.hide
+  hide hide-profile-nitro-card

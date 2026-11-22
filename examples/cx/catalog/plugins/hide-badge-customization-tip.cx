@@ -1,0 +1,3 @@
+plugin "HideBadgeCustomizationTip":
+  needs appearance.hide
+  hide hide-badge-customization-tip

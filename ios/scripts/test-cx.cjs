@@ -564,7 +564,10 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "UserProfileNote", "UserProfileConnections", "LegacyUserProfileConnections", "UserProfileMutuals", "UserProfileMutualGuilds",
             "UserProfileIncomingFriendRequest", "AppLauncherOnboardingBanner", "RecommendationsBanner", "ContactSyncUpsellCTA",
             "DoubleTapToReactChatInputBanner", "GiftingBadgeProgressBanner", "PremiumGiftWishlistBanner", "NitroLimitUpsellBar",
-            "GIFPickerSearchSuggestions", "EmojiPickerPremiumSearchUpsell", "GuildSettingsServerTagUpsellCard"].map(name => [
+            "GIFPickerSearchSuggestions", "EmojiPickerPremiumSearchUpsell", "GuildSettingsServerTagUpsellCard",
+            "RefreshChatInputCoachmark", "MobileShopButtonCoachmark", "OrbsBadgeCoachmark", "WishlistButtonCoachmark",
+            "ShopThisLookMarketingCoachmark", "CustomTypingIndicatorProfileCoachmark", "DisplayNameStylesFlywheelProfileCoachmark",
+            "UserProfilePremiumUpsellCard", "BadgeCustomizationProfileCoachmark", "ActivitiesPrivateChannelCallTooltip"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>

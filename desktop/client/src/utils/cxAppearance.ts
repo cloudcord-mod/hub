@@ -27,6 +27,16 @@ export const cxAppearanceTargets = {
     "hide-gif-search-suggestions": hideMobileComponent("HideGifSearchSuggestions", "suggested searches in the GIF picker", "modules/gif_picker/native/GIFPickerSearchSuggestions.tsx"),
     "hide-emoji-search-promotion": hideMobileComponent("HideEmojiSearchPromotion", "the Nitro upsell in emoji search", "modules/emoji_picker/native/components/EmojiPickerPremiumSearchUpsell.tsx"),
     "hide-server-tag-promotion": hideMobileComponent("HideServerTagPromotion", "the server tag upsell in server settings", "modules/guild_settings/native/GuildSettingsServerTagUpsellCard.tsx"),
+    "hide-chat-input-refresh-tip": hideMobileComponent("HideChatInputRefreshTip", "the redesigned chat input tip", "modules/chat_input/native/RefreshChatInputCoachmark.tsx"),
+    "hide-shop-button-tip": hideMobileComponent("HideShopButtonTip", "the Shop button introduction", "modules/collectibles/native/MobileShopButtonCoachmark.tsx"),
+    "hide-shop-orbs-tip": hideMobileComponent("HideShopOrbsTip", "the Orbs badge introduction in the Shop", "modules/collectibles/native/OrbsBadgeCoachmark.tsx"),
+    "hide-shop-wishlist-tip": hideMobileComponent("HideShopWishlistTip", "the wishlist button introduction in the Shop", "modules/collectibles/native/WishlistButtonCoachmark.tsx"),
+    "hide-shop-this-look-tip": hideMobileComponent("HideShopThisLookTip", "the Shop This Look marketing tip", "modules/collectibles/shop_this_look/native/ShopThisLookMarketingCoachmark.tsx"),
+    "hide-typing-indicator-profile-tip": hideMobileComponent("HideTypingIndicatorProfileTip", "the custom typing indicator tip on profiles", "modules/custom_typing_indicator/native/CustomTypingIndicatorProfileCoachmark.tsx"),
+    "hide-display-name-styles-tip": hideMobileComponent("HideDisplayNameStylesTip", "the display name styles tip on profiles", "modules/display_name_styles/native/DisplayNameStylesFlywheelProfileCoachmark.tsx"),
+    "hide-profile-nitro-card": hideMobileComponent("HideProfileNitroCard", "the Nitro upsell card on profiles", "modules/user_profile/native/UserProfilePremiumUpsellCard.tsx"),
+    "hide-badge-customization-tip": hideMobileComponent("HideBadgeCustomizationTip", "the badge customization tip on profiles", "modules/user_profile/native/BadgeCustomizationProfileCoachmark.tsx"),
+    "hide-call-activities-tip": hideMobileComponent("HideCallActivitiesTip", "the Activities tooltip in private calls", "modules/activities/native/ActivitiesPrivateChannelCallTooltip.tsx"),
     // PlainFolderIcon by botato (GPL-3.0-or-later).
     "plain-folder-icon": {
         plugin: "PlainFolderIcon", label: "Replace the mini server icons in collapsed folders with a plain folder icon",

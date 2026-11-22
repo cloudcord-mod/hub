@@ -1,0 +1,3 @@
+plugin "HideChatInputRefreshTip":
+  needs appearance.hide
+  hide hide-chat-input-refresh-tip

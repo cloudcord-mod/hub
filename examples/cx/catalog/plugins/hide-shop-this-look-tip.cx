@@ -1,0 +1,3 @@
+plugin "HideShopThisLookTip":
+  needs appearance.hide
+  hide hide-shop-this-look-tip
