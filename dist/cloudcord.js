@@ -26374,28 +26374,25 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       user,
       safeStore("UserProfileStore")?.getUserProfile?.(user?.userId || user?.id)
     ];
-    var native = candidates.find((profile) => {
-      var colors2 = profile?.themeColors ?? profile?.theme_colors;
-      return Array.isArray(colors2) && colors2.some((value) => value != null) || profile?.primaryColor != null || profile?.primary_color != null || profile?.accentColor != null || profile?.accent_color != null;
+    var synced = sharedProfileColorPair(data);
+    var primary = profilePreviewColor(synced?.[0]);
+    for (var profile of candidates) {
+      if (primary)
+        break;
+      var colors = profile?.themeColors ?? profile?.theme_colors;
+      var [first, second] = Array.isArray(colors) ? colors : [];
+      primary = profilePreviewColor(first) ?? profilePreviewColor(profile?.primaryColor ?? profile?.primary_color) ?? profilePreviewColor(second) ?? profilePreviewColor(profile?.accentColor ?? profile?.accent_color);
+    }
+    var value = primary ? Number.parseInt(primary.slice(1), 16) : null;
+    var channels2 = value === null ? null : [
+      value >> 16 & 255,
+      value >> 8 & 255,
+      value & 255
+    ].map((channel) => {
+      var c2 = channel / 255;
+      return c2 <= 0.04045 ? c2 / 12.92 : ((c2 + 0.055) / 1.055) ** 2.4;
     });
-    var colors = data?.profileColorsEnabled ? [
-      data.primaryColor,
-      data.accentColor
-    ] : native?.themeColors ?? native?.theme_colors ?? [
-      native?.primaryColor ?? native?.primary_color ?? native?.accentColor ?? native?.accent_color
-    ];
-    var values = colors.filter((value) => value != null).map((value) => typeof value === "string" ? parseInt(value.replace("#", ""), 16) : Number(value)).filter(Number.isFinite).slice(0, 1);
-    var luminance = values.length ? values.reduce((sum, value) => {
-      var channels2 = [
-        value >> 16 & 255,
-        value >> 8 & 255,
-        value & 255
-      ].map((channel) => {
-        var c2 = channel / 255;
-        return c2 <= 0.04045 ? c2 / 12.92 : ((c2 + 0.055) / 1.055) ** 2.4;
-      });
-      return sum + channels2[0] * 0.2126 + channels2[1] * 0.7152 + channels2[2] * 0.0722;
-    }, 0) / values.length : null;
+    var luminance = channels2 ? channels2[0] * 0.2126 + channels2[1] * 0.7152 + channels2[2] * 0.0722 : null;
     var light = luminance !== null ? (luminance + 0.05) / 0.05 >= 1.05 / (luminance + 0.05) : safeStore("ThemeStore")?.theme === "light";
     var tintColor = light ? "#000000" : "#ffffff";
     var renderId = `${badge.id}:${user?.userId || user?.id || user?.user?.id || "self"}:${light ? "light" : "dark"}`;
@@ -72233,7 +72230,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7577efbe3c14ed0de34795f27a80aacc283043ed";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "aa95e929279284924e282b17b365c8b6309c71af";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
