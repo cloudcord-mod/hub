@@ -61205,6 +61205,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function supportsMobileHide({ target }) {
     return !("desktopOnly" in cxAppearanceTargets[target]);
   }
+  function applyRememberedNumbers(source, values) {
+    if (!values || typeof values !== "object")
+      return source;
+    return reviewCx(source).numberOptions.reduce((current, option) => {
+      var value = values[option.effect];
+      return typeof value === "number" ? updateCxNumberOption(current, option, value) : current;
+    }, source);
+  }
   function readRememberedAppearance() {
     var records = settings.cxRememberedAppearance;
     if (!Array.isArray(records))
@@ -62029,10 +62037,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       if (!entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== void 0)
         continue;
       try {
-        var review = reviewCx(entry.source);
+        var source = applyRememberedNumbers(entry.source, saved.numberValues);
+        var review = reviewCx(source);
         if (!canRememberCxExtension(review))
           continue;
-        session.enable(entry.source, {
+        session.enable(source, {
           ...createMobileCxHost(),
           toast() {
           }
@@ -62162,7 +62171,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     React2.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
     var remembered = readRememberedAppearance();
     var catalogEntry = candidate && rememberedCatalog.get(candidate.review.name);
-    var rememberRevision = catalogEntry?.source === candidate?.source ? catalogEntry?.appearanceRevision : void 0;
+    var numberValues = candidate?.review.numberOptions.length ? Object.fromEntries(candidate.review.numberOptions.map((option) => [
+      option.effect,
+      option.value
+    ])) : void 0;
+    var rememberRevision = catalogEntry && applyRememberedNumbers(catalogEntry.source, numberValues) === candidate?.source ? catalogEntry.appearanceRevision : void 0;
     function enable(remember = false) {
       if (!candidate)
         return;
@@ -62176,7 +62189,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           rememberAppearance({
             name: candidate.review.name,
             revision: rememberRevision,
-            selected: candidate.selected
+            selected: candidate.selected,
+            numberValues
           }, candidate.review.kind === "theme");
           setStatus(`${candidate.review.name} is active and will reopen with CloudCord.`);
         }
@@ -62447,7 +62461,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               }),
               session.list().filter(({ id, name }) => !kind || entry?.id === id && entry.name === name).flatMap(({ id, name }) => {
                 var _$entry = rememberedCatalog.get(name);
-                var saved = _$entry?.source === session.source(id) ? remembered.find((item) => item.name === name && item.revision === _$entry?.appearanceRevision) : void 0;
+                var saved = _$entry && remembered.find((item) => item.name === name && item.revision === _$entry.appearanceRevision && applyRememberedNumbers(_$entry.source, item.numberValues) === session.source(id));
                 return [
                   ...session.appearanceOptions(id).filter(supportsMobileHide).map(({ target, label: label2, enabled }) => /* @__PURE__ */ jsx(TableSwitchRow, {
                     label: `${name} \xB7 ${label2}`,
@@ -67368,7 +67382,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c7430c17f611e1fa5767896e678c8b33c8ae8ec5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "809eb7a0c36cf965f207fd6924ecc7568f8c4ac7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
