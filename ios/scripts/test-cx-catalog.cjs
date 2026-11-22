@@ -285,7 +285,7 @@ async function main(args) {
             const requests = row?.requests ?? [];
             const androidMatches = requests.length ? requests.filter(request => request.observedInAndroidSnapshot === true).length + "/" + requests.length : "";
             entry.discoverFactory = { status, error: row?.error ?? "Missing Discover factory result", androidMatches, requests,
-                settingsDeclared: row?.settingsDeclared };
+                settingsDeclared: row?.settingsDeclared, stack: row?.stack };
         }
         discoverFactory = { scope: "Isolated Discover factories with inert Vendetta fixtures", counts,
             distinctFindByProps: discoverEvidence.summary.distinctFindByProps,

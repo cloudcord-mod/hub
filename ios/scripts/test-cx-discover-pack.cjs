@@ -86,6 +86,7 @@ async function main() {
         try {
             const check = context.evalCode(bootstrap + `
 let error = "";
+let stack = "";
 let hooks = [];
 let settingsDeclared = false;
 try {
@@ -95,8 +96,11 @@ try {
     hooks = ["onLoad", "onUnload", "start", "stop"].filter(key => typeof candidate[key] === "function");
     settingsDeclared = Boolean(candidate.settings);
     if (!hooks.length && !settingsDeclared) throw new Error("Preview has no recognizable lifecycle or settings");
-} catch (failure) { error = String(failure?.message ?? failure); }
-JSON.stringify({ error, hooks, settingsDeclared, requests: [...requests.values()], fixtureApis: [...used].sort() });`);
+} catch (failure) {
+    error = String(failure?.message ?? failure);
+    stack = typeof failure?.stack === "string" ? failure.stack.slice(0, 2000) : "";
+}
+JSON.stringify({ error, stack, hooks, settingsDeclared, requests: [...requests.values()], fixtureApis: [...used].sort() });`);
             const value = check.error ?? check.value;
             try {
                 const result = context.dump(value);
@@ -107,7 +111,8 @@ JSON.stringify({ error, hooks, settingsDeclared, requests: [...requests.values()
                     if (!evidence.has(key)) evidence.set(key, groups?.some(group => keys.every(name => group.has(name))) ?? null);
                     return { keys, observedInAndroidSnapshot: evidence.get(key) };
                 });
-                rows.push({ id, status: data.error ? "Fail" : "Pass", error: data.error, hooks: data.hooks, settingsDeclared: data.settingsDeclared, requests, fixtureApis: data.fixtureApis });
+                rows.push({ id, status: data.error ? "Fail" : "Pass", error: data.error, stack: data.stack || undefined,
+                    hooks: data.hooks, settingsDeclared: data.settingsDeclared, requests, fixtureApis: data.fixtureApis });
             } finally { value.dispose(); }
         } finally { context.dispose(); runtime.dispose(); }
     }
