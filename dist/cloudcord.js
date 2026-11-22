@@ -38124,6 +38124,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           desktopOnly: true,
           style: {}
         },
+        "high-contrast-chat-selection": {
+          plugin: "HighContrastChatSelection",
+          label: "Use high-contrast colors for selected chat text",
+          css: '[class*="messageContent_"]::selection, [class*="messageContent_"] ::selection { color: HighlightText !important; background-color: Highlight !important; }',
+          desktopOnly: true,
+          style: {}
+        },
         "floating-chat-bar": {
           plugin: "FloatingChatBar",
           label: "lift the chat bar above the bottom edge",
@@ -53069,6 +53076,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/high-contrast-chat-selection.cx
+  var high_contrast_chat_selection_default;
+  var init_high_contrast_chat_selection = __esm({
+    "../examples/cx/catalog/plugins/high-contrast-chat-selection.cx"() {
+      high_contrast_chat_selection_default = 'plugin "HighContrastChatSelection":\n  needs appearance.style\n  style high-contrast-chat-selection\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/high-contrast-text.cx
   var high_contrast_text_default;
   var init_high_contrast_text = __esm({
@@ -56057,6 +56072,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_you_banner_decorations();
       init_hide_you_settings_tip();
       init_hide_you_trial_offer();
+      init_high_contrast_chat_selection();
       init_high_contrast_text();
       init_high_res_profile_images();
       init_highlight_links();
@@ -59790,6 +59806,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "9c0a5b4d1bf7f53d3706b10be3690c6e2e87551587dea910b98a82ea0507f8ad"
+          },
+          {
+            name: "HighContrastChatSelection",
+            source: high_contrast_chat_selection_default,
+            description: "Use high-contrast colors for selected chat text",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
           },
           {
             name: "HighContrastText",
@@ -72097,7 +72122,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3ab4bfd9e88beedb25a8e00cae96fd167310c434";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b396113506ef484deb51188c238d520f8a38cf03";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
