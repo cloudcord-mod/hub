@@ -753,6 +753,11 @@ function registerStaticTypingDots() {
     };
 }
 
+function supportsDesktopHide({ target }: { target: keyof typeof cxAppearanceTargets; }) {
+    const rule = cxAppearanceTargets[target];
+    return !("mobileOnly" in rule && rule.mobileOnly);
+}
+
 function applyAppearanceTarget(target: keyof typeof cxAppearanceTargets) {
     const rule = cxAppearanceTargets[target];
     if (target === "hide-profile-about-me") {
@@ -1491,7 +1496,8 @@ async function restoreRememberedAppearance(generation: number) {
                     if (generation !== appearanceGeneration || session.source(id) !== undefined) return;
                     const saved = rememberedAppearance.find(record => record.id === id && record.source === source);
                     if (!saved) return;
-                    session.enable(source, { ...createDesktopCxHost(review.name), toast() {} }, review.permissions, saved.selected);
+                    const selected = review.appearanceOptions.filter(option => supportsDesktopHide(option) && saved.selected.includes(option.target)).map(option => option.target);
+                    session.enable(source, { ...createDesktopCxHost(review.name), toast() {} }, review.permissions, selected);
                     failedAppearanceRestores.delete(id);
                     if (typeof bundled === "function") activeCatalogLoaders.set(id, bundled);
                 };
@@ -1590,7 +1596,7 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
         try {
             const preview = reviewCx(next);
             if (kind && preview.kind !== kind) throw new Error(`Open this file from ${preview.kind === "theme" ? "Themes" : "Plugins"}.`);
-            setCandidate({ source: next, loader, review: preview, selected: preview.appearanceOptions.filter(option => option.defaultOn).map(option => option.target) });
+            setCandidate({ source: next, loader, review: preview, selected: preview.appearanceOptions.filter(option => option.defaultOn && supportsDesktopHide(option)).map(option => option.target) });
             setStatus("");
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));
@@ -1739,7 +1745,7 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
                         setCandidate({ ...candidate, source: next, loader: undefined, review: reviewCx(next) });
                     }} /> {option.value}{option.unit}
             </label>)}
-            {candidate.review.appearanceOptions.map(({ target, label }) => <div key={target}>
+            {candidate.review.appearanceOptions.filter(supportsDesktopHide).map(({ target, label }) => <div key={target}>
                 <label><input type="checkbox" aria-label={label} checked={candidate.selected.includes(target)} onChange={event => {
                     setCandidate({ ...candidate, selected: selectCxAppearanceOption(candidate.selected, target, event.currentTarget.checked) });
                 }} /> {label}</label>
@@ -1752,7 +1758,7 @@ export function CxSettings({ kind, entry }: { kind?: CxAddonKind; entry?: CxAddo
             const saved = rememberedAppearance.find(entry => entry.id === id && entry.source === session.source(id));
             return <div key={id}>
                 {saved && <small>Remembered on this device</small>}
-                {session.appearanceOptions(id).map(({ target, label, enabled }) => <div key={target}>
+                {session.appearanceOptions(id).filter(supportsDesktopHide).map(({ target, label, enabled }) => <div key={target}>
                     <label><input type="checkbox" aria-label={`${name} · ${label}`} checked={enabled} disabled={rememberingAppearance.has(id)} onChange={event => {
                         try {
                             session.setAppearanceOption(id, target, event.currentTarget.checked);
