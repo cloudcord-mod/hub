@@ -4539,6 +4539,9 @@ jobs:
               return { ...defaultPreview(), ...savedSnapshot(look), enabled: current.enabled,
                   hideBadgesWhenSyncOff: current.hideBadgesWhenSyncOff, syncRevision: Date.now() };
           }
+          function sharedLookSnapshot(profile: any) {
+              return savedSnapshot({ ...defaultPreview(), ...previewFromShared(profile || {}) });
+          }
           // Templates: community profiles from getcloudcord.com/templates.
           const TEMPLATE_CATEGORIES = ["Aesthetic", "Anime", "Gaming", "Minimal", "Dark", "Cute", "Funny", "Other"];
           const countTemplateUse = (id: string) => { fetch(SHARED_PROFILE_API + "/v1/shares/" + id + "/use", { method: "POST" }).catch(() => {}); };
@@ -4573,7 +4576,7 @@ jobs:
                   const own = saved().find(item => item.share?.id === id);
                   const share = await shareRequest("/" + id, "GET", undefined, own?.share?.token);
                   if (ownerId !== currentUserId) throw new Error("Your Discord account changed.");
-                  return { name: String(share.name || "Template").slice(0, 40), data: savedSnapshot({ ...current, ...Object.fromEntries(Object.entries(previewFromShared(share.profile || {})).filter(([, value]) => value !== "" && value !== undefined)) }) };
+                  return { name: String(share.name || "Template").slice(0, 40), data: sharedLookSnapshot(share.profile) };
               };
               const preview = (id: string) => run(async () => {
                   if (previewing?.id === id) { onPreview(null); setPreviewing(null); showToast("Preview stopped"); return; }
@@ -4752,7 +4755,7 @@ jobs:
                   try { share = await shareRequest("/" + id, "GET", undefined, own?.share?.token); }
                   catch (error: any) { throw new Error(/not found/i.test(String(error?.message)) ? "That profile doesn't exist or is private." : error?.message); }
                   if (ownerId !== currentUserId) return;
-                  const data = savedSnapshot({ ...current, ...previewFromShared(share.profile || {}) });
+                  const data = sharedLookSnapshot(share.profile);
                   commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: String(share.name || "Imported profile").slice(0, 40), savedAt: Date.now(), data }, ...readSavedProfiles(ownerId)]);
                   setCode("");
                   showToast("Added \u201c" + share.name + "\u201d to Saved");
@@ -5366,7 +5369,12 @@ jobs:
                               preview = rootSettings.fakeProfile as PreviewSettings; clearCache(); suppressOwnPullUntil = data ? Date.now() + 24 * 3600000 : Date.now() + 15000; refreshPreview(); redraw();
                           }} onUse={(data: any) => {
                               if (!editorOwner.current || editorOwner.current !== currentUserId) return;
-                              rootSettings.fakeProfile = { ...preview, ...data, enabled: preview.enabled, syncRevision: Date.now() };
+                              const restored = loadSavedLook(preview, data);
+                              for (const field of ["avatarMedia", "bannerMedia"] as const) {
+                                  if (restored[field]) unmarkMediaCleared(field);
+                                  else markMediaCleared(field);
+                              }
+                              rootSettings.fakeProfile = restored;
                               preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw();
                           }} /> : null}
                           {(activeTab as string) === "saved" ? <SavedProfiles key={editorOwner.current ?? ""} ownerId={editorOwner.current} current={preview} realUser={realCurrentUser} catalog={catalog} onUse={(data: any) => {

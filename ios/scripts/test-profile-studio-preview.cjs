@@ -387,6 +387,19 @@ async function testPortableTransfer() {
     }
 }
 
+const lookHelpers = page.slice(page.indexOf("function savedSnapshot("), page.indexOf("// Templates: community profiles"));
+const mobileLooks = vm.runInNewContext(transformSync(lookHelpers + "\n({ sharedLookSnapshot, loadSavedLook });", { loader: "ts" }).code, {
+    defaultPreview: () => ({ enabled: false, bannerMedia: null, profileColorsEnabled: false, bio: "" }),
+    previewFromShared: profile => profile,
+});
+const incomingLook = mobileLooks.sharedLookSnapshot({ bio: "Template bio" });
+const appliedLook = mobileLooks.loadSavedLook({ enabled: true, bannerMedia: { uri: "old" }, profileColorsEnabled: true, hideBadgesWhenSyncOff: true }, incomingLook);
+assert.equal(appliedLook.bannerMedia, null);
+assert.equal(appliedLook.profileColorsEnabled, false);
+assert.equal(appliedLook.bio, "Template bio");
+assert.equal(appliedLook.enabled, true);
+assert.equal(appliedLook.hideBadgesWhenSyncOff, true);
+
 Promise.all([testMobilePreviewOpening(), testPortableTransfer()]).then(() => {
     console.log("PASS Profile Studio previews, saved looks and cross-platform clipboard transfer");
 }).catch(error => {
