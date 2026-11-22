@@ -47828,16 +47828,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return fields;
   }
   function searchCxCatalog(entries2, search, category = "All") {
-    var _loop2 = function(entry2) {
-      var { lowerName, compactName, searchableText } = catalogSearchFields(entry2);
+    var _loop2 = function(entry12) {
+      var { lowerName, compactName, searchableText } = catalogSearchFields(entry12);
       if (lowerName === query)
-        exact.push(entry2);
+        exact1.push(entry12);
       else if (compactQuery && compactName === compactQuery)
-        normalized.push(entry2);
+        normalized.push(entry12);
+      else if (compactQuery && entry12.commands?.some((command) => normalizeCatalogSearch(command).replaceAll(" ", "") === compactQuery))
+        commandMatches.push(entry12);
       else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery))
-        partial.push(entry2);
+        partial1.push(entry12);
       else if (terms.length && terms.every((term) => searchableText.includes(term)))
-        feature.push(entry2);
+        feature.push(entry12);
     };
     if (category !== "All")
       entries2 = entries2.filter((entry2) => entry2.categories?.includes(category));
@@ -47849,16 +47851,31 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     if (query.startsWith("/")) {
       if (!compactQuery && query !== "/")
         return [];
-      return entries2.filter((entry2) => entry2.commands?.some((command) => normalizeCatalogSearch(command).replaceAll(" ", "").includes(compactQuery)));
+      if (!compactQuery)
+        return entries2.filter((entry2) => entry2.commands?.length);
+      var exact = [];
+      var prefix2 = [];
+      var partial = [];
+      for (var entry of entries2) {
+        var commands3 = entry.commands?.map((command) => normalizeCatalogSearch(command).replaceAll(" ", ""));
+        if (commands3?.includes(compactQuery))
+          exact.push(entry);
+        else if (commands3?.some((command) => command.startsWith(compactQuery)))
+          prefix2.push(entry);
+        else if (commands3?.some((command) => command.includes(compactQuery)))
+          partial.push(entry);
+      }
+      return exact.concat(prefix2, partial);
     }
     var terms = normalizedQuery ? normalizedQuery.split(" ") : [];
-    var exact = [];
+    var exact1 = [];
     var normalized = [];
-    var partial = [];
+    var commandMatches = [];
+    var partial1 = [];
     var feature = [];
-    for (var entry of entries2)
-      _loop2(entry);
-    return exact.concat(normalized, partial, feature);
+    for (var entry1 of entries2)
+      _loop2(entry1);
+    return exact1.concat(normalized, commandMatches, partial1, feature);
   }
   function parseCx(source) {
     var _loop2 = function(line12) {
@@ -69112,7 +69129,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c2716b057809f01dc58b6e0ea49ea94a34aa1a79";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a815e0319d4a3082229432d0f8e39c3d1c729004";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
