@@ -138,22 +138,24 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         }
     }, [navigation]);
 
-    const results = useMemo(() => {
-        let values = props.items;
-        if (props.resolveItem) values = values.map(props.resolveItem).filter(isNotNil);
-        const items = values.filter(item => isNotNil(item) && typeof item === "object"
+    const items = useMemo(() => {
+        const values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
+        return values.filter(item => isNotNil(item) && typeof item === "object"
             && (!matchesFilter || matchesFilter(item))
             && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
+    }, [props.items, props.resolveItem, props.isEnabled, enabledOnly, matchesFilter]);
+
+    const results = useMemo(() => {
         if (commandSearch) {
             return commandSearch(items, query).map(obj => ({ obj }));
         }
         if (!query) {
-            if (sortFn) items.sort(sortFn);
-            return items.map(obj => ({ obj }));
+            const ordered = sortFn ? items.slice().sort(sortFn) : items;
+            return ordered.map(obj => ({ obj }));
         }
 
         return fuzzysort.go(query, items, { keys: props.searchKeywords });
-    }, [props.items, props.resolveItem, props.isEnabled, props.searchKeywords, sortFn, query, enabledOnly, matchesFilter, commandSearch]);
+    }, [items, props.searchKeywords, sortFn, query, commandSearch]);
 
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };
