@@ -1,0 +1,6 @@
+plugin "Inspect Discord Timestamp":
+  needs commands.register
+  needs reply.local
+  on command "inspecttimestamp":
+    input "text" text
+    reply "${inspectDiscordTimestamp(text)}" else "Paste a Discord timestamp such as <t:1760000000:R>."

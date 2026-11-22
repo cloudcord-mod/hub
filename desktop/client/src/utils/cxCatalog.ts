@@ -327,6 +327,7 @@ import plugin_catalog_improve_contrast from "../../../../examples/cx/catalog/plu
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_indent_lines from "../../../../examples/cx/catalog/plugins/indent-lines.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
+import plugin_catalog_inspect_discord_timestamp from "../../../../examples/cx/catalog/plugins/inspect-discord-timestamp.cx";
 import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso-week.cx";
 import plugin_catalog_join_lines from "../../../../examples/cx/catalog/plugins/join-lines.cx";
 import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
@@ -462,6 +463,7 @@ import plugin_catalog_theme_starter from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plugins/thin-scrollbars.cx";
 import plugin_catalog_timestamp_difference from "../../../../examples/cx/catalog/plugins/timestamp-difference.cx";
 import plugin_catalog_timestamp_styles from "../../../../examples/cx/catalog/plugins/timestamp-styles.cx";
+import plugin_catalog_timestamp_time_zone_offset from "../../../../examples/cx/catalog/plugins/timestamp-time-zone-offset.cx";
 import plugin_catalog_total_time from "../../../../examples/cx/catalog/plugins/total-time.cx";
 import plugin_catalog_transfer_duration from "../../../../examples/cx/catalog/plugins/transfer-duration.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
@@ -935,6 +937,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
         { name: "Indent Lines", source: plugin_catalog_indent_lines, description: "/indentlines", commands: ["indentlines"], categories: ["Commands"], appearanceRevision: "105e91032887863c35b9e5e1d74a847c62af5d275cceafa7e2d79320cd272d65", privateCommands: true },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
+        { name: "Inspect Discord Timestamp", source: plugin_catalog_inspect_discord_timestamp, description: "/inspecttimestamp", commands: ["inspecttimestamp"], categories: ["Commands"], appearanceRevision: "6fc09a5a211f7e8a286f584370781b4ccac23476121968cdb3d91c2afa728f0c", privateCommands: true },
         { name: "ISO Week", source: plugin_catalog_iso_week, description: "/isoweek", commands: ["isoweek"], categories: ["Commands"], appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5", privateCommands: true },
         { name: "Join Lines", source: plugin_catalog_join_lines, description: "/joinlines", commands: ["joinlines"], categories: ["Commands"], appearanceRevision: "7fe09a418a6341397253829916ab3fc523ae42d483a0c37a00c032d48430f135", privateCommands: true },
         { name: "JSON Check", source: plugin_catalog_json_check, description: "/jsoncheck", commands: ["jsoncheck"], categories: ["Commands"], appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f", privateCommands: true },
@@ -1070,6 +1073,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ThinScrollbars", source: plugin_catalog_thin_scrollbars, description: "Thinner scrollbars", desktopOnly: true, categories: ["Appearance"] },
         { name: "Timestamp Difference", source: plugin_catalog_timestamp_difference, description: "/timestampdiff", commands: ["timestampdiff"], categories: ["Commands"], appearanceRevision: "f322ad1f90489ea334f18706038470062328b80579da8eea741730784d3859d1", privateCommands: true },
         { name: "Timestamp Styles", source: plugin_catalog_timestamp_styles, description: "/timestampstyles", commands: ["timestampstyles"], categories: ["Commands"], appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4", privateCommands: true },
+        { name: "Timestamp Time Zone Offset", source: plugin_catalog_timestamp_time_zone_offset, description: "/timestampoffset", commands: ["timestampoffset"], categories: ["Commands"], appearanceRevision: "587f054a27a9ebdc3b5d57872dcacabcbe690f66d46be6f16da314420056638f", privateCommands: true },
         { name: "Total Time", source: plugin_catalog_total_time, description: "/totaltime", commands: ["totaltime"], categories: ["Commands"], appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca", privateCommands: true },
         { name: "Transfer Duration", source: plugin_catalog_transfer_duration, description: "/transfertime", commands: ["transfertime"], categories: ["Commands"], appearanceRevision: "4aee6915d955f7780f0f8ba3772a58ac53c33a4a8a4939d306659e0cdd161bd5", privateCommands: true },
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },

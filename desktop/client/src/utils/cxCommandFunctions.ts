@@ -755,6 +755,23 @@ export const cxCommandFunctions = {
                 return `${label} · ${markup} · \`${markup}\``;
             }).join("\n");
     },
+    inspectDiscordTimestamp(input: string) {
+        const match = /^<t:(-?\d{1,13})(?::([tTdDfFR]))?>$/.exec(input.trim());
+        if (!match) return;
+        const seconds = Number(match[1]);
+        const date = new Date(seconds * 1000);
+        if (!Number.isFinite(date.getTime())) return;
+        return "UTC " + date.toISOString() + " · Unix seconds " + seconds + " · Format " + (match[2] ?? "f");
+    },
+    timestampAtOffset(input: string, offset: string) {
+        const instant = isoUnixMilliseconds(input);
+        const match = /^([+-])(\d{2}):(\d{2})$/.exec(offset.trim());
+        if (instant === undefined || !match) return;
+        const hours = Number(match[2]), minutes = Number(match[3]);
+        if (hours > 23 || minutes > 59) return;
+        const displacement = (hours * 60 + minutes) * 60000 * (match[1] === "-" ? -1 : 1);
+        return new Date(instant + displacement).toISOString().replace(/Z$/, match[0]);
+    },
     recurringTimestamps(start: string, interval: string, count: string) {
         const ms = isoUnixMilliseconds(start);
         const step = durationSeconds(interval), occurrences = integerText(count);

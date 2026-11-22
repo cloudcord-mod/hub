@@ -3146,6 +3146,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["extractmentions", { text: "<@!123456789012345678> <@123456789012345678> <@&234567890123456789> <#345678901234567890>" }, /^User \x60123456789012345678\x60\nRole \x60234567890123456789\x60\nChannel \x60345678901234567890\x60$/],
                 ["extractmentions", { text: "no mentions" }, /^No Discord/],
             ]],
+            ["Inspect Discord Timestamp", [
+                ["inspecttimestamp", { text: "<t:3600:R>" }, /^UTC 1970-01-01T01:00:00\.000Z · Unix seconds 3600 · Format R$/],
+                ["inspecttimestamp", { text: "<t:3600:z>" }, /^Paste a Discord timestamp/],
+            ]],
+            ["Timestamp Time Zone Offset", [
+                ["timestampoffset", { timestamp: "2026-11-20T23:00:00Z", offset: "+03:30" }, /^2026-11-21T02:30:00\.000\+03:30$/],
+                ["timestampoffset", { timestamp: "2026-11-20T23:00:00Z", offset: "+03:99" }, /^Enter an ISO timestamp/],
+            ]],
             ["Calendar Day Difference", [
                 ["calendardays", { start: "2024-02-28", end: "2024-03-01" }, /^2 days later$/],
                 ["calendardays", { start: "2023-02-29", end: "2023-03-01" }, /^Enter two calendar dates/],

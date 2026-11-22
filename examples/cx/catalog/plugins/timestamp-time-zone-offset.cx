@@ -1,0 +1,7 @@
+plugin "Timestamp Time Zone Offset":
+  needs commands.register
+  needs reply.local
+  on command "timestampoffset":
+    input "timestamp" text
+    input "offset" text
+    reply "${timestampAtOffset(timestamp, offset)}" else "Enter an ISO timestamp with its time zone and a target offset such as +03:00."
