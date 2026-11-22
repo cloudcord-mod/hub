@@ -347,7 +347,16 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
     overflow-wrap: anywhere;
 }
 
-.cpx-chat-preview > img {
+.cpx-avatar-fallback {
+    display: inline-grid;
+    place-items: center;
+    color: var(--text-default, #fff);
+    background: var(--background-mod-subtle, #444);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.cpx-chat-preview > .cpx-chat-avatar {
     flex: none;
     width: 34px;
     height: 34px;

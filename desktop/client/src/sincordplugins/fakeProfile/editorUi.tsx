@@ -219,7 +219,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 {(["profile", "popout", "chat"] as const).map(value => <button type="button" key={value} aria-pressed={mode === value} className={`cpx-btn ${mode === value ? "cpx-btn-primary" : "cpx-btn-ghost"}`} onClick={() => setMode(value)}>{value === "profile" ? "Profile" : value === "popout" ? "Popout" : "Chat"}</button>)}
             </div></>}
         {mode === "chat" ? <div className="cpx-chat-preview">
-            <img src={avatar} alt="" />
+            <PreviewAvatar key={avatar} src={avatar} name={name} className="cpx-chat-avatar" />
             <div className="cpx-chat-preview-content">
                 <div className="cpx-chat-preview-heading">
                     <strong>{name}</strong>
@@ -230,7 +230,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
         </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} frameName={frameName} effectName={effectName} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
             <div className="cpx-card-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
             <div className="cpx-card-avatar">
-                <img className="cpx-card-avatar-img" src={avatar} alt="" />
+                <PreviewAvatar key={avatar} src={avatar} name={name} className="cpx-card-avatar-img" />
                 {decorationUrl && <img className="cpx-card-decoration" src={decorationUrl} alt="" />}
                 <span className="cpx-card-status" style={{ background: status === "streaming" ? "#593695" : STATUS_COLORS[status] }} aria-label={`Status: ${status}`} />
             </div>
@@ -254,6 +254,15 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
     </aside>;
 }
 
+function PreviewAvatar({ src, name, className }: { src: string; name: string; className: string; }) {
+    const [failed, setFailed] = React.useState(false);
+    if (src && !failed)
+        return <img className={className} src={src} alt="" onError={() => setFailed(true)} />;
+
+    const initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
+    return <span className={`${className} cpx-avatar-fallback`} aria-hidden="true">{initial}</span>;
+}
+
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
 export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallbackAvatar, fallbackSurface, decorationUrl, nameplateUrl, frameName, effectName, badges = [] }: {
     data: any; fallbackName: string; fallbackUsername: string; fallbackAvatar: string; decorationUrl?: string; nameplateUrl?: string; badges?: { id: string; icon: string; label: string; }[];
@@ -270,7 +279,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
         <div className="cpx-dc-inner">
             <div className="cpx-dc-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
             <div className="cpx-dc-avatar">
-                <img className="cpx-dc-avatar-img" src={data.avatar || fallbackAvatar} alt="" />
+                <PreviewAvatar key={data.avatar || fallbackAvatar} src={data.avatar || fallbackAvatar} name={data.globalName || fallbackName} className="cpx-dc-avatar-img" />
                 {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}
                 <span className={`cpx-dc-status cpx-dc-status-${status}`} aria-label={`Status: ${status}`} />
             </div>
