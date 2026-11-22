@@ -1,7 +1,8 @@
+import { requestDiscordReload } from "@core/debug/safeMode";
 import { getCurrentTheme, getThemeFromLoader, selectTheme, themes } from "@lib/addons/themes";
 import { findAssetId } from "@lib/api/assets";
 import { getLoaderName, getLoaderVersion, isThemeSupported, getReactDevToolsProp, isReactDevToolsPreloaded } from "@lib/api/native/loader";
-import { BundleUpdaterManager, NativeClientInfoModule, NativeDeviceModule } from "@lib/api/native/modules";
+import { NativeClientInfoModule, NativeDeviceModule } from "@lib/api/native/modules";
 import { after } from "@lib/api/patcher";
 import { settings } from "@lib/api/settings";
 import { logger } from "@lib/utils/logger";
@@ -40,7 +41,7 @@ export async function toggleSafeMode() {
             await selectTheme(themes[settings.safeMode.currentThemeId] ?? null);
         }
     }
-    setTimeout(BundleUpdaterManager.reload, 400);
+    setTimeout(requestDiscordReload, 400);
 }
 
 let socket: WebSocket | undefined;

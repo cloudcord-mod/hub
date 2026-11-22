@@ -1,6 +1,6 @@
+import { requestDiscordReload } from "@core/debug/safeMode";
 import { hasStack, isComponentStack } from "@core/ui/reporter/utils/isStack";
 import { getDebugInfo, toggleSafeMode } from "@lib/api/debug";
-import { BundleUpdaterManager } from "@lib/api/native/modules";
 import { settings } from "@lib/api/settings";
 import { Codeblock, ErrorBoundary } from "@lib/ui/components";
 import { createStyles } from "@lib/ui/styles";
@@ -42,7 +42,7 @@ export default function ErrorBoundaryScreen(props: {
                     {isComponentStack(props.error) ? <ErrorComponentStackCard componentStack={props.error.componentStack} /> : null}
                 </ScrollView>
                 <Card style={{ gap: 6 }}>
-                    <Button text="Reload Discord" onPress={() => BundleUpdaterManager.reload()} />
+                    <Button text="Reload Discord" onPress={requestDiscordReload} />
                     {!settings.safeMode?.enabled && <Button text="Reload in Safe Mode" onPress={() => toggleSafeMode()} />}
                     <Button variant="destructive" text="Retry Render" onPress={() => props.rerender()} />
                 </Card>

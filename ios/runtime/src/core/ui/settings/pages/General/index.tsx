@@ -1,4 +1,4 @@
-import { isSafeMode, toggleSafeMode } from "@core/debug/safeMode";
+import { isSafeMode, requestDiscordReload, toggleSafeMode } from "@core/debug/safeMode";
 import { Strings } from "@core/i18n";
 import { PupuIcon } from "@core/ui/settings";
 import About from "@core/ui/settings/pages/General/About";
@@ -111,11 +111,7 @@ export default function General() {
                     <TableRow
                         label={(globalThis as any).__CLOUDCORD_ORIGINAL_RAIN__ ? "Update runtime & restart" : Strings.RELOAD_DISCORD}
                         icon={<TableRow.Icon source={findAssetId("RetryIcon")!} />}
-                        onPress={() => {
-                            Promise.resolve(BundleUpdaterManager.reload()).catch((error: any) => {
-                                require("react-native").Alert.alert("Update failed", error?.message ?? "Try again later.");
-                            });
-                        }}
+                        onPress={requestDiscordReload}
                     />
                     <TableSwitchRow
                         label={"Safe Mode"}
@@ -133,7 +129,7 @@ export default function General() {
                                         <AlertActionButton
                                             text="Reload Now"
                                             variant="destructive"
-                                            onPress={() => BundleUpdaterManager.reload()}
+                                            onPress={requestDiscordReload}
                                         />
                                         <AlertActionButton text="Later" variant="secondary" />
                                     </AlertActions>}
