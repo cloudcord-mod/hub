@@ -97,6 +97,7 @@ function buildCatalog(additions = new Map()) {
         });
     }
     const desktopPlugins = groups.plugins.filter(entry => !entry.mobileOnly).length;
+    const nonLinuxDesktopPlugins = groups.plugins.filter(entry => !entry.mobileOnly && !entry.linuxOnly).length;
     const mobilePlugins = groups.plugins.filter(entry => !entry.desktopOnly).length;
     if (desktopPlugins > desktopPluginTarget) throw new Error(`CX desktop catalog exceeds ${desktopPluginTarget} entries`);
     const source = [
@@ -123,12 +124,12 @@ function buildCatalog(additions = new Map()) {
         "};",
         "",
     ].join("\n");
-    return { source, plugins: groups.plugins.length, desktopPlugins, mobilePlugins, themes: groups.themes.length, names, commands, pluginFiles, pluginBodies };
+    return { source, plugins: groups.plugins.length, desktopPlugins, nonLinuxDesktopPlugins, mobilePlugins, themes: groups.themes.length, names, commands, pluginFiles, pluginBodies };
 }
 
 if (require.main === module) {
     try {
-        const { source, desktopPlugins, mobilePlugins, themes } = buildCatalog();
+        const { source, desktopPlugins, nonLinuxDesktopPlugins, mobilePlugins, themes } = buildCatalog();
         const mode = process.argv[2];
         if (mode === "--release" && (desktopPlugins !== desktopPluginTarget || themes !== 100)) {
             throw new Error(`Complete desktop CX release requires ${desktopPluginTarget} plugins and 100 themes. Found ${desktopPlugins} plugins and ${themes} themes.`);
@@ -137,7 +138,7 @@ if (require.main === module) {
             if (fs.readFileSync(catalogPath, "utf8").replaceAll("\r\n", "\n") !== source) throw new Error("Shared CX catalog needs regeneration");
         } else if (mode === undefined) fs.writeFileSync(catalogPath, source);
         else throw new Error("Use --check, --release, or no flag to regenerate");
-        console.log(`CX catalog has ${desktopPlugins}/${desktopPluginTarget} desktop plugins, ${mobilePlugins} mobile plugins and ${themes}/100 themes`);
+        console.log(`CX catalog has ${desktopPlugins}/${desktopPluginTarget} desktop plugins (${nonLinuxDesktopPlugins} outside Linux), ${mobilePlugins} mobile plugins and ${themes}/100 themes`);
     } catch (error) {
         console.error(error.message);
         process.exitCode = 1;
