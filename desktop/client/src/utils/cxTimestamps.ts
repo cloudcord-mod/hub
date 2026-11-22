@@ -8,15 +8,26 @@ export type CxTimestampSurface = typeof cxTimestampSurfaces[number];
 export type CxTimestampTarget = CxTimestampSurface | typeof cxCalendarPeriods[number];
 export type CxTimestampFormats = Partial<Record<CxTimestampTarget, string>>;
 
+function parseTimestamp(input: unknown) {
+    // Native message timestamps may already carry Discord's chosen locale.
+    return moment.isMoment(input) ? input : typeof input === "string"
+        ? moment(input, moment.ISO_8601, true)
+        : typeof input === "number" || Object.prototype.toString.call(input) === "[object Date]"
+            ? moment(input as number | Date) : undefined;
+}
+
+export function formatCxReplyTimestamp(original: unknown, reply: unknown) {
+    const source = parseTimestamp(original);
+    const current = parseTimestamp(reply);
+    if (!source?.isValid() || !current?.isValid()) return;
+    return source.format(source.isSame(current, "day") ? "LT" : "L LT");
+}
+
 export function formatCxTimestamp(input: unknown, surface: CxTimestampSurface, formats: CxTimestampFormats | undefined) {
     const template = formats?.[surface];
     if (!template || input == null) return;
 
-    // Native message timestamps may already carry Discord's chosen locale.
-    const date = moment.isMoment(input) ? input : typeof input === "string"
-        ? moment(input, moment.ISO_8601, true)
-        : typeof input === "number" || Object.prototype.toString.call(input) === "[object Date]"
-            ? moment(input as number | Date) : undefined;
+    const date = parseTimestamp(input);
     if (!date?.isValid()) return;
     return template.split(/(\[(?:calendar|relative)\])/g).map(part => {
         if (part === "[relative]") return date.fromNow();

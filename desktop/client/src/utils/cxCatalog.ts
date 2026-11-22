@@ -751,7 +751,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "RelationshipNotifier", source: plugin_catalog_relationship_notifier, description: "Show a local notification when a friend removes you", categories: ["Profiles"] },
         { name: "RepeatMessages", source: plugin_catalog_repeat_messages, description: "Send the selected message again with its attachments and stickers", categories: ["Chat"] },
         { name: "ReplyPingControl", source: plugin_catalog_reply_ping_control, description: "Choose whether incoming replies ping you on this device", categories: ["Chat"] },
-        { name: "ReplyTimestamp", source: plugin_catalog_reply_timestamp, description: "Show the original message's timestamp on loaded reply previews", desktopOnly: true, categories: ["Chat"] },
+        { name: "ReplyTimestamp", source: plugin_catalog_reply_timestamp, description: "Show the original message's timestamp on loaded reply previews", categories: ["Chat"] },
         { name: "Resize Dimensions", source: plugin_catalog_resize_dimensions, description: "/resizedimensions", commands: ["resizedimensions"], categories: ["Commands"], appearanceRevision: "3120fff9dc0b3d5c7b10d5a36790889834e63855d918591628d837ac14c94ec6", privateCommands: true },
         { name: "RevealAllSpoilers", source: plugin_catalog_reveal_all_spoilers, description: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true, categories: ["Chat"] },
         { name: "ReverseImageSearch", source: plugin_catalog_reverse_image_search, description: "Add a Search Image action with a choice of search engines", categories: ["Media"] },

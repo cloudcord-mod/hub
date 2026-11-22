@@ -407,6 +407,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         let speakingWhileMuted = false, selfMuted = false, serverMuted = false, selfDeafened = false;
         const mediaListeners = new Set();
         let includeProfileNames = false;
+        let resolvedReply;
         const stores = {
             MediaEngineStore: {
                 getSpeakingWhileMuted: () => speakingWhileMuted,
@@ -459,6 +460,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             SpotifyStore: { getTrack: () => ({
                 id: trackId, album: { id: trackId }, artists: [{ id: trackId, external_urls: { spotify: "https://untrusted.example" } }],
             }) },
+            ReferencedMessageStore: { getMessageByReference: () => resolvedReply },
             MessageStore: {
                 getMessages: id => id === reactionChannel ? reactionCache : undefined,
                 getMessage: (channel, id) => channel === embedMessage?.channel_id && id === embedMessage.id ? embedMessage
@@ -4329,6 +4331,41 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         assert.equal(formatMarkup(), nativeTimestampMarkup.full);
         assert.equal(timestampUtils.parseTimestamp, parseTimestamp);
         assert.equal(messageRenderer.default, createMessageContent);
+        if (!desktop) {
+            const plugin = cxCatalog.plugins.find(entry => entry.name === "ReplyTimestamp");
+            assert.throws(() => activateCx(plugin.source, host, ["appearance.style"]), /approval/);
+            const reference = Object.freeze({ message_id: other, channel_id: repeatChannel });
+            const originalNode = Object.freeze({ type: "text", content: "Original message" });
+            const content = Object.freeze([originalNode]);
+            const preview = Object.freeze({
+                state: 0, message: Object.freeze({ username: "Original author", content }),
+            });
+            const original = Object.freeze({ referencedMessage: preview, content: "Reply message" });
+            const input = { message: { messageReference: reference, timestamp: new Date(2022, 6, 10, 15) }, cxTestPresentation: original };
+            selectCatalog("ReplyTimestamp");
+            click(render(), "Allow for this session");
+            assert.equal(messageRenderer.default(input), original, "missing referenced messages keep Discord's original preview");
+
+            resolvedReply = { message: { timestamp: stamp } };
+            const result = messageRenderer.default(input);
+            assert.match(result.referencedMessage.message.content[0].content, /2:42 PM · /);
+            assert.equal(result.referencedMessage.message.username, "Original author");
+            assert.equal(result.referencedMessage.message.content[1], originalNode);
+            assert.equal(original.referencedMessage.message.content, content);
+            assert.equal(result.content, original.content);
+            resolvedReply = { message: { timestamp: new Date(2022, 6, 9, 14, 42) } };
+            assert.match(messageRenderer.default(input).referencedMessage.message.content[0].content, /07\/09\/2022 2:42 PM · /);
+            assert.equal(messageRenderer.default({ ...input, isInlineReplyPreview: true }), original);
+            const deleted = Object.freeze({ referencedMessage: { state: 2, content: "Deleted" } });
+            assert.equal(messageRenderer.default({ ...input, cxTestPresentation: deleted }), deleted);
+            settings.safeMode = { enabled: true };
+            assert.equal(messageRenderer.default(input), original);
+            settings.safeMode = undefined;
+            click(render(), "Disable ReplyTimestamp");
+            assert.equal(messageRenderer.default(input), original);
+            assert.equal(messageRenderer.default, createMessageContent);
+            resolvedReply = undefined;
+        }
         const channelStore = stores.ChannelStore;
         const originalGetChannel = channelStore.getChannel;
         const rawChannel = Object.freeze({ id: "channel", name: "🎈-ʜᴇʟʟᴏ-world", guild_id: guildId, type: 0 });

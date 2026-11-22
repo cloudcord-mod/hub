@@ -9,7 +9,7 @@ import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, 
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
-import { createCxTimestampRegistry, type CxTimestampFormats, type CxTimestampSurface } from "@lib/api/cx";
+import { createCxTimestampRegistry, formatCxReplyTimestamp, type CxTimestampFormats, type CxTimestampSurface } from "@lib/api/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel, type CxVoiceMemberOptions } from "@lib/api/cx";
 import { selectCxAppearanceOption } from "@lib/api/cx";
 import { formatCxChannelName, formatCxEmojiMarkdown, formatCxStickerLink, getCxAttachmentImageUrl, getCxGifDescription, getCxImageTitle, validateCxMediaLink, validateCxStickerLink, type CxChannelLabel } from "@lib/api/cx";
@@ -50,6 +50,36 @@ const timestampFields = [
 ] as const satisfies readonly [string, CxTimestampSurface][];
 let timestampUsers = 0;
 let stopTimestamps: (() => void) | undefined;
+
+function registerReplyTimestamps(enabled: () => boolean) {
+    // ReplyTimestamp by Kyuuhachi (GPL-3.0-or-later).
+    const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+    const store = findByStoreName("ReferencedMessageStore");
+    if (typeof store?.getMessageByReference !== "function") throw new Error("Discord's reply preview store is unavailable");
+    return overrideCxMethods(renderer, {
+        default(args, invoke) {
+            const rendered = invoke(args) as {
+                referencedMessage?: { message?: { content?: unknown; }; };
+            } | undefined;
+            const input = args[0] as { isInlineReplyPreview?: boolean; message?: { messageReference?: object; timestamp?: unknown; }; } | undefined;
+            const preview = rendered?.referencedMessage;
+            const content = preview?.message?.content;
+            const reference = input?.message?.messageReference;
+            if (!Array.isArray(content) || !reference || input?.isInlineReplyPreview) return rendered;
+            const original = store.getMessageByReference(reference);
+            if (original?.message == null) return rendered;
+            const label = formatCxReplyTimestamp(original.message.timestamp, input?.message?.timestamp);
+            if (!label) return rendered;
+            return {
+                ...rendered,
+                referencedMessage: {
+                    ...preview,
+                    message: { ...preview.message, content: [{ type: "text", content: label + " · " }, ...content] },
+                },
+            };
+        },
+    }, enabled);
+}
 
 function registerTimestampFormats(formats: CxTimestampFormats) {
     if (!stopTimestamps) {
@@ -2780,7 +2810,7 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "reveal-spoilers-shortcut":
                     throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
                 case "reply-timestamp":
-                    throw new Error("Reply timestamps are available on desktop and browser.");
+                    return registerReplyTimestamps(enabled);
                 case "message-latency":
                     throw new Error("The send-delay indicator is available on desktop and browser.");
                 case "animated-assets":

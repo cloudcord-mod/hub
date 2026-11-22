@@ -35,7 +35,7 @@ export { formatCxEmojiMarkdown, formatCxStickerLink, getCxSteamLink, validateCxM
 export { getCxAttachmentImageUrl } from "./cxAttachmentImages";
 export { getCxImageSearchOptions, type CxSearchMediaSource } from "./cxMediaSearch";
 export { getCxGifDescription, getCxImageTitle } from "./cxMediaLabels";
-export { createCxTimestampRegistry, type CxTimestampFormats, type CxTimestampSurface } from "./cxTimestamps";
+export { createCxTimestampRegistry, formatCxReplyTimestamp, type CxTimestampFormats, type CxTimestampSurface } from "./cxTimestamps";
 export { createCxVoicePing } from "./cxVoicePing";
 export { bindCxMutedVoice } from "./cxMutedVoice";
 export { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "./cxUserNotes";
