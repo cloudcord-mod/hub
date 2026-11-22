@@ -36771,6 +36771,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         /* @__PURE__ */ jsx(FlashList, {
           data: results,
           extraData: search,
+          keyExtractor: props.getItemKey ? ({ obj }) => props.getItemKey(obj) : void 0,
+          keyboardShouldPersistTaps: "handled",
           estimatedItemSize: 136,
           ListHeaderComponent: headerElement,
           ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native31.View, {
@@ -68310,6 +68312,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       filterOptions: pluginFilters,
       defaultFilter: showDefaultRow,
       searchCommands: searchPluginCommands,
+      getItemKey: getPluginRowKey,
       searchKeywords: [
         "name",
         "description",
@@ -68495,7 +68498,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     });
   }
-  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, searchPluginCommands, pluginFilters;
+  var import_react_native42, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -68528,6 +68531,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       ({ AlertModal: AlertModal4, AlertActions: AlertActions2, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
       isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
       showDefaultRow = (item) => !("source" in item && item.alternate);
+      getPluginRowKey = (item) => ("source" in item ? "cx:" : "native:") + item.id;
       searchPluginCommands = (items, query) => searchCxCatalog(items.filter((item) => "source" in item), query);
       pluginFilters = {
         ...Object.fromEntries(CX_CATALOG_CATEGORIES.filter((category) => category !== "All" && category !== "Themes").map((category) => [
@@ -70259,7 +70263,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2b7c712c743c62db838e97cf00ae3f1f5ffa6fa8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "951ea7d26265d47bf965a4581d399df20e778939";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
