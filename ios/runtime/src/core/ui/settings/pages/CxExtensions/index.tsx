@@ -2418,6 +2418,7 @@ const rememberedCatalog = new Map([
     ...cxCatalog.themes.filter(entry => entry.appearanceRevision).map(entry => [entry.name, { ...entry, id: "theme" }] as const),
 ]);
 type RememberedAppearance = NonNullable<typeof settings.cxRememberedAppearance>[number];
+const failedRestores = new Set<string>();
 
 function applyRememberedNumbers(source: string, values?: Record<string, number>) {
     if (!values || typeof values !== "object") return source;
@@ -2435,6 +2436,7 @@ function readRememberedAppearance(): RememberedAppearance[] {
 }
 
 function forgetRememberedAppearance(name: string) {
+    failedRestores.delete(name);
     settings.cxRememberedAppearance = readRememberedAppearance().filter(entry => entry.name !== name);
 }
 
@@ -3072,7 +3074,10 @@ export function restoreRememberedCxAppearance() {
                 ...createMobileCxHost(),
                 toast() {},
             }, review.permissions, saved.selected);
-        } catch { /* The appearance remains available to review or forget. */ }
+            failedRestores.delete(saved.name);
+        } catch {
+            failedRestores.add(saved.name);
+        }
     }
     refreshRememberedAppearance();
     return () => {
@@ -3082,7 +3087,7 @@ export function restoreRememberedCxAppearance() {
 }
 
 export type CxAddonKind = "plugin" | "theme";
-export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; categories?: readonly CxCatalogCategory[]; active: boolean; privateCommands?: boolean; needsReview?: boolean; };
+export type CxAddonRow = { id: string; name: string; source: string; description?: string; keywords?: string; commands?: readonly string[]; categories?: readonly CxCatalogCategory[]; active: boolean; privateCommands?: boolean; needsReview?: boolean; restoreFailed?: boolean; };
 
 export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
     const revision = React.useSyncExternalStore(subscribeRememberedAppearance, () => rememberedAppearanceUpdates);
@@ -3094,8 +3099,9 @@ export function useCxAddonRows(kind: CxAddonKind): CxAddonRow[] {
             const current = session.source(id);
             const active = current !== undefined && (kind === "plugin" || current === entry.source);
             const saved = approvals.get(entry.name);
-            const needsReview = kind === "plugin" && !active && saved !== undefined && saved !== entry.appearanceRevision;
-            return { ...entry, id, active, needsReview, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
+            const restoreFailed = !active && saved === entry.appearanceRevision && failedRestores.has(entry.name);
+            const needsReview = !active && (restoreFailed || saved !== undefined && saved !== entry.appearanceRevision);
+            return { ...entry, id, active, needsReview, restoreFailed, privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
             && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
@@ -3131,7 +3137,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
             if (kind && preview.kind !== kind) throw new Error(`Open this file from ${preview.kind === "theme" ? "Themes" : "Plugins"}.`);
             setCandidate({ source: next, originalSource: next, review: preview, selected: preview.appearanceOptions
                 .filter(option => option.defaultOn && supportsMobileHide(option)).map(option => option.target) });
-            setStatus("");
+            setStatus(entry?.restoreFailed ? "This add-on couldn’t start automatically. Review it and try enabling it again." : "");
         } catch (error) {
             setStatus(String(error instanceof Error ? error.message : error));
         }
@@ -3194,6 +3200,7 @@ export default function CxExtensions({ kind, entry }: { kind?: CxAddonKind; entr
                     throw error;
                 }
             } else session.enable(candidate.source, host, candidate.review.permissions, candidate.selected);
+            failedRestores.delete(candidate.review.name);
             setStatus(`${candidate.review.name} is active for this session.`);
             setCandidate(undefined);
             if (remember && rememberRevision) {

@@ -673,6 +673,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             },
         };
         const selectedTheme = { name: "Previously selected" };
+        let themeSupported = true;
         let nativeTheme = selectedTheme, nativeMode, stylesheet;
         let cursor = 0;
         const useState = initial => {
@@ -830,7 +831,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "@lib/api/native/modules": { NativeFileModule: {
                 readFile: () => new Promise(resolve => { resolveCxFile = resolve; }),
             } },
-            "@lib/api/native/loader": { isThemeSupported: () => true },
+            "@lib/api/native/loader": { isThemeSupported: () => themeSupported },
             "@lib/api/settings": { settings },
             "@lib/api/storage": { createStorageAsync: async () => localNotes },
             "@lib/ui/alerts": { openAlert: (_, alert) => { noteAlert = alert.props; }, dismissAlert: () => {} },
@@ -6299,8 +6300,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(nativeTheme, selectedTheme);
             assert.equal(appearanceHooks.size, 0);
             settings.safeMode.enabled = false;
+            themeSupported = false;
+            const failedRestore = restore();
+            const failedTheme = module.exports.useCxAddonRows("theme").find(row => row.name === "Blue Hour");
+            assert.equal(failedTheme.active, false);
+            assert.equal(failedTheme.restoreFailed, true);
+            assert.equal(failedTheme.needsReview, true);
+            failedRestore();
+            themeSupported = true;
             const unload = restore();
             assert.equal(nativeTheme.name, "Blue Hour");
+            assert.equal(module.exports.useCxAddonRows("theme").find(row => row.name === "Blue Hour").restoreFailed, false);
             const emoji = { ast: [{ type: "emoji", jumboable: true }] };
             assert.equal(markupParser.parseMessageMarkup(emoji, undefined, false).content[0].jumboable, false);
             assert.ok(!button(render(), "Forget MoreJumboEmoji"), "saved numeric settings match the active extension");

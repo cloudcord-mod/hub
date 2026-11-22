@@ -37,7 +37,7 @@ export function AddonActions({ kind }: { kind: CxAddonKind; }) {
 export function CxAddonCard({ kind, entry }: { kind: CxAddonKind; entry: CxAddonRow; }) {
     const review = useAddonReview(kind, entry);
     return <AddonCard headerLabel={entry.name} descriptionLabel={entry.description}
-        headerSublabel={entry.needsReview ? "Review update to enable" : undefined}
+        headerSublabel={entry.restoreFailed ? "Couldn’t start automatically" : entry.needsReview ? "Review update to enable" : undefined}
         toggleType={kind === "theme" ? "radio" : "switch"} toggleValue={() => entry.active}
         actions={entry.active || entry.needsReview ? [{ icon: "SettingsIcon", onPress: review }] : undefined}
         onToggleChange={enabled => {
