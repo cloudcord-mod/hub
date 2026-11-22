@@ -36817,8 +36817,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             marginBottom: 10
           },
           children: [
-            /* @__PURE__ */ jsx(HelpMessage, {
-              messageType: 0,
+            /* @__PURE__ */ jsx(Text, {
+              variant: "text-sm/medium",
+              color: "text-muted",
               children: props.safeModeHint?.message
             }),
             props.safeModeHint?.footer
@@ -72319,7 +72320,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ab32b707cf6df682517dfd9eac519659e428ecd6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "98662ec2a6b9dd5c3ef5508450b50b2a6cd1ab7e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
