@@ -66658,27 +66658,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     };
   }
   function restoreRememberedCxAppearance() {
-    if (settings.safeMode?.enabled)
-      return;
-    for (var saved of readRememberedAppearance()) {
-      var entry = rememberedCatalog.get(saved.name);
-      if (!entry || entry.appearanceRevision !== saved.revision || session.source(entry.id) !== void 0)
-        continue;
+    var _loop2 = function(saved2) {
+      var entry = rememberedCatalog.get(saved2.name);
+      if (!entry || entry.appearanceRevision !== saved2.revision || session.source(entry.id) !== void 0)
+        return "continue";
       try {
-        var source = applyRememberedNumbers(entry.source, saved.numberValues);
+        var source = applyRememberedNumbers(entry.source, saved2.numberValues);
         var review = reviewCx(source);
         if (!canRememberCxExtension(review))
-          continue;
+          return "continue";
+        var selected = review.appearanceOptions.filter((option) => supportsMobileHide(option) && saved2.selected.includes(option.target)).map((option) => option.target);
         session.enable(source, {
           ...createMobileCxHost(),
           toast() {
           }
-        }, review.permissions, saved.selected);
-        failedRestores.delete(saved.name);
+        }, review.permissions, selected);
+        failedRestores.delete(saved2.name);
       } catch (e) {
-        failedRestores.add(saved.name);
+        failedRestores.add(saved2.name);
       }
-    }
+    };
+    if (settings.safeMode?.enabled)
+      return;
+    for (var saved of readRememberedAppearance())
+      _loop2(saved);
     refreshRememberedAppearance();
     return () => {
       session.clear();
@@ -72122,7 +72125,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2321552fe335e2299bed580cb0d8ca0712f1ab59";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "daf22d6db9acc8902c635e9c5787f41c80c03e70";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
