@@ -41341,6 +41341,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "guild.roleclipboard",
           label: "Copy the selected server role's hex color"
         },
+        "copy-role-name": {
+          permission: "guild.roleclipboard",
+          label: "Copy the selected server role\u2019s name as plain text"
+        },
         "copy-role-mention": {
           permission: "guild.roleclipboard",
           label: "Copy mention markup for the selected server role"
@@ -46828,6 +46832,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function getCxRoleMenuValue(effect, id, role) {
     if (!role || role.id !== id || !isCxProfileUserId(id))
       return;
+    if (effect === "copy-role-name")
+      return typeof role.name === "string" && role.name.trim() ? role.name : void 0;
     if (effect === "copy-role-mention")
       return "<@&" + id + ">";
     if (effect === "copy-role-color") {
@@ -46847,6 +46853,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_promiseAllSettled();
       init_cxProfileMenu();
       cxRoleMenuLabels = {
+        "copy-role-name": "Copy Role Name",
         "copy-role-color": "Copy Role Color",
         "copy-role-mention": "Copy Role Mention",
         "view-role-icon": "View Role Icon"
@@ -48995,7 +49002,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "replies.suppressping": "Send replies without pinging the person you reply to",
         "profile.avatar": "Read the avatar URL of the selected Discord user or your own avatar when the command runs",
         "guild.members": "Read loaded members with the role you select in the current server",
-        "guild.roleclipboard": "Copy a loaded role's color or mention markup when you choose the corresponding menu action",
+        "guild.roleclipboard": "Copy a loaded role's name, color, or mention markup when you choose a menu action",
         "guild.rolemedia": "Open the selected role's Discord-hosted icon when you choose View Role Icon",
         "guild.randommember": "Pick a loaded member of the current server to mention",
         "friends.invites.create": "Create a friend invite when you run the listed command",
@@ -49665,6 +49672,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_role_mention = __esm({
     "../examples/cx/catalog/plugins/copy-role-mention.cx"() {
       copy_role_mention_default = 'plugin "CopyRoleMention":\n  needs guild.roleclipboard\n  use copy-role-mention\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-role-name.cx
+  var copy_role_name_default;
+  var init_copy_role_name = __esm({
+    "../examples/cx/catalog/plugins/copy-role-name.cx"() {
+      copy_role_name_default = 'plugin "CopyRoleName":\n  needs guild.roleclipboard\n  use copy-role-name\n';
     }
   });
 
@@ -53665,6 +53680,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_replied_message_link();
       init_copy_role_color();
       init_copy_role_mention();
+      init_copy_role_name();
       init_copy_server_bio();
       init_copy_server_details();
       init_copy_server_media_links();
@@ -54747,6 +54763,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "CopyRoleMention",
             source: copy_role_mention_default,
             description: "Copy mention markup for the selected server role",
+            categories: [
+              "Servers & channels"
+            ]
+          },
+          {
+            name: "CopyRoleName",
+            source: copy_role_name_default,
+            description: "Copy the selected server role\u2019s name as plain text",
             categories: [
               "Servers & channels"
             ]
@@ -62210,6 +62234,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-channel-name":
             return registerCopyChannelName(enabled);
           case "copy-role-color":
+          case "copy-role-name":
           case "copy-role-mention":
           case "view-role-icon":
             return registerMobileRoleMenu(effect, enabled);
@@ -68218,7 +68243,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "eea116880e6d6bcac3eb7249d4a96d69bf659c2e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "9fab51e11dfb5934595b55017c003ea3fc137fad";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
