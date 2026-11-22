@@ -1,0 +1,3 @@
+plugin "HideBoostPerkCards":
+  needs appearance.hide
+  hide hide-boost-perk-cards

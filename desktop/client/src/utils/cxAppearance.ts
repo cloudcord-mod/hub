@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-boost-tier-cards": hideMobileComponent("HideBoostTierCards", "the tier comparison cards on the server boost page", "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingTierCards.tsx"),
+    "hide-boost-perk-cards": hideMobileComponent("HideBoostPerkCards", "the top perks cards on the server boost page", "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingTopPerksCards.tsx"),
+    "hide-profile-upsell-card": hideMobileComponent("HideProfileUpsellCard", "the general upsell card on profiles", "modules/user_profile/native/UserProfileUpsellCard.tsx"),
     "hide-voice-soundboard-shortcut": hideMobileComponent("HideVoiceSoundboardShortcut", "the soundboard shortcut in the voice panel", "modules/voice_panel/native/controls/buttons/VoicePanelSoundboardButton.tsx"),
     "hide-voice-header-chat-shortcut": hideMobileComponent("HideVoiceHeaderChatShortcut", "the chat shortcut in the voice panel header", "modules/voice_panel/native/header/VoicePanelHeaderChatButton.tsx"),
     "hide-emoji-unicode-shortcut": hideMobileComponent("HideEmojiUnicodeShortcut", "the Unicode category shortcut in the emoji picker", "modules/emoji_picker/native/components/categories/EmojiPickerCategoriesUnicodeShortcutItem.tsx"),

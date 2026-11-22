@@ -1,0 +1,3 @@
+plugin "HideBoostTierCards":
+  needs appearance.hide
+  hide hide-boost-tier-cards

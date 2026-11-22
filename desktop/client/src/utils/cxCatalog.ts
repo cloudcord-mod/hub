@@ -143,8 +143,10 @@ import plugin_catalog_hide_badge_customization_tip from "../../../../examples/cx
 import plugin_catalog_hide_badges from "../../../../examples/cx/catalog/plugins/hide-badges.cx";
 import plugin_catalog_hide_blocked_and_ignored_messages from "../../../../examples/cx/catalog/plugins/hide-blocked-and-ignored-messages.cx";
 import plugin_catalog_hide_boost_goal from "../../../../examples/cx/catalog/plugins/hide-boost-goal.cx";
+import plugin_catalog_hide_boost_perk_cards from "../../../../examples/cx/catalog/plugins/hide-boost-perk-cards.cx";
 import plugin_catalog_hide_boost_progress_tip from "../../../../examples/cx/catalog/plugins/hide-boost-progress-tip.cx";
 import plugin_catalog_hide_boost_recognition_cards from "../../../../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx";
+import plugin_catalog_hide_boost_tier_cards from "../../../../examples/cx/catalog/plugins/hide-boost-tier-cards.cx";
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
@@ -227,6 +229,7 @@ import plugin_catalog_hide_profile_notes from "../../../../examples/cx/catalog/p
 import plugin_catalog_hide_profile_overscroll_banner from "../../../../examples/cx/catalog/plugins/hide-profile-overscroll-banner.cx";
 import plugin_catalog_hide_profile_personal_widgets from "../../../../examples/cx/catalog/plugins/hide-profile-personal-widgets.cx";
 import plugin_catalog_hide_profile_roles_card from "../../../../examples/cx/catalog/plugins/hide-profile-roles-card.cx";
+import plugin_catalog_hide_profile_upsell_card from "../../../../examples/cx/catalog/plugins/hide-profile-upsell-card.cx";
 import plugin_catalog_hide_profile_wishlist_suggestions from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx";
 import plugin_catalog_hide_profile_wishlist_tip from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx";
 import plugin_catalog_hide_profile_your_friends_card from "../../../../examples/cx/catalog/plugins/hide-profile-your-friends-card.cx";
@@ -724,8 +727,10 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBadges", source: plugin_catalog_hide_badges, description: "Hide profile badge rows", categories: ["Appearance","Profiles"], appearanceRevision: "7534988c55ea4ec909649c757c024e770e0257e7fbb301c010fce5cd98f3d9a2" },
         { name: "HideBlockedAndIgnoredMessages", source: plugin_catalog_hide_blocked_and_ignored_messages, description: "Hide matching incoming messages and history on this device", categories: ["Chat"] },
         { name: "HideBoostGoal", source: plugin_catalog_hide_boost_goal, description: "Hide the server boost progress bar", categories: ["Appearance"], appearanceRevision: "812688497568203e8e885e392fdfce9b4797a09ad2ceaf1d970a7b863f9e9b03" },
+        { name: "HideBoostPerkCards", source: plugin_catalog_hide_boost_perk_cards, description: "Hide the top perks cards on the server boost page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "06312db5b8cee94c3a4c1500834123dd85d12ed1dd181685324b13f4d442fe97" },
         { name: "HideBoostProgressTip", source: plugin_catalog_hide_boost_progress_tip, description: "Hide the server boost progress tooltip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "1d6378a948edebe2f07e6390da4e0dff29121bcc249e40d38a8a058e1b8ca0de" },
         { name: "HideBoostRecognitionCards", source: plugin_catalog_hide_boost_recognition_cards, description: "Hide the booster recognition cards on the server boost marketing page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "54c3f3af4e1ca07a919192a5a7d05a8348b1a2a907353d62df351008bcae149c" },
+        { name: "HideBoostTierCards", source: plugin_catalog_hide_boost_tier_cards, description: "Hide the tier comparison cards on the server boost page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c9c37273317baa20c2bf97f86e73de64c092c210ce4332455ebfd560776ab9e4" },
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags, description: "Hide APP and BOT tags", categories: ["Appearance"], appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
@@ -808,6 +813,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideProfileOverscrollBanner", source: plugin_catalog_hide_profile_overscroll_banner, description: "Hide the profile banner extension shown during overscroll", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d97606faa3d65ad91d18023ee2cf57329ceff46a375d1af567195b9040c0d6ee" },
         { name: "HideProfilePersonalWidgets", source: plugin_catalog_hide_profile_personal_widgets, description: "Hide personal widgets displayed on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b57ba16d4dad9800cbd7c77002e4e3a437864a62815aa2f3b4c3ea23bd375d26" },
         { name: "HideProfileRolesCard", source: plugin_catalog_hide_profile_roles_card, description: "Hide the server roles card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "208f02f9a949274f4e599d3239f6af62b3eb52010e5a8ee2305a818ffc2447b7" },
+        { name: "HideProfileUpsellCard", source: plugin_catalog_hide_profile_upsell_card, description: "Hide the general upsell card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "dbe7f5f4fba6e40fa6536b49fd43fcabbbf06ed4ad6fb62f8be1c7ce2693a3ec" },
         { name: "HideProfileWishlistSuggestions", source: plugin_catalog_hide_profile_wishlist_suggestions, description: "Hide suggested items on profile wishlists", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d23c4eb8f183ca2a7f49fc9086f59dd68e5f6c031b000430c0670ea2754d0622" },
         { name: "HideProfileWishlistTip", source: plugin_catalog_hide_profile_wishlist_tip, description: "Hide the wishlist viewing tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74d22841fc73e0f740b1819df239a6b3023720a18799b73e96b32cf90f67649f" },
         { name: "HideProfileYourFriendsCard", source: plugin_catalog_hide_profile_your_friends_card, description: "Hide the Your Friends card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389" },

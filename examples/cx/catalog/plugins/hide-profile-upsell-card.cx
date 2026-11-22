@@ -1,0 +1,3 @@
+plugin "HideProfileUpsellCard":
+  needs appearance.hide
+  hide hide-profile-upsell-card
