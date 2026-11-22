@@ -1,0 +1,3 @@
+plugin "HideVoiceSoundboardShortcut":
+  needs appearance.hide
+  hide hide-voice-soundboard-shortcut

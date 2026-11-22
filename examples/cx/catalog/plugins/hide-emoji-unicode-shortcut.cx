@@ -1,0 +1,3 @@
+plugin "HideEmojiUnicodeShortcut":
+  needs appearance.hide
+  hide hide-emoji-unicode-shortcut

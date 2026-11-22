@@ -1,0 +1,3 @@
+plugin "HideVoiceHeaderChatShortcut":
+  needs appearance.hide
+  hide hide-voice-header-chat-shortcut

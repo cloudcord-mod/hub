@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-voice-soundboard-shortcut": hideMobileComponent("HideVoiceSoundboardShortcut", "the soundboard shortcut in the voice panel", "modules/voice_panel/native/controls/buttons/VoicePanelSoundboardButton.tsx"),
+    "hide-voice-header-chat-shortcut": hideMobileComponent("HideVoiceHeaderChatShortcut", "the chat shortcut in the voice panel header", "modules/voice_panel/native/header/VoicePanelHeaderChatButton.tsx"),
+    "hide-emoji-unicode-shortcut": hideMobileComponent("HideEmojiUnicodeShortcut", "the Unicode category shortcut in the emoji picker", "modules/emoji_picker/native/components/categories/EmojiPickerCategoriesUnicodeShortcutItem.tsx"),
     "hide-active-channel-cards": hideMobileComponent("HideActiveChannelCards", "active text channel cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActiveChannel.tsx"),
     "hide-activity-cards": hideMobileComponent("HideActivityCards", "activity cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActivity.tsx"),
     "hide-upcoming-event-cards": hideMobileComponent("HideUpcomingEventCards", "event cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardEvent.tsx"),

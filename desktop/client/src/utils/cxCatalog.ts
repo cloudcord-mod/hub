@@ -172,6 +172,7 @@ import plugin_catalog_hide_edited_label from "../../../../examples/cx/catalog/pl
 import plugin_catalog_hide_embeds from "../../../../examples/cx/catalog/plugins/hide-embeds.cx";
 import plugin_catalog_hide_emoji_button from "../../../../examples/cx/catalog/plugins/hide-emoji-button.cx";
 import plugin_catalog_hide_emoji_search_promotion from "../../../../examples/cx/catalog/plugins/hide-emoji-search-promotion.cx";
+import plugin_catalog_hide_emoji_unicode_shortcut from "../../../../examples/cx/catalog/plugins/hide-emoji-unicode-shortcut.cx";
 import plugin_catalog_hide_empty_folders from "../../../../examples/cx/catalog/plugins/hide-empty-folders.cx";
 import plugin_catalog_hide_friend_requests_badge from "../../../../examples/cx/catalog/plugins/hide-friend-requests-badge.cx";
 import plugin_catalog_hide_game_claim_card from "../../../../examples/cx/catalog/plugins/hide-game-claim-card.cx";
@@ -277,7 +278,9 @@ import plugin_catalog_hide_upload_button from "../../../../examples/cx/catalog/p
 import plugin_catalog_hide_user_panel_activity from "../../../../examples/cx/catalog/plugins/hide-user-panel-activity.cx";
 import plugin_catalog_hide_voice_activity_cards from "../../../../examples/cx/catalog/plugins/hide-voice-activity-cards.cx";
 import plugin_catalog_hide_voice_event_banner from "../../../../examples/cx/catalog/plugins/hide-voice-event-banner.cx";
+import plugin_catalog_hide_voice_header_chat_shortcut from "../../../../examples/cx/catalog/plugins/hide-voice-header-chat-shortcut.cx";
 import plugin_catalog_hide_voice_panel_tips from "../../../../examples/cx/catalog/plugins/hide-voice-panel-tips.cx";
+import plugin_catalog_hide_voice_soundboard_shortcut from "../../../../examples/cx/catalog/plugins/hide-voice-soundboard-shortcut.cx";
 import plugin_catalog_hide_voice_user_avatars from "../../../../examples/cx/catalog/plugins/hide-voice-user-avatars.cx";
 import plugin_catalog_hide_you_banner_decorations from "../../../../examples/cx/catalog/plugins/hide-you-banner-decorations.cx";
 import plugin_catalog_hide_you_settings_tip from "../../../../examples/cx/catalog/plugins/hide-you-settings-tip.cx";
@@ -746,6 +749,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideEmbeds", source: plugin_catalog_hide_embeds, description: "Hide link embeds in chat", categories: ["Appearance"], appearanceRevision: "2abec10ac8fe9ee6a8e8c6c66263ca400056ef1f2227dcd7dd259f9d25a17fde" },
         { name: "HideEmojiButton", source: plugin_catalog_hide_emoji_button, description: "Hide the composer expression picker shortcut", categories: ["Appearance"], appearanceRevision: "14be6bcbbb139ddab33206f05050697b5d9c13b8b0047356a96c56ef88e5cd20" },
         { name: "HideEmojiSearchPromotion", source: plugin_catalog_hide_emoji_search_promotion, description: "Hide the Nitro upsell in emoji search", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "8d565a893f4e193c3f8855c188b8150d40bd7aef7d800e86da8250f6f59ded88" },
+        { name: "HideEmojiUnicodeShortcut", source: plugin_catalog_hide_emoji_unicode_shortcut, description: "Hide the Unicode category shortcut in the emoji picker", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9b13cad362255389f538a60b36dcc4b0881273977807271fa1a3a21a76cce068" },
         { name: "HideEmptyFolders", source: plugin_catalog_hide_empty_folders, description: "Hide empty expanded server folders", categories: ["Appearance"], appearanceRevision: "1724bea813368f7e907c921f341adf457f98769eb360c0a9be46deef5e0bd9a7" },
         { name: "HideFriendRequestsBadge", source: plugin_catalog_hide_friend_requests_badge, description: "Hide the pending friend requests counter", categories: ["Appearance"], appearanceRevision: "111bc312069e6c29234d3675d597cd7c35bae9f8d2f21868e4a806ce23ab1e36" },
         { name: "HideGameClaimCard", source: plugin_catalog_hide_game_claim_card, description: "Hide the game claim promotion card in eligible servers", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e06c36c1379dfbfbd22049ecf024ebf3b88e4be4e393fcf2df0c35be8cf77494" },
@@ -851,7 +855,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideUserPanelActivity", source: plugin_catalog_hide_user_panel_activity, description: "Hides your activity line in the user panel", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideVoiceActivityCards", source: plugin_catalog_hide_voice_activity_cards, description: "Hide voice activity cards in Happening Now", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "66a985fb9c74f587966b7b00aae4fdd56acf3af5b05f511189ebb55b0f636bb0" },
         { name: "HideVoiceEventBanner", source: plugin_catalog_hide_voice_event_banner, description: "Hide the scheduled event banner in voice channels", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "1a6d421d15934212c4a4e66bc0ac31f15e3a23f33946a464be6faf07edea6576" },
+        { name: "HideVoiceHeaderChatShortcut", source: plugin_catalog_hide_voice_header_chat_shortcut, description: "Hide the chat shortcut in the voice panel header", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "26b508a7f1e90f2aff13fdccf70fe907e6e37ce616f6ecc674c58c01dad4cfb5" },
         { name: "HideVoicePanelTips", source: plugin_catalog_hide_voice_panel_tips, description: "Hides tips in the voice connection panel", desktopOnly: true, categories: ["Appearance","Voice & calls"] },
+        { name: "HideVoiceSoundboardShortcut", source: plugin_catalog_hide_voice_soundboard_shortcut, description: "Hide the soundboard shortcut in the voice panel", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "ba9f6e69e9c4cfa655b26faaeab17f73351d5430b3c0819f7b8b0f160c9a5bdf" },
         { name: "HideVoiceUserAvatars", source: plugin_catalog_hide_voice_user_avatars, description: "Hide avatars next to users in voice channels", categories: ["Appearance","Voice & calls"], appearanceRevision: "208bcea2901031db1d7d2886d1fd0f43d98dcfc3582575a4f0730e8dd1ff9703" },
         { name: "HideYouBannerDecorations", source: plugin_catalog_hide_you_banner_decorations, description: "Hide decorative overlays on the You tab banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "342a9ca78810b116e597749a72bae2c47f6409b9c4007050e57cc2e8c0ec341e" },
         { name: "HideYouSettingsTip", source: plugin_catalog_hide_you_settings_tip, description: "Hide the settings shortcut tooltip on the You tab", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "a675e48f836e167b9f5695b8d55e653b6c4f5fe64b714e4cae579d136aa9911f" },
