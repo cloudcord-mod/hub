@@ -36902,6 +36902,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),
+        "hide-voice-event-banner": hideMobileComponent("HideVoiceEventBanner", "the scheduled event banner in voice channels", "modules/guild_scheduled_events/native/components/GuildEventVoiceBanner.tsx"),
         "hide-profile-activity-badges": hideMobileComponent("HideProfileActivityBadges", "activity badges on profiles", "modules/user_profile/native/UserProfileActivityBadges.tsx"),
         "hide-profile-activity-timebar": hideMobileComponent("HideProfileActivityTimebar", "the elapsed-time bar on profile activity cards", "modules/user_profile/native/UserProfileActivityTimebar.tsx"),
         "hide-profile-wishlist-suggestions": hideMobileComponent("HideProfileWishlistSuggestions", "suggested items on profile wishlists", "modules/user_profile/native/UserProfileWishlistSuggestionsGrid.tsx"),
@@ -37287,9 +37289,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideStreamPreviews",
           label: "voice-channel stream previews",
           css: '[class*="streamPreview"] { display: none !important; }',
-          mobile: [
-            "VoicePanelStreamPreview"
-          ]
+          mobile: {
+            hideComponentPaths: [
+              "modules/voice_panel/native/shared/VoicePanelStreamPreview.tsx"
+            ]
+          }
         },
         "voice-user-avatars": {
           plugin: "HideVoiceUserAvatars",
@@ -50110,6 +50114,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-channel-list-tips.cx
+  var hide_channel_list_tips_default;
+  var init_hide_channel_list_tips = __esm({
+    "../examples/cx/catalog/plugins/hide-channel-list-tips.cx"() {
+      hide_channel_list_tips_default = 'plugin "HideChannelListTips":\n  needs appearance.hide\n  hide hide-channel-list-tips\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-channel-topic.cx
   var hide_channel_topic_default;
   var init_hide_channel_topic = __esm({
@@ -50811,6 +50823,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_user_panel_activity = __esm({
     "../examples/cx/catalog/plugins/hide-user-panel-activity.cx"() {
       hide_user_panel_activity_default = 'plugin "HideUserPanelActivity":\n  needs appearance.style\n  style hide-user-panel-activity\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-voice-event-banner.cx
+  var hide_voice_event_banner_default;
+  var init_hide_voice_event_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-voice-event-banner.cx"() {
+      hide_voice_event_banner_default = 'plugin "HideVoiceEventBanner":\n  needs appearance.hide\n  hide hide-voice-event-banner\n';
     }
   });
 
@@ -53307,6 +53327,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_bot_tags();
       init_hide_call_activities_tip();
       init_hide_call_buttons();
+      init_hide_channel_list_tips();
       init_hide_channel_topic();
       init_hide_character_count();
       init_hide_chat_input_refresh_tip();
@@ -53395,6 +53416,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_unread_pills();
       init_hide_upload_button();
       init_hide_user_panel_activity();
+      init_hide_voice_event_banner();
       init_hide_voice_panel_tips();
       init_hide_voice_user_avatars();
       init_high_contrast_text();
@@ -54907,6 +54929,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4"
           },
           {
+            name: "HideChannelListTips",
+            source: hide_channel_list_tips_default,
+            description: "Hide feature tips in the server channel list header",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "9b23014e616ac1c5e2008e72a500b01828d12f51d51c20b6841f6be8aefc3a56"
+          },
+          {
             name: "HideChannelTopic",
             source: hide_channel_topic_default,
             description: "Hide channel topics",
@@ -55721,6 +55753,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideVoiceEventBanner",
+            source: hide_voice_event_banner_default,
+            description: "Hide the scheduled event banner in voice channels",
+            mobileOnly: true,
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ],
+            appearanceRevision: "1a6d421d15934212c4a4e66bc0ac31f15e3a23f33946a464be6faf07edea6576"
           },
           {
             name: "HideVoicePanelTips",
@@ -67462,7 +67505,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4d80942e0f0576acb500a5e8524a1cdc50661632";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "640c56e13d1a7b55cabd01af366c38ac909a2ed0";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
