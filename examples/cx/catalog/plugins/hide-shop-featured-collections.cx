@@ -1,0 +1,3 @@
+plugin "HideShopFeaturedCollections":
+  needs appearance.hide
+  hide hide-shop-featured-collections

@@ -198,6 +198,8 @@ import plugin_catalog_hide_server_feed_member_count from "../../../../examples/c
 import plugin_catalog_hide_server_live_notice from "../../../../examples/cx/catalog/plugins/hide-server-live-notice.cx";
 import plugin_catalog_hide_server_tag_promotion from "../../../../examples/cx/catalog/plugins/hide-server-tag-promotion.cx";
 import plugin_catalog_hide_shop_button_tip from "../../../../examples/cx/catalog/plugins/hide-shop-button-tip.cx";
+import plugin_catalog_hide_shop_featured_collections from "../../../../examples/cx/catalog/plugins/hide-shop-featured-collections.cx";
+import plugin_catalog_hide_shop_limited_time_badges from "../../../../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx";
 import plugin_catalog_hide_shop_orbs_tip from "../../../../examples/cx/catalog/plugins/hide-shop-orbs-tip.cx";
 import plugin_catalog_hide_shop_tab from "../../../../examples/cx/catalog/plugins/hide-shop-tab.cx";
 import plugin_catalog_hide_shop_this_look_tip from "../../../../examples/cx/catalog/plugins/hide-shop-this-look-tip.cx";
@@ -697,6 +699,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideServerLiveNotice", source: plugin_catalog_hide_server_live_notice, description: "Hide the live event notice above the server channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "02cedf54e3dcbd4628039da3c365116f739d2e1bfd79d50f992155546f1830df" },
         { name: "HideServerTagPromotion", source: plugin_catalog_hide_server_tag_promotion, description: "Hide the server tag upsell in server settings", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640" },
         { name: "HideShopButtonTip", source: plugin_catalog_hide_shop_button_tip, description: "Hide the Shop button introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848" },
+        { name: "HideShopFeaturedCollections", source: plugin_catalog_hide_shop_featured_collections, description: "Hide featured collections in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "daa25863e067d4624b5affaded88ee76ce45516516f3aae7958b773166a1c00c" },
+        { name: "HideShopLimitedTimeBadges", source: plugin_catalog_hide_shop_limited_time_badges, description: "Hide limited-time labels on Shop collectibles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "768c11081eb04523c28f1e2fc2d7d3ab32317c4e142c32dff2132c2597ef329a" },
         { name: "HideShopOrbsTip", source: plugin_catalog_hide_shop_orbs_tip, description: "Hide the Orbs badge introduction in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c85b6065539f13b9ef0db320e0202a52659ad7c1524c8630cf4bc2a4a81e31fe" },
         { name: "HideShopTab", source: plugin_catalog_hide_shop_tab, description: "Hide the Shop entry", categories: ["Appearance"], appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d" },
         { name: "HideShopThisLookTip", source: plugin_catalog_hide_shop_this_look_tip, description: "Hide the Shop This Look marketing tip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "4f2f4cf3a6832e4de7ae8318151be0a4f77b256d80d0dc59ad5c92c6288e7ca4" },

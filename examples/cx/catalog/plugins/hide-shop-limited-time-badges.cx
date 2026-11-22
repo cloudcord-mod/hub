@@ -1,0 +1,3 @@
+plugin "HideShopLimitedTimeBadges":
+  needs appearance.hide
+  hide hide-shop-limited-time-badges

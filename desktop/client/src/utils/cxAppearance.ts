@@ -17,6 +17,8 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-shop-featured-collections": hideMobileComponent("HideShopFeaturedCollections", "featured collections in the Shop", "modules/collectibles/native/FeaturedBlock.tsx"),
+    "hide-shop-limited-time-badges": hideMobileComponent("HideShopLimitedTimeBadges", "limited-time labels on Shop collectibles", "modules/collectibles/native/LimitedTimeBadge.tsx"),
     "hide-dm-friend-suggestions": hideMobileComponent("HideDmFriendSuggestions", "suggested friends and their heading from the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriend.tsx", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriendsHeader.tsx"),
     "hide-dm-add-friends-widget": hideMobileComponent("HideDmAddFriendsWidget", "the Add Friends widget in the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemAddFriendsWidget.tsx"),
     "hide-dm-wave-button": hideMobileComponent("HideDmWaveButton", "the wave shortcut on eligible DM rows", "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelWave.tsx"),
