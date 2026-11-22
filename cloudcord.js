@@ -38138,6 +38138,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           desktopOnly: true,
           style: {}
         },
+        "wrap-chat-links": {
+          plugin: "WrapChatLinks",
+          label: "Wrap long links to fit narrow chat panes",
+          css: '[class*="messageContent_"] a[href] { white-space: normal !important; overflow-wrap: anywhere !important; }',
+          desktopOnly: true,
+          style: {}
+        },
         "floating-chat-bar": {
           plugin: "FloatingChatBar",
           label: "lift the chat bar above the bottom edge",
@@ -54908,6 +54915,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/wrap-chat-links.cx
+  var wrap_chat_links_default;
+  var init_wrap_chat_links = __esm({
+    "../examples/cx/catalog/plugins/wrap-chat-links.cx"() {
+      wrap_chat_links_default = 'plugin "WrapChatLinks":\n  needs appearance.style\n  style wrap-chat-links\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/wrap-text.cx
   var wrap_text_default;
   var init_wrap_text = __esm({
@@ -56289,6 +56304,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_word_frequency();
       init_work_session_budget();
       init_wrap_chat_code_blocks();
+      init_wrap_chat_links();
       init_wrap_text();
       init_write_upper_case();
       init_zero_width_sanitizer();
@@ -61961,6 +61977,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "WrapChatCodeBlocks",
             source: wrap_chat_code_blocks_default,
             description: "Wrap long lines in chat code blocks",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
+            ]
+          },
+          {
+            name: "WrapChatLinks",
+            source: wrap_chat_links_default,
+            description: "Wrap long links to fit narrow chat panes",
             desktopOnly: true,
             categories: [
               "Appearance"
@@ -72150,7 +72175,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "17459558f13d77ffc5d1588ed29fd59b2a4ce38d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "12fddd1f91c1ef3e951bae4077c1d264e6d193cd";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
