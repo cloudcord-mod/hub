@@ -5534,6 +5534,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const props = Object.freeze({ userBio: originalLinks, disableInteractions: false });
             assert.equal(readBio(desktopPlugin, props), convertedLinks);
             assert.equal(props.userBio, originalLinks);
+            selectCatalog("HideProfileAboutMe");
+            click(render(), "Allow for this session");
+            assert.equal(readBio(desktopPlugin, props), "", "hiding the bio takes precedence over text transforms");
+            assert.equal(props.userBio, originalLinks);
+            click(render(), "Disable HideProfileAboutMe");
+            assert.equal(readBio(desktopPlugin, props), convertedLinks);
             click(render(), "Disable LinkConverter");
             assert.equal(readBio(desktopPlugin, props), originalLinks);
         } else {
