@@ -94,7 +94,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
                     <Text variant="text-sm/medium" numberOfLines={1} style={{ color: C.muted() }}>@{username}</Text>
                 </View>
             </View>
-            <Pressable accessibilityRole="switch" accessibilityState={{ checked: enabled }} onPress={onToggle}
+            <Pressable accessibilityRole="switch" accessibilityLabel="Custom profile" accessibilityState={{ checked: enabled }} onPress={onToggle}
                 style={{ flexDirection: "row", alignItems: "center", gap: GAP.md, padding: GAP.md, borderRadius: R.md, backgroundColor: enabled ? C.brandSoft : C.raised() }}>
                 <View style={{ flex: 1, gap: 2 }}>
                     <Text variant="text-md/bold" style={{ color: C.text() }}>Custom profile</Text>
@@ -102,7 +102,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
                 </View>
                 <Switch value={enabled} />
             </Pressable>
-            <View style={{ flexDirection: "row", gap: GAP.sm }}>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: GAP.sm }}>
                 <Action label="Preview in Discord" onPress={onPreview} primary grow />
                 <Action label={quickLook ? "Hide live preview" : "Live preview"} onPress={onQuickLook} grow />
             </View>
@@ -111,9 +111,10 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
 }
 
 function Action({ label, onPress, primary, danger, disabled, grow, selected }: { label: string; onPress: () => void; primary?: boolean; danger?: boolean; disabled?: boolean; grow?: boolean; selected?: boolean }) {
+    const wrap = grow && selected === undefined;
     return <Pressable accessibilityRole={selected === undefined ? "button" : "tab"} accessibilityState={{ disabled: !!disabled, selected }} disabled={disabled} onPress={onPress}
-        style={({ pressed }) => ({ flex: grow ? 1 : undefined, alignItems: "center", justifyContent: "center", minHeight: 40, paddingHorizontal: selected === undefined ? GAP.lg : GAP.xs, borderRadius: R.sm, backgroundColor: danger ? C.red : primary ? C.brand : C.raised(), opacity: disabled ? 0.45 : pressed ? 0.8 : 1 })}>
-        <Text variant="text-sm/bold" style={{ color: primary || danger ? "#FFFFFF" : C.text() }}>{label}</Text>
+        style={({ pressed }) => ({ flex: grow && !wrap ? 1 : undefined, flexGrow: wrap ? 1 : undefined, flexBasis: wrap ? "40%" : undefined, minWidth: wrap ? 132 : undefined, alignItems: "center", justifyContent: "center", minHeight: 44, paddingHorizontal: selected === undefined ? GAP.lg : GAP.xs, paddingVertical: GAP.xs, borderRadius: R.sm, backgroundColor: danger ? C.red : primary ? C.brand : C.raised(), opacity: disabled ? 0.45 : pressed ? 0.8 : 1 })}>
+        <Text variant="text-sm/bold" style={{ color: primary || danger ? "#FFFFFF" : C.text(), textAlign: "center" }}>{label}</Text>
     </Pressable>;
 }
 export { Action as Button };
@@ -124,7 +125,7 @@ export function StudioNav({ selected, onSelect }: { selected: StudioTab; onSelec
         {STUDIO_TABS.map(tab => {
             const on = tab.id === selected;
             return <Pressable key={tab.id} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={() => onSelect(tab.id)}
-                style={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 38, borderRadius: 999, backgroundColor: on ? C.brand : C.panel(), borderWidth: 1, borderColor: on ? C.brand : C.line() }}>
+                style={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, minHeight: 44, paddingVertical: GAP.xs, borderRadius: 999, backgroundColor: on ? C.brand : C.panel(), borderWidth: 1, borderColor: on ? C.brand : C.line() }}>
                 <TabIcon tab={tab.id} active={on} size={16} />
                 <Text variant="text-sm/bold" style={{ color: on ? "#FFFFFF" : C.text() }}>{tab.label}</Text>
             </Pressable>;
