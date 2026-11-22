@@ -525,6 +525,11 @@ export const cxAppearanceTargets = {
         css: '@media (hover: hover) { [id^="chat-messages-"]:not(:hover, :focus-within) :is([class^="timestampInline_"], [class*=" timestampInline_"]) { opacity: 0 !important; } }',
         desktopOnly: true, style: {},
     },
+    "readable-chat-timestamps": {
+        plugin: "ReadableChatTimestamps", label: "Make inline chat timestamps larger and easier to read",
+        css: '[id^="chat-messages-"] time:is([class^="timestampInline_"], [class*=" timestampInline_"]), [id^="chat-messages-"] :is([class^="timestampInline_"], [class*=" timestampInline_"]) time { color: var(--text-normal, currentColor) !important; font-size: 0.875rem !important; }',
+        desktopOnly: true, style: {},
+    },
     "message-stickers": {
         plugin: "HideStickers", label: "stickers in chat",
         css: '[class*="stickerAsset"] { display: none !important; }',

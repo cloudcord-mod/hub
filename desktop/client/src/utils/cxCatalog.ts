@@ -440,6 +440,7 @@ import plugin_catalog_quote_draft from "../../../../examples/cx/catalog/plugins/
 import plugin_catalog_quote_message from "../../../../examples/cx/catalog/plugins/quote-message.cx";
 import plugin_catalog_read_all_notifications_button from "../../../../examples/cx/catalog/plugins/read-all-notifications-button.cx";
 import plugin_catalog_read_all_notifications from "../../../../examples/cx/catalog/plugins/read-all-notifications.cx";
+import plugin_catalog_readable_chat_timestamps from "../../../../examples/cx/catalog/plugins/readable-chat-timestamps.cx";
 import plugin_catalog_readable_ink from "../../../../examples/cx/catalog/plugins/readable-ink.cx";
 import plugin_catalog_readable_line_length from "../../../../examples/cx/catalog/plugins/readable-line-length.cx";
 import plugin_catalog_readable_spoilers from "../../../../examples/cx/catalog/plugins/readable-spoilers.cx";
@@ -1101,6 +1102,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "QuoteMessage", source: plugin_catalog_quote_message, description: "Add Quote and Copy as Quote actions to message menus", categories: ["Chat"] },
         { name: "ReadAllNotificationsButton", source: plugin_catalog_read_all_notifications_button, description: "Add a server list button to mark loaded server channels as read", categories: ["Servers & channels"] },
         { name: "ReadAllNotifications", source: plugin_catalog_read_all_notifications, description: "/readall", commands: ["readall"], categories: ["Commands","Servers & channels"] },
+        { name: "ReadableChatTimestamps", source: plugin_catalog_readable_chat_timestamps, description: "Make inline chat timestamps larger and easier to read", desktopOnly: true, categories: ["Appearance"] },
         { name: "Readable Ink", source: plugin_catalog_readable_ink, description: "/readableink", commands: ["readableink"], categories: ["Commands"], appearanceRevision: "7d9315a5485ec4dbace842a66d573b3c8412747a45aaa180050928cd234ee725", privateCommands: true },
         { name: "ReadableLineLength", source: plugin_catalog_readable_line_length, description: "limit the width of long message lines", categories: ["Appearance"], appearanceRevision: "e30b087d4786298624d546ab6a0b4832e6091f12cd6ff3ce0b48d5386144f214" },
         { name: "ReadableSpoilers", source: plugin_catalog_readable_spoilers, description: "outline concealed spoilers", categories: ["Appearance"], appearanceRevision: "47032e939cf4992d24d2cebdf4ffb7e2d8afe49fffa2dcba7d9a08921cf75853" },

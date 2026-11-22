@@ -1,0 +1,3 @@
+plugin "ReadableChatTimestamps":
+  needs appearance.style
+  style readable-chat-timestamps
