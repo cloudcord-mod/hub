@@ -39465,6 +39465,24 @@ Milliseconds \`${ms}\``;
             return;
           return Math.floor(pace / 60) + ":" + String(pace % 60).padStart(2, "0") + " per km";
         },
+        calendarDayDifference(start, end) {
+          var first = utcMidnight(start.trim()), last = utcMidnight(end.trim());
+          if (first === void 0 || last === void 0)
+            return;
+          var days = (last - first) / dayMilliseconds;
+          if (!days)
+            return "The dates are the same day.";
+          return Math.abs(days) + (Math.abs(days) === 1 ? " day " : " days ") + (days > 0 ? "later" : "earlier");
+        },
+        workSessionBudget(focus, breaks, sessions) {
+          var work = durationSeconds(focus), rest = durationSeconds(breaks);
+          var count = integerText(sessions);
+          if (!work || rest === void 0 || count === void 0 || count < 1 || count > 100)
+            return;
+          var focusTime = work * count;
+          var breakTime = rest * (count - 1);
+          return "Total " + readableDuration(focusTime + breakTime) + " \xB7 Focus " + readableDuration(focusTime) + " \xB7 Breaks between sessions " + readableDuration(breakTime);
+        },
         countdownTimestamp(input) {
           var duration = durationSeconds(input);
           if (!duration)
@@ -49950,6 +49968,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/calendar-day-difference.cx
+  var calendar_day_difference_default;
+  var init_calendar_day_difference = __esm({
+    "../examples/cx/catalog/plugins/calendar-day-difference.cx"() {
+      calendar_day_difference_default = 'plugin "Calendar Day Difference":\n  needs commands.register\n  needs reply.local\n  on command "calendardays":\n    input "start" text\n    input "end" text\n    reply "${calendarDayDifference(start, end)}" else "Enter two calendar dates in YYYY-MM-DD format."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/call-time-counter.cx
   var call_time_counter_default;
   var init_call_time_counter = __esm({
@@ -54090,6 +54116,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/work-session-budget.cx
+  var work_session_budget_default;
+  var init_work_session_budget = __esm({
+    "../examples/cx/catalog/plugins/work-session-budget.cx"() {
+      work_session_budget_default = 'plugin "Work Session Budget":\n  needs commands.register\n  needs reply.local\n  on command "sessionbudget":\n    input "focus" text\n    input "breaks" text\n    input "sessions" text\n    reply "${workSessionBudget(focus, breaks, sessions)}" else "Enter focus and break durations such as 25m and 5m, and 1 to 100 sessions."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/wrap-text.cx
   var wrap_text_default;
   var init_wrap_text = __esm({
@@ -54949,6 +54983,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_build_discord_link();
       init_bypass_pin_prompt();
       init_calculator();
+      init_calendar_day_difference();
       init_call_time_counter();
       init_centered_chat();
       init_chat_buttons_begone();
@@ -55417,6 +55452,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_wiki_lookup();
       init_word_count();
       init_word_frequency();
+      init_work_session_budget();
       init_wrap_text();
       init_write_upper_case();
       init_zero_width_sanitizer();
@@ -55808,6 +55844,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Chat",
               "Commands"
             ]
+          },
+          {
+            name: "Calendar Day Difference",
+            source: calendar_day_difference_default,
+            description: "/calendardays",
+            commands: [
+              "calendardays"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "1d1617b39231f10b323258cd7c4f39b4cd228d360e1b93a8adb3f11a9aeba72a",
+            privateCommands: true
           },
           {
             name: "CallTimeCounter",
@@ -60501,6 +60550,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065",
+            privateCommands: true
+          },
+          {
+            name: "Work Session Budget",
+            source: work_session_budget_default,
+            description: "/sessionbudget",
+            commands: [
+              "sessionbudget"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "0c100044729ae85eb7d9cc7a3fada7136b6016ff6e17b09e702ca24a78b6d7b2",
             privateCommands: true
           },
           {
@@ -70662,7 +70724,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e474255d36044f22e4f13d41d861dbf592fc9854";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "07733c353fe3b47f1d5fdbefa55e135270a74659";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
