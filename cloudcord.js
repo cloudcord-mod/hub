@@ -39226,6 +39226,34 @@ Milliseconds \`${ms}\``;
             remainder ? remainder + "ms" : ""
           ].filter(Boolean).join(" ") + (difference > 0 ? " later" : " earlier");
         },
+        shiftTimestamp(input, offset) {
+          var instant = isoUnixMilliseconds(input);
+          var duration = durationSeconds(offset.trim().replace(/^[+-]/, ""));
+          if (instant === void 0 || duration === void 0)
+            return;
+          var result = new Date(instant + duration * 1e3 * (offset.trim().startsWith("-") ? -1 : 1));
+          if (Number.isFinite(result.getTime()))
+            return result.toISOString();
+        },
+        mediaTimecode(input) {
+          var seconds = durationSeconds(input);
+          if (seconds === void 0)
+            return;
+          return [
+            Math.floor(seconds / 3600),
+            Math.floor(seconds / 60) % 60,
+            seconds % 60
+          ].map((part) => String(part).padStart(2, "0")).join(":");
+        },
+        transferDuration(size, rate) {
+          var bytes = fileSizeBytes(size);
+          var megabits = Number(rate);
+          if (bytes === void 0 || !/^\d+(?:\.\d+)?$/.test(rate) || !Number.isFinite(megabits) || megabits <= 0)
+            return;
+          var seconds = Math.ceil(bytes * 8 / 1e6 / megabits);
+          if (Number.isSafeInteger(seconds))
+            return "Estimated transfer time: " + readableDuration(seconds);
+        },
         countdownTimestamp(input) {
           var duration = durationSeconds(input);
           if (!duration)
@@ -51820,6 +51848,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/media-timecode.cx
+  var media_timecode_default;
+  var init_media_timecode = __esm({
+    "../examples/cx/catalog/plugins/media-timecode.cx"() {
+      media_timecode_default = 'plugin "Media Timecode":\n  needs commands.register\n  needs reply.local\n  on command "mediatimecode":\n    input "duration" text\n    reply "${mediaTimecode(duration)}" else "Enter a duration such as 1h2m3s."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/meeting-timestamp.cx
   var meeting_timestamp_default;
   var init_meeting_timestamp = __esm({
@@ -52612,6 +52648,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/shift-timestamp.cx
+  var shift_timestamp_default;
+  var init_shift_timestamp = __esm({
+    "../examples/cx/catalog/plugins/shift-timestamp.cx"() {
+      shift_timestamp_default = 'plugin "Shift Timestamp":\n  needs commands.register\n  needs reply.local\n  on command "shifttimestamp":\n    input "timestamp" text\n    input "offset" text\n    reply "${shiftTimestamp(timestamp, offset)}" else "Use an ISO timestamp with a time zone and an offset such as -1h30m."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/ship-calc.cx
   var ship_calc_default;
   var init_ship_calc = __esm({
@@ -52897,6 +52941,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_total_time = __esm({
     "../examples/cx/catalog/plugins/total-time.cx"() {
       total_time_default = 'plugin "Total Time":\n  needs commands.register\n  needs reply.local\n  on command "totaltime" with text:\n    reply "${totalTime(text)}" else "Enter up to 100 durations, one per line, such as 2h 30m."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/transfer-duration.cx
+  var transfer_duration_default;
+  var init_transfer_duration = __esm({
+    "../examples/cx/catalog/plugins/transfer-duration.cx"() {
+      transfer_duration_default = 'plugin "Transfer Duration":\n  needs commands.register\n  needs reply.local\n  on command "transfertime":\n    input "size" text\n    input "megabits" text\n    reply "${transferDuration(size, megabits)}" else "Enter a file size such as 100 MB and a positive speed in Mbps."\n';
     }
   });
 
@@ -54301,6 +54353,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_markdown_checklist();
       init_markdown_escape();
       init_markdown_outline();
+      init_media_timecode();
       init_meeting_timestamp();
       init_message_budget();
       init_message_burst();
@@ -54379,6 +54432,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_scroll_to_latest();
       init_sed_enhanced();
       init_send_timestamps();
+      init_shift_timestamp();
       init_ship_calc();
       init_show_ping();
       init_show_song_name();
@@ -54415,6 +54469,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_timestamp_difference();
       init_timestamp_styles();
       init_total_time();
+      init_transfer_duration();
       init_translate();
       init_transparent_chat_bar();
       init_trim_lines();
@@ -57296,6 +57351,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Media Timecode",
+            source: media_timecode_default,
+            description: "/mediatimecode",
+            commands: [
+              "mediatimecode"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "75855931fabb06743babc76dadad36ecef3b9416807cb8787b293c834b7843ad",
+            privateCommands: true
+          },
+          {
             name: "Meeting Timestamp",
             source: meeting_timestamp_default,
             description: "/meetingtimestamp",
@@ -58095,6 +58163,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "Shift Timestamp",
+            source: shift_timestamp_default,
+            description: "/shifttimestamp",
+            commands: [
+              "shifttimestamp"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "ce6b64d62d0d71d19d7b25a422da767dacd965b260bcbdf9f11b3a3e327427aa",
+            privateCommands: true
+          },
+          {
             name: "ShipCalc",
             source: ship_calc_default,
             description: "/ship",
@@ -58461,6 +58542,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca",
+            privateCommands: true
+          },
+          {
+            name: "Transfer Duration",
+            source: transfer_duration_default,
+            description: "/transfertime",
+            commands: [
+              "transfertime"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "4aee6915d955f7780f0f8ba3772a58ac53c33a4a8a4939d306659e0cdd161bd5",
             privateCommands: true
           },
           {
@@ -68938,7 +69032,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0c4986151195edace80c8d0bf9864a593af4240a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8f09f61b494dd377e87a38b70228a1851068f76d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
