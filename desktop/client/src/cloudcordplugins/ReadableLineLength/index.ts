@@ -8,4 +8,4 @@
 
 import { defineTweak } from "@utils/cloudcordTweak";
 
-export default defineTweak("ReadableLineLength", "Wraps long messages at a comfortable width", "[class*=\"messageContent\"] { max-width: 80ch; }", ["Chat"]);
+export default defineTweak("ReadableLineLength", "Wraps long messages at a comfortable width", "[class*=\"messageContent\"] { max-width: min(100%, 80ch); min-width: 0; overflow-wrap: anywhere; }", ["Chat"]);
