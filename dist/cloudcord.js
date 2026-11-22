@@ -38396,8 +38396,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         },
         "blur-chat-media": {
           plugin: "BlurImagesUntilHover",
-          label: "conceal chat images and videos until you reveal them",
-          css: '[class*="imageWrapper"] img, [class*="imageWrapper"] video { filter: blur(18px); transition: filter .2s; } [class*="imageWrapper"]:hover img, [class*="imageWrapper"]:hover video { filter: none; }',
+          label: "conceal chat images and videos until you hover or focus their controls",
+          css: '[class*="imageWrapper"] img, [class*="imageWrapper"] video { filter: blur(18px); transition: filter .2s; } [class*="imageWrapper"]:is(:hover, :focus-within) img, [class*="imageWrapper"]:is(:hover, :focus-within) video { filter: none; }',
           style: {
             blurredMedia: "all"
           }
@@ -56710,7 +56710,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           {
             name: "BlurImagesUntilHover",
             source: blur_images_until_hover_default,
-            description: "conceal chat images and videos until you reveal them",
+            description: "conceal chat images and videos until you hover or focus their controls",
             categories: [
               "Appearance"
             ],
@@ -72275,7 +72275,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7f0744ac5dcc8ee957854408ad7095a6a6258379";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3098c4918c5e78baf2abb066aae35dbacb6e8f0b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
