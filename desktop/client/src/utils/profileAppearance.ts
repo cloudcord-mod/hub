@@ -263,7 +263,8 @@ export function profileMentionAliasScore(data: { username?: unknown; globalName?
 export function profilePreviewStatus(data: Pick<ProfileAppearance, "presenceStatus" | "customActivity">, nativeStatus?: unknown) {
     if (nativeStatus === "offline" || nativeStatus === "invisible") return "invisible";
     if (data.customActivity?.type === 1 && streamURL(data.customActivity.url)) return "streaming";
-    if (data.presenceStatus) return data.presenceStatus;
+    const draftStatus = data.presenceStatus;
+    if (draftStatus === "online" || draftStatus === "idle" || draftStatus === "dnd" || draftStatus === "invisible") return draftStatus;
     return nativeStatus === "idle" || nativeStatus === "dnd" ? nativeStatus : "online";
 }
 

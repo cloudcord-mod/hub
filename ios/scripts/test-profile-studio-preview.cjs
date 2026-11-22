@@ -227,6 +227,7 @@ assert.equal(nativeLook.pronouns, nativeProfile.pronouns);
 assert.equal(nativeLook.status, "dnd");
 assert.equal(mobileAppearance({ presenceStatus: "idle" }, account).status, "idle");
 assert.equal(profileAppearance.profilePreviewStatus({ presenceStatus: "online" }, "offline"), "invisible");
+assert.equal(profileAppearance.profilePreviewStatus({ presenceStatus: "constructor" }, "idle"), "idle", "invalid saved presence falls back to the native state");
 assert.equal(profileAppearance.profilePreviewStatus({ customActivity: { type: 1, url: "https://www.twitch.tv/cloudcord" } }, "idle"), "streaming");
 const serverTag = { tag: "CLOD", guildId: id, badge: "a".repeat(32), icon: mobileProfile.tagIcon };
 assert.equal(mobileAppearance({ serverTag }, account).tagIcon, mobileProfile.tagIcon);
