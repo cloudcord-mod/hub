@@ -1,0 +1,8 @@
+plugin "Grid Cell Size":
+  needs commands.register
+  needs reply.local
+  on command "gridcellsize":
+    input "width" text
+    input "columns" text
+    input "gap" text
+    reply "${gridCellSize(width, columns, gap)}" else "Enter a canvas width, a column count and a nonnegative gap in pixels."

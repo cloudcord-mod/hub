@@ -118,7 +118,10 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     const [search, setSearch] = useState("");
     const query = search.trim();
     const [enabledOnly, setEnabledOnly] = useState(false);
-    const [sortFn, setSortFn] = useState<((a: T, b: T) => number) | null>(() => null);
+    const [sort, setSort] = useState<string>();
+    const sortFn = sort ? props.sortOptions?.[sort] : undefined;
+    const defaultSortLabel = query ? "Relevance" : "Default order";
+    const activeSortLabel = sort ?? defaultSortLabel;
     const [filter, setFilter] = useState("");
     const { bottom: bottomInset } = useSafeAreaInsets();
     const navigation = NavigationNative.useNavigation();
@@ -190,21 +193,24 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 {props.safeModeHint?.footer}
             </View>}
             <View style={{ flexDirection: "row", gap: 8 }}>
-                <Search style={{ flexGrow: 1 }} isRound={!!props.sortOptions} onChangeText={v => setSearch(v)} />
+                <Search style={{ flex: 1, minWidth: 0 }} isRound={!!props.sortOptions} onChangeText={v => setSearch(v)} />
                 {props.sortOptions && <IconButton
                     icon={findAssetId("ArrowsUpDownIcon")}
                     variant="tertiary"
-                    disabled={!!query}
+                    accessibilityLabel={`Sort add-ons, current order: ${activeSortLabel}`}
                     onPress={() => showSimpleActionSheet({
                         key: "AddonListSortOptions",
                         header: {
-                            title: "Sort Options",
+                            title: `Sort add-ons · ${activeSortLabel}`,
                             onClose: () => hideActionSheet("AddonListSortOptions"),
                         },
-                        options: Object.entries(props.sortOptions!).map(([name, fn]) => ({
-                            label: name,
-                            onPress: () => setSortFn(() => fn)
-                        }))
+                        options: [
+                            { label: defaultSortLabel, onPress: () => setSort(undefined) },
+                            ...Object.keys(props.sortOptions!).map(name => ({
+                                label: name,
+                                onPress: () => setSort(name),
+                            })),
+                        ],
                     })}
                 />}
             </View>

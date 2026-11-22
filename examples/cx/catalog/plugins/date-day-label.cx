@@ -1,0 +1,5 @@
+plugin "Date Day Label":
+  needs commands.register
+  needs reply.local
+  on command "datedaylabel" with text:
+    reply "${dateDayLabel(text)}" else "Enter a date as YYYY-MM-DD."

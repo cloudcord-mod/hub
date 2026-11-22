@@ -1,0 +1,8 @@
+plugin "Safe Area Inset":
+  needs commands.register
+  needs reply.local
+  on command "safeareainset":
+    input "width" text
+    input "height" text
+    input "inset" text
+    reply "${safeAreaInset(width, height, inset)}" else "Enter width, height, and a uniform inset that fits inside the image."

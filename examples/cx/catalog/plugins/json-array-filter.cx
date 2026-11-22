@@ -1,0 +1,8 @@
+plugin "JSON Array Filter":
+  needs commands.register
+  needs reply.local
+  on command "jsonarrayfilter":
+    input "json" text
+    input "key" text
+    input "value" text
+    reply "${jsonArrayFilter(json, key, value)}" else "Enter an object array, a property name, and a JSON string, number, boolean, or null."

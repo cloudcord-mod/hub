@@ -1,0 +1,7 @@
+plugin "Pair Lines":
+  needs commands.register
+  needs reply.local
+  on command "pairlines":
+    input "labels" text
+    input "values" text
+    reply "${pairLines(labels, values)}" else "Enter the same number of nonempty lines in labels and values."

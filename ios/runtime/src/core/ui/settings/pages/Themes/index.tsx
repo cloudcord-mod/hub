@@ -42,6 +42,7 @@ export default function Themes() {
   return (
     <AddonPage<VdThemeInfo | CxAddonRow>
       title={Strings.THEMES}
+      getItemKey={theme => "source" in theme ? "cx:" + theme.name : "native:" + theme.id}
       isEnabled={theme => "source" in theme ? theme.active : !activeCxTheme && theme.selected}
       searchKeywords={[
         themeName,

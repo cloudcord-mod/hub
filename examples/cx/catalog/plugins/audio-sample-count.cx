@@ -1,0 +1,7 @@
+plugin "Audio Sample Count":
+  needs commands.register
+  needs reply.local
+  on command "audiosamples":
+    input "rate" text
+    input "duration" text
+    reply "${audioSampleCount(rate, duration)}" else "Enter a sample rate in Hz and a duration such as 1m 30s."

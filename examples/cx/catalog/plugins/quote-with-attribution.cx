@@ -1,0 +1,7 @@
+plugin "Quote with Attribution":
+  needs commands.register
+  needs reply.local
+  on command "attributedquote":
+    input "text" text
+    input "author" text
+    reply "${quoteWithAttribution(text, author)}" else "Enter a quote and a one-line attribution."

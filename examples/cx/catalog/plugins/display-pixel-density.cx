@@ -1,0 +1,8 @@
+plugin "Display Pixel Density":
+  needs commands.register
+  needs reply.local
+  on command "displayppi":
+    input "width" text
+    input "height" text
+    input "diagonal" text
+    reply "${displayPixelDensity(width, height, diagonal)}" else "Enter the width and height in pixels and the diagonal in inches."

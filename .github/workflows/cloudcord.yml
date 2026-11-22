@@ -146,8 +146,11 @@ jobs:
           cp "../ios/runtime/src/core/ui/settings/components/CustomBadgeBeta.tsx" "src/core/ui/settings/components/CustomBadgeBeta.tsx"
           cp "../ios/runtime/src/core/ui/settings/components/LocalProfiles.tsx" "src/core/ui/settings/components/LocalProfiles.tsx"
           mkdir -p src/core/ui/settings/pages/Addons
+          mkdir -p src/core/ui/settings/pages/Tools
+          cp "../ios/runtime/src/core/ui/settings/pages/Tools/index.tsx" "src/core/ui/settings/pages/Tools/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/Addons/index.tsx" "src/core/ui/settings/pages/Addons/index.tsx"
           cp "../ios/runtime/src/core/ui/components/AddonPage.tsx" "src/core/ui/components/AddonPage.tsx"
+          cp "../ios/runtime/src/core/ui/components/AddonCard.tsx" "src/core/ui/components/AddonCard.tsx"
           mkdir -p src/core/ui/settings/pages/CxExtensions
           cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/index.tsx" "src/core/ui/settings/pages/CxExtensions/index.tsx"
           cp "../ios/runtime/src/core/ui/settings/pages/CxExtensions/AddonCard.tsx" "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"

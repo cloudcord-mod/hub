@@ -1,0 +1,7 @@
+plugin "CSV Column Frequency":
+  needs commands.register
+  needs reply.local
+  on command "csvcolumnfrequency":
+    input "csv" text
+    input "column" text
+    reply "${csvColumnFrequency(csv, column)}" else "Enter CSV and a 1-based column number."

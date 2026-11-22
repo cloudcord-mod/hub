@@ -21,3 +21,7 @@ Desktop plugin adaptations (GPL-3.0-or-later), sourced through [Illegalcord](htt
 - [ExpandedWidgets](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/illegalcordplugins/expandedWidgets).
 - [MutedServersActivityBadge](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/plugins/mutedServersActivityBadge).
 - [ScreenShareAlert](https://github.com/ImHisako/Illegalcord/tree/8b33a1d5a07798429fe79865e02aac8c8e1d326b/src/illegalcordplugins/ScreenShareAlert).
+
+## Other desktop plugin adaptations
+
+- [GridFloor](https://github.com/MasuRii/OpenCord/tree/4453363d37c07c0038b63518e60c74089ec3c34c/src/mallcordplugins/gridFloor) by Sharp from MallCord (GPL-3.0-or-later).

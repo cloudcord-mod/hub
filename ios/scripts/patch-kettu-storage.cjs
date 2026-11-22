@@ -21,13 +21,13 @@ function patch(rel, steps) {
 patch("src/core/vendetta/storage.ts", [
     ["set guard", /(set\(target[^,]*, prop[^,]*, value\)\s*\{\s*)if \(typeof value === "object"\)/, '$1if (value !== null && typeof value === "object")', true],
     ["delete guard", /(deleteProperty\(target[^,]*, prop[^)]*\)\s*\{\s*const value = )typeof target\[prop\] === "object" \? childrens\.get\(target\[prop\]\)!? : target\[prop\];/, '$1target[prop] !== null && typeof target[prop] === "object" ? childrens.get(target[prop]) ?? target[prop] : target[prop];', false],
-    ["load guard", /const data = await backend\.get\(\);\n(\s*)const \{ proxy, emitter \} = createProxy\(data\);/, 'let data: any = await backend.get();\n$1if (!data || typeof data !== "object") data = {};\n$1const { proxy, emitter } = createProxy(data);', false],
+    ["load guard", /const data = await backend\.get\(\);\r?\n(\s*)const \{ proxy, emitter \} = createProxy\(data\);/, 'let data: any = await backend.get();\n$1if (!data || typeof data !== "object") data = {};\n$1const { proxy, emitter } = createProxy(data);', false],
 ]);
 patch("src/lib/api/storage/index.ts", [
     ["callback guard", /const proxy = new Proxy\(Observable\.from\(data\),/, 'const proxy = new Proxy(Observable.from(data && typeof data === "object" ? data : {}),', true],
 ]);
 patch("src/lib/api/patcher.ts", [
-    ["missing method guard", /function create\(fn: Function\) \{\n/, `// A method this Discord build doesn't have can't be patched; skip it instead of crashing.
+    ["missing method guard", /function create\(fn: Function\) \{\r?\n/, `// A method this Discord build doesn't have can't be patched; skip it instead of crashing.
 function patchable(args: any[]) {
     const parent = args[1];
     if (!parent || (typeof parent !== "object" && typeof parent !== "function")) return false;

@@ -1,0 +1,5 @@
+plugin "Calendar Quarter":
+  needs commands.register
+  needs reply.local
+  on command "calendarquarter" with text:
+    reply "${calendarQuarter(text)}" else "Enter a calendar date in YYYY-MM-DD format."

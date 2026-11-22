@@ -66,16 +66,14 @@ export default function initSettings() {
                 render: () => import("@core/ui/settings/pages/Addons")
             },
             {
-                key: "CLOUDCORD_PREVIEWS",
-                title: () => "Previews",
-                icon: safeAsset("EyeIcon", "GiftIcon", "SettingsIcon"),
-                render: () => import("@core/ui/settings/pages/FakeProfile").then(module => ({ default: module.PreviewsPage }))
-            },
-            {
-                key: "CLOUDCORD_ACCOUNT_TOOLS",
-                title: () => "Account Tools",
+                key: "CLOUDCORD_TOOLS",
+                title: () => "Tools",
                 icon: safeAsset("WrenchIcon", "SettingsIcon"),
-                render: () => import("@core/ui/settings/pages/FakeProfile").then(module => ({ default: module.AccountToolsPage }))
+                render: () => import("@core/ui/settings/pages/Tools"),
+                usePredicate: () => {
+                    const hidden = useProxy(settings).cloudcordHiddenTabs ?? [];
+                    return !hidden.includes("CLOUDCORD_PREVIEWS") || !hidden.includes("CLOUDCORD_ACCOUNT_TOOLS");
+                },
             },
             {
                 key: "CLOUDCORD_TESTING_PLUGINS",
@@ -93,7 +91,7 @@ export default function initSettings() {
             }
         ];
 
-    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_PREVIEWS", "CLOUDCORD_ACCOUNT_TOOLS", "STORE_CLOUD", "BOTCORD", "CLOUDCORD_TESTING_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
+    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_TOOLS", "STORE_CLOUD", "BOTCORD", "CLOUDCORD_TESTING_PLUGINS", "CLOUDCORD_DIAGNOSTICS"];
     const configurableKeys = new Set(defaultOrder.filter(key => key !== "CLOUDCORD"));
     const configuredOrder = settings.cloudcordTabOrder ?? [];
     const orderIndex = new Map(configuredOrder.map((key, index) => [key, index]));

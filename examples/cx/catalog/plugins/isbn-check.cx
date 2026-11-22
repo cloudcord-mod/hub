@@ -1,0 +1,5 @@
+plugin "ISBN Check":
+  needs commands.register
+  needs reply.local
+  on command "isbncheck" with text:
+    reply "${checkIsbn(text)}" else "Enter an ISBN-10 or ISBN-13, with optional hyphens or spaces."

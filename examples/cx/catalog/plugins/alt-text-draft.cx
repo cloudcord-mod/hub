@@ -1,0 +1,8 @@
+plugin "Alt Text Draft":
+  needs commands.register
+  needs reply.local
+  on command "alttextdraft":
+    input "subject" text
+    input "context" text optional
+    input "visible" text optional
+    reply "${altTextDraft(subject, context, visible)}" else "Enter a subject and keep the draft below 500 characters."

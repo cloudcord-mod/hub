@@ -1,0 +1,8 @@
+plugin "Recipe Scaler":
+  needs commands.register
+  needs reply.local
+  on command "recipescale":
+    input "original" text
+    input "servings" text
+    input "ingredients" text
+    reply "${scaleRecipe(original, servings, ingredients)}" else "Enter positive serving counts and one amount | ingredient per line, like 200 | g flour."

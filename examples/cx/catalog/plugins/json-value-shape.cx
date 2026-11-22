@@ -1,0 +1,5 @@
+plugin "JSON Value Shape":
+  needs commands.register
+  needs reply.local
+  on command "jsonvalueshape" with text:
+    reply "${jsonValueShape(text)}" else "Paste a valid JSON value."

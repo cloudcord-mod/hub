@@ -1,0 +1,7 @@
+plugin "Event Overlap":
+  needs commands.register
+  needs reply.local
+  on command "eventoverlap":
+    input "first" text
+    input "second" text
+    reply "${eventOverlap(first, second)}" else "Enter two ranges, each as start | end, using ISO date-times with a time zone."

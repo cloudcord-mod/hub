@@ -1,0 +1,7 @@
+plugin "Team Rotation":
+  needs commands.register
+  needs reply.local
+  on command "teamrotation":
+    input "names" text
+    input "shift" text
+    reply "${teamRotation(names, shift)}" else "Enter one name per line and a whole-number rotation."

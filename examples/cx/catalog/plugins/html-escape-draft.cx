@@ -1,0 +1,5 @@
+plugin "HTML Escape Draft":
+  needs commands.register
+  needs reply.local
+  on command "htmlescape" with text:
+    reply "${htmlEscapeDraft(text)}" else "Paste text short enough to fit in one reply after escaping."

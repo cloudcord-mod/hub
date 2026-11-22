@@ -1,0 +1,7 @@
+plugin "Hex Byte Format":
+  needs commands.register
+  needs reply.local
+  on command "hexbyteformat":
+    input "text" text
+    input "width" text
+    reply "${hexByteFormat(text, width)}" else "Enter hexadecimal bytes and a row width from 1 to 32."

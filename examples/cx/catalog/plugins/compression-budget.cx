@@ -1,0 +1,7 @@
+plugin "Compression Budget":
+  needs commands.register
+  needs reply.local
+  on command "compressionbudget":
+    input "original" text
+    input "target" text
+    reply "${compressionBudget(original, target)}" else "Enter two sizes such as 40 MB and 10 MB, with a smaller target."

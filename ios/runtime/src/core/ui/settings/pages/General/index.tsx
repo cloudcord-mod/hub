@@ -14,13 +14,18 @@ import { GITHUB } from "@lib/utils/constants";
 import { showToast } from "@lib/ui/toasts";
 import { NavigationNative } from "@metro/common";
 import { AlertActionButton, AlertActions, AlertModal, Stack, TableRow, TableRowGroup, TableSwitchRow } from "@metro/common/components";
-import { Linking, ScrollView } from "react-native";
+import { Linking, Platform, ScrollView } from "react-native";
 
 export default function General() {
     useProxy(settings);
 
     const debugInfo = getDebugInfo();
     const navigation = NavigationNative.useNavigation();
+    const canFetchRuntime = typeof BundleUpdaterManager?.checkForUpdates === "function"
+        || typeof BundleUpdaterManager?.download === "function";
+    const recoveryInstructions = Platform.OS === "android"
+        ? "Hold Volume Up in Discord, then choose Use stable runtime. This is available on current CloudCord Manager installs."
+        : "Shake the device in Discord, then choose Refetch Bundle in the recovery menu.";
 
     return (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 38 }}>
@@ -67,15 +72,15 @@ export default function General() {
                     />
                 </TableRowGroup>
                 <TableRowGroup title={Strings.ACTIONS}>
-                    <TableSwitchRow
+                    {canFetchRuntime && (globalThis as any).__CLOUDCORD_ORIGINAL_RAIN__ && <TableSwitchRow
                         label="Auto-update"
                         subLabel="Check every five minutes. Saved updates apply after Discord restarts."
                         value={(settings as any).cloudcordAutoUpdate !== false}
                         onValueChange={(value: boolean) => (settings as any).cloudcordAutoUpdate = value}
-                    />
-                    <TableRow label="Update status" subLabel={(settings as any).cloudcordUpdateStatus || "Waiting for the next update check"} />
+                    />}
+                    {canFetchRuntime && <TableRow label="Update status" subLabel={(settings as any).cloudcordUpdateStatus || "No update check yet"} />}
                     <TableRow label="Loaded runtime" subLabel={String((globalThis as any).__CLOUDCORD_RUNTIME_REVISION__ ?? "Unknown").slice(0, 12)} />
-                    <TableRow label="Fetch Runtime" subLabel="Download the latest runtime. Reopen Discord to apply it." onPress={async () => {
+                    {canFetchRuntime ? <TableRow label="Fetch Runtime" subLabel="Download the latest runtime. Reopen Discord to apply it." onPress={async () => {
                         (settings as any).cloudcordUpdateStatus = "Checking for updates…";
                         try {
                             await fetchRuntimeUpdate(BundleUpdaterManager);
@@ -85,7 +90,7 @@ export default function General() {
                             (settings as any).cloudcordUpdateStatus = message;
                             showToast(message);
                         }
-                    }} />
+                    }} /> : <TableRow label="Update through recovery" subLabel={recoveryInstructions} />}
                     <TableRow label="Copy CCP runtime report" subLabel="Loaded Discord functions and read-only checks"
                         icon={<TableRow.Icon source={findAssetId("CopyIcon") || findAssetId("WrenchIcon")} />}
                         onPress={async () => {

@@ -4,30 +4,22 @@ import { Card, FormRadio, FormSwitch, IconButton, LegacyFormRow, Stack, Text } f
 import { findByProps } from "@metro/wrappers";
 import { semanticColors } from "@ui/color";
 import { createStyles, TextStyleSheet } from "@ui/styles";
+import type { ReactNode } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 const { hideActionSheet } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet"));
 const { showSimpleActionSheet } = lazyDestructure(() => findByProps("showSimpleActionSheet"));
 
-// TODO: These styles work weirdly. Low DPI Has cramped text. Fix?
 const useStyles = createStyles({
-    card: {
-        backgroundColor: semanticColors?.CARD_SECONDARY_BG,
-        borderRadius: 12,
-        overflow: "hidden"
-    },
-    header: {
-        padding: 0,
-    },
     headerLeading: {
-        flexDirection: "column",
-        justifyContent: "center",
-        scale: 1.2
+        flex: 1,
+        minWidth: 0,
+        gap: 2,
     },
     headerTrailing: {
-        display: "flex",
         flexDirection: "row",
-        gap: 15,
+        flexShrink: 0,
+        gap: 8,
         alignItems: "center"
     },
     headerLabel: {
@@ -35,31 +27,19 @@ const useStyles = createStyles({
         color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY,
     },
     headerSubtitle: {
-        ...TextStyleSheet["text-md/semibold"],
+        ...TextStyleSheet["text-sm/medium"],
         color: semanticColors.TEXT_MUTED,
-    },
-    descriptionLabel: {
-        ...TextStyleSheet["text-md/semibold"],
-        color: semanticColors.TEXT_NORMAL,
     },
     actions: {
         flexDirection: "row-reverse",
         alignItems: "center",
         gap: 5
     },
-    iconStyle: {
-        tintColor: semanticColors.INTERACTIVE_ICON_DEFAULT,
-        opacity: 0.2,
-        height: 64,
-        width: 64,
-        left: void 0,
-        right: "30%",
-        top: "-10%"
-    }
 });
 
 interface Action {
     icon: string;
+    accessibilityLabel?: string;
     disabled?: boolean;
     onPress: () => void;
 }
@@ -83,6 +63,7 @@ interface CardProps {
     toggleValue: () => boolean;
     onToggleChange?: (v: boolean) => void;
     descriptionLabel?: string;
+    preview?: ReactNode;
     actions?: Action[];
     overflowTitle?: string;
     overflowActions?: OverflowAction[];
@@ -93,15 +74,15 @@ export default function AddonCard(props: CardProps) {
 
     return (
         <Card>
-            <Stack spacing={16}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Stack spacing={6}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
                     <View style={styles.headerLeading}>
                         <Text style={styles.headerLabel}>{props.headerLabel}</Text>
                         {props.headerSublabel && (
                             <Text style={styles.headerSubtitle}>{props.headerSublabel}</Text>
                         )}
                     </View>
-                    <View style={[styles.headerTrailing, { marginLeft: "auto" }]}>
+                    <View style={styles.headerTrailing}>
                         <View style={styles.actions}>
                             {props.overflowActions &&
                                 <IconButton
@@ -121,10 +102,12 @@ export default function AddonCard(props: CardProps) {
                                     variant="secondary"
                                     icon={findAssetId("CircleInformationIcon-primary")}
                                 />}
-                            {props.actions?.map(({ icon, onPress, disabled }) => (
+                            {props.actions?.map(({ icon, onPress, disabled, accessibilityLabel }, index) => (
                                 <IconButton
+                                    key={icon + index}
                                     onPress={onPress}
                                     disabled={disabled}
+                                    accessibilityLabel={accessibilityLabel}
                                     size="sm"
                                     variant="secondary"
                                     icon={findAssetId(icon)}
@@ -134,10 +117,12 @@ export default function AddonCard(props: CardProps) {
                         {props.toggleType && (props.toggleType === "switch" ?
                             <FormSwitch
                                 value={props.toggleValue()}
+                                accessibilityLabel={props.headerLabel}
                                 onValueChange={props.onToggleChange}
                             />
                             :
-                            <TouchableOpacity onPress={() => {
+                            <TouchableOpacity accessibilityRole="radio" accessibilityLabel={props.headerLabel}
+                                accessibilityState={{ checked: props.toggleValue() }} onPress={() => {
                                 props.onToggleChange?.(!props.toggleValue());
                             }}>
                                 <FormRadio selected={props.toggleValue()} />
@@ -145,7 +130,8 @@ export default function AddonCard(props: CardProps) {
                         )}
                     </View>
                 </View>
-                {props.descriptionLabel && <Text variant="text-md/medium">
+                {props.preview}
+                {props.descriptionLabel && <Text variant="text-sm/medium" color="text-muted">
                     {props.descriptionLabel}
                 </Text>}
             </Stack>

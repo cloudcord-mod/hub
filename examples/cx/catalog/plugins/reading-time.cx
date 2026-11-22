@@ -1,0 +1,7 @@
+plugin "Reading Time":
+  needs commands.register
+  needs reply.local
+  on command "readingtime":
+    input "text" text
+    input "rate" text
+    reply "${readingTime(text, rate)}" else "Enter text and a reading rate between 50 and 1000 words per minute."

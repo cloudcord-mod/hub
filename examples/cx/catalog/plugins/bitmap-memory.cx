@@ -1,0 +1,8 @@
+plugin "Bitmap Memory":
+  needs commands.register
+  needs reply.local
+  on command "bitmapmemory":
+    input "width" text
+    input "height" text
+    input "channels" text
+    reply "${bitmapMemory(width, height, channels)}" else "Enter positive pixel dimensions and 1 to 4 eight-bit channels."

@@ -1,0 +1,8 @@
+plugin "Arithmetic Sequence":
+  needs commands.register
+  needs reply.local
+  on command "arithmeticsequence":
+    input "start" text
+    input "step" text
+    input "count" text
+    reply "${arithmeticSequence(start, step, count)}" else "Enter a starting value, step, and a count from 1 to 50."

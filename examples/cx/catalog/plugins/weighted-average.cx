@@ -1,0 +1,5 @@
+plugin "Weighted Average":
+  needs commands.register
+  needs reply.local
+  on command "weightedaverage" with text:
+    reply "${weightedAverage(text)}" else "Enter one value | weight pair per line, with at least one positive weight."

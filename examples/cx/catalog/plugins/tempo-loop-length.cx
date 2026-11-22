@@ -1,0 +1,8 @@
+plugin "Tempo Loop Length":
+  needs commands.register
+  needs reply.local
+  on command "tempoloop":
+    input "bpm" text
+    input "bars" text
+    input "beats" text
+    reply "${tempoLoopLength(bpm, bars, beats)}" else "Enter a tempo from 20 to 400 BPM, bars, and beats per bar."

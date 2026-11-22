@@ -1,0 +1,7 @@
+plugin "Line Length Report":
+  needs commands.register
+  needs reply.local
+  on command "linelengths":
+    input "text" text
+    input "limit" text
+    reply "${lineLengthReport(text, limit)}" else "Enter text and a positive character limit."

@@ -1,0 +1,5 @@
+plugin "Hex Text Decode":
+  needs commands.register
+  needs reply.local
+  on command "hextext" with text:
+    reply "${hexTextDecode(text)}" else "Enter UTF-8 bytes in hexadecimal, optionally separated by spaces."

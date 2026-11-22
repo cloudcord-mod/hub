@@ -1,0 +1,7 @@
+plugin "Unit Price Comparison":
+  needs commands.register
+  needs reply.local
+  on command "unitprice":
+    input "first" text
+    input "second" text
+    reply "${unitPriceComparison(first, second)}" else "Enter each offer as price / quantity, using the same currency and unit."

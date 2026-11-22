@@ -1,0 +1,7 @@
+plugin "Reduce Fraction":
+  needs commands.register
+  needs reply.local
+  on command "reducefraction":
+    input "numerator" text
+    input "denominator" text
+    reply "${reduceFraction(numerator, denominator)}" else "Enter integer numerator and a nonzero denominator."

@@ -1,0 +1,5 @@
+plugin "Open Checklist Items":
+  needs commands.register
+  needs reply.local
+  on command "openchecklist" with text:
+    reply "${openChecklistItems(text)}" else "Paste a Markdown checklist."

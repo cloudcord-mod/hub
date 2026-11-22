@@ -1,0 +1,5 @@
+plugin "Month Calendar":
+  needs commands.register
+  needs reply.local
+  on command "monthcalendar" with text:
+    reply "${monthCalendar(text)}" else "Enter a month as YYYY-MM."

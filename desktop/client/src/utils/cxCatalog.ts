@@ -2,14 +2,19 @@
 import plugin_base_character_counter from "../../../../examples/cx/pilot/character-counter.cx";
 import plugin_catalog_agenda_draft from "../../../../examples/cx/catalog/plugins/agenda-draft.cx";
 import plugin_catalog_all_call_time_counter from "../../../../examples/cx/catalog/plugins/all-call-time-counter.cx";
+import plugin_catalog_alt_text_draft from "../../../../examples/cx/catalog/plugins/alt-text-draft.cx";
 import plugin_catalog_always_animate from "../../../../examples/cx/catalog/plugins/always-animate.cx";
 import plugin_catalog_amoled_mode from "../../../../examples/cx/catalog/plugins/amoled-mode.cx";
 import plugin_catalog_anonymise_file_names from "../../../../examples/cx/catalog/plugins/anonymise-file-names.cx";
+import plugin_catalog_arithmetic_sequence from "../../../../examples/cx/catalog/plugins/arithmetic-sequence.cx";
 import plugin_catalog_aspect_ratio from "../../../../examples/cx/catalog/plugins/aspect-ratio.cx";
 import plugin_catalog_at_someone from "../../../../examples/cx/catalog/plugins/at-someone.cx";
+import plugin_catalog_audio_pitch_ratio from "../../../../examples/cx/catalog/plugins/audio-pitch-ratio.cx";
+import plugin_catalog_audio_sample_count from "../../../../examples/cx/catalog/plugins/audio-sample-count.cx";
 import plugin_catalog_auto_vaporwave from "../../../../examples/cx/catalog/plugins/auto-vaporwave.cx";
 import plugin_catalog_avatar_grabber from "../../../../examples/cx/catalog/plugins/avatar-grabber.cx";
 import plugin_catalog_balanced_groups from "../../../../examples/cx/catalog/plugins/balanced-groups.cx";
+import plugin_catalog_base_converter from "../../../../examples/cx/catalog/plugins/base-converter.cx";
 import plugin_catalog_better_chat_names from "../../../../examples/cx/catalog/plugins/better-chat-names.cx";
 import plugin_catalog_better_gif_alt_text from "../../../../examples/cx/catalog/plugins/better-gif-alt-text.cx";
 import plugin_catalog_better_plus_reacts from "../../../../examples/cx/catalog/plugins/better-plus-reacts.cx";
@@ -18,6 +23,7 @@ import plugin_catalog_bigger_chat_text from "../../../../examples/cx/catalog/plu
 import plugin_catalog_bigger_code_blocks from "../../../../examples/cx/catalog/plugins/bigger-code-blocks.cx";
 import plugin_catalog_bigger_jumbo_emojis from "../../../../examples/cx/catalog/plugins/bigger-jumbo-emojis.cx";
 import plugin_catalog_bigger_server_icons from "../../../../examples/cx/catalog/plugins/bigger-server-icons.cx";
+import plugin_catalog_bitmap_memory from "../../../../examples/cx/catalog/plugins/bitmap-memory.cx";
 import plugin_catalog_bitrate_budget from "../../../../examples/cx/catalog/plugins/bitrate-budget.cx";
 import plugin_catalog_block_keywords from "../../../../examples/cx/catalog/plugins/block-keywords.cx";
 import plugin_catalog_blur_images_until_hover from "../../../../examples/cx/catalog/plugins/blur-images-until-hover.cx";
@@ -28,6 +34,7 @@ import plugin_catalog_build_discord_link from "../../../../examples/cx/catalog/p
 import plugin_catalog_bypass_pin_prompt from "../../../../examples/cx/catalog/plugins/bypass-pin-prompt.cx";
 import plugin_catalog_calculator from "../../../../examples/cx/catalog/plugins/calculator.cx";
 import plugin_catalog_calendar_day_difference from "../../../../examples/cx/catalog/plugins/calendar-day-difference.cx";
+import plugin_catalog_calendar_quarter from "../../../../examples/cx/catalog/plugins/calendar-quarter.cx";
 import plugin_catalog_call_time_counter from "../../../../examples/cx/catalog/plugins/call-time-counter.cx";
 import plugin_catalog_centered_chat from "../../../../examples/cx/catalog/plugins/centered-chat.cx";
 import plugin_catalog_chat_buttons_begone from "../../../../examples/cx/catalog/plugins/chat-buttons-begone.cx";
@@ -52,6 +59,7 @@ import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plu
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
 import plugin_catalog_compare_csv_cells from "../../../../examples/cx/catalog/plugins/compare-csv-cells.cx";
 import plugin_catalog_compare_lines from "../../../../examples/cx/catalog/plugins/compare-lines.cx";
+import plugin_catalog_compression_budget from "../../../../examples/cx/catalog/plugins/compression-budget.cx";
 import plugin_catalog_copy_account_creation_timestamp from "../../../../examples/cx/catalog/plugins/copy-account-creation-timestamp.cx";
 import plugin_catalog_copy_attachment_links from "../../../../examples/cx/catalog/plugins/copy-attachment-links.cx";
 import plugin_catalog_copy_attachment_names from "../../../../examples/cx/catalog/plugins/copy-attachment-names.cx";
@@ -88,12 +96,17 @@ import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/pl
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
 import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
 import plugin_catalog_count_text_matches from "../../../../examples/cx/catalog/plugins/count-text-matches.cx";
+import plugin_catalog_csv_column_frequency from "../../../../examples/cx/catalog/plugins/csv-column-frequency.cx";
 import plugin_catalog_csv_column from "../../../../examples/cx/catalog/plugins/csv-column.cx";
+import plugin_catalog_csv_row_filter from "../../../../examples/cx/catalog/plugins/csv-row-filter.cx";
+import plugin_catalog_csv_shape from "../../../../examples/cx/catalog/plugins/csv-shape.cx";
+import plugin_catalog_csv_to_json from "../../../../examples/cx/catalog/plugins/csv-to-json.cx";
 import plugin_catalog_csv_to_markdown from "../../../../examples/cx/catalog/plugins/csv-to-markdown.cx";
 import plugin_catalog_csv_to_tsv from "../../../../examples/cx/catalog/plugins/csv-to-tsv.cx";
 import plugin_catalog_custom_emoji_markup from "../../../../examples/cx/catalog/plugins/custom-emoji-markup.cx";
 import plugin_catalog_custom_timestamps from "../../../../examples/cx/catalog/plugins/custom-timestamps.cx";
 import plugin_catalog_dashless from "../../../../examples/cx/catalog/plugins/dashless.cx";
+import plugin_catalog_date_day_label from "../../../../examples/cx/catalog/plugins/date-day-label.cx";
 import plugin_catalog_date_offset from "../../../../examples/cx/catalog/plugins/date-offset.cx";
 import plugin_catalog_days_between from "../../../../examples/cx/catalog/plugins/days-between.cx";
 import plugin_catalog_decision_draft from "../../../../examples/cx/catalog/plugins/decision-draft.cx";
@@ -107,6 +120,7 @@ import plugin_catalog_disable_inline_embed_media from "../../../../examples/cx/c
 import plugin_catalog_discord_countdown from "../../../../examples/cx/catalog/plugins/discord-countdown.cx";
 import plugin_catalog_discord_link_details from "../../../../examples/cx/catalog/plugins/discord-link-details.cx";
 import plugin_catalog_discord_timestamp from "../../../../examples/cx/catalog/plugins/discord-timestamp.cx";
+import plugin_catalog_display_pixel_density from "../../../../examples/cx/catalog/plugins/display-pixel-density.cx";
 import plugin_catalog_dont_round_my_timestamps from "../../../../examples/cx/catalog/plugins/dont-round-my-timestamps.cx";
 import plugin_catalog_double_click_edit from "../../../../examples/cx/catalog/plugins/double-click-edit.cx";
 import plugin_catalog_double_click_to_reply from "../../../../examples/cx/catalog/plugins/double-click-to-reply.cx";
@@ -117,6 +131,7 @@ import plugin_catalog_encode_base64 from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
 import plugin_catalog_escape_regex from "../../../../examples/cx/catalog/plugins/escape-regex.cx";
+import plugin_catalog_event_overlap from "../../../../examples/cx/catalog/plugins/event-overlap.cx";
 import plugin_catalog_event_window from "../../../../examples/cx/catalog/plugins/event-window.cx";
 import plugin_catalog_expand_tabs from "../../../../examples/cx/catalog/plugins/expand-tabs.cx";
 import plugin_catalog_extract_line_range from "../../../../examples/cx/catalog/plugins/extract-line-range.cx";
@@ -144,6 +159,9 @@ import plugin_catalog_friend_invites from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_gamzee_s_typing_quirk from "../../../../examples/cx/catalog/plugins/gamzee-s-typing-quirk.cx";
 import plugin_catalog_google_that from "../../../../examples/cx/catalog/plugins/google-that.cx";
 import plugin_catalog_grayscale_images from "../../../../examples/cx/catalog/plugins/grayscale-images.cx";
+import plugin_catalog_grid_cell_size from "../../../../examples/cx/catalog/plugins/grid-cell-size.cx";
+import plugin_catalog_hex_byte_format from "../../../../examples/cx/catalog/plugins/hex-byte-format.cx";
+import plugin_catalog_hex_text_decode from "../../../../examples/cx/catalog/plugins/hex-text-decode.cx";
 import plugin_catalog_hide_active_channel_cards from "../../../../examples/cx/catalog/plugins/hide-active-channel-cards.cx";
 import plugin_catalog_hide_active_now from "../../../../examples/cx/catalog/plugins/hide-active-now.cx";
 import plugin_catalog_hide_activity_cards from "../../../../examples/cx/catalog/plugins/hide-activity-cards.cx";
@@ -357,10 +375,12 @@ import plugin_catalog_hold_your_tongue from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hop_on from "../../../../examples/cx/catalog/plugins/hop-on.cx";
 import plugin_catalog_hover_highlight_messages from "../../../../examples/cx/catalog/plugins/hover-highlight-messages.cx";
 import plugin_catalog_hsl_color_converter from "../../../../examples/cx/catalog/plugins/hsl-color-converter.cx";
+import plugin_catalog_html_escape_draft from "../../../../examples/cx/catalog/plugins/html-escape-draft.cx";
 import plugin_catalog_html_escape from "../../../../examples/cx/catalog/plugins/html-escape.cx";
 import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins/ignore-calls.cx";
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
+import plugin_catalog_image_megapixels from "../../../../examples/cx/catalog/plugins/image-megapixels.cx";
 import plugin_catalog_image_pixel_count from "../../../../examples/cx/catalog/plugins/image-pixel-count.cx";
 import plugin_catalog_image_print_size from "../../../../examples/cx/catalog/plugins/image-print-size.cx";
 import plugin_catalog_improve_contrast from "../../../../examples/cx/catalog/plugins/improve-contrast.cx";
@@ -368,21 +388,27 @@ import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-r
 import plugin_catalog_indent_lines from "../../../../examples/cx/catalog/plugins/indent-lines.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
 import plugin_catalog_inspect_discord_timestamp from "../../../../examples/cx/catalog/plugins/inspect-discord-timestamp.cx";
+import plugin_catalog_isbn_check from "../../../../examples/cx/catalog/plugins/isbn-check.cx";
 import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso-week.cx";
 import plugin_catalog_join_lines from "../../../../examples/cx/catalog/plugins/join-lines.cx";
+import plugin_catalog_json_array_filter from "../../../../examples/cx/catalog/plugins/json-array-filter.cx";
 import plugin_catalog_json_check from "../../../../examples/cx/catalog/plugins/json-check.cx";
 import plugin_catalog_json_compact from "../../../../examples/cx/catalog/plugins/json-compact.cx";
 import plugin_catalog_json_format from "../../../../examples/cx/catalog/plugins/json-format.cx";
 import plugin_catalog_json_keys from "../../../../examples/cx/catalog/plugins/json-keys.cx";
 import plugin_catalog_json_pointer from "../../../../examples/cx/catalog/plugins/json-pointer.cx";
+import plugin_catalog_json_value_shape from "../../../../examples/cx/catalog/plugins/json-value-shape.cx";
 import plugin_catalog_jump_to_top from "../../../../examples/cx/catalog/plugins/jump-to-top.cx";
 import plugin_catalog_jump_to from "../../../../examples/cx/catalog/plugins/jump-to.cx";
 import plugin_catalog_keyword_notify from "../../../../examples/cx/catalog/plugins/keyword-notify.cx";
 import plugin_catalog_larger_chat_text from "../../../../examples/cx/catalog/plugins/larger-chat-text.cx";
 import plugin_catalog_leet_text from "../../../../examples/cx/catalog/plugins/leet-text.cx";
+import plugin_catalog_line_length_report from "../../../../examples/cx/catalog/plugins/line-length-report.cx";
 import plugin_catalog_lines_to_csv from "../../../../examples/cx/catalog/plugins/lines-to-csv.cx";
+import plugin_catalog_lines_to_spoilers from "../../../../examples/cx/catalog/plugins/lines-to-spoilers.cx";
 import plugin_catalog_link_converter from "../../../../examples/cx/catalog/plugins/link-converter.cx";
 import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/plugins/local-channel-notes.cx";
+import plugin_catalog_map_scale_distance from "../../../../examples/cx/catalog/plugins/map-scale-distance.cx";
 import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/plugins/markdown-checklist.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_markdown_outline from "../../../../examples/cx/catalog/plugins/markdown-outline.cx";
@@ -393,6 +419,7 @@ import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_message_latency from "../../../../examples/cx/catalog/plugins/message-latency.cx";
 import plugin_catalog_message_notifier from "../../../../examples/cx/catalog/plugins/message-notifier.cx";
 import plugin_catalog_monospace_chat from "../../../../examples/cx/catalog/plugins/monospace-chat.cx";
+import plugin_catalog_month_calendar from "../../../../examples/cx/catalog/plugins/month-calendar.cx";
 import plugin_catalog_more_commands from "../../../../examples/cx/catalog/plugins/more-commands.cx";
 import plugin_catalog_more_jumbo_emoji from "../../../../examples/cx/catalog/plugins/more-jumbo-emoji.cx";
 import plugin_catalog_mute_in_app_message_sounds from "../../../../examples/cx/catalog/plugins/mute-in-app-message-sounds.cx";
@@ -425,30 +452,42 @@ import plugin_catalog_number_base_converter from "../../../../examples/cx/catalo
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
 import plugin_catalog_number_summary from "../../../../examples/cx/catalog/plugins/number-summary.cx";
 import plugin_catalog_opacity_contrast from "../../../../examples/cx/catalog/plugins/opacity-contrast.cx";
+import plugin_catalog_open_checklist_items from "../../../../examples/cx/catalog/plugins/open-checklist-items.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
 import plugin_catalog_ordered_line_diff from "../../../../examples/cx/catalog/plugins/ordered-line-diff.cx";
+import plugin_catalog_packing_capacity from "../../../../examples/cx/catalog/plugins/packing-capacity.cx";
+import plugin_catalog_page_range_count from "../../../../examples/cx/catalog/plugins/page-range-count.cx";
+import plugin_catalog_pair_lines from "../../../../examples/cx/catalog/plugins/pair-lines.cx";
 import plugin_catalog_pcm_audio_size from "../../../../examples/cx/catalog/plugins/pcm-audio-size.cx";
 import plugin_catalog_percentage_change from "../../../../examples/cx/catalog/plugins/percentage-change.cx";
+import plugin_catalog_percentage_points from "../../../../examples/cx/catalog/plugins/percentage-points.cx";
 import plugin_catalog_pick_names from "../../../../examples/cx/catalog/plugins/pick-names.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
 import plugin_catalog_plain_folder_icon from "../../../../examples/cx/catalog/plugins/plain-folder-icon.cx";
 import plugin_catalog_playback_duration from "../../../../examples/cx/catalog/plugins/playback-duration.cx";
+import plugin_catalog_playlist_duration from "../../../../examples/cx/catalog/plugins/playlist-duration.cx";
 import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugins/polish-wording.cx";
 import plugin_catalog_poll_draft from "../../../../examples/cx/catalog/plugins/poll-draft.cx";
+import plugin_catalog_prime_factors from "../../../../examples/cx/catalog/plugins/prime-factors.cx";
 import plugin_catalog_profile_media from "../../../../examples/cx/catalog/plugins/profile-media.cx";
 import plugin_catalog_quick_mention from "../../../../examples/cx/catalog/plugins/quick-mention.cx";
 import plugin_catalog_quote_draft from "../../../../examples/cx/catalog/plugins/quote-draft.cx";
 import plugin_catalog_quote_message from "../../../../examples/cx/catalog/plugins/quote-message.cx";
+import plugin_catalog_quote_with_attribution from "../../../../examples/cx/catalog/plugins/quote-with-attribution.cx";
 import plugin_catalog_read_all_notifications_button from "../../../../examples/cx/catalog/plugins/read-all-notifications-button.cx";
 import plugin_catalog_read_all_notifications from "../../../../examples/cx/catalog/plugins/read-all-notifications.cx";
 import plugin_catalog_readable_chat_timestamps from "../../../../examples/cx/catalog/plugins/readable-chat-timestamps.cx";
 import plugin_catalog_readable_ink from "../../../../examples/cx/catalog/plugins/readable-ink.cx";
 import plugin_catalog_readable_line_length from "../../../../examples/cx/catalog/plugins/readable-line-length.cx";
 import plugin_catalog_readable_spoilers from "../../../../examples/cx/catalog/plugins/readable-spoilers.cx";
+import plugin_catalog_reading_time from "../../../../examples/cx/catalog/plugins/reading-time.cx";
 import plugin_catalog_realtime_timestamps from "../../../../examples/cx/catalog/plugins/realtime-timestamps.cx";
+import plugin_catalog_recipe_scaler from "../../../../examples/cx/catalog/plugins/recipe-scaler.cx";
 import plugin_catalog_recurring_timestamps from "../../../../examples/cx/catalog/plugins/recurring-timestamps.cx";
 import plugin_catalog_redact_email_addresses from "../../../../examples/cx/catalog/plugins/redact-email-addresses.cx";
+import plugin_catalog_reduce_fraction from "../../../../examples/cx/catalog/plugins/reduce-fraction.cx";
 import plugin_catalog_relationship_notifier from "../../../../examples/cx/catalog/plugins/relationship-notifier.cx";
+import plugin_catalog_release_notes_outline from "../../../../examples/cx/catalog/plugins/release-notes-outline.cx";
 import plugin_catalog_remove_blank_lines from "../../../../examples/cx/catalog/plugins/remove-blank-lines.cx";
 import plugin_catalog_repeat_messages from "../../../../examples/cx/catalog/plugins/repeat-messages.cx";
 import plugin_catalog_reply_ping_control from "../../../../examples/cx/catalog/plugins/reply-ping-control.cx";
@@ -458,12 +497,15 @@ import plugin_catalog_reveal_all_spoilers from "../../../../examples/cx/catalog/
 import plugin_catalog_reverse_image_search from "../../../../examples/cx/catalog/plugins/reverse-image-search.cx";
 import plugin_catalog_reverse_line_order from "../../../../examples/cx/catalog/plugins/reverse-line-order.cx";
 import plugin_catalog_reverse_text from "../../../../examples/cx/catalog/plugins/reverse-text.cx";
+import plugin_catalog_roman_numerals from "../../../../examples/cx/catalog/plugins/roman-numerals.cx";
 import plugin_catalog_rot13_text from "../../../../examples/cx/catalog/plugins/rot13-text.cx";
+import plugin_catalog_round_robin_count from "../../../../examples/cx/catalog/plugins/round-robin-count.cx";
 import plugin_catalog_round_server_icons from "../../../../examples/cx/catalog/plugins/round-server-icons.cx";
 import plugin_catalog_rounded_avatars_square from "../../../../examples/cx/catalog/plugins/rounded-avatars-square.cx";
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
 import plugin_catalog_rounded_images from "../../../../examples/cx/catalog/plugins/rounded-images.cx";
 import plugin_catalog_running_pace from "../../../../examples/cx/catalog/plugins/running-pace.cx";
+import plugin_catalog_safe_area_inset from "../../../../examples/cx/catalog/plugins/safe-area-inset.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
 import plugin_catalog_screen_share_alert from "../../../../examples/cx/catalog/plugins/screen-share-alert.cx";
 import plugin_catalog_scroll_to_latest from "../../../../examples/cx/catalog/plugins/scroll-to-latest.cx";
@@ -489,6 +531,7 @@ import plugin_catalog_sort_lines from "../../../../examples/cx/catalog/plugins/s
 import plugin_catalog_sort_reactions from "../../../../examples/cx/catalog/plugins/sort-reactions.cx";
 import plugin_catalog_space_out from "../../../../examples/cx/catalog/plugins/space-out.cx";
 import plugin_catalog_spacious_messages from "../../../../examples/cx/catalog/plugins/spacious-messages.cx";
+import plugin_catalog_split_bill_evenly from "../../../../examples/cx/catalog/plugins/split-bill-evenly.cx";
 import plugin_catalog_split_large_messages from "../../../../examples/cx/catalog/plugins/split-large-messages.cx";
 import plugin_catalog_split_points from "../../../../examples/cx/catalog/plugins/split-points.cx";
 import plugin_catalog_spotify_share_commands from "../../../../examples/cx/catalog/plugins/spotify-share-commands.cx";
@@ -500,6 +543,8 @@ import plugin_catalog_stop_auto_unread from "../../../../examples/cx/catalog/plu
 import plugin_catalog_strip_url_tracking from "../../../../examples/cx/catalog/plugins/strip-url-tracking.cx";
 import plugin_catalog_surround_lines from "../../../../examples/cx/catalog/plugins/surround-lines.cx";
 import plugin_catalog_talk_in_reverse from "../../../../examples/cx/catalog/plugins/talk-in-reverse.cx";
+import plugin_catalog_team_rotation from "../../../../examples/cx/catalog/plugins/team-rotation.cx";
+import plugin_catalog_tempo_loop_length from "../../../../examples/cx/catalog/plugins/tempo-loop-length.cx";
 import plugin_catalog_terezi_typing_quirk from "../../../../examples/cx/catalog/plugins/terezi-typing-quirk.cx";
 import plugin_catalog_test_result_summary from "../../../../examples/cx/catalog/plugins/test-result-summary.cx";
 import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins/text-replace.cx";
@@ -518,11 +563,13 @@ import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/t
 import plugin_catalog_truncate_text from "../../../../examples/cx/catalog/plugins/truncate-text.cx";
 import plugin_catalog_tsv_to_csv from "../../../../examples/cx/catalog/plugins/tsv-to-csv.cx";
 import plugin_catalog_tsv_to_markdown from "../../../../examples/cx/catalog/plugins/tsv-to-markdown.cx";
+import plugin_catalog_typography_scale from "../../../../examples/cx/catalog/plugins/typography-scale.cx";
 import plugin_catalog_unicode_from_code_points from "../../../../examples/cx/catalog/plugins/unicode-from-code-points.cx";
 import plugin_catalog_unicode_inspector from "../../../../examples/cx/catalog/plugins/unicode-inspector.cx";
 import plugin_catalog_unindent from "../../../../examples/cx/catalog/plugins/unindent.cx";
 import plugin_catalog_unique_lines from "../../../../examples/cx/catalog/plugins/unique-lines.cx";
 import plugin_catalog_unit_converter from "../../../../examples/cx/catalog/plugins/unit-converter.cx";
+import plugin_catalog_unit_price_comparison from "../../../../examples/cx/catalog/plugins/unit-price-comparison.cx";
 import plugin_catalog_unix_date_converter from "../../../../examples/cx/catalog/plugins/unix-date-converter.cx";
 import plugin_catalog_unlocked_avatar_zoom from "../../../../examples/cx/catalog/plugins/unlocked-avatar-zoom.cx";
 import plugin_catalog_unsuppress_embeds from "../../../../examples/cx/catalog/plugins/unsuppress-embeds.cx";
@@ -545,6 +592,9 @@ import plugin_catalog_vote_tally from "../../../../examples/cx/catalog/plugins/v
 import plugin_catalog_vriska_s_typing_quirk from "../../../../examples/cx/catalog/plugins/vriska-s-typing-quirk.cx";
 import plugin_catalog_wait_for_slot from "../../../../examples/cx/catalog/plugins/wait-for-slot.cx";
 import plugin_catalog_webcam_start_notifier from "../../../../examples/cx/catalog/plugins/webcam-start-notifier.cx";
+import plugin_catalog_weekday_count from "../../../../examples/cx/catalog/plugins/weekday-count.cx";
+import plugin_catalog_weighted_average from "../../../../examples/cx/catalog/plugins/weighted-average.cx";
+import plugin_catalog_whitespace_report from "../../../../examples/cx/catalog/plugins/whitespace-report.cx";
 import plugin_catalog_wider_channel_list from "../../../../examples/cx/catalog/plugins/wider-channel-list.cx";
 import plugin_catalog_wider_chat from "../../../../examples/cx/catalog/plugins/wider-chat.cx";
 import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/wiki-lookup.cx";
@@ -666,14 +716,19 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CX Character Counter", source: plugin_base_character_counter, description: "/ccp-count · /ccp-inspect", commands: ["ccp-count","ccp-inspect"], categories: ["Commands"] },
         { name: "Agenda Draft", source: plugin_catalog_agenda_draft, description: "/agendadraft", commands: ["agendadraft"], categories: ["Commands"], appearanceRevision: "538a8a159652531cdd7ed4c506f14b2d2001eba8c665774323529ac2728aa328", privateCommands: true },
         { name: "AllCallTimeCounter", source: plugin_catalog_all_call_time_counter, description: "Show elapsed call time next to members in server voice channels", categories: ["Voice & calls"] },
+        { name: "Alt Text Draft", source: plugin_catalog_alt_text_draft, description: "/alttextdraft", commands: ["alttextdraft"], categories: ["Commands"], appearanceRevision: "b2bb0ed808c71a80754975bdc61c48cace2a844dcff0d56bc50ee800c17c8e3f", privateCommands: true },
         { name: "AlwaysAnimate", source: plugin_catalog_always_animate, description: "Animate avatars, banners, and server icons", categories: ["Appearance"], appearanceRevision: "6ca0d83b5f1187005ec249c75c2bb955b5ab0bfacb66607ab148b6648dd40139" },
         { name: "AmoledMode", source: plugin_catalog_amoled_mode, description: "use black backgrounds in dark mode", categories: ["Appearance"], appearanceRevision: "bf99224c4afbbf358e4d46d6c6ab292bbde63d4d7188452e02dde9fbab2ba125" },
         { name: "AnonymiseFileNames", source: plugin_catalog_anonymise_file_names, description: "Use random upload names by default", commands: ["spoiler"], categories: ["Commands","Media"] },
+        { name: "Arithmetic Sequence", source: plugin_catalog_arithmetic_sequence, description: "/arithmeticsequence", commands: ["arithmeticsequence"], categories: ["Commands"], appearanceRevision: "fa4da91dd2b07fdcef4e8d7eedb9a5d45cce8b0f93e517bd345aac0657c91395", privateCommands: true },
         { name: "Aspect Ratio", source: plugin_catalog_aspect_ratio, description: "/aspectratio", commands: ["aspectratio"], categories: ["Commands"], appearanceRevision: "560afc850e2072a68df61ff2034ecd32d40021d082549d99b45f1b5c324930fe", privateCommands: true },
         { name: "AtSomeone", source: plugin_catalog_at_someone, description: "/someone", commands: ["someone"], categories: ["Chat","Commands","Servers & channels"] },
+        { name: "Audio Pitch Ratio", source: plugin_catalog_audio_pitch_ratio, description: "/pitchratio", commands: ["pitchratio"], categories: ["Commands"], appearanceRevision: "cf5ea22edfe68b967f60293a188c23e299462cba7853e0dcbaff867132df2515", privateCommands: true },
+        { name: "Audio Sample Count", source: plugin_catalog_audio_sample_count, description: "/audiosamples", commands: ["audiosamples"], categories: ["Commands"], appearanceRevision: "98566f584c63aa95ce7203c01f2407e97b96a6413847c72ea8dbfb2577823925", privateCommands: true },
         { name: "AutoVaporwave", source: plugin_catalog_auto_vaporwave, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "AvatarGrabber", source: plugin_catalog_avatar_grabber, description: "/avatar", commands: ["avatar"], categories: ["Chat","Commands","Media","Profiles"] },
         { name: "Balanced Groups", source: plugin_catalog_balanced_groups, description: "/balancegroups", commands: ["balancegroups"], categories: ["Commands"], appearanceRevision: "9f44d571612fa60f9dfcfedb1cb7ec791b3c58422f07e9f2c7fa260477f74f6e", privateCommands: true },
+        { name: "Base Converter", source: plugin_catalog_base_converter, description: "/baseconvert", commands: ["baseconvert"], categories: ["Commands"], appearanceRevision: "a86bb46287cfaf9ccb697d27fc405323e720ade010c3ec4e55ffdac093544cd9", privateCommands: true },
         { name: "BetterChatNames", source: plugin_catalog_better_chat_names, description: "Format displayed server channel names as titles", categories: ["Appearance"], appearanceRevision: "435eb8c7dfa38e86a016810782e3bc2cd1879beedbd5095c9da1a6e56bbd4801" },
         { name: "BetterGifAltText", source: plugin_catalog_better_gif_alt_text, description: "Use meaningful filenames for GIFs with generic alt text", categories: ["Media"] },
         { name: "BetterPlusReacts", source: plugin_catalog_better_plus_reacts, description: "React to the matching previous message when you send a plus shortcut", categories: ["Chat"] },
@@ -682,6 +737,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "BiggerCodeBlocks", source: plugin_catalog_bigger_code_blocks, description: "increase code block text size", categories: ["Appearance"], appearanceRevision: "efb77c30e8dd184ced6e1426a7834003f56516d087dbec5e777d8e1b0b594b9b" },
         { name: "BiggerJumboEmojis", source: plugin_catalog_bigger_jumbo_emojis, description: "Makes emoji-only messages bigger", desktopOnly: true, categories: ["Appearance"] },
         { name: "BiggerServerIcons", source: plugin_catalog_bigger_server_icons, description: "make server icons larger", categories: ["Appearance"], appearanceRevision: "f8130f30395716696cf844097fad053f7be44394cbf888bc1188bdd1e30e2432" },
+        { name: "Bitmap Memory", source: plugin_catalog_bitmap_memory, description: "/bitmapmemory", commands: ["bitmapmemory"], categories: ["Commands"], appearanceRevision: "05b8e6431b3129e5c05b790b7fb6e8deb479a07d9f093f3d9b3ff1ad29c20649", privateCommands: true },
         { name: "Bitrate Budget", source: plugin_catalog_bitrate_budget, description: "/bitratebudget", commands: ["bitratebudget"], categories: ["Commands"], appearanceRevision: "cf5f3d94fccdfd64a7664b41ac357ffffde15dc078ead41cda06beb4eb01cbd0", privateCommands: true },
         { name: "BlockKeywords", source: plugin_catalog_block_keywords, description: "Edit the source to enter keywords", categories: ["Chat"] },
         { name: "BlurImagesUntilHover", source: plugin_catalog_blur_images_until_hover, description: "conceal chat images and videos until you hover or focus their controls", categories: ["Appearance"], appearanceRevision: "cc7408046bf4b402423ea2b0819358ff2ab9c3da9848a1e514985907aaca0598" },
@@ -692,6 +748,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "BypassPinPrompt", source: plugin_catalog_bypass_pin_prompt, description: "Use Discord’s Pin and Unpin actions without a confirmation prompt", categories: ["Chat"] },
         { name: "Calculator", source: plugin_catalog_calculator, description: "/calc", commands: ["calc"], categories: ["Chat","Commands"] },
         { name: "Calendar Day Difference", source: plugin_catalog_calendar_day_difference, description: "/calendardays", commands: ["calendardays"], categories: ["Commands"], appearanceRevision: "1d1617b39231f10b323258cd7c4f39b4cd228d360e1b93a8adb3f11a9aeba72a", privateCommands: true },
+        { name: "Calendar Quarter", source: plugin_catalog_calendar_quarter, description: "/calendarquarter", commands: ["calendarquarter"], categories: ["Commands"], appearanceRevision: "51e7105cde632148954c137bffae029b7a77b06b9eb2b213c7a248d89c8d4e22", privateCommands: true },
         { name: "CallTimeCounter", source: plugin_catalog_call_time_counter, description: "Show the elapsed time in your current call", categories: ["Voice & calls"] },
         { name: "CenteredChat", source: plugin_catalog_centered_chat, description: "center the message list on wide screens", categories: ["Appearance"], appearanceRevision: "b83a7ec1531049c64d41b5b2401a77ad421f81966abb0957703cbb3757b96d71" },
         { name: "ChatButtonsBegone", source: plugin_catalog_chat_buttons_begone, description: "Hide the listed interface elements on this device", keywords: "Hide the chat attachment button Hide the chat gift button Hide the GIF picker shortcut Hide the sticker picker shortcut Hide the composer expression picker shortcut Hide the chat apps button Hide the Shop entry Hide the threads shortcut in the channel header Hide avatar decorations Hide profile badge rows Hide profile effects", categories: ["Appearance","Profiles"], appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433" },
@@ -716,6 +773,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, description: "Makes the server list narrower", desktopOnly: true, categories: ["Appearance"] },
         { name: "Compare CSV Cells", source: plugin_catalog_compare_csv_cells, description: "/comparecsv", commands: ["comparecsv"], categories: ["Commands"], appearanceRevision: "01283845ff190f8429780e75501c85a7318bf5c5bdf2fdee25e35e2bff2f3c42", privateCommands: true },
         { name: "Compare Lines", source: plugin_catalog_compare_lines, description: "/comparelines", commands: ["comparelines"], categories: ["Commands"], appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20", privateCommands: true },
+        { name: "Compression Budget", source: plugin_catalog_compression_budget, description: "/compressionbudget", commands: ["compressionbudget"], categories: ["Commands"], appearanceRevision: "7929cb38329f8f1f16829748642f7f47e94ab91d0c4eb45fd67d0187e7944dea", privateCommands: true },
         { name: "CopyAccountCreationTimestamp", source: plugin_catalog_copy_account_creation_timestamp, description: "Copy Account Creation Timestamp", categories: ["Profiles"] },
         { name: "CopyAttachmentLinks", source: plugin_catalog_copy_attachment_links, description: "Copy links to files attached to the selected message", categories: ["Chat"] },
         { name: "CopyAttachmentNames", source: plugin_catalog_copy_attachment_names, description: "Copy the selected message’s attachment filenames", categories: ["Chat"] },
@@ -752,12 +810,17 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls, description: "Copy User URL", categories: ["Profiles"] },
         { name: "Count Lines", source: plugin_catalog_count_lines, description: "/countlines", commands: ["countlines"], categories: ["Commands"], appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18", privateCommands: true },
         { name: "Count Text Matches", source: plugin_catalog_count_text_matches, description: "/countmatches", commands: ["countmatches"], categories: ["Commands"], appearanceRevision: "c4ad9bf10c15aa9dd16232f23544b8ce36addec7aec9aff772c40ab43787dd67", privateCommands: true },
+        { name: "CSV Column Frequency", source: plugin_catalog_csv_column_frequency, description: "/csvcolumnfrequency", commands: ["csvcolumnfrequency"], categories: ["Commands"], appearanceRevision: "c27f3287e9f52371685be868c70ee452199cfde15c3266254adee23e64c7f6b4", privateCommands: true },
         { name: "CSV Column", source: plugin_catalog_csv_column, description: "/csvcolumn", commands: ["csvcolumn"], categories: ["Commands"], appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5", privateCommands: true },
+        { name: "CSV Row Filter", source: plugin_catalog_csv_row_filter, description: "/csvrowfilter", commands: ["csvrowfilter"], categories: ["Commands"], appearanceRevision: "f9963d7680c4364783bf134b2436efc4076542c8f3b1f285de94546daab498dd", privateCommands: true },
+        { name: "CSV Shape", source: plugin_catalog_csv_shape, description: "/csvshape", commands: ["csvshape"], categories: ["Commands"], appearanceRevision: "9326380cd4bd8b906ede27fb9076e19a15a6150386f9a809b7c6ee5a708a950c", privateCommands: true },
+        { name: "CSV to JSON", source: plugin_catalog_csv_to_json, description: "/csvtojson", commands: ["csvtojson"], categories: ["Commands"], appearanceRevision: "f1cdab86c46e9a8cba0371a99bf021d6972d7c10a866f6a77836263fc387c641", privateCommands: true },
         { name: "CSV to Markdown", source: plugin_catalog_csv_to_markdown, description: "/csvtomarkdown", commands: ["csvtomarkdown"], categories: ["Commands"], appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1", privateCommands: true },
         { name: "CSV to TSV", source: plugin_catalog_csv_to_tsv, description: "/csvtotsv", commands: ["csvtotsv"], categories: ["Commands"], appearanceRevision: "a2bb7ff2aaaf7cf411a5f76068115e98a6c209fe5dc0a58d8b1af87caf10f81c", privateCommands: true },
         { name: "Custom Emoji Markup", source: plugin_catalog_custom_emoji_markup, description: "/emojimarkup", commands: ["emojimarkup"], categories: ["Commands"], appearanceRevision: "7414afa57a6076f4838a837cece00a881b1713f9a88b7dc1d489370b13467cde", privateCommands: true },
         { name: "CustomTimestamps", source: plugin_catalog_custom_timestamps, description: "Format cozy timestamps as [calendar]", keywords: "Format compact timestamps as LT Format tooltip timestamps as LLLL • [relative] Format accessibility timestamps as [calendar] Format today timestamps as [Today at] HH:mm:ss Format yesterday timestamps as [Yesterday at] HH:mm:ss Format week timestamps as ddd DD.MM.YYYY HH:mm:ss Format older timestamps as ddd DD.MM.YYYY HH:mm:ss Format markdown timestamps as LLLL • [relative]", categories: ["Appearance"], appearanceRevision: "5f19c067a66226d3e35e1a88bbdffa11e01b993a315630ad0e5c9c18de0e803e" },
         { name: "Dashless", source: plugin_catalog_dashless, description: "Replace hyphens with spaces in text channel names", categories: ["Appearance"], appearanceRevision: "3dcfa0c1c2ed0d8eb1ff55d93a318a4a5143a75fba9e4dd60eb5416cb4ebcaa9" },
+        { name: "Date Day Label", source: plugin_catalog_date_day_label, description: "/datedaylabel", commands: ["datedaylabel"], categories: ["Commands"], appearanceRevision: "3c0e24b463492804464f98f1613389edd6ef4ce3476669522a8fa851c09a5baa", privateCommands: true },
         { name: "Date Offset", source: plugin_catalog_date_offset, description: "/dateoffset", commands: ["dateoffset"], categories: ["Commands"], appearanceRevision: "6bec04ebdb1f4e619904a7a1694448e4e464bb5c168d4514f4a38b83653c4006", privateCommands: true },
         { name: "Days Between", source: plugin_catalog_days_between, description: "/daysbetween", commands: ["daysbetween"], categories: ["Commands"], appearanceRevision: "ffb6315e5f4628232c4b4f4daa247d12b7ad705e609b6b5182b55ea130a3e11a", privateCommands: true },
         { name: "Decision Draft", source: plugin_catalog_decision_draft, description: "/decisiondraft", commands: ["decisiondraft"], categories: ["Commands"], appearanceRevision: "db15dcc5bb89217e4584363778b9b2da12bf2d2aa47cc824d3afd64e8c1f59a2", privateCommands: true },
@@ -771,6 +834,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Discord Countdown", source: plugin_catalog_discord_countdown, description: "/countdowntimestamp", commands: ["countdowntimestamp"], categories: ["Commands"], appearanceRevision: "b1e07b26d2e9aec1dd374fd4286111c1cc6cecfad5e417e8438bb3f7f7bce693", privateCommands: true },
         { name: "Discord Link Details", source: plugin_catalog_discord_link_details, description: "/discordlinkdetails", commands: ["discordlinkdetails"], categories: ["Commands"], appearanceRevision: "de375129c1a6f0c0167c450336a626633bfdb14cf549ace5186eceb16a2a65ab", privateCommands: true },
         { name: "Discord Timestamp", source: plugin_catalog_discord_timestamp, description: "/discordtimestamp · /discordlocaltimestamp", commands: ["discordtimestamp","discordlocaltimestamp"], categories: ["Commands"], appearanceRevision: "f8dd293b323bb4f78d2c219d370045e59f183dd39457c74b4cde7355a23467ab", privateCommands: true },
+        { name: "Display Pixel Density", source: plugin_catalog_display_pixel_density, description: "/displayppi", commands: ["displayppi"], categories: ["Commands"], appearanceRevision: "f1c1bb48efce453dff3ecf55a8964a3d4fc3d6a93b1303fb0afb4ec4259d062e", privateCommands: true },
         { name: "DontRoundMyTimestamps", source: plugin_catalog_dont_round_my_timestamps, description: "Round relative timestamps down", categories: ["Appearance"], appearanceRevision: "fb96d0a8d75d3d356b8fd7a704d9e33da540ec46dcf55ff268f2de79ae842880" },
         { name: "DoubleClickEdit", source: plugin_catalog_double_click_edit, description: "Open the editor for your own message on double-click or double-tap", categories: ["Chat"] },
         { name: "DoubleClickToReply", source: plugin_catalog_double_click_to_reply, description: "Open a reply to another user's message on double-click or double-tap", categories: ["Chat"] },
@@ -781,6 +845,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "Escape Regex", source: plugin_catalog_escape_regex, description: "/escaperegex", commands: ["escaperegex"], categories: ["Commands"], appearanceRevision: "39717d3c4cc4cc1ea826a8f705b930d7da3d660558a0cf6f14be118000576a29", privateCommands: true },
+        { name: "Event Overlap", source: plugin_catalog_event_overlap, description: "/eventoverlap", commands: ["eventoverlap"], categories: ["Commands"], appearanceRevision: "1c953cc8b0404cbc9f4a4748c3af4a0d1a0811dc82813905b1d668ca78ec2df2", privateCommands: true },
         { name: "Event Window", source: plugin_catalog_event_window, description: "/eventwindow", commands: ["eventwindow"], categories: ["Commands"], appearanceRevision: "2b493a66f732896ad09e295f4ebdcdd2cff9375cc7b045d97269f351d91b2f3e", privateCommands: true },
         { name: "Expand Tabs", source: plugin_catalog_expand_tabs, description: "/expandtabs", commands: ["expandtabs"], categories: ["Commands"], appearanceRevision: "f2195ebbbfc81dfe5d88192560bdbd24c1cc0975a591e7650a63ae6004b3f46b", privateCommands: true },
         { name: "Extract Line Range", source: plugin_catalog_extract_line_range, description: "/linerange", commands: ["linerange"], categories: ["Commands"], appearanceRevision: "bf377de933d188bafcc7f0ccd195aad3a03ed09d551e2a521c4b6ddf12b350bf", privateCommands: true },
@@ -808,6 +873,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Gamzee'sTypingQuirk", source: plugin_catalog_gamzee_s_typing_quirk, description: "Apply 1 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "GoogleThat", source: plugin_catalog_google_that, description: "/googlethat", commands: ["googlethat"], categories: ["Chat","Commands"] },
         { name: "GrayscaleImages", source: plugin_catalog_grayscale_images, description: "Shows images in grayscale until hovered", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Grid Cell Size", source: plugin_catalog_grid_cell_size, description: "/gridcellsize", commands: ["gridcellsize"], categories: ["Commands"], appearanceRevision: "0ba38c38428719dd43760d96c07ebcf533612d0814a467e5e8d4e1fc74449c45", privateCommands: true },
+        { name: "Hex Byte Format", source: plugin_catalog_hex_byte_format, description: "/hexbyteformat", commands: ["hexbyteformat"], categories: ["Commands"], appearanceRevision: "0e27ee1005e2ea23fa7ac641f3e0321c6b3b534cdbc05113f3421e605adb4d2d", privateCommands: true },
+        { name: "Hex Text Decode", source: plugin_catalog_hex_text_decode, description: "/hextext", commands: ["hextext"], categories: ["Commands"], appearanceRevision: "5384f1f17c906917047b86f3a7980f8df63ba3e13ba64f1ddef604ce677b7a7d", privateCommands: true },
         { name: "HideActiveChannelCards", source: plugin_catalog_hide_active_channel_cards, description: "Hide active text channel cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6764ad5a3e29345fe28106ff9d3d60ad23aaa67989756513ec1030e993be51ca" },
         { name: "HideActiveNow", source: plugin_catalog_hide_active_now, description: "Hide the active friends panel", categories: ["Appearance"], appearanceRevision: "3ea10b3241ba84c918d96f0c98c1b365c4e0f2c9a3014fa429ed7a3b2c5d4361" },
         { name: "HideActivityCards", source: plugin_catalog_hide_activity_cards, description: "Hide activity cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2630fad59e2644f36d80cec14c41c68a557f27b23d724ec9d258d380225d6cb7" },
@@ -1021,10 +1089,12 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HopOn", source: plugin_catalog_hop_on, description: "Edit the source to set the HTTPS destination", categories: ["Chat"] },
         { name: "HoverHighlightMessages", source: plugin_catalog_hover_highlight_messages, description: "Highlights the message under your cursor", desktopOnly: true, categories: ["Appearance"] },
         { name: "HSL Color Converter", source: plugin_catalog_hsl_color_converter, description: "/hsltohex", commands: ["hsltohex"], categories: ["Commands"], appearanceRevision: "824ea2d52eb31cc78fa7f8c0adf6709f71e12f0c529f7fbd60c9545fb18dc7de", privateCommands: true },
+        { name: "HTML Escape Draft", source: plugin_catalog_html_escape_draft, description: "/htmlescape", commands: ["htmlescape"], categories: ["Commands"], appearanceRevision: "9ed4320d3490a9e33786fe97094103fb7a2935e07afc5e83f05ddcb88e6fd7f5", privateCommands: true },
         { name: "HTML Escape", source: plugin_catalog_html_escape, description: "/escapehtml", commands: ["escapehtml"], categories: ["Commands"], appearanceRevision: "a0f96e9b36ee69cd2b9df93ed39f296b65e170ec028f879622b68e975365f233", privateCommands: true },
         { name: "IgnoreCalls", source: plugin_catalog_ignore_calls, description: "Edit the source to enter Discord IDs", categories: ["Voice & calls"] },
         { name: "ImageFilename", source: plugin_catalog_image_filename, description: "Show image filenames and GIF links", categories: ["Media"] },
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
+        { name: "Image Megapixels", source: plugin_catalog_image_megapixels, description: "/megapixels", commands: ["megapixels"], categories: ["Commands"], appearanceRevision: "659fdf0e697a7493a367ea98459b53cb071642fc13e502b17249426c2757a9cc", privateCommands: true },
         { name: "Image Pixel Count", source: plugin_catalog_image_pixel_count, description: "/pixelcount", commands: ["pixelcount"], categories: ["Commands"], appearanceRevision: "b7370fa1ee7f6e7422f8be5d8b9551705f5438c878d0fe239911bdfd3699ecae", privateCommands: true },
         { name: "Image Print Size", source: plugin_catalog_image_print_size, description: "/printsize", commands: ["printsize"], categories: ["Commands"], appearanceRevision: "a223ac136df378fba61cd2fd33ef04c30995c8918389861f81d84bd32a043343", privateCommands: true },
         { name: "Improve Contrast", source: plugin_catalog_improve_contrast, description: "/improvecontrast", commands: ["improvecontrast"], categories: ["Commands"], appearanceRevision: "a5f2ddbbf7bdc8258da75b5c2540054215e0528fcb069b39682fcc973c144776", privateCommands: true },
@@ -1032,21 +1102,27 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Indent Lines", source: plugin_catalog_indent_lines, description: "/indentlines", commands: ["indentlines"], categories: ["Commands"], appearanceRevision: "105e91032887863c35b9e5e1d74a847c62af5d275cceafa7e2d79320cd272d65", privateCommands: true },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Inspect Discord Timestamp", source: plugin_catalog_inspect_discord_timestamp, description: "/inspecttimestamp", commands: ["inspecttimestamp"], categories: ["Commands"], appearanceRevision: "6fc09a5a211f7e8a286f584370781b4ccac23476121968cdb3d91c2afa728f0c", privateCommands: true },
+        { name: "ISBN Check", source: plugin_catalog_isbn_check, description: "/isbncheck", commands: ["isbncheck"], categories: ["Commands"], appearanceRevision: "d8e4aa3354ed4cfcb1659e6d31a09cf58bcc603f599ae02b4255e8f424ae21de", privateCommands: true },
         { name: "ISO Week", source: plugin_catalog_iso_week, description: "/isoweek", commands: ["isoweek"], categories: ["Commands"], appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5", privateCommands: true },
         { name: "Join Lines", source: plugin_catalog_join_lines, description: "/joinlines", commands: ["joinlines"], categories: ["Commands"], appearanceRevision: "7fe09a418a6341397253829916ab3fc523ae42d483a0c37a00c032d48430f135", privateCommands: true },
+        { name: "JSON Array Filter", source: plugin_catalog_json_array_filter, description: "/jsonarrayfilter", commands: ["jsonarrayfilter"], categories: ["Commands"], appearanceRevision: "855d51bc34364a8e9ebc193dcad9626b0273472725cf6075ed97d1d55777339d", privateCommands: true },
         { name: "JSON Check", source: plugin_catalog_json_check, description: "/jsoncheck", commands: ["jsoncheck"], categories: ["Commands"], appearanceRevision: "375aa3dcc0cb897ab529c29c8d4c0c1ee0f8defd4c4a94f9c74552c3d8cef41f", privateCommands: true },
         { name: "JSON Compact", source: plugin_catalog_json_compact, description: "/compactjson", commands: ["compactjson"], categories: ["Commands"], appearanceRevision: "0b77f82f688780525ef236126510b12e1f4fc9c64fc30d6fc310ecaf72e6e6cb", privateCommands: true },
         { name: "JSON Format", source: plugin_catalog_json_format, description: "/formatjson", commands: ["formatjson"], categories: ["Commands"], appearanceRevision: "6cbb6fa93fe3ed2c6460acbf2fe3d8d95ce033161591e4ded1bf998e5144b15c", privateCommands: true },
         { name: "JSON Keys", source: plugin_catalog_json_keys, description: "/jsonkeys", commands: ["jsonkeys"], categories: ["Commands"], appearanceRevision: "780ef644254e15292dcdb73d4029c5549ed0404b948f3f81eecb7440fa19b44d", privateCommands: true },
         { name: "JSON Pointer", source: plugin_catalog_json_pointer, description: "/jsonpointer", commands: ["jsonpointer"], categories: ["Commands"], appearanceRevision: "cce9a34c37c39761ba736fcf2101312f25ca0cf5cdbf8a20a16f8db085f6d900", privateCommands: true },
+        { name: "JSON Value Shape", source: plugin_catalog_json_value_shape, description: "/jsonvalueshape", commands: ["jsonvalueshape"], categories: ["Commands"], appearanceRevision: "c13fec4573fdfec223f4c3523a89a14ebebf65349d94d3241c2e3a3a1c5210ed", privateCommands: true },
         { name: "JumpToTop", source: plugin_catalog_jump_to_top, description: "Add a channel header button to jump to the first message", categories: ["Servers & channels"] },
         { name: "JumpTo", source: plugin_catalog_jump_to, description: "Jump to the first or last message from channel and message menus", categories: ["Servers & channels"] },
         { name: "KeywordNotify", source: plugin_catalog_keyword_notify, description: "Edit the source to enter keywords", categories: ["Chat"] },
         { name: "LargerChatText", source: plugin_catalog_larger_chat_text, description: "Makes chat text larger", desktopOnly: true, categories: ["Appearance"] },
         { name: "LeetText", source: plugin_catalog_leet_text, description: "/leet", commands: ["leet"], categories: ["Chat","Commands"] },
+        { name: "Line Length Report", source: plugin_catalog_line_length_report, description: "/linelengths", commands: ["linelengths"], categories: ["Commands"], appearanceRevision: "985966d0ffaf46b547ffb9e100ec98e5d229a7eeca96a811d5d846f3f1b0c684", privateCommands: true },
         { name: "Lines to CSV", source: plugin_catalog_lines_to_csv, description: "/linestocsv", commands: ["linestocsv"], categories: ["Commands"], appearanceRevision: "3544e3d0cff90a35a71d6453fb16294daeff812e5daef57c7132b74666db017f", privateCommands: true },
+        { name: "Lines to Spoilers", source: plugin_catalog_lines_to_spoilers, description: "/spoilerlines", commands: ["spoilerlines"], categories: ["Commands"], appearanceRevision: "635fabbfdce045d1ca532ff5deb0eb2038595552c2ce91385186e6b93809b72f", privateCommands: true },
         { name: "LinkConverter", source: plugin_catalog_link_converter, description: "send · https://reddit.com → https://rxddit.com", keywords: "profile · https://reddit.com → https://rxddit.com send · https://www.reddit.com → https://rxddit.com profile · https://www.reddit.com → https://rxddit.com send · https://old.reddit.com → https://rxddit.com profile · https://old.reddit.com → https://rxddit.com send · https://x.com → https://fxtwitter.com profile · https://x.com → https://fxtwitter.com send · https://www.x.com → https://fxtwitter.com profile · https://www.x.com → https://fxtwitter.com send · https://instagram.com → https://vxinstagram.com profile · h", categories: ["Chat","Profiles"] },
         { name: "LocalChannelNotes", source: plugin_catalog_local_channel_notes, description: "Add a local note editor to channel menus", categories: ["Servers & channels"] },
+        { name: "Map Scale Distance", source: plugin_catalog_map_scale_distance, description: "/mapdistance", commands: ["mapdistance"], categories: ["Commands"], appearanceRevision: "24f6fe380ef56f4b4077a1c681d6445395173deaa122a68a2523fc5a2e78eac4", privateCommands: true },
         { name: "Markdown Checklist", source: plugin_catalog_markdown_checklist, description: "/markdownchecklist", commands: ["markdownchecklist"], categories: ["Commands"], appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261", privateCommands: true },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"], appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b", privateCommands: true },
         { name: "Markdown Outline", source: plugin_catalog_markdown_outline, description: "/markdownoutline", commands: ["markdownoutline"], categories: ["Commands"], appearanceRevision: "efbf7198f0c2ff46dd1f5fc1e30a0c5990c856fc821022f46c5855608811b28e", privateCommands: true },
@@ -1057,6 +1133,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "MessageLatency", source: plugin_catalog_message_latency, description: "Show an estimated send-delay indicator on messages", categories: ["Chat"] },
         { name: "MessageNotifier", source: plugin_catalog_message_notifier, description: "Edit the source to enter Discord IDs", categories: ["Chat"] },
         { name: "MonospaceChat", source: plugin_catalog_monospace_chat, description: "Shows chat text in a monospace font", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Month Calendar", source: plugin_catalog_month_calendar, description: "/monthcalendar", commands: ["monthcalendar"], categories: ["Commands"], appearanceRevision: "57ae876ca6f8e6840e9232092b6961e6555bf2e6c66d9b5684e549f4d4ff35b0", privateCommands: true },
         { name: "MoreCommands", source: plugin_catalog_more_commands, description: "/choose · /flipcoin · /rolldice", commands: ["choose","flipcoin","rolldice","randomnumber","wordcount","transform","ask","gettime","echo","lenny","mock","morse","dissatisfaction","smug","happy","crying","angry","anger","joy","blush","confused","sleeping","laughing","giving","peace","ending1","uwu","comfy","lovehappy","loveee","give","lovegive","music","stars","lovegiving"], categories: ["Chat","Commands"] },
         { name: "MoreJumboEmoji", source: plugin_catalog_more_jumbo_emoji, description: "Change how many emoji can appear at jumbo size in an emoji-only message (50)", categories: ["Appearance"], appearanceRevision: "57138d95b6782f1ed3d13194e9a974ac1eac4baf35b4ba6838615083a57173ad" },
         { name: "MuteInAppMessageSounds", source: plugin_catalog_mute_in_app_message_sounds, description: "Mute new-message sounds while Discord is open", mobileOnly: true, categories: ["Chat"] },
@@ -1089,30 +1166,42 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"], appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da", privateCommands: true },
         { name: "Number Summary", source: plugin_catalog_number_summary, description: "/numberstats", commands: ["numberstats"], categories: ["Commands"], appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb", privateCommands: true },
         { name: "Opacity Contrast", source: plugin_catalog_opacity_contrast, description: "/opacitycontrast", commands: ["opacitycontrast"], categories: ["Commands"], appearanceRevision: "c25ed9504fa3ab322289d6ea6bb3d13e1a66d385f72e4be47637e52367db43bc", privateCommands: true },
+        { name: "Open Checklist Items", source: plugin_catalog_open_checklist_items, description: "/openchecklist", commands: ["openchecklist"], categories: ["Commands"], appearanceRevision: "2e98774f3cdbe167036cfa98b80466f9f3fea9c2fe0344d1a9b8658a7348ab56", privateCommands: true },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
         { name: "Ordered Line Diff", source: plugin_catalog_ordered_line_diff, description: "/linediff", commands: ["linediff"], categories: ["Commands"], appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302", privateCommands: true },
+        { name: "Packing Capacity", source: plugin_catalog_packing_capacity, description: "/packingcapacity", commands: ["packingcapacity"], categories: ["Commands"], appearanceRevision: "fdbde452743a5c27233f3c8f8a445cd11a8865af18434871ae21a3a308c4abd8", privateCommands: true },
+        { name: "Page Range Count", source: plugin_catalog_page_range_count, description: "/pagerangecount", commands: ["pagerangecount"], categories: ["Commands"], appearanceRevision: "4f83ce973c55b353110e1ec7f1c7b87103a541920552cd24d0a168a202a81c6a", privateCommands: true },
+        { name: "Pair Lines", source: plugin_catalog_pair_lines, description: "/pairlines", commands: ["pairlines"], categories: ["Commands"], appearanceRevision: "40f28e15b209c77a8da7265ab50dbbdfde576b0f9010dcf486bc337e1a740c3d", privateCommands: true },
         { name: "PCM Audio Size", source: plugin_catalog_pcm_audio_size, description: "/pcmsize", commands: ["pcmsize"], categories: ["Commands"], appearanceRevision: "8f5b371208287d9131b6fb1ff3076a24c6173c17cc448232e63f1b22328ae4dc", privateCommands: true },
         { name: "Percentage Change", source: plugin_catalog_percentage_change, description: "/percentchange", commands: ["percentchange"], categories: ["Commands"], appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e", privateCommands: true },
+        { name: "Percentage Points", source: plugin_catalog_percentage_points, description: "/percentagepoints", commands: ["percentagepoints"], categories: ["Commands"], appearanceRevision: "de7fa51e6cd08ce265f204cbe1872757641f76d80490deff8a25c87743c58880", privateCommands: true },
         { name: "Pick Names", source: plugin_catalog_pick_names, description: "/picknames", commands: ["picknames"], categories: ["Commands"], appearanceRevision: "6bac0273d0f9dfd45078b339e3a8f38fd2295eed75074ed7cc6125f808925467", privateCommands: true },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },
         { name: "PlainFolderIcon", source: plugin_catalog_plain_folder_icon, description: "Replace the mini server icons in collapsed folders with a plain folder icon", desktopOnly: true, categories: ["Appearance"] },
         { name: "Playback Duration", source: plugin_catalog_playback_duration, description: "/playbacktime", commands: ["playbacktime"], categories: ["Commands"], appearanceRevision: "b31fafdd291c4499b847101f814e47849ba29e27f17e8bc10c95d9ab44bf8e1c", privateCommands: true },
+        { name: "Playlist Duration", source: plugin_catalog_playlist_duration, description: "/playlistduration", commands: ["playlistduration"], categories: ["Commands"], appearanceRevision: "938888c7440feeaa4c722e9cc01c9f4e035942d3739e92433fd20166221667d5", privateCommands: true },
         { name: "PolishWording", source: plugin_catalog_polish_wording, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Poll Draft", source: plugin_catalog_poll_draft, description: "/polldraft", commands: ["polldraft"], categories: ["Commands"], appearanceRevision: "e38274bea9f8c72f38a95b05ec57685bd1ef014a0388dca663e6694c6d1df879", privateCommands: true },
+        { name: "Prime Factors", source: plugin_catalog_prime_factors, description: "/primefactors", commands: ["primefactors"], categories: ["Commands"], appearanceRevision: "d101d2d5f87470318d9b14bb20d4a80c828ec24b89099e2b8f6e885f9c3b29fb", privateCommands: true },
         { name: "ProfileMedia", source: plugin_catalog_profile_media, description: "Add View and Download actions for Discord avatars and banners", categories: ["Media","Profiles"] },
         { name: "QuickMention", source: plugin_catalog_quick_mention, description: "Insert the selected message author's mention into the current draft", categories: ["Chat"] },
         { name: "Quote Draft", source: plugin_catalog_quote_draft, description: "/quotedraft", commands: ["quotedraft"], categories: ["Commands"], appearanceRevision: "073a4f0340adf8d6fc3400e0a73418fdc401ae35847002aa9c6a7b2dfc1a55e5", privateCommands: true },
         { name: "QuoteMessage", source: plugin_catalog_quote_message, description: "Add Quote and Copy as Quote actions to message menus", categories: ["Chat"] },
+        { name: "Quote with Attribution", source: plugin_catalog_quote_with_attribution, description: "/attributedquote", commands: ["attributedquote"], categories: ["Commands"], appearanceRevision: "2daac56fca237009adf6adeb4377edb3280158e997df29c251c5bc810a0a34c1", privateCommands: true },
         { name: "ReadAllNotificationsButton", source: plugin_catalog_read_all_notifications_button, description: "Add a server list button to mark loaded server channels as read", categories: ["Servers & channels"] },
         { name: "ReadAllNotifications", source: plugin_catalog_read_all_notifications, description: "/readall", commands: ["readall"], categories: ["Commands","Servers & channels"] },
         { name: "ReadableChatTimestamps", source: plugin_catalog_readable_chat_timestamps, description: "Make inline chat timestamps larger and easier to read", desktopOnly: true, categories: ["Appearance"] },
         { name: "Readable Ink", source: plugin_catalog_readable_ink, description: "/readableink", commands: ["readableink"], categories: ["Commands"], appearanceRevision: "7d9315a5485ec4dbace842a66d573b3c8412747a45aaa180050928cd234ee725", privateCommands: true },
         { name: "ReadableLineLength", source: plugin_catalog_readable_line_length, description: "limit the width of long message lines", categories: ["Appearance"], appearanceRevision: "e30b087d4786298624d546ab6a0b4832e6091f12cd6ff3ce0b48d5386144f214" },
         { name: "ReadableSpoilers", source: plugin_catalog_readable_spoilers, description: "outline concealed spoilers", categories: ["Appearance"], appearanceRevision: "47032e939cf4992d24d2cebdf4ffb7e2d8afe49fffa2dcba7d9a08921cf75853" },
+        { name: "Reading Time", source: plugin_catalog_reading_time, description: "/readingtime", commands: ["readingtime"], categories: ["Commands"], appearanceRevision: "fcd20f99564c039202a2eec246997f6293cbfae8942a83aa280f551a77f9026e", privateCommands: true },
         { name: "RealtimeTimestamps", source: plugin_catalog_realtime_timestamps, description: "Format cozy timestamps as HH:mm:ss", keywords: "Format compact timestamps as HH:mm:ss Format tooltip timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss Format markdown timestamps as dddd, MMMM D, YYYY [at] HH:mm:ss", categories: ["Appearance"], appearanceRevision: "f1714e6be55c954394bb91974ab838b366e4cc70f0428848bfcef46a51aca753" },
+        { name: "Recipe Scaler", source: plugin_catalog_recipe_scaler, description: "/recipescale", commands: ["recipescale"], categories: ["Commands"], appearanceRevision: "dd56ec5ed266d228b4f313efa1e9f46f6a8d8eb43913691e6fa66738d29989fd", privateCommands: true },
         { name: "Recurring Timestamps", source: plugin_catalog_recurring_timestamps, description: "/recurringtimes", commands: ["recurringtimes"], categories: ["Commands"], appearanceRevision: "7353b409e64afe4a5d08248433601634285b82a2f970e4d3a8073c8d5957dfe7", privateCommands: true },
         { name: "Redact Email Addresses", source: plugin_catalog_redact_email_addresses, description: "/redactemails", commands: ["redactemails"], categories: ["Commands"], appearanceRevision: "c13ff42634dcacc33789c26c2b0fd0ffb7abae5138adefcabb6fb35120239d6b", privateCommands: true },
+        { name: "Reduce Fraction", source: plugin_catalog_reduce_fraction, description: "/reducefraction", commands: ["reducefraction"], categories: ["Commands"], appearanceRevision: "839caef680eaa738fcc30c87a62387d477c9fb0a05ebcb00ab8b3091cac0c9d0", privateCommands: true },
         { name: "RelationshipNotifier", source: plugin_catalog_relationship_notifier, description: "Show a local notification when a friend removes you", categories: ["Profiles"] },
+        { name: "Release Notes Outline", source: plugin_catalog_release_notes_outline, description: "/releaseoutline", commands: ["releaseoutline"], categories: ["Commands"], appearanceRevision: "fb7857d2a5b2a275a0a4ec372da75709ebbce65688c00cd09e094df67c7cf572", privateCommands: true },
         { name: "Remove Blank Lines", source: plugin_catalog_remove_blank_lines, description: "/removeblanklines", commands: ["removeblanklines"], categories: ["Commands"], appearanceRevision: "fbdd3ecce06cfd9b56f5f8a3fc1164ddd43d97a98279f4c8edcb0af17a88b51d", privateCommands: true },
         { name: "RepeatMessages", source: plugin_catalog_repeat_messages, description: "Send the selected message again with its attachments and stickers", categories: ["Chat"] },
         { name: "ReplyPingControl", source: plugin_catalog_reply_ping_control, description: "Choose whether incoming replies ping you on this device", categories: ["Chat"] },
@@ -1122,12 +1211,15 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ReverseImageSearch", source: plugin_catalog_reverse_image_search, description: "Add a Search Image action with a choice of search engines", categories: ["Media"] },
         { name: "Reverse Line Order", source: plugin_catalog_reverse_line_order, description: "/reverselines", commands: ["reverselines"], categories: ["Commands"], appearanceRevision: "13108c795a0f1b9e7d63ac3d4245b666c3fe5395a601f48a8a0115e612b6f905", privateCommands: true },
         { name: "ReverseText", source: plugin_catalog_reverse_text, description: "/reverse", commands: ["reverse"], categories: ["Chat","Commands"] },
+        { name: "Roman Numerals", source: plugin_catalog_roman_numerals, description: "/romannumerals", commands: ["romannumerals"], categories: ["Commands"], appearanceRevision: "a4f08d71ba50414553e1c7b65b74049a1553e61ba6547d37c0495ff8bf379f31", privateCommands: true },
         { name: "ROT13 Text", source: plugin_catalog_rot13_text, description: "/rot13text", commands: ["rot13text"], categories: ["Commands"], appearanceRevision: "1a6cf1874ecf898df5517cccde97da90526624064f8515b8245c09926ff8f296", privateCommands: true },
+        { name: "Round Robin Count", source: plugin_catalog_round_robin_count, description: "/roundrobincount", commands: ["roundrobincount"], categories: ["Commands"], appearanceRevision: "24830953a4ef4d3d7935e8077c45b01c5cc031fd0a708f18d005dc6799d8ddb3", privateCommands: true },
         { name: "RoundServerIcons", source: plugin_catalog_round_server_icons, description: "round server icons", categories: ["Appearance"], appearanceRevision: "22777f8ac8216a937b033f1fdbf1c3d48c985ac2f75a6d1a6d5593ff180ff3fe" },
         { name: "RoundedAvatarsSquare", source: plugin_catalog_rounded_avatars_square, description: "give avatars softer square corners", desktopOnly: true, categories: ["Appearance"] },
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar, description: "round the chat bar", categories: ["Appearance"], appearanceRevision: "a1b819ce91635dd9353e95423d84f0334072934369d4d60635ba720593976761" },
         { name: "RoundedImages", source: plugin_catalog_rounded_images, description: "Rounder corners on images and videos in chat", desktopOnly: true, categories: ["Appearance"] },
         { name: "Running Pace", source: plugin_catalog_running_pace, description: "/runningpace", commands: ["runningpace"], categories: ["Commands"], appearanceRevision: "b794b4fdbe1057c769279550e44e090065bf29cafc0deb63f6751c33d2e0591c", privateCommands: true },
+        { name: "Safe Area Inset", source: plugin_catalog_safe_area_inset, description: "/safeareainset", commands: ["safeareainset"], categories: ["Commands"], appearanceRevision: "56cad9c71cfdc44c3e7872835fdbfa8e95fa5810627427794fc2b87080f7f7bf", privateCommands: true },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages, description: "/schedule", commands: ["schedule"], categories: ["Chat","Commands"] },
         { name: "ScreenShareAlert", source: plugin_catalog_screen_share_alert, description: "Show local alerts when someone starts sharing in your current voice call", categories: ["Voice & calls"] },
         { name: "ScrollToLatest", source: plugin_catalog_scroll_to_latest, description: "Open channels at the latest message and mark them read", categories: ["Servers & channels"] },
@@ -1153,6 +1245,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "SortReactions", source: plugin_catalog_sort_reactions, description: "Show the most-used reactions first under each message", categories: ["Appearance"], appearanceRevision: "b8d8985cd6abc4573eb4451047e4824fa844e2adc576e5a7e2427a0d2e506ff8" },
         { name: "SpaceOut", source: plugin_catalog_space_out, description: "/spaceout", commands: ["spaceout"], categories: ["Chat","Commands"] },
         { name: "SpaciousMessages", source: plugin_catalog_spacious_messages, description: "increase spacing between message groups", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Split Bill Evenly", source: plugin_catalog_split_bill_evenly, description: "/splitbill", commands: ["splitbill"], categories: ["Commands"], appearanceRevision: "ed4474280cde22f07cc8d14355aadfc9c6706c81fba5188e5ee982f56f25fc32", privateCommands: true },
         { name: "SplitLargeMessages", source: plugin_catalog_split_large_messages, description: "Split long drafts into at most eight messages when slowmode is off", categories: ["Chat"] },
         { name: "Split Points", source: plugin_catalog_split_points, description: "/splitpoints", commands: ["splitpoints"], categories: ["Commands"], appearanceRevision: "12cc96cd1648c8f74a39587d2ab67e9d9d3100dfab5a7ca413361b956836a774", privateCommands: true },
         { name: "SpotifyShareCommands", source: plugin_catalog_spotify_share_commands, description: "/track · /album · /artist", commands: ["track","album","artist"], categories: ["Chat","Commands","Media"] },
@@ -1164,6 +1257,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Strip URL Tracking", source: plugin_catalog_strip_url_tracking, description: "/striptracking", commands: ["striptracking"], categories: ["Commands"], appearanceRevision: "b12b0fa4c9ff014bf176c7aa74e147f2ce69e502361cb748cd9e74182a7d4f40", privateCommands: true },
         { name: "Surround Lines", source: plugin_catalog_surround_lines, description: "/surroundlines", commands: ["surroundlines"], categories: ["Commands"], appearanceRevision: "71e06ef1a3d96e5376cb5e6833af5b4a08b3f484cfcc746d3fe5933dfd42363d", privateCommands: true },
         { name: "TalkInReverse", source: plugin_catalog_talk_in_reverse, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
+        { name: "Team Rotation", source: plugin_catalog_team_rotation, description: "/teamrotation", commands: ["teamrotation"], categories: ["Commands"], appearanceRevision: "3b5fd019108f8051571ad7a83b2807a51819cad9eee39f45c8ea1e881ce96b3d", privateCommands: true },
+        { name: "Tempo Loop Length", source: plugin_catalog_tempo_loop_length, description: "/tempoloop", commands: ["tempoloop"], categories: ["Commands"], appearanceRevision: "fd77b878ef4203e7111a5ff0843ff1e8e7e0f01dde85984a3e380291087b0be0", privateCommands: true },
         { name: "TereziTypingQuirk", source: plugin_catalog_terezi_typing_quirk, description: "Apply 3 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "Test Result Summary", source: plugin_catalog_test_result_summary, description: "/testresultsummary", commands: ["testresultsummary"], categories: ["Commands"], appearanceRevision: "af2bfbac3d600fd166703c4a2c13b91075a9fb497c568c7d400048bcf1fe1f9a", privateCommands: true },
         { name: "TextReplace", source: plugin_catalog_text_replace, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
@@ -1182,11 +1277,13 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Truncate Text", source: plugin_catalog_truncate_text, description: "/truncatetext", commands: ["truncatetext"], categories: ["Commands"], appearanceRevision: "fb3353fcfa8814176a2068c522a13e2e7a73148ca0c9ee768e327770595abf43", privateCommands: true },
         { name: "TSV to CSV", source: plugin_catalog_tsv_to_csv, description: "/tsvtocsv", commands: ["tsvtocsv"], categories: ["Commands"], appearanceRevision: "fd03053374fa9b987c7037a3ef839d6b74524cb54d62b9cff8bc7a3c90a39def", privateCommands: true },
         { name: "TSV to Markdown", source: plugin_catalog_tsv_to_markdown, description: "/tsvtomarkdown", commands: ["tsvtomarkdown"], categories: ["Commands"], appearanceRevision: "05a390f2e23439ec365877f5f0fecb7bbefe77bac06bcc550bf7871ed214152a", privateCommands: true },
+        { name: "Typography Scale", source: plugin_catalog_typography_scale, description: "/typescale", commands: ["typescale"], categories: ["Commands"], appearanceRevision: "4ecca44f20e8e3095ea5f0a618c7f2d95870889a2289632e963c4617fdf12c17", privateCommands: true },
         { name: "Unicode From Code Points", source: plugin_catalog_unicode_from_code_points, description: "/unicodefrompoints", commands: ["unicodefrompoints"], categories: ["Commands"], appearanceRevision: "dd0e87b09b264ba6e9ab74eb257ec86da227e2578ffc5a85eac879a90a99515f", privateCommands: true },
         { name: "Unicode Inspector", source: plugin_catalog_unicode_inspector, description: "/unicodeinfo", commands: ["unicodeinfo"], categories: ["Commands"], appearanceRevision: "c03b9d01de319ccd4df28ea35a9dc3b1e6a4e11397d4392ad0268162f5d4fc0f", privateCommands: true },
         { name: "Unindent", source: plugin_catalog_unindent, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Unique Lines", source: plugin_catalog_unique_lines, description: "/uniquelines", commands: ["uniquelines"], categories: ["Commands"], appearanceRevision: "07d60765a5167987e470a46f82f49c116e8f1d54bb4c3b412ebe9f5444f80cf6", privateCommands: true },
         { name: "UnitConverter", source: plugin_catalog_unit_converter, description: "/convert", commands: ["convert"], categories: ["Chat","Commands"] },
+        { name: "Unit Price Comparison", source: plugin_catalog_unit_price_comparison, description: "/unitprice", commands: ["unitprice"], categories: ["Commands"], appearanceRevision: "93f9835058f6ce3a8831d1ea058d76e11b8e486e999040a1e190c2b8c4847fa6", privateCommands: true },
         { name: "Unix Date Converter", source: plugin_catalog_unix_date_converter, description: "/unixtoiso · /isotounix", commands: ["unixtoiso","isotounix"], categories: ["Commands"], appearanceRevision: "5a1b3879b131dee4257e757865253bd0129ac1bc72ab98bf5b301294336042f5", privateCommands: true },
         { name: "UnlockedAvatarZoom", source: plugin_catalog_unlocked_avatar_zoom, description: "Increase the zoom limit in Discord's avatar crop tool (4×)", desktopOnly: true, categories: ["Appearance"] },
         { name: "UnsuppressEmbeds", source: plugin_catalog_unsuppress_embeds, description: "Suppress or unsuppress embeds in the selected message", categories: ["Chat"] },
@@ -1209,6 +1306,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Vriska'sTypingQuirk", source: plugin_catalog_vriska_s_typing_quirk, description: "Apply 38 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "WaitForSlot", source: plugin_catalog_wait_for_slot, description: "Queue for a full voice channel and respond when a slot opens", categories: ["Voice & calls"] },
         { name: "WebcamStartNotifier", source: plugin_catalog_webcam_start_notifier, description: "Play different tones when someone turns their camera on or off", categories: ["Voice & calls"] },
+        { name: "Weekday Count", source: plugin_catalog_weekday_count, description: "/weekdaycount", commands: ["weekdaycount"], categories: ["Commands"], appearanceRevision: "5c87b6a22ec4da3b23a241b88771d67074316e2413234605fbede5d7b6ea3d10", privateCommands: true },
+        { name: "Weighted Average", source: plugin_catalog_weighted_average, description: "/weightedaverage", commands: ["weightedaverage"], categories: ["Commands"], appearanceRevision: "c66c97d0fb371bb9b17e6d37dd8206dad539278b2ed264477ba3f646dc12d74f", privateCommands: true },
+        { name: "Whitespace Report", source: plugin_catalog_whitespace_report, description: "/whitespacereport", commands: ["whitespacereport"], categories: ["Commands"], appearanceRevision: "c243bc446217a68d2fd1ef55399398e1032d4c3d1e7cbe114f973af79d9aa8ef", privateCommands: true },
         { name: "WiderChannelList", source: plugin_catalog_wider_channel_list, description: "make the channel list wider", categories: ["Appearance"], appearanceRevision: "fde7b45ab2285ac096cbcf3aca158b346ce52df7503790fcb09291ed9ee63fd2" },
         { name: "WiderChat", source: plugin_catalog_wider_chat, description: "Lets messages use the full width of the window", desktopOnly: true, categories: ["Appearance"] },
         { name: "WikiLookup", source: plugin_catalog_wiki_lookup, description: "/wiki", commands: ["wiki"], categories: ["Commands"] },

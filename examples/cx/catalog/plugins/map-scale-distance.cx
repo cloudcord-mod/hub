@@ -1,0 +1,7 @@
+plugin "Map Scale Distance":
+  needs commands.register
+  needs reply.local
+  on command "mapdistance":
+    input "centimeters" text
+    input "scale" text
+    reply "${mapScaleDistance(centimeters, scale)}" else "Enter centimeters on the map and the denominator of a 1:n scale."

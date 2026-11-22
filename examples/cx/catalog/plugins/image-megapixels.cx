@@ -1,0 +1,7 @@
+plugin "Image Megapixels":
+  needs commands.register
+  needs reply.local
+  on command "megapixels":
+    input "width" text
+    input "height" text
+    reply "${imageMegapixels(width, height)}" else "Enter positive integer pixel dimensions."

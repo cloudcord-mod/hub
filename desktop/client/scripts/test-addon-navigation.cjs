@@ -9,7 +9,7 @@ const layoutState = { showCloudCordSection: true, showSectionHeading: true, sett
 let assignedTester = false;
 const layoutContext = vm.createContext({ settings: { store: layoutState }, LayoutTypes: { SECTION: 1 }, isTruthy: Boolean,
     VencordTab: 'overview', BotCordTab: 'bot', FakeProfileTab: 'profile', AddonsTab: 'addons', CloudCordDiagnosticsTab: 'diagnostics',
-    TweaksTab: 'tweaks', PreviewsTab: 'previews', AccountToolsTab: 'tools', CloudSyncTab: 'sync', TestingPluginsTab: 'testing',
+    TweaksTab: 'tweaks', ToolsTab: 'tools', CloudSyncTab: 'sync', TestingPluginsTab: 'testing',
     currentAssignment: () => assignedTester, InfoIcon: 'icon', RobotIcon: 'icon', UserIcon: 'icon', PluginsIcon: 'icon',
     MainSettingsIcon: 'icon', PaintbrushIcon: 'icon', EyeIcon: 'icon', CloudIcon: 'icon' });
 vm.runInContext(esbuild.transformSync(`globalThis.builder = { ${layoutSource} };`, { loader: 'ts' }).code, layoutContext);
@@ -23,8 +23,8 @@ for (const enabled of [undefined, false, true, false]) {
     assert.equal(entries.some(node => node.key === 'cloudcord_diagnostics'), enabled === true);
     assert.ok(entries.some(node => node.key === 'cloudcord_cloud_sync' && node.Component === 'addons'));
     assert.ok(entries.some(node => node.key === 'cloudcord_tweaks' && node.Component === 'tweaks'));
-    assert.ok(entries.some(node => node.key === 'cloudcord_previews' && node.Component === 'previews'));
-    assert.ok(entries.some(node => node.key === 'cloudcord_account_tools' && node.Component === 'tools'));
+    assert.equal(entries.filter(node => node.key === 'cloudcord_tools' && node.Component === 'tools').length, 1);
+    assert.ok(!entries.some(node => ['cloudcord_previews', 'cloudcord_account_tools'].includes(node.key)));
     assert.equal(entries.some(node => node.key === 'cloudcord_sync'), enabled === true);
     assert.equal(entries.some(node => node.key === 'cloudcord_testing_plugins'), assignedTester);
 }
@@ -38,9 +38,15 @@ vm.runInContext(esbuild.transformSync(mobileSource, { loader: 'ts' }).code, mobi
 mobileContext.initSettings();
 const diagnosticRow = sections.find(section => section.name === 'CloudCord').items.find(row => row.key === 'CLOUDCORD_DIAGNOSTICS');
 const mobileRows = sections.find(section => section.name === 'CloudCord').items;
-for (const key of ['BUNNY_PLUGINS', 'CLOUDCORD_PREVIEWS', 'CLOUDCORD_ACCOUNT_TOOLS', 'STORE_CLOUD']) {
+for (const key of ['BUNNY_PLUGINS', 'CLOUDCORD_TOOLS', 'STORE_CLOUD']) {
     assert.equal(mobileRows.filter(row => row.key === key).length, 1);
 }
+const toolsRow = mobileRows.find(row => row.key === 'CLOUDCORD_TOOLS');
+assert.ok(!mobileRows.some(row => ['CLOUDCORD_PREVIEWS', 'CLOUDCORD_ACCOUNT_TOOLS'].includes(row.key)));
+mobileState.cloudcordHiddenTabs = ['CLOUDCORD_PREVIEWS'];
+assert.equal(toolsRow.usePredicate(), true);
+mobileState.cloudcordHiddenTabs.push('CLOUDCORD_ACCOUNT_TOOLS');
+assert.equal(toolsRow.usePredicate(), false);
 for (const enabled of [undefined, false, true, false]) {
     mobileState.cloudcordDiagnosticsEnabled = enabled;
     assert.equal(diagnosticRow.usePredicate(), enabled === true);

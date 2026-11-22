@@ -1,0 +1,7 @@
+plugin "Round Robin Count":
+  needs commands.register
+  needs reply.local
+  on command "roundrobincount":
+    input "teams" text
+    input "meetings" text
+    reply "${roundRobinCount(teams, meetings)}" else "Enter 2–1000 teams and 1–20 meetings per pairing."

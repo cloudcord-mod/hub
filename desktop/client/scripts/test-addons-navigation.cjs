@@ -71,8 +71,8 @@ const commonHooks = {
     useEffect() {}, useMemo: fn => fn(),
     useState(initial) {
         const index = cursor++;
-        if (!(index in states)) states[index] = initial;
-        return [states[index], value => { states[index] = value; }];
+        if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
+        return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
     },
 };
 const nativePlugins = {
@@ -154,7 +154,7 @@ const mobileMocks = {
     "@metro": { findByProps: () => ({ showSimpleActionSheet: args => { filterSheet = args; } }) },
     "@metro/common": { NavigationNative: { useNavigation: () => ({}) } },
     "@metro/common/components": {
-        FlashList: "FlashList", Text: "Text", Button: "Button", TableSwitchRow: "Switch", useSafeAreaInsets: () => ({ bottom: 0 }),
+        FlashList: "FlashList", Text: "Text", Button: "Button", IconButton: "IconButton", TableSwitchRow: "Switch", useSafeAreaInsets: () => ({ bottom: 0 }),
     },
     "@ui/components": { ErrorBoundary: "Boundary", Search: "Search" },
     "es-toolkit": { isNotNil: value => value != null },
@@ -172,6 +172,7 @@ const mobileList = () => {
     return walk(MobileAddonPage({
         CardComponent: "Card", title: "Plugins", items: mobileItems, searchKeywords: ["name"],
         getItemKey: row => row.name,
+        sortOptions: { "Name (A-Z)": (a, b) => a.name.localeCompare(b.name) },
         searchCommands: (rows, query) => rows.filter(row => "/" + row.name.toLowerCase() === query),
         filterOptions: { "Private commands": row => row.privateCommands, "Needs review": row => row.needsReview },
         defaultFilter: row => !row.alternate,
@@ -203,6 +204,18 @@ searchMobile("");
 assert.deepEqual(mobileRows(), ["Command"]);
 selectMobileFilter("Needs review");
 assert.deepEqual(mobileRows(), ["Changed"]);
+selectMobileFilter("All plugins");
+searchMobile("search");
+const sortButton = walk(mobileList().props.ListHeaderComponent).find(node => node.type === "IconButton");
+assert.ok(!sortButton.props.disabled, "sorting must remain available during search");
+sortButton.props.onPress();
+filterSheet.options.find(option => option.label === "Name (A-Z)").onPress();
+assert.deepEqual(mobileRows(), ["Changed", "Native"]);
+const sortedButton = walk(mobileList().props.ListHeaderComponent).find(node => node.type === "IconButton");
+assert.match(sortedButton.props.accessibilityLabel, /Name \(A-Z\)/);
+sortedButton.props.onPress();
+filterSheet.options.find(option => option.label === "Relevance").onPress();
+assert.deepEqual(mobileRows(), ["Native", "Changed"], "relevance restores default search order");
 mobileItems.length = 0;
 assert.deepEqual(mobileRows(), [], "an empty filter must leave the filter controls available");
 selectMobileFilter("All plugins");

@@ -1,0 +1,8 @@
+plugin "Base Converter":
+  needs commands.register
+  needs reply.local
+  on command "baseconvert":
+    input "value" text
+    input "from" text
+    input "to" text
+    reply "${baseConverter(value, from, to)}" else "Enter a number and bases between 2 and 36."

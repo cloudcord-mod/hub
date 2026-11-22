@@ -1,0 +1,7 @@
+plugin "Weekday Count":
+  needs commands.register
+  needs reply.local
+  on command "weekdaycount":
+    input "start" text
+    input "end" text
+    reply "${weekdayCount(start, end)}" else "Enter an ordered start and end date in YYYY-MM-DD format."

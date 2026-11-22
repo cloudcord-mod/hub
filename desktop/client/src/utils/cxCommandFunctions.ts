@@ -137,6 +137,12 @@ const decimalFileUnits = fileSizeUnits(1000, ["B", "kB", "MB", "GB", "TB", "PB"]
 const binaryFileUnits = fileSizeUnits(1024, ["B", "KiB", "MiB", "GiB", "TiB", "PiB"]);
 const displayNumber = (value: number) => String(Number(value.toPrecision(12)));
 
+function decimalNumber(text: string) {
+    if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(text)) return;
+    const value = Number(text);
+    return Number.isFinite(value) ? value : undefined;
+}
+
 function fileSizeBytes(text: string) {
     const match = /^(\d+(?:\.\d+)?)\s*(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)$/.exec(text.trim());
     if (!match) return;
@@ -505,14 +511,269 @@ export const cxCommandFunctions = {
         return output.length <= 3900 ? output : "The mention list is too long for one reply.";
     },
     percentChange(before: string, after: string) {
-        const values = [before.trim(), after.trim()];
-        if (values.some(value => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value))) return;
-        const [original, updated] = values.map(Number);
-        if (!Number.isFinite(original) || !Number.isFinite(updated)) return;
+        const original = decimalNumber(before.trim());
+        const updated = decimalNumber(after.trim());
+        if (original === undefined || updated === undefined) return;
         if (!original) return "Percentage change from zero is undefined.";
         const change = (updated - original) / Math.abs(original) * 100;
         if (!Number.isFinite(change)) return;
         return (change > 0 ? "+" : "") + displayNumber(change) + "%";
+    },
+    scaleRecipe(original: string, servings: string, ingredients: string) {
+        const from = decimalNumber(original.trim());
+        const to = decimalNumber(servings.trim());
+        if (from === undefined || to === undefined || from <= 0 || to <= 0) return;
+        const rows = ingredients.trim().split(/\r\n|\r|\n/);
+        if (rows.length > 40) return;
+        const scaled: string[] = [];
+        for (const row of rows) {
+            const [amountText, name, extra] = row.split("|").map(part => part.trim());
+            if (!amountText || !name || extra !== undefined) return;
+            const amount = decimalNumber(amountText);
+            if (amount === undefined || amount <= 0) return;
+            const quantity = amount * (to / from);
+            if (!Number.isFinite(quantity) || quantity <= 0) return;
+            scaled.push(displayNumber(quantity) + " " + name);
+        }
+        const result = scaled.join("\n").replace(/`(?=``)/g, "`\u200b");
+        return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Scaled ingredients are too long for one reply.";
+    },
+    displayPixelDensity(width: string, height: string, diagonal: string) {
+        const columns = integerText(width);
+        const rows = integerText(height);
+        const inches = decimalNumber(diagonal.trim());
+        if (columns === undefined || columns < 1 || rows === undefined || rows < 1 || inches === undefined || inches <= 0) return;
+        const density = Math.hypot(columns, rows) / inches;
+        if (Number.isFinite(density)) return displayNumber(density) + " pixels per inch";
+    },
+    splitBillEvenly(total: string, people: string) {
+        const amount = /^(\d{1,10})(?:\.(\d{1,2}))?$/.exec(total.trim());
+        const count = integerText(people);
+        if (!amount || count === undefined || count < 1 || count > 1000) return;
+        const cents = Number(amount[1]) * 100 + Number((amount[2] ?? "").padEnd(2, "0"));
+        const share = Math.floor(cents / count);
+        const remainder = cents % count;
+        const format = (value: number) => (value / 100).toFixed(2);
+        return remainder
+            ? `${remainder} pay ${format(share + 1)} each, ${count - remainder} pay ${format(share)} each.`
+            : `${format(share)} each for ${count} ${count === 1 ? "person" : "people"}.`;
+    },
+    whitespaceReport(text: string) {
+        if (!text) return;
+        const lines = text.split(/\r\n|\r|\n/);
+        const tabs = (text.match(/\t/g) ?? []).length;
+        const nonbreaking = (text.match(/\u00a0/g) ?? []).length;
+        const trailing = lines.filter(line => /[ \t]+$/.test(line)).length;
+        const empty = lines.filter(line => !line.trim()).length;
+        return `${lines.length} lines · ${empty} blank · ${trailing} with trailing spaces or tabs · ${tabs} tabs · ${nonbreaking} nonbreaking spaces`;
+    },
+    reduceFraction(numerator: string, denominator: string) {
+        const top = integerText(numerator), bottom = integerText(denominator);
+        if (top === undefined || bottom === undefined || !bottom) return;
+        let a = Math.abs(top), b = Math.abs(bottom);
+        while (b) [a, b] = [b, a % b];
+        const sign = bottom < 0 ? -1 : 1;
+        return `${sign * top / a}/${Math.abs(bottom) / a}`;
+    },
+    primeFactors(text: string) {
+        const value = integerText(text);
+        if (value === undefined || value < 2 || value > 1000000000) return;
+        const factors: number[] = [];
+        let remaining = value;
+        for (let divisor = 2; divisor * divisor <= remaining; divisor++) {
+            while (remaining % divisor === 0) {
+                factors.push(divisor);
+                remaining /= divisor;
+            }
+        }
+        if (remaining > 1) factors.push(remaining);
+        return `${value} = ${factors.join(" × ")}`;
+    },
+    baseConverter(input: string, from: string, to: string) {
+        const source = integerText(from), target = integerText(to);
+        if (source === undefined || source < 2 || source > 36 || target === undefined || target < 2 || target > 36) return;
+        const text = input.trim().toLowerCase();
+        if (!/^-?[0-9a-z]{1,96}$/.test(text)) return;
+        const negative = text.startsWith("-");
+        let value = 0n;
+        for (const digit of negative ? text.slice(1) : text) {
+            const index = "0123456789abcdefghijklmnopqrstuvwxyz".indexOf(digit);
+            if (index >= source) return;
+            value = value * BigInt(source) + BigInt(index);
+        }
+        return (negative ? -value : value).toString(target).toUpperCase();
+    },
+    audioPitchRatio(frequency: string, semitones: string) {
+        const hz = decimalNumber(frequency.trim()), shift = decimalNumber(semitones.trim());
+        if (hz === undefined || hz <= 0 || shift === undefined || Math.abs(shift) > 48) return;
+        const ratio = 2 ** (shift / 12), changed = hz * ratio;
+        if (Number.isFinite(changed) && changed > 0) return `${displayNumber(changed)} Hz · ratio ${displayNumber(ratio)}×`;
+    },
+    mapScaleDistance(centimeters: string, scale: string) {
+        const distance = decimalNumber(centimeters.trim()), denominator = integerText(scale);
+        if (distance === undefined || distance < 0 || denominator === undefined || denominator < 1) return;
+        const meters = distance * (denominator / 100);
+        if (Number.isFinite(meters)) return `${displayNumber(meters)} m · ${displayNumber(meters / 1000)} km`;
+    },
+    htmlEscapeDraft(text: string) {
+        if (!text) return;
+        return planningBlock(text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;").replaceAll("'", "&#39;"));
+    },
+    hexByteFormat(text: string, width: string) {
+        const columns = integerText(width), data = text.replace(/\s/g, "").toUpperCase();
+        if (columns === undefined || columns < 1 || columns > 32 || !/^(?:[0-9A-F]{2}){1,1024}$/.test(data)) return;
+        const bytes = data.match(/../g)!;
+        const rows: string[] = [];
+        for (let i = 0; i < bytes.length; i += columns) {
+            rows.push(i.toString(16).toUpperCase().padStart(4, "0") + "  " + bytes.slice(i, i + columns).join(" "));
+        }
+        return planningBlock(rows.join("\n"));
+    },
+    dateDayLabel(text: string) {
+        const instant = utcMidnight(text);
+        if (instant === undefined) return;
+        const date = new Date(instant);
+        const names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        return names[date.getUTCDay()] + " · " + date.toISOString().slice(0, 10);
+    },
+    percentagePoints(before: string, after: string) {
+        const from = decimalNumber(before.trim().replace(/%$/, "")), to = decimalNumber(after.trim().replace(/%$/, ""));
+        if (from === undefined || to === undefined || from < 0 || from > 100 || to < 0 || to > 100) return;
+        const delta = to - from;
+        return `${delta > 0 ? "+" : ""}${displayNumber(delta)} percentage points`;
+    },
+    monthCalendar(text: string) {
+        const month = text.trim();
+        if (!/^\d{4}-(?:0[1-9]|1[0-2])$/.test(month)) return;
+        const first = new Date(month + "-01T00:00:00Z");
+        const next = new Date(first);
+        next.setUTCMonth(next.getUTCMonth() + 1);
+        const days = (next.getTime() - first.getTime()) / dayMilliseconds;
+        const offset = (first.getUTCDay() + 6) % 7;
+        const lines = [month, "Mo Tu We Th Fr Sa Su"];
+        for (let index = -offset; index < days; index += 7) {
+            lines.push(Array.from({ length: 7 }, (_, day) => {
+                const value = index + day + 1;
+                return value > 0 && value <= days ? String(value).padStart(2, " ") : "  ";
+            }).join(" ").trimEnd());
+        }
+        return planningBlock(lines.join("\n"));
+    },
+    pageRangeCount(text: string) {
+        const parts = text.trim().split(/[,\s]+/);
+        if (parts.length > 128) return;
+        const ranges: { start: number; end: number; }[] = [];
+        for (const part of parts) {
+            const match = /^(\d{1,6})(?:-(\d{1,6}))?$/.exec(part);
+            if (!match) return;
+            const start = Number(match[1]), end = Number(match[2] ?? match[1]);
+            if (!start || end < start) return;
+            ranges.push({ start, end });
+        }
+        ranges.sort((a, b) => a.start - b.start);
+        let count = 0, last = 0;
+        for (const { start, end } of ranges) {
+            count += Math.max(0, end - Math.max(start - 1, last));
+            last = Math.max(last, end);
+        }
+        return count + (count === 1 ? " distinct page" : " distinct pages");
+    },
+    bitmapMemory(width: string, height: string, channels: string) {
+        const columns = integerText(width), rows = integerText(height), channelCount = integerText(channels);
+        if (columns === undefined || columns < 1 || rows === undefined || rows < 1
+            || channelCount === undefined || channelCount < 1 || channelCount > 4) return;
+        const bytes = columns * rows * channelCount;
+        if (Number.isSafeInteger(bytes)) return `${bytes} bytes · ${displayNumber(bytes / 1048576)} MiB uncompressed`;
+    },
+    typographyScale(base: string, ratio: string, steps: string) {
+        const size = decimalNumber(base.trim()), multiplier = decimalNumber(ratio.trim()), count = integerText(steps);
+        if (size === undefined || size <= 0 || size > 1000 || multiplier === undefined || multiplier < 1
+            || multiplier > 3 || count === undefined || count < 1 || count > 12) return;
+        return Array.from({ length: count }, (_, index) => Number((size * multiplier ** index).toFixed(2)) + " px").join(" · ");
+    },
+    safeAreaInset(width: string, height: string, inset: string) {
+        const columns = integerText(width), rows = integerText(height), margin = integerText(inset);
+        if (columns === undefined || rows === undefined || margin === undefined || margin < 0
+            || columns <= 2 * margin || rows <= 2 * margin) return;
+        return `${columns - margin * 2} × ${rows - margin * 2} px usable · begins at (${margin}, ${margin})`;
+    },
+    teamRotation(names: string, shift: string) {
+        const roster = planningRows(names), amount = integerText(shift);
+        if (roster.length < 2 || roster.length > 80 || amount === undefined) return;
+        const offset = (amount % roster.length + roster.length) % roster.length;
+        const ordered = [...roster.slice(offset), ...roster.slice(0, offset)];
+        return planningBlock(ordered.map((name, index) => `${index + 1}. ${name}`).join("\n"));
+    },
+    jsonArrayFilter(json: string, key: string, filter: string) {
+        try {
+            const rows: unknown = JSON.parse(json);
+            const value: unknown = JSON.parse(filter);
+            if (!Array.isArray(rows) || !key || (value !== null && typeof value === "object")) return;
+            const matches = rows.filter(row => row !== null && typeof row === "object" && !Array.isArray(row)
+                && Object.prototype.hasOwnProperty.call(row, key) && row[key] === value);
+            return planningBlock(JSON.stringify(matches, null, 2));
+        } catch { return; }
+    },
+    csvToJson(text: string) {
+        const [header, ...rows] = csvRows(text);
+        if (!header || header.some(key => !key.trim()) || new Set(header).size !== header.length
+            || rows.some(row => row.length !== header.length)) return;
+        return planningBlock(JSON.stringify(rows.map(row => Object.fromEntries(header.map((key, i) => [key, row[i]]))), null, 2));
+    },
+    calendarQuarter(text: string) {
+        const instant = utcMidnight(text);
+        if (instant === undefined) return;
+        const date = new Date(instant);
+        const year = date.toISOString().slice(0, 4);
+        const quarter = Math.floor(date.getUTCMonth() / 3);
+        const start = String(quarter * 3 + 1).padStart(2, "0") + "-01";
+        const end = ["03-31", "06-30", "09-30", "12-31"][quarter];
+        return `Q${quarter + 1} ${year} · ${year}-${start} to ${year}-${end}`;
+    },
+    weightedAverage(text: string) {
+        const rows = text.trim().split(/\r\n|\r|\n/);
+        if (rows.length > 128) return;
+        let weightedTotal = 0;
+        let totalWeight = 0;
+        for (const row of rows) {
+            const [valueText, weightText, extra] = row.split("|").map(part => part.trim());
+            if (!valueText || !weightText || extra !== undefined) return;
+            const value = decimalNumber(valueText);
+            const weight = decimalNumber(weightText);
+            if (value === undefined || weight === undefined || weight < 0) return;
+            weightedTotal += value * weight;
+            totalWeight += weight;
+        }
+        if (totalWeight <= 0 || !Number.isFinite(totalWeight) || !Number.isFinite(weightedTotal)) return;
+        const average = weightedTotal / totalWeight;
+        if (Number.isFinite(average)) return "Weighted average: " + displayNumber(average);
+    },
+    unitPriceComparison(first: string, second: string) {
+        const unitPrice = (offer: string) => {
+            const [priceText, quantityText, extra] = offer.split("/").map(part => part.trim());
+            if (!priceText || !quantityText || extra !== undefined) return;
+            const price = decimalNumber(priceText);
+            const quantity = decimalNumber(quantityText);
+            if (price === undefined || price < 0 || quantity === undefined || quantity <= 0) return;
+            const rate = price / quantity;
+            return Number.isFinite(rate) ? rate : undefined;
+        };
+        const a = unitPrice(first);
+        const b = unitPrice(second);
+        if (a === undefined || b === undefined) return;
+        const firstPrice = displayNumber(a);
+        const secondPrice = displayNumber(b);
+        const verdict = firstPrice === secondPrice ? "Same price per unit" : a < b ? "First offer is cheaper" : "Second offer is cheaper";
+        return firstPrice + " vs " + secondPrice + " per unit. " + verdict + ".";
+    },
+    pairLines(labels: string, values: string) {
+        const lines = (text: string) => text.trim().split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);
+        const left = lines(labels);
+        const right = lines(values);
+        if (!left.length || left.length !== right.length) return;
+        const result = left.map((label, index) => label + ": " + right[index]).join("\n").replace(/`(?=``)/g, "`\u200b");
+        return result.length <= 3900 ? codeFence + "\n" + result + "\n" + codeFence : "Paired lines are too long for one reply.";
     },
     commonLines(first: string, second: string) {
         const otherLines = new Set(second.split(/\r\n|\r|\n/));
@@ -669,6 +930,44 @@ export const cxCommandFunctions = {
             return Math.round(255 * value).toString(16).padStart(2, "0");
         };
         return "`#" + [0, 8, 4].map(component).join("") + "`";
+    },
+    weekdayCount(start: string, end: string) {
+        const first = utcMidnight(start), last = utcMidnight(end);
+        if (first === undefined || last === undefined || last < first) return;
+        const days = (last - first) / dayMilliseconds + 1;
+        let weekdays = Math.floor(days / 7) * 5;
+        const weekday = new Date(first).getUTCDay();
+        for (let offset = 0; offset < days % 7; offset++) {
+            const day = (weekday + offset) % 7;
+            if (day > 0 && day < 6) weekdays++;
+        }
+        return `${weekdays} weekdays · ${days - weekdays} weekend days (inclusive)`;
+    },
+    eventOverlap(first: string, second: string) {
+        const parseRange = (text: string) => {
+            const parts = text.split("|").map(part => part.trim());
+            if (parts.length !== 2) return;
+            const start = isoUnixMilliseconds(parts[0]), end = isoUnixMilliseconds(parts[1]);
+            if (start !== undefined && end !== undefined && end > start) return { start, end };
+        };
+        const left = parseRange(first), right = parseRange(second);
+        if (!left || !right) return;
+        const start = Math.max(left.start, right.start), end = Math.min(left.end, right.end);
+        if (end <= start) return "The events do not overlap.";
+        const seconds = (end - start) / 1000;
+        const duration = Number.isInteger(seconds) ? readableDuration(seconds) : displayNumber(seconds) + "s";
+        return `Overlap: ${duration} · <t:${Math.floor(start / 1000)}:F> to <t:${Math.floor(end / 1000)}:F>`;
+    },
+    roundRobinCount(teams: string, meetings: string) {
+        const count = integerText(teams), rounds = integerText(meetings);
+        if (count === undefined || count < 2 || count > 1000 || rounds === undefined || rounds < 1 || rounds > 20) return;
+        return `${count * (count - 1) / 2 * rounds} total matches · ${(count - 1) * rounds} per team`;
+    },
+    packingCapacity(items: string, capacity: string) {
+        const count = integerText(items), perContainer = integerText(capacity);
+        if (count === undefined || count < 0 || perContainer === undefined || perContainer < 1) return;
+        const full = Math.floor(count / perContainer), remaining = count % perContainer;
+        return `${full + (remaining ? 1 : 0)} containers · ${full} full · ${remaining} remaining items`;
     },
     daysBetween(start: string, end: string) {
         const first = utcMidnight(start), last = utcMidnight(end);
@@ -1038,6 +1337,41 @@ export const cxCommandFunctions = {
         const count = columns * rows;
         return count + " pixels · " + count / 1_000_000 + " MP";
     },
+    tempoLoopLength(bpm: string, bars: string, beats: string) {
+        const tempo = decimalNumber(bpm.trim()), measureCount = integerText(bars), beatsPerMeasure = integerText(beats);
+        if (tempo === undefined || tempo < 20 || tempo > 400 || measureCount === undefined
+            || measureCount < 1 || measureCount > 10000 || beatsPerMeasure === undefined || beatsPerMeasure < 1 || beatsPerMeasure > 32) return;
+        const totalBeats = measureCount * beatsPerMeasure;
+        return `${totalBeats} beats · ${displayNumber(totalBeats * 60 / tempo)} seconds`;
+    },
+    imageMegapixels(width: string, height: string) {
+        const columns = integerText(width), rows = integerText(height);
+        if (columns === undefined || rows === undefined || columns < 1 || rows < 1) return;
+        const pixels = columns * rows;
+        if (Number.isSafeInteger(pixels)) return `${pixels} pixels · ${displayNumber(pixels / 1000000)} MP`;
+    },
+    compressionBudget(original: string, target: string) {
+        const size = fileSizeBytes(original), limit = fileSizeBytes(target);
+        if (size === undefined || limit === undefined || limit <= 0 || limit >= size) return;
+        return `Remove ${size - limit} bytes (${displayNumber((size - limit) * 100 / size)}%) · keep at most ${displayNumber(limit * 100 / size)}%`;
+    },
+    audioSampleCount(rate: string, duration: string) {
+        const sampleRate = integerText(rate), seconds = durationSeconds(duration);
+        if (sampleRate === undefined || sampleRate < 1 || sampleRate > 768000 || !seconds) return;
+        const samples = sampleRate * seconds;
+        if (Number.isSafeInteger(samples)) return samples + " samples per channel";
+    },
+    playlistDuration(text: string) {
+        const tracks = planningRows(text);
+        if (!tracks.length || tracks.length > 200) return;
+        let total = 0;
+        for (const track of tracks) {
+            const match = /^(?:(\d{1,4}):)?(\d{1,4}):([0-5]\d)$/.exec(track);
+            if (!match || (match[1] && !/^[0-5]\d$/.test(match[2]))) return;
+            total += Number(match[1] ?? 0) * 3600 + Number(match[2]) * 60 + Number(match[3]);
+        }
+        return tracks.length + (tracks.length === 1 ? " track · " : " tracks · ") + readableDuration(total);
+    },
     pcmAudioSize(rate: string, bits: string, channels: string, duration: string) {
         const sampleRate = integerText(rate), bitDepth = integerText(bits), channelCount = integerText(channels);
         const seconds = durationSeconds(duration);
@@ -1172,6 +1506,126 @@ export const cxCommandFunctions = {
             rows.map(row => '"' + row[column].replaceAll('"', '""') + '"').join(","));
         return planningBlock(transposed.join("\n"));
     },
+    csvShape(text: string) {
+        const rows = csvRows(text);
+        if (!rows.length) return;
+        const expected = rows[0].length;
+        const mismatched = rows.flatMap((row, index) => row.length === expected ? [] : [index + 1]);
+        return `${rows.length} rows · ${expected} columns in the first row`
+            + (mismatched.length ? ` · Different width in ${mismatched.length} rows (first: ${mismatched[0]})` : " · All rows have the same width");
+    },
+    jsonValueShape(text: string) {
+        try {
+            const value: unknown = JSON.parse(text);
+            const kind = (item: unknown) => item === null ? "null" : Array.isArray(item) ? "array" : typeof item;
+            const type = kind(value);
+            if (Array.isArray(value)) return `Array · ${value.length} entries · ${[...new Set(value.map(kind))].join(", ") || "empty"}`;
+            if (value !== null && typeof value === "object") return `Object · ${Object.keys(value).length} top-level keys`;
+            return "JSON type: " + type;
+        } catch { return; }
+    },
+    lineLengthReport(text: string, limit: string) {
+        const maximum = integerText(limit);
+        if (!text.trim() || maximum === undefined || maximum < 1 || maximum > 4000) return;
+        const lines = text.split(/\r\n|\r|\n/);
+        const over = lines.flatMap((line, index) => {
+            const length = Array.from(line).length;
+            return length > maximum ? [`Line ${index + 1}: ${length}`] : [];
+        });
+        return over.length
+            ? `${over.length} lines exceed ${maximum} characters\n${over.slice(0, 20).join("\n")}`
+            : `All ${lines.length} lines fit within ${maximum} characters.`;
+    },
+    romanNumerals(text: string) {
+        const symbols = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+            [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]] as const;
+        const format = (value: number) => {
+            let output = "";
+            for (const [amount, symbol] of symbols) {
+                const count = Math.floor(value / amount);
+                output += symbol.repeat(count);
+                value %= amount;
+            }
+            return output;
+        };
+        const integer = integerText(text);
+        if (integer !== undefined) return integer >= 1 && integer <= 3999 ? format(integer) : undefined;
+        const roman = text.trim().toUpperCase();
+        if (!/^[MDCLXVI]{1,15}$/.test(roman)) return;
+        let value = 0, position = 0;
+        for (const [amount, symbol] of symbols) {
+            while (roman.startsWith(symbol, position)) {
+                value += amount;
+                position += symbol.length;
+            }
+        }
+        if (position === roman.length && value <= 3999 && format(value) === roman) return String(value);
+    },
+    hexTextDecode(text: string) {
+        const hex = text.replace(/\s/g, "");
+        if (!/^(?:[0-9a-f]{2}){1,1900}$/i.test(hex)) return;
+        try {
+            const decoded = decodeURIComponent(hex.replace(/../g, "%$&"));
+            return planningBlock(decoded.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, char =>
+                "\\x" + char.charCodeAt(0).toString(16).padStart(2, "0")));
+        } catch { return; }
+    },
+    gridCellSize(width: string, columns: string, gap: string) {
+        const canvas = decimalNumber(width.trim()), count = integerText(columns), spacing = decimalNumber(gap.trim());
+        if (canvas === undefined || canvas <= 0 || count === undefined || count < 1 || count > 1000 || spacing === undefined || spacing < 0) return;
+        const available = canvas - (count - 1) * spacing;
+        if (available <= 0 || !Number.isFinite(available)) return;
+        return `${displayNumber(available / count)} px per column · ${displayNumber(available)} px usable width`;
+    },
+    arithmeticSequence(start: string, step: string, count: string) {
+        const first = decimalNumber(start.trim()), delta = decimalNumber(step.trim()), length = integerText(count);
+        if (first === undefined || delta === undefined || length === undefined || length < 1 || length > 50) return;
+        const values = Array.from({ length }, (_, index) => first + index * delta);
+        if (values.every(Number.isFinite)) return values.map(displayNumber).join(", ");
+    },
+    csvRowFilter(input: string, column: string, value: string) {
+        const position = integerText(column);
+        if (position === undefined || position < 1 || position > 64) return;
+        const [header, ...rows] = csvRows(input);
+        if (!header || header[position - 1] === undefined || rows.some(row => row.length !== header.length)) return;
+        const matches = rows.filter(row => row[position - 1] === value);
+        if (!matches.length) return "No matching rows.";
+        return planningBlock([header, ...matches].map(row => row.map(cell => '"' + cell.replaceAll('"', '""') + '"').join(",")).join("\n"));
+    },
+    csvColumnFrequency(input: string, column: string) {
+        const position = integerText(column);
+        if (position === undefined || position < 1 || position > 64 || input.length > 12000) return;
+        const [header, ...rows] = csvRows(input);
+        if (!header || !rows.length || rows.length > 150 || header[position - 1] === undefined
+            || rows.some(row => row.length !== header.length)) return;
+        const counts = new Map<string, number>();
+        for (const row of rows) {
+            const value = row[position - 1];
+            counts.set(value, (counts.get(value) ?? 0) + 1);
+        }
+        const top = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 20);
+        return planningBlock(top.map(([value, count]) => count + " × " + JSON.stringify(value)).join("\n"));
+    },
+    checkIsbn(text: string) {
+        const isbn = text.toUpperCase().replace(/[\s-]/g, "");
+        if (/^\d{9}[\dX]$/.test(isbn)) {
+            const sum = Array.from(isbn, (digit, index) => (digit === "X" ? 10 : Number(digit)) * (10 - index))
+                .reduce((total, value) => total + value, 0);
+            return sum % 11 === 0 ? "Valid ISBN-10 checksum." : "Invalid ISBN-10 checksum.";
+        }
+        if (/^97[89]\d{10}$/.test(isbn)) {
+            const sum = Array.from(isbn, (digit, index) => Number(digit) * (index % 2 ? 3 : 1))
+                .reduce((total, value) => total + value, 0);
+            return sum % 10 === 0 ? "Valid ISBN-13 checksum." : "Invalid ISBN-13 checksum.";
+        }
+    },
+    releaseNotesOutline(added: string, fixed: string, changed: string) {
+        const sections = [["Added", added], ["Fixed", fixed], ["Changed", changed]].flatMap(([heading, text]) => {
+            const lines = planningRows(text);
+            return lines.length ? ["## " + heading + "\n" + lines.map(line => "- " + line.replace(/^[-*+]\s+/, "")).join("\n")] : [];
+        });
+        if (sections.length) return planningBlock(sections.join("\n\n"));
+    },
     csvColumn(input: string, column: string) {
         const position = integerText(column);
         if (position === undefined || position < 1 || position > 64 || input.length > 12000) return;
@@ -1256,6 +1710,43 @@ export const cxCommandFunctions = {
         const max = Number(maximum);
         const number = randomInteger(Math.min(min, max), Math.max(min, max));
         if (number !== undefined) return String(number);
+    },
+    readingTime(text: string, rate: string) {
+        const words = text.trim().split(/\s+/).filter(Boolean).length;
+        const speed = integerText(rate);
+        if (!words || speed === undefined || speed < 50 || speed > 1000) return;
+        return `${words} words · about ${readableDuration(Math.ceil(words * 60 / speed))} at ${speed} words/min`;
+    },
+    openChecklistItems(text: string) {
+        const rows = text.split(/\r\n|\r|\n/);
+        const pattern = /^[ \t]*(?:[-*+]|\d+\.)[ \t]+\[([ xX])\][ \t]+(.+)$/;
+        const items = rows.flatMap(row => {
+            const match = pattern.exec(row);
+            return match ? [match] : [];
+        });
+        if (!items.length) return;
+        const open = items.filter(([, state]) => state === " ").map(([, , item]) => "- [ ] " + item.trim());
+        return open.length ? planningBlock(open.join("\n")) : "All checklist items are complete.";
+    },
+    altTextDraft(subject: string, context: string, visible: string) {
+        const description = subject.trim().replace(/\s+/g, " ");
+        if (!description) return;
+        const details = [description, context.trim().replace(/\s+/g, " "),
+            visible.trim() && "Visible text: " + visible.trim().replace(/\s+/g, " ")].filter(Boolean);
+        const draft = details.map(line => /[.!?]$/.test(line) ? line : line + ".").join(" ");
+        if (draft.length <= 500) return planningBlock(draft);
+    },
+    linesToSpoilers(text: string) {
+        const rows = text.trim().split(/\r\n|\r|\n/);
+        if (!rows.some(row => row.trim())) return;
+        const result = rows.map(row => row.trim() ? "||" + row.replaceAll("|", "\\|") + "||" : "").join("\n");
+        if (result.length <= 3900) return planningBlock(result);
+    },
+    quoteWithAttribution(text: string, author: string) {
+        const source = author.trim();
+        if (!source || source.length > 160 || /[\r\n]/.test(source) || !text.trim()) return;
+        const quote = text.trim().split(/\r\n|\r|\n/).map(line => "> " + line).join("\n");
+        return planningBlock(quote + "\n\n— " + source);
     },
     wordCount(text: string) {
         const words = text.trim().split(/\s+/).filter(Boolean).length;

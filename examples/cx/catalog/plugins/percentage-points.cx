@@ -1,0 +1,7 @@
+plugin "Percentage Points":
+  needs commands.register
+  needs reply.local
+  on command "percentagepoints":
+    input "before" text
+    input "after" text
+    reply "${percentagePoints(before, after)}" else "Enter two percentages between 0 and 100."

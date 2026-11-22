@@ -1,0 +1,5 @@
+plugin "Roman Numerals":
+  needs commands.register
+  needs reply.local
+  on command "romannumerals" with text:
+    reply "${romanNumerals(text)}" else "Enter an integer from 1 to 3999 or a Roman numeral in canonical form."

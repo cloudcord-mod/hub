@@ -1,0 +1,5 @@
+plugin "Playlist Duration":
+  needs commands.register
+  needs reply.local
+  on command "playlistduration" with text:
+    reply "${playlistDuration(text)}" else "Enter one track time per line in M:SS or H:MM:SS format."

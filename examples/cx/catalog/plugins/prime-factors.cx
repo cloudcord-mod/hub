@@ -1,0 +1,5 @@
+plugin "Prime Factors":
+  needs commands.register
+  needs reply.local
+  on command "primefactors" with text:
+    reply "${primeFactors(text)}" else "Enter an integer between 2 and 1000000000."

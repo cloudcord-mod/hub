@@ -7,7 +7,6 @@
 import { definePluginSettings } from "@api/Settings";
 import {
     CloudIcon,
-    EyeIcon,
     MainSettingsIcon,
     InfoIcon,
     PluginsIcon,
@@ -33,14 +32,10 @@ import { waitFor } from "@webpack";
 import { React } from "@webpack/common";
 import type { ComponentType, PropsWithChildren, ReactNode } from "react";
 
-const PreviewsTab = wrapTab(() => {
-    const { PreviewsTab: Page } = require("@components/settings/tabs/extras");
+const ToolsTab = wrapTab(() => {
+    const { ToolsTab: Page } = require("@components/settings/tabs/extras");
     return <Page />;
-}, "Previews");
-const AccountToolsTab = wrapTab(() => {
-    const { AccountToolsTab: Page } = require("@components/settings/tabs/extras");
-    return <Page />;
-}, "Account Tools");
+}, "Tools");
 const TweaksTab = wrapTab(() => {
     const { TweaksPage: Page } = require("@components/settings/tabs/addons/TweaksPage");
     return <Page />;
@@ -274,8 +269,7 @@ export default definePlugin({
                 Icon: PluginsIcon
             }),
             buildEntry({ key: "cloudcord_tweaks", title: "Tweaks", Component: TweaksTab, Icon: PaintbrushIcon }),
-            buildEntry({ key: "cloudcord_previews", title: "Previews", Component: PreviewsTab, Icon: EyeIcon }),
-            buildEntry({ key: "cloudcord_account_tools", title: "Account Tools", Component: AccountToolsTab, Icon: MainSettingsIcon }),
+            buildEntry({ key: "cloudcord_tools", title: "Tools", Component: ToolsTab, Icon: MainSettingsIcon }),
             settings.store.showCloudSyncTab && buildEntry({ key: "cloudcord_sync", title: "CloudSync", Component: CloudSyncTab, Icon: CloudIcon }),
             currentAssignment() && buildEntry({ key: "cloudcord_testing_plugins", title: "Testing Plugins", Component: TestingPluginsTab, Icon: PluginsIcon }),
             settings.store.diagnosticsMode === true && buildEntry({

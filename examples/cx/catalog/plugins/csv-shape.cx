@@ -1,0 +1,5 @@
+plugin "CSV Shape":
+  needs commands.register
+  needs reply.local
+  on command "csvshape" with text:
+    reply "${csvShape(text)}" else "Paste CSV with at least one row."

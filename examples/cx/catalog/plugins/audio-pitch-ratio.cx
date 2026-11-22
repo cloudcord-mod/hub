@@ -1,0 +1,7 @@
+plugin "Audio Pitch Ratio":
+  needs commands.register
+  needs reply.local
+  on command "pitchratio":
+    input "frequency" text
+    input "semitones" text
+    reply "${audioPitchRatio(frequency, semitones)}" else "Enter a positive frequency and a shift between -48 and 48 semitones."

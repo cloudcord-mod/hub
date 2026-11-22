@@ -1,0 +1,5 @@
+plugin "Lines to Spoilers":
+  needs commands.register
+  needs reply.local
+  on command "spoilerlines" with text:
+    reply "${linesToSpoilers(text)}" else "Paste at least one line. The result must fit in one reply."

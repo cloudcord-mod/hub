@@ -1,0 +1,5 @@
+plugin "CSV to JSON":
+  needs commands.register
+  needs reply.local
+  on command "csvtojson" with text:
+    reply "${csvToJson(text)}" else "Enter rectangular CSV with a unique, nonempty header for each column."

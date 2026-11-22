@@ -1,0 +1,8 @@
+plugin "CSV Row Filter":
+  needs commands.register
+  needs reply.local
+  on command "csvrowfilter":
+    input "csv" text
+    input "column" text
+    input "value" text
+    reply "${csvRowFilter(csv, column, value)}" else "Enter CSV, a 1-based column number, and an exact cell value."

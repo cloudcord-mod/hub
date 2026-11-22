@@ -1,0 +1,8 @@
+plugin "Release Notes Outline":
+  needs commands.register
+  needs reply.local
+  on command "releaseoutline":
+    input "added" text optional
+    input "fixed" text optional
+    input "changed" text optional
+    reply "${releaseNotesOutline(added, fixed, changed)}" else "Keep the release notes short enough for one reply."

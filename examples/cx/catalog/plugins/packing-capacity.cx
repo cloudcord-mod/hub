@@ -1,0 +1,7 @@
+plugin "Packing Capacity":
+  needs commands.register
+  needs reply.local
+  on command "packingcapacity":
+    input "items" text
+    input "capacity" text
+    reply "${packingCapacity(items, capacity)}" else "Enter a nonnegative item count and positive container capacity."

@@ -1,0 +1,5 @@
+plugin "Whitespace Report":
+  needs commands.register
+  needs reply.local
+  on command "whitespacereport" with text:
+    reply "${whitespaceReport(text)}" else "Paste text to inspect."

@@ -1,0 +1,7 @@
+plugin "Split Bill Evenly":
+  needs commands.register
+  needs reply.local
+  on command "splitbill":
+    input "total" text
+    input "people" text
+    reply "${splitBillEvenly(total, people)}" else "Enter an amount with up to two decimal places and a group of 1 to 1000 people."
