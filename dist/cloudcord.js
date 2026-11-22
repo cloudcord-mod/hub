@@ -12702,7 +12702,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         loader: debug.bunny.loader,
         broadcastCheck,
         diagnosticsCapture: settings.cloudcordDiagnosticsCapture === true,
-        runtimeUrl: loaderConfig.customLoadUrl.enabled ? loaderConfig.customLoadUrl.url : "stable",
+        runtimeSource: loaderConfig.customLoadUrl.enabled ? "custom" : "stable",
         profileIdentity: (() => {
           var state2 = globalThis.__CLOUDCORD_PROFILE_DIAGNOSTICS__;
           return state2 ? {
@@ -12807,7 +12807,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             children: [
               /* @__PURE__ */ jsx(TableSwitchRow, {
                 label: "Use custom runtime",
-                subLabel: "Switch between the stable runtime and a specific CloudCord bundle URL",
+                subLabel: "Restart Discord to apply a change to the runtime source",
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: {
                     uri: cloudcord_default
@@ -12817,24 +12817,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 onValueChange: (value) => loaderConfig.customLoadUrl.enabled = value
               }),
               loaderConfig.customLoadUrl.enabled && /* @__PURE__ */ jsx(TableRow, {
-                label: /* @__PURE__ */ jsxs(import_react_native18.View, {
+                label: /* @__PURE__ */ jsx(import_react_native18.View, {
                   style: {
                     width: "100%",
                     gap: 10
                   },
-                  children: [
-                    /* @__PURE__ */ jsx(TextInput, {
-                      size: "lg",
-                      value: loaderConfig.customLoadUrl.url,
-                      placeholder: "https://\u2026/cc.js",
-                      onChange: (value) => loaderConfig.customLoadUrl.url = typeof value === "string" ? value : value?.nativeEvent?.text ?? ""
-                    }),
-                    /* @__PURE__ */ jsx(Button, {
-                      text: "Apply and reload",
-                      onPress: () => BundleUpdaterManager.reload()
-                    })
-                  ]
+                  children: /* @__PURE__ */ jsx(TextInput, {
+                    size: "lg",
+                    value: loaderConfig.customLoadUrl.url,
+                    placeholder: "https://\u2026/cc.js",
+                    onChange: (value) => loaderConfig.customLoadUrl.url = typeof value === "string" ? value : value?.nativeEvent?.text ?? ""
+                  })
                 })
+              }),
+              /* @__PURE__ */ jsx(TableRow, {
+                label: "Reload runtime",
+                onPress: () => _async_to_generator(function* () {
+                  try {
+                    yield BundleUpdaterManager.reload();
+                  } catch (e) {
+                    showToast("Could not reload the runtime. Close and reopen Discord to apply the selected source.");
+                  }
+                })()
               }),
               versions.map((version, index) => /* @__PURE__ */ jsx(TableRow, {
                 label: index === 0 ? "Current stable" : `Previous version ${index}`,
@@ -72216,7 +72220,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cc19efd1c6dbcf226f81ddc7f3182eac477a9f73";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ed87131703477c619ffb3c54798389dbc5a2dfd3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
