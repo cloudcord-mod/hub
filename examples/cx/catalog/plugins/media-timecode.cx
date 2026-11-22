@@ -1,0 +1,6 @@
+plugin "Media Timecode":
+  needs commands.register
+  needs reply.local
+  on command "mediatimecode":
+    input "duration" text
+    reply "${mediaTimecode(duration)}" else "Enter a duration such as 1h2m3s."

@@ -628,6 +628,26 @@ export const cxCommandFunctions = {
         const duration = seconds < 1 ? "" : readableDuration(Math.floor(seconds));
         return [duration, remainder ? remainder + "ms" : ""].filter(Boolean).join(" ") + (difference > 0 ? " later" : " earlier");
     },
+    shiftTimestamp(input: string, offset: string) {
+        const instant = isoUnixMilliseconds(input);
+        const duration = durationSeconds(offset.trim().replace(/^[+-]/, ""));
+        if (instant === undefined || duration === undefined) return;
+        const result = new Date(instant + duration * 1000 * (offset.trim().startsWith("-") ? -1 : 1));
+        if (Number.isFinite(result.getTime())) return result.toISOString();
+    },
+    mediaTimecode(input: string) {
+        const seconds = durationSeconds(input);
+        if (seconds === undefined) return;
+        return [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60]
+            .map(part => String(part).padStart(2, "0")).join(":");
+    },
+    transferDuration(size: string, rate: string) {
+        const bytes = fileSizeBytes(size);
+        const megabits = Number(rate);
+        if (bytes === undefined || !/^\d+(?:\.\d+)?$/.test(rate) || !Number.isFinite(megabits) || megabits <= 0) return;
+        const seconds = Math.ceil(bytes * 8 / 1_000_000 / megabits);
+        if (Number.isSafeInteger(seconds)) return "Estimated transfer time: " + readableDuration(seconds);
+    },
     countdownTimestamp(input: string) {
         const duration = durationSeconds(input);
         if (!duration) return;

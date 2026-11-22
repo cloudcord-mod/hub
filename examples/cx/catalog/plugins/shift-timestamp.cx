@@ -1,0 +1,7 @@
+plugin "Shift Timestamp":
+  needs commands.register
+  needs reply.local
+  on command "shifttimestamp":
+    input "timestamp" text
+    input "offset" text
+    reply "${shiftTimestamp(timestamp, offset)}" else "Use an ISO timestamp with a time zone and an offset such as -1h30m."

@@ -2965,6 +2965,18 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["timestampdiff", { start: "2026-11-20T10:00:00Z", end: "2026-11-20T12:15:00+02:00" }, /^15m later$/],
                 ["timestampdiff", { start: "2026-11-20T10:00:00.100Z", end: "2026-11-20T10:00:00Z" }, /^100ms earlier$/],
             ]],
+            ["Shift Timestamp", [
+                ["shifttimestamp", { timestamp: "2026-11-20T10:00:00+02:00", offset: "-9h" }, /^2026-11-19T23:00:00\.000Z$/],
+                ["shifttimestamp", { timestamp: "2026-11-20T10:00:00", offset: "1h" }, /^Use an ISO/],
+            ]],
+            ["Media Timecode", [
+                ["mediatimecode", { duration: "1d2h3m4s" }, /^26:03:04$/],
+                ["mediatimecode", { duration: "1m2m" }, /^Enter a duration/],
+            ]],
+            ["Transfer Duration", [
+                ["transfertime", { size: "100 MB", megabits: "20" }, /^Estimated transfer time: 40s$/],
+                ["transfertime", { size: "100 MB", megabits: "0" }, /^Enter a file size/],
+            ]],
             ["Duration Converter", [
                 ["convertduration", { text: "1d 2h30m5s" }, /^1d 2h 30m 5s · 95405 seconds$/],
                 ["convertduration", { text: "1h 2h" }, /^Enter a duration/],

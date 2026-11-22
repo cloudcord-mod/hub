@@ -280,6 +280,7 @@ import plugin_catalog_local_channel_notes from "../../../../examples/cx/catalog/
 import plugin_catalog_markdown_checklist from "../../../../examples/cx/catalog/plugins/markdown-checklist.cx";
 import plugin_catalog_markdown_escape from "../../../../examples/cx/catalog/plugins/markdown-escape.cx";
 import plugin_catalog_markdown_outline from "../../../../examples/cx/catalog/plugins/markdown-outline.cx";
+import plugin_catalog_media_timecode from "../../../../examples/cx/catalog/plugins/media-timecode.cx";
 import plugin_catalog_meeting_timestamp from "../../../../examples/cx/catalog/plugins/meeting-timestamp.cx";
 import plugin_catalog_message_budget from "../../../../examples/cx/catalog/plugins/message-budget.cx";
 import plugin_catalog_message_burst from "../../../../examples/cx/catalog/plugins/message-burst.cx";
@@ -358,6 +359,7 @@ import plugin_catalog_screen_share_alert from "../../../../examples/cx/catalog/p
 import plugin_catalog_scroll_to_latest from "../../../../examples/cx/catalog/plugins/scroll-to-latest.cx";
 import plugin_catalog_sed_enhanced from "../../../../examples/cx/catalog/plugins/sed-enhanced.cx";
 import plugin_catalog_send_timestamps from "../../../../examples/cx/catalog/plugins/send-timestamps.cx";
+import plugin_catalog_shift_timestamp from "../../../../examples/cx/catalog/plugins/shift-timestamp.cx";
 import plugin_catalog_ship_calc from "../../../../examples/cx/catalog/plugins/ship-calc.cx";
 import plugin_catalog_show_ping from "../../../../examples/cx/catalog/plugins/show-ping.cx";
 import plugin_catalog_show_song_name from "../../../../examples/cx/catalog/plugins/show-song-name.cx";
@@ -394,6 +396,7 @@ import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plug
 import plugin_catalog_timestamp_difference from "../../../../examples/cx/catalog/plugins/timestamp-difference.cx";
 import plugin_catalog_timestamp_styles from "../../../../examples/cx/catalog/plugins/timestamp-styles.cx";
 import plugin_catalog_total_time from "../../../../examples/cx/catalog/plugins/total-time.cx";
+import plugin_catalog_transfer_duration from "../../../../examples/cx/catalog/plugins/transfer-duration.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
 import plugin_catalog_transparent_chat_bar from "../../../../examples/cx/catalog/plugins/transparent-chat-bar.cx";
 import plugin_catalog_trim_lines from "../../../../examples/cx/catalog/plugins/trim-lines.cx";
@@ -816,6 +819,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Markdown Checklist", source: plugin_catalog_markdown_checklist, description: "/markdownchecklist", commands: ["markdownchecklist"], categories: ["Commands"], appearanceRevision: "6732669ee7bfddc071dabfed115d4b5ac81ee645c8c16a2d4d873b19478ba261", privateCommands: true },
         { name: "Markdown Escape", source: plugin_catalog_markdown_escape, description: "/escapemarkdown", commands: ["escapemarkdown"], categories: ["Commands"], appearanceRevision: "ec3f1cf014a3fc6eec49b8a3df251d7b0050d30eaa995e8b39b83e4457bd802b", privateCommands: true },
         { name: "Markdown Outline", source: plugin_catalog_markdown_outline, description: "/markdownoutline", commands: ["markdownoutline"], categories: ["Commands"], appearanceRevision: "efbf7198f0c2ff46dd1f5fc1e30a0c5990c856fc821022f46c5855608811b28e", privateCommands: true },
+        { name: "Media Timecode", source: plugin_catalog_media_timecode, description: "/mediatimecode", commands: ["mediatimecode"], categories: ["Commands"], appearanceRevision: "75855931fabb06743babc76dadad36ecef3b9416807cb8787b293c834b7843ad", privateCommands: true },
         { name: "Meeting Timestamp", source: plugin_catalog_meeting_timestamp, description: "/meetingtimestamp", commands: ["meetingtimestamp"], categories: ["Commands"], appearanceRevision: "7938b3cc298e7b8fbc0d8272725d92ffc6acb0bf3ce8b865909792f753cc96ce", privateCommands: true },
         { name: "Message Budget", source: plugin_catalog_message_budget, description: "/messagebudget", commands: ["messagebudget"], categories: ["Commands"], appearanceRevision: "871e9aef7a49228b859b27c889d33df5db666dd2a0e986542f90450951cb301f", privateCommands: true },
         { name: "MessageBurst", source: plugin_catalog_message_burst, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
@@ -894,6 +898,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ScrollToLatest", source: plugin_catalog_scroll_to_latest, description: "Open channels at the latest message and mark them read", categories: ["Servers & channels"] },
         { name: "SedEnhanced", source: plugin_catalog_sed_enhanced, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
         { name: "SendTimestamps", source: plugin_catalog_send_timestamps, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
+        { name: "Shift Timestamp", source: plugin_catalog_shift_timestamp, description: "/shifttimestamp", commands: ["shifttimestamp"], categories: ["Commands"], appearanceRevision: "ce6b64d62d0d71d19d7b25a422da767dacd965b260bcbdf9f11b3a3e327427aa", privateCommands: true },
         { name: "ShipCalc", source: plugin_catalog_ship_calc, description: "/ship", commands: ["ship"], categories: ["Chat","Commands"] },
         { name: "ShowPing", source: plugin_catalog_show_ping, description: "Show your live call latency in milliseconds", keywords: "Hide the desktop Krisp button beside the voice connection controls", categories: ["Appearance","Voice & calls"] },
         { name: "ShowSongName", source: plugin_catalog_show_song_name, description: "Show the song title in Spotify activity status", categories: ["Appearance"], appearanceRevision: "a1198a0081e2aa6e20ff9ef087da55aa322a18eb8009cd406f2a0bafc7a3fa8d" },
@@ -930,6 +935,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Timestamp Difference", source: plugin_catalog_timestamp_difference, description: "/timestampdiff", commands: ["timestampdiff"], categories: ["Commands"], appearanceRevision: "f322ad1f90489ea334f18706038470062328b80579da8eea741730784d3859d1", privateCommands: true },
         { name: "Timestamp Styles", source: plugin_catalog_timestamp_styles, description: "/timestampstyles", commands: ["timestampstyles"], categories: ["Commands"], appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4", privateCommands: true },
         { name: "Total Time", source: plugin_catalog_total_time, description: "/totaltime", commands: ["totaltime"], categories: ["Commands"], appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca", privateCommands: true },
+        { name: "Transfer Duration", source: plugin_catalog_transfer_duration, description: "/transfertime", commands: ["transfertime"], categories: ["Commands"], appearanceRevision: "4aee6915d955f7780f0f8ba3772a58ac53c33a4a8a4939d306659e0cdd161bd5", privateCommands: true },
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },
         { name: "TransparentChatBar", source: plugin_catalog_transparent_chat_bar, description: "make the chat input background translucent", categories: ["Appearance"], appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e" },
         { name: "Trim Lines", source: plugin_catalog_trim_lines, description: "/trimlines", commands: ["trimlines"], categories: ["Commands"], appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849", privateCommands: true },
