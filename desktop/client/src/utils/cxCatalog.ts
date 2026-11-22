@@ -311,6 +311,7 @@ import plugin_catalog_percentage_change from "../../../../examples/cx/catalog/pl
 import plugin_catalog_pick_names from "../../../../examples/cx/catalog/plugins/pick-names.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
 import plugin_catalog_plain_folder_icon from "../../../../examples/cx/catalog/plugins/plain-folder-icon.cx";
+import plugin_catalog_playback_duration from "../../../../examples/cx/catalog/plugins/playback-duration.cx";
 import plugin_catalog_polish_wording from "../../../../examples/cx/catalog/plugins/polish-wording.cx";
 import plugin_catalog_poll_draft from "../../../../examples/cx/catalog/plugins/poll-draft.cx";
 import plugin_catalog_profile_media from "../../../../examples/cx/catalog/plugins/profile-media.cx";
@@ -377,6 +378,7 @@ import plugin_catalog_test_result_summary from "../../../../examples/cx/catalog/
 import plugin_catalog_text_replace from "../../../../examples/cx/catalog/plugins/text-replace.cx";
 import plugin_catalog_theme_starter from "../../../../examples/cx/catalog/plugins/theme-starter.cx";
 import plugin_catalog_thin_scrollbars from "../../../../examples/cx/catalog/plugins/thin-scrollbars.cx";
+import plugin_catalog_timestamp_difference from "../../../../examples/cx/catalog/plugins/timestamp-difference.cx";
 import plugin_catalog_timestamp_styles from "../../../../examples/cx/catalog/plugins/timestamp-styles.cx";
 import plugin_catalog_total_time from "../../../../examples/cx/catalog/plugins/total-time.cx";
 import plugin_catalog_translate from "../../../../examples/cx/catalog/plugins/translate.cx";
@@ -832,6 +834,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Pick Names", source: plugin_catalog_pick_names, description: "/picknames", commands: ["picknames"], categories: ["Commands"], appearanceRevision: "6bac0273d0f9dfd45078b339e3a8f38fd2295eed75074ed7cc6125f808925467", privateCommands: true },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },
         { name: "PlainFolderIcon", source: plugin_catalog_plain_folder_icon, description: "Replace the mini server icons in collapsed folders with a plain folder icon", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Playback Duration", source: plugin_catalog_playback_duration, description: "/playbacktime", commands: ["playbacktime"], categories: ["Commands"], appearanceRevision: "b31fafdd291c4499b847101f814e47849ba29e27f17e8bc10c95d9ab44bf8e1c", privateCommands: true },
         { name: "PolishWording", source: plugin_catalog_polish_wording, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Poll Draft", source: plugin_catalog_poll_draft, description: "/polldraft", commands: ["polldraft"], categories: ["Commands"], appearanceRevision: "e38274bea9f8c72f38a95b05ec57685bd1ef014a0388dca663e6694c6d1df879", privateCommands: true },
         { name: "ProfileMedia", source: plugin_catalog_profile_media, description: "Add View and Download actions for Discord avatars and banners", categories: ["Media","Profiles"] },
@@ -898,6 +901,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "TextReplace", source: plugin_catalog_text_replace, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "Theme Starter", source: plugin_catalog_theme_starter, description: "/themestarter", commands: ["themestarter"], categories: ["Commands"], appearanceRevision: "6554f9b1b18d14eac32a85e66a21fddbfac3b452d339fb0c0d498c19f945e023", privateCommands: true },
         { name: "ThinScrollbars", source: plugin_catalog_thin_scrollbars, description: "Thinner scrollbars", desktopOnly: true, categories: ["Appearance"] },
+        { name: "Timestamp Difference", source: plugin_catalog_timestamp_difference, description: "/timestampdiff", commands: ["timestampdiff"], categories: ["Commands"], appearanceRevision: "f322ad1f90489ea334f18706038470062328b80579da8eea741730784d3859d1", privateCommands: true },
         { name: "Timestamp Styles", source: plugin_catalog_timestamp_styles, description: "/timestampstyles", commands: ["timestampstyles"], categories: ["Commands"], appearanceRevision: "2fc2a437e3554a6fc09a1bdc9a74edd293f9f401b39b4ff048888b77732b98e4", privateCommands: true },
         { name: "Total Time", source: plugin_catalog_total_time, description: "/totaltime", commands: ["totaltime"], categories: ["Commands"], appearanceRevision: "468ceed33fe1982713615b411c798e3798e0de5018f0dc07b4d20ddcb4c08aca", privateCommands: true },
         { name: "Translate", source: plugin_catalog_translate, description: "/translate", commands: ["translate"], categories: ["Chat","Commands"] },

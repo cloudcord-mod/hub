@@ -2917,6 +2917,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             ["Markdown Checklist", [
                 ["markdownchecklist", { text: " Ship \n\n- [x] Build\n* Publish" }, /- \[ \] Ship\n- \[x\] Build\n- \[ \] Publish/],
             ]],
+            ["Playback Duration", [
+                ["playbacktime", { duration: "1h 30m", speed: "1.5" }, /^Playback time: 1h at 1\.5×$/],
+                ["playbacktime", { duration: "10m", speed: "0" }, /^Use a duration/],
+            ]],
+            ["Timestamp Difference", [
+                ["timestampdiff", { start: "2026-11-20T10:00:00Z", end: "2026-11-20T12:15:00+02:00" }, /^15m later$/],
+                ["timestampdiff", { start: "2026-11-20T10:00:00.100Z", end: "2026-11-20T10:00:00Z" }, /^100ms earlier$/],
+            ]],
             ["Duration Converter", [
                 ["convertduration", { text: "1d 2h30m5s" }, /^1d 2h 30m 5s · 95405 seconds$/],
                 ["convertduration", { text: "1h 2h" }, /^Enter a duration/],

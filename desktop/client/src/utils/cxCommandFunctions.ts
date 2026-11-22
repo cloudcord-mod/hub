@@ -93,6 +93,14 @@ function durationSeconds(input: string) {
     return seconds;
 }
 
+function readableDuration(seconds: number) {
+    return [...durationUnits].map(([unit, size]) => {
+        const part = Math.floor(seconds / size);
+        seconds %= size;
+        return part ? part + unit : "";
+    }).filter(Boolean).join(" ") || "0s";
+}
+
 function isoUnixMilliseconds(input: string) {
     const parsed = /^(\d{4}-\d{2}-\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?(?:[Zz]|([+-])(\d{2}):(\d{2}))$/.exec(input.trim());
     if (!parsed) return;
@@ -555,6 +563,22 @@ export const cxCommandFunctions = {
         const hours = Math.floor(seconds % 86_400 / 3_600);
         const minutes = Math.floor(seconds % 3_600 / 60);
         return `${days}d ${hours}h ${minutes}m ${seconds % 60}s · ${seconds} seconds`;
+    },
+    playbackDuration(input: string, rate: string) {
+        const duration = durationSeconds(input);
+        const speed = Number(rate);
+        if (!duration || !/^\d+(?:\.\d{1,2})?$/.test(rate) || speed < 0.25 || speed > 4) return;
+        return "Playback time: " + readableDuration(Math.round(duration / speed)) + " at " + speed + "×";
+    },
+    timestampDifference(start: string, end: string) {
+        const from = isoUnixMilliseconds(start), to = isoUnixMilliseconds(end);
+        if (from === undefined || to === undefined) return;
+        const difference = to - from;
+        if (!difference) return "The timestamps are the same instant.";
+        const seconds = Math.abs(difference) / 1000;
+        const remainder = Math.abs(difference) % 1000;
+        const duration = seconds < 1 ? "" : readableDuration(Math.floor(seconds));
+        return [duration, remainder ? remainder + "ms" : ""].filter(Boolean).join(" ") + (difference > 0 ? " later" : " earlier");
     },
     countdownTimestamp(input: string) {
         const duration = durationSeconds(input);

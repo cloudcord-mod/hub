@@ -1,0 +1,7 @@
+plugin "Timestamp Difference":
+  needs commands.register
+  needs reply.local
+  on command "timestampdiff":
+    input "start" text
+    input "end" text
+    reply "${timestampDifference(start, end)}" else "Use two ISO timestamps with explicit time zones."

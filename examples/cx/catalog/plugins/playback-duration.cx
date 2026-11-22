@@ -1,0 +1,7 @@
+plugin "Playback Duration":
+  needs commands.register
+  needs reply.local
+  on command "playbacktime":
+    input "duration" text
+    input "speed" text
+    reply "${playbackDuration(duration, speed)}" else "Use a duration such as 1h 30m and a playback speed from 0.25 to 4."
