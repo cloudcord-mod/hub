@@ -1,0 +1,7 @@
+plugin "Event Window":
+  needs commands.register
+  needs reply.local
+  on command "eventwindow":
+    input "start" text
+    input "end" text
+    reply "${eventWindow(start, end)}" else "Enter a start and end as ISO dates with timezones. End must be after start."

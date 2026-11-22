@@ -1,0 +1,6 @@
+plugin "Clean Discord Invite":
+  needs commands.register
+  needs reply.local
+  on command "cleaninvite":
+    input "text" text
+    reply "${cleanDiscordInvite(text)}" else "Enter a Discord invite link."

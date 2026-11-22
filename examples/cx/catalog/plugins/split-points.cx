@@ -1,0 +1,7 @@
+plugin "Split Points":
+  needs commands.register
+  needs reply.local
+  on command "splitpoints":
+    input "total" text
+    input "people" text
+    reply "${splitPoints(total, people)}" else "Enter a non-negative whole point total and 1–10,000 people."

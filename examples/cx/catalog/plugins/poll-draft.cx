@@ -1,0 +1,7 @@
+plugin "Poll Draft":
+  needs commands.register
+  needs reply.local
+  on command "polldraft":
+    input "question" text
+    input "options" text
+    reply "${pollDraft(question, options)}" else "Enter a one-line question and 2–10 distinct choices, one per line."

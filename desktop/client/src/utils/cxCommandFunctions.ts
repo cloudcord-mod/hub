@@ -528,6 +528,61 @@ export const cxCommandFunctions = {
         const times = Array.from({ length: occurrences }, (_, index) => `<t:${seconds + index * step}:F>`);
         return times.map((timestamp, index) => `${index + 1}. ${timestamp} · \`${timestamp}\``).join("\n");
     },
+    eventWindow(start: string, end: string) {
+        const from = isoUnixMilliseconds(start), to = isoUnixMilliseconds(end);
+        if (from === undefined || to === undefined || to <= from) return;
+        const seconds = Math.floor((to - from) / 1000);
+        const duration = seconds < 1 ? "<1s" : Math.floor(seconds / 3600) + "h " + Math.floor(seconds % 3600 / 60) + "m " + seconds % 60 + "s";
+        return "Start <t:" + Math.floor(from / 1000) + ":F>\nEnd <t:" + Math.floor(to / 1000) + ":F>\nDuration " + duration;
+    },
+    voteTally(input: string) {
+        if (input.length > 12000) return;
+        const votes = planningRows(input);
+        if (!votes.length || votes.length > 500 || votes.some(vote => vote.length > 100)) return;
+        const choices = new Map<string, { label: string; count: number; }>();
+        for (const label of votes) {
+            const key = label.normalize("NFC").toLowerCase();
+            const existing = choices.get(key);
+            if (existing) existing.count++;
+            else choices.set(key, { label, count: 1 });
+        }
+        if (choices.size > 30) return;
+        const rows = [...choices.values()].sort((a, b) => b.count - a.count);
+        return planningBlock(rows.map(({ label, count }) => count + " · " + label).join("\n") + "\n\nTotal votes: " + votes.length);
+    },
+    redactEmails(input: string) {
+        if (!input.trim() || input.length > 3600) return;
+        const addresses = /[a-z0-9.!#$%&'*+\/=?^_{}|~-]+@[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?)+/gi;
+        const redacted = input.replace(addresses, "[email removed]");
+        return redacted === input ? "No email addresses found." : planningBlock(redacted);
+    },
+    cleanDiscordInvite(input: string) {
+        const value = input.trim().replace(/^<([^<>]+)>$/, "$1");
+        const invite = /^(?:https?:\/\/)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)([a-z0-9-]{2,40})\/?(?:[?#][^\s<>]{0,1000})?$/i.exec(value);
+        if (!invite) return;
+        return "<https://discord.gg/" + invite[1] + ">";
+    },
+    customEmojiMarkup(name: string, id: string, kind: string) {
+        const label = name.trim(), snowflake = id.trim();
+        if (!/^[a-z0-9_]{2,32}$/i.test(label) || !discordId(snowflake) || (kind !== "static" && kind !== "animated")) return;
+        return planningBlock("<" + (kind === "animated" ? "a" : "") + ":" + label + ":" + snowflake + ">");
+    },
+    pollDraft(question: string, options: string) {
+        const title = question.trim();
+        const choices = planningRows(options);
+        const distinct = new Set(choices.map(value => value.normalize("NFC").toLowerCase()));
+        if (!title || title.length > 160 || /[\r\n]/.test(title) || choices.length < 2 || choices.length > 10
+            || distinct.size !== choices.length || choices.some(choice => choice.length > 150)) return;
+        return planningBlock(title + "\n\n" + choices.map((choice, index) => (index + 1) + ". " + choice).join("\n"));
+    },
+    splitPoints(total: string, people: string) {
+        const points = integerText(total), count = integerText(people);
+        if (points === undefined || points < 0 || count === undefined || count < 1 || count > 10000) return;
+        const per = Math.floor(points / count);
+        const remainder = points % count;
+        if (!remainder) return count + " × " + per + " points";
+        return remainder + " × " + (per + 1) + " points\n" + (count - remainder) + " × " + per + " points";
+    },
     buildMessageLink(server: string, channel: string, message: string) {
         const scope = server.trim(), channelId = channel.trim(), messageId = message.trim();
         if ((scope !== "@me" && !discordId(scope)) || !discordId(channelId) || (messageId && !discordId(messageId))) return;

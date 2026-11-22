@@ -1,0 +1,6 @@
+plugin "Redact Email Addresses":
+  needs commands.register
+  needs reply.local
+  on command "redactemails":
+    input "text" text
+    reply "${redactEmails(text)}" else "Enter text up to 3,600 characters."

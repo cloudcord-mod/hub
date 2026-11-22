@@ -1,0 +1,8 @@
+plugin "Custom Emoji Markup":
+  needs commands.register
+  needs reply.local
+  on command "emojimarkup":
+    input "name" text
+    input "id" text
+    input "kind" choice "static,animated"
+    reply "${customEmojiMarkup(name, id, kind)}" else "Enter a valid emoji name and Discord emoji ID."

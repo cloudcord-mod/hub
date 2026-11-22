@@ -1,0 +1,6 @@
+plugin "Vote Tally":
+  needs commands.register
+  needs reply.local
+  on command "votetally":
+    input "text" text
+    reply "${voteTally(text)}" else "Paste one vote per line, with up to 30 distinct choices."

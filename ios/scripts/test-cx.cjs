@@ -2647,6 +2647,34 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["csvcolumn", { document: 'Name,Result\r\nA,"yes, now"\nB,"new\nlines"', column: "2" }, /\n"Result"\n"yes, now"\n"new\nlines"\n/],
                 ["csvcolumn", { document: "Name,Result\nA", column: "2" }, /^Paste up to 150/],
             ]],
+            ["Event Window", [
+                ["eventwindow", { start: "2026-11-22T15:00:00+03:00", end: "2026-11-22T13:30:00Z" }, /Start <t:\d+:F>\nEnd <t:\d+:F>\nDuration 1h 30m 0s/],
+                ["eventwindow", { start: "2026-02-30T00:00:00Z", end: "2026-03-01T00:00:00Z" }, /^Enter a start and end/],
+            ]],
+            ["Vote Tally", [
+                ["votetally", { text: "Red\r\n Blue\nred" }, /2 · Red\n1 · Blue\n\nTotal votes: 3/],
+                ["votetally", { text: "x".repeat(101) }, /^Paste one vote/],
+            ]],
+            ["Redact Email Addresses", [
+                ["redactemails", { text: "Contact Test.User+spam@example.org, or team@example.com." }, /Contact \[email removed\], or \[email removed\]\./],
+                ["redactemails", { text: "No contact info here" }, /^No email addresses found/],
+            ]],
+            ["Clean Discord Invite", [
+                ["cleaninvite", { text: "<https://discord.com/invite/Team7?utm_source=test>" }, /^<https:\/\/discord\.gg\/Team7>$/],
+                ["cleaninvite", { text: "https://discord.gg.example.org/invite/Team7" }, /^Enter a Discord invite/],
+            ]],
+            ["Custom Emoji Markup", [
+                ["emojimarkup", { name: "party_cap", id: "123456789012345678", kind: "animated" }, /<a:party_cap:123456789012345678>/],
+                ["emojimarkup", { name: "@everyone", id: "123456789012345678", kind: "static" }, /^Enter a valid emoji name/],
+            ]],
+            ["Poll Draft", [
+                ["polldraft", { question: "Next update?", options: "Fix badges\nMore themes" }, /Next update\?\n\n1\. Fix badges\n2\. More themes/],
+                ["polldraft", { question: "Next update?", options: "Themes\nthemes" }, /^Enter a one-line/],
+            ]],
+            ["Split Points", [
+                ["splitpoints", { total: "13", people: "4" }, /^1 × 4 points\n3 × 3 points$/],
+                ["splitpoints", { total: "13", people: "0" }, /^Enter a non-negative/],
+            ]],
             ["Timestamp Styles", [
                 ["timestampstyles", { text: "1970-01-01T04:00:00+03:00" }, /Short time · <t:3600:t>.*Time with seconds · <t:3600:T>.*Relative · <t:3600:R>/s],
                 ["timestampstyles", { text: "1970-01-01T04:00:00" }, /^Enter a date and time with a timezone/],
