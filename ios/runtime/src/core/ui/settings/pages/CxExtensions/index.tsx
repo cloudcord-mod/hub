@@ -9,6 +9,7 @@ import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, 
 import { cxCatalog } from "@lib/api/cxCatalog";
 import { bindCxChannelOpenRead, filterCxEmojiCategories, isCxNotificationMuted, type CxMessageAlert } from "@lib/api/cx";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "@lib/api/cx";
+import { getCxMessageLatency, type CxMessageLatencyOptions } from "@lib/api/cx";
 import { createCxTimestampRegistry, formatCxReplyTimestamp, type CxTimestampFormats, type CxTimestampSurface } from "@lib/api/cx";
 import { createCxCallClock, createCxJumpActions, createCxVoiceMemberClock, createCxNavigationControls, getCxFirstMessageTarget, markCxServersReadAndWait, type CxNavigationChannel, type CxVoiceMemberOptions } from "@lib/api/cx";
 import { selectCxAppearanceOption } from "@lib/api/cx";
@@ -50,6 +51,31 @@ const timestampFields = [
 ] as const satisfies readonly [string, CxTimestampSurface][];
 let timestampUsers = 0;
 let stopTimestamps: (() => void) | undefined;
+
+function registerMessageLatency(options: CxMessageLatencyOptions, enabled: () => boolean) {
+    const renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+    return overrideCxMethods(renderer, {
+        default(args, invoke) {
+            const rendered = invoke(args) as { content?: unknown; timestamp?: unknown; timestampAccessibilityLabel?: unknown; } | undefined;
+            const input = args[0] as { isInlineReplyPreview?: boolean; isEditing?: boolean;
+                message?: Parameters<typeof getCxMessageLatency>[0]; } | undefined;
+            if (!rendered || !input?.message || input.isInlineReplyPreview || input.isEditing) return rendered;
+            const delay = getCxMessageLatency(input.message, options, UserStore.getCurrentUser()?.id);
+            if (!delay) return rendered;
+            const label = !delay.delta ? "Possible legacy Android client"
+                : delay.ahead ? "Clock ahead by about " + delay.delta : "Estimated send delay: " + delay.delta;
+            if (Array.isArray(rendered.content) && rendered.content.length) {
+                return { ...rendered, content: [...rendered.content, { type: "text", content: "\n" + label }] };
+            }
+            if (typeof rendered.timestamp === "string" && rendered.timestamp) return {
+                ...rendered,
+                timestamp: rendered.timestamp + " · " + label,
+                timestampAccessibilityLabel: [rendered.timestampAccessibilityLabel ?? rendered.timestamp, label].join(". "),
+            };
+            return rendered;
+        },
+    }, enabled);
+}
 
 function registerReplyTimestamps(enabled: () => boolean) {
     // ReplyTimestamp by Kyuuhachi (GPL-3.0-or-later).
@@ -2812,7 +2838,8 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "reply-timestamp":
                     return registerReplyTimestamps(enabled);
                 case "message-latency":
-                    throw new Error("The send-delay indicator is available on desktop and browser.");
+                    if (!effectOptions || !("latency" in effectOptions)) throw new Error("Missing send-delay options");
+                    return registerMessageLatency(effectOptions, enabled);
                 case "animated-assets":
                     return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
                 case "floor-relative-time":

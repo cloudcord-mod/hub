@@ -5,108 +5,14 @@
  */
 
 import ErrorBoundary from "@components/ErrorBoundary";
-import type { CxMessageLatencyOptions } from "@utils/cx";
+import { getCxMessageLatency, type CxLatencyFill, type CxMessageLatencyOptions } from "@utils/cxMessageLatency";
 import { isNonNullish } from "@utils/guards";
 import type { Message } from "@vencord/discord-types";
-import { AuthenticationStore, SnowflakeUtils, Tooltip } from "@webpack/common";
-
-type FillValue = ("status-danger" | "status-warning" | "status-positive" | "text-muted");
-type Fill = [FillValue, FillValue, FillValue];
-type DiffKey = keyof Diff;
-
-interface Diff {
-    days: number,
-    hours: number,
-    minutes: number,
-    seconds: number;
-    milliseconds: number;
-}
-
-const DISCORD_KT_DELAY = 1471228928;
-
-function stringDelta(delta: number, showMillis: boolean) {
-    const diff: Diff = {
-        days: Math.floor(delta / (60 * 60 * 24 * 1000)),
-        hours: Math.floor((delta / (60 * 60 * 1000)) % 24),
-        minutes: Math.floor((delta / (60 * 1000)) % 60),
-        seconds: Math.floor(delta / 1000 % 60),
-        milliseconds: Math.floor(delta % 1000)
-    };
-
-    const str = (k: DiffKey) => diff[k] > 0 ? `${diff[k]} ${diff[k] > 1 ? k : k.substring(0, k.length - 1)}` : null;
-    const keys = Object.keys(diff) as DiffKey[];
-
-    const ts = keys.reduce((prev, k) => {
-        const s = str(k);
-
-        return prev + (
-            isNonNullish(s)
-                ? (prev !== ""
-                    ? (showMillis ? k === "milliseconds" : k === "seconds")
-                        ? " and "
-                        : " "
-                    : "") + s
-                : ""
-        );
-    }, "");
-
-    return ts || "0 seconds";
-}
-
-function latencyTooltipData(message: Message, options: CxMessageLatencyOptions) {
-    const { latency, detectDiscordKotlin, showMillis, ignoreSelf } = options;
-    const { id, nonce } = message;
-
-    // Message wasn't received through gateway
-    if (!isNonNullish(nonce) || !/^\d{17,20}$/.test(String(nonce))) return null;
-
-    // Bots basically never send a nonce, and if someone does do it then it's usually not a snowflake
-    if (message.author.bot) return null;
-
-    if (ignoreSelf && message.author.id === AuthenticationStore.getId()) return null;
-
-    let isDiscordKotlin = false;
-    let delta = SnowflakeUtils.extractTimestamp(id) - SnowflakeUtils.extractTimestamp(nonce); // milliseconds
-    if (!Number.isFinite(delta)) return null;
-    if (!showMillis) {
-        delta = Math.round(delta / 1000) * 1000;
-    }
-
-    // Old Discord Android clients have a delay of around 17 days
-    // This is a workaround for that
-    if (-delta >= DISCORD_KT_DELAY - 86400000) {
-        // One day of padding for good measure
-        isDiscordKotlin = detectDiscordKotlin;
-        delta += DISCORD_KT_DELAY;
-    }
-
-    // Thanks dziurwa (I hate you)
-    // This is when the user's clock is ahead
-    // Can't do anything if the clock is behind
-    const abs = Math.abs(delta);
-    const ahead = abs !== delta;
-    const latencyMillis = latency * 1000;
-
-    const displayDelay = abs >= latencyMillis ? stringDelta(abs, showMillis) : null;
-
-    // Also thanks dziurwa
-    // 2 minutes
-    const TROLL_LIMIT = 2 * 60 * 1000;
-
-    const fill: Fill = isDiscordKotlin
-        ? ["status-positive", "status-positive", "text-muted"]
-        : delta >= TROLL_LIMIT || ahead
-            ? ["text-muted", "text-muted", "text-muted"]
-            : delta >= (latencyMillis * 2)
-                ? ["status-danger", "text-muted", "text-muted"]
-                : ["status-warning", "status-warning", "text-muted"];
-
-    return (abs >= latencyMillis || isDiscordKotlin) ? { delta: displayDelay, ahead, fill, isDiscordKotlin } : null;
-}
+import { AuthenticationStore, Tooltip } from "@webpack/common";
 
 function Icon({ delta, fill, props }: {
     delta: string | null;
-    fill: Fill,
+    fill: CxLatencyFill,
     props: {
         onClick(): void;
         onMouseEnter(): void;
@@ -145,7 +51,7 @@ function Icon({ delta, fill, props }: {
 }
 
 export const MessageLatencyTooltip = ErrorBoundary.wrap(({ message, options }: { message: Message; options: CxMessageLatencyOptions; }) => {
-    const d = latencyTooltipData(message, options);
+    const d = getCxMessageLatency(message, options, AuthenticationStore.getId());
 
     if (!isNonNullish(d)) return null;
 

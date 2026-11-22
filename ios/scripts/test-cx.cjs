@@ -964,8 +964,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 require: name => ({
                     ...replyMocks,
                     "@utils/guards": { isNonNullish: value => value != null },
-                    "@webpack/common": { Tooltip: "Tooltip", AuthenticationStore: { getId: () => me },
-                        SnowflakeUtils: { extractTimestamp: id => Number(BigInt(id) >> 22n) } },
+                    "@utils/cxMessageLatency": moduleBox.exports,
+                    "@webpack/common": { Tooltip: "Tooltip", AuthenticationStore: { getId: () => me } },
                 })[name],
             });
             mocks["@plugins/messageLatency/MessageLatencyTooltip"] = latencyView.exports;
@@ -1217,7 +1217,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Disable ReplyTimestamp");
             assert.equal(runtime.renderReplyTimestamp({ referencedMessage: replied, baseMessage }), null);
 
-            const delayId = delay => String((1_700_000_000_000n + BigInt(delay)) << 22n);
+            const delayId = delay => String((1_200_000_000_000n + BigInt(delay)) << 22n);
             const delayed = { author: { id: sender }, id: delayId(3200), nonce: delayId(0) };
             assert.equal(runtime.renderMessageLatency(delayed), null);
             selectCatalog("MessageLatency");
@@ -4365,6 +4365,33 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             assert.equal(messageRenderer.default(input), original);
             assert.equal(messageRenderer.default, createMessageContent);
             resolvedReply = undefined;
+        }
+        if (!desktop) {
+            const snowflake = ms => String((1_200_000_000_000n + BigInt(ms)) << 22n);
+            const message = { id: snowflake(3200), nonce: snowflake(0), author: { id: sender } };
+            const originalText = Object.freeze({ type: "text", content: "Original content" });
+            const original = Object.freeze({ content: Object.freeze([originalText]), timestamp: "2:42 PM" });
+            const input = { message, cxTestPresentation: original };
+            selectCatalog("MessageLatency");
+            click(render(), "Allow for this session");
+            const delay = messageRenderer.default(input);
+            assert.equal(delay.content[0], originalText);
+            assert.equal(delay.content[1].content, "\nEstimated send delay: 3 seconds");
+            assert.equal(original.content.length, 1);
+            assert.equal(messageRenderer.default({ ...input, message: { ...message, id: snowflake(1000) } }), original);
+            assert.equal(messageRenderer.default({ ...input, message: { ...message, nonce: "fake" } }), original);
+            assert.equal(messageRenderer.default({ ...input, message: { ...message, author: { bot: true } } }), original);
+            assert.equal(messageRenderer.default({ ...input, isInlineReplyPreview: true }), original);
+            assert.equal(messageRenderer.default({ ...input, isEditing: true }), original);
+            const media = messageRenderer.default({ ...input, cxTestPresentation: { content: [], timestamp: "2:42 PM" } });
+            assert.equal(media.timestamp, "2:42 PM · Estimated send delay: 3 seconds");
+            const future = messageRenderer.default({ ...input, message: { ...message, nonce: snowflake(8500) } });
+            assert.match(future.content[1].content, /Clock ahead by about 5 seconds/);
+            settings.safeMode = { enabled: true };
+            assert.equal(messageRenderer.default(input), original);
+            settings.safeMode = undefined;
+            click(render(), "Disable MessageLatency");
+            assert.equal(messageRenderer.default, createMessageContent);
         }
         const channelStore = stores.ChannelStore;
         const originalGetChannel = channelStore.getChannel;

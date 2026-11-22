@@ -1,3 +1,4 @@
+import type { CxMessageLatencyOptions } from "./cxMessageLatency";
 import { cxAppearanceTargets, type CxAppearanceTarget, type CxHideTarget, type CxStyleTarget } from "./cxAppearance";
 import { cxClientFunctions, cxExternalLookups, translateCxText, type CxClientFunction, type CxExternalLookup, type CxFriendInviteAction } from "./cxClientCommands";
 import { chooseOne, cxCommandFunctions } from "./cxCommandFunctions";
@@ -225,7 +226,7 @@ type CxQuoteOptions = { includeLink: boolean; };
 type CxAvatarCropOptions = { maxAvatarCropZoom: number; };
 type CxJumboEmojiOptions = { jumboEmojiLimit: number; };
 type CxNotificationVolumeOptions = { notificationVolume: number; };
-export type CxMessageLatencyOptions = { latency: number; detectDiscordKotlin: boolean; showMillis: boolean; ignoreSelf: boolean; };
+export { getCxMessageLatency, type CxMessageLatencyOptions } from "./cxMessageLatency";
 type CxNumberOption = { effect: "avatar-crop-zoom" | "jumbo-emoji-limit" | "notification-volume" | "message-latency"; label: string; value: number; min: number; max: number; unit: string; };
 type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceShareOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxJumboEmojiOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
 
