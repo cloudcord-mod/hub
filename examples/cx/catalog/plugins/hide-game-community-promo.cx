@@ -1,0 +1,3 @@
+plugin "HideGameCommunityPromo":
+  needs appearance.hide
+  hide hide-game-community-promo

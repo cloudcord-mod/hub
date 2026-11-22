@@ -137,6 +137,7 @@ import plugin_catalog_hide_badges from "../../../../examples/cx/catalog/plugins/
 import plugin_catalog_hide_blocked_and_ignored_messages from "../../../../examples/cx/catalog/plugins/hide-blocked-and-ignored-messages.cx";
 import plugin_catalog_hide_boost_goal from "../../../../examples/cx/catalog/plugins/hide-boost-goal.cx";
 import plugin_catalog_hide_boost_progress_tip from "../../../../examples/cx/catalog/plugins/hide-boost-progress-tip.cx";
+import plugin_catalog_hide_boost_recognition_cards from "../../../../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx";
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
@@ -164,6 +165,7 @@ import plugin_catalog_hide_emoji_search_promotion from "../../../../examples/cx/
 import plugin_catalog_hide_empty_folders from "../../../../examples/cx/catalog/plugins/hide-empty-folders.cx";
 import plugin_catalog_hide_friend_requests_badge from "../../../../examples/cx/catalog/plugins/hide-friend-requests-badge.cx";
 import plugin_catalog_hide_game_claim_card from "../../../../examples/cx/catalog/plugins/hide-game-claim-card.cx";
+import plugin_catalog_hide_game_community_promo from "../../../../examples/cx/catalog/plugins/hide-game-community-promo.cx";
 import plugin_catalog_hide_gif_button from "../../../../examples/cx/catalog/plugins/hide-gif-button.cx";
 import plugin_catalog_hide_gif_favorite_button from "../../../../examples/cx/catalog/plugins/hide-gif-favorite-button.cx";
 import plugin_catalog_hide_gif_search_suggestions from "../../../../examples/cx/catalog/plugins/hide-gif-search-suggestions.cx";
@@ -189,9 +191,11 @@ import plugin_catalog_hide_nitro_tenure_tip from "../../../../examples/cx/catalo
 import plugin_catalog_hide_notification_bell from "../../../../examples/cx/catalog/plugins/hide-notification-bell.cx";
 import plugin_catalog_hide_orb_wallet_nitro_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-nitro-promotion.cx";
 import plugin_catalog_hide_orb_wallet_seasonal_promotion from "../../../../examples/cx/catalog/plugins/hide-orb-wallet-seasonal-promotion.cx";
+import plugin_catalog_hide_outbound_promotion_cards from "../../../../examples/cx/catalog/plugins/hide-outbound-promotion-cards.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
 import plugin_catalog_hide_powerup_unlock_tip from "../../../../examples/cx/catalog/plugins/hide-powerup-unlock-tip.cx";
 import plugin_catalog_hide_premium_group_promotion from "../../../../examples/cx/catalog/plugins/hide-premium-group-promotion.cx";
+import plugin_catalog_hide_premium_marketing_banner from "../../../../examples/cx/catalog/plugins/hide-premium-marketing-banner.cx";
 import plugin_catalog_hide_profile_activity_badges from "../../../../examples/cx/catalog/plugins/hide-profile-activity-badges.cx";
 import plugin_catalog_hide_profile_activity_timebar from "../../../../examples/cx/catalog/plugins/hide-profile-activity-timebar.cx";
 import plugin_catalog_hide_profile_banner_images from "../../../../examples/cx/catalog/plugins/hide-profile-banner-images.cx";
@@ -676,6 +680,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBlockedAndIgnoredMessages", source: plugin_catalog_hide_blocked_and_ignored_messages, description: "Hide matching incoming messages and history on this device", categories: ["Chat"] },
         { name: "HideBoostGoal", source: plugin_catalog_hide_boost_goal, description: "Hide the server boost progress bar", categories: ["Appearance"], appearanceRevision: "812688497568203e8e885e392fdfce9b4797a09ad2ceaf1d970a7b863f9e9b03" },
         { name: "HideBoostProgressTip", source: plugin_catalog_hide_boost_progress_tip, description: "Hide the server boost progress tooltip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "1d6378a948edebe2f07e6390da4e0dff29121bcc249e40d38a8a058e1b8ca0de" },
+        { name: "HideBoostRecognitionCards", source: plugin_catalog_hide_boost_recognition_cards, description: "Hide the booster recognition cards on the server boost marketing page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "54c3f3af4e1ca07a919192a5a7d05a8348b1a2a907353d62df351008bcae149c" },
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags, description: "Hide APP and BOT tags", categories: ["Appearance"], appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
@@ -703,6 +708,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideEmptyFolders", source: plugin_catalog_hide_empty_folders, description: "Hide empty expanded server folders", categories: ["Appearance"], appearanceRevision: "1724bea813368f7e907c921f341adf457f98769eb360c0a9be46deef5e0bd9a7" },
         { name: "HideFriendRequestsBadge", source: plugin_catalog_hide_friend_requests_badge, description: "Hide the pending friend requests counter", categories: ["Appearance"], appearanceRevision: "111bc312069e6c29234d3675d597cd7c35bae9f8d2f21868e4a806ce23ab1e36" },
         { name: "HideGameClaimCard", source: plugin_catalog_hide_game_claim_card, description: "Hide the game claim promotion card in eligible servers", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e06c36c1379dfbfbd22049ecf024ebf3b88e4be4e393fcf2df0c35be8cf77494" },
+        { name: "HideGameCommunityPromo", source: plugin_catalog_hide_game_community_promo, description: "Hide the card promoting other game communities", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "8a17e7433b5bfea666645bcd31e454ef1729ed6236fd72fee5ae55898939f8c5" },
         { name: "HideGifButton", source: plugin_catalog_hide_gif_button, description: "Hide the GIF picker shortcut", categories: ["Appearance"], appearanceRevision: "d7af74fc801892989cd4bed7856bf4f73b673f8e14548316368442fd81e166cf" },
         { name: "HideGifFavoriteButton", source: plugin_catalog_hide_gif_favorite_button, description: "Hide the favorite button when viewing GIFs", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5133bb74db5017212d71f4cd4eec44be922f2ae2257f7877de07baf7ba1d6d8e" },
         { name: "HideGifSearchSuggestions", source: plugin_catalog_hide_gif_search_suggestions, description: "Hide suggested searches in the GIF picker", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b827be2027141767b08deeba23ea88217ed2d75f1821af1765ab0c9d3606e844" },
@@ -728,9 +734,11 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideNotificationBell", source: plugin_catalog_hide_notification_bell, description: "Hide the channel notification settings shortcut", categories: ["Appearance"], appearanceRevision: "7ba7ebf67f69bf87b478780c25dc22ee79e44f0f381e0339fbc78c50ace61320" },
         { name: "HideOrbWalletNitroPromotion", source: plugin_catalog_hide_orb_wallet_nitro_promotion, description: "Hide the Nitro promotion in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideOrbWalletSeasonalPromotion", source: plugin_catalog_hide_orb_wallet_seasonal_promotion, description: "Hide the Black Friday card in the Orbs Wallet", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideOutboundPromotionCards", source: plugin_catalog_hide_outbound_promotion_cards, description: "Hide external offer cards on premium surfaces", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "4a3f01281d0af0c4f184367a740165f4199b332be09d1f66cae36403ab6394d5" },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button, description: "Hide the pinned messages shortcut", categories: ["Appearance"], appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67" },
         { name: "HidePowerupUnlockTip", source: plugin_catalog_hide_powerup_unlock_tip, description: "Hide the boost-to-unlock tooltip for server powerups", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "fc174f9df6d011b4f746ef1de2f5cb3678025bfbefad4048eda0cf49f5ef4dea" },
         { name: "HidePremiumGroupPromotion", source: plugin_catalog_hide_premium_group_promotion, description: "Hide the premium group promotion in the offer dialog", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HidePremiumMarketingBanner", source: plugin_catalog_hide_premium_marketing_banner, description: "Hide the banner tile on the premium promotions page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "508126ef428933e2220d3d92219d41a375cf541c65f9fb3b88bc4b234baa907a" },
         { name: "HideProfileActivityBadges", source: plugin_catalog_hide_profile_activity_badges, description: "Hide activity badges on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5eb45da8e6b8f4b64553b82a09ba64b96f22ac4ab0faf9d8ae00b93eda857a40" },
         { name: "HideProfileActivityTimebar", source: plugin_catalog_hide_profile_activity_timebar, description: "Hide the elapsed-time bar on profile activity cards", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "a4f2b8a3365692099cd125181785282a06e13d22e28ec0c5a546686646d822da" },
         { name: "Hide Profile Banner Images", source: plugin_catalog_hide_profile_banner_images, description: "Hide Discord-hosted profile banner images except your own and those of friends", categories: ["Appearance"], appearanceRevision: "c2654ca55ea9bf9aa21d8bb1cef13879d1c933a0c6c9ed27d5917ef051ec10db" },

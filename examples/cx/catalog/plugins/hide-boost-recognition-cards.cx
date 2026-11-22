@@ -1,0 +1,3 @@
+plugin "HideBoostRecognitionCards":
+  needs appearance.hide
+  hide hide-boost-recognition-cards

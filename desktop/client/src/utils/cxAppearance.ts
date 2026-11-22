@@ -17,6 +17,10 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-game-community-promo": hideMobileComponent("HideGameCommunityPromo", "the card promoting other game communities", "modules/game_community_upsell/native/GameCommunityMultiGuildUpsellCard.tsx"),
+    "hide-outbound-promotion-cards": hideMobileComponent("HideOutboundPromotionCards", "external offer cards on premium surfaces", "components_native/premium/OutboundPromotionCard.tsx"),
+    "hide-premium-marketing-banner": hideMobileComponent("HidePremiumMarketingBanner", "the banner tile on the premium promotions page", "modules/premium/promotions/native/MarketingPageBannerTile.tsx"),
+    "hide-boost-recognition-cards": hideMobileComponent("HideBoostRecognitionCards", "the booster recognition cards on the server boost marketing page", "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingBoosterRecognitionCards.tsx"),
     "hide-scheduled-message-draft-tip": hideMobileComponent("HideScheduledMessageDraftTip", "the scheduled-message draft tooltip", "modules/scheduled_messages/native/ScheduledMessageDraftCoachmark.tsx"),
     "hide-you-settings-tip": hideMobileComponent("HideYouSettingsTip", "the settings shortcut tooltip on the You tab", "modules/main_tabs_v2/native/tabs/you/YouSettingsCoachmark.tsx"),
     "hide-game-claim-card": hideMobileComponent("HideGameClaimCard", "the game claim promotion card in eligible servers", "modules/game_claim/native/GameClaimCoachmark.tsx"),

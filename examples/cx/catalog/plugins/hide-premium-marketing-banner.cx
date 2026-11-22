@@ -1,0 +1,3 @@
+plugin "HidePremiumMarketingBanner":
+  needs appearance.hide
+  hide hide-premium-marketing-banner

@@ -1,0 +1,3 @@
+plugin "HideOutboundPromotionCards":
+  needs appearance.hide
+  hide hide-outbound-promotion-cards
