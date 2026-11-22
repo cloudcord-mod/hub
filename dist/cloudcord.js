@@ -68629,15 +68629,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           ...cloudCordCoreUnloads,
           ...u
         ].forEach((f) => f && unload.push(f)));
+        var cancelled = false;
+        var restoreTimer;
+        unload.push(() => {
+          cancelled = true;
+          if (restoreTimer !== void 0)
+            clearTimeout(restoreTimer);
+        });
         void Promise.resolve().then(() => _async_to_generator(function* () {
           var { settings: settings2 } = (init_settings(), __toCommonJS(settings_exports));
           var { awaitStorage: awaitStorage3 } = (init_storage(), __toCommonJS(storage_exports));
           yield awaitStorage3(settings2);
-          if (settings2.safeMode?.enabled || !settings2.cxRememberedAppearance?.length)
+          if (cancelled || settings2.safeMode?.enabled || !settings2.cxRememberedAppearance?.length)
             return;
-          var cleanup2 = yield runStartupTask("CX appearance", () => (init_CxExtensions(), __toCommonJS(CxExtensions_exports)).restoreRememberedCxAppearance());
-          if (cleanup2)
-            unload.push(cleanup2);
+          restoreTimer = setTimeout(() => {
+            restoreTimer = void 0;
+            if (cancelled || settings2.safeMode?.enabled)
+              return;
+            void runStartupTask("CX appearance", () => (init_CxExtensions(), __toCommonJS(CxExtensions_exports)).restoreRememberedCxAppearance()).then((cleanup2) => {
+              if (!cleanup2)
+                return;
+              if (cancelled)
+                cleanup2();
+              else
+                unload.push(cleanup2);
+            }).catch((error) => console.warn("CloudCord could not clean up CX appearance", error));
+          }, 0);
         })()).catch((error) => console.warn("CloudCord could not restore CX appearance", error));
         initDebugger();
         globalThis.bunny = lib_exports;
@@ -68651,7 +68668,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "73b464220e06a32ac90661abe4bfb19949e33b09";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4233b7113ce48ca68e105876f387d1aec086f60f";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
