@@ -36965,7 +36965,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-home-drawer-unread-subtitle": hideMobileComponent("HideHomeDrawerUnreadSubtitle", "unread status text in the home drawer", "modules/home_drawer/native/subtitles/UnreadSubtitle.tsx"),
         "hide-stage-backdrop": hideMobileComponent("HideStageBackdrop", "decorative background artwork in Stage channels", "modules/stage_channels/native/components/StageChannelBackground.tsx"),
         "hide-profile-fixed-backdrop": hideMobileComponent("HideProfileFixedBackdrop", "the fixed backdrop behind profile content", "modules/user_profile/native/UserProfileFixedBackground.tsx"),
-        "hide-profile-banner": hideMobileComponent("HideProfileBanner", "banner images on mobile profiles", "modules/user_profile/native/UserProfileBanner.tsx"),
+        "hide-profile-banner": {
+          plugin: "HideProfileBanner",
+          label: "banner images on profiles",
+          catalogOriginal: "hide-profile-banner.cx",
+          css: "",
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileBanner.tsx"
+            ]
+          }
+        },
         "hide-profile-activity-card-badges": hideMobileComponent("HideProfileActivityCardBadges", "badges within profile activity cards", "modules/user_profile/native/UserProfileActivityCardBadges.tsx"),
         "hide-channel-list-dividers": hideMobileComponent("HideChannelListDividers", "separator lines in the server channel list", "modules/channel_list_v2/native/components/Divider.tsx"),
         "hide-premium-offer-divider": hideMobileComponent("HidePremiumOfferDivider", "decorative separators in Premium offer sheets", "modules/premium/roadblocks/native/views/PremiumUpsellSectionDivider.tsx"),
@@ -58911,8 +58921,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           {
             name: "HideProfileBanner",
             source: hide_profile_banner_default,
-            description: "Hide banner images on mobile profiles",
-            mobileOnly: true,
+            description: "Hide banner images on profiles",
             categories: [
               "Appearance"
             ],
@@ -72032,7 +72041,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "baa56e424e0127f15852c6c70f8a27d9f322d967";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "65b7ac4884936864160225a7d4777b324fad0703";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
