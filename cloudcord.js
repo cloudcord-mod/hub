@@ -41357,6 +41357,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           permission: "servers.mediacopy",
           label: "Copy links to the selected server's icon and banner"
         },
+        "copy-server-splash-links": {
+          permission: "servers.mediacopy",
+          label: "Copy invite and discovery splash links from the selected server"
+        },
         "copy-server-details": {
           permission: "servers.detailscopy",
           label: "Copy the selected server's name or description"
@@ -46776,6 +46780,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Copy Server Description"
         }
       ];
+    if (effect === "copy-server-splash-links")
+      return [
+        {
+          key: "splash",
+          label: "Copy Invite Splash Link"
+        },
+        {
+          key: "discoverySplash",
+          label: "Copy Discovery Splash Link"
+        }
+      ];
     var view = effect === "view-server-media";
     return [
       {
@@ -46793,6 +46808,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function getCxGuildAssetUrl(path, id, hash) {
     if (!isCxProfileUserId(id) || typeof hash !== "string" || !/^(?:a_)?[a-f0-9]{32}$/.test(hash))
       return;
+    if ((path === "splashes" || path === "discovery-splashes") && hash.startsWith("a_"))
+      return;
     var format = hash.startsWith("a_") ? "gif" : "png";
     return "https://cdn.discordapp.com/" + path + "/" + id + "/" + hash + "." + format + "?size=4096";
   }
@@ -46801,6 +46818,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       return;
     if (field === "icon" || field === "banner")
       return getCxGuildAssetUrl(field === "icon" ? "icons" : "banners", id, guild[field]);
+    if (field === "splash")
+      return getCxGuildAssetUrl("splashes", id, guild.splash);
+    if (field === "discoverySplash")
+      return getCxGuildAssetUrl("discovery-splashes", id, guild.discoverySplash ?? guild.discovery_splash);
     var text = guild[field];
     return typeof text === "string" && text.trim() ? text : void 0;
   }
@@ -48983,7 +49004,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "spotify.activity": "Read your current Spotify track, album, or artist when the command runs",
         "servers.markread": "Mark unread server channels as read when you run the listed command",
         "servers.mediaview": "Open an icon or banner from the selected server in Discord\u2019s image viewer",
-        "servers.mediacopy": "Copy the selected server's icon or banner link when you choose the corresponding menu action",
+        "servers.mediacopy": "Copy links to the selected server's images when you choose a menu action",
         "servers.detailscopy": "Copy the selected server's name or description when you choose the corresponding menu action",
         "channels.iconview": "Open the selected group DM's icon when you choose View Group Icon",
         "channels.markonopen": "Mark the channel you open as read through its newest known message",
@@ -49676,6 +49697,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_copy_server_nickname = __esm({
     "../examples/cx/catalog/plugins/copy-server-nickname.cx"() {
       copy_server_nickname_default = 'plugin "CopyServerNickname":\n  needs profilemenu.copy\n  on profile menu copy server-nickname\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/copy-server-splash-links.cx
+  var copy_server_splash_links_default;
+  var init_copy_server_splash_links = __esm({
+    "../examples/cx/catalog/plugins/copy-server-splash-links.cx"() {
+      copy_server_splash_links_default = 'plugin "Copy Server Splash Links":\n  needs servers.mediacopy\n  use copy-server-splash-links\n';
     }
   });
 
@@ -53640,6 +53669,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_server_details();
       init_copy_server_media_links();
       init_copy_server_nickname();
+      init_copy_server_splash_links();
       init_copy_sticker_links();
       init_copy_user_mention();
       init_copy_user_urls();
@@ -54752,6 +54782,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy Server Nickname",
             categories: [
               "Profiles"
+            ]
+          },
+          {
+            name: "Copy Server Splash Links",
+            source: copy_server_splash_links_default,
+            description: "Copy invite and discovery splash links from the selected server",
+            categories: [
+              "Media",
+              "Servers & channels"
             ]
           },
           {
@@ -62176,6 +62215,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return registerMobileRoleMenu(effect, enabled);
           case "view-server-media":
           case "copy-server-media-links":
+          case "copy-server-splash-links":
           case "copy-server-details":
           case "view-group-dm-icon":
             return registerMobileServerMenu(effect, enabled);
@@ -68178,7 +68218,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7bc2774a5630ec8f53104f186a6bb273e33a230b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "eea116880e6d6bcac3eb7249d4a96d69bf659c2e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
