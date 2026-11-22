@@ -37402,6 +37402,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             messagePresentation: "shouldShowRoleDot"
           }
         },
+        "hide-chat-role-name-colors": {
+          plugin: "HideChatRoleNameColors",
+          label: "role colors on names in chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messagePresentation: "shouldShowRoleOnName"
+          }
+        },
         "server-tags": {
           plugin: "HideClanTags",
           label: "server tags",
@@ -51480,6 +51489,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-chat-role-name-colors.cx
+  var hide_chat_role_name_colors_default;
+  var init_hide_chat_role_name_colors = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-role-name-colors.cx"() {
+      hide_chat_role_name_colors_default = 'plugin "HideChatRoleNameColors":\n  needs appearance.hide\n  hide hide-chat-role-name-colors\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-chat-thread-previews.cx
   var hide_chat_thread_previews_default;
   var init_hide_chat_thread_previews = __esm({
@@ -55495,6 +55512,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_chat_linked_role_tags();
       init_hide_chat_post_previews();
       init_hide_chat_role_dots();
+      init_hide_chat_role_name_colors();
       init_hide_chat_thread_previews();
       init_hide_clan_tags();
       init_hide_composer_emoji_promo();
@@ -57703,6 +57721,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "aea9c80e488fef746d51483621339a35d64d4c00014bd1dab2e5c5f30afe5979"
+          },
+          {
+            name: "HideChatRoleNameColors",
+            source: hide_chat_role_name_colors_default,
+            description: "Hide role colors on names in chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "0ba54a59a4a4611db829166eb0b42e6aacade00bd7a05746ad8c0a5313d09bf4"
           },
           {
             name: "HideChatThreadPreviews",
@@ -66789,7 +66817,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               var presentation = invoke(args);
               if (!presentation || typeof presentation !== "object")
                 return presentation;
-              if (mobile.messagePresentation === "edited" || mobile.messagePresentation === "shouldShowRoleDot") {
+              if (mobile.messagePresentation === "edited" || mobile.messagePresentation === "shouldShowRoleDot" || mobile.messagePresentation === "shouldShowRoleOnName") {
                 var field = mobile.messagePresentation;
                 if (presentation[field] === true)
                   return {
@@ -71428,7 +71456,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ec959caef69abce938c5802a108c6b1194536ebe";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f91c33c266916ce096b6f6d29e78298d66e05ab";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
