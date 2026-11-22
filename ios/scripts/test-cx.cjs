@@ -5865,6 +5865,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             { name: "Copy Notes" },
         ], "copy notes");
         assert.equal(searched[0].name, "Copy Notes", "name matches rank before feature descriptions");
+        const commandEntries = [
+            { name: "Convert Duration", commands: ["convertduration"] },
+            { name: "Duration Details", commands: ["durationdetails"] },
+            { name: "Playback", commands: ["duration"] },
+        ];
+        assert.deepEqual(Array.from(moduleBox.exports.searchCxCatalog(commandEntries, "/duration"), entry => entry.name),
+            ["Playback", "Duration Details", "Convert Duration"]);
+        assert.equal(moduleBox.exports.searchCxCatalog(commandEntries, "duration")[0].name, "Playback");
         const mutableEntry = { name: "Café Notes", keywords: "private mémoire" };
         assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "cafenotes")[0], mutableEntry);
         assert.equal(moduleBox.exports.searchCxCatalog([mutableEntry], "memoire")[0], mutableEntry);

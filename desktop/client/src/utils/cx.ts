@@ -357,21 +357,33 @@ export function searchCxCatalog<T extends CxSearchEntry>(entries: readonly T[], 
     const compactQuery = normalizedQuery.replaceAll(" ", "");
     if (query.startsWith("/")) {
         if (!compactQuery && query !== "/") return [];
-        return entries.filter(entry => entry.commands?.some(command => normalizeCatalogSearch(command).replaceAll(" ", "").includes(compactQuery)));
+        if (!compactQuery) return entries.filter(entry => entry.commands?.length);
+        const exact: T[] = [];
+        const prefix: T[] = [];
+        const partial: T[] = [];
+        for (const entry of entries) {
+            const commands = entry.commands?.map(command => normalizeCatalogSearch(command).replaceAll(" ", ""));
+            if (commands?.includes(compactQuery)) exact.push(entry);
+            else if (commands?.some(command => command.startsWith(compactQuery))) prefix.push(entry);
+            else if (commands?.some(command => command.includes(compactQuery))) partial.push(entry);
+        }
+        return exact.concat(prefix, partial);
     }
     const terms = normalizedQuery ? normalizedQuery.split(" ") : [];
     const exact: T[] = [];
     const normalized: T[] = [];
+    const commandMatches: T[] = [];
     const partial: T[] = [];
     const feature: T[] = [];
     for (const entry of entries) {
         const { lowerName, compactName, searchableText } = catalogSearchFields(entry);
         if (lowerName === query) exact.push(entry);
         else if (compactQuery && compactName === compactQuery) normalized.push(entry);
+        else if (compactQuery && entry.commands?.some(command => normalizeCatalogSearch(command).replaceAll(" ", "") === compactQuery)) commandMatches.push(entry);
         else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery)) partial.push(entry);
         else if (terms.length && terms.every(term => searchableText.includes(term))) feature.push(entry);
     }
-    return exact.concat(normalized, partial, feature);
+    return exact.concat(normalized, commandMatches, partial, feature);
 }
 
 export function parseCx(source: string): CxDocument {
