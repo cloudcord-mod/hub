@@ -7,6 +7,7 @@ import { findAssetId } from "@lib/api/assets";
 import { copyCcpReport } from "@lib/api/ccpReport";
 import { getDebugInfo } from "@lib/api/debug";
 import { BundleUpdaterManager } from "@lib/api/native/modules";
+import { fetchRuntimeUpdate } from "@lib/api/native/runtimeUpdates";
 import { settings } from "@lib/api/settings";
 import { openAlert } from "@lib/ui/alerts";
 import { GITHUB } from "@lib/utils/constants";
@@ -77,9 +78,7 @@ export default function General() {
                     <TableRow label="Fetch Runtime" subLabel="Download the latest runtime. Reopen Discord to apply it." onPress={async () => {
                         (settings as any).cloudcordUpdateStatus = "Checking for updates…";
                         try {
-                            const fetchRuntime = BundleUpdaterManager?.checkForUpdates ?? BundleUpdaterManager?.download;
-                            if (typeof fetchRuntime !== "function") throw new Error("This loader cannot fetch from settings. Use Refetch Bundle in the recovery menu.");
-                            await fetchRuntime.call(BundleUpdaterManager);
+                            await fetchRuntimeUpdate(BundleUpdaterManager);
                             (settings as any).cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
                         } catch (error) {
                             const message = error instanceof Error ? error.message : "Runtime download failed";

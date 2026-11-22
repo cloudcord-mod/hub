@@ -1,5 +1,11 @@
 const URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
 let pending: Promise<void> | undefined;
+export async function fetchRuntimeUpdate(updater: any) {
+    if (typeof updater?.checkForUpdates === "function") return updater.checkForUpdates();
+    if (typeof updater?.download === "function") return updater.download();
+    throw new Error("This loader cannot fetch from settings. Use Refetch Bundle in the recovery menu.");
+}
+
 export function startAutoUpdates(prefs: any, updater: any) {
     let stopped = false, checking = false;
     const check = async () => {
@@ -7,8 +13,7 @@ export function startAutoUpdates(prefs: any, updater: any) {
         checking = true;
         prefs.cloudcordUpdateStatus = "Checking for updates…";
         try {
-            if (typeof updater?.checkForUpdates !== "function") throw new Error("This loader cannot check for updates.");
-            await updater.checkForUpdates();
+            await fetchRuntimeUpdate(updater);
             if (!stopped) prefs.cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
         } catch (error: any) {
             if (!stopped) prefs.cloudcordUpdateStatus = "Update failed: " + (error?.message || "connection unavailable") + ". Retrying automatically.";

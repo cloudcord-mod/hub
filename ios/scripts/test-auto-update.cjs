@@ -29,5 +29,13 @@ vm.runInNewContext(esbuild.transformSync(fs.readFileSync("ios/runtime/src/lib/ap
     await new Promise(setImmediate);
     assert.equal(checks, 2);
     stop();
+    const legacyPrefs = {};
+    const legacyUpdater = { checks: 0, async download() { this.checks++; } };
+    const stopLegacy = api.startAutoUpdates(legacyPrefs, legacyUpdater);
+    await new Promise(setImmediate);
+    assert.equal(legacyUpdater.checks, 1);
+    assert.match(legacyPrefs.cloudcordUpdateStatus, /Latest runtime saved/);
+    stopLegacy();
+    await assert.rejects(api.fetchRuntimeUpdate(undefined), /Refetch Bundle/);
     console.log("auto-update checks passed: deduplicated download, correct Rain cache, readback, retries, opt-out");
 })().catch(error => { console.error(error); process.exitCode = 1; });
