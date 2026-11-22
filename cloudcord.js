@@ -21044,19 +21044,23 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     });
   }
-  function StudioAvatar({ uri, name }) {
-    var [failed, setFailed] = (0, import_react6.useState)(false);
-    if (uri && !failed) {
+  function StudioAvatar({ uri, fallback, name }) {
+    var [attempt, setAttempt] = (0, import_react6.useState)(0);
+    var active = [
+      uri || fallback,
+      uri && uri !== fallback ? fallback : void 0
+    ][attempt];
+    if (active) {
       return /* @__PURE__ */ jsx(import_react_native24.Image, {
         source: {
-          uri
+          uri: active
         },
         style: {
           width: "100%",
           height: "100%"
         },
-        onError: () => setFailed(true)
-      });
+        onError: () => setAttempt(attempt + 1)
+      }, active);
     }
     var initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
     return /* @__PURE__ */ jsx(import_react_native24.View, {
@@ -21076,7 +21080,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  function StudioHero({ name, username, avatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
+  function StudioHero({ name, username, avatar, fallbackAvatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
     var tint = accent || C3.raised();
     return /* @__PURE__ */ jsxs(import_react_native24.View, {
       style: {
@@ -21169,8 +21173,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       },
                       children: /* @__PURE__ */ jsx(StudioAvatar, {
                         uri: avatar,
+                        fallback: fallbackAvatar,
                         name
-                      }, avatar)
+                      }, JSON.stringify([
+                        avatar,
+                        fallbackAvatar
+                      ]))
                     }),
                     /* @__PURE__ */ jsx(StudioPresence, {
                       status,
@@ -22435,7 +22443,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  function PreviewCard({ name, username, pronouns, avatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
+  function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
     var [layout, setLayout] = (0, import_react6.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
@@ -22486,8 +22494,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               children: /* @__PURE__ */ jsx(StudioAvatar, {
                 uri: avatar,
+                fallback: fallbackAvatar,
                 name
-              }, avatar)
+              }, JSON.stringify([
+                avatar,
+                fallbackAvatar
+              ]))
             }),
             /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
@@ -22619,8 +22631,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       },
                       children: /* @__PURE__ */ jsx(StudioAvatar, {
                         uri: avatar,
+                        fallback: fallbackAvatar,
                         name
-                      }, avatar)
+                      }, JSON.stringify([
+                        avatar,
+                        fallbackAvatar
+                      ]))
                     }),
                     decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
                       source: {
@@ -22798,7 +22814,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  function DiscordProfileCard({ name, username, pronouns, avatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
+  function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }) {
     var themed = !!primary;
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
@@ -22847,8 +22863,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               children: /* @__PURE__ */ jsx(StudioAvatar, {
                 uri: avatar,
+                fallback: fallbackAvatar,
                 name
-              }, avatar)
+              }, JSON.stringify([
+                avatar,
+                fallbackAvatar
+              ]))
             }),
             decoration ? /* @__PURE__ */ jsx(import_react_native24.Image, {
               source: {
@@ -31446,6 +31466,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       name: data.displayName || realUser?.globalName || realUser?.global_name || realUser?.username || "You",
       username: data.username || realUser?.username || "username",
       avatar: data.avatarMedia?.uri || realAvatar,
+      fallbackAvatar: realAvatar,
       banner: data.bannerMedia?.uri || fallback.banner,
       bio: data.bio ?? fallback.bio,
       pronouns: data.pronouns ?? fallback.pronouns,
@@ -71997,7 +72018,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "268dc82ef84bab3e285ecd1dbf21c60fc5fbdffd";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "324a5a1dcd6aaf9c2f46365482e6d679a4788205";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
