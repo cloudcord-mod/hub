@@ -39854,6 +39854,23 @@ Copy \`<t:${timestamp}:F>\``;
           var action = contain ? "Padding" : "Crop";
           return "Resize to " + scaledW + " \xD7 " + scaledH + " px\n" + action + ": " + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
         },
+        videoSizeEstimate(rate, duration) {
+          var kbps = Number(rate);
+          var seconds = durationSeconds(duration);
+          if (!/^\d{1,8}(?:\.\d{1,3})?$/.test(rate) || kbps <= 0 || !seconds)
+            return;
+          var megabytes = kbps * seconds / 8e3;
+          return "Estimated payload: " + Number(megabytes.toPrecision(8)) + " MB";
+        },
+        videoFrameCount(fps, duration) {
+          var rate = Number(fps);
+          var seconds = durationSeconds(duration);
+          if (!/^\d{1,4}(?:\.\d{1,3})?$/.test(fps) || rate < 1 || rate > 1e3 || !seconds)
+            return;
+          var frames = Math.round(rate * seconds);
+          if (Number.isSafeInteger(frames))
+            return "Estimated frames: " + frames;
+        },
         bitrateBudget(size, duration) {
           var bytes = fileSizeBytes(size);
           var seconds = durationSeconds(duration);
@@ -54160,6 +54177,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/video-frame-count.cx
+  var video_frame_count_default;
+  var init_video_frame_count = __esm({
+    "../examples/cx/catalog/plugins/video-frame-count.cx"() {
+      video_frame_count_default = 'plugin "Video Frame Count":\n  needs commands.register\n  needs reply.local\n  on command "framecount":\n    input "fps" text\n    input "duration" text\n    reply "${videoFrameCount(fps, duration)}" else "Enter a frame rate from 1 to 1000 and a positive duration."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/video-size-estimate.cx
+  var video_size_estimate_default;
+  var init_video_size_estimate = __esm({
+    "../examples/cx/catalog/plugins/video-size-estimate.cx"() {
+      video_size_estimate_default = 'plugin "Video Size Estimate":\n  needs commands.register\n  needs reply.local\n  on command "videosize":\n    input "rate" text\n    input "duration" text\n    reply "${videoSizeEstimate(rate, duration)}" else "Enter a positive total bitrate in kbps and a duration such as 2m."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/view-group-dm-icon.cx
   var view_group_dm_icon_default;
   var init_view_group_dm_icon = __esm({
@@ -55651,6 +55684,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_user_tags();
       init_utf_8_byte_count();
       init_vibe_check();
+      init_video_frame_count();
+      init_video_size_estimate();
       init_view_group_dm_icon();
       init_view_role_icon();
       init_view_server_media();
@@ -60812,6 +60847,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Chat",
               "Commands"
             ]
+          },
+          {
+            name: "Video Frame Count",
+            source: video_frame_count_default,
+            description: "/framecount",
+            commands: [
+              "framecount"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "05bbc7b2a9de22b4b85f1792f5b967269fc9dc356581b753d84da9049a942cf0",
+            privateCommands: true
+          },
+          {
+            name: "Video Size Estimate",
+            source: video_size_estimate_default,
+            description: "/videosize",
+            commands: [
+              "videosize"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "97d0539fc2b4f0f2846916d89aa7527a5a1f2cadd478c519a29e4554475f991e",
+            privateCommands: true
           },
           {
             name: "View Group DM Icon",
@@ -71115,7 +71176,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c00eb598c9bedf5ea84335af1ccb35d373a26395";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2c043e78c39567111c1934e2e3399be0ef76e7d2";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
