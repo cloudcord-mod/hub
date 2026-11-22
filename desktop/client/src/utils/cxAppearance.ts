@@ -275,6 +275,11 @@ export const cxAppearanceTargets = {
         css: "", mobileOnly: true,
         mobile: { messagePresentation: "shouldShowRoleDot" },
     },
+    "hide-chat-role-name-colors": {
+        plugin: "HideChatRoleNameColors", label: "role colors on names in chat",
+        css: "", mobileOnly: true,
+        mobile: { messagePresentation: "shouldShowRoleOnName" },
+    },
     "server-tags": {
         plugin: "HideClanTags", label: "server tags",
         css: '[class*="clanTag"], [class*="chipletContainer"] { display: none !important; }',

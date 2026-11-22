@@ -1,0 +1,3 @@
+plugin "HideChatRoleNameColors":
+  needs appearance.hide
+  hide hide-chat-role-name-colors

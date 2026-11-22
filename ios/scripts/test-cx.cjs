@@ -508,7 +508,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             edited: true, stickers: Object.freeze([{ id: "sticker" }]), content: "hello <t:12345>",
             reactions: Object.freeze([{ count: 3 }]),
             attachments: Object.freeze([{ id: "file" }]),
-            roleIcon: Object.freeze({ id: "role" }), shouldShowRoleDot: true,
+            roleIcon: Object.freeze({ id: "role" }), shouldShowRoleDot: true, shouldShowRoleOnName: true,
             threadEmbed: Object.freeze({ id: "thread" }),
             connectionsRoleTag: Object.freeze({ id: "linked-role" }),
             postPreviewEmbeds: Object.freeze([{ id: "post-preview" }]),
@@ -2374,6 +2374,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(rendered.embeds.length, rule.mobile.messagePresentation === "embeds" ? 0 : 1);
                 assert.equal(rendered.attachments.length, rule.mobile.messagePresentation === "attachments" ? 0 : 1);
                 assert.equal(rendered.shouldShowRoleDot, rule.mobile.messagePresentation !== "shouldShowRoleDot");
+                assert.equal(rendered.shouldShowRoleOnName, rule.mobile.messagePresentation !== "shouldShowRoleOnName");
                 assert.equal(rendered.safetyPolicyNoticeEmbed, messagePresentation.safetyPolicyNoticeEmbed);
                 assert.equal(rendered.safetySystemNotificationEmbed, messagePresentation.safetySystemNotificationEmbed);
                 for (const field of ["timestamp", "timestampTooltip", "timestampAccessibilityLabel"]) {

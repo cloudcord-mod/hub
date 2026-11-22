@@ -2279,7 +2279,8 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
             default(args, invoke) {
                 const presentation = invoke(args);
                 if (!presentation || typeof presentation !== "object") return presentation;
-                if (mobile.messagePresentation === "edited" || mobile.messagePresentation === "shouldShowRoleDot") {
+                if (mobile.messagePresentation === "edited" || mobile.messagePresentation === "shouldShowRoleDot"
+                    || mobile.messagePresentation === "shouldShowRoleOnName") {
                     const field = mobile.messagePresentation;
                     if ((presentation as Record<string, unknown>)[field] === true) return { ...presentation, [field]: false };
                 } else if (mobile.messagePresentation === "timestamps") {
