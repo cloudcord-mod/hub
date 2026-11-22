@@ -17327,8 +17327,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return "invisible";
     if (data.customActivity?.type === 1 && streamURL(data.customActivity.url))
       return "streaming";
-    if (data.presenceStatus)
-      return data.presenceStatus;
+    var draftStatus = data.presenceStatus;
+    if (draftStatus === "online" || draftStatus === "idle" || draftStatus === "dnd" || draftStatus === "invisible")
+      return draftStatus;
     return nativeStatus === "idle" || nativeStatus === "dnd" ? nativeStatus : "online";
   }
   function parseServerTagIcon(value) {
@@ -72046,7 +72047,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8accdde251ba8fd91e6a8b8b287cb99ac4d0c111";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cde70d67a113cd60820ccb39905b7ad63c1c821a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
