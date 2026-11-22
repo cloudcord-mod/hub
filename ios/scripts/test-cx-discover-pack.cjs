@@ -121,7 +121,7 @@ try {
     error = String(failure?.message ?? failure);
     stack = typeof failure?.stack === "string" ? failure.stack.slice(0, 2000) : "";
 }
-JSON.stringify({ error, stack, hooks, settingsDeclared, requests: [...requests.values()], fixtureApis: [...used].sort() });`);
+JSON.stringify({ error, stack, hooks, settingsDeclared, requests: [...requests.values()], fixtureApis: [...used] });`);
             const value = check.error ?? check.value;
             try {
                 const result = context.dump(value);
