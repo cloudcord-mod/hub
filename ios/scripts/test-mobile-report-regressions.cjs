@@ -89,7 +89,7 @@ vm.runInContext(compile(publishedSource), refreshContext);
     assert.equal(emits, 2, 'unchanged badges must not trigger store refreshes');
     let clears = 0;
     const confirmations = [];
-    let profile = { bio: 'saved', nitro: false };
+    let profile = { bio: 'saved', nitro: false, primaryColor: 0, accentColor: 0xffffff };
     const own = vm.createContext({
         rootSettings: {}, preview: { primaryColor: '#000000', accentColor: '#ffffff' },
         fakeProfileEditorOpen: false, suppressOwnPullUntil: 0,
@@ -106,16 +106,18 @@ vm.runInContext(compile(publishedSource), refreshContext);
     vm.runInContext(compile(source.slice(source.indexOf('async function pullOwnSharedProfile('), source.indexOf('const sharedProfileSeenAt'))), own);
     await own.pullOwnSharedProfile();
     assert.equal(clears, 1);
+    assert.equal(own.preview.profileColorsEnabled, true, 'older synced profiles infer their color setting');
     assert.deepEqual(confirmations.at(-1), [own.currentUserId, 'confirmed']);
     own.pullOwnSharedProfile.lastAttempt = 0;
     await own.pullOwnSharedProfile();
     assert.equal(clears, 1, 'identical own profile must not replace observed settings or clear caches');
     assert.equal(confirmations.length, 2, 'a matching server copy can confirm sync without refreshing the profile');
-    profile = { bio: 'updated', nitro: false };
+    profile = { ...profile, bio: 'updated', profileColorsEnabled: false };
     own.pullOwnSharedProfile.lastAttempt = 0;
     await own.pullOwnSharedProfile();
     assert.equal(clears, 2, 'actual own profile changes must still apply');
     assert.equal(own.preview.bio, 'updated');
+    assert.equal(own.preview.profileColorsEnabled, false, 'an explicit off setting wins over retained color values');
     let finish;
     own.fetch = () => new Promise(resolve => { finish = () => resolve({ ok: true, json: async () => ({ profile: { bio: 'late response', syncRevision: 10 } }) }); });
     own.pullOwnSharedProfile.lastAttempt = 0;
