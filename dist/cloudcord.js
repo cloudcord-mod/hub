@@ -74349,7 +74349,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a93b03a60554686efe7941798fd5a9b0192c3695";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "52624cd3b62c6fa65433d1ec8ba75871a6299650";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
