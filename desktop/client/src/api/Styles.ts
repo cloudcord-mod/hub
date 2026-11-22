@@ -20,6 +20,8 @@ import { generateTextCss } from "@components/BaseText";
 import { generateMarginCss } from "@components/margins";
 import { classNameFactory as _classNameFactory, classNameToSelector, createAndAppendStyle } from "@utils/css";
 
+import { applyGoogleFont, getGoogleFont } from "@utils/googleFonts";
+
 // Backwards compat for Vesktop
 /** @deprecated Import this from `@utils/css` instead */
 export const classNameFactory = _classNameFactory;
@@ -82,6 +84,8 @@ export function initStyles() {
 
 document.addEventListener("DOMContentLoaded", () => {
     document.documentElement.append(vencordRootNode);
+    const font = getGoogleFont();
+    if (font) void applyGoogleFont(font, false).catch(() => {});
 }, { once: true });
 
 export function requireStyle(name: string) {

@@ -16,6 +16,7 @@ import type { ComponentType } from "react";
 
 import { wrapTab } from "../BaseTab";
 import { PluginsPage, ThemesPage } from "./AddonPage";
+import FontsPage from "./FontsPage";
 
 const cl = classNameFactory("cc-addons-");
 
@@ -24,6 +25,7 @@ interface Page { name: string; Icon: ComponentType<IconProps>; Tab: ComponentTyp
 const PAGES: Page[] = [
     { name: "Plugins", Icon: PluginsIcon, Tab: PluginsPage, show: v => v.showPluginsTab !== false },
     { name: "Themes", Icon: PaintbrushIcon, Tab: ThemesPage, show: v => v.showThemesTab !== false },
+    { name: "Fonts", Icon: PaintbrushIcon, Tab: FontsPage },
 ];
 
 // Lets other pages (like Overview) open Add-ons on a specific tab.

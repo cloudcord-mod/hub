@@ -2,14 +2,15 @@ import { Strings } from "@core/i18n";
 import { CardWrapper } from "@core/ui/components/AddonCard";
 import { showConfirmationAlert } from "@core/vendetta/alerts";
 import { useProxy } from "@core/vendetta/storage";
-import { FontDefinition, fonts, selectFont } from "@lib/addons/fonts";
+import { FontDefinition, fonts, saveFont, selectFont } from "@lib/addons/fonts";
 import { findAssetId } from "@lib/api/assets";
 import { BundleUpdaterManager } from "@lib/api/native/modules";
 import { lazyDestructure } from "@lib/utils/lazy";
 import { findByProps } from "@metro";
 import { NavigationNative, tokens } from "@metro/common";
 import { Button, Card, IconButton, Stack, Text } from "@metro/common/components";
-import { View } from "react-native";
+import { useState } from "react";
+import { Alert, View } from "react-native";
 
 import FontEditor from "./FontEditor";
 
@@ -19,6 +20,8 @@ export default function FontCard({ item: font }: CardWrapper<FontDefinition>) {
     useProxy(fonts);
 
     const navigation = NavigationNative.useNavigation();
+    const [busy, setBusy] = useState(false);
+    const installed = Boolean(fonts[font.name]);
     const selected = fonts.__selected === font.name;
 
     return (
@@ -45,15 +48,25 @@ export default function FontCard({ item: font }: CardWrapper<FontDefinition>) {
                                 }}
                                 size="sm"
                                 variant="secondary"
-                                disabled={selected}
+                                disabled={!installed || selected || busy}
                                 icon={findAssetId("WrenchIcon")}
                             />
                             <Button
                                 size="sm"
                                 variant={selected ? "secondary" : "primary"}
-                                text={selected ? "Unapply" : "Apply"}
+                                disabled={busy}
+                                text={busy ? "Loading…" : selected ? "Unapply" : "Use font"}
                                 onPress={async () => {
-                                    await selectFont(selected ? null : font.name);
+                                    setBusy(true);
+                                    try {
+                                        if (!fonts[font.name]) await saveFont(font);
+                                        await selectFont(selected ? null : font.name);
+                                    } catch {
+                                        Alert.alert("Couldn't apply font", "Check your connection and try again.");
+                                        return;
+                                    } finally {
+                                        setBusy(false);
+                                    }
                                     showConfirmationAlert({
                                         title: Strings.HOLD_UP,
                                         content: "Reload Discord to apply changes?",

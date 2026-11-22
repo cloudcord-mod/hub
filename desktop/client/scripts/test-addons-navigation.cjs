@@ -13,6 +13,7 @@ const React = {
 const moduleObject = { exports: {} };
 const mocks = {
     "./styles.css": {},
+    "./FontsPage": { __esModule: true, default: "Fonts" },
     "@webpack/common": { React },
     "@api/Settings": { useSettings: () => ({ plugins: { Settings: visibility } }) },
     "@utils/css": { classNameFactory: prefix => suffix => prefix + suffix },
@@ -31,7 +32,7 @@ const { default: Addons, setNextAddonsTab } = moduleObject.exports;
 
 const tabs = tree => tree?.props.children[0].props.children[0] ?? [];
 const labels = tree => Array.from(tabs(tree), button => button.props.children[1].props.children[0]);
-assert.deepEqual(labels(Addons()), ["Plugins", "Themes"]);
+assert.deepEqual(labels(Addons()), ["Plugins", "Themes", "Fonts"]);
 assert.equal(imported.length, 0);
 assert.equal(Addons().props.children[1].props.children[0].type, "Boundary");
 
@@ -58,10 +59,11 @@ setNextAddonsTab("Themes");
 active = undefined;
 assert.equal(tabs(Addons())[1].props["aria-selected"], true);
 visibility = { showThemesTab: false };
-assert.deepEqual(labels(Addons()), ["Plugins"]);
+assert.deepEqual(labels(Addons()), ["Plugins", "Fonts"]);
 assert.equal(tabs(Addons())[0].props["aria-selected"], true);
 visibility = { showPluginsTab: false, showThemesTab: false };
-assert.equal(Addons(), null);
+assert.deepEqual(labels(Addons()), ["Fonts"]);
+assert.equal(tabs(Addons())[0].props["aria-selected"], true);
 assert.equal(imported.length, 0);
 
 const countModule = { exports: {} };
