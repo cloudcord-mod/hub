@@ -36750,20 +36750,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       matchesFilter
     ]);
     var results = (0, import_react11.useMemo)(() => {
-      if (commandSearch) {
-        return commandSearch(items, query).map((obj) => ({
-          obj
-        }));
-      }
-      if (!query) {
-        var ordered = sortFn ? items.slice().sort(sortFn) : items;
-        return ordered.map((obj) => ({
-          obj
-        }));
-      }
-      return import_fuzzysort.default.go(query, items, {
+      var matches = commandSearch ? commandSearch(items, query).map((obj) => ({
+        obj
+      })) : query ? import_fuzzysort.default.go(query, items, {
         keys: props.searchKeywords
-      });
+      }) : items.map((obj) => ({
+        obj
+      }));
+      return sortFn ? Array.from(matches).sort((a, b3) => sortFn(a.obj, b3.obj)) : matches;
     }, [
       items,
       props.searchKeywords,
@@ -72334,7 +72328,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "6b4735bbcfb5e98036e77ba40d1d2097ef21b68d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "972a9738d34562377213e93e2aed728e6fb734bf";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
