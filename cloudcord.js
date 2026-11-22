@@ -39230,6 +39230,56 @@ Copy \`<t:${timestamp}:F>\``;
             return;
           return planningBlock(title + "\n\n" + choices.map((choice, index) => index + 1 + ". " + choice).join("\n"));
         },
+        agendaDraft(title, items) {
+          var heading = title.trim();
+          var rows = planningRows(items);
+          if (!heading || heading.length > 120 || /[\r\n]/.test(heading) || !rows.length || rows.length > 30)
+            return;
+          var total = 0;
+          var agenda = [];
+          for (var row of rows) {
+            var match = /^(\d{1,3})\s*\|\s*(.+)$/.exec(row);
+            if (!match || Number(match[1]) < 1 || match[2].length > 150)
+              return;
+            agenda.push(total + " min \xB7 " + match[2] + " (" + Number(match[1]) + " min)");
+            total += Number(match[1]);
+          }
+          return planningBlock(heading + "\n\n" + agenda.join("\n") + "\n\nTotal: " + total + " min");
+        },
+        decisionDraft(topic, decision, actions) {
+          var title = topic.trim();
+          var body = decision.trim();
+          var tasks = planningRows(actions);
+          if (!title || title.length > 120 || /[\r\n]/.test(title) || !body || body.length > 1500 || tasks.length > 15 || tasks.some((task) => task.length > 120))
+            return;
+          var next = tasks.length ? "\n\nNext actions\n" + tasks.map((task) => "- [ ] " + task).join("\n") : "";
+          return planningBlock(title + "\n\nDecision\n" + body + next);
+        },
+        pickNames(text, count) {
+          var rows = planningRows(text);
+          var number = integerText(count);
+          var remaining = /* @__PURE__ */ new Map();
+          if (rows.length > 150 || rows.some((row) => row.length > 100))
+            return;
+          for (var name of rows) {
+            var key = name.normalize("NFC").toLowerCase();
+            if (!remaining.has(key))
+              remaining.set(key, name);
+          }
+          if (number === void 0 || number < 1 || number > 20 || number > remaining.size)
+            return;
+          var names = [
+            ...remaining.values()
+          ];
+          for (var i = 0; i < number; i++) {
+            var next = randomInteger(i, names.length - 1);
+            [names[i], names[next]] = [
+              names[next],
+              names[i]
+            ];
+          }
+          return planningBlock(names.slice(0, number).join("\n"));
+        },
         splitPoints(total, people) {
           var points = integerText(total), count = integerText(people);
           if (points === void 0 || points < 0 || count === void 0 || count < 1 || count > 1e4)
@@ -49036,6 +49086,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/agenda-draft.cx
+  var agenda_draft_default;
+  var init_agenda_draft = __esm({
+    "../examples/cx/catalog/plugins/agenda-draft.cx"() {
+      agenda_draft_default = 'plugin "Agenda Draft":\n  needs commands.register\n  needs reply.local\n  on command "agendadraft":\n    input "title" text\n    input "items" text\n    reply "${agendaDraft(title, items)}" else "Enter a title and one item per line in the form 15 | Topic."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/all-call-time-counter.cx
   var all_call_time_counter_default;
   var init_all_call_time_counter = __esm({
@@ -49641,6 +49699,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_days_between = __esm({
     "../examples/cx/catalog/plugins/days-between.cx"() {
       days_between_default = 'plugin "Days Between":\n  needs commands.register\n  needs reply.local\n  on command "daysbetween":\n    input "start" text\n    input "end" text\n    reply "${daysBetween(start, end)}" else "Enter two valid dates as YYYY-MM-DD."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/decision-draft.cx
+  var decision_draft_default;
+  var init_decision_draft = __esm({
+    "../examples/cx/catalog/plugins/decision-draft.cx"() {
+      decision_draft_default = 'plugin "Decision Draft":\n  needs commands.register\n  needs reply.local\n  on command "decisiondraft":\n    input "topic" text\n    input "decision" text\n    input "actions" text optional\n    reply "${decisionDraft(topic, decision, actions)}" else "Enter a topic, a decision, and up to 15 optional action items."\n';
     }
   });
 
@@ -51743,6 +51809,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/pick-names.cx
+  var pick_names_default;
+  var init_pick_names = __esm({
+    "../examples/cx/catalog/plugins/pick-names.cx"() {
+      pick_names_default = 'plugin "Pick Names":\n  needs commands.register\n  needs reply.local\n  on command "picknames":\n    input "text" text\n    input "count" integer\n    reply "${pickNames(text, count)}" else "Enter one name per line and a count from 1 to 20 that fits the number of distinct names."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/ping-notifications.cx
   var ping_notifications_default;
   var init_ping_notifications = __esm({
@@ -53424,6 +53498,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_character_counter2();
+      init_agenda_draft();
       init_all_call_time_counter();
       init_always_animate();
       init_amoled_mode();
@@ -53500,6 +53575,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_dashless();
       init_date_offset();
       init_days_between();
+      init_decision_draft();
       init_declutter();
       init_decode_base64();
       init_dim_inactive_channels();
@@ -53718,6 +53794,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_open_steam_links_in_app();
       init_ordered_line_diff();
       init_percentage_change();
+      init_pick_names();
       init_ping_notifications();
       init_plain_folder_icon();
       init_polish_wording();
@@ -53935,6 +54012,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Commands"
             ]
+          },
+          {
+            name: "Agenda Draft",
+            source: agenda_draft_default,
+            description: "/agendadraft",
+            commands: [
+              "agendadraft"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "538a8a159652531cdd7ed4c506f14b2d2001eba8c665774323529ac2728aa328",
+            privateCommands: true
           },
           {
             name: "AllCallTimeCounter",
@@ -54682,6 +54772,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "ffb6315e5f4628232c4b4f4daa247d12b7ad705e609b6b5182b55ea130a3e11a",
+            privateCommands: true
+          },
+          {
+            name: "Decision Draft",
+            source: decision_draft_default,
+            description: "/decisiondraft",
+            commands: [
+              "decisiondraft"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "db15dcc5bb89217e4584363778b9b2da12bf2d2aa47cc824d3afd64e8c1f59a2",
             privateCommands: true
           },
           {
@@ -56824,6 +56927,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e",
+            privateCommands: true
+          },
+          {
+            name: "Pick Names",
+            source: pick_names_default,
+            description: "/picknames",
+            commands: [
+              "picknames"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "6bac0273d0f9dfd45078b339e3a8f38fd2295eed75074ed7cc6125f808925467",
             privateCommands: true
           },
           {
@@ -67916,7 +68032,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8cbeb62805a07488d6c227a3edb07bd74e80662d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ec972000495f9c6531fdde487472ab04efc9c125";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
