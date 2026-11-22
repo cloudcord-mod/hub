@@ -1,0 +1,7 @@
+plugin "Calendar Day Difference":
+  needs commands.register
+  needs reply.local
+  on command "calendardays":
+    input "start" text
+    input "end" text
+    reply "${calendarDayDifference(start, end)}" else "Enter two calendar dates in YYYY-MM-DD format."

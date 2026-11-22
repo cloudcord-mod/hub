@@ -3146,6 +3146,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["extractmentions", { text: "<@!123456789012345678> <@123456789012345678> <@&234567890123456789> <#345678901234567890>" }, /^User \x60123456789012345678\x60\nRole \x60234567890123456789\x60\nChannel \x60345678901234567890\x60$/],
                 ["extractmentions", { text: "no mentions" }, /^No Discord/],
             ]],
+            ["Calendar Day Difference", [
+                ["calendardays", { start: "2024-02-28", end: "2024-03-01" }, /^2 days later$/],
+                ["calendardays", { start: "2023-02-29", end: "2023-03-01" }, /^Enter two calendar dates/],
+            ]],
+            ["Work Session Budget", [
+                ["sessionbudget", { focus: "25m", breaks: "5m", sessions: "4" }, /^Total 1h 55m · Focus 1h 40m · Breaks between sessions 15m$/],
+                ["sessionbudget", { focus: "25m", breaks: "5m", sessions: "1" }, /Breaks between sessions 0s$/],
+            ]],
             ["Running Pace", [
                 ["runningpace", { distance: "5", duration: "27m30s" }, /^5:30 per km$/],
                 ["runningpace", { distance: "0", duration: "1h" }, /^Enter a positive distance/],

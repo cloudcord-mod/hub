@@ -27,6 +27,7 @@ import plugin_catalog_bold_usernames from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_build_discord_link from "../../../../examples/cx/catalog/plugins/build-discord-link.cx";
 import plugin_catalog_bypass_pin_prompt from "../../../../examples/cx/catalog/plugins/bypass-pin-prompt.cx";
 import plugin_catalog_calculator from "../../../../examples/cx/catalog/plugins/calculator.cx";
+import plugin_catalog_calendar_day_difference from "../../../../examples/cx/catalog/plugins/calendar-day-difference.cx";
 import plugin_catalog_call_time_counter from "../../../../examples/cx/catalog/plugins/call-time-counter.cx";
 import plugin_catalog_centered_chat from "../../../../examples/cx/catalog/plugins/centered-chat.cx";
 import plugin_catalog_chat_buttons_begone from "../../../../examples/cx/catalog/plugins/chat-buttons-begone.cx";
@@ -495,6 +496,7 @@ import plugin_catalog_wider_chat from "../../../../examples/cx/catalog/plugins/w
 import plugin_catalog_wiki_lookup from "../../../../examples/cx/catalog/plugins/wiki-lookup.cx";
 import plugin_catalog_word_count from "../../../../examples/cx/catalog/plugins/word-count.cx";
 import plugin_catalog_word_frequency from "../../../../examples/cx/catalog/plugins/word-frequency.cx";
+import plugin_catalog_work_session_budget from "../../../../examples/cx/catalog/plugins/work-session-budget.cx";
 import plugin_catalog_wrap_text from "../../../../examples/cx/catalog/plugins/wrap-text.cx";
 import plugin_catalog_write_upper_case from "../../../../examples/cx/catalog/plugins/write-upper-case.cx";
 import plugin_catalog_zero_width_sanitizer from "../../../../examples/cx/catalog/plugins/zero-width-sanitizer.cx";
@@ -633,6 +635,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Build Discord Link", source: plugin_catalog_build_discord_link, description: "/builddiscordlink", commands: ["builddiscordlink"], categories: ["Commands"], appearanceRevision: "fe5e0c4e8428a16dbec7380657ff718ba561b9ba9a5806b840aa7608ff03d1c8", privateCommands: true },
         { name: "BypassPinPrompt", source: plugin_catalog_bypass_pin_prompt, description: "Use Discord’s Pin and Unpin actions without a confirmation prompt", categories: ["Chat"] },
         { name: "Calculator", source: plugin_catalog_calculator, description: "/calc", commands: ["calc"], categories: ["Chat","Commands"] },
+        { name: "Calendar Day Difference", source: plugin_catalog_calendar_day_difference, description: "/calendardays", commands: ["calendardays"], categories: ["Commands"], appearanceRevision: "1d1617b39231f10b323258cd7c4f39b4cd228d360e1b93a8adb3f11a9aeba72a", privateCommands: true },
         { name: "CallTimeCounter", source: plugin_catalog_call_time_counter, description: "Show the elapsed time in your current call", categories: ["Voice & calls"] },
         { name: "CenteredChat", source: plugin_catalog_centered_chat, description: "center the message list on wide screens", categories: ["Appearance"], appearanceRevision: "b83a7ec1531049c64d41b5b2401a77ad421f81966abb0957703cbb3757b96d71" },
         { name: "ChatButtonsBegone", source: plugin_catalog_chat_buttons_begone, description: "Hide the listed interface elements on this device", keywords: "Hide the chat attachment button Hide the chat gift button Hide the GIF picker shortcut Hide the sticker picker shortcut Hide the composer expression picker shortcut Hide the chat apps button Hide the Shop entry Hide the threads shortcut in the channel header Hide avatar decorations Hide profile badge rows Hide profile effects", categories: ["Appearance","Profiles"], appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433" },
@@ -1101,6 +1104,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "WikiLookup", source: plugin_catalog_wiki_lookup, description: "/wiki", commands: ["wiki"], categories: ["Commands"] },
         { name: "WordCount", source: plugin_catalog_word_count, description: "Show word and character counts below messages longer than five words", categories: ["Chat"] },
         { name: "Word Frequency", source: plugin_catalog_word_frequency, description: "/wordfrequency", commands: ["wordfrequency"], categories: ["Commands"], appearanceRevision: "daaa16333c9af73a667c6daef2061b4708774ca79b55b5e29bb90d18a9653065", privateCommands: true },
+        { name: "Work Session Budget", source: plugin_catalog_work_session_budget, description: "/sessionbudget", commands: ["sessionbudget"], categories: ["Commands"], appearanceRevision: "0c100044729ae85eb7d9cc7a3fada7136b6016ff6e17b09e702ca24a78b6d7b2", privateCommands: true },
         { name: "Wrap Text", source: plugin_catalog_wrap_text, description: "/wraptext", commands: ["wraptext"], categories: ["Commands"], appearanceRevision: "e60541db78f6a4d662c6501972181a629fc629e6acb5290275a0ea069a6a1834", privateCommands: true },
         { name: "WriteUpperCase", source: plugin_catalog_write_upper_case, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ZeroWidthSanitizer", source: plugin_catalog_zero_width_sanitizer, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },

@@ -716,6 +716,22 @@ export const cxCommandFunctions = {
         if (!Number.isSafeInteger(pace) || pace < 1) return;
         return Math.floor(pace / 60) + ":" + String(pace % 60).padStart(2, "0") + " per km";
     },
+    calendarDayDifference(start: string, end: string) {
+        const first = utcMidnight(start.trim()), last = utcMidnight(end.trim());
+        if (first === undefined || last === undefined) return;
+        const days = (last - first) / dayMilliseconds;
+        if (!days) return "The dates are the same day.";
+        return Math.abs(days) + (Math.abs(days) === 1 ? " day " : " days ") + (days > 0 ? "later" : "earlier");
+    },
+    workSessionBudget(focus: string, breaks: string, sessions: string) {
+        const work = durationSeconds(focus), rest = durationSeconds(breaks);
+        const count = integerText(sessions);
+        if (!work || rest === undefined || count === undefined || count < 1 || count > 100) return;
+        const focusTime = work * count;
+        const breakTime = rest * (count - 1);
+        return "Total " + readableDuration(focusTime + breakTime) + " · Focus " + readableDuration(focusTime)
+            + " · Breaks between sessions " + readableDuration(breakTime);
+    },
     countdownTimestamp(input: string) {
         const duration = durationSeconds(input);
         if (!duration) return;

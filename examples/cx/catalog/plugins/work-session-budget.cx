@@ -1,0 +1,8 @@
+plugin "Work Session Budget":
+  needs commands.register
+  needs reply.local
+  on command "sessionbudget":
+    input "focus" text
+    input "breaks" text
+    input "sessions" text
+    reply "${workSessionBudget(focus, breaks, sessions)}" else "Enter focus and break durations such as 25m and 5m, and 1 to 100 sessions."
