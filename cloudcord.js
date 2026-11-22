@@ -62438,6 +62438,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return records.slice(0, MAX_REMEMBERED_CX_EXTENSIONS).filter((entry) => typeof entry?.name === "string" && typeof entry.revision === "string" && Array.isArray(entry.selected) && entry.selected.every((target) => typeof target === "string"));
   }
   function forgetRememberedAppearance(name) {
+    failedRestores.delete(name);
     settings.cxRememberedAppearance = readRememberedAppearance().filter((entry) => entry.name !== name);
   }
   function rememberAppearance(entry, replaceTheme = false) {
@@ -63276,7 +63277,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           toast() {
           }
         }, review.permissions, saved.selected);
+        failedRestores.delete(saved.name);
       } catch (e) {
+        failedRestores.add(saved.name);
       }
     }
     refreshRememberedAppearance();
@@ -63298,12 +63301,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         var current = session.source(id);
         var active = current !== void 0 && (kind === "plugin" || current === entry.source);
         var saved = approvals.get(entry.name);
-        var needsReview = kind === "plugin" && !active && saved !== void 0 && saved !== entry.appearanceRevision;
+        var restoreFailed = !active && saved === entry.appearanceRevision && failedRestores.has(entry.name);
+        var needsReview = !active && (restoreFailed || saved !== void 0 && saved !== entry.appearanceRevision);
         return {
           ...entry,
           id,
           active,
           needsReview,
+          restoreFailed,
           privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands
         };
       });
@@ -63355,7 +63360,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           review: preview2,
           selected: preview2.appearanceOptions.filter((option) => option.defaultOn && supportsMobileHide(option)).map((option) => option.target)
         });
-        setStatus("");
+        setStatus(entry?.restoreFailed ? "This add-on couldn\u2019t start automatically. Review it and try enabling it again." : "");
       } catch (error) {
         setStatus(String(error instanceof Error ? error.message : error));
       }
@@ -63427,6 +63432,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }
         } else
           session.enable(candidate.source, host, candidate.review.permissions, candidate.selected);
+        failedRestores.delete(candidate.review.name);
         setStatus(`${candidate.review.name} is active for this session.`);
         setCandidate(void 0);
         if (remember && rememberRevision) {
@@ -63801,7 +63807,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })
     });
   }
-  var import_react_native32, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore2, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, rememberedAppearanceListeners, rememberedAppearanceUpdates;
+  var import_react_native32, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore2, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, failedRestores, rememberedAppearanceListeners, rememberedAppearanceUpdates;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -64312,6 +64318,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }
         ])
       ]);
+      failedRestores = /* @__PURE__ */ new Set();
       rememberedAppearanceListeners = /* @__PURE__ */ new Set();
       rememberedAppearanceUpdates = 0;
     }
@@ -65989,7 +65996,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return /* @__PURE__ */ jsx(AddonCard, {
       headerLabel: entry.name,
       descriptionLabel: entry.description,
-      headerSublabel: entry.needsReview ? "Review update to enable" : void 0,
+      headerSublabel: entry.restoreFailed ? "Couldn\u2019t start automatically" : entry.needsReview ? "Review update to enable" : void 0,
       toggleType: kind === "theme" ? "radio" : "switch",
       toggleValue: () => entry.active,
       actions: entry.active || entry.needsReview ? [
@@ -68668,7 +68675,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4233b7113ce48ca68e105876f387d1aec086f60f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8d2caf9ac3c4cf685c4ede7913508e178b8c25aa";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
