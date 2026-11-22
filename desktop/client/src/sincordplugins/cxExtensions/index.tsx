@@ -1017,6 +1017,7 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
             return () => { uploadAnonymiser = undefined; };
         },
         registerNativeEffect(effect, avatarResolution = 256, effectOptions) {
+            if (effect === "mute-in-app-message-sounds") throw new Error("This message sound option is available on Android and iOS.");
             switch (effect) {
                 case "show-voice-ping":
                     return voicePing.bind(RTCConnectionStore, FluxDispatcher);

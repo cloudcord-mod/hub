@@ -2883,6 +2883,11 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 }
                 case "notification-volume":
                     throw new Error("Notification volume control is available on desktop and browser.");
+                case "mute-in-app-message-sounds":
+                    return overrideCxMethods(findByFilePath("modules/notifications/native/playInAppMessageSound.tsx"), {
+                        default: () => undefined,
+                        playInAppMessageSound: () => undefined,
+                    }, enabled);
                 case "reveal-spoilers-shortcut":
                     throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
                 case "reply-timestamp":

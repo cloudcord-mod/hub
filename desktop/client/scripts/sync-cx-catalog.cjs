@@ -77,8 +77,10 @@ function buildCatalog(additions = new Map()) {
                 [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.desktopOnly)
                 || parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.desktopOnly)
             );
-            const mobileOnly = parsed.kind === "plugin" &&
-                [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.mobileOnly);
+            const mobileOnly = parsed.kind === "plugin" && (
+                [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.mobileOnly)
+                || parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.mobileOnly)
+            );
             if (mobileOnly && desktopOnly) throw new Error(`Conflicting platform requirements in ${file}`);
             const linuxOnly = parsed.kind === "plugin" && parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.linuxOnly);
             const review = parsed.kind === "plugin" ? reviewCx(document) : undefined;

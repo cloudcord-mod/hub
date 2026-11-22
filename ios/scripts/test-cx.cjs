@@ -659,6 +659,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const editHooks = new Set();
         const AboutMeCard = () => null;
         const markupCache = new WeakMap();
+        const messageSounds = { playInAppMessageSound: () => "played" };
         const markupParser = {
             parseMessageMarkup(message, contentMessage, hideSimpleEmbedContent, inline = false) {
                 const cached = markupCache.get(message);
@@ -852,6 +853,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             } },
             "@metro/internals/modules": { metroModules: hiddenComponentModules },
             "@metro": { findByFilePath: path => path.endsWith("/ButtonEllipsis.native.tsx") ? { Ellipsis: typingEllipsis }
+                : path.endsWith("/playInAppMessageSound.tsx") ? messageSounds
                 : path.endsWith("/useMessageMaxLength.tsx") ? splitLimit
                 : path.endsWith("/ChatInputSendUtils.tsx") ? splitComposer
                 : path.endsWith("/useComputeEmojiPickerFunctions.tsx") ? mobileEmojiPicker
@@ -5314,6 +5316,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(markupParser.parseMessageMarkup(messageWithEmoji, undefined, false), baseline);
                 assert.equal(custom.jumboable, true);
             }
+        }
+
+        if (!desktop) {
+            selectCatalog("MuteInAppMessageSounds");
+            click(render(), "Allow for this session");
+            assert.equal(messageSounds.playInAppMessageSound(), undefined);
+            settings.safeMode = { enabled: true };
+            assert.equal(messageSounds.playInAppMessageSound(), "played");
+            settings.safeMode = undefined;
+            click(render(), "Disable MuteInAppMessageSounds");
+            assert.equal(messageSounds.playInAppMessageSound(), "played");
         }
 
         selectCatalog("OpenSteamLinksInApp");

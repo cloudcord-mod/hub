@@ -1,0 +1,3 @@
+plugin "MuteInAppMessageSounds":
+  needs notifications.volume
+  use mute-in-app-message-sounds

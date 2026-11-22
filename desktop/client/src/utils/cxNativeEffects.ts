@@ -21,6 +21,7 @@ export const cxNativeEffects = {
     "jumbo-emoji-limit": { permission: "appearance.style", label: "Change how many emoji can appear at jumbo size in an emoji-only message" },
     "stop-auto-unread": { permission: "notifications.preventautoupgrade", label: "Keep your chosen channel notification settings" },
     "notification-volume": { permission: "notifications.volume", label: "Adjust the volume of Discord notifications and in-app sounds", desktopOnly: true },
+    "mute-in-app-message-sounds": { permission: "notifications.volume", label: "Mute new-message sounds while Discord is open", mobileOnly: true },
     "flat-attachments": { permission: "appearance.style", label: "Show chat attachments individually without the media grid" },
     "split-long-messages": { permission: "messages.split", label: "Split long drafts into at most eight messages when slowmode is off" },
     "unicode-emoji-autocomplete": { permission: "appearance.hide", label: "Show only standard Unicode emoji in chat autocomplete" },
