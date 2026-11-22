@@ -39951,6 +39951,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             return;
           return planningBlock(rows.map((row) => row.join("	")).join("\n"));
         },
+        tsvToCsv(input) {
+          if (!input.trim() || input.length > 12e3)
+            return;
+          var rows = input.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((row) => row.split("	"));
+          var columns = rows[0].length;
+          if (rows.some((row) => row.length !== columns))
+            return;
+          return planningBlock(rows.map((row) => row.map((cell) => '"' + cell.replaceAll('"', '""') + '"').join(",")).join("\n"));
+        },
+        compareCsvCells(before3, after2) {
+          if (before3.length > 12e3 || after2.length > 12e3)
+            return;
+          var left = csvRows(before3), right = csvRows(after2);
+          var columns = left[0]?.length;
+          if (!columns || columns > 32 || left.length > 64 || left.length !== right.length || left.some((row) => row.length !== columns) || right.some((row) => row.length !== columns))
+            return;
+          var locations = left.flatMap((row, y2) => row.flatMap((cell, x2) => cell !== right[y2][x2] ? [
+            `R${y2 + 1}C${x2 + 1}`
+          ] : []));
+          if (!locations.length)
+            return "No CSV cells changed.";
+          var listed = locations.slice(0, 100).join(", ");
+          return locations.length + (locations.length === 1 ? " changed cell \xB7 " : " changed cells \xB7 ") + listed + (locations.length > 100 ? " (first 100 shown)" : "");
+        },
         surroundLines(text, prefix2, suffix) {
           if (!text || !(prefix2 || suffix) || /[\r\n]/.test(prefix2 + suffix) || prefix2.length + suffix.length > 64)
             return;
@@ -50181,6 +50205,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/compare-csv-cells.cx
+  var compare_csv_cells_default;
+  var init_compare_csv_cells = __esm({
+    "../examples/cx/catalog/plugins/compare-csv-cells.cx"() {
+      compare_csv_cells_default = 'plugin "Compare CSV Cells":\n  needs commands.register\n  needs reply.local\n  on command "comparecsv":\n    input "before" text\n    input "after" text\n    reply "${compareCsvCells(before, after)}" else "Paste two rectangular CSV tables of equal dimensions, up to 64 rows and 32 columns."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/compare-lines.cx
   var compare_lines_default;
   var init_compare_lines = __esm({
@@ -54008,6 +54040,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/tsv-to-csv.cx
+  var tsv_to_csv_default;
+  var init_tsv_to_csv = __esm({
+    "../examples/cx/catalog/plugins/tsv-to-csv.cx"() {
+      tsv_to_csv_default = 'plugin "TSV to CSV":\n  needs commands.register\n  needs reply.local\n  on command "tsvtocsv":\n    input "text" text\n    reply "${tsvToCsv(text)}" else "Paste a rectangular tab-separated table."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/tsv-to-markdown.cx
   var tsv_to_markdown_default;
   var init_tsv_to_markdown = __esm({
@@ -55161,6 +55201,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_compact_member_list();
       init_compact_messages();
       init_compact_server_list();
+      init_compare_csv_cells();
       init_compare_lines();
       init_copy_account_creation_timestamp();
       init_copy_attachment_links();
@@ -55595,6 +55636,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_transparent_chat_bar();
       init_transpose_csv();
       init_trim_lines();
+      init_tsv_to_csv();
       init_tsv_to_markdown();
       init_unicode_inspector();
       init_unindent();
@@ -56238,6 +56280,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "Compare CSV Cells",
+            source: compare_csv_cells_default,
+            description: "/comparecsv",
+            commands: [
+              "comparecsv"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "01283845ff190f8429780e75501c85a7318bf5c5bdf2fdee25e35e2bff2f3c42",
+            privateCommands: true
           },
           {
             name: "Compare Lines",
@@ -60581,6 +60636,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "a14d6b8023c77f16c070ce27c24d8fccca0b83b79a794ce1920412746f392849",
+            privateCommands: true
+          },
+          {
+            name: "TSV to CSV",
+            source: tsv_to_csv_default,
+            description: "/tsvtocsv",
+            commands: [
+              "tsvtocsv"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "fd03053374fa9b987c7037a3ef839d6b74524cb54d62b9cff8bc7a3c90a39def",
             privateCommands: true
           },
           {
@@ -71047,7 +71115,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d59df716e8628561297863f63642adb2e832cba3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c00eb598c9bedf5ea84335af1ccb35d373a26395";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
