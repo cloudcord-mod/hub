@@ -1539,8 +1539,9 @@ export function useCxAddonRows(kind: CxAddonKind, query: string): CxAddonRow[] {
                 categories: active ? session.categories(id) : entry.categories,
                 privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands };
         });
+        const catalogNames = new Set(entries.map(entry => entry.name));
         const imported = session.list().filter(({ id, name }) => ((id === "theme") === (kind === "theme"))
-            && !catalog.some(entry => entry.name === name)).map(({ id, name }) => ({
+            && !catalogNames.has(name)).map(({ id, name }) => ({
                 id, name, source: session.source(id)!, active: true, commands: session.commands(id),
                 categories: session.categories(id), privateCommands: session.isPrivateCommand(id),
             }));
