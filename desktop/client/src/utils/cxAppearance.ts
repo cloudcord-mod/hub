@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-channel-list-style-promo": hideMobileComponent("HideChannelListStylePromo", "the Nitro upsell under channel list appearance previews", "modules/user_settings/appearance/native/components/SettingsAppearanceChannelListPreviewNitroUpsell.tsx"),
+    "hide-settings-gift-badge-progress": hideMobileComponent("HideSettingsGiftBadgeProgress", "gifting badge progress in Premium settings", "modules/user_settings/premium/native/UserSettingsGiftingBadgeProgress.tsx"),
+    "hide-dismissible-profile-upsells": hideMobileComponent("HideDismissibleProfileUpsells", "dismissible offers on profiles", "modules/user_profile/native/UserProfileDismissibleUpsells.tsx"),
     "hide-channel-unread-count": hideMobileComponent("HideChannelUnreadCount", "numeric unread badges in the mobile channel list", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelUnreadBadge.tsx"),
     "hide-recap-entry-badges": hideMobileComponent("HideRecapEntryBadges", "badges on content entries in the recap", "modules/icymi/native/content_inventory/Badges.tsx"),
     "hide-recap-custom-status": hideMobileComponent("HideRecapCustomStatus", "custom status updates in the recap", "modules/icymi/native/content_inventory/CustomStatusEntryRow.tsx"),

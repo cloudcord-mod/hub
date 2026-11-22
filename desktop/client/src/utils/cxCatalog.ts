@@ -155,6 +155,7 @@ import plugin_catalog_hide_bounties_promo_header from "../../../../examples/cx/c
 import plugin_catalog_hide_bounties_scroll_prompt from "../../../../examples/cx/catalog/plugins/hide-bounties-scroll-prompt.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
+import plugin_catalog_hide_channel_list_style_promo from "../../../../examples/cx/catalog/plugins/hide-channel-list-style-promo.cx";
 import plugin_catalog_hide_channel_list_tips from "../../../../examples/cx/catalog/plugins/hide-channel-list-tips.cx";
 import plugin_catalog_hide_channel_topic from "../../../../examples/cx/catalog/plugins/hide-channel-topic.cx";
 import plugin_catalog_hide_channel_unread_count from "../../../../examples/cx/catalog/plugins/hide-channel-unread-count.cx";
@@ -171,6 +172,7 @@ import plugin_catalog_hide_contact_sync_promotion from "../../../../examples/cx/
 import plugin_catalog_hide_custom_statuses from "../../../../examples/cx/catalog/plugins/hide-custom-statuses.cx";
 import plugin_catalog_hide_disabled_emojis from "../../../../examples/cx/catalog/plugins/hide-disabled-emojis.cx";
 import plugin_catalog_hide_discover_button from "../../../../examples/cx/catalog/plugins/hide-discover-button.cx";
+import plugin_catalog_hide_dismissible_profile_upsells from "../../../../examples/cx/catalog/plugins/hide-dismissible-profile-upsells.cx";
 import plugin_catalog_hide_display_name_styles_tip from "../../../../examples/cx/catalog/plugins/hide-display-name-styles-tip.cx";
 import plugin_catalog_hide_dm_add_friends_widget from "../../../../examples/cx/catalog/plugins/hide-dm-add-friends-widget.cx";
 import plugin_catalog_hide_dm_friend_suggestions from "../../../../examples/cx/catalog/plugins/hide-dm-friend-suggestions.cx";
@@ -261,6 +263,7 @@ import plugin_catalog_hide_server_feed_member_count from "../../../../examples/c
 import plugin_catalog_hide_server_live_notice from "../../../../examples/cx/catalog/plugins/hide-server-live-notice.cx";
 import plugin_catalog_hide_server_tag_promotion from "../../../../examples/cx/catalog/plugins/hide-server-tag-promotion.cx";
 import plugin_catalog_hide_server_theme_tip from "../../../../examples/cx/catalog/plugins/hide-server-theme-tip.cx";
+import plugin_catalog_hide_settings_gift_badge_progress from "../../../../examples/cx/catalog/plugins/hide-settings-gift-badge-progress.cx";
 import plugin_catalog_hide_settings_premium_new_badge from "../../../../examples/cx/catalog/plugins/hide-settings-premium-new-badge.cx";
 import plugin_catalog_hide_shop_button_tip from "../../../../examples/cx/catalog/plugins/hide-shop-button-tip.cx";
 import plugin_catalog_hide_shop_featured_collections from "../../../../examples/cx/catalog/plugins/hide-shop-featured-collections.cx";
@@ -750,6 +753,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBountiesScrollPrompt", source: plugin_catalog_hide_bounties_scroll_prompt, description: "Hide the scroll prompt in the Bounties modal", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5396fe64555b90748fd34f964c37ace0d3d4ccd8c5e92173c00dd0b11e309d2f" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
+        { name: "HideChannelListStylePromo", source: plugin_catalog_hide_channel_list_style_promo, description: "Hide the Nitro upsell under channel list appearance previews", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ab7d6aedb6dfce5fca4298fd2e90004c165c2ebb6636b552b5c81ad33d545a63" },
         { name: "HideChannelListTips", source: plugin_catalog_hide_channel_list_tips, description: "Hide feature tips in the server channel list header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9b23014e616ac1c5e2008e72a500b01828d12f51d51c20b6841f6be8aefc3a56" },
         { name: "HideChannelTopic", source: plugin_catalog_hide_channel_topic, description: "Hide channel topics", categories: ["Appearance"], appearanceRevision: "79414d895258b347a6dc13cba58453948a75bb443e8bdc7ddc54f40e94b5a3c4" },
         { name: "HideChannelUnreadCount", source: plugin_catalog_hide_channel_unread_count, description: "Hide numeric unread badges in the mobile channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "32b8f58a4c15fc552cfa1f8f1f8f5585733111888cccbe5ddfebb8d7f369baa6" },
@@ -766,6 +770,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideCustomStatuses", source: plugin_catalog_hide_custom_statuses, description: "Hide custom statuses in the member list", categories: ["Appearance"], appearanceRevision: "549b5cc6629e0f3cc22555035bb96816d9308806a2bf71f2c320eee04f82dc7d" },
         { name: "HideDisabledEmojis", source: plugin_catalog_hide_disabled_emojis, description: "Hide unavailable emoji in Discord’s emoji picker", categories: ["Appearance"], appearanceRevision: "0e8e0b52055839b1fb48d75d078ff2945b3b7cc483df10b1939c0ebcd189785d" },
         { name: "HideDiscoverButton", source: plugin_catalog_hide_discover_button, description: "Hides the Discover button in the server list", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideDismissibleProfileUpsells", source: plugin_catalog_hide_dismissible_profile_upsells, description: "Hide dismissible offers on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0065a5154d6694c6af5879214c83029ba9061a6f2879348932865c0d915a7159" },
         { name: "HideDisplayNameStylesTip", source: plugin_catalog_hide_display_name_styles_tip, description: "Hide the display name styles tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b2f3e613dda86aa78c01940feeed87d0a2ef9e4f750df312df248c6b01e4ef50" },
         { name: "HideDmAddFriendsWidget", source: plugin_catalog_hide_dm_add_friends_widget, description: "Hide the Add Friends widget in the DM list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d70d81c1c8f37e7b93193e2522ca9c5d43da4d77b09499cc268d3cfca3697c12" },
         { name: "HideDmFriendSuggestions", source: plugin_catalog_hide_dm_friend_suggestions, description: "Hide suggested friends and their heading from the DM list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "55c07bd0119ea63f75e4206513e58c36a1e4514d502b79940509ec0a77adfa5a" },
@@ -856,6 +861,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideServerLiveNotice", source: plugin_catalog_hide_server_live_notice, description: "Hide the live event notice above the server channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "02cedf54e3dcbd4628039da3c365116f739d2e1bfd79d50f992155546f1830df" },
         { name: "HideServerTagPromotion", source: plugin_catalog_hide_server_tag_promotion, description: "Hide the server tag upsell in server settings", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640" },
         { name: "HideServerThemeTip", source: plugin_catalog_hide_server_theme_tip, description: "Hide the server theme introduction for members", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "fcf3ec61162e3f78d941d24c2b2ffec00e111bbb1cca794bce45461c77443b4e" },
+        { name: "HideSettingsGiftBadgeProgress", source: plugin_catalog_hide_settings_gift_badge_progress, description: "Hide gifting badge progress in Premium settings", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "18e48bb180ace705ba0a398f642dcff16b36c9c352c378fe863e112b6730d142" },
         { name: "HideSettingsPremiumNewBadge", source: plugin_catalog_hide_settings_premium_new_badge, description: "Hide the dismissible New badge on premium settings", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e6966c616536b401b01ee778a177fb7436960d5946903a6a8a9cf149c5f3e05e" },
         { name: "HideShopButtonTip", source: plugin_catalog_hide_shop_button_tip, description: "Hide the Shop button introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848" },
         { name: "HideShopFeaturedCollections", source: plugin_catalog_hide_shop_featured_collections, description: "Hide featured collections in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "daa25863e067d4624b5affaded88ee76ce45516516f3aae7958b773166a1c00c" },

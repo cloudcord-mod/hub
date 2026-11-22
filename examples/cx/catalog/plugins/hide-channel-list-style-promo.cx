@@ -1,0 +1,3 @@
+plugin "HideChannelListStylePromo":
+  needs appearance.hide
+  hide hide-channel-list-style-promo

@@ -1,0 +1,3 @@
+plugin "HideDismissibleProfileUpsells":
+  needs appearance.hide
+  hide hide-dismissible-profile-upsells
