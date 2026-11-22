@@ -2288,8 +2288,10 @@ const appearanceHost: Pick<Parameters<typeof session.enable>[1], "hideAppearance
                 } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL") {
                     const field = mobile.messagePresentation;
                     if (field in presentation && (presentation as Record<string, unknown>)[field] != null) return { ...presentation, [field]: undefined };
-                } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
-                    return { ...presentation, stickers: [] };
+                } else {
+                    const field = mobile.messagePresentation;
+                    const items = (presentation as Record<string, unknown>)[field];
+                    if (Array.isArray(items) && items.length) return { ...presentation, [field]: [] };
                 }
                 return presentation;
             },

@@ -506,6 +506,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             mentioned: true, highlightColor: 0x33ffff00,
             useAttachmentGridLayout: true,
             edited: true, stickers: Object.freeze([{ id: "sticker" }]), content: "hello <t:12345>",
+            reactions: Object.freeze([{ count: 3 }]),
             referencedMessage: Object.freeze({ id: "reply" }), avatarDecorationURL: "https://example.com/avatar.png",
             timestamp: "8:24 PM", timestampTooltip: "November 7 at 8:24 PM", timestampAccessibilityLabel: "8:24 PM",
         });
@@ -2336,6 +2337,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(rendered.content, messagePresentation.content);
                 assert.equal(rendered.edited, rule.mobile.messagePresentation !== "edited");
                 assert.equal(rendered.stickers.length, rule.mobile.messagePresentation === "stickers" ? 0 : 1);
+                assert.equal(rendered.reactions.length, rule.mobile.messagePresentation === "reactions" ? 0 : 1);
                 for (const field of ["timestamp", "timestampTooltip", "timestampAccessibilityLabel"]) {
                     assert.equal(rendered[field], rule.mobile.messagePresentation === "timestamps" ? undefined : messagePresentation[field]);
                 }

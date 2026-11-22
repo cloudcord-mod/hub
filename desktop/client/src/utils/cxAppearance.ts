@@ -205,7 +205,7 @@ export const cxAppearanceTargets = {
     "message-reactions": {
         plugin: "HideReactions", label: "message reactions",
         css: '[class*="reactions_"] { display: none !important; }',
-        mobile: ["MessageReactions", "MessageReactionsContent"],
+        mobile: { messagePresentation: "reactions", legacyComponents: ["MessageReactions", "MessageReactionsContent"] },
     },
     "profile-effects": {
         plugin: "HideProfileEffects", label: "profile effects",
