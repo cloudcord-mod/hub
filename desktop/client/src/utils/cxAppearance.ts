@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-launcher-apps-intro": hideMobileComponent("HideLauncherAppsIntro", "the apps introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/AppsBanner.tsx"),
+    "hide-launcher-bots-intro": hideMobileComponent("HideLauncherBotsIntro", "the bots introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/BotsBanner.tsx"),
+    "hide-launcher-activities-intro": hideMobileComponent("HideLauncherActivitiesIntro", "the activities introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/ActivitiesBanner.tsx"),
     "disable-inline-attachment-media": {
         plugin: "DisableInlineAttachmentMedia", label: "inline media previews for chat attachments", css: "", mobileOnly: true,
         mobile: { messageRenderOption: "inlineAttachmentMedia" },

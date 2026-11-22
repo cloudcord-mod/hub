@@ -222,6 +222,9 @@ import plugin_catalog_hide_inbox_button from "../../../../examples/cx/catalog/pl
 import plugin_catalog_hide_join_messages from "../../../../examples/cx/catalog/plugins/hide-join-messages.cx";
 import plugin_catalog_hide_jump_to_present from "../../../../examples/cx/catalog/plugins/hide-jump-to-present.cx";
 import plugin_catalog_hide_keyboard_tips from "../../../../examples/cx/catalog/plugins/hide-keyboard-tips.cx";
+import plugin_catalog_hide_launcher_activities_intro from "../../../../examples/cx/catalog/plugins/hide-launcher-activities-intro.cx";
+import plugin_catalog_hide_launcher_apps_intro from "../../../../examples/cx/catalog/plugins/hide-launcher-apps-intro.cx";
+import plugin_catalog_hide_launcher_bots_intro from "../../../../examples/cx/catalog/plugins/hide-launcher-bots-intro.cx";
 import plugin_catalog_hide_live_stage_cards from "../../../../examples/cx/catalog/plugins/hide-live-stage-cards.cx";
 import plugin_catalog_hide_media_message_preview from "../../../../examples/cx/catalog/plugins/hide-media-message-preview.cx";
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
@@ -864,6 +867,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideJoinMessages", source: plugin_catalog_hide_join_messages, description: "Hide system messages for joins", categories: ["Chat"] },
         { name: "HideJumpToPresent", source: plugin_catalog_hide_jump_to_present, description: "Hide the jump-to-present bar", categories: ["Appearance"], appearanceRevision: "25897139625060ef49ccc528560da8c0ddb33ff1db9b774e757ba40650703a7d" },
         { name: "HideKeyboardTips", source: plugin_catalog_hide_keyboard_tips, description: "Hides the keyboard tips under the chat bar", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideLauncherActivitiesIntro", source: plugin_catalog_hide_launcher_activities_intro, description: "Hide the activities introduction banner in the launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "f2c484ce82276c7a19a53ba82b1ad4d276b46a5a7a9cf0a8dae6cdd6184099af" },
+        { name: "HideLauncherAppsIntro", source: plugin_catalog_hide_launcher_apps_intro, description: "Hide the apps introduction banner in the launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ce164eaeaf25af9f13175ee99b4f9bc16be617ed1eaf61dd04be756290bc4e91" },
+        { name: "HideLauncherBotsIntro", source: plugin_catalog_hide_launcher_bots_intro, description: "Hide the bots introduction banner in the launcher", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "4cb0fdf94df637a2382c1d2656ecc37835cf7763e94a943843e970fb7abfa3c8" },
         { name: "HideLiveStageCards", source: plugin_catalog_hide_live_stage_cards, description: "Hide live Stage cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6da62a057179f0765698517278064713d5c3824890881f7eda94cd60b27636a9" },
         { name: "HideMediaMessagePreview", source: plugin_catalog_hide_media_message_preview, description: "Hide the source-message preview in the media viewer", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b38b32c928f3ded6619a8bdd5a23bbd7f2022fcafe34bae370ffcb232f503bfa" },
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities, description: "Hide game and music activity text in the member list", categories: ["Appearance"], appearanceRevision: "efcbd78248bb6f5d22c117a37c14dbf80295b01a55761aee8866dbba3a7f0dda" },

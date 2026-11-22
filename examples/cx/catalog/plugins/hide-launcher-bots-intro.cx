@@ -1,0 +1,3 @@
+plugin "HideLauncherBotsIntro":
+  needs appearance.hide
+  hide hide-launcher-bots-intro

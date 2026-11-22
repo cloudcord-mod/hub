@@ -1,0 +1,3 @@
+plugin "HideLauncherAppsIntro":
+  needs appearance.hide
+  hide hide-launcher-apps-intro
