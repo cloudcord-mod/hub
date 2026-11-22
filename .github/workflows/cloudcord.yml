@@ -445,7 +445,7 @@ jobs:
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
           import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
-          import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@lib/api/profileAppearance";
+          import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon, SAVED_LOOK_PAGE_SIZE, selectSavedLooks, sharedProfileColorsEnabled } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -1507,7 +1507,7 @@ jobs:
                       giftLevel: Number.isInteger(data.giftLevel) ? data.giftLevel : -1,
                       avatarDecoration: String(data.avatarDecoration || ""),
                       avatarDecorationSku: String(data.avatarDecorationSku || ""),
-                      profileColorsEnabled: data.profileColorsEnabled === true || data.primaryColor != null || data.accentColor != null,
+                      profileColorsEnabled: sharedProfileColorsEnabled(data),
                       primaryColor: colorHex(data.primaryColor, preview.primaryColor),
                       accentColor: colorHex(data.accentColor, preview.accentColor),
                       bio: String(data.bio || ""),
@@ -4922,7 +4922,7 @@ jobs:
                   boostMonths: data.boostMonths >= 0 ? (BOOST_DURATIONS[Number(data.boostMonths) + 1] || 0) : 0,
                   giftLevel: Number.isInteger(data.giftLevel) ? data.giftLevel : -1,
                   avatarDecoration: String(data.avatarDecoration || ""), avatarDecorationSku: String(data.avatarDecorationSku || ""),
-                  profileColorsEnabled: data.profileColorsEnabled === true || data.primaryColor != null || data.accentColor != null,
+                  profileColorsEnabled: sharedProfileColorsEnabled(data),
                   primaryColor: colorHex(data.primaryColor, ""), accentColor: colorHex(data.accentColor, ""),
                   bio: String(data.bio || ""), pronouns: String(data.pronouns || ""), createdAt: String(data.createdAt || ""), signupDate: String(data.signupDate || data.joinedSince || ""),
                   oldName: String(data.oldName || ""), replaceBadges: remoteReplaceBadges(data), selectedBadges

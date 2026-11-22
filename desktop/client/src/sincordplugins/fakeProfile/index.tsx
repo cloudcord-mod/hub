@@ -22,7 +22,7 @@ import { installConnectionSettings } from "@utils/connectionSettings";
 import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
-import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks } from "@utils/profileAppearance";
+import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks, sharedProfileColorsEnabled } from "@utils/profileAppearance";
 
 import { CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, ProfileBadge } from "@api/Badges";
 import { applyBadgeLayout, badgeLayoutKey, defaultBadgeOrder, moveBadgeOrder } from "@api/BadgeLayout";
@@ -584,12 +584,13 @@ function activeUserId(): string | null {
 }
 
 function fromSharedProfile(data: any): CustomProfileData {
+    const colorsEnabled = sharedProfileColorsEnabled(data);
     return {
         ...normalizeProfileAppearance(data),
         username: data?.username || "", globalName: data?.globalName || data?.displayName || "",
         avatar: data?.avatar || "", banner: data?.banner || "", bio: data?.bio || "",
-        pronouns: data?.pronouns || "", accentColor: data?.primaryColor ?? data?.accentColor,
-        accentColor2: data?.primaryColor != null ? data?.accentColor : data?.accentColor2, badgeFlags: data?.badgeFlags || 0,
+        pronouns: data?.pronouns || "", accentColor: colorsEnabled ? data?.primaryColor ?? data?.accentColor : undefined,
+        accentColor2: colorsEnabled ? (data?.primaryColor != null ? data?.accentColor : data?.accentColor2) : undefined, badgeFlags: data?.badgeFlags || 0,
         nitro: data?.nitro === true || data?.nitro == null && Number(data?.nitroLevel ?? -1) >= 0, nitroLevel: data?.nitroLevel, nitroSince: data?.nitroSince || "",
         boostMonths: data?.boostMonths, giftLevel: Number.isInteger(data?.giftLevel) ? data.giftLevel : undefined, customBadgeIds: Array.isArray(data?.customBadgeIds) ? data.customBadgeIds.filter((id: string) => id !== REPLACE_BADGES_SYNC_ID) : [],
         oldName: data?.oldName || "", createdAt: data?.createdAt || "", signupDate: data?.signupDate || data?.joinedSince || "",

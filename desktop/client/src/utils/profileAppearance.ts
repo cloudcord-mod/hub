@@ -128,6 +128,11 @@ export function profilePreviewColor(value: unknown): string | undefined {
         return "#" + value.toString(16).padStart(6, "0");
 }
 
+export function sharedProfileColorsEnabled(data?: { profileColorsEnabled?: unknown; primaryColor?: unknown; accentColor?: unknown; } | null): boolean {
+    if (typeof data?.profileColorsEnabled === "boolean") return data.profileColorsEnabled;
+    return data?.primaryColor != null || data?.accentColor != null;
+}
+
 export function nativeProfilePreviewSurface(userId: string, profile?: DiscordProfileSurface | null, userBanner?: unknown) {
     const colors = profile?.themeColors ?? profile?.theme_colors;
     return {
