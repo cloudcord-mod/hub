@@ -140,6 +140,7 @@ export const cxAppearanceTargets = {
     "hide-server-live-notice": hideMobileComponent("HideServerLiveNotice", "the live event notice above the server channel list", "modules/guild_scheduled_events/native/guild_sidebar/GuildLiveChannelNotice.tsx"),
     "hide-gif-favorite-button": {
         plugin: "HideGifFavoriteButton", label: "the favorite button when viewing GIFs",
+        catalogOriginal: "hide-gif-favorite-button.cx",
         css: 'button:is([class^="gifFavoriteButton_"], [class*=" gifFavoriteButton_"]) { display: none !important; }',
         mobile: { hideComponentPaths: ["modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"] },
     },
@@ -299,6 +300,7 @@ export const cxAppearanceTargets = {
     },
     "hide-chat-attachments": {
         plugin: "HideChatAttachments", label: "file and media attachments in chat",
+        catalogOriginal: "hide-chat-attachments.cx",
         css: '[id^="message-accessories-"] :is([class^="attachment_"], [class*=" attachment_"], [class^="newMosaicStyle_"], [class*=" newMosaicStyle_"], [class^="audioAttachment_"], [class*=" audioAttachment_"]) { display: none !important; }',
         mobile: { messagePresentation: "attachments" },
     },

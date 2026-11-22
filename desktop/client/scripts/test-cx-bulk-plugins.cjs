@@ -293,7 +293,8 @@ for (const name of ["ReverseText", "ClapText", "SpaceOut", "Starify", "VibeCheck
 }
 for (const [key, rule] of Object.entries(cxAppearanceTargets)) {
     if (rule.catalogOriginal) {
-        const file = require("node:path").resolve(__dirname, "../../../examples/cx/catalog/plugins/hide-" + key + ".cx");
+        const name = typeof rule.catalogOriginal === "string" ? rule.catalogOriginal : "hide-" + key + ".cx";
+        const file = path.resolve(__dirname, "../../../examples/cx/catalog/plugins", name);
         const document = parseCx(require("node:fs").readFileSync(file, "utf8"));
         assert.equal(document.name, rule.plugin);
         assert.deepEqual([...document.hiddenTargets], [key]);
