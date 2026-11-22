@@ -15,8 +15,14 @@ import (
 var IsTestBuildStr = "0"
 var IsTestBuild = false
 
-var ReleaseUrl = "https://api.github.com/repos/cloudcord-mod/release-hub/releases/latest"
+const desktopReleaseAPI = "https://api.github.com/repos/cloudcord-mod/hub/releases/tags/"
+const desktopDownloads = "https://github.com/cloudcord-mod/hub/releases/download/"
+const stableDesktopTag = "new_beta_t_desktop"
+const testDesktopTag = "new_beta_test_desktop"
+
+var ReleaseUrl = desktopReleaseAPI + stableDesktopTag
 var ReleaseUrlFallback = ""
+
 const InstallerReleaseUrl = "https://api.github.com/repos/cloudcord-mod/release-hub/releases/latest"
 const InstallerReleaseUrlFallback = ""
 
@@ -25,7 +31,7 @@ var UserAgent = "CloudCordSetup/" + buildinfo.InstallerGitHash + " (https://gith
 func init() {
 	if IsTestBuildStr == "1" || os.Getenv("CLOUDCORD_TEST_BUILD") == "1" {
 		IsTestBuild = true
-		ReleaseUrl = "https://api.github.com/repos/cloudcord-mod/release-hub/releases/tags/new_beta_test_desktop"
+		ReleaseUrl = desktopReleaseAPI + testDesktopTag
 	}
 }
 

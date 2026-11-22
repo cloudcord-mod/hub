@@ -55,15 +55,15 @@ func GetGithubRelease(url, fallbackUrl string) (*GithubRelease, error) {
 
 	if res.StatusCode >= 300 {
 		isRateLimitedOrBlocked := res.StatusCode == 401 || res.StatusCode == 403 || res.StatusCode == 429
-		triedFallback := url == fallbackUrl
+		hasFallback := fallbackUrl != "" && url != fallbackUrl
 
-		if isRateLimitedOrBlocked && !triedFallback {
+		if isRateLimitedOrBlocked && hasFallback {
 			Log.Error(fmt.Sprintf("Failed to fetch %s (status code %d). Trying fallback url %s", url, res.StatusCode, fallbackUrl))
 			return GetGithubRelease(fallbackUrl, fallbackUrl)
 		}
 
 		err = errors.New(res.Status)
-		Log.Error(url, "returned Non-OK status", GithubError)
+		Log.Error(url, "returned Non-OK status", err)
 		return nil, err
 	}
 
@@ -148,13 +148,6 @@ func installLatestBuilds() (retErr error) {
 		return
 	}
 
-	if len(ReleaseData.Assets) == 0 {
-		data, err := GetGithubRelease(ReleaseUrl, ReleaseUrlFallback)
-		if err == nil && data != nil {
-			ReleaseData = *data
-		}
-	}
-
 	downloadUrl := ""
 	for _, ass := range ReleaseData.Assets {
 		if IsTestBuild {
@@ -172,9 +165,9 @@ func installLatestBuilds() (retErr error) {
 
 	if downloadUrl == "" {
 		if IsTestBuild {
-			downloadUrl = "https://github.com/cloudcord-mod/release-hub/releases/download/new_beta_test_desktop/desktop-test.asar"
+			downloadUrl = desktopDownloads + testDesktopTag + "/desktop-test.asar"
 		} else {
-			downloadUrl = "https://github.com/cloudcord-mod/release-hub/releases/download/new_beta_t_desktop/desktop.asar"
+			downloadUrl = desktopDownloads + stableDesktopTag + "/cloudcord.asar"
 		}
 	}
 
@@ -197,4 +190,3 @@ func installLatestBuilds() (retErr error) {
 	InstalledHash = LatestHash
 	return nil
 }
-

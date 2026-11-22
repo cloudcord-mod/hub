@@ -100,7 +100,7 @@ func main() {
 
 	if *installFlag || *updateFlag {
 		if !<-GithubDoneChan {
-			die("Not " + Ternary(*installFlag, "installing", "updating") + " as fetching release data failed")
+			Log.Warn("Could not fetch release metadata. Trying the direct runtime download:", GithubError)
 		}
 	}
 
