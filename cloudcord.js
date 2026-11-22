@@ -9083,1045 +9083,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
-  // src/lib/api/cxTesting/cx-testing-queues.json
-  var cx_testing_queues_default;
-  var init_cx_testing_queues = __esm({
-    "src/lib/api/cxTesting/cx-testing-queues.json"() {
-      cx_testing_queues_default = [
-        [
-          ["mobile/all-call-time-counter", "AllCallTimeCounter", "Shared declarative CX"],
-          ["mobile/chat-buttons-begone", "ChatButtonsBegone", "Shared declarative CX"],
-          ["mobile/dashless", "Dashless", "Shared declarative CX"],
-          ["mobile/equius-s-typing-quirk", "Equius'sTypingQuirk", "Shared declarative CX"],
-          ["mobile/file-name-randomization", "FileNameRandomization", "Shared declarative CX"],
-          ["mobile/hide-disabled-emojis", "HideDisabledEmojis", "Shared declarative CX"],
-          ["mobile/link-converter", "LinkConverter", "Shared declarative CX"],
-          ["mobile/no-reply-ping", "NoReplyPing", "Shared declarative CX"],
-          ["mobile/profile-media", "ProfileMedia", "Shared declarative CX"],
-          ["mobile/rot13-text", "ROT13 Text", "Shared declarative CX"],
-          ["mobile/sollux-typing-quirk", "SolluxTypingQuirk", "Shared declarative CX"],
-          ["mobile/user-notes", "UserNotes", "Shared declarative CX"],
-          ["mobile/vriska-s-typing-quirk", "Vriska'sTypingQuirk", "Shared declarative CX"],
-          ["gpl/add-attachments", "AddAttachments", "Desktop CX pack"],
-          ["gpl/alt-krisp-switch", "AltKrispSwitch", "Desktop CX pack"],
-          ["gpl/always-expand-roles", "AlwaysExpandRoles", "Desktop CX pack"],
-          ["gpl/animalese", "Animalese", "Desktop CX pack"],
-          ["gpl/anti-move-deco", "AntiMoveDeco", "Desktop CX pack"],
-          ["gpl/apple-music-rich-presence", "AppleMusicRichPresence", "Desktop CX pack"],
-          ["gpl/auto-dndwhile-playing", "AutoDNDWhilePlaying", "Desktop CX pack"],
-          ["gpl/auto-zipper", "AutoZipper", "Desktop CX pack"],
-          ["gpl/better-activities", "BetterActivities", "Desktop CX pack"],
-          ["gpl/better-ban-reasons", "BetterBanReasons", "Desktop CX pack"],
-          ["gpl/better-folders", "BetterFolders", "Desktop CX pack"],
-          ["gpl/better-gif-picker", "BetterGifPicker", "Desktop CX pack"],
-          ["gpl/better-plus-reacts", "BetterPlusReacts", "Desktop CX pack"],
-          ["gpl/better-screen-share", "BetterScreenShare", "Desktop CX pack"],
-          ["gpl/better-upload-button", "BetterUploadButton", "Desktop CX pack"],
-          ["gpl/bigger-code-blocks", "BiggerCodeBlocks", "Desktop CX pack"],
-          ["gpl/bigger-stream-preview", "BiggerStreamPreview", "Desktop CX pack"],
-          ["gpl/blur-images-until-hover", "BlurImagesUntilHover", "Desktop CX pack"],
-          ["gpl/bold-usernames", "BoldUsernames", "Desktop CX pack"],
-          ["gpl/bypass-status", "BypassStatus", "Desktop CX pack"],
-          ["gpl/cancel-friend-request", "CancelFriendRequest", "Desktop CX pack"],
-          ["gpl/channel-notes", "ChannelNotes", "Desktop CX pack"],
-          ["gpl/clan-switcher", "ClanSwitcher", "Desktop CX pack"],
-          ["gpl/cleaner-channel-groups", "CleanerChannelGroups", "Desktop CX pack"],
-          ["gpl/clickable-roles", "ClickableRoles", "Desktop CX pack"],
-          ["gpl/client-theme", "ClientTheme", "Desktop CX pack"],
-          ["gpl/cloud-cord-core", "CloudCord Core", "Desktop CX pack"],
-          ["gpl/cloud-cord-verification", "CloudCordVerification", "Desktop CX pack"],
-          ["gpl/color-sighted", "ColorSighted", "Desktop CX pack"],
-          ["gpl/compact-compose", "CompactCompose", "Desktop CX pack"],
-          ["gpl/compact-server-list", "CompactServerList", "Desktop CX pack"],
-          ["gpl/content-warning", "ContentWarning", "Desktop CX pack"],
-          ["gpl/copy-media-link", "CopyMediaLink", "Desktop CX pack"],
-          ["gpl/copy-sticker-links", "CopyStickerLinks", "Desktop CX pack"],
-          ["gpl/crash-handler", "CrashHandler", "Desktop CX pack"],
-          ["gpl/custom-app-icons", "CustomAppIcons", "Desktop CX pack"],
-          ["gpl/custom-folder-icons", "CustomFolderIcons", "Desktop CX pack"],
-          ["gpl/custom-rpc", "CustomRPC", "Desktop CX pack"],
-          ["gpl/custom-stream-preview", "CustomStreamPreview", "Desktop CX pack"],
-          ["gpl/cx-extensions", "CxExtensions", "Desktop CX pack"],
-          ["gpl/decode-base64", "DecodeBase64", "Desktop CX pack"],
-          ["gpl/dev-companion", "DevCompanion", "Desktop CX pack"],
-          ["gpl/disable-cameras", "DisableCameras", "Desktop CX pack"],
-          ["gpl/dm-read-receipt", "DmReadReceipt", "Desktop CX pack"],
-          ["gpl/download-all-attachments", "DownloadAllAttachments", "Desktop CX pack"],
-          ["gpl/dragify", "Dragify", "Desktop CX pack"],
-          ["gpl/encrypted-message", "EncryptedMessage", "Desktop CX pack"],
-          ["gpl/equissant", "Equissant", "Desktop CX pack"],
-          ["gpl/experiments", "Experiments", "Desktop CX pack"],
-          ["gpl/expression-cloner", "ExpressionCloner", "Desktop CX pack"],
-          ["gpl/fake-lag", "FakeLag", "Desktop CX pack"],
-          ["gpl/fake-nitro", "FakeNitro", "Desktop CX pack"],
-          ["gpl/fast-delete-channels", "FastDeleteChannels", "Desktop CX pack"],
-          ["gpl/favorite-emoji-first", "FavoriteEmojiFirst", "Desktop CX pack"],
-          ["gpl/file-splitter", "FileSplitter", "Desktop CX pack"],
-          ["gpl/find-reply", "FindReply", "Desktop CX pack"],
-          ["gpl/fix-images-quality", "FixImagesQuality", "Desktop CX pack"],
-          ["gpl/fix-youtube-embeds", "FixYoutubeEmbeds", "Desktop CX pack"],
-          ["gpl/follow-voice-user", "FollowVoiceUser", "Desktop CX pack"],
-          ["gpl/forward-anywhere", "ForwardAnywhere", "Desktop CX pack"],
-          ["gpl/friend-invites", "FriendInvites", "Desktop CX pack"],
-          ["gpl/friend-tags", "FriendTags", "Desktop CX pack"],
-          ["gpl/full-vcpfp", "FullVCPFP", "Desktop CX pack"],
-          ["gpl/ghosted", "Ghosted", "Desktop CX pack"],
-          ["gpl/gif-paste", "GifPaste", "Desktop CX pack"],
-          ["gpl/global-badges", "GlobalBadges", "Desktop CX pack"],
-          ["gpl/greet-sticker-picker", "GreetStickerPicker", "Desktop CX pack"],
-          ["gpl/hide-add-server-button", "HideAddServerButton", "Desktop CX pack"],
-          ["gpl/hide-badges", "HideBadges", "Desktop CX pack"],
-          ["gpl/hide-call-buttons", "HideCallButtons", "Desktop CX pack"],
-          ["gpl/hide-chat-buttons", "HideChatButtons", "Desktop CX pack"],
-          ["gpl/hide-discover-button", "HideDiscoverButton", "Desktop CX pack"],
-          ["gpl/hide-edited-label", "HideEditedLabel", "Desktop CX pack"],
-          ["gpl/hide-empty-folders", "HideEmptyFolders", "Desktop CX pack"],
-          ["gpl/hide-gift-button", "HideGiftButton", "Desktop CX pack"],
-          ["gpl/hide-image-alt-text", "HideImageAltText", "Desktop CX pack"],
-          ["gpl/hide-jump-to-present", "HideJumpToPresent", "Desktop CX pack"],
-          ["gpl/hide-member-activities", "HideMemberActivities", "Desktop CX pack"],
-          ["gpl/hide-messages", "HideMessages", "Desktop CX pack"],
-          ["gpl/hide-nitro-tab", "HideNitroTab", "Desktop CX pack"],
-          ["gpl/hide-profile-effects", "HideProfileEffects", "Desktop CX pack"],
-          ["gpl/hide-reactions-bar", "HideReactionsBar", "Desktop CX pack"],
-          ["gpl/hide-scrollbars", "HideScrollbars", "Desktop CX pack"],
-          ["gpl/hide-server-banners", "HideServerBanners", "Desktop CX pack"],
-          ["gpl/hide-spoiler-warnings", "HideSpoilerWarnings", "Desktop CX pack"],
-          ["gpl/hide-stickers", "HideStickers", "Desktop CX pack"],
-          ["gpl/hide-system-messages", "HideSystemMessages", "Desktop CX pack"],
-          ["gpl/hide-typing-indicator", "HideTypingIndicator", "Desktop CX pack"],
-          ["gpl/hide-user-panel-activity", "HideUserPanelActivity", "Desktop CX pack"],
-          ["gpl/high-contrast-text", "HighContrastText", "Desktop CX pack"],
-          ["gpl/home-typing", "HomeTyping", "Desktop CX pack"],
-          ["gpl/husk", "Husk", "Desktop CX pack"],
-          ["gpl/id-translater", "ID Translater", "Desktop CX pack"],
-          ["gpl/ignore-calls", "IgnoreCalls", "Desktop CX pack"],
-          ["gpl/image-link", "ImageLink", "Desktop CX pack"],
-          ["gpl/ingtoninator", "Ingtoninator", "Desktop CX pack"],
-          ["gpl/invisible-chat", "InvisibleChat", "Desktop CX pack"],
-          ["gpl/iremember-you", "IRememberYou", "Desktop CX pack"],
-          ["gpl/jump-to-top", "JumpToTop", "Desktop CX pack"],
-          ["gpl/keyboard-sounds", "KeyboardSounds", "Desktop CX pack"],
-          ["gpl/last-active", "LastActive", "Desktop CX pack"],
-          ["gpl/leet-text", "LeetText", "Desktop CX pack", "leet-text.cx"],
-          ["gpl/local-times", "LocalTimes", "Desktop CX pack"],
-          ["gpl/media-playback-speed", "MediaPlaybackSpeed", "Desktop CX pack"],
-          ["gpl/mention-colors", "MentionColors", "Desktop CX pack"],
-          ["gpl/message-colors", "MessageColors", "Desktop CX pack"],
-          ["gpl/message-link-embeds", "MessageLinkEmbeds", "Desktop CX pack"],
-          ["gpl/message-logger-enhanced", "MessageLoggerEnhanced", "Desktop CX pack"],
-          ["gpl/message-reminders", "MessageReminders", "Desktop CX pack"],
-          ["gpl/message-vault", "MessageVault", "Desktop CX pack"],
-          ["gpl/monospace-chat", "MonospaceChat", "Desktop CX pack"],
-          ["gpl/more-quick-reactions", "MoreQuickReactions", "Desktop CX pack"],
-          ["gpl/motion-blur", "MotionBlur", "Desktop CX pack"],
-          ["gpl/music-rich-presence", "MusicRichPresence", "Desktop CX pack"],
-          ["gpl/mutual-server-members", "MutualServerMembers", "Desktop CX pack"],
-          ["gpl/never-pause-previews", "NeverPausePreviews", "Desktop CX pack"],
-          ["gpl/no-animations", "NoAnimations", "Desktop CX pack"],
-          ["gpl/no-devtools-warning", "NoDevtoolsWarning", "Desktop CX pack"],
-          ["gpl/no-f1", "NoF1", "Desktop CX pack"],
-          ["gpl/no-middle-click-paste", "NoMiddleClickPaste", "Desktop CX pack"],
-          ["gpl/no-onboarding-delay", "NoOnboardingDelay", "Desktop CX pack"],
-          ["gpl/no-push-to-talk", "NoPushToTalk", "Desktop CX pack"],
-          ["gpl/no-role-headers", "NoRoleHeaders", "Desktop CX pack"],
-          ["gpl/no-shadows", "NoShadows", "Desktop CX pack"],
-          ["gpl/notification-title", "NotificationTitle", "Desktop CX pack"],
-          ["gpl/no-unblock-to-jump", "NoUnblockToJump", "Desktop CX pack"],
-          ["gpl/open-in-app", "OpenInApp", "Desktop CX pack"],
-          ["gpl/party-mode", "PartyMode", "Desktop CX pack"],
-          ["gpl/permissions-viewer", "PermissionsViewer", "Desktop CX pack"],
-          ["gpl/pin-dms", "PinDMs", "Desktop CX pack"],
-          ["gpl/plain-folder-icon", "PlainFolderIcon", "Desktop CX pack"],
-          ["gpl/polish-wording", "PolishWording", "Desktop CX pack"],
-          ["gpl/profile-spoofer", "ProfileSpoofer", "Desktop CX pack"],
-          ["gpl/questify", "Questify", "Desktop CX pack"],
-          ["gpl/quick-reply", "QuickReply", "Desktop CX pack"],
-          ["gpl/quoter", "Quoter", "Desktop CX pack"],
-          ["gpl/reaction-timestamps", "ReactionTimestamps", "Desktop CX pack"],
-          ["gpl/read-all-notifications-button", "ReadAllNotificationsButton", "Desktop CX pack"],
-          ["gpl/relationship-notifier", "RelationshipNotifier", "Desktop CX pack"],
-          ["gpl/reorder-attachments", "ReorderAttachments", "Desktop CX pack"],
-          ["gpl/reply-ping-control", "ReplyPingControl", "Desktop CX pack"],
-          ["gpl/reverse-image-search", "ReverseImageSearch", "Desktop CX pack"],
-          ["gpl/rich-presence", "RichPresence", "Desktop CX pack"],
-          ["gpl/rounded-chat-bar", "RoundedChatBar", "Desktop CX pack"],
-          ["gpl/rpceditor", "RPCEditor", "Desktop CX pack"],
-          ["gpl/screen-recorder", "ScreenRecorder", "Desktop CX pack"],
-          ["gpl/secret-ring-tone-enabler", "SecretRingToneEnabler", "Desktop CX pack"],
-          ["gpl/self-forward", "SelfForward", "Desktop CX pack"],
-          ["gpl/server-info", "ServerInfo", "Desktop CX pack"],
-          ["gpl/server-search", "ServerSearch", "Desktop CX pack"],
-          ["gpl/shiki-codeblocks", "ShikiCodeblocks", "Desktop CX pack"],
-          ["gpl/show-badges-in-chat", "ShowBadgesInChat", "Desktop CX pack"],
-          ["gpl/show-hidden-things", "ShowHiddenThings", "Desktop CX pack"],
-          ["gpl/show-resource-channels", "ShowResourceChannels", "Desktop CX pack"],
-          ["gpl/show-timeout-duration", "ShowTimeoutDuration", "Desktop CX pack"],
-          ["gpl/signature", "Signature", "Desktop CX pack"],
-          ["gpl/silent-edit", "SilentEdit", "Desktop CX pack"],
-          ["gpl/sinbop-stream-fixes", "SinbopStreamFixes", "Desktop CX pack"],
-          ["gpl/smaller-avatars-in-chat", "SmallerAvatarsInChat", "Desktop CX pack"],
-          ["gpl/smooth-type", "SmoothType", "Desktop CX pack"],
-          ["gpl/soft-corners", "SoftCorners", "Desktop CX pack"],
-          ["gpl/song-spotlight", "SongSpotlight", "Desktop CX pack"],
-          ["gpl/space-out", "SpaceOut", "Desktop CX pack"],
-          ["gpl/spotify-activity-toggle", "SpotifyActivityToggle", "Desktop CX pack"],
-          ["gpl/square-avatars", "SquareAvatars", "Desktop CX pack"],
-          ["gpl/status-presets", "StatusPresets", "Desktop CX pack"],
-          ["gpl/stereo-screenshare-audio", "StereoScreenshareAudio", "Desktop CX pack"],
-          ["gpl/sticky-date-dividers", "StickyDateDividers", "Desktop CX pack"],
-          ["gpl/streamer-mode-on", "StreamerModeOn", "Desktop CX pack"],
-          ["gpl/summaries", "Summaries", "Desktop CX pack"],
-          ["gpl/suspicious-links", "SuspiciousLinks", "Desktop CX pack"],
-          ["gpl/text-screenshot", "TextScreenshot", "Desktop CX pack"],
-          ["gpl/thin-scrollbars", "ThinScrollbars", "Desktop CX pack"],
-          ["gpl/timezones", "Timezones", "Desktop CX pack"],
-          ["gpl/toggle-video-bind", "ToggleVideoBind", "Desktop CX pack"],
-          ["gpl/transparent-chat-bar", "TransparentChatBar", "Desktop CX pack"],
-          ["gpl/typing-tweaks", "TypingTweaks", "Desktop CX pack"],
-          ["gpl/universal-mention", "UniversalMention", "Desktop CX pack"],
-          ["gpl/unlimited-favorite-gifs", "UnlimitedFavoriteGIFs", "Desktop CX pack"],
-          ["gpl/unsuppress-embeds", "UnsuppressEmbeds", "Desktop CX pack"],
-          ["gpl/user-pfp", "UserPFP", "Desktop CX pack"],
-          ["gpl/usrbg", "USRBG", "Desktop CX pack"],
-          ["gpl/vc-narrator", "VcNarrator", "Desktop CX pack"],
-          ["gpl/vibe-check", "VibeCheck", "Desktop CX pack"],
-          ["gpl/view-raw-variant", "ViewRawVariant", "Desktop CX pack"],
-          ["gpl/voice-chat-double-click", "VoiceChatDoubleClick", "Desktop CX pack"],
-          ["gpl/voice-fake-detector", "VoiceFakeDetector", "Desktop CX pack"],
-          ["gpl/voice-messages-in-background", "VoiceMessagesInBackground", "Desktop CX pack"],
-          ["gpl/voice-server-info", "VoiceServerInfo", "Desktop CX pack"],
-          ["gpl/volume-booster", "VolumeBooster", "Desktop CX pack"],
-          ["gpl/web-context-menus", "WebContextMenus", "Desktop CX pack"],
-          ["gpl/web-rich-presence", "WebRichPresence", "Desktop CX pack"],
-          ["gpl/wellbeing", "Wellbeing", "Desktop CX pack"],
-          ["gpl/whos-watching", "WhosWatching", "Desktop CX pack"],
-          ["gpl/wiggly-text", "WigglyText", "Desktop CX pack"],
-          ["gpl/write-upper-case", "WriteUpperCase", "Desktop CX pack"],
-          ["gpl/zero-width-sanitizer", "ZeroWidthSanitizer", "Desktop CX pack"],
-          ["discover-66", "\u{1F384} Christmas Counter", "Discover CX preview"],
-          ["discover-73", "Animal Commands", "Discover CX preview"],
-          ["discover-36", "Bluetooth Audio Fix", "Discover CX preview"],
-          ["discover-21", "Char Counter", "Discover CX preview"],
-          ["discover-64", "ClipboardGIFSend", "Discover CX preview"],
-          ["discover-32", "Dislate Lite", "Discover CX preview"],
-          ["discover-37", "Force Timestamp Locale", "Discover CX preview"],
-          ["discover-95", "Geastures+", "Discover CX preview"],
-          ["discover-1", "Global Badges", "Discover CX preview"],
-          ["discover-52", "HideBlockedAndIgnoredMessages", "Discover CX preview"],
-          ["discover-91", "Keyword Tracker", "Discover CX preview"],
-          ["discover-68", "Let it Snow", "Discover CX preview"],
-          ["discover-20", "Monet Theme", "Discover CX preview"],
-          ["discover-38", "Mute New Guilds", "Discover CX preview"],
-          ["discover-40", "NoAutoReplyMention", "Discover CX preview"],
-          ["discover-10", "NoDelete", "Discover CX preview"],
-          ["discover-57", "NSFW Blur", "Discover CX preview"],
-          ["discover-88", "PermissionViewer", "Discover CX preview"],
-          ["discover-19", "Plugin Browser", "Discover CX preview"],
-          ["discover-29", "Quick Delete", "Discover CX preview"],
-          ["discover-78", "Realmoji", "Discover CX preview"],
-          ["discover-94", "SearchActionSheet", "Discover CX preview"],
-          ["discover-44", "Show Tag", "Discover CX preview"],
-          ["discover-83", "SilentDelete", "Discover CX preview"],
-          ["discover-15", "SpotifyPreview", "Discover CX preview"],
-          ["discover-77", "Text Replace", "Discover CX preview"],
-          ["discover-48", "UserPFP", "Discover CX preview"],
-          ["discover-3", "ViewRaw", "Discover CX preview"]
-        ],
-        [
-          ["mobile/better-chat-names", "BetterChatNames", "Shared declarative CX"],
-          ["mobile/copy-bios", "CopyBios", "Shared declarative CX"],
-          ["mobile/double-click-edit", "DoubleClickEdit", "Shared declarative CX"],
-          ["mobile/eridan-typing-quirk", "EridanTypingQuirk", "Shared declarative CX"],
-          ["mobile/foreign-copy-handler", "foreignCopyHandler", "Shared declarative CX"],
-          ["mobile/high-res-profile-images", "High-Res Profile Images", "Shared declarative CX"],
-          ["mobile/nepeta-s-typing-quirk", "Nepeta'sTypingQuirk", "Shared declarative CX"],
-          ["mobile/notify-when-muted", "NotifyWhenMuted", "Shared declarative CX"],
-          ["mobile/read-all-notifications", "ReadAllNotifications", "Shared declarative CX"],
-          ["mobile/scroll-to-latest", "ScrollToLatest", "Shared declarative CX"],
-          ["mobile/terezi-typing-quirk", "TereziTypingQuirk", "Shared declarative CX"],
-          ["mobile/user-tags", "UserTags", "Shared declarative CX"],
-          ["gpl/1-fa", "1FA", "Desktop CX pack"],
-          ["gpl/advanced-permissions", "AdvancedPermissions", "Desktop CX pack"],
-          ["gpl/always-animate", "AlwaysAnimate", "Desktop CX pack"],
-          ["gpl/always-trust", "AlwaysTrust", "Desktop CX pack"],
-          ["gpl/anonymise-file-names", "AnonymiseFileNames", "Desktop CX pack"],
-          ["gpl/anti-nickname", "AntiNickname", "Desktop CX pack"],
-          ["gpl/at-someone", "AtSomeone", "Desktop CX pack"],
-          ["gpl/auto-jump-to-message", "AutoJumpToMessage", "Desktop CX pack"],
-          ["gpl/avatar-grabber", "AvatarGrabber", "Desktop CX pack"],
-          ["gpl/better-audio-player", "BetterAudioPlayer", "Desktop CX pack"],
-          ["gpl/better-blocked-users", "BetterBlockedUsers", "Desktop CX pack"],
-          ["gpl/better-gif-alt-text", "BetterGifAltText", "Desktop CX pack"],
-          ["gpl/better-image-editor", "BetterImageEditor", "Desktop CX pack"],
-          ["gpl/better-role-context", "BetterRoleContext", "Desktop CX pack"],
-          ["gpl/better-sessions", "BetterSessions", "Desktop CX pack"],
-          ["gpl/bigger-avatars-in-chat", "BiggerAvatarsInChat", "Desktop CX pack"],
-          ["gpl/bigger-jumbo-emojis", "BiggerJumboEmojis", "Desktop CX pack"],
-          ["gpl/block-keywords", "BlockKeywords", "Desktop CX pack"],
-          ["gpl/blur-nsfw", "BlurNSFW", "Desktop CX pack"],
-          ["gpl/bookmarks", "Bookmarks", "Desktop CX pack"],
-          ["gpl/calculator", "Calculator", "Desktop CX pack"],
-          ["gpl/centered-chat", "CenteredChat", "Desktop CX pack"],
-          ["gpl/channel-tabs", "ChannelTabs", "Desktop CX pack"],
-          ["gpl/clap-text", "ClapText", "Desktop CX pack"],
-          ["gpl/cleaner-discord", "CleanerDiscord", "Desktop CX pack"],
-          ["gpl/click-sparkles", "ClickSparkles", "Desktop CX pack"],
-          ["gpl/clips-enhancements", "ClipsEnhancements", "Desktop CX pack"],
-          ["gpl/cloud-cord-accent", "CloudCordAccent", "Desktop CX pack"],
-          ["gpl/collapsible-ui", "CollapsibleUI", "Desktop CX pack"],
-          ["gpl/color-text", "ColorText", "Desktop CX pack", "color-text.cx"],
-          ["gpl/compact-member-list", "CompactMemberList", "Desktop CX pack"],
-          ["gpl/console-janitor", "ConsoleJanitor", "Desktop CX pack"],
-          ["gpl/copy-emoji-markdown", "CopyEmojiMarkdown", "Desktop CX pack"],
-          ["gpl/copy-profile-colors", "CopyProfileColors", "Desktop CX pack"],
-          ["gpl/copy-user-mention", "CopyUserMention", "Desktop CX pack"],
-          ["gpl/ctrl-enter-save", "CtrlEnterSave", "Desktop CX pack"],
-          ["gpl/custom-commands", "CustomCommands", "Desktop CX pack"],
-          ["gpl/custom-idle", "CustomIdle", "Desktop CX pack"],
-          ["gpl/custom-sounds", "CustomSounds", "Desktop CX pack"],
-          ["gpl/custom-timestamps", "CustomTimestamps", "Desktop CX pack"],
-          ["gpl/dearrow", "Dearrow", "Desktop CX pack"],
-          ["gpl/decor", "Decor", "Desktop CX pack"],
-          ["gpl/dim-inactive-channels", "DimInactiveChannels", "Desktop CX pack"],
-          ["gpl/disable-deep-links", "DisableDeepLinks", "Desktop CX pack"],
-          ["gpl/dont-round-my-timestamps", "DontRoundMyTimestamps", "Desktop CX pack"],
-          ["gpl/draft-navigator", "DraftNavigator", "Desktop CX pack"],
-          ["gpl/element-highlighter", "ElementHighlighter", "Desktop CX pack"],
-          ["gpl/equibop-stream-fixes", "EquibopStreamFixes", "Desktop CX pack"],
-          ["gpl/event-logs", "EventLogs", "Desktop CX pack"],
-          ["gpl/export-dm", "ExportDM", "Desktop CX pack"],
-          ["gpl/f8-break", "F8Break", "Desktop CX pack"],
-          ["gpl/fake-messages", "FakeMessages", "Desktop CX pack"],
-          ["gpl/fake-profile-themes", "FakeProfileThemes", "Desktop CX pack"],
-          ["gpl/fast-gif-picker", "FastGifPicker", "Desktop CX pack"],
-          ["gpl/favorite-gif-search", "FavoriteGifSearch", "Desktop CX pack"],
-          ["gpl/file-upload", "FileUpload", "Desktop CX pack"],
-          ["gpl/fix-codeblock-gap", "FixCodeblockGap", "Desktop CX pack"],
-          ["gpl/fix-screenshare", "FixScreenshare", "Desktop CX pack"],
-          ["gpl/floating-chat-bar", "FloatingChatBar", "Desktop CX pack"],
-          ["gpl/font-loader", "FontLoader", "Desktop CX pack"],
-          ["gpl/frequent-quick-switcher", "FrequentQuickSwitcher", "Desktop CX pack"],
-          ["gpl/friendship-ranks", "FriendshipRanks", "Desktop CX pack"],
-          ["gpl/full-search-context", "FullSearchContext", "Desktop CX pack"],
-          ["gpl/game-activity-toggle", "GameActivityToggle", "Desktop CX pack"],
-          ["gpl/gif-collections", "GifCollections", "Desktop CX pack"],
-          ["gpl/gif-provider-switcher", "GifProviderSwitcher", "Desktop CX pack"],
-          ["gpl/google-that", "GoogleThat", "Desktop CX pack"],
-          ["gpl/guild-picker-dumper", "GuildPickerDumper", "Desktop CX pack"],
-          ["gpl/hide-apps-button", "HideAppsButton", "Desktop CX pack"],
-          ["gpl/hide-boost-goal", "HideBoostGoal", "Desktop CX pack"],
-          ["gpl/hide-channel-topic", "HideChannelTopic", "Desktop CX pack"],
-          ["gpl/hide-clan-tags", "HideClanTags", "Desktop CX pack"],
-          ["gpl/hide-dm-search", "HideDmSearch", "Desktop CX pack"],
-          ["gpl/hide-embeds", "HideEmbeds", "Desktop CX pack"],
-          ["gpl/hide-friend-requests-badge", "HideFriendRequestsBadge", "Desktop CX pack"],
-          ["gpl/hide-guild-boost-tag", "HideGuildBoostTag", "Desktop CX pack"],
-          ["gpl/hide-inbox-button", "HideInboxButton", "Desktop CX pack"],
-          ["gpl/hide-keyboard-tips", "HideKeyboardTips", "Desktop CX pack"],
-          ["gpl/hide-member-list-button", "HideMemberListButton", "Desktop CX pack"],
-          ["gpl/hide-nameplates", "HideNameplates", "Desktop CX pack"],
-          ["gpl/hide-notification-bell", "HideNotificationBell", "Desktop CX pack"],
-          ["gpl/hide-quests-tab", "HideQuestsTab", "Desktop CX pack"],
-          ["gpl/hide-reply-previews", "HideReplyPreviews", "Desktop CX pack"],
-          ["gpl/hide-send-button", "HideSendButton", "Desktop CX pack"],
-          ["gpl/hide-servers", "HideServers", "Desktop CX pack"],
-          ["gpl/hide-status-emojis", "HideStatusEmojis", "Desktop CX pack"],
-          ["gpl/hide-stream-previews", "HideStreamPreviews", "Desktop CX pack"],
-          ["gpl/hide-threads-button", "HideThreadsButton", "Desktop CX pack"],
-          ["gpl/hide-unread-pills", "HideUnreadPills", "Desktop CX pack"],
-          ["gpl/hide-voice-panel-tips", "HideVoicePanelTips", "Desktop CX pack"],
-          ["gpl/highlight-links", "HighlightLinks", "Desktop CX pack"],
-          ["gpl/hop-on", "HopOn", "Desktop CX pack"],
-          ["gpl/hype-squad-switcher", "HypeSquadSwitcher", "Desktop CX pack"],
-          ["gpl/idle-auto-restart", "IdleAutoRestart", "Desktop CX pack"],
-          ["gpl/ilove-spam", "ILoveSpam", "Desktop CX pack"],
-          ["gpl/image-zoom", "ImageZoom", "Desktop CX pack"],
-          ["gpl/in-role", "InRole", "Desktop CX pack"],
-          ["gpl/invite-defaults", "InviteDefaults", "Desktop CX pack"],
-          ["gpl/jumpscare", "Jumpscare", "Desktop CX pack"],
-          ["gpl/keep-current-channel", "KeepCurrentChannel", "Desktop CX pack"],
-          ["gpl/keyword-notify", "KeywordNotify", "Desktop CX pack"],
-          ["gpl/last-fmrich-presence", "LastFMRichPresence", "Desktop CX pack"],
-          ["gpl/limitless-screenshare", "LimitlessScreenshare", "Desktop CX pack"],
-          ["gpl/login-with-qr", "LoginWithQR", "Desktop CX pack"],
-          ["gpl/member-count", "MemberCount", "Desktop CX pack"],
-          ["gpl/message-burst", "MessageBurst", "Desktop CX pack"],
-          ["gpl/message-fetch-timer", "MessageFetchTimer", "Desktop CX pack"],
-          ["gpl/message-link-tooltip", "MessageLinkTooltip", "Desktop CX pack"],
-          ["gpl/message-notifier", "MessageNotifier", "Desktop CX pack"],
-          ["gpl/message-tags", "MessageTags", "Desktop CX pack"],
-          ["gpl/mic-loopback-tester", "MicLoopbackTester", "Desktop CX pack"],
-          ["gpl/more-commands", "MoreCommands", "Desktop CX pack"],
-          ["gpl/more-stickers", "MoreStickers", "Desktop CX pack"],
-          ["gpl/moyai", "Moyai", "Desktop CX pack"],
-          ["gpl/muted-channels-faded", "MutedChannelsFaded", "Desktop CX pack"],
-          ["gpl/narrow-channel-list", "NarrowChannelList", "Desktop CX pack"],
-          ["gpl/new-guild-settings", "NewGuildSettings", "Desktop CX pack"],
-          ["gpl/no-blocked-messages", "NoBlockedMessages", "Desktop CX pack"],
-          ["gpl/no-dmwhile-streaming", "NoDMWhileStreaming", "Desktop CX pack"],
-          ["gpl/no-masked-url-paste", "NoMaskedUrlPaste", "Desktop CX pack"],
-          ["gpl/no-mosaic", "NoMosaic", "Desktop CX pack"],
-          ["gpl/no-pending-count", "NoPendingCount", "Desktop CX pack"],
-          ["gpl/no-reply-mention", "NoReplyMention", "Desktop CX pack"],
-          ["gpl/no-rpc", "NoRPC", "Desktop CX pack"],
-          ["gpl/no-system-badge", "NoSystemBadge", "Desktop CX pack"],
-          ["gpl/notification-volume", "NotificationVolume", "Desktop CX pack"],
-          ["gpl/oneko", "oneko", "Desktop CX pack"],
-          ["gpl/orbolay-bridge", "OrbolayBridge", "Desktop CX pack"],
-          ["gpl/pause-invites-forever", "PauseInvitesForever", "Desktop CX pack"],
-          ["gpl/pet-pet", "PetPet", "Desktop CX pack"],
-          ["gpl/ping-notifications", "PingNotifications", "Desktop CX pack"],
-          ["gpl/platform-indicators", "PlatformIndicators", "Desktop CX pack"],
-          ["gpl/preview-message", "PreviewMessage", "Desktop CX pack"],
-          ["gpl/pull-user-into-voice", "PullUserIntoVoice", "Desktop CX pack"],
-          ["gpl/quick-delete", "QuickDelete", "Desktop CX pack"],
-          ["gpl/quick-theme-switcher", "QuickThemeSwitcher", "Desktop CX pack"],
-          ["gpl/random-voice", "RandomVoice", "Desktop CX pack"],
-          ["gpl/readable-line-length", "ReadableLineLength", "Desktop CX pack"],
-          ["gpl/realtime-timestamps", "RealtimeTimestamps", "Desktop CX pack"],
-          ["gpl/remind-me", "RemindMe", "Desktop CX pack"],
-          ["gpl/repeat-messages", "RepeatMessages", "Desktop CX pack"],
-          ["gpl/reply-timestamp", "ReplyTimestamp", "Desktop CX pack"],
-          ["gpl/review-db", "ReviewDB", "Desktop CX pack"],
-          ["gpl/role-color-everywhere", "RoleColorEverywhere", "Desktop CX pack"],
-          ["gpl/rounded-images", "RoundedImages", "Desktop CX pack"],
-          ["gpl/save-favorite-gifs", "SaveFavoriteGIFs", "Desktop CX pack"],
-          ["gpl/search-fix", "SearchFix", "Desktop CX pack"],
-          ["gpl/sed-enhanced", "SedEnhanced", "Desktop CX pack"],
-          ["gpl/send-timestamps", "SendTimestamps", "Desktop CX pack"],
-          ["gpl/server-list-indicators", "ServerListIndicators", "Desktop CX pack"],
-          ["gpl/set-as-profile-image", "SetAsProfileImage", "Desktop CX pack"],
-          ["gpl/ship-calc", "ShipCalc", "Desktop CX pack"],
-          ["gpl/show-connections", "ShowConnections", "Desktop CX pack"],
-          ["gpl/show-message-embeds", "ShowMessageEmbeds", "Desktop CX pack"],
-          ["gpl/show-roles-in-chat", "ShowRolesInChat", "Desktop CX pack"],
-          ["gpl/show-typing-users", "ShowTypingUsers", "Desktop CX pack"],
-          ["gpl/silence-users", "SilenceUsers", "Desktop CX pack"],
-          ["gpl/silent-message-toggle", "SilentMessageToggle", "Desktop CX pack"],
-          ["gpl/sincord-helper", "SincordHelper", "Desktop CX pack"],
-          ["gpl/smaller-chat-text", "SmallerChatText", "Desktop CX pack"],
-          ["gpl/smooth-ui", "SmoothUI", "Desktop CX pack"],
-          ["gpl/soggy", "Soggy", "Desktop CX pack"],
-          ["gpl/sort-friends", "SortFriends", "Desktop CX pack"],
-          ["gpl/spacious-messages", "SpaciousMessages", "Desktop CX pack"],
-          ["gpl/spotify-crack", "SpotifyCrack", "Desktop CX pack"],
-          ["gpl/starify", "Starify", "Desktop CX pack"],
-          ["gpl/status-while-active", "StatusWhileActive", "Desktop CX pack"],
-          ["gpl/sticker-blocker", "StickerBlocker", "Desktop CX pack"],
-          ["gpl/stop-auto-unread", "StopAutoUnread", "Desktop CX pack"],
-          ["gpl/streaming-codec-disabler", "StreamingCodecDisabler", "Desktop CX pack"],
-          ["gpl/super-reaction-tweaks", "SuperReactionTweaks", "Desktop CX pack"],
-          ["gpl/talk-in-reverse", "TalkInReverse", "Desktop CX pack"],
-          ["gpl/theme-attributes", "ThemeAttributes", "Desktop CX pack"],
-          ["gpl/tidal-embeds", "TidalEmbeds", "Desktop CX pack"],
-          ["gpl/title", "Title", "Desktop CX pack"],
-          ["gpl/tone-indicators", "ToneIndicators", "Desktop CX pack"],
-          ["gpl/trivia-ai", "TriviaAI", "Desktop CX pack"],
-          ["gpl/unindent", "Unindent", "Desktop CX pack"],
-          ["gpl/universal-volume", "UniversalVolume", "Desktop CX pack"],
-          ["gpl/unlocked-avatar-zoom", "UnlockedAvatarZoom", "Desktop CX pack"],
-          ["gpl/url-highlighter", "UrlHighlighter", "Desktop CX pack"],
-          ["gpl/userplugin-installer", "UserpluginInstaller", "Desktop CX pack"],
-          ["gpl/valid-reply", "ValidReply", "Desktop CX pack"],
-          ["gpl/vc-narrator-custom", "VcNarratorCustom", "Desktop CX pack"],
-          ["gpl/view-icons", "ViewIcons", "Desktop CX pack"],
-          ["gpl/voice-buttons", "VoiceButtons", "Desktop CX pack"],
-          ["gpl/voice-chat-utilities", "VoiceChatUtilities", "Desktop CX pack"],
-          ["gpl/voice-join-messages", "VoiceJoinMessages", "Desktop CX pack"],
-          ["gpl/voice-message-transcriber", "VoiceMessageTranscriber", "Desktop CX pack"],
-          ["gpl/voice-stats", "VoiceStats", "Desktop CX pack"],
-          ["gpl/wait-for-slot", "WaitForSlot", "Desktop CX pack"],
-          ["gpl/web-keybinds", "WebKeybinds", "Desktop CX pack"],
-          ["gpl/web-rtcleak-prevent", "WebRTCLeakPrevent", "Desktop CX pack"],
-          ["gpl/whitelisted-emojis", "WhitelistedEmojis", "Desktop CX pack"],
-          ["gpl/wider-channel-list", "WiderChannelList", "Desktop CX pack"],
-          ["gpl/wiki-lookup", "WikiLookup", "Desktop CX pack"],
-          ["gpl/xsoverlay", "XSOverlay", "Desktop CX pack"],
-          ["gpl/zip-preview", "ZipPreview", "Desktop CX pack"],
-          ["discover-17", "AltMediaPicker", "Discover CX preview"],
-          ["discover-30", "Better Chat Buttons", "Discover CX preview"],
-          ["discover-89", "BringBackTenor", "Discover CX preview"],
-          ["discover-85", "Chatbox Avatar", "Discover CX preview"],
-          ["discover-18", "Cloud Sync", "Discover CX preview"],
-          ["discover-74", "FavouriteAnything", "Discover CX preview"],
-          ["discover-28", "Freemoji", "Discover CX preview"],
-          ["discover-63", "Gif Categories", "Discover CX preview"],
-          ["discover-80", "GuildLurk", "Discover CX preview"],
-          ["discover-70", "HypeSquadSwitcher", "Discover CX preview"],
-          ["discover-55", "KonoChan-Randomizer", "Discover CX preview"],
-          ["discover-49", "LoginSound", "Discover CX preview"],
-          ["discover-39", "MoreConfirm", "Discover CX preview"],
-          ["discover-35", "NexxUtils", "Discover CX preview"],
-          ["discover-12", "NoBandwidthKick", "Discover CX preview"],
-          ["discover-41", "NoIdle", "Discover CX preview"],
-          ["discover-71", "Override User Avatars", "Discover CX preview"],
-          ["discover-86", "Piratifier", "Discover CX preview"],
-          ["discover-47", "Plugin Embeds", "Discover CX preview"],
-          ["discover-62", "Radial Status v1.0.1", "Discover CX preview"],
-          ["discover-65", "RemoveBanner", "Discover CX preview"],
-          ["discover-93", "Server Drawer", "Discover CX preview"],
-          ["discover-45", "shutupClyde", "Discover CX preview"],
-          ["discover-69", "SilentLeave", "Discover CX preview"],
-          ["discover-90", "StreamQuality", "Discover CX preview"],
-          ["discover-25", "Use System Emoji", "Discover CX preview"],
-          ["discover-84", "UwUify", "Discover CX preview"]
-        ],
-        [
-          ["mobile/call-time-counter", "CallTimeCounter", "Shared declarative CX"],
-          ["mobile/count-lines", "Count Lines", "Shared declarative CX"],
-          ["mobile/double-click-to-reply", "DoubleClickToReply", "Shared declarative CX"],
-          ["mobile/feferi-typing-quirk", "FeferiTypingQuirk", "Shared declarative CX"],
-          ["mobile/gamzee-s-typing-quirk", "Gamzee'sTypingQuirk", "Shared declarative CX"],
-          ["mobile/hold-your-tongue", "HoldYourTongue", "Shared declarative CX"],
-          ["mobile/no-confirm-pin", "NoConfirmPin", "Shared declarative CX"],
-          ["mobile/open-steam-links-in-app", "OpenSteamLinksInApp", "Shared declarative CX"],
-          ["mobile/reverse-text", "ReverseText", "Shared declarative CX"],
-          ["mobile/show-ping", "ShowPing", "Shared declarative CX"],
-          ["mobile/unique-lines", "Unique Lines", "Shared declarative CX"],
-          ["mobile/voice-count", "VoiceCount", "Shared declarative CX"],
-          ["gpl/account-panel-server-profile", "AccountPanelServerProfile", "Desktop CX pack"],
-          ["gpl/all-connections-enabled", "AllConnectionsEnabled", "Desktop CX pack"],
-          ["gpl/always-expand-profiles", "AlwaysExpandProfiles", "Desktop CX pack"],
-          ["gpl/amoled-mode", "AmoledMode", "Desktop CX pack"],
-          ["gpl/anti-delete-message", "AntiDeleteMessage", "Desktop CX pack"],
-          ["gpl/anti-soap-hide-soap", "AntiSoap (hideSoap)", "Desktop CX pack"],
-          ["gpl/auto-disconnect-and-auto-mute", "AutoDisconnectAndAutoMute", "Desktop CX pack"],
-          ["gpl/auto-vaporwave", "AutoVaporwave", "Desktop CX pack"],
-          ["gpl/banners-everywhere", "BannersEverywhere", "Desktop CX pack"],
-          ["gpl/better-backreading", "BetterBackreading", "Desktop CX pack"],
-          ["gpl/better-commands", "BetterCommands", "Desktop CX pack"],
-          ["gpl/better-gif-load", "BetterGifLoad", "Desktop CX pack"],
-          ["gpl/better-invites", "BetterInvites", "Desktop CX pack"],
-          ["gpl/better-role-dot", "BetterRoleDot", "Desktop CX pack"],
-          ["gpl/better-settings", "BetterSettings", "Desktop CX pack"],
-          ["gpl/bigger-chat-text", "BiggerChatText", "Desktop CX pack"],
-          ["gpl/bigger-server-icons", "BiggerServerIcons", "Desktop CX pack"],
-          ["gpl/block-krisp", "BlockKrisp", "Desktop CX pack"],
-          ["gpl/bold-text", "BoldText", "Desktop CX pack"],
-          ["gpl/bypass-pin-prompt", "BypassPinPrompt", "Desktop CX pack"],
-          ["gpl/call-timer", "CallTimer", "Desktop CX pack"],
-          ["gpl/channel-badges", "ChannelBadges", "Desktop CX pack"],
-          ["gpl/character-counter", "CharacterCounter", "Desktop CX pack"],
-          ["gpl/clean-channel-name", "CleanChannelName", "Desktop CX pack"],
-          ["gpl/clear-urls", "ClearURLs", "Desktop CX pack"],
-          ["gpl/client-side-block", "ClientSideBlock", "Desktop CX pack"],
-          ["gpl/clip-upload", "ClipUpload", "Desktop CX pack"],
-          ["gpl/cloud-cord-store", "CloudCordStore", "Desktop CX pack"],
-          ["gpl/colorful-mentions", "ColorfulMentions", "Desktop CX pack"],
-          ["gpl/command-palette", "CommandPalette", "Desktop CX pack"],
-          ["gpl/compact-messages", "CompactMessages", "Desktop CX pack"],
-          ["gpl/console-shortcuts", "ConsoleShortcuts", "Desktop CX pack"],
-          ["gpl/copy-file-contents", "CopyFileContents", "Desktop CX pack"],
-          ["gpl/copy-status-urls", "CopyStatusUrls", "Desktop CX pack"],
-          ["gpl/copy-user-urls", "CopyUserURLs", "Desktop CX pack"],
-          ["gpl/cursor-buddy", "CursorBuddy", "Desktop CX pack"],
-          ["gpl/custom-cursor", "CustomCursor", "Desktop CX pack"],
-          ["gpl/custom-reaction-buttons", "CustomReactionButtons", "Desktop CX pack"],
-          ["gpl/custom-status-timeouts", "CustomStatusTimeouts", "Desktop CX pack"],
-          ["gpl/custom-user-colors", "CustomUserColors", "Desktop CX pack"],
-          ["gpl/declutter", "Declutter", "Desktop CX pack"],
-          ["gpl/default-status-forever", "DefaultStatusForever", "Desktop CX pack"],
-          ["gpl/disable-call-idle", "DisableCallIdle", "Desktop CX pack"],
-          ["gpl/discord-dev-banner", "DiscordDevBanner", "Desktop CX pack"],
-          ["gpl/double-emoji", "DoubleEmoji", "Desktop CX pack"],
-          ["gpl/drag-favorite-emotes", "DragFavoriteEmotes", "Desktop CX pack"],
-          ["gpl/embedded-urls", "EmbeddedURLs", "Desktop CX pack"],
-          ["gpl/equicord-toolbox", "EquicordToolbox", "Desktop CX pack"],
-          ["gpl/exit-sounds", "ExitSounds", "Desktop CX pack"],
-          ["gpl/export-messages", "ExportMessages", "Desktop CX pack"],
-          ["gpl/fake-deafen", "FakeDeafen", "Desktop CX pack"],
-          ["gpl/fake-mute", "FakeMute", "Desktop CX pack"],
-          ["gpl/fake-tools", "FakeTools", "Desktop CX pack"],
-          ["gpl/favorite-anything", "FavoriteAnything", "Desktop CX pack"],
-          ["gpl/favourite-anything", "FavouriteAnything", "Desktop CX pack"],
-          ["gpl/file-viewer", "FileViewer", "Desktop CX pack"],
-          ["gpl/fix-file-extensions", "FixFileExtensions", "Desktop CX pack"],
-          ["gpl/fix-spotify-embeds", "FixSpotifyEmbeds", "Desktop CX pack"],
-          ["gpl/focus-mode", "FocusMode", "Desktop CX pack"],
-          ["gpl/force-owner-crown", "ForceOwnerCrown", "Desktop CX pack"],
-          ["gpl/friend-codes", "FriendCodes", "Desktop CX pack"],
-          ["gpl/friends-since", "FriendsSince", "Desktop CX pack"],
-          ["gpl/full-user-in-chatbox", "FullUserInChatbox", "Desktop CX pack"],
-          ["gpl/game-mode", "GameMode", "Desktop CX pack"],
-          ["gpl/gif-maker", "GifMaker", "Desktop CX pack"],
-          ["gpl/git-hub-repos", "GitHubRepos", "Desktop CX pack"],
-          ["gpl/grayscale-images", "GrayscaleImages", "Desktop CX pack"],
-          ["gpl/hide-active-now", "HideActiveNow", "Desktop CX pack"],
-          ["gpl/hide-avatar-decorations", "HideAvatarDecorations", "Desktop CX pack"],
-          ["gpl/hide-bot-tags", "HideBotTags", "Desktop CX pack"],
-          ["gpl/hide-character-count", "HideCharacterCount", "Desktop CX pack"],
-          ["gpl/hide-custom-statuses", "HideCustomStatuses", "Desktop CX pack"],
-          ["gpl/hide-download-apps-button", "HideDownloadAppsButton", "Desktop CX pack"],
-          ["gpl/hide-emoji-button", "HideEmojiButton", "Desktop CX pack"],
-          ["gpl/hide-gif-button", "HideGifButton", "Desktop CX pack"],
-          ["gpl/hide-help-button", "HideHelpButton", "Desktop CX pack"],
-          ["gpl/hide-join-messages", "HideJoinMessages", "Desktop CX pack"],
-          ["gpl/hide-media", "HideMedia", "Desktop CX pack"],
-          ["gpl/hide-mention-badges", "HideMentionBadges", "Desktop CX pack"],
-          ["gpl/hide-new-messages-bar", "HideNewMessagesBar", "Desktop CX pack"],
-          ["gpl/hide-pins-button", "HidePinsButton", "Desktop CX pack"],
-          ["gpl/hide-reactions", "HideReactions", "Desktop CX pack"],
-          ["gpl/hide-role-icons", "HideRoleIcons", "Desktop CX pack"],
-          ["gpl/hide-server-banner", "HideServerBanner", "Desktop CX pack"],
-          ["gpl/hide-shop-tab", "HideShopTab", "Desktop CX pack"],
-          ["gpl/hide-sticker-button", "HideStickerButton", "Desktop CX pack"],
-          ["gpl/hide-suggested-channels", "HideSuggestedChannels", "Desktop CX pack"],
-          ["gpl/hide-timestamps", "HideTimestamps", "Desktop CX pack"],
-          ["gpl/hide-upload-button", "HideUploadButton", "Desktop CX pack"],
-          ["gpl/hide-voice-user-avatars", "HideVoiceUserAvatars", "Desktop CX pack"],
-          ["gpl/highlight-mentions", "HighlightMentions", "Desktop CX pack"],
-          ["gpl/hover-highlight-messages", "HoverHighlightMessages", "Desktop CX pack"],
-          ["gpl/icon-viewer", "IconViewer", "Desktop CX pack"],
-          ["gpl/ignore-activities", "IgnoreActivities", "Desktop CX pack"],
-          ["gpl/image-filename", "ImageFilename", "Desktop CX pack"],
-          ["gpl/implicit-relationships", "ImplicitRelationships", "Desktop CX pack"],
-          ["gpl/instant-screenshare", "InstantScreenshare", "Desktop CX pack"],
-          ["gpl/irc-colors", "IrcColors", "Desktop CX pack"],
-          ["gpl/jump-to", "JumpTo", "Desktop CX pack"],
-          ["gpl/keyboard-navigation", "KeyboardNavigation", "Desktop CX pack"],
-          ["gpl/larger-chat-text", "LargerChatText", "Desktop CX pack"],
-          ["gpl/last-online", "LastOnline", "Desktop CX pack"],
-          ["gpl/loading-quotes", "LoadingQuotes", "Desktop CX pack"],
-          ["gpl/markdown-tables", "MarkdownTables", "Desktop CX pack"],
-          ["gpl/mention-avatars", "MentionAvatars", "Desktop CX pack"],
-          ["gpl/message-click-actions", "MessageClickActions", "Desktop CX pack"],
-          ["gpl/message-latency", "MessageLatency", "Desktop CX pack"],
-          ["gpl/message-logger", "MessageLogger", "Desktop CX pack"],
-          ["gpl/message-peek", "MessagePeek", "Desktop CX pack"],
-          ["gpl/message-translate", "MessageTranslate", "Desktop CX pack"],
-          ["gpl/middle-click-tweaks", "MiddleClickTweaks", "Desktop CX pack"],
-          ["gpl/more-jumbo-emoji", "MoreJumboEmoji", "Desktop CX pack"],
-          ["gpl/more-user-tags", "MoreUserTags", "Desktop CX pack"],
-          ["gpl/music-controls", "MusicControls", "Desktop CX pack"],
-          ["gpl/mutual-group-dms", "MutualGroupDMs", "Desktop CX pack"],
-          ["gpl/neon-glow", "NeonGlow", "Desktop CX pack"],
-          ["gpl/new-plugins-manager", "NewPluginsManager", "Desktop CX pack"],
-          ["gpl/no-chat-bar-border", "NoChatBarBorder", "Desktop CX pack"],
-          ["gpl/no-draft-length-limit", "NoDraftLengthLimit", "Desktop CX pack"],
-          ["gpl/no-message-hover-bar", "NoMessageHoverBar", "Desktop CX pack"],
-          ["gpl/no-nitro-upsell", "NoNitroUpsell", "Desktop CX pack"],
-          ["gpl/no-profile-themes", "NoProfileThemes", "Desktop CX pack"],
-          ["gpl/normalize-message-links", "NormalizeMessageLinks", "Desktop CX pack"],
-          ["gpl/no-server-emojis", "NoServerEmojis", "Desktop CX pack"],
-          ["gpl/no-system-helper", "NoSystemHelper", "Desktop CX pack"],
-          ["gpl/no-typing-animation", "NoTypingAnimation", "Desktop CX pack"],
-          ["gpl/one-ping-per-dm", "OnePingPerDM", "Desktop CX pack"],
-          ["gpl/override-forum-defaults", "OverrideForumDefaults", "Desktop CX pack"],
-          ["gpl/permission-free-will", "PermissionFreeWill", "Desktop CX pack"],
-          ["gpl/picture-in-picture", "PictureInPicture", "Desktop CX pack"],
-          ["gpl/pin-icon", "PinIcon", "Desktop CX pack"],
-          ["gpl/platform-spoofer", "PlatformSpoofer", "Desktop CX pack"],
-          ["gpl/profile-sets", "ProfileSets", "Desktop CX pack"],
-          ["gpl/purge-dms", "PurgeDMs", "Desktop CX pack"],
-          ["gpl/quick-mention", "QuickMention", "Desktop CX pack"],
-          ["gpl/quote-message", "QuoteMessage", "Desktop CX pack", "quote-message.cx"],
-          ["gpl/react-error-decoder", "ReactErrorDecoder", "Desktop CX pack"],
-          ["gpl/readable-spoilers", "ReadableSpoilers", "Desktop CX pack"],
-          ["gpl/recent-dmswitcher", "RecentDMSwitcher", "Desktop CX pack"],
-          ["gpl/remix-revived", "RemixRevived", "Desktop CX pack"],
-          ["gpl/replace-google-search", "ReplaceGoogleSearch", "Desktop CX pack"],
-          ["gpl/reveal-all-spoilers", "RevealAllSpoilers", "Desktop CX pack"],
-          ["gpl/rich-magnet-links", "RichMagnetLinks", "Desktop CX pack"],
-          ["gpl/rounded-avatars-square", "RoundedAvatarsSquare", "Desktop CX pack"],
-          ["gpl/round-server-icons", "RoundServerIcons", "Desktop CX pack"],
-          ["gpl/scheduled-messages", "ScheduledMessages", "Desktop CX pack"],
-          ["gpl/secret-guard", "SecretGuard", "Desktop CX pack"],
-          ["gpl/sekai-stickers", "SekaiStickers", "Desktop CX pack"],
-          ["gpl/server-clone", "ServerClone", "Desktop CX pack"],
-          ["gpl/server-pinner", "ServerPinner", "Desktop CX pack"],
-          ["gpl/share-perms", "SharePerms", "Desktop CX pack"],
-          ["gpl/show-all-message-buttons", "ShowAllMessageButtons", "Desktop CX pack"],
-          ["gpl/show-hidden-channels", "ShowHiddenChannels", "Desktop CX pack"],
-          ["gpl/show-me-your-name", "ShowMeYourName", "Desktop CX pack"],
-          ["gpl/show-song-name", "ShowSongName", "Desktop CX pack"],
-          ["gpl/sidebar-chat", "SidebarChat", "Desktop CX pack"],
-          ["gpl/silent-delete", "SilentDelete", "Desktop CX pack"],
-          ["gpl/silent-typing", "SilentTyping", "Desktop CX pack"],
-          ["gpl/sincord-toolbox", "SincordToolbox", "Desktop CX pack"],
-          ["gpl/smooth-scrolling", "SmoothScrolling", "Desktop CX pack"],
-          ["gpl/snowfall", "Snowfall", "Desktop CX pack"],
-          ["gpl/song-link", "SongLink", "Desktop CX pack"],
-          ["gpl/sort-reactions", "SortReactions", "Desktop CX pack"],
-          ["gpl/split-large-messages", "SplitLargeMessages", "Desktop CX pack"],
-          ["gpl/spotify-share-commands", "SpotifyShareCommands", "Desktop CX pack"],
-          ["gpl/startup-timings", "StartupTimings", "Desktop CX pack"],
-          ["gpl/steam-status-sync", "SteamStatusSync", "Desktop CX pack"],
-          ["gpl/sticker-paste", "StickerPaste", "Desktop CX pack"],
-          ["gpl/streaks", "Streaks", "Desktop CX pack"],
-          ["gpl/stream-proof", "StreamProof", "Desktop CX pack"],
-          ["gpl/surface-translate", "SurfaceTranslate", "Desktop CX pack"],
-          ["gpl/text-replace", "TextReplace", "Desktop CX pack"],
-          ["gpl/theme-library", "ThemeLibrary", "Desktop CX pack"],
-          ["gpl/tiktok-tts", "TiktokTTS", "Desktop CX pack"],
-          ["gpl/toast-notifications", "ToastNotifications", "Desktop CX pack"],
-          ["gpl/translate", "Translate", "Desktop CX pack"],
-          ["gpl/typing-indicator", "TypingIndicator", "Desktop CX pack"],
-          ["gpl/unit-converter", "UnitConverter", "Desktop CX pack"],
-          ["gpl/unlimited-accounts", "UnlimitedAccounts", "Desktop CX pack"],
-          ["gpl/unread-count-badge", "UnreadCountBadge", "Desktop CX pack"],
-          ["gpl/user-messages-pronouns", "UserMessagesPronouns", "Desktop CX pack"],
-          ["gpl/user-voice-show", "UserVoiceShow", "Desktop CX pack"],
-          ["gpl/valid-user", "ValidUser", "Desktop CX pack"],
-          ["gpl/vcpanel-settings", "VCPanelSettings", "Desktop CX pack"],
-          ["gpl/view-raw", "ViewRaw", "Desktop CX pack"],
-          ["gpl/voice-channel-log", "VoiceChannelLog", "Desktop CX pack"],
-          ["gpl/voice-download", "VoiceDownload", "Desktop CX pack"],
-          ["gpl/voice-messages", "VoiceMessages", "Desktop CX pack"],
-          ["gpl/voice-rejoin", "VoiceRejoin", "Desktop CX pack"],
-          ["gpl/voice-vumeters", "VoiceVUMeters", "Desktop CX pack"],
-          ["gpl/webcam-start-notifier", "WebcamStartNotifier", "Desktop CX pack"],
-          ["gpl/webpack-tarball", "WebpackTarball", "Desktop CX pack"],
-          ["gpl/web-screen-share-fixes", "WebScreenShareFixes", "Desktop CX pack"],
-          ["gpl/who-reacted", "WhoReacted", "Desktop CX pack"],
-          ["gpl/wider-chat", "WiderChat", "Desktop CX pack"],
-          ["gpl/word-count", "WordCount", "Desktop CX pack"],
-          ["gpl/youtube-adblock", "YoutubeAdblock", "Desktop CX pack"],
-          ["discover-75", "\u{1F1FA}\u{1F1F8} GTA VI Countdown", "Discover CX preview"],
-          ["discover-13", "AlwaysTrust", "Discover CX preview"],
-          ["discover-87", "BetterCommandPopout", "Discover CX preview"],
-          ["discover-79", "BypassPinPrompt", "Discover CX preview"],
-          ["discover-14", "ClientThemes", "Discover CX preview"],
-          ["discover-60", "Commands", "Discover CX preview"],
-          ["discover-8", "FileSizeOnPicker", "Discover CX preview"],
-          ["discover-16", "FreeStickers", "Discover CX preview"],
-          ["discover-72", "GifRoulette", "Discover CX preview"],
-          ["discover-51", "Hidden Channels", "Discover CX preview"],
-          ["discover-81", "InfoCommands", "Discover CX preview"],
-          ["discover-42", "Last.fm", "Discover CX preview"],
-          ["discover-26", "Message Preview", "Discover CX preview"],
-          ["discover-61", "Multi Scrobbler", "Discover CX preview"],
-          ["discover-9", "No Embed Copy", "Discover CX preview"],
-          ["discover-7", "NoCompression", "Discover CX preview"],
-          ["discover-23", "NoTrack", "Discover CX preview"],
-          ["discover-46", "Pastelize", "Discover CX preview"],
-          ["discover-33", "PlatformIndicators", "Discover CX preview"],
-          ["discover-54", "Plugins List", "Discover CX preview"],
-          ["discover-58", "Read All", "Discover CX preview"],
-          ["discover-92", "RemoveUserBanner", "Discover CX preview"],
-          ["discover-43", "Show Image Links", "Discover CX preview"],
-          ["discover-56", "Silent Messages", "Discover CX preview"],
-          ["discover-2", "SlowmodeExtended", "Discover CX preview"],
-          ["discover-24", "Tenor Gif Fix", "Discover CX preview"],
-          ["discover-34", "UserBG", "Discover CX preview"],
-          ["discover-82", "ValidUser", "Discover CX preview"]
-        ]
-      ];
-    }
-  });
-
-  // src/lib/api/cxTesting/index.ts
-  function testingUserId(store) {
-    try {
-      return store?.getCurrentUser?.()?.id;
-    } catch (e) {
-      return void 0;
-    }
-  }
-  function useTestingUserId(react, store) {
-    var [userId, setUserId] = react.useState(testingUserId(store));
-    react.useEffect(() => {
-      var read = () => setUserId(testingUserId(store));
-      read();
-      try {
-        store?.addChangeListener?.(read);
-        return () => {
-          try {
-            store?.removeChangeListener?.(read);
-          } catch (e) {
-          }
-        };
-      } catch (e) {
-        return void 0;
-      }
-    }, [
-      store
-    ]);
-    return userId;
-  }
-  function getTestingAssignment(userId, platform) {
-    if (!userId)
-      return;
-    var tester = testers.get(userId);
-    if (tester?.platform !== platform)
-      return;
-    return {
-      userId,
-      platform: tester.platform,
-      label: tester.label,
-      entries: tester.queue < 0 ? retests : (platform === "windows" ? entries : mobileQueues)[tester.queue]
-    };
-  }
-  function testingStorageKey(assignment) {
-    return "cloudcord.cx.testing.v1." + assignment.userId + "." + assignment.platform;
-  }
-  function loadResults(value, assignment) {
-    var records = {};
-    if (!value || typeof value !== "object")
-      return records;
-    for (var { id } of assignment.entries) {
-      var result = value[id];
-      if (!result || ![
-        "Pass",
-        "Fail",
-        "Blocked"
-      ].includes(result.status))
-        continue;
-      if (typeof result.cloudcord !== "string" || typeof result.discord !== "string" || typeof result.error !== "string")
-        continue;
-      records[id] = result;
-    }
-    return records;
-  }
-  function exportTestingResults(assignment, records) {
-    var csv = (fields) => fields.map((value) => {
-      var safe = /^[\s\uFEFF]*[=+\-@]/.test(value) ? "'" + value : value;
-      return '"' + safe.replaceAll('"', '""') + '"';
-    }).join(",");
-    return [
-      csv([
-        "Plugin ID",
-        "Plugin",
-        "Platform",
-        "Status",
-        "CloudCord build",
-        "Discord build",
-        "Exact error or blocker"
-      ]),
-      ...assignment.entries.flatMap(({ id, name }) => {
-        var result = records[id];
-        return result ? [
-          csv([
-            id,
-            name,
-            assignment.platform,
-            result.status,
-            result.cloudcord,
-            result.discord,
-            result.error
-          ])
-        ] : [];
-      })
-    ].join("\r\n");
-  }
-  function useTestingReview(react, assignment, storage, initialBuild, authorized) {
-    var [records, setRecords] = react.useState(void 0);
-    var [search, setSearch] = react.useState("");
-    var [position, setPosition] = react.useState(0);
-    var [build, setBuild] = react.useState(initialBuild);
-    var [draft, setDraft] = react.useState(void 0);
-    var [message, setMessage] = react.useState("");
-    var [saving, setSaving] = react.useState(false);
-    var pending2 = react.useRef(false);
-    var storageRef = react.useRef(storage);
-    storageRef.current = storage;
-    react.useEffect(() => {
-      var closed = false;
-      Promise.resolve().then(() => storageRef.current.read()).then((value) => {
-        if (!closed)
-          setRecords(loadResults(value, assignment));
-      }, () => {
-        if (!closed)
-          setMessage("Could not load saved tests.");
-      });
-      return () => {
-        closed = true;
-      };
-    }, [
-      assignment.userId,
-      assignment.platform
-    ]);
-    var query = search.trim().toLowerCase();
-    var filtered = assignment.entries.filter((entry2) => !query || entry2.name.toLowerCase().includes(query) || entry2.id.includes(query));
-    var index = Math.min(position, Math.max(0, filtered.length - 1));
-    var entry = filtered[index];
-    var review = entry ? records?.[entry.id] : void 0;
-    var error = draft && draft.id === entry?.id ? draft.error : review?.error ?? "";
-    function save(status) {
-      return _async_to_generator(function* () {
-        if (!entry || !records || pending2.current || !authorized())
-          return;
-        var cloudcord = build.cloudcord.trim();
-        var discord = build.discord.trim();
-        if (!cloudcord || !discord) {
-          setMessage("Enter both build numbers.");
-          return;
-        }
-        if (status !== "Pass" && !error.trim()) {
-          setMessage("Enter the exact error or blocker.");
-          return;
-        }
-        var next = {
-          ...records,
-          [entry.id]: {
-            status,
-            cloudcord,
-            discord,
-            error: status === "Pass" ? "" : error
-          }
-        };
-        pending2.current = true;
-        setSaving(true);
-        try {
-          yield storageRef.current.write(next);
-          setRecords(next);
-          setDraft(void 0);
-          setMessage("Saved " + status + ".");
-        } catch (e) {
-          setMessage("Could not save this result.");
-        } finally {
-          pending2.current = false;
-          setSaving(false);
-        }
-      })();
-    }
-    return {
-      entry,
-      review,
-      error,
-      message,
-      saving,
-      ready: records !== void 0,
-      search,
-      build,
-      completed: Object.keys(records ?? {}).length,
-      count: filtered.length,
-      index,
-      searchFor(value) {
-        setSearch(value);
-        setPosition(0);
-        setDraft(void 0);
-        setMessage("");
-      },
-      move(step) {
-        setPosition(Math.max(0, Math.min(index + step, filtered.length - 1)));
-        setDraft(void 0);
-        setMessage("");
-      },
-      setBuild(field, value) {
-        setBuild((previous) => ({
-          ...previous,
-          [field]: value
-        }));
-      },
-      setError(value) {
-        if (entry)
-          setDraft({
-            id: entry.id,
-            error: value
-          });
-      },
-      save,
-      export() {
-        return records && authorized() ? exportTestingResults(assignment, records) : void 0;
-      }
-    };
-  }
-  var testers, entries, sharedGroup, mobileOrder, mobileQueues, retests;
-  var init_cxTesting = __esm({
-    "src/lib/api/cxTesting/index.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_cx_testing_queues();
-      testers = /* @__PURE__ */ new Map([
-        [
-          "1429837711602094201",
-          {
-            platform: "windows",
-            label: "Desktop 1",
-            queue: 0
-          }
-        ],
-        [
-          "463515440606609419",
-          {
-            platform: "windows",
-            label: "Desktop 2",
-            queue: 1
-          }
-        ],
-        [
-          "1569533258461614171",
-          {
-            platform: "ios",
-            label: "Mobile 1",
-            queue: 0
-          }
-        ],
-        [
-          "1539587971840483359",
-          {
-            platform: "android",
-            label: "Mobile 2",
-            queue: 1
-          }
-        ],
-        [
-          "1205417504718192680",
-          {
-            platform: "ios",
-            label: "Mobile 3",
-            queue: 2
-          }
-        ],
-        [
-          "801526290623627315",
-          {
-            platform: "ios",
-            label: "iOS shared plugin retests",
-            queue: -1
-          }
-        ]
-      ]);
-      entries = cx_testing_queues_default.map((queue) => queue.map(([id, name, group]) => ({
-        id,
-        name,
-        group
-      })));
-      sharedGroup = "Shared declarative CX";
-      mobileOrder = [
-        sharedGroup,
-        "Discover CX preview",
-        "Desktop CX pack"
-      ];
-      mobileQueues = entries.map((queue) => [
-        ...queue
-      ].sort((a, b3) => mobileOrder.indexOf(a.group) - mobileOrder.indexOf(b3.group)));
-      retests = entries.flat().filter((entry) => entry.group === sharedGroup).sort((a, b3) => a.name.localeCompare(b3.name));
-    }
-  });
-
-  // src/lib/api/pluginTesting.ts
-  function currentTestingAssignment() {
-    return getTestingAssignment(testingUserId(UserStore), import_react_native7.Platform.OS);
-  }
-  function useMobileTestingAssignment() {
-    var userId = useTestingUserId(React2, UserStore);
-    return getTestingAssignment(userId, import_react_native7.Platform.OS);
-  }
-  var import_react_native7, UserStore;
-  var init_pluginTesting = __esm({
-    "src/lib/api/pluginTesting.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_cxTesting();
-      init_common();
-      init_wrappers();
-      import_react_native7 = __toESM(require_react_native());
-      UserStore = findByStoreNameLazy("UserStore");
-    }
-  });
-
   // src/lib/ui/components/wrappers/AlertModal.tsx
   function AlertModal2(props) {
     var _AlertModal = alertComponents.AlertModal;
     var forwardFailedModal = findByFilePath("modules/forwarding/native/ForwardFailedAlertModal.tsx");
     if (!forwardFailedModal && "extraContent" in props) {
       var { extraContent, content, ...rest } = props;
-      var combinedContent = /* @__PURE__ */ jsxs(import_react_native8.View, {
+      var combinedContent = /* @__PURE__ */ jsxs(import_react_native7.View, {
         style: {
           gap: 16
         },
@@ -10131,7 +9099,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             color: "text-muted",
             children: content
           }) : content,
-          /* @__PURE__ */ jsx(import_react_native8.View, {
+          /* @__PURE__ */ jsx(import_react_native7.View, {
             children: extraContent
           })
         ]
@@ -10145,7 +9113,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...props
     });
   }
-  var import_react_native8, alertComponents, AlertActionButton2;
+  var import_react_native7, alertComponents, AlertActionButton2;
   var init_AlertModal = __esm({
     "src/lib/ui/components/wrappers/AlertModal.tsx"() {
       "use strict";
@@ -10154,7 +9122,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_jsxRuntime();
       init_metro();
       init_components();
-      import_react_native8 = __toESM(require_react_native());
+      import_react_native7 = __toESM(require_react_native());
       alertComponents = findByPropsLazy("AlertModal", "AlertActions");
       AlertActionButton2 = (props) => {
         var NativeAction = alertComponents.AlertActionButton;
@@ -10290,7 +9258,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function createThemedStyleSheet(sheet) {
     for (var key in sheet) {
-      sheet[key] = new Proxy(import_react_native9.StyleSheet.flatten(sheet[key]), {
+      sheet[key] = new Proxy(import_react_native8.StyleSheet.flatten(sheet[key]), {
         get(target, prop, receiver) {
           var res = Reflect.get(target, prop, receiver);
           return isSemanticColor(res) ? resolveSemanticColor(res) : res;
@@ -10299,7 +9267,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     return sheet;
   }
-  var import_react_native9, Styles, ThemeContext, TextStyleSheet;
+  var import_react_native8, Styles, ThemeContext, TextStyleSheet;
   var init_styles = __esm({
     "src/lib/ui/styles.ts"() {
       "use strict";
@@ -10308,7 +9276,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_lazy();
       init_wrappers();
       init_color();
-      import_react_native9 = __toESM(require_react_native());
+      import_react_native8 = __toESM(require_react_native());
       Styles = findByPropsLazy("createStyles");
       ({ ThemeContext } = lazyDestructure(() => findByProps("ThemeContext"), {
         hint: "object"
@@ -10324,7 +9292,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         return constants.Fonts.CODE_NORMAL;
     } catch (e) {
     }
-    return import_react_native10.Platform.OS === "ios" ? "Menlo" : "monospace";
+    return import_react_native9.Platform.OS === "ios" ? "Menlo" : "monospace";
   }
   function Codeblock({ selectable, style, children }) {
     if (!selectable)
@@ -10332,7 +9300,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         style,
         children
       });
-    return import_react_native10.Platform.select({
+    return import_react_native9.Platform.select({
       ios: /* @__PURE__ */ jsx(InputBasedCodeblock, {
         style,
         children
@@ -10344,7 +9312,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native10, useStyles, InputBasedCodeblock, TextBasedCodeblock;
+  var import_react_native9, useStyles, InputBasedCodeblock, TextBasedCodeblock;
   var init_Codeblock = __esm({
     "src/lib/ui/components/Codeblock.tsx"() {
       "use strict";
@@ -10354,7 +9322,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_common();
       init_color();
       init_styles();
-      import_react_native10 = __toESM(require_react_native());
+      import_react_native9 = __toESM(require_react_native());
       useStyles = createStyles(() => ({
         codeBlock: {
           fontFamily: codeFont(),
@@ -10368,7 +9336,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           padding: 10
         }
       }));
-      InputBasedCodeblock = ({ style, children }) => /* @__PURE__ */ jsx(import_react_native10.TextInput, {
+      InputBasedCodeblock = ({ style, children }) => /* @__PURE__ */ jsx(import_react_native9.TextInput, {
         editable: false,
         multiline: true,
         style: [
@@ -10377,7 +9345,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ],
         value: children
       });
-      TextBasedCodeblock = ({ selectable, style, children }) => /* @__PURE__ */ jsx(import_react_native10.Text, {
+      TextBasedCodeblock = ({ selectable, style, children }) => /* @__PURE__ */ jsx(import_react_native9.Text, {
         selectable,
         style: [
           useStyles().codeBlock,
@@ -10720,7 +9688,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return;
     }
     return /* @__PURE__ */ jsx(Card, {
-      children: /* @__PURE__ */ jsxs(import_react_native11.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native10.View, {
         style: {
           gap: 8
         },
@@ -10729,11 +9697,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             variant: "heading-lg/bold",
             children: "Component Stack"
           }),
-          /* @__PURE__ */ jsx(import_react_native11.View, {
+          /* @__PURE__ */ jsx(import_react_native10.View, {
             style: {
               gap: 4
             },
-            children: stack.map((component) => /* @__PURE__ */ jsxs(import_react_native11.View, {
+            children: stack.map((component) => /* @__PURE__ */ jsxs(import_react_native10.View, {
               style: {
                 flexDirection: "row"
               },
@@ -10758,7 +9726,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           collapsed && /* @__PURE__ */ jsx(Text, {
             children: "..."
           }),
-          /* @__PURE__ */ jsxs(import_react_native11.View, {
+          /* @__PURE__ */ jsxs(import_react_native10.View, {
             style: {
               gap: 8,
               flexDirection: "row",
@@ -10769,7 +9737,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(Button, {
                 variant: "secondary",
                 text: `Show ${collapsed ? "more" : "less"}`,
-                icon: collapsed ? findAssetId("down_arrow") : /* @__PURE__ */ jsx(import_react_native11.Image, {
+                icon: collapsed ? findAssetId("down_arrow") : /* @__PURE__ */ jsx(import_react_native10.Image, {
                   style: {
                     transform: [
                       {
@@ -10793,7 +9761,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react, import_react_native11;
+  var import_react, import_react_native10;
   var init_ErrorComponentStackCard = __esm({
     "src/core/ui/reporter/components/ErrorComponentStackCard.tsx"() {
       "use strict";
@@ -10805,7 +9773,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_common();
       init_components();
       import_react = __toESM(require_react());
-      import_react_native11 = __toESM(require_react_native());
+      import_react_native10 = __toESM(require_react_native());
     }
   });
 
@@ -10922,7 +9890,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return null;
     }
     return /* @__PURE__ */ jsx(Card, {
-      children: /* @__PURE__ */ jsxs(import_react_native12.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native11.View, {
         style: {
           gap: 12
         },
@@ -10931,7 +9899,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             variant: "heading-lg/bold",
             children: "Call Stack"
           }),
-          /* @__PURE__ */ jsx(import_react_native12.View, {
+          /* @__PURE__ */ jsx(import_react_native11.View, {
             style: {
               gap: 4
             },
@@ -10943,7 +9911,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           collapsed && /* @__PURE__ */ jsx(Text, {
             children: "..."
           }),
-          /* @__PURE__ */ jsxs(import_react_native12.View, {
+          /* @__PURE__ */ jsxs(import_react_native11.View, {
             style: {
               gap: 8,
               flexDirection: "row",
@@ -10954,7 +9922,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(Button, {
                 variant: "secondary",
                 text: `Show ${collapsed ? "more" : "less"}`,
-                icon: collapsed ? findAssetId("down_arrow") : /* @__PURE__ */ jsx(import_react_native12.Image, {
+                icon: collapsed ? findAssetId("down_arrow") : /* @__PURE__ */ jsx(import_react_native11.Image, {
                   style: {
                     transform: [
                       {
@@ -10980,7 +9948,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function Line(props) {
     var [collapsed, setCollapsed] = (0, import_react2.useState)(true);
-    return /* @__PURE__ */ jsxs(import_react_native12.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native11.Pressable, {
       onPress: () => setCollapsed((v2) => !v2),
       children: [
         /* @__PURE__ */ jsx(Text, {
@@ -11009,7 +9977,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     }, props.id);
   }
-  var import_react2, import_react_native12;
+  var import_react2, import_react_native11;
   var init_ErrorStackCard = __esm({
     "src/core/ui/reporter/components/ErrorStackCard.tsx"() {
       "use strict";
@@ -11021,7 +9989,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_common();
       init_components();
       import_react2 = __toESM(require_react());
-      import_react_native12 = __toESM(require_react_native());
+      import_react_native11 = __toESM(require_react_native());
       init_ErrorCard();
     }
   });
@@ -11029,7 +9997,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   // src/core/ui/reporter/components/ErrorDetailsActionSheet.tsx
   function ErrorDetailsActionSheet(props) {
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native13.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native12.View, {
         style: {
           gap: 12,
           paddingVertical: 12
@@ -11053,7 +10021,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native13;
+  var import_react_native12;
   var init_ErrorDetailsActionSheet = __esm({
     "src/core/ui/reporter/components/ErrorDetailsActionSheet.tsx"() {
       "use strict";
@@ -11063,7 +10031,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_isStack();
       init_components2();
       init_components();
-      import_react_native13 = __toESM(require_react_native());
+      import_react_native12 = __toESM(require_react_native());
       init_ErrorComponentStackCard();
       init_ErrorStackCard();
     }
@@ -11176,7 +10144,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
 
   // src/lib/ui/components/Search.tsx
   function SearchIcon() {
-    return /* @__PURE__ */ jsx(import_react_native14.Image, {
+    return /* @__PURE__ */ jsx(import_react_native13.Image, {
       style: {
         width: 16,
         height: 16
@@ -11184,7 +10152,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       source: findAssetId("icon-search")
     });
   }
-  var import_react_native14, Search_default;
+  var import_react_native13, Search_default;
   var init_Search = __esm({
     "src/lib/ui/components/Search.tsx"() {
       "use strict";
@@ -11195,7 +10163,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_assets();
       init_components();
       init_ErrorBoundary();
-      import_react_native14 = __toESM(require_react_native());
+      import_react_native13 = __toESM(require_react_native());
       Search_default = ({ onChangeText, placeholder, style, isRound }) => {
         var [query, setQuery] = React.useState("");
         var onChange = (value) => {
@@ -11203,7 +10171,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           onChangeText?.(value);
         };
         return /* @__PURE__ */ jsx(ErrorBoundary, {
-          children: /* @__PURE__ */ jsx(import_react_native14.View, {
+          children: /* @__PURE__ */ jsx(import_react_native13.View, {
             style,
             children: /* @__PURE__ */ jsx(TextInput, {
               grow: true,
@@ -11246,11 +10214,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           onPress: () => {
             setHidden(!hidden);
             if (!noAnimation)
-              import_react_native15.LayoutAnimation.configureNext(import_react_native15.LayoutAnimation.Presets.easeInEaseOut);
+              import_react_native14.LayoutAnimation.configureNext(import_react_native14.LayoutAnimation.Presets.easeInEaseOut);
           }
         }),
         !hidden && /* @__PURE__ */ jsx(Fragment, {
-          children: /* @__PURE__ */ jsx(import_react_native15.View, {
+          children: /* @__PURE__ */ jsx(import_react_native14.View, {
             style: !noPadding && {
               paddingHorizontal: 15
             },
@@ -11260,7 +10228,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react_native15;
+  var import_react_native14;
   var init_Summary = __esm({
     "src/lib/ui/components/Summary.tsx"() {
       "use strict";
@@ -11269,7 +10237,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_jsxRuntime();
       init_assets();
       init_components();
-      import_react_native15 = __toESM(require_react_native());
+      import_react_native14 = __toESM(require_react_native());
     }
   });
 
@@ -12073,7 +11041,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       } catch (e) {
       }
-      import_react_native16.Alert.alert("Restart Discord", "Fully close and reopen Discord to apply the change.");
+      import_react_native15.Alert.alert("Restart Discord", "Fully close and reopen Discord to apply the change.");
     })();
   }
   function isSafeMode() {
@@ -12090,7 +11058,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         setTimeout(requestDiscordReload, 500);
     }).apply(this, arguments);
   }
-  var import_react_native16;
+  var import_react_native15;
   var init_safeMode = __esm({
     "src/core/debug/safeMode.ts"() {
       "use strict";
@@ -12100,7 +11068,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_themes();
       init_modules();
       init_settings();
-      import_react_native16 = __toESM(require_react_native());
+      import_react_native15 = __toESM(require_react_native());
     }
   });
 
@@ -12109,7 +11077,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   __export(toasts_exports, {
     showToast: () => showToast
   });
-  var import_react_native17, uuid4, showToast;
+  var import_react_native16, uuid4, showToast;
   var init_toasts = __esm({
     "src/lib/ui/toasts.ts"() {
       "use strict";
@@ -12120,18 +11088,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_lazy();
       init_common();
       init_wrappers();
-      import_react_native17 = __toESM(require_react_native());
+      import_react_native16 = __toESM(require_react_native());
       ({ uuid4 } = lazyDestructure(() => findByProps("uuid4")));
       showToast = (content, asset) => {
-        if (import_react_native17.Platform.OS === "android") {
+        if (import_react_native16.Platform.OS === "android") {
           try {
-            if (typeof import_react_native17.ToastAndroid?.show === "function") {
-              import_react_native17.ToastAndroid.show(content, import_react_native17.ToastAndroid.SHORT);
+            if (typeof import_react_native16.ToastAndroid?.show === "function") {
+              import_react_native16.ToastAndroid.show(content, import_react_native16.ToastAndroid.SHORT);
               return;
             }
           } catch (e) {
           }
-          import_react_native17.Alert.alert("CloudCord", content);
+          import_react_native16.Alert.alert("CloudCord", content);
           return;
         }
         return toasts.open({
@@ -12359,7 +11327,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (devTools?.connectToDevTools) {
       devTools.connectToDevTools({
         websocket: ws,
-        resolveRNStyle: import_react_native18.StyleSheet.flatten
+        resolveRNStyle: import_react_native17.StyleSheet.flatten
       });
     }
   }
@@ -12390,7 +11358,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var hermesProps = globalThis.HermesInternal.getRuntimeProperties();
     var hermesVer = hermesProps["OSS Release Version"];
     var padding = "for RN ";
-    var PlatformConstants = import_react_native18.Platform.constants;
+    var PlatformConstants = import_react_native17.Platform.constants;
     var rnVer = PlatformConstants.reactNativeVersion;
     return {
       vendetta: {
@@ -12417,7 +11385,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         buildType: hermesProps.Build,
         bytecodeVersion: hermesProps["Bytecode Version"]
       },
-      ...import_react_native18.Platform.select({
+      ...import_react_native17.Platform.select({
         android: {
           os: {
             name: "Android",
@@ -12432,7 +11400,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         }
       }),
-      ...import_react_native18.Platform.select({
+      ...import_react_native17.Platform.select({
         android: {
           device: {
             manufacturer: PlatformConstants.Manufacturer,
@@ -12470,7 +11438,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }
   }
-  var import_react_native18, socket2, originalConsoleLog2, originalConsoleError2, originalConsoleWarn2, originalLoggerLog2, originalLoggerError2, originalLoggerWarn2, VERSION2, rdtPort, rdtClient, rdtConnected, changeHooks, versionHash;
+  var import_react_native17, socket2, originalConsoleLog2, originalConsoleError2, originalConsoleWarn2, originalLoggerLog2, originalLoggerError2, originalLoggerWarn2, VERSION2, rdtPort, rdtClient, rdtConnected, changeHooks, versionHash;
   var init_debug = __esm({
     "src/lib/api/debug.ts"() {
       "use strict";
@@ -12486,7 +11454,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_settings();
       init_logger();
       init_toasts();
-      import_react_native18 = __toESM(require_react_native());
+      import_react_native17 = __toESM(require_react_native());
       VERSION2 = 1;
       rdtPort = 8097;
       rdtClient = null;
@@ -12783,7 +11751,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         showToast(`Could not copy module report: ${String(error?.message || error).slice(0, 100)}`, findAssetId("Small"));
       }
     };
-    return /* @__PURE__ */ jsx(import_react_native19.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native18.ScrollView, {
       style: {
         flex: 1
       },
@@ -12859,7 +11827,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 onValueChange: (value) => loaderConfig.customLoadUrl.enabled = value
               }),
               loaderConfig.customLoadUrl.enabled && /* @__PURE__ */ jsx(TableRow, {
-                label: /* @__PURE__ */ jsx(import_react_native19.View, {
+                label: /* @__PURE__ */ jsx(import_react_native18.View, {
                   style: {
                     width: "100%",
                     gap: 10
@@ -12922,11 +11890,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   ]
                 })
               }),
-              order.map((key) => /* @__PURE__ */ jsx(import_react_native19.Pressable, {
+              order.map((key) => /* @__PURE__ */ jsx(import_react_native18.Pressable, {
                 delayLongPress: 350,
                 onLongPress: () => setMovingKey(key),
                 onPress: () => movingKey && placeBefore(key),
-                children: /* @__PURE__ */ jsx(import_react_native19.View, {
+                children: /* @__PURE__ */ jsx(import_react_native18.View, {
                   style: movingKey === key ? {
                     borderWidth: 1,
                     borderColor: "#5865f2",
@@ -12959,7 +11927,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react3, import_react_native19, requestEvents, uiEvents, runtimeErrors, lastUiEvent, fetchWrapped, uiCaptureInstalled, errorCaptureInstalled, requestSequence, NITRO_COMPONENTS, SAFE_UI_KEYS, TAB_KEYS, TAB_LABELS;
+  var import_react3, import_react_native18, requestEvents, uiEvents, runtimeErrors, lastUiEvent, fetchWrapped, uiCaptureInstalled, errorCaptureInstalled, requestSequence, NITRO_COMPONENTS, SAFE_UI_KEYS, TAB_KEYS, TAB_LABELS;
   var init_Diagnostics = __esm({
     "src/core/ui/settings/pages/Diagnostics/index.tsx"() {
       "use strict";
@@ -12980,7 +11948,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_modules2();
       init_toasts();
       import_react3 = __toESM(require_react());
-      import_react_native19 = __toESM(require_react_native());
+      import_react_native18 = __toESM(require_react_native());
       requestEvents = [];
       uiEvents = [];
       runtimeErrors = [];
@@ -13106,7 +12074,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         version: debugInfo.device.manufacturer,
         icon: "WrenchIcon"
       },
-      ...import_react_native20.Platform.OS !== "ios" ? [
+      ...import_react_native19.Platform.OS !== "ios" ? [
         {
           label: Strings.BRAND,
           version: debugInfo.device.brand,
@@ -13119,9 +12087,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         icon: "MobilePhoneIcon"
       },
       // this is renamed now on android but i cant be bothered to find it
-      ...import_react_native20.Platform.OS !== "android" ? [
+      ...import_react_native19.Platform.OS !== "android" ? [
         {
-          label: import_react_native20.Platform.select({
+          label: import_react_native19.Platform.select({
             android: Strings.CODENAME,
             ios: Strings.MODELID
           }),
@@ -13130,7 +12098,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       ] : []
     ];
-    return /* @__PURE__ */ jsx(import_react_native20.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native19.ScrollView, {
       style: {
         flex: 1
       },
@@ -13164,7 +12132,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native20;
+  var import_react_native19;
   var init_About = __esm({
     "src/core/ui/settings/pages/General/About.tsx"() {
       "use strict";
@@ -13178,7 +12146,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_debug();
       init_settings();
       init_components();
-      import_react_native20 = __toESM(require_react_native());
+      import_react_native19 = __toESM(require_react_native());
     }
   });
 
@@ -13347,8 +12315,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var debugInfo = getDebugInfo();
     var navigation2 = NavigationNative.useNavigation();
     var canFetchRuntime = typeof BundleUpdaterManager?.checkForUpdates === "function" || typeof BundleUpdaterManager?.download === "function";
-    var recoveryInstructions = import_react_native21.Platform.OS === "android" ? "Hold Volume Up in Discord, then choose Use stable runtime. This is available on current CloudCord Manager installs." : "Shake the device in Discord, then choose Refetch Bundle in the recovery menu.";
-    return /* @__PURE__ */ jsx(import_react_native21.ScrollView, {
+    var recoveryInstructions = import_react_native20.Platform.OS === "android" ? "Hold Volume Up in Discord, then choose Use stable runtime. This is available on current CloudCord Manager installs." : "Shake the device in Discord, then choose Refetch Bundle in the recovery menu.";
+    return /* @__PURE__ */ jsx(import_react_native20.ScrollView, {
       style: {
         flex: 1
       },
@@ -13407,7 +12375,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("Discord")
                 }),
-                onPress: () => import_react_native21.Linking.openURL("https://discord.gg/EBEZJ84zBT")
+                onPress: () => import_react_native20.Linking.openURL("https://discord.gg/EBEZJ84zBT")
               }),
               /* @__PURE__ */ jsx(TableRow, {
                 arrow: true,
@@ -13415,7 +12383,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("GlobeIcon") || findAssetId("CircleInformationIcon-primary")
                 }),
-                onPress: () => import_react_native21.Linking.openURL("https://getcloudcord.com")
+                onPress: () => import_react_native20.Linking.openURL("https://getcloudcord.com")
               }),
               /* @__PURE__ */ jsx(TableRow, {
                 arrow: true,
@@ -13423,7 +12391,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 icon: /* @__PURE__ */ jsx(TableRow.Icon, {
                   source: findAssetId("img_account_sync_github_white")
                 }),
-                onPress: () => import_react_native21.Linking.openURL(GITHUB)
+                onPress: () => import_react_native20.Linking.openURL(GITHUB)
               })
             ]
           }),
@@ -13567,7 +12535,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native21;
+  var import_react_native20;
   var init_General = __esm({
     "src/core/ui/settings/pages/General/index.tsx"() {
       "use strict";
@@ -13591,7 +12559,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_toasts();
       init_common();
       init_components();
-      import_react_native21 = __toESM(require_react_native());
+      import_react_native20 = __toESM(require_react_native());
     }
   });
 
@@ -13611,7 +12579,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ])
       ];
     };
-    return /* @__PURE__ */ jsx(import_react_native22.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native21.ScrollView, {
       style: {
         flex: 1
       },
@@ -13655,7 +12623,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react_native22, tabs;
+  var import_react_native21, tabs;
   var init_Customization = __esm({
     "src/core/ui/settings/pages/Customization/index.tsx"() {
       "use strict";
@@ -13667,7 +12635,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_modules();
       init_settings();
       init_components();
-      import_react_native22 = __toESM(require_react_native());
+      import_react_native21 = __toESM(require_react_native());
       tabs = [
         [
           "BOTCORD",
@@ -13694,1734 +12662,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           "CloudSync"
         ]
       ];
-    }
-  });
-
-  // src/lib/api/botcord.ts
-  function snapshot() {
-    return {
-      accounts: state.accounts.slice(),
-      activeAccountId: state.activeAccountId,
-      recentDMs: {
-        ...state.recentDMs
-      },
-      loaded: state.loaded
-    };
-  }
-  function notify() {
-    for (var listener of listeners) {
-      try {
-        listener();
-      } catch (e) {
-      }
-    }
-  }
-  function secretBridge(method, ...args) {
-    var bridge = globalThis.__RAIN_BRIDGE_CALL_SYNC__;
-    if (typeof bridge !== "function")
-      return {
-        ok: false
-      };
-    try {
-      var response = bridge({
-        rain: {
-          method: "botcord.secret." + method,
-          args
-        }
-      });
-      if (!response || response.error)
-        return {
-          ok: false
-        };
-      return {
-        ok: true,
-        value: response.result
-      };
-    } catch (e) {
-      return {
-        ok: false
-      };
-    }
-  }
-  function cleanAccount(value) {
-    if (!value || typeof value !== "object")
-      return null;
-    var id = typeof value.id === "string" ? value.id : "";
-    var username = typeof value.username === "string" ? value.username : "";
-    var token = normalizeBotToken(typeof value.token === "string" && value.token ? value.token : id ? keychainGet(id.slice(0, 64)) : "");
-    if (!id || !username || !token)
-      return null;
-    return {
-      id: id.slice(0, 64),
-      username: username.slice(0, 128),
-      avatar: typeof value.avatar === "string" ? value.avatar.slice(0, 256) : null,
-      token: token.slice(0, 512)
-    };
-  }
-  function sanitizeState(value) {
-    var accounts = Array.isArray(value?.accounts) ? value.accounts.slice(0, MAX_ACCOUNTS).map(cleanAccount).filter(Boolean) : [];
-    var active = typeof value?.activeAccountId === "string" && accounts.some((a) => a.id === value.activeAccountId) ? value.activeAccountId : accounts[0]?.id ?? null;
-    var recentDMs = {};
-    if (value?.recentDMs && typeof value.recentDMs === "object") {
-      for (var account of accounts) {
-        var rows = Array.isArray(value.recentDMs[account.id]) ? value.recentDMs[account.id] : [];
-        recentDMs[account.id] = rows.slice(0, 100).map((row) => {
-          var recipient = row?.recipient || {};
-          if (typeof row?.channelId !== "string" || typeof recipient?.id !== "string")
-            return null;
-          return {
-            channelId: row.channelId.slice(0, 64),
-            recipient: {
-              id: recipient.id.slice(0, 64),
-              username: typeof recipient.username === "string" ? recipient.username.slice(0, 128) : void 0,
-              global_name: typeof recipient.global_name === "string" ? recipient.global_name.slice(0, 128) : null,
-              avatar: typeof recipient.avatar === "string" ? recipient.avatar.slice(0, 256) : null,
-              bot: Boolean(recipient.bot)
-            },
-            lastOpenedAt: typeof row.lastOpenedAt === "number" ? row.lastOpenedAt : 0
-          };
-        }).filter(Boolean);
-      }
-    }
-    return {
-      accounts,
-      activeAccountId: active,
-      recentDMs,
-      loaded: true
-    };
-  }
-  function persist() {
-    return _async_to_generator(function* () {
-      var secure = keychainAvailable() && state.accounts.every((account) => keychainSet(account.id, account.token));
-      var accounts = secure ? state.accounts.map(({ token: _token, ...rest }) => rest) : state.accounts;
-      var payload = JSON.stringify({
-        accounts,
-        activeAccountId: state.activeAccountId,
-        recentDMs: state.recentDMs
-      });
-      yield NativeFileModule.writeFile("documents", FILE_PATH, payload, "utf8");
-    })();
-  }
-  function resetCorruptStore() {
-    return _async_to_generator(function* () {
-      for (var account of state.accounts)
-        keychainDelete(account.id);
-      state = {
-        ...DEFAULT_STATE,
-        loaded: true
-      };
-      try {
-        yield NativeFileModule.writeFile("documents", FILE_PATH, JSON.stringify({
-          accounts: [],
-          activeAccountId: null,
-          recentDMs: {}
-        }), "utf8");
-      } catch (e) {
-      }
-    })();
-  }
-  function ensureBotCordLoaded() {
-    return _async_to_generator(function* () {
-      if (state.loaded)
-        return;
-      if (loadPromise)
-        return loadPromise;
-      loadPromise = (() => _async_to_generator(function* () {
-        try {
-          var fullPath = `${NativeFileModule.getConstants().DocumentsDirPath}/${FILE_PATH}`;
-          if (!(yield NativeFileModule.fileExists(fullPath))) {
-            yield resetCorruptStore();
-            return;
-          }
-          var size = yield NativeFileModule.getSize(fullPath);
-          if (typeof size === "number" && size > MAX_FILE_BYTES) {
-            yield resetCorruptStore();
-            return;
-          }
-          var raw = yield NativeFileModule.readFile(fullPath, "utf8");
-          if (!raw || raw.length > MAX_FILE_BYTES) {
-            yield resetCorruptStore();
-            return;
-          }
-          var parsed = JSON.parse(raw);
-          state = sanitizeState(parsed);
-          if (Array.isArray(parsed?.accounts) && parsed.accounts.some((account) => typeof account?.token === "string" && account.token) && keychainAvailable())
-            yield persist();
-        } catch (e) {
-          yield resetCorruptStore();
-        } finally {
-          state.loaded = true;
-          loadPromise = null;
-          notify();
-        }
-      })())();
-      return loadPromise;
-    })();
-  }
-  function useBotCordState() {
-    var [value, setValue] = import_react4.default.useState(() => snapshot());
-    import_react4.default.useEffect(() => {
-      var active = true;
-      var update = () => active && setValue(snapshot());
-      listeners.add(update);
-      ensureBotCordLoaded().then(update).catch(update);
-      return () => {
-        active = false;
-        listeners.delete(update);
-      };
-    }, []);
-    return value;
-  }
-  function normalizeBotToken(token) {
-    return token.trim().replace(/^Bot\s+/i, "");
-  }
-  function getBotUser(token) {
-    return _async_to_generator(function* () {
-      var cleanToken = normalizeBotToken(token);
-      var response = yield fetch("https://discord.com/api/v10/users/@me", {
-        headers: {
-          Authorization: `Bot ${cleanToken}`
-        }
-      });
-      if (!response.ok)
-        throw new Error("Invalid bot token or Discord rejected the request.");
-      var user = yield response.json();
-      return {
-        id: user.id,
-        username: user.global_name || user.username || `Bot ${user.id}`,
-        avatar: user.avatar,
-        token: cleanToken
-      };
-    })();
-  }
-  function addBotAccount(token) {
-    return _async_to_generator(function* () {
-      var account = yield getBotUser(token);
-      yield ensureBotCordLoaded();
-      var existing = state.accounts.findIndex((a) => a.id === account.id);
-      if (existing === -1)
-        state.accounts = [
-          ...state.accounts,
-          account
-        ].slice(-MAX_ACCOUNTS);
-      else
-        state.accounts = state.accounts.map((a, i) => i === existing ? account : a);
-      state.activeAccountId = account.id;
-      yield persist();
-      notify();
-      return account;
-    })();
-  }
-  function removeBotAccount(id) {
-    return _async_to_generator(function* () {
-      yield ensureBotCordLoaded();
-      state.accounts = state.accounts.filter((a) => a.id !== id);
-      keychainDelete(id);
-      if (state.activeAccountId === id)
-        state.activeAccountId = state.accounts[0]?.id ?? null;
-      yield persist();
-      notify();
-    })();
-  }
-  function setActiveBotAccount(id) {
-    return _async_to_generator(function* () {
-      yield ensureBotCordLoaded();
-      state.activeAccountId = id && state.accounts.some((a) => a.id === id) ? id : state.accounts[0]?.id ?? null;
-      yield persist();
-      notify();
-    })();
-  }
-  function readDiscordError(response) {
-    return _async_to_generator(function* () {
-      try {
-        var body = yield response.json();
-        return typeof body?.message === "string" ? body.message : null;
-      } catch (e) {
-        return null;
-      }
-    })();
-  }
-  function botFetch(token, path) {
-    return _async_to_generator(function* () {
-      var _loop2 = function* (attempt2) {
-        var response = yield fetch(`https://discord.com/api/v10${path}`, {
-          headers: {
-            Authorization: `Bot ${normalizeBotToken(token)}`,
-            Accept: "application/json"
-          }
-        });
-        if (response.ok)
-          return {
-            v: response.json()
-          };
-        var message = yield readDiscordError(response);
-        if ((response.status === 429 || response.status >= 500) && attempt2 < 2) {
-          yield new Promise((resolve) => setTimeout(resolve, 400 * (attempt2 + 1)));
-          return "continue";
-        }
-        if (response.status === 403)
-          throw new Error("This bot needs View Channel and Read Message History permissions (403).");
-        throw new Error(message ? `${message} (${response.status})` : `Discord API request failed (${response.status}).`);
-      };
-      for (var attempt = 0; attempt < 3; attempt++) {
-        var _ret = yield* _loop2(attempt);
-        if (_type_of(_ret) === "object")
-          return _ret.v;
-      }
-      throw new Error("Discord did not respond after three attempts.");
-    })();
-  }
-  function getBotGuilds(token) {
-    return botFetch(token, "/users/@me/guilds");
-  }
-  function getBotGuildChannels(token, guildId) {
-    return botFetch(token, `/guilds/${guildId}/channels`);
-  }
-  function getBotChannelMessages(token, channelId) {
-    return botFetch(token, `/channels/${channelId}/messages?limit=25`);
-  }
-  function getBotGuildMembers(token, guildId) {
-    return _async_to_generator(function* () {
-      var members = [];
-      var after2 = "0";
-      while (true) {
-        var page = yield botFetch(token, `/guilds/${guildId}/members?limit=1000&after=${after2}`);
-        members.push(...page);
-        if (page.length < 1e3)
-          break;
-        var next = page[page.length - 1]?.user?.id;
-        if (!next || next === after2)
-          break;
-        after2 = next;
-      }
-      return members;
-    })();
-  }
-  function createBotDM(token, recipient) {
-    return _async_to_generator(function* () {
-      var response = yield fetch("https://discord.com/api/v10/users/@me/channels", {
-        method: "POST",
-        headers: {
-          Authorization: `Bot ${normalizeBotToken(token)}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          recipient_id: recipient.id
-        })
-      });
-      if (!response.ok) {
-        var message = yield readDiscordError(response);
-        throw new Error(message ? `${message} (${response.status})` : `Failed to open DM (${response.status}).`);
-      }
-      var channel = yield response.json();
-      yield ensureBotCordLoaded();
-      var account = state.accounts.find((a) => normalizeBotToken(a.token) === normalizeBotToken(token));
-      if (account) {
-        var current = state.recentDMs[account.id] ?? [];
-        state.recentDMs = {
-          ...state.recentDMs,
-          [account.id]: [
-            {
-              channelId: channel.id,
-              recipient: {
-                id: recipient.id,
-                username: recipient.username,
-                global_name: recipient.global_name,
-                avatar: recipient.avatar,
-                bot: Boolean(recipient.bot)
-              },
-              lastOpenedAt: Date.now()
-            },
-            ...current.filter((dm) => dm.recipient.id !== recipient.id)
-          ].slice(0, 100)
-        };
-        yield persist();
-        notify();
-      }
-      return channel;
-    })();
-  }
-  function sendBotMessage(token, channelId, content, attachment) {
-    return _async_to_generator(function* () {
-      var body;
-      var headers = {
-        Authorization: `Bot ${normalizeBotToken(token)}`
-      };
-      if (attachment?.uri) {
-        var form = new FormData();
-        form.append("payload_json", JSON.stringify({
-          content
-        }));
-        form.append("files[0]", {
-          uri: attachment.uri,
-          name: attachment.name || `image-${Date.now()}.jpg`,
-          type: attachment.type || "image/jpeg"
-        });
-        body = form;
-      } else {
-        headers["Content-Type"] = "application/json";
-        body = JSON.stringify({
-          content
-        });
-      }
-      var response = yield fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
-        method: "POST",
-        headers,
-        body
-      });
-      if (!response.ok) {
-        var message = yield readDiscordError(response);
-        throw new Error(message ? `${message} (${response.status})` : `Failed to send message (${response.status}).`);
-      }
-      return response.json();
-    })();
-  }
-  var import_react4, FILE_PATH, SECRET_PREFIX, MAX_FILE_BYTES, MAX_ACCOUNTS, DEFAULT_STATE, state, loadPromise, listeners, keychainAvailable, keychainGet, keychainSet, keychainDelete;
-  var init_botcord = __esm({
-    "src/lib/api/botcord.ts"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_type_of();
-      init_modules();
-      import_react4 = __toESM(require_react());
-      FILE_PATH = "botcord/accounts.json";
-      SECRET_PREFIX = "bot-token:";
-      MAX_FILE_BYTES = 256 * 1024;
-      MAX_ACCOUNTS = 50;
-      DEFAULT_STATE = {
-        accounts: [],
-        activeAccountId: null,
-        recentDMs: {},
-        loaded: false
-      };
-      state = {
-        ...DEFAULT_STATE
-      };
-      loadPromise = null;
-      listeners = /* @__PURE__ */ new Set();
-      keychainAvailable = () => secretBridge("delete", SECRET_PREFIX + "probe").ok;
-      keychainGet = (id) => {
-        var result = secretBridge("get", SECRET_PREFIX + id);
-        return result.ok && typeof result.value === "string" ? result.value : "";
-      };
-      keychainSet = (id, token) => secretBridge("set", SECRET_PREFIX + id, token).value === true;
-      keychainDelete = (id) => {
-        secretBridge("delete", SECRET_PREFIX + id);
-      };
-    }
-  });
-
-  // src/core/ui/settings/pages/BotCord/index.tsx
-  var BotCord_exports = {};
-  __export(BotCord_exports, {
-    default: () => BotCord
-  });
-  function nativeColor(value, fallback) {
-    try {
-      if (typeof value === "string")
-        return value;
-      if (isSemanticColor(value)) {
-        var resolved = resolveSemanticColor(value);
-        if (typeof resolved === "string" && resolved)
-          return resolved;
-      }
-    } catch (e) {
-    }
-    return fallback;
-  }
-  function ApiAvatar({ user, size = 40 }) {
-    var uri = avatarUrl(user, 128);
-    var colors = getNativeColors();
-    if (uri)
-      return /* @__PURE__ */ jsx(import_react_native23.Image, {
-        source: {
-          uri
-        },
-        style: {
-          width: size,
-          height: size,
-          borderRadius: size / 2
-        }
-      });
-    var label2 = displayName(user).trim().slice(0, 2).toUpperCase() || "?";
-    return /* @__PURE__ */ jsx(import_react_native23.View, {
-      style: {
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: colors.input
-      },
-      children: /* @__PURE__ */ jsx(Text, {
-        variant: "text-sm/semibold",
-        children: label2
-      })
-    });
-  }
-  function MessageRow({ message }) {
-    var styles2 = useStyles2();
-    var author = message.author || {};
-    var time = message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit"
-    }) : "";
-    var reactionCount = message.reactions?.reduce((sum, reaction) => sum + (reaction.count || 0), 0) || 0;
-    return /* @__PURE__ */ jsxs(import_react_native23.View, {
-      style: styles2.row,
-      children: [
-        /* @__PURE__ */ jsx(ApiAvatar, {
-          user: author,
-          size: 40
-        }),
-        /* @__PURE__ */ jsxs(import_react_native23.View, {
-          style: styles2.messageBody,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native23.View, {
-              style: styles2.nameLine,
-              children: [
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "text-md/semibold",
-                  children: displayName(author)
-                }),
-                author.bot ? /* @__PURE__ */ jsx(Text, {
-                  variant: "text-xs/semibold",
-                  color: "text-brand",
-                  children: "APP"
-                }) : null,
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "text-xs/normal",
-                  color: "text-muted",
-                  children: time
-                })
-              ]
-            }),
-            !!message.content && /* @__PURE__ */ jsx(Text, {
-              selectable: true,
-              variant: "text-md/normal",
-              children: message.content
-            }),
-            !!message.attachments?.length && /* @__PURE__ */ jsx(import_react_native23.View, {
-              style: {
-                marginTop: 6,
-                gap: 6
-              },
-              children: message.attachments.map((attachment, index) => {
-                var uri = attachment.url || attachment.proxy_url;
-                var type = String(attachment.content_type || "");
-                var isImage = type.startsWith("image/") || /\.(png|jpe?g|gif|webp)(?:$|\?)/i.test(String(uri || attachment.filename || ""));
-                return isImage && uri ? /* @__PURE__ */ jsx(import_react_native23.Image, {
-                  source: {
-                    uri
-                  },
-                  resizeMode: "cover",
-                  style: {
-                    width: 260,
-                    height: 180,
-                    maxWidth: "100%",
-                    borderRadius: 8,
-                    backgroundColor: tokens.colors.BACKGROUND_SECONDARY
-                  }
-                }, attachment.id || `${attachment.filename}-${index}`) : /* @__PURE__ */ jsx(Text, {
-                  variant: "text-sm/normal",
-                  color: "text-link",
-                  children: attachment.filename || "Attachment"
-                }, attachment.id || `${attachment.filename}-${index}`);
-              })
-            }),
-            !!message.embeds?.length && /* @__PURE__ */ jsxs(Text, {
-              variant: "text-sm/normal",
-              color: "text-muted",
-              children: [
-                message.embeds.length,
-                " embed",
-                message.embeds.length === 1 ? "" : "s"
-              ]
-            }),
-            reactionCount > 0 && /* @__PURE__ */ jsxs(Text, {
-              variant: "text-sm/normal",
-              color: "text-muted",
-              children: [
-                "Reactions: ",
-                reactionCount
-              ]
-            })
-          ]
-        })
-      ]
-    });
-  }
-  function AccountSheet({ accounts, active, onMain }) {
-    return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native23.View, {
-        style: {
-          paddingHorizontal: 12,
-          paddingBottom: 20
-        },
-        children: [
-          /* @__PURE__ */ jsx(Text, {
-            variant: "heading-lg/extrabold",
-            children: "Switch account"
-          }),
-          /* @__PURE__ */ jsxs(Stack, {
-            spacing: 4,
-            style: {
-              marginTop: 10
-            },
-            children: [
-              accounts.map((account) => /* @__PURE__ */ jsx(ActionSheetRow, {
-                label: account.username,
-                icon: /* @__PURE__ */ jsx(ApiAvatar, {
-                  user: account,
-                  size: 32
-                }),
-                onPress: () => _async_to_generator(function* () {
-                  yield setActiveBotAccount(account.id);
-                  hideSheet("BOTCORD_ACCOUNT");
-                })()
-              }, account.id)),
-              /* @__PURE__ */ jsx(ActionSheetRow, {
-                label: "Back to Discord",
-                onPress: () => {
-                  hideSheet("BOTCORD_ACCOUNT");
-                  onMain();
-                }
-              }),
-              /* @__PURE__ */ jsx(ActionSheetRow, {
-                label: "Log out bot",
-                variant: "destructive",
-                onPress: () => _async_to_generator(function* () {
-                  yield removeBotAccount(active.id);
-                  hideSheet("BOTCORD_ACCOUNT");
-                  onMain();
-                })()
-              })
-            ]
-          })
-        ]
-      })
-    });
-  }
-  function BotClient({ accounts, activeId, onExit }) {
-    var styles2 = useStyles2();
-    var nativeColors2 = getNativeColors();
-    var navigation2 = NavigationNative.useNavigation();
-    var state2 = useBotCordState();
-    var active = accounts.find((a) => a.id === activeId) ?? accounts[0] ?? null;
-    var [guilds, setGuilds] = (0, import_react5.useState)([]);
-    var [channels2, setChannels] = (0, import_react5.useState)([]);
-    var [guild, setGuild] = (0, import_react5.useState)(null);
-    var [channel, setChannel] = (0, import_react5.useState)(null);
-    var [messages, setMessages] = (0, import_react5.useState)([]);
-    var [composer, setComposer] = (0, import_react5.useState)("");
-    var [selectedImage, setSelectedImage] = (0, import_react5.useState)(null);
-    var [loading, setLoading] = (0, import_react5.useState)(false);
-    var [error, setError] = (0, import_react5.useState)(null);
-    var [screen, setScreen] = (0, import_react5.useState)("messages");
-    var [members, setMembers] = (0, import_react5.useState)([]);
-    var [memberSearch, setMemberSearch] = (0, import_react5.useState)("");
-    var [memberStatus, setMemberStatus] = (0, import_react5.useState)("");
-    var listRef = (0, import_react5.useRef)(null);
-    (0, import_react5.useEffect)(() => {
-      if (!active)
-        return;
-      setLoading(true);
-      setError(null);
-      setGuild(null);
-      setChannel(null);
-      setChannels([]);
-      setMessages([]);
-      setSelectedImage(null);
-      setMembers([]);
-      setMemberStatus("");
-      setScreen("messages");
-      getBotGuilds(active.token).then(setGuilds).catch((e) => setError(String(e))).finally(() => setLoading(false));
-    }, [
-      active?.id
-    ]);
-    (0, import_react5.useEffect)(() => {
-      if (!active || !channel?.id)
-        return;
-      var disposed = false;
-      var refresh = () => _async_to_generator(function* () {
-        try {
-          var remote = yield getBotChannelMessages(active.token, channel.id);
-          if (disposed)
-            return;
-          var chronological = remote.slice().reverse();
-          setMessages((current) => {
-            var optimistic = current.filter((message) => String(message?.id || "").startsWith("local-"));
-            return [
-              ...chronological,
-              ...optimistic
-            ];
-          });
-        } catch (e) {
-        }
-      })();
-      var timer = setInterval(refresh, 1500);
-      return () => {
-        disposed = true;
-        clearInterval(timer);
-      };
-    }, [
-      active?.id,
-      channel?.id
-    ]);
-    var openGuild = (nextGuild) => _async_to_generator(function* () {
-      if (!active)
-        return;
-      setGuild(nextGuild);
-      setChannel(null);
-      setMessages([]);
-      setScreen("guild");
-      setLoading(true);
-      setError(null);
-      try {
-        var nextChannels = yield getBotGuildChannels(active.token, nextGuild.id);
-        setChannels(nextChannels.sort((a, b3) => (a.position ?? 0) - (b3.position ?? 0)));
-      } catch (e) {
-        setError(String(e));
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var openMessages = () => {
-      setGuild(null);
-      setChannel(null);
-      setMessages([]);
-      setScreen("messages");
-      setError(null);
-    };
-    var openChannel = (nextChannel) => _async_to_generator(function* () {
-      if (!active)
-        return;
-      setLoading(true);
-      setError(null);
-      try {
-        var result = yield getBotChannelMessages(active.token, nextChannel.id);
-        setChannel(nextChannel);
-        setMessages(result.reverse());
-      } catch (e) {
-        setError(String(e));
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var openRecentDM = (dm) => _async_to_generator(function* () {
-      yield openChannel({
-        id: dm.channelId,
-        name: displayName(dm.recipient),
-        recipients: [
-          dm.recipient
-        ],
-        type: 1,
-        botcordDM: true
-      });
-    })();
-    var loadAllMembers = () => _async_to_generator(function* () {
-      if (!active)
-        return;
-      setScreen("members");
-      setMemberSearch("");
-      setError(null);
-      if (members.length > 0) {
-        setMemberStatus(`${members.length} available members`);
-        return;
-      }
-      setMemberStatus("Loading members");
-      var dedup = /* @__PURE__ */ new Map();
-      var completed = 0;
-      for (var i = 0; i < guilds.length; i += 4) {
-        var batch = guilds.slice(i, i + 4);
-        var results = yield Promise.all(batch.map((g2) => getBotGuildMembers(active.token, g2.id).catch(() => [])));
-        for (var rows of results) {
-          for (var member of rows) {
-            var user = member?.user;
-            if (user?.id && user.id !== active.id && !dedup.has(user.id))
-              dedup.set(user.id, member);
-          }
-        }
-        completed += batch.length;
-        setMemberStatus(`Loading ${completed} of ${guilds.length}`);
-      }
-      var all = Array.from(dedup.values());
-      setMembers(all);
-      setMemberStatus(`${all.length} available members`);
-    })();
-    var openMemberDM = (member) => _async_to_generator(function* () {
-      if (!active || !member?.user?.id)
-        return;
-      setLoading(true);
-      setError(null);
-      try {
-        var dm = yield createBotDM(active.token, member.user);
-        setChannel({
-          ...dm,
-          name: displayName(member.user),
-          recipients: [
-            member.user
-          ],
-          botcordDM: true
-        });
-        var result = yield getBotChannelMessages(active.token, dm.id);
-        setMessages(result.reverse());
-      } catch (e) {
-        setError(String(e));
-      } finally {
-        setLoading(false);
-      }
-    })();
-    var pickImage = () => _async_to_generator(function* () {
-      setError(null);
-      try {
-        var imagePicker = findByProps("launchImageLibrary");
-        var asset = null;
-        if (imagePicker?.launchImageLibrary) {
-          var result = yield new Promise((resolve, reject) => {
-            try {
-              var returned = imagePicker.launchImageLibrary({
-                mediaType: "photo",
-                selectionLimit: 1,
-                includeBase64: false,
-                assetRepresentationMode: "current"
-              }, resolve);
-              if (returned?.then)
-                returned.then(resolve, reject);
-            } catch (error2) {
-              reject(error2);
-            }
-          });
-          if (result?.didCancel)
-            return;
-          if (result?.errorCode)
-            throw new Error(result.errorMessage || "Could not open photos.");
-          asset = result?.assets?.[0];
-        } else {
-          var filePicker = findByProps("pickSingle", "isCancel");
-          if (!filePicker?.pickSingle)
-            throw new Error("Photo picker unavailable.");
-          try {
-            asset = yield filePicker.pickSingle({
-              type: filePicker.types?.images || "image/*",
-              mode: "import",
-              copyTo: "documentDirectory"
-            });
-          } catch (error2) {
-            if (filePicker.isCancel?.(error2))
-              return;
-            throw error2;
-          }
-        }
-        var uri = asset?.fileCopyUri || asset?.uri;
-        if (!uri)
-          return;
-        setSelectedImage({
-          uri,
-          name: asset?.fileName || asset?.name || `image-${Date.now()}.jpg`,
-          type: asset?.type || "image/jpeg",
-          width: asset?.width,
-          height: asset?.height
-        });
-      } catch (e) {
-        setError(String(e));
-      }
-    })();
-    var send = () => _async_to_generator(function* () {
-      if (!active || !channel || !composer.trim() && !selectedImage)
-        return;
-      var content = composer.trim();
-      var image = selectedImage;
-      var optimisticId = `local-${Date.now()}`;
-      var optimistic = {
-        id: optimisticId,
-        content,
-        author: active,
-        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-        attachments: image ? [
-          {
-            id: "0",
-            filename: image.name,
-            url: image.uri,
-            proxy_url: image.uri,
-            content_type: image.type
-          }
-        ] : [],
-        botcordPending: true
-      };
-      setComposer("");
-      setSelectedImage(null);
-      setError(null);
-      setMessages((old) => [
-        ...old,
-        optimistic
-      ]);
-      requestAnimationFrame(() => listRef.current?.scrollToEnd?.({
-        animated: true
-      }));
-      try {
-        var sent = yield sendBotMessage(active.token, channel.id, content, image || void 0);
-        setMessages((old) => old.map((message) => message.id === optimisticId ? sent : message));
-      } catch (e) {
-        setMessages((old) => old.filter((message) => message.id !== optimisticId));
-        setComposer(content);
-        setSelectedImage(image);
-        setError(String(e));
-      }
-    })();
-    if (!active)
-      return null;
-    var categories = channels2.filter((c2) => c2.type === 4);
-    var textChannels = (parentId) => channels2.filter((c2) => [
-      0,
-      5,
-      10,
-      11,
-      12
-    ].includes(c2.type) && (c2.parent_id || null) === parentId);
-    var recentDMs = state2.recentDMs?.[active.id] ?? [];
-    var filteredMembers = members.filter((member) => {
-      var q3 = memberSearch.trim().toLowerCase();
-      if (!q3)
-        return true;
-      return `${member.nick || ""} ${member.user?.global_name || ""} ${member.user?.username || ""}`.toLowerCase().includes(q3);
-    });
-    var openAccounts = () => showSheet("BOTCORD_ACCOUNT", AccountSheet, {
-      accounts,
-      active,
-      onMain: () => {
-        onExit();
-        navigation2.goBack?.();
-      }
-    });
-    var returnFromChat = () => {
-      var wasDm = Boolean(channel?.botcordDM);
-      setChannel(null);
-      setMessages([]);
-      setComposer("");
-      setSelectedImage(null);
-      setError(null);
-      if (wasDm) {
-        setGuild(null);
-        setChannels([]);
-        setScreen("messages");
-      } else {
-        setScreen("guild");
-      }
-    };
-    if (channel) {
-      var dmUser = channel.recipients?.[0];
-      return /* @__PURE__ */ jsxs(import_react_native23.KeyboardAvoidingView, {
-        style: styles2.root,
-        behavior: import_react_native23.Platform.OS === "ios" ? "padding" : void 0,
-        keyboardVerticalOffset: 0,
-        children: [
-          /* @__PURE__ */ jsxs(import_react_native23.View, {
-            style: styles2.header,
-            children: [
-              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
-                accessibilityRole: "button",
-                accessibilityLabel: "Back",
-                onPress: returnFromChat,
-                hitSlop: 10,
-                style: ({ pressed }) => ({
-                  width: 64,
-                  height: 36,
-                  flexShrink: 0,
-                  borderRadius: 18,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: nativeColors2.selected,
-                  opacity: pressed ? 0.7 : 1,
-                  zIndex: 20
-                }),
-                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
-                  style: {
-                    color: nativeColors2.text,
-                    fontSize: 15,
-                    fontWeight: "600"
-                  },
-                  children: "Back"
-                })
-              }),
-              dmUser ? /* @__PURE__ */ jsx(ApiAvatar, {
-                user: dmUser,
-                size: 32
-              }) : null,
-              /* @__PURE__ */ jsxs(import_react_native23.View, {
-                style: {
-                  flex: 1
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Text, {
-                    variant: "heading-md/semibold",
-                    numberOfLines: 1,
-                    children: channel.botcordDM ? displayName(dmUser) : channel.name
-                  }),
-                  !channel.botcordDM && guild ? /* @__PURE__ */ jsx(Text, {
-                    variant: "text-xs/normal",
-                    color: "text-muted",
-                    numberOfLines: 1,
-                    children: guild.name
-                  }) : null
-                ]
-              }),
-              /* @__PURE__ */ jsx(PressableScale, {
-                onPress: openAccounts,
-                children: /* @__PURE__ */ jsx(ApiAvatar, {
-                  user: active,
-                  size: 32
-                })
-              })
-            ]
-          }),
-          error ? /* @__PURE__ */ jsx(import_react_native23.View, {
-            style: {
-              paddingHorizontal: 12,
-              paddingVertical: 8
-            },
-            children: /* @__PURE__ */ jsx(Text, {
-              variant: "text-sm/medium",
-              color: "text-feedback-critical",
-              children: error
-            })
-          }) : null,
-          loading ? /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/normal",
-            color: "text-muted",
-            style: {
-              padding: 10,
-              textAlign: "center"
-            },
-            children: "Loading"
-          }) : null,
-          /* @__PURE__ */ jsx(import_react_native23.FlatList, {
-            ref: listRef,
-            style: {
-              flex: 1
-            },
-            data: messages,
-            keyExtractor: (m2, i) => m2.id || String(i),
-            renderItem: ({ item }) => /* @__PURE__ */ jsx(MessageRow, {
-              message: item
-            }),
-            contentContainerStyle: {
-              paddingVertical: 6
-            },
-            keyboardDismissMode: import_react_native23.Platform.OS === "ios" ? "interactive" : "on-drag",
-            keyboardShouldPersistTaps: "handled",
-            onContentSizeChange: () => listRef.current?.scrollToEnd?.({
-              animated: false
-            })
-          }),
-          selectedImage ? /* @__PURE__ */ jsxs(import_react_native23.View, {
-            style: {
-              height: 72,
-              paddingHorizontal: 10,
-              paddingVertical: 6,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 10,
-              backgroundColor: tokens.colors.BACKGROUND_PRIMARY
-            },
-            children: [
-              /* @__PURE__ */ jsx(import_react_native23.Image, {
-                source: {
-                  uri: selectedImage.uri
-                },
-                style: {
-                  width: 56,
-                  height: 56,
-                  borderRadius: 8,
-                  backgroundColor: tokens.colors.BACKGROUND_SECONDARY
-                }
-              }),
-              /* @__PURE__ */ jsx(import_react_native23.Text, {
-                numberOfLines: 1,
-                style: {
-                  flex: 1,
-                  color: nativeColors2.text,
-                  fontSize: 14
-                },
-                children: selectedImage.name
-              }),
-              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
-                onPress: () => setSelectedImage(null),
-                hitSlop: 8,
-                style: ({ pressed }) => ({
-                  height: 34,
-                  paddingHorizontal: 12,
-                  borderRadius: 17,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: nativeColors2.selected,
-                  opacity: pressed ? 0.7 : 1
-                }),
-                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
-                  style: {
-                    color: nativeColors2.text,
-                    fontSize: 13,
-                    fontWeight: "600"
-                  },
-                  children: "Remove"
-                })
-              })
-            ]
-          }) : null,
-          /* @__PURE__ */ jsxs(import_react_native23.View, {
-            style: styles2.composer,
-            children: [
-              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
-                accessibilityRole: "button",
-                accessibilityLabel: "Add photo",
-                onPress: pickImage,
-                hitSlop: 6,
-                style: ({ pressed }) => ({
-                  width: 52,
-                  height: 44,
-                  flexShrink: 0,
-                  borderRadius: 22,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: nativeColors2.selected,
-                  opacity: pressed ? 0.7 : 1
-                }),
-                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
-                  style: {
-                    color: nativeColors2.text,
-                    fontSize: 13,
-                    fontWeight: "600"
-                  },
-                  children: "Photo"
-                })
-              }),
-              /* @__PURE__ */ jsx(import_react_native23.TextInput, {
-                value: composer,
-                placeholder: channel.botcordDM ? `Message ${displayName(dmUser)}` : `Message #${channel.name}`,
-                placeholderTextColor: nativeColors2.muted,
-                onChangeText: setComposer,
-                maxLength: 2e3,
-                returnKeyType: "send",
-                onSubmitEditing: () => {
-                  if (composer.trim() || selectedImage)
-                    send();
-                },
-                style: {
-                  width: 0,
-                  minWidth: 0,
-                  flexGrow: 1,
-                  flexShrink: 1,
-                  height: 44,
-                  paddingHorizontal: 14,
-                  paddingVertical: 0,
-                  borderRadius: 22,
-                  backgroundColor: nativeColors2.input,
-                  color: nativeColors2.text,
-                  fontSize: 16
-                }
-              }),
-              /* @__PURE__ */ jsx(import_react_native23.Pressable, {
-                accessibilityRole: "button",
-                accessibilityLabel: "Send message",
-                disabled: !composer.trim() && !selectedImage,
-                onPress: send,
-                hitSlop: 6,
-                style: ({ pressed }) => ({
-                  width: 52,
-                  height: 44,
-                  flexShrink: 0,
-                  borderRadius: 22,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  opacity: !composer.trim() && !selectedImage ? 0.45 : pressed ? 0.72 : 1,
-                  backgroundColor: nativeColors2.brand
-                }),
-                children: /* @__PURE__ */ jsx(import_react_native23.Text, {
-                  style: {
-                    color: nativeColors2.inverse,
-                    fontSize: 13,
-                    fontWeight: "600"
-                  },
-                  children: "Send"
-                })
-              })
-            ]
-          })
-        ]
-      });
-    }
-    return /* @__PURE__ */ jsxs(import_react_native23.View, {
-      style: styles2.root,
-      children: [
-        /* @__PURE__ */ jsxs(import_react_native23.View, {
-          style: styles2.header,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native23.View, {
-              style: {
-                flex: 1
-              },
-              children: [
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "heading-md/semibold",
-                  numberOfLines: 1,
-                  children: screen === "members" ? "New Message" : screen === "messages" ? "Messages" : guild?.name || "BotCord"
-                }),
-                /* @__PURE__ */ jsx(Text, {
-                  variant: "text-xs/normal",
-                  color: "text-muted",
-                  numberOfLines: 1,
-                  children: active.username
-                })
-              ]
-            }),
-            screen === "members" ? /* @__PURE__ */ jsx(import_react_native23.Pressable, {
-              accessibilityRole: "button",
-              accessibilityLabel: "Back",
-              onPress: openMessages,
-              hitSlop: 8,
-              style: ({ pressed }) => ({
-                paddingHorizontal: 8,
-                height: 36,
-                justifyContent: "center",
-                opacity: pressed ? 0.65 : 1
-              }),
-              children: /* @__PURE__ */ jsx(import_react_native23.Text, {
-                style: {
-                  color: nativeColors2.text,
-                  fontSize: 16,
-                  fontWeight: "600"
-                },
-                children: "Back"
-              })
-            }) : /* @__PURE__ */ jsx(Button, {
-              size: "sm",
-              variant: "secondary",
-              text: "New Message",
-              onPress: loadAllMembers
-            }),
-            /* @__PURE__ */ jsx(PressableScale, {
-              onPress: openAccounts,
-              children: /* @__PURE__ */ jsx(ApiAvatar, {
-                user: active,
-                size: 32
-              })
-            })
-          ]
-        }),
-        error ? /* @__PURE__ */ jsx(import_react_native23.View, {
-          style: {
-            paddingHorizontal: 12,
-            paddingVertical: 8
-          },
-          children: /* @__PURE__ */ jsx(Text, {
-            variant: "text-sm/medium",
-            color: "text-feedback-critical",
-            children: error
-          })
-        }) : null,
-        loading ? /* @__PURE__ */ jsx(Text, {
-          variant: "text-sm/normal",
-          color: "text-muted",
-          style: {
-            padding: 8,
-            textAlign: "center"
-          },
-          children: "Loading"
-        }) : null,
-        /* @__PURE__ */ jsxs(import_react_native23.View, {
-          style: styles2.navigator,
-          children: [
-            /* @__PURE__ */ jsxs(import_react_native23.View, {
-              style: styles2.guildRail,
-              children: [
-                /* @__PURE__ */ jsx(PressableScale, {
-                  onPress: openMessages,
-                  style: styles2.guildButton,
-                  children: /* @__PURE__ */ jsx(IconButton, {
-                    size: "lg",
-                    variant: screen === "messages" ? "primary" : "secondary",
-                    icon: findAssetId("HomeIcon") || findAssetId("MessagesIcon") || findAssetId("ChatIcon"),
-                    onPress: openMessages
-                  })
-                }),
-                /* @__PURE__ */ jsx(import_react_native23.FlatList, {
-                  data: guilds,
-                  keyExtractor: (g2) => g2.id,
-                  showsVerticalScrollIndicator: false,
-                  renderItem: ({ item }) => {
-                    var uri = guildIconUrl(item);
-                    return /* @__PURE__ */ jsx(PressableScale, {
-                      onPress: () => openGuild(item),
-                      style: styles2.guildButton,
-                      children: uri ? /* @__PURE__ */ jsx(import_react_native23.Image, {
-                        source: {
-                          uri
-                        },
-                        style: styles2.guildImage
-                      }) : /* @__PURE__ */ jsx(import_react_native23.View, {
-                        style: styles2.guildImage,
-                        children: /* @__PURE__ */ jsx(Text, {
-                          variant: "text-sm/semibold",
-                          children: item.name?.slice(0, 2).toUpperCase()
-                        })
-                      })
-                    });
-                  }
-                })
-              ]
-            }),
-            /* @__PURE__ */ jsx(import_react_native23.View, {
-              style: styles2.sidebar,
-              children: screen === "messages" ? /* @__PURE__ */ jsxs(Fragment, {
-                children: [
-                  /* @__PURE__ */ jsxs(import_react_native23.View, {
-                    style: styles2.sidebarHeader,
-                    children: [
-                      /* @__PURE__ */ jsx(Text, {
-                        variant: "heading-md/semibold",
-                        style: {
-                          flex: 1
-                        },
-                        children: "Direct Messages"
-                      }),
-                      /* @__PURE__ */ jsx(Button, {
-                        size: "sm",
-                        variant: "secondary",
-                        text: "New Message",
-                        onPress: loadAllMembers
-                      })
-                    ]
-                  }),
-                  /* @__PURE__ */ jsx(import_react_native23.FlatList, {
-                    data: recentDMs,
-                    keyExtractor: (dm) => dm.channelId,
-                    renderItem: ({ item }) => /* @__PURE__ */ jsxs(PressableScale, {
-                      onPress: () => openRecentDM(item),
-                      style: styles2.dmRow,
-                      children: [
-                        /* @__PURE__ */ jsx(ApiAvatar, {
-                          user: item.recipient,
-                          size: 36
-                        }),
-                        /* @__PURE__ */ jsxs(import_react_native23.View, {
-                          style: {
-                            flex: 1
-                          },
-                          children: [
-                            /* @__PURE__ */ jsx(Text, {
-                              variant: "text-md/medium",
-                              numberOfLines: 1,
-                              children: displayName(item.recipient)
-                            }),
-                            item.recipient.bot ? /* @__PURE__ */ jsx(Text, {
-                              variant: "text-xs/normal",
-                              color: "text-muted",
-                              children: "APP"
-                            }) : null
-                          ]
-                        })
-                      ]
-                    }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native23.View, {
-                      style: styles2.listEmpty,
-                      children: /* @__PURE__ */ jsx(Text, {
-                        variant: "text-md/normal",
-                        color: "text-muted",
-                        children: "No recent direct messages. Use New Message to choose a member."
-                      })
-                    })
-                  })
-                ]
-              }) : screen === "members" ? /* @__PURE__ */ jsxs(Fragment, {
-                children: [
-                  /* @__PURE__ */ jsxs(import_react_native23.View, {
-                    style: styles2.sidebarHeader,
-                    children: [
-                      /* @__PURE__ */ jsx(Button, {
-                        size: "sm",
-                        variant: "secondary",
-                        text: "Back",
-                        onPress: openMessages
-                      }),
-                      /* @__PURE__ */ jsxs(import_react_native23.View, {
-                        style: {
-                          flex: 1
-                        },
-                        children: [
-                          /* @__PURE__ */ jsx(Text, {
-                            variant: "heading-md/semibold",
-                            children: "New Message"
-                          }),
-                          /* @__PURE__ */ jsx(Text, {
-                            variant: "text-xs/normal",
-                            color: "text-muted",
-                            children: memberStatus
-                          })
-                        ]
-                      })
-                    ]
-                  }),
-                  /* @__PURE__ */ jsx(import_react_native23.View, {
-                    style: styles2.search,
-                    children: /* @__PURE__ */ jsx(TextInput, {
-                      size: "md",
-                      value: memberSearch,
-                      placeholder: "Search members",
-                      onChange: (value) => setMemberSearch(typeof value === "string" ? value : value?.nativeEvent?.text ?? "")
-                    })
-                  }),
-                  /* @__PURE__ */ jsx(import_react_native23.FlatList, {
-                    data: filteredMembers,
-                    keyExtractor: (member, i) => member.user?.id || String(i),
-                    keyboardShouldPersistTaps: "handled",
-                    initialNumToRender: 18,
-                    maxToRenderPerBatch: 18,
-                    windowSize: 7,
-                    removeClippedSubviews: true,
-                    renderItem: ({ item }) => /* @__PURE__ */ jsxs(PressableScale, {
-                      onPress: () => openMemberDM(item),
-                      style: styles2.dmRow,
-                      children: [
-                        /* @__PURE__ */ jsx(ApiAvatar, {
-                          user: item.user,
-                          size: 36
-                        }),
-                        /* @__PURE__ */ jsxs(import_react_native23.View, {
-                          style: {
-                            flex: 1
-                          },
-                          children: [
-                            /* @__PURE__ */ jsx(Text, {
-                              variant: "text-md/medium",
-                              numberOfLines: 1,
-                              children: item.nick || displayName(item.user)
-                            }),
-                            item.nick && item.nick !== displayName(item.user) ? /* @__PURE__ */ jsx(Text, {
-                              variant: "text-xs/normal",
-                              color: "text-muted",
-                              numberOfLines: 1,
-                              children: displayName(item.user)
-                            }) : item.user?.bot ? /* @__PURE__ */ jsx(Text, {
-                              variant: "text-xs/normal",
-                              color: "text-muted",
-                              children: "APP"
-                            }) : null
-                          ]
-                        })
-                      ]
-                    }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native23.View, {
-                      style: styles2.listEmpty,
-                      children: /* @__PURE__ */ jsx(Text, {
-                        variant: "text-md/normal",
-                        color: "text-muted",
-                        children: "No members are available from the bot's servers."
-                      })
-                    })
-                  })
-                ]
-              }) : /* @__PURE__ */ jsxs(Fragment, {
-                children: [
-                  /* @__PURE__ */ jsx(import_react_native23.View, {
-                    style: styles2.sidebarHeader,
-                    children: /* @__PURE__ */ jsx(Text, {
-                      variant: "heading-md/semibold",
-                      numberOfLines: 1,
-                      children: guild?.name
-                    })
-                  }),
-                  /* @__PURE__ */ jsx(import_react_native23.FlatList, {
-                    data: [
-                      ...textChannels(null),
-                      ...categories.flatMap((cat) => [
-                        {
-                          ...cat,
-                          botcordCategory: true
-                        },
-                        ...textChannels(cat.id)
-                      ])
-                    ],
-                    keyExtractor: (item) => `${item.botcordCategory ? "cat" : "chan"}-${item.id}`,
-                    renderItem: ({ item }) => item.botcordCategory ? /* @__PURE__ */ jsx(Text, {
-                      variant: "text-xs/bold",
-                      color: "text-muted",
-                      style: styles2.category,
-                      children: String(item.name || "CATEGORY").toUpperCase()
-                    }) : /* @__PURE__ */ jsx(PressableScale, {
-                      onPress: () => openChannel(item),
-                      style: styles2.channelRow,
-                      children: /* @__PURE__ */ jsx(Text, {
-                        variant: "text-md/medium",
-                        color: "text-muted",
-                        children: item.name
-                      })
-                    }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native23.View, {
-                      style: styles2.listEmpty,
-                      children: /* @__PURE__ */ jsx(Text, {
-                        variant: "text-md/normal",
-                        color: "text-muted",
-                        children: "No message channels available."
-                      })
-                    })
-                  })
-                ]
-              })
-            })
-          ]
-        })
-      ]
-    });
-  }
-  function BotCord() {
-    var state2 = useBotCordState();
-    var [token, setToken] = (0, import_react5.useState)("");
-    var [adding, setAdding] = (0, import_react5.useState)(false);
-    var [error, setError] = (0, import_react5.useState)(null);
-    var [opened, setOpened] = (0, import_react5.useState)(false);
-    var accounts = state2.accounts;
-    var active = (0, import_react5.useMemo)(() => accounts.find((a) => a.id === state2.activeAccountId) ?? accounts[0] ?? null, [
-      accounts,
-      state2.activeAccountId
-    ]);
-    if (opened && active)
-      return /* @__PURE__ */ jsx(BotClient, {
-        accounts,
-        activeId: active.id,
-        onExit: () => setOpened(false)
-      });
-    return /* @__PURE__ */ jsx(import_react_native23.ScrollView, {
-      style: {
-        flex: 1
-      },
-      contentContainerStyle: {
-        paddingBottom: 38
-      },
-      children: /* @__PURE__ */ jsxs(Stack, {
-        style: {
-          paddingVertical: 24,
-          paddingHorizontal: 12
-        },
-        spacing: 16,
-        children: [
-          /* @__PURE__ */ jsxs(import_react_native23.View, {
-            children: [
-              /* @__PURE__ */ jsx(Text, {
-                variant: "heading-xl/bold",
-                children: "BotCord"
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-sm/normal",
-                color: "text-muted",
-                children: "Bot accounts use Discord's mobile components and stay only on this device."
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsxs(TableRowGroup, {
-            title: "Bot Accounts",
-            children: [
-              accounts.map((account) => /* @__PURE__ */ jsx(TableRow, {
-                label: account.username,
-                subLabel: state2.activeAccountId === account.id ? "Active bot" : `Bot ID: ${account.id}`,
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: findAssetId("RobotIcon") || findAssetId("AppsIcon")
-                }),
-                onPress: () => _async_to_generator(function* () {
-                  yield setActiveBotAccount(account.id);
-                  setOpened(true);
-                })(),
-                trailing: /* @__PURE__ */ jsx(Button, {
-                  size: "sm",
-                  variant: "secondary",
-                  text: "Remove",
-                  onPress: () => removeBotAccount(account.id)
-                })
-              }, account.id)),
-              !state2.loaded ? /* @__PURE__ */ jsx(TableRow, {
-                label: "Loading bot accounts"
-              }) : null,
-              state2.loaded && accounts.length === 0 ? /* @__PURE__ */ jsx(TableRow, {
-                label: "No bot accounts added yet"
-              }) : null
-            ]
-          }),
-          /* @__PURE__ */ jsx(TableRowGroup, {
-            title: "Add Bot Account",
-            children: /* @__PURE__ */ jsx(TableRow, {
-              label: /* @__PURE__ */ jsxs(import_react_native23.View, {
-                style: {
-                  width: "100%",
-                  gap: 10
-                },
-                children: [
-                  /* @__PURE__ */ jsx(TextInput, {
-                    size: "lg",
-                    value: token,
-                    placeholder: "Bot token",
-                    onChange: setToken,
-                    secureTextEntry: true,
-                    state: error ? "error" : void 0,
-                    errorMessage: error || void 0
-                  }),
-                  /* @__PURE__ */ jsx(Button, {
-                    size: "md",
-                    variant: "primary",
-                    text: "Add Bot Account",
-                    loading: adding,
-                    disabled: adding || !token.trim(),
-                    onPress: () => _async_to_generator(function* () {
-                      setAdding(true);
-                      setError(null);
-                      try {
-                        yield addBotAccount(token);
-                        setToken("");
-                      } catch (e) {
-                        setError(String(e));
-                      } finally {
-                        setAdding(false);
-                      }
-                    })()
-                  })
-                ]
-              })
-            })
-          }),
-          active ? /* @__PURE__ */ jsx(Button, {
-            size: "lg",
-            variant: "primary",
-            text: `Open as ${active.username}`,
-            onPress: () => setOpened(true)
-          }) : null
-        ]
-      })
-    });
-  }
-  var import_react5, import_react_native23, useStyles2, avatarUrl, guildIconUrl, displayName, getNativeColors;
-  var init_BotCord = __esm({
-    "src/core/ui/settings/pages/BotCord/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_assets();
-      init_botcord();
-      init_sheets();
-      init_color();
-      init_styles();
-      init_metro();
-      init_common();
-      init_components();
-      import_react5 = __toESM(require_react());
-      import_react_native23 = __toESM(require_react_native());
-      useStyles2 = createStyles({
-        root: {
-          flex: 1,
-          backgroundColor: tokens.colors.BACKGROUND_PRIMARY
-        },
-        header: {
-          minHeight: 56,
-          paddingHorizontal: 12,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-          backgroundColor: tokens.colors.BACKGROUND_PRIMARY
-        },
-        navigator: {
-          flex: 1,
-          flexDirection: "row",
-          backgroundColor: tokens.colors.BACKGROUND_SECONDARY
-        },
-        guildRail: {
-          width: 72,
-          backgroundColor: "#1e1f22",
-          paddingVertical: 8
-        },
-        sidebar: {
-          flex: 1,
-          backgroundColor: tokens.colors.BACKGROUND_SECONDARY
-        },
-        sidebarHeader: {
-          minHeight: 54,
-          paddingHorizontal: 12,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8
-        },
-        row: {
-          flexDirection: "row",
-          gap: 10,
-          paddingHorizontal: 12,
-          paddingVertical: 7
-        },
-        messageBody: {
-          flex: 1
-        },
-        nameLine: {
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 6,
-          flexWrap: "wrap"
-        },
-        composer: {
-          height: 60,
-          width: "100%",
-          paddingHorizontal: 10,
-          paddingVertical: 8,
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 8,
-          flexShrink: 0,
-          backgroundColor: tokens.colors.BACKGROUND_PRIMARY
-        },
-        category: {
-          paddingHorizontal: 12,
-          paddingTop: 14,
-          paddingBottom: 4
-        },
-        channelRow: {
-          paddingHorizontal: 12,
-          paddingVertical: 10
-        },
-        guildButton: {
-          width: 72,
-          height: 56,
-          alignItems: "center",
-          justifyContent: "center"
-        },
-        guildImage: {
-          width: 48,
-          height: 48,
-          borderRadius: 24
-        },
-        dmRow: {
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 10,
-          paddingHorizontal: 12,
-          paddingVertical: 8
-        },
-        search: {
-          paddingHorizontal: 10,
-          paddingBottom: 8
-        },
-        listEmpty: {
-          padding: 20
-        }
-      });
-      avatarUrl = (user, size = 128) => user?.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=${size}` : null;
-      guildIconUrl = (guild, size = 128) => guild?.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=${size}` : null;
-      displayName = (user) => user?.global_name || user?.username || "Unknown";
-      getNativeColors = () => ({
-        text: nativeColor(tokens.colors.TEXT_NORMAL, "#f2f3f5"),
-        muted: nativeColor(tokens.colors.TEXT_MUTED, "#b5bac1"),
-        input: nativeColor(tokens.colors.BACKGROUND_MODIFIER_ACCENT, "#2b2d31"),
-        selected: nativeColor(tokens.colors.BACKGROUND_MODIFIER_SELECTED, "#35373c"),
-        brand: nativeColor(tokens.colors.BRAND_500, "#5865f2"),
-        inverse: nativeColor(tokens.colors.WHITE_500, "#ffffff")
-      });
     }
   });
 
@@ -19652,7 +16892,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       showToast(e.message, findAssetId("Small"));
     });
   }
-  var import_react_native24, showSimpleActionSheet, handleClick, getChannelId, getChannel, url_default;
+  var import_react_native22, showSimpleActionSheet, handleClick, getChannelId, getChannel, url_default;
   var init_url = __esm({
     "src/core/plugins/quickinstall/url.tsx"() {
       "use strict";
@@ -19673,7 +16913,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_finders();
       init_wrappers();
       init_toasts();
-      import_react_native24 = __toESM(require_react_native());
+      import_react_native22 = __toESM(require_react_native());
       showSimpleActionSheet = findExports(byMutableProp("showSimpleActionSheet"));
       handleClick = findByPropsLazy("handleClick");
       ({ getChannelId } = lazyDestructure(() => channels));
@@ -19709,7 +16949,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               confirmText: Strings.INSTALL,
               cancelText: Strings.CANCEL,
               secondaryConfirmText: Strings.OPEN_IN_BROWSER,
-              onConfirmSecondary: () => import_react_native24.Linking.openURL(url2)
+              onConfirmSecondary: () => import_react_native22.Linking.openURL(url2)
             });
           }).call(this);
         }));
@@ -21099,7 +18339,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...tabInfo(tab).icons,
       "SettingsIcon"
     ]);
-    return source ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+    return source ? /* @__PURE__ */ jsx(import_react_native23.Image, {
       source,
       style: {
         width: size,
@@ -21112,7 +18352,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }) {
     var visibleStatus = status === "offline" ? "invisible" : status && Object.prototype.hasOwnProperty.call(STATUS_COLORS, status) ? status : "online";
     var label2 = visibleStatus === "invisible" ? "offline" : visibleStatus === "dnd" ? "do not disturb" : visibleStatus;
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       accessible: true,
       accessibilityLabel: `Status: ${label2}`,
       style: {
@@ -21129,13 +18369,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function StudioAvatar({ uri, fallback, name }) {
-    var [attempt, setAttempt] = (0, import_react6.useState)(0);
+    var [attempt, setAttempt] = (0, import_react4.useState)(0);
     var active = [
       uri || fallback,
       uri && uri !== fallback ? fallback : void 0
     ][attempt];
     if (active) {
-      return /* @__PURE__ */ jsx(import_react_native25.Image, {
+      return /* @__PURE__ */ jsx(import_react_native23.Image, {
         source: {
           uri: active
         },
@@ -21147,7 +18387,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }, active);
     }
     var initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         flex: 1,
         alignItems: "center",
@@ -21165,12 +18405,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function StudioBanner({ uri, fallback }) {
-    var [attempt, setAttempt] = (0, import_react6.useState)(0);
+    var [attempt, setAttempt] = (0, import_react4.useState)(0);
     var active = [
       uri || fallback,
       uri && uri !== fallback ? fallback : void 0
     ][attempt];
-    return active ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+    return active ? /* @__PURE__ */ jsx(import_react_native23.Image, {
       source: {
         uri: active
       },
@@ -21184,7 +18424,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function StudioHero({ name, username, avatar, fallbackAvatar, banner, fallbackBanner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }) {
     var tint = accent || C3.raised();
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         borderRadius: R2.lg,
         overflow: "hidden",
@@ -21193,7 +18433,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         borderColor: C3.line()
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             height: 96,
             backgroundColor: tint
@@ -21206,7 +18446,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               banner,
               fallbackBanner
             ])),
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 position: "absolute",
                 top: 12,
@@ -21220,7 +18460,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: "rgba(0,0,0,0.55)"
               },
               children: [
-                /* @__PURE__ */ jsx(import_react_native25.View, {
+                /* @__PURE__ */ jsx(import_react_native23.View, {
                   style: {
                     width: 8,
                     height: 8,
@@ -21239,14 +18479,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             paddingHorizontal: GAP.lg,
             paddingBottom: GAP.lg,
             gap: GAP.md
           },
           children: [
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 flexDirection: "row",
                 alignItems: "flex-end",
@@ -21254,13 +18494,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 marginTop: -36
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     width: 80,
                     height: 80
                   },
                   children: [
-                    /* @__PURE__ */ jsx(import_react_native25.View, {
+                    /* @__PURE__ */ jsx(import_react_native23.View, {
                       style: {
                         width: 80,
                         height: 80,
@@ -21286,7 +18526,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     })
                   ]
                 }),
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     flex: 1,
                     paddingBottom: 4
@@ -21315,7 +18555,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+            /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
               accessibilityRole: "switch",
               accessibilityLabel: "Custom profile",
               accessibilityState: {
@@ -21331,7 +18571,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: enabled ? C3.brandSoft : C3.raised()
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     flex: 1,
                     gap: 2
@@ -21358,7 +18598,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -21385,7 +18625,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function Action({ label: label2, onPress, primary, danger, disabled, grow, selected }) {
     var wrap = grow && selected === void 0;
-    return /* @__PURE__ */ jsx(import_react_native25.Pressable, {
+    return /* @__PURE__ */ jsx(import_react_native23.Pressable, {
       accessibilityRole: selected === void 0 ? "button" : "tab",
       accessibilityState: {
         disabled: !!disabled,
@@ -21418,7 +18658,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function StudioNav({ selected, onSelect }) {
-    return /* @__PURE__ */ jsx(import_react_native25.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native23.ScrollView, {
       horizontal: true,
       showsHorizontalScrollIndicator: false,
       contentContainerStyle: {
@@ -21427,7 +18667,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       },
       children: STUDIO_TABS.map((tab) => {
         var on = tab.id === selected;
-        return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+        return /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
           accessibilityRole: "tab",
           accessibilityState: {
             selected: on
@@ -21465,7 +18705,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function StudioTitle({ tab }) {
     var info = tabInfo(tab);
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
@@ -21473,7 +18713,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         paddingHorizontal: 2
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             width: 40,
             height: 40,
@@ -21488,7 +18728,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             size: 20
           })
         }),
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flex: 1
           },
@@ -21513,7 +18753,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Panel({ children, padded = true }) {
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         borderRadius: R2.lg,
         backgroundColor: C3.panel(),
@@ -21537,22 +18777,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var tileRows = [];
     for (var i1 = 0; i1 < tiles.length; i1 += 3)
       tileRows.push(tiles.slice(i1, i1 + 3));
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         gap: GAP.lg
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             gap: GAP.sm
           },
-          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
+          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native23.View, {
             style: {
               flexDirection: "row",
               gap: GAP.sm
             },
             children: [
-              row.map((stat) => /* @__PURE__ */ jsxs(import_react_native25.View, {
+              row.map((stat) => /* @__PURE__ */ jsxs(import_react_native23.View, {
                 style: {
                   flex: 1,
                   padding: GAP.md,
@@ -21589,7 +18829,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   })
                 ]
               }, stat.label)),
-              row.length === 1 ? /* @__PURE__ */ jsx(import_react_native25.View, {
+              row.length === 1 ? /* @__PURE__ */ jsx(import_react_native23.View, {
                 style: {
                   flex: 1
                 }
@@ -21599,14 +18839,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }),
         /* @__PURE__ */ jsxs(Panel, {
           children: [
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 flexDirection: "row",
                 alignItems: "center",
                 gap: GAP.md
               },
               children: [
-                /* @__PURE__ */ jsx(import_react_native25.View, {
+                /* @__PURE__ */ jsx(import_react_native23.View, {
                   style: {
                     width: 56,
                     height: 56,
@@ -21627,7 +18867,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     ]
                   })
                 }),
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     flex: 1,
                     gap: 2
@@ -21656,11 +18896,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            todo.length ? /* @__PURE__ */ jsx(import_react_native25.View, {
+            todo.length ? /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 gap: GAP.xs
               },
-              children: todo.map((task) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+              children: todo.map((task) => /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
                 accessibilityRole: "button",
                 onPress: () => onSelect(task.tab),
                 style: ({ pressed }) => ({
@@ -21672,7 +18912,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: pressed ? C3.raised() : "transparent"
                 }),
                 children: [
-                  /* @__PURE__ */ jsx(import_react_native25.View, {
+                  /* @__PURE__ */ jsx(import_react_native23.View, {
                     style: {
                       width: 20,
                       height: 20,
@@ -21701,17 +18941,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }) : null
           ]
         }),
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             gap: GAP.sm
           },
-          children: tileRows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
+          children: tileRows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native23.View, {
             style: {
               flexDirection: "row",
               gap: GAP.sm
             },
             children: [
-              row.map((tab) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+              row.map((tab) => /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
                 accessibilityRole: "button",
                 onPress: () => onSelect(tab.id),
                 style: ({ pressed }) => ({
@@ -21726,7 +18966,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   justifyContent: "space-between"
                 }),
                 children: [
-                  /* @__PURE__ */ jsx(import_react_native25.View, {
+                  /* @__PURE__ */ jsx(import_react_native23.View, {
                     style: {
                       width: 32,
                       height: 32,
@@ -21752,7 +18992,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }, tab.id)),
               Array.from({
                 length: 3 - row.length
-              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native25.View, {
+              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native23.View, {
                 style: {
                   flex: 1
                 }
@@ -21764,7 +19004,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Switch({ value }) {
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         width: 44,
         height: 26,
@@ -21773,7 +19013,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: value ? C3.green : C3.off,
         alignItems: value ? "flex-end" : "flex-start"
       },
-      children: /* @__PURE__ */ jsx(import_react_native25.View, {
+      children: /* @__PURE__ */ jsx(import_react_native23.View, {
         style: {
           width: 20,
           height: 20,
@@ -21784,7 +19024,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Toggle({ label: label2, subLabel, value, onPress }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
       accessibilityRole: "switch",
       accessibilityState: {
         checked: value
@@ -21801,7 +19041,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: pressed ? C3.raised() : C3.page()
       }),
       children: [
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flex: 1,
             gap: 2
@@ -21830,7 +19070,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PickRow({ label: label2, subLabel, value, onPress }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
       accessibilityRole: "button",
       onPress,
       style: ({ pressed }) => ({
@@ -21842,7 +19082,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: pressed ? C3.raised() : C3.page()
       }),
       children: [
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flex: 1,
             gap: 2
@@ -21884,8 +19124,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Input({ value, defaultValue, onChangeText, style, multiline, ...props }) {
-    var [focused, setFocused] = (0, import_react6.useState)(false);
-    return /* @__PURE__ */ jsx(import_react_native25.TextInput, {
+    var [focused, setFocused] = (0, import_react4.useState)(false);
+    return /* @__PURE__ */ jsx(import_react_native23.TextInput, {
       ...props,
       value,
       defaultValue: value === void 0 ? defaultValue : void 0,
@@ -21918,7 +19158,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Row({ label: label2, subLabel, icon: icon3, trailing, value, arrow, selected, onPress }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+    return /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
       accessibilityRole: "button",
       accessibilityState: {
         selected: !!selected
@@ -21937,7 +19177,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }),
       children: [
         icon3,
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flex: 1,
             gap: 2
@@ -21987,7 +19227,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function RowIcon({ source }) {
-    return source ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+    return source ? /* @__PURE__ */ jsx(import_react_native23.Image, {
       source,
       style: {
         width: 24,
@@ -22010,19 +19250,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Section({ title, description, children }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         gap: GAP.md
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flexDirection: "row",
             alignItems: "center",
             gap: GAP.sm
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native25.View, {
+            /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 width: 4,
                 height: 18,
@@ -22047,7 +19287,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           children: description
         }) : null,
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             gap: GAP.md
           },
@@ -22057,7 +19297,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Divider() {
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         height: 1,
         backgroundColor: C3.line()
@@ -22065,7 +19305,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Field({ label: label2, hint, error, children }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         gap: 6
       },
@@ -22096,7 +19336,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Chips({ options, value, onChange }) {
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       accessibilityRole: "radiogroup",
       style: {
         flexDirection: "row",
@@ -22105,7 +19345,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       },
       children: options.map((option) => {
         var on = option.value === value;
-        return /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+        return /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
           accessibilityRole: "radio",
           accessibilityState: {
             checked: on
@@ -22123,7 +19363,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             borderColor: on ? C3.brand : C3.line()
           },
           children: [
-            option.dot ? /* @__PURE__ */ jsx(import_react_native25.View, {
+            option.dot ? /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 width: 10,
                 height: 10,
@@ -22144,7 +19384,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Tick() {
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         position: "absolute",
         top: 6,
@@ -22166,7 +19406,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function CurrentRow({ label: label2, image, wide, onRemove }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
@@ -22179,7 +19419,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         minHeight: 56
       },
       children: [
-        label2 && image ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+        label2 && image ? /* @__PURE__ */ jsx(import_react_native23.Image, {
           source: {
             uri: image
           },
@@ -22190,7 +19430,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             borderRadius: 8
           }
         }) : null,
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flex: 1,
             gap: 2
@@ -22213,7 +19453,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        label2 ? /* @__PURE__ */ jsx(import_react_native25.Pressable, {
+        label2 ? /* @__PURE__ */ jsx(import_react_native23.Pressable, {
           accessibilityRole: "button",
           onPress: onRemove,
           style: {
@@ -22239,16 +19479,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var _loop2 = function(item2) {
       cells.push(cell(keyOf(item2), labelOf2(item2), imageOf(item2), isSelected(item2), () => onPick(item2)));
     };
-    var [query, setQuery] = (0, import_react6.useState)("");
-    var [limit, setLimit] = (0, import_react6.useState)(18);
+    var [query, setQuery] = (0, import_react4.useState)("");
+    var [limit, setLimit] = (0, import_react4.useState)(18);
     var needle = query.trim().toLowerCase();
-    var filtered = (0, import_react6.useMemo)(() => needle ? items.filter((item2) => labelOf2(item2).toLowerCase().includes(needle)) : items, [
+    var filtered = (0, import_react4.useMemo)(() => needle ? items.filter((item2) => labelOf2(item2).toLowerCase().includes(needle)) : items, [
       items,
       needle
     ]);
     var columns = wide ? 2 : 3;
     var cells = [];
-    var cell = (key, label2, image, selected, onPress, none = false) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+    var cell = (key, label2, image, selected, onPress, none = false) => /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
       accessibilityRole: "button",
       accessibilityState: {
         selected
@@ -22265,7 +19505,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         gap: 6
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             width: "100%",
             aspectRatio: wide ? 4 : 1,
@@ -22281,7 +19521,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               color: C3.muted()
             },
             children: "\u2205"
-          }) : image ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+          }) : image ? /* @__PURE__ */ jsx(import_react_native23.Image, {
             source: {
               uri: image
             },
@@ -22312,7 +19552,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         children: "Loading Discord's catalog\u2026"
       });
     if (status?.error)
-      return /* @__PURE__ */ jsxs(import_react_native25.View, {
+      return /* @__PURE__ */ jsxs(import_react_native23.View, {
         style: {
           gap: GAP.sm
         },
@@ -22337,7 +19577,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var rows = [];
     for (var i = 0; i < cells.length; i += columns)
       rows.push(cells.slice(i, i + columns));
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         gap: GAP.md
       },
@@ -22351,11 +19591,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             setLimit(18);
           }
         }),
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             gap: GAP.sm
           },
-          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
+          children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native23.View, {
             style: {
               flexDirection: "row",
               gap: GAP.sm
@@ -22364,7 +19604,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               row,
               Array.from({
                 length: columns - row.length
-              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native25.View, {
+              }, (_2, i2) => /* @__PURE__ */ jsx(import_react_native23.View, {
                 style: {
                   flex: 1
                 }
@@ -22394,17 +19634,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var rows = [];
     for (var i = 0; i < items.length; i += 2)
       rows.push(items.slice(i, i + 2));
-    return /* @__PURE__ */ jsx(import_react_native25.View, {
+    return /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         gap: GAP.sm
       },
-      children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native25.View, {
+      children: rows.map((row, index) => /* @__PURE__ */ jsxs(import_react_native23.View, {
         style: {
           flexDirection: "row",
           gap: GAP.sm
         },
         children: [
-          row.map((item) => /* @__PURE__ */ jsxs(import_react_native25.Pressable, {
+          row.map((item) => /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
             accessibilityRole: "checkbox",
             accessibilityState: {
               checked: item.active
@@ -22424,7 +19664,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               backgroundColor: item.active ? C3.brandSoft : C3.page()
             },
             children: [
-              item.icon ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+              item.icon ? /* @__PURE__ */ jsx(import_react_native23.Image, {
                 source: {
                   uri: item.icon
                 },
@@ -22433,7 +19673,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   height: 24
                 },
                 resizeMode: "contain"
-              }) : /* @__PURE__ */ jsx(import_react_native25.View, {
+              }) : /* @__PURE__ */ jsx(import_react_native23.View, {
                 style: {
                   width: 24,
                   height: 24
@@ -22450,7 +19690,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               })
             ]
           }, item.key)),
-          row.length === 1 ? /* @__PURE__ */ jsx(import_react_native25.View, {
+          row.length === 1 ? /* @__PURE__ */ jsx(import_react_native23.View, {
             style: {
               flex: 1
             }
@@ -22460,7 +19700,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PreviewTag({ label: label2, icon: icon3 }) {
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
@@ -22471,7 +19711,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: C3.line()
       },
       children: [
-        icon3 ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+        icon3 ? /* @__PURE__ */ jsx(import_react_native23.Image, {
           source: {
             uri: icon3
           },
@@ -22493,7 +19733,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PreviewNameplate({ uri }) {
-    return /* @__PURE__ */ jsx(import_react_native25.Image, {
+    return /* @__PURE__ */ jsx(import_react_native23.Image, {
       source: {
         uri
       },
@@ -22511,7 +19751,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function PreviewCosmetics({ frame, effect }) {
     if (!frame && !effect)
       return null;
-    var chip = (label2, value) => /* @__PURE__ */ jsx(import_react_native25.View, {
+    var chip = (label2, value) => /* @__PURE__ */ jsx(import_react_native23.View, {
       style: {
         paddingHorizontal: 8,
         paddingVertical: 3,
@@ -22530,7 +19770,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ]
       })
     });
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -22543,10 +19783,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon, onBadges, onSaved }) {
-    var [layout, setLayout] = (0, import_react6.useState)("Profile");
+    var [layout, setLayout] = (0, import_react4.useState)("Profile");
     var edge = primary || C3.page();
     var card = C3.page();
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         gap: GAP.sm
       },
@@ -22558,7 +19798,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           },
           children: "Live preview"
         }),
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             flexDirection: "row",
             gap: GAP.sm
@@ -22575,7 +19815,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             onPress: () => setLayout(mode)
           }, mode))
         }),
-        layout === "Chat" ? /* @__PURE__ */ jsxs(import_react_native25.View, {
+        layout === "Chat" ? /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flexDirection: "row",
             gap: GAP.md,
@@ -22584,13 +19824,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             backgroundColor: card
           },
           children: [
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 width: 38,
                 height: 38
               },
               children: [
-                /* @__PURE__ */ jsx(import_react_native25.View, {
+                /* @__PURE__ */ jsx(import_react_native23.View, {
                   style: {
                     width: 38,
                     height: 38,
@@ -22606,7 +19846,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     fallbackAvatar
                   ]))
                 }),
-                decoration ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+                decoration ? /* @__PURE__ */ jsx(import_react_native23.Image, {
                   source: {
                     uri: decoration
                   },
@@ -22622,13 +19862,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 }) : null
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 flex: 1,
                 gap: 4
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
@@ -22684,14 +19924,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           officialBadgeIcon,
           frame,
           effect
-        }) : /* @__PURE__ */ jsxs(import_react_native25.View, {
+        }) : /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             borderRadius: R2.lg,
             padding: 3,
             backgroundColor: edge
           },
           children: [
-            primary && accent && accent !== primary ? /* @__PURE__ */ jsx(import_react_native25.View, {
+            primary && accent && accent !== primary ? /* @__PURE__ */ jsx(import_react_native23.View, {
               pointerEvents: "none",
               style: {
                 position: "absolute",
@@ -22704,7 +19944,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 backgroundColor: accent
               }
             }) : null,
-            /* @__PURE__ */ jsx(import_react_native25.View, {
+            /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 height: 88,
                 borderTopLeftRadius: R2.lg - 3,
@@ -22720,7 +19960,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 fallbackBanner
               ]))
             }),
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 backgroundColor: card,
                 borderBottomLeftRadius: R2.lg - 3,
@@ -22730,7 +19970,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 gap: 6
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     position: "absolute",
                     top: -42,
@@ -22739,7 +19979,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     height: 84
                   },
                   children: [
-                    /* @__PURE__ */ jsx(import_react_native25.View, {
+                    /* @__PURE__ */ jsx(import_react_native23.View, {
                       style: {
                         width: 84,
                         height: 84,
@@ -22758,7 +19998,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         fallbackAvatar
                       ]))
                     }),
-                    decoration ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+                    decoration ? /* @__PURE__ */ jsx(import_react_native23.Image, {
                       source: {
                         uri: decoration
                       },
@@ -22777,7 +20017,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     })
                   ]
                 }),
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
@@ -22818,13 +20058,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     pronouns ? ` \xB7 ${pronouns}` : ""
                   ]
                 }),
-                badges.length ? /* @__PURE__ */ jsx(import_react_native25.View, {
+                badges.length ? /* @__PURE__ */ jsx(import_react_native23.View, {
                   style: {
                     flexDirection: "row",
                     flexWrap: "wrap",
                     gap: 6
                   },
-                  children: badges.map((uri) => /* @__PURE__ */ jsx(import_react_native25.Image, {
+                  children: badges.map((uri) => /* @__PURE__ */ jsx(import_react_native23.Image, {
                     source: {
                       uri
                     },
@@ -22844,7 +20084,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: customStatus
                 }) : null,
-                activity?.name ? /* @__PURE__ */ jsxs(import_react_native25.View, {
+                activity?.name ? /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     padding: GAP.sm,
                     borderRadius: R2.sm,
@@ -22893,7 +20133,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             flexDirection: "row",
             flexWrap: "wrap",
@@ -22939,14 +20179,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var colors = palette();
     var ring = themed ? colors.panel : colors.page;
     var themedSurface = colors === LIGHT ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.55)";
-    var inner = /* @__PURE__ */ jsxs(import_react_native25.View, {
+    var inner = /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         borderRadius: themed ? 6 : 10,
         overflow: "hidden",
         backgroundColor: themed ? themedSurface : colors.page
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             height: 96,
             backgroundColor: bannerColor || primary || colors.raised
@@ -22959,7 +20199,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             fallbackBanner
           ]))
         }),
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             position: "absolute",
             top: 54,
@@ -22968,7 +20208,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             height: 84
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native25.View, {
+            /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 width: 84,
                 height: 84,
@@ -22987,7 +20227,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 fallbackAvatar
               ]))
             }),
-            decoration ? /* @__PURE__ */ jsx(import_react_native25.Image, {
+            decoration ? /* @__PURE__ */ jsx(import_react_native23.Image, {
               source: {
                 uri: decoration
               },
@@ -23007,13 +20247,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        badges.length ? /* @__PURE__ */ jsx(import_react_native25.View, {
+        badges.length ? /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             marginTop: 8,
             marginLeft: 110,
             marginRight: 10
           },
-          children: /* @__PURE__ */ jsx(import_react_native25.View, {
+          children: /* @__PURE__ */ jsx(import_react_native23.View, {
             style: {
               alignSelf: "flex-end",
               flexDirection: "row",
@@ -23026,7 +20266,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               borderRadius: 8,
               backgroundColor: colors.panel
             },
-            children: badges.map((icon3, index) => /* @__PURE__ */ jsx(import_react_native25.Image, {
+            children: badges.map((icon3, index) => /* @__PURE__ */ jsx(import_react_native23.Image, {
               source: {
                 uri: icon3
               },
@@ -23039,7 +20279,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }, index))
           })
         }) : null,
-        /* @__PURE__ */ jsxs(import_react_native25.View, {
+        /* @__PURE__ */ jsxs(import_react_native23.View, {
           style: {
             paddingHorizontal: 14,
             paddingBottom: 14,
@@ -23047,7 +20287,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             gap: 10
           },
           children: [
-            /* @__PURE__ */ jsxs(import_react_native25.View, {
+            /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 gap: 2,
                 borderRadius: 8,
@@ -23065,7 +20305,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: name
                 }),
-                /* @__PURE__ */ jsxs(import_react_native25.View, {
+                /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     flexDirection: "row",
                     alignItems: "center",
@@ -23102,7 +20342,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               ]
             }),
-            customStatus ? /* @__PURE__ */ jsx(import_react_native25.View, {
+            customStatus ? /* @__PURE__ */ jsx(import_react_native23.View, {
               style: {
                 alignSelf: "flex-start",
                 maxWidth: "100%",
@@ -23120,7 +20360,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 children: customStatus
               })
             }) : null,
-            bio || activity?.name ? /* @__PURE__ */ jsxs(import_react_native25.View, {
+            bio || activity?.name ? /* @__PURE__ */ jsxs(import_react_native23.View, {
               style: {
                 gap: 8,
                 padding: 10,
@@ -23136,7 +20376,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   },
                   children: bio
                 }) : null,
-                activity?.name ? /* @__PURE__ */ jsxs(import_react_native25.View, {
+                activity?.name ? /* @__PURE__ */ jsxs(import_react_native23.View, {
                   style: {
                     gap: 1
                   },
@@ -23177,14 +20417,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
     if (!themed)
-      return /* @__PURE__ */ jsx(import_react_native25.View, {
+      return /* @__PURE__ */ jsx(import_react_native23.View, {
         style: {
           borderRadius: 10,
           overflow: "hidden"
         },
         children: inner
       });
-    return /* @__PURE__ */ jsxs(import_react_native25.View, {
+    return /* @__PURE__ */ jsxs(import_react_native23.View, {
       style: {
         borderRadius: 10,
         overflow: "hidden",
@@ -23192,7 +20432,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         backgroundColor: primary
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native25.View, {
+        /* @__PURE__ */ jsx(import_react_native23.View, {
           style: {
             position: "absolute",
             left: 0,
@@ -23206,15 +20446,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react6, import_react_native25, DARK, LIGHT, palette, C3, R2, GAP, STUDIO_TABS, tabInfo, STATUS_COLORS;
+  var import_react4, import_react_native23, DARK, LIGHT, palette, C3, R2, GAP, STUDIO_TABS, tabInfo, STATUS_COLORS;
   var init_ProfileStudio = __esm({
     "src/core/ui/settings/components/ProfileStudio.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_jsxRuntime();
-      import_react6 = __toESM(require_react());
-      import_react_native25 = __toESM(require_react_native());
+      import_react4 = __toESM(require_react());
+      import_react_native23 = __toESM(require_react_native());
       init_components();
       init_assets();
       init_metro();
@@ -23429,10 +20669,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function LocalProfiles({ badges, refresh, nitroOptions = [], boostOptions = [], giftOptions = [] }) {
     var state2 = settings;
-    var [, redraw] = (0, import_react7.useReducer)((x2) => x2 + 1, 0);
-    var [id, setId] = (0, import_react7.useState)("");
-    var [editing, setEditing] = (0, import_react7.useState)(null);
-    var [draft, setDraft] = (0, import_react7.useState)({});
+    var [, redraw] = (0, import_react5.useReducer)((x2) => x2 + 1, 0);
+    var [id, setId] = (0, import_react5.useState)("");
+    var [editing, setEditing] = (0, import_react5.useState)(null);
+    var [draft, setDraft] = (0, import_react5.useState)({});
     var saved = state2.cloudcordLocalProfiles || {};
     var ids = Object.keys(saved);
     var validId = /^\d{15,22}$/.test(id.trim());
@@ -23456,7 +20696,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "banner"
       ]) {
         if (draft[field] && !/^https:\/\//i.test(draft[field]))
-          return import_react_native26.Alert.alert("Image link needed", "Use an HTTPS image link for the picture and banner.");
+          return import_react_native24.Alert.alert("Image link needed", "Use an HTTPS image link for the picture and banner.");
       }
       var clean = Object.fromEntries(Object.entries(draft).filter(([, value]) => value !== "" && value !== void 0 && value !== null));
       state2.cloudcordLocalProfiles = {
@@ -23468,9 +20708,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
       refresh();
       redraw();
-      import_react_native26.Alert.alert("Saved on this device", "Open their profile to see it. Nobody else sees these changes.");
+      import_react_native24.Alert.alert("Saved on this device", "Open their profile to see it. Nobody else sees these changes.");
     };
-    var restore = (target2) => import_react_native26.Alert.alert("Restore this profile?", "Your changes for this person are removed. Their real profile stays as it is.", [
+    var restore = (target2) => import_react_native24.Alert.alert("Restore this profile?", "Your changes for this person are removed. Their real profile stays as it is.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -23520,7 +20760,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
     var target = editing ? labelOf(editing, draft) : null;
-    return /* @__PURE__ */ jsxs(import_react_native26.View, {
+    return /* @__PURE__ */ jsxs(import_react_native24.View, {
       style: {
         gap: 24
       },
@@ -23567,7 +20807,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 data.avatar ? "Picture" : "",
                 data.bio ? "Bio" : ""
               ].filter(Boolean).join(" \xB7 ");
-              return /* @__PURE__ */ jsxs(import_react_native26.Pressable, {
+              return /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
                 accessibilityRole: "button",
                 onPress: () => open(userId),
                 style: {
@@ -23581,7 +20821,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: "rgba(0,0,0,0.25)"
                 },
                 children: [
-                  avatar ? /* @__PURE__ */ jsx(import_react_native26.Image, {
+                  avatar ? /* @__PURE__ */ jsx(import_react_native24.Image, {
                     source: {
                       uri: avatar
                     },
@@ -23590,7 +20830,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       height: 40,
                       borderRadius: 20
                     }
-                  }) : /* @__PURE__ */ jsx(import_react_native26.View, {
+                  }) : /* @__PURE__ */ jsx(import_react_native24.View, {
                     style: {
                       width: 40,
                       height: 40,
@@ -23598,7 +20838,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       backgroundColor: "#4E5058"
                     }
                   }),
-                  /* @__PURE__ */ jsxs(import_react_native26.View, {
+                  /* @__PURE__ */ jsxs(import_react_native24.View, {
                     style: {
                       flex: 1,
                       gap: 2
@@ -23622,7 +20862,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native26.Pressable, {
+                  /* @__PURE__ */ jsx(import_react_native24.Pressable, {
                     accessibilityRole: "button",
                     accessibilityLabel: "Restore " + label2.name,
                     onPress: () => restore(userId),
@@ -23764,7 +21004,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 })
               })
             }),
-            /* @__PURE__ */ jsxs(import_react_native26.View, {
+            /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
                 gap: 8
               },
@@ -23793,15 +21033,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react7, import_react_native26, hexToNumber, numberToHex;
+  var import_react5, import_react_native24, hexToNumber, numberToHex;
   var init_LocalProfiles = __esm({
     "src/core/ui/settings/components/LocalProfiles.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_jsxRuntime();
-      import_react7 = __toESM(require_react());
-      import_react_native26 = __toESM(require_react_native());
+      import_react5 = __toESM(require_react());
+      import_react_native24 = __toESM(require_react_native());
       init_components();
       init_metro();
       init_settings();
@@ -23822,12 +21062,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function CustomBadgeBeta() {
     var open = () => _async_to_generator(function* () {
       try {
-        yield import_react_native27.Linking.openURL("https://getcloudcord.com/upload");
+        yield import_react_native25.Linking.openURL("https://getcloudcord.com/upload");
       } catch (e) {
-        import_react_native27.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser.");
+        import_react_native25.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser.");
       }
     })();
-    return /* @__PURE__ */ jsxs(import_react_native27.View, {
+    return /* @__PURE__ */ jsxs(import_react_native25.View, {
       style: {
         gap: 14
       },
@@ -23849,7 +21089,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react_native27;
+  var import_react_native25;
   var init_CustomBadgeBeta = __esm({
     "src/core/ui/settings/components/CustomBadgeBeta.tsx"() {
       "use strict";
@@ -23857,7 +21097,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
-      import_react_native27 = __toESM(require_react_native());
+      import_react_native25 = __toESM(require_react_native());
       init_components();
       init_ProfileStudio();
     }
@@ -23870,11 +21110,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     CustomSocialEditor: () => CustomSocialEditor
   });
   function Picture({ uri, banner = false }) {
-    var [failed, setFailed] = (0, import_react8.useState)(false);
-    (0, import_react8.useEffect)(() => setFailed(false), [
+    var [failed, setFailed] = (0, import_react6.useState)(false);
+    (0, import_react6.useEffect)(() => setFailed(false), [
       uri
     ]);
-    return uri && !failed ? /* @__PURE__ */ jsx(import_react_native28.Image, {
+    return uri && !failed ? /* @__PURE__ */ jsx(import_react_native26.Image, {
       source: {
         uri
       },
@@ -23891,11 +21131,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function CustomSocialDetail({ entry, onRemove }) {
     var connection = "service" in entry;
-    var [linkError, setLinkError] = (0, import_react8.useState)("");
+    var [linkError, setLinkError] = (0, import_react6.useState)("");
     var openLink = (url2) => {
-      void import_react_native28.Linking.openURL(url2).catch(() => setLinkError("Couldn't open this link. Try opening it in your browser."));
+      void import_react_native26.Linking.openURL(url2).catch(() => setLinkError("Couldn't open this link. Try opening it in your browser."));
     };
-    return /* @__PURE__ */ jsxs(import_react_native28.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native26.ScrollView, {
       contentContainerStyle: {
         padding: 16,
         gap: 14
@@ -23905,7 +21145,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           uri: entry.banner,
           banner: true
         }),
-        /* @__PURE__ */ jsxs(import_react_native28.View, {
+        /* @__PURE__ */ jsxs(import_react_native26.View, {
           style: {
             flexDirection: "row",
             alignItems: "center",
@@ -23915,7 +21155,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             /* @__PURE__ */ jsx(Picture, {
               uri: entry.avatar
             }),
-            /* @__PURE__ */ jsxs(import_react_native28.View, {
+            /* @__PURE__ */ jsxs(import_react_native26.View, {
               style: {
                 flex: 1
               },
@@ -23949,7 +21189,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           color: "text-normal",
           children: entry.bio
         }),
-        !connection && /* @__PURE__ */ jsxs(import_react_native28.View, {
+        !connection && /* @__PURE__ */ jsxs(import_react_native26.View, {
           style: {
             gap: 8
           },
@@ -23982,20 +21222,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }) : null
           ]
         }),
-        !connection && /* @__PURE__ */ jsx(import_react_native28.View, {
+        !connection && /* @__PURE__ */ jsx(import_react_native26.View, {
           style: {
             flexDirection: "row",
             gap: 8,
             flexWrap: "wrap"
           },
-          children: entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+          children: entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native26.View, {
             style: {
               flexDirection: "row",
               gap: 4,
               alignItems: "center"
             },
             children: [
-              badge.icon ? /* @__PURE__ */ jsx(import_react_native28.Image, {
+              badge.icon ? /* @__PURE__ */ jsx(import_react_native26.Image, {
                 source: {
                   uri: badge.icon
                 },
@@ -24013,7 +21253,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }),
         connection && /* @__PURE__ */ jsxs(Fragment, {
           children: [
-            entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+            entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native26.View, {
               children: [
                 /* @__PURE__ */ jsx(Text, {
                   color: "text-muted",
@@ -24072,7 +21312,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       });
   }
   function Input2({ label: label2, value, onChange }) {
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native26.View, {
       style: {
         gap: 4
       },
@@ -24090,20 +21330,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function CustomSocialEditor({ data, onChange, resolveUser }) {
-    var [selected, setSelected] = (0, import_react8.useState)(null), [error, setError] = (0, import_react8.useState)(""), [loading, setLoading] = (0, import_react8.useState)(false);
-    var [accountQuery, setAccountQuery] = (0, import_react8.useState)(""), [itemQuery, setItemQuery] = (0, import_react8.useState)("");
-    var [matches, setMatches] = (0, import_react8.useState)([]);
+    var [selected, setSelected] = (0, import_react6.useState)(null), [error, setError] = (0, import_react6.useState)(""), [loading, setLoading] = (0, import_react6.useState)(false);
+    var [accountQuery, setAccountQuery] = (0, import_react6.useState)(""), [itemQuery, setItemQuery] = (0, import_react6.useState)("");
+    var [matches, setMatches] = (0, import_react6.useState)([]);
     var navigation2 = NavigationNative.useNavigation();
     var friends = [], connections = data.customConnections || [];
     var entry = [
       ...friends,
       ...connections
     ].find((item) => item.id === selected);
-    var latest = (0, import_react8.useRef)(data);
+    var latest = (0, import_react6.useRef)(data);
     latest.current = data;
-    var activeSelection = (0, import_react8.useRef)(selected);
+    var activeSelection = (0, import_react6.useRef)(selected);
     activeSelection.current = selected;
-    var alive = (0, import_react8.useRef)(true);
+    var alive = (0, import_react6.useRef)(true);
     var reportLookupError = (before3, message) => {
       var current = [
         ...latest.current.customFriends || [],
@@ -24115,13 +21355,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         return;
       setError(message);
     };
-    (0, import_react8.useEffect)(() => {
+    (0, import_react6.useEffect)(() => {
       alive.current = true;
       return () => {
         alive.current = false;
       };
     }, []);
-    (0, import_react8.useEffect)(() => {
+    (0, import_react6.useEffect)(() => {
       setAccountQuery("");
       setItemQuery("");
       setMatches([]);
@@ -24210,7 +21450,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         customFriends: items
       });
     };
-    return /* @__PURE__ */ jsxs(import_react_native28.View, {
+    return /* @__PURE__ */ jsxs(import_react_native26.View, {
       style: {
         padding: 14,
         gap: 12
@@ -24233,7 +21473,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         [
           ...friends,
           ...connections
-        ].map((item) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+        ].map((item) => /* @__PURE__ */ jsxs(import_react_native26.View, {
           style: {
             gap: 8,
             paddingVertical: 12,
@@ -24255,7 +21495,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 setError("");
               }
             }),
-            /* @__PURE__ */ jsxs(import_react_native28.View, {
+            /* @__PURE__ */ jsxs(import_react_native26.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -24295,7 +21535,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }, item.id)),
-        entry && /* @__PURE__ */ jsxs(import_react_native28.View, {
+        entry && /* @__PURE__ */ jsxs(import_react_native26.View, {
           style: {
             gap: 10
           },
@@ -24349,7 +21589,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   subLabel: customConnectionServiceName(entry.service),
                   onPress: () => navigation2.push("PUPU_CUSTOM_PAGE", {
                     title: "Connection service",
-                    render: () => /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
+                    render: () => /* @__PURE__ */ jsx(import_react_native26.ScrollView, {
                       children: [
                         "steam",
                         "youtube",
@@ -24467,7 +21707,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }),
             !("service" in entry) && /* @__PURE__ */ jsxs(Fragment, {
               children: [
-                entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+                entry.badges.map((badge, index) => /* @__PURE__ */ jsxs(import_react_native26.View, {
                   style: {
                     gap: 6
                   },
@@ -24517,7 +21757,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }),
             "service" in entry && /* @__PURE__ */ jsxs(Fragment, {
               children: [
-                entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+                entry.details.map((detail, index) => /* @__PURE__ */ jsxs(import_react_native26.View, {
                   style: {
                     gap: 6
                   },
@@ -24567,7 +21807,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        entry && "service" in entry && /* @__PURE__ */ jsxs(import_react_native28.View, {
+        entry && "service" in entry && /* @__PURE__ */ jsxs(import_react_native26.View, {
           style: {
             gap: 10
           },
@@ -24616,7 +21856,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   });
               }
             }, item.id)),
-            (entry.items || []).map((item, index) => /* @__PURE__ */ jsxs(import_react_native28.View, {
+            (entry.items || []).map((item, index) => /* @__PURE__ */ jsxs(import_react_native26.View, {
               style: {
                 gap: 6
               },
@@ -24701,7 +21941,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_react8, import_react_native28, createId;
+  var import_react6, import_react_native26, createId;
   var init_CustomSocial = __esm({
     "src/core/ui/settings/components/CustomSocial.tsx"() {
       "use strict";
@@ -24714,8 +21954,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_metro();
       init_components();
       init_ProfileStudio();
-      import_react8 = __toESM(require_react());
-      import_react_native28 = __toESM(require_react_native());
+      import_react6 = __toESM(require_react());
+      import_react_native26 = __toESM(require_react_native());
       createId = () => `custom-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
     }
   });
@@ -24789,8 +22029,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function TableRadioGroup2({ title, value, onChange, children }) {
     var list = (Array.isArray(children) ? children.flat() : [
       children
-    ]).filter(import_react9.isValidElement);
-    return /* @__PURE__ */ jsxs(import_react_native29.View, {
+    ]).filter(import_react7.isValidElement);
+    return /* @__PURE__ */ jsxs(import_react_native27.View, {
       style: {
         gap: 8
       },
@@ -24800,7 +22040,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           color: "text-muted",
           children: String(title).toUpperCase()
         }) : null,
-        list.map((child) => /* @__PURE__ */ (0, import_react9.cloneElement)(child, {
+        list.map((child) => /* @__PURE__ */ (0, import_react7.cloneElement)(child, {
           selected: child.props.value === value,
           onPress: () => onChange(child.props.value)
         }))
@@ -24953,7 +22193,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return _async_to_generator(function* () {
       if (globalThis.__CLOUDCORD_LOADER__?.loaderName !== "RealCord")
         return;
-      var reader = import_react_native29.NativeModules.FileReaderModule ?? import_react_native29.NativeModules.RCTFileReaderModule;
+      var reader = import_react_native27.NativeModules.FileReaderModule ?? import_react_native27.NativeModules.RCTFileReaderModule;
       if (typeof reader?.readAsDataURL !== "function")
         return;
       try {
@@ -25611,7 +22851,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return;
     sharedRenderTimer = setTimeout(() => {
       sharedRenderTimer = null;
-      if (import_react_native29.AppState.currentState !== "active")
+      if (import_react_native27.AppState.currentState !== "active")
         return;
       for (var refresh of identityRefreshers) {
         try {
@@ -25647,7 +22887,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function requestSharedProfile(userId, force = false) {
     var id = String(userId || "");
-    if (import_react_native29.AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId)
+    if (import_react_native27.AppState.currentState !== "active" || !/^\d{15,22}$/.test(id) || id === currentUserId)
       return false;
     var now = Date.now();
     var seenAt = sharedProfileSeenAt.get(id);
@@ -25806,7 +23046,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         if (!action || props?.__cloudcordRealProfileMenu)
           return rendered;
         if (Array.isArray(props?.options))
-          return /* @__PURE__ */ (0, import_react9.cloneElement)(rendered, {
+          return /* @__PURE__ */ (0, import_react7.cloneElement)(rendered, {
             __cloudcordRealProfileMenu: true,
             options: [
               ...props.options,
@@ -25815,11 +23055,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           });
         if (!props?.children)
           return rendered;
-        return /* @__PURE__ */ (0, import_react9.cloneElement)(rendered, {
+        return /* @__PURE__ */ (0, import_react7.cloneElement)(rendered, {
           __cloudcordRealProfileMenu: true,
           children: [
             props.children,
-            /* @__PURE__ */ (0, import_react9.createElement)(TableRow, {
+            /* @__PURE__ */ (0, import_react7.createElement)(TableRow, {
               key: "cloudcord-profile-view",
               label: action.label,
               onPress: action.onPress
@@ -25873,7 +23113,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return value;
   }
   function refreshSharedProfiles() {
-    if (import_react_native29.AppState.currentState !== "active")
+    if (import_react_native27.AppState.currentState !== "active")
       return;
     var now = Date.now();
     var budget = 4;
@@ -26722,7 +23962,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function refreshPublishedBadges(force = false) {
     return _async_to_generator(function* () {
-      if (import_react_native29.AppState.currentState !== "active" || publishedBadgeRequest || !force && Date.now() - publishedBadgeFetchedAt < 6e4)
+      if (import_react_native27.AppState.currentState !== "active" || publishedBadgeRequest || !force && Date.now() - publishedBadgeFetchedAt < 6e4)
         return;
       publishedBadgeRequest = true;
       publishedBadgeFetchedAt = Date.now();
@@ -27367,7 +24607,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var label2 = String(props?.label || rendered.props.accessibilityLabel || rendered.props.label || rendered.props.description || "Badge");
           if (props) {
             if (String(props.id || "").startsWith("cloudcord-official-")) {
-              var image = /* @__PURE__ */ jsx(import_react_native29.Image, {
+              var image = /* @__PURE__ */ jsx(import_react_native27.Image, {
                 source: props.source,
                 resizeMode: "contain",
                 style: {
@@ -27376,10 +24616,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   tintColor: props.tintColor
                 }
               });
-              return /* @__PURE__ */ jsx(import_react_native29.Pressable, {
+              return /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: label2,
-                onPress: rendered.props.onPress ?? (() => import_react_native29.Alert.alert(label2)),
+                onPress: rendered.props.onPress ?? (() => import_react_native27.Alert.alert(label2)),
                 children: image
               });
             }
@@ -27536,7 +24776,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var open = () => {
             var link = detail && "service" in detail && typeof detail.url === "string" && /^https:/;
             if (link) {
-              void import_react_native29.Linking.openURL(link).catch(() => showToast("Couldn't open this link."));
+              void import_react_native27.Linking.openURL(link).catch(() => showToast("Couldn't open this link."));
               return;
             }
             if (detail)
@@ -27571,7 +24811,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             onClick: open,
             onOpenProfile: open
           } : current;
-          return /* @__PURE__ */ (0, import_react9.createElement)(Component2, nextProps);
+          return /* @__PURE__ */ (0, import_react7.createElement)(Component2, nextProps);
         });
       socialWrapperTypes.add(socialRenderers.get(Component2));
       return {
@@ -27590,8 +24830,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (identityRenderers.has(Component2))
       return identityRenderers.get(Component2);
     function CloudCordIdentity(props) {
-      var [, refresh] = (0, import_react9.useReducer)((value) => value + 1, 0);
-      (0, import_react9.useEffect)(() => {
+      var [, refresh] = (0, import_react7.useReducer)((value) => value + 1, 0);
+      (0, import_react7.useEffect)(() => {
         var update = () => refresh();
         identityRefreshers.add(update);
         return () => {
@@ -27634,7 +24874,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           currentProps.name = name;
         }
       }
-      return /* @__PURE__ */ (0, import_react9.createElement)(Component2, currentProps);
+      return /* @__PURE__ */ (0, import_react7.createElement)(Component2, currentProps);
     }
     identityRenderers.set(Component2, CloudCordIdentity);
     return CloudCordIdentity;
@@ -27890,8 +25130,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var messagePreviews = findByProps("useFormattedMessagePreview", "formatMessagePreview");
     addPatch("formatMessagePreview", messagePreviews, (args, original) => original(...args.map((value) => presentationIdentity(value))));
     addPatch("useFormattedMessagePreview", messagePreviews, (args, original) => {
-      var [, refresh] = (0, import_react9.useReducer)((value) => value + 1, 0);
-      (0, import_react9.useEffect)(() => {
+      var [, refresh] = (0, import_react7.useReducer)((value) => value + 1, 0);
+      (0, import_react7.useEffect)(() => {
         var update = () => refresh();
         identityRefreshers.add(update);
         return () => {
@@ -28437,12 +25677,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function addFakeFriendRequest(input) {
     return _async_to_generator(function* () {
       if (!localRequestActions?.ready) {
-        import_react_native29.Alert.alert("Fake friend request", "Local request previews are unavailable on this build.");
+        import_react_native27.Alert.alert("Fake friend request", "Local request previews are unavailable on this build.");
         return false;
       }
       var id = parseUserId(input);
       if (!id) {
-        import_react_native29.Alert.alert("Fake friend request", "Paste a user ID, mention or profile link.");
+        import_react_native27.Alert.alert("Fake friend request", "Paste a user ID, mention or profile link.");
         return false;
       }
       var user = findByStoreName("UserStore")?.getUser?.(id);
@@ -28455,11 +25695,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
       }
       if (!user) {
-        import_react_native29.Alert.alert("Fake friend request", "Couldn't find that user.");
+        import_react_native27.Alert.alert("Fake friend request", "Couldn't find that user.");
         return false;
       }
       if ((findByStoreName("RelationshipStore")?.getRelationshipType?.(id) ?? 0) !== 0) {
-        import_react_native29.Alert.alert("Fake friend request", "You already have a request or friendship with this user.");
+        import_react_native27.Alert.alert("Fake friend request", "You already have a request or friendship with this user.");
         return false;
       }
       var item = {
@@ -29077,7 +26317,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var channel = channelId ? findByStoreName("ChannelStore")?.getChannel?.(channelId) : null;
     var me = findByStoreName("UserStore")?.getCurrentUser?.();
     if (!channel?.guild_id || !me) {
-      import_react_native29.Alert.alert("Fake boost", "Open a server text channel first, then come back.");
+      import_react_native27.Alert.alert("Fake boost", "Open a server text channel first, then come back.");
       return;
     }
     var snowflake3 = findByProps("fromTimestamp", "extractTimestamp");
@@ -29117,10 +26357,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function BoostSection({ refresh }) {
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [times, setTimes] = (0, import_react9.useState)(1);
-    var [reached, setReached] = (0, import_react9.useState)(0);
-    var [chosenId, setChosenId] = (0, import_react9.useState)(() => String(findByStoreName("SelectedGuildStore")?.getGuildId?.() ?? ""));
-    var [roleQuery, setRoleQuery] = (0, import_react9.useState)("");
+    var [times, setTimes] = (0, import_react7.useState)(1);
+    var [reached, setReached] = (0, import_react7.useState)(0);
+    var [chosenId, setChosenId] = (0, import_react7.useState)(() => String(findByStoreName("SelectedGuildStore")?.getGuildId?.() ?? ""));
+    var [roleQuery, setRoleQuery] = (0, import_react7.useState)("");
     var guildId = /^\d{15,22}$/.test(chosenId.trim()) ? chosenId.trim() : null;
     var guild = guildId ? findByStoreName("GuildStore")?.getGuild?.(guildId) : null;
     var fake = boostFor(guildId) ?? {};
@@ -29328,7 +26568,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 placeholderTextColor: "#777"
               })
             }),
-            /* @__PURE__ */ jsxs(import_react_native29.View, {
+            /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -29337,7 +26577,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               children: [
                 shownRoles.map((role) => {
                   var on = chosenRoles.has(role.id);
-                  return /* @__PURE__ */ jsxs(import_react_native29.Pressable, {
+                  return /* @__PURE__ */ jsxs(import_react_native27.Pressable, {
                     onPress: () => toggleRole(role.id),
                     style: {
                       flexDirection: "row",
@@ -29351,7 +26591,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       backgroundColor: on ? "rgba(88,101,242,0.18)" : "rgba(128,128,128,0.16)"
                     },
                     children: [
-                      /* @__PURE__ */ jsx(import_react_native29.View, {
+                      /* @__PURE__ */ jsx(import_react_native27.View, {
                         style: {
                           width: 10,
                           height: 10,
@@ -29394,7 +26634,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function VisualRolesEditor({ fake, roles, onChange }) {
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [draft, setDraft] = (0, import_react9.useState)({
+    var [draft, setDraft] = (0, import_react7.useState)({
       id: "",
       name: "",
       color: "#5865F2",
@@ -29403,8 +26643,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       admin: false,
       top: true
     });
-    var [tweakId, setTweakId] = (0, import_react9.useState)("");
-    var [query, setQuery] = (0, import_react9.useState)("");
+    var [tweakId, setTweakId] = (0, import_react7.useState)("");
+    var [query, setQuery] = (0, import_react7.useState)("");
     var custom = fake.customRoles ?? [];
     var tweaks = fake.roleTweaks ?? {};
     var tweak = tweakId ? tweaks[tweakId] ?? {} : {};
@@ -29429,7 +26669,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       });
     };
     var validColor = (text) => /^#?[0-9a-f]{6}$/i.test(text.trim()) ? "#" + text.trim().replace(/^#/, "").toUpperCase() : void 0;
-    return /* @__PURE__ */ jsxs(import_react_native29.View, {
+    return /* @__PURE__ */ jsxs(import_react_native27.View, {
       style: {
         gap: 12
       },
@@ -29445,7 +26685,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 role.top ? "Top" : "",
                 role.admin ? "Administrator" : ""
               ].filter(Boolean).join(" \xB7 "),
-              icon: /* @__PURE__ */ jsx(import_react_native29.View, {
+              icon: /* @__PURE__ */ jsx(import_react_native27.View, {
                 style: {
                   width: 12,
                   height: 12,
@@ -29453,7 +26693,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   backgroundColor: role.color
                 }
               }),
-              onPress: () => import_react_native29.Alert.alert("Delete " + role.name + "?", "", [
+              onPress: () => import_react_native27.Alert.alert("Delete " + role.name + "?", "", [
                 {
                   text: "Cancel",
                   style: "cancel"
@@ -29644,7 +26884,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var me = findByStoreName("UserStore")?.getCurrentUser?.()?.id;
     var guilds = Object.values(findByStoreName("GuildStore")?.getGuilds?.() ?? {}).filter((guild) => guild && guild.ownerId !== me);
     if (!guilds.length) {
-      import_react_native29.Alert.alert("Leave all servers", "No servers to leave. Servers you own are skipped.");
+      import_react_native27.Alert.alert("Leave all servers", "No servers to leave. Servers you own are skipped.");
       return;
     }
     var run = () => _async_to_generator(function* () {
@@ -29686,7 +26926,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
       showToast("Left " + left + " of " + guilds.length + " servers.");
     })();
-    import_react_native29.Alert.alert("Leave all servers?", "You will leave " + guilds.length + " servers. Servers you own are skipped. You'll need new invites to rejoin.", [
+    import_react_native27.Alert.alert("Leave all servers?", "You will leave " + guilds.length + " servers. Servers you own are skipped. You'll need new invites to rejoin.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -29694,7 +26934,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       {
         text: "Leave all",
         style: "destructive",
-        onPress: () => import_react_native29.Alert.alert("Are you sure?", "Last chance to cancel.", [
+        onPress: () => import_react_native27.Alert.alert("Are you sure?", "Last chance to cancel.", [
           {
             text: "Cancel",
             style: "cancel"
@@ -29709,7 +26949,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ]);
   }
   function confirmResetCloudCordProfile(onDone) {
-    import_react_native29.Alert.alert("Reset CloudCord?", "Deletes your custom profile, badges, other-profile edits and Nitro & tools settings on this device, like a fresh install. Your Discord account is not touched.", [
+    import_react_native27.Alert.alert("Reset CloudCord?", "Deletes your custom profile, badges, other-profile edits and Nitro & tools settings on this device, like a fresh install. Your Discord account is not touched.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -29743,14 +26983,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function FakeConversationsList() {
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [, force] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
+    var [, force] = (0, import_react7.useReducer)((x2) => x2 + 1, 0);
     var list = savedConversations();
     if (!list.length)
       return null;
     return /* @__PURE__ */ jsx(K2.Section, {
       title: "All your fake conversations (" + list.length + ")",
       description: "Delete one to remove its messages (and its DM, if it made one) from this device.",
-      children: list.map((item) => /* @__PURE__ */ jsxs(import_react_native29.View, {
+      children: list.map((item) => /* @__PURE__ */ jsxs(import_react_native27.View, {
         style: {
           flexDirection: "row",
           alignItems: "center",
@@ -29784,15 +27024,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var channel = channelId ? findByStoreName("ChannelStore")?.getChannel?.(channelId) : null;
     var users = findByStoreName("UserStore");
     var existing = savedConversations().find((item) => item.channelId === channelId);
-    var [draft, setDraft] = (0, import_react9.useState)(() => existing ? JSON.parse(JSON.stringify(existing)) : channelId ? {
+    var [draft, setDraft] = (0, import_react7.useState)(() => existing ? JSON.parse(JSON.stringify(existing)) : channelId ? {
       id: newKey(),
       name: "Fake conversation",
       channelId,
       people: [],
       lines: []
     } : null);
-    var [personInput, setPersonInput] = (0, import_react9.useState)("");
-    var [inputKey, setInputKey] = (0, import_react9.useState)(0);
+    var [personInput, setPersonInput] = (0, import_react7.useState)("");
+    var [inputKey, setInputKey] = (0, import_react7.useState)(0);
     if (!draft)
       return /* @__PURE__ */ jsx(K2.Section, {
         title: "Fake conversation",
@@ -29953,7 +27193,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           size: "sm",
           onPress: addFromInput
         }),
-        draft.lines.map((line, index) => /* @__PURE__ */ jsxs(import_react_native29.View, {
+        draft.lines.map((line, index) => /* @__PURE__ */ jsxs(import_react_native27.View, {
           style: {
             gap: 6
           },
@@ -29980,7 +27220,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               placeholderTextColor: "#777"
             }),
-            /* @__PURE__ */ jsxs(import_react_native29.View, {
+            /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 flexDirection: "row",
                 gap: 8,
@@ -30014,7 +27254,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }, line.key)),
-        /* @__PURE__ */ jsxs(import_react_native29.View, {
+        /* @__PURE__ */ jsxs(import_react_native27.View, {
           style: {
             flexDirection: "row",
             flexWrap: "wrap",
@@ -30076,13 +27316,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function ServerCloneSection() {
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
     var guilds = Object.values(findByStoreName("GuildStore")?.getGuilds?.() ?? {});
-    var [guildId, setGuildId] = (0, import_react9.useState)("");
-    var [name, setName] = (0, import_react9.useState)("");
-    var [status, setStatus] = (0, import_react9.useState)({
+    var [guildId, setGuildId] = (0, import_react7.useState)("");
+    var [name, setName] = (0, import_react7.useState)("");
+    var [status, setStatus] = (0, import_react7.useState)({
       running: false,
       text: ""
     });
-    var signal = (0, import_react9.useRef)({
+    var signal = (0, import_react7.useRef)({
       cancelled: false
     });
     var start = () => _async_to_generator(function* () {
@@ -30146,7 +27386,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             placeholderTextColor: "#777"
           })
         }),
-        /* @__PURE__ */ jsx(import_react_native29.View, {
+        /* @__PURE__ */ jsx(import_react_native27.View, {
           style: {
             flexDirection: "row",
             flexWrap: "wrap",
@@ -30179,10 +27419,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function ExtrasCard({ section, onReset }) {
-    var [, force] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
+    var [, force] = (0, import_react7.useReducer)((x2) => x2 + 1, 0);
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [friendId, setFriendId] = (0, import_react9.useState)("");
-    var [inputKey, setInputKey] = (0, import_react9.useState)(0);
+    var [friendId, setFriendId] = (0, import_react7.useState)("");
+    var [inputKey, setInputKey] = (0, import_react7.useState)(0);
     var add = () => _async_to_generator(function* () {
       if (yield addFakeFriendRequest(friendId)) {
         setFriendId("");
@@ -30197,7 +27437,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       applyFakeNitro();
       force();
     };
-    return /* @__PURE__ */ jsx(import_react_native29.View, {
+    return /* @__PURE__ */ jsx(import_react_native27.View, {
       style: {
         padding: 16,
         gap: 24
@@ -30284,7 +27524,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 selectable: true,
                 children: link
               }) : null,
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -30309,7 +27549,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         findByProps("setString", "getString")?.setString?.(link);
                         showToast("Copied gift link.");
                       } catch (e) {
-                        import_react_native29.Alert.alert("Gift link", link);
+                        import_react_native27.Alert.alert("Gift link", link);
                       }
                     }
                   }) : null,
@@ -30346,7 +27586,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   placeholderTextColor: "#777"
                 }, inputKey)
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -30402,7 +27642,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           /* @__PURE__ */ jsx(ServerCloneSection, {}),
           /* @__PURE__ */ jsx(K2.Section, {
             title: "Account tools",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -30429,7 +27669,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function ExtrasPage({ section }) {
-    return /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native27.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       keyboardDismissMode: "on-drag",
       automaticallyAdjustKeyboardInsets: true,
@@ -30659,19 +27899,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         connectRealProfileMenu();
         yield pullOwnSharedProfile();
         void refreshPublishedBadges(true);
-        import_react_native29.AppState.addEventListener("change", (state2) => {
+        import_react_native27.AppState.addEventListener("change", (state2) => {
           if (state2 === "active")
             void refreshPublishedBadges(true);
         });
         if (!sharedSyncTimer)
           sharedSyncTimer = setInterval(() => {
-            if (import_react_native29.AppState.currentState !== "active")
+            if (import_react_native27.AppState.currentState !== "active")
               return;
             void pullOwnSharedProfile().catch((error) => {
               diagnostics.last = error?.message || "Could not refresh Fake Profile";
             });
             refreshSharedProfiles();
-            if (import_react_native29.AppState.currentState === "active")
+            if (import_react_native27.AppState.currentState === "active")
               void refreshPublishedBadges();
           }, 15e3);
         if (preview.enabled) {
@@ -30693,7 +27933,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           height: Number(asset.height)
         };
       return yield withTimeout(new Promise((resolve, reject) => {
-        import_react_native29.Image.getSize(uri, (width, height) => resolve({
+        import_react_native27.Image.getSize(uri, (width, height) => resolve({
           width,
           height
         }), reject);
@@ -30876,10 +28116,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     })();
   }
   function ServerTagPicker({ onSelect }) {
-    var [url2, setUrl] = (0, import_react9.useState)("");
-    var [error, setError] = (0, import_react9.useState)("");
+    var [url2, setUrl] = (0, import_react7.useState)("");
+    var [error, setError] = (0, import_react7.useState)("");
     var tags = availableServerTags(safeStore("UserStore")?.getUsers?.());
-    return /* @__PURE__ */ jsxs(import_react_native29.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native27.ScrollView, {
       contentContainerStyle: {
         padding: 16,
         gap: 16
@@ -30944,7 +28184,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function NameStylePreview({ styles: styles2 = preview.displayNameStyles || null }) {
     var NativeName = findByProps("AVERAGE_FONT_WIDTH_RATIO")?.default;
     var name = preview.displayName || preview.username || realCurrentUser?.globalName || realCurrentUser?.username || "Your name";
-    return /* @__PURE__ */ jsxs(import_react_native29.View, {
+    return /* @__PURE__ */ jsxs(import_react_native27.View, {
       style: {
         padding: 16,
         borderRadius: 12,
@@ -30983,7 +28223,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function NameStylePicker({ field, onSelect }) {
-    var [selected, setSelected] = (0, import_react9.useState)(preview.displayNameStyles || {
+    var [selected, setSelected] = (0, import_react7.useState)(preview.displayNameStyles || {
       fontId: 11,
       effectId: 1,
       colors: [
@@ -30992,7 +28232,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
     var NativeName = findByProps("AVERAGE_FONT_WIDTH_RATIO")?.default;
     var name = preview.displayName || preview.username || realCurrentUser?.globalName || realCurrentUser?.username || "Your name";
-    return /* @__PURE__ */ jsxs(import_react_native29.ScrollView, {
+    return /* @__PURE__ */ jsxs(import_react_native27.ScrollView, {
       contentContainerStyle: {
         padding: 16,
         gap: 12
@@ -31006,7 +28246,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ...selected,
             [field]: option.value
           };
-          return /* @__PURE__ */ jsx(import_react_native29.View, {
+          return /* @__PURE__ */ jsx(import_react_native27.View, {
             style: {
               borderRadius: 12,
               borderWidth: selected[field] === option.value ? 2 : 0,
@@ -31056,8 +28296,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function DateInput({ label: label2, value, onSave }) {
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [draft, setDraft] = (0, import_react9.useState)(value || "");
-    var [error, setError] = (0, import_react9.useState)("");
+    var [draft, setDraft] = (0, import_react7.useState)(value || "");
+    var [error, setError] = (0, import_react7.useState)("");
     var commit = (text) => {
       setDraft(text);
       if (!text.trim()) {
@@ -31176,26 +28416,26 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function ProfileTemplates({ ownerId, current, onUse, onPreview }) {
-    var [previewing, setPreviewing] = (0, import_react9.useState)(() => resumeMobileTemplate(ownerId));
-    (0, import_react9.useEffect)(() => {
+    var [previewing, setPreviewing] = (0, import_react7.useState)(() => resumeMobileTemplate(ownerId));
+    (0, import_react7.useEffect)(() => {
       setPreviewing(resumeMobileTemplate(ownerId));
     }, [
       ownerId
     ]);
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [query, setQuery] = (0, import_react9.useState)("");
-    var [category, setCategory] = (0, import_react9.useState)("");
-    var [sort, setSort] = (0, import_react9.useState)("popular");
-    var [items, setItems] = (0, import_react9.useState)(null);
-    var [busy, setBusy] = (0, import_react9.useState)(false);
-    var [code, setCode] = (0, import_react9.useState)("");
-    var [pubName, setPubName] = (0, import_react9.useState)("");
-    var [pubDescription, setPubDescription] = (0, import_react9.useState)("");
-    var [pubCategory, setPubCategory] = (0, import_react9.useState)("Aesthetic");
-    var [pubVisibility, setPubVisibility] = (0, import_react9.useState)("public");
-    var [publishedId, setPublishedId] = (0, import_react9.useState)(null);
+    var [query, setQuery] = (0, import_react7.useState)("");
+    var [category, setCategory] = (0, import_react7.useState)("");
+    var [sort, setSort] = (0, import_react7.useState)("popular");
+    var [items, setItems] = (0, import_react7.useState)(null);
+    var [busy, setBusy] = (0, import_react7.useState)(false);
+    var [code, setCode] = (0, import_react7.useState)("");
+    var [pubName, setPubName] = (0, import_react7.useState)("");
+    var [pubDescription, setPubDescription] = (0, import_react7.useState)("");
+    var [pubCategory, setPubCategory] = (0, import_react7.useState)("Aesthetic");
+    var [pubVisibility, setPubVisibility] = (0, import_react7.useState)("public");
+    var [publishedId, setPublishedId] = (0, import_react7.useState)(null);
     var saved = () => readSavedProfiles(ownerId);
-    (0, import_react9.useEffect)(() => {
+    (0, import_react7.useEffect)(() => {
       var cancelled = false;
       var timer = setTimeout(() => _async_to_generator(function* () {
         var params = "?limit=40&sort=" + sort + (query.trim() ? "&q=" + encodeURIComponent(query.trim()) : "") + (category ? "&category=" + encodeURIComponent(category) : "");
@@ -31225,7 +28465,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         yield task();
       } catch (error) {
         if (ownerId === currentUserId)
-          import_react_native29.Alert.alert("Templates", /not found/i.test(String(error?.message)) ? "That template doesn't exist or is private." : error?.message || "Something went wrong.");
+          import_react_native27.Alert.alert("Templates", /not found/i.test(String(error?.message)) ? "That template doesn't exist or is private." : error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
@@ -31308,7 +28548,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       showToast(pubVisibility === "public" ? "Published to templates" : "Template link created");
     })());
     var codeId = shareCodeFrom(code);
-    var pill = (label2, on, onPress) => /* @__PURE__ */ jsx(import_react_native29.Pressable, {
+    var pill = (label2, on, onPress) => /* @__PURE__ */ jsx(import_react_native27.Pressable, {
       onPress,
       style: {
         paddingHorizontal: 12,
@@ -31325,7 +28565,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         children: label2
       })
     }, label2);
-    return /* @__PURE__ */ jsxs(import_react_native29.View, {
+    return /* @__PURE__ */ jsxs(import_react_native27.View, {
       style: {
         gap: 20
       },
@@ -31334,7 +28574,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           children: /* @__PURE__ */ jsx(S2.Section, {
             title: "Previewing \u201C" + previewing.name + "\u201D",
             description: "Your profile shows this template right now, only for you. Nothing is saved or synced until you choose Use.",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 flexDirection: "row",
                 gap: 8
@@ -31373,7 +28613,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   onChangeText: setQuery
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31384,7 +28624,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   pill("New", sort === "new", () => setSort("new"))
                 ]
               }),
-              /* @__PURE__ */ jsx(import_react_native29.View, {
+              /* @__PURE__ */ jsx(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31409,7 +28649,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }) : null,
         (items || []).map((template) => {
           var p = template.preview || {};
-          return /* @__PURE__ */ jsxs(import_react_native29.View, {
+          return /* @__PURE__ */ jsxs(import_react_native27.View, {
             style: {
               gap: 8
             },
@@ -31424,14 +28664,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 bio: template.description || p.bio || void 0,
                 badges: []
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 8
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native29.View, {
+                  /* @__PURE__ */ jsxs(import_react_native27.View, {
                     style: {
                       flex: 1
                     },
@@ -31485,7 +28725,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   onChangeText: setCode
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -31532,7 +28772,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   onChangeText: setPubDescription
                 })
               }),
-              /* @__PURE__ */ jsx(import_react_native29.View, {
+              /* @__PURE__ */ jsx(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31540,7 +28780,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 },
                 children: TEMPLATE_CATEGORIES.map((name) => pill(name, pubCategory === name, () => setPubCategory(name)))
               }),
-              /* @__PURE__ */ jsx(import_react_native29.View, {
+              /* @__PURE__ */ jsx(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -31608,14 +28848,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function SavedProfiles({ ownerId, current, realUser, catalog, onUse }) {
     var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [, redraw] = (0, import_react9.useReducer)((x2) => x2 + 1, 0);
-    var [name, setName] = (0, import_react9.useState)("");
-    var [renaming, setRenaming] = (0, import_react9.useState)(null);
-    var [query, setQuery] = (0, import_react9.useState)("");
-    var [sort, setSort] = (0, import_react9.useState)("newest");
-    var [limit, setLimit] = (0, import_react9.useState)(SAVED_LOOK_PAGE_SIZE);
+    var [, redraw] = (0, import_react7.useReducer)((x2) => x2 + 1, 0);
+    var [name, setName] = (0, import_react7.useState)("");
+    var [renaming, setRenaming] = (0, import_react7.useState)(null);
+    var [query, setQuery] = (0, import_react7.useState)("");
+    var [sort, setSort] = (0, import_react7.useState)("newest");
+    var [limit, setLimit] = (0, import_react7.useState)(SAVED_LOOK_PAGE_SIZE);
     var items = readSavedProfiles(ownerId);
-    var [favoritesOnly, setFavoritesOnly] = (0, import_react9.useState)(false);
+    var [favoritesOnly, setFavoritesOnly] = (0, import_react7.useState)(false);
     var visible = selectSavedLooks(items, query, sort, limit, favoritesOnly);
     var commit = (next) => {
       if (!ownerId || ownerId !== currentUserId)
@@ -31638,10 +28878,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       setName("");
       showToast("Saved \u201C" + label2 + "\u201D");
     };
-    var [code, setCode] = (0, import_react9.useState)("");
-    var [busy, setBusy] = (0, import_react9.useState)(false);
-    var [sharing, setSharing] = (0, import_react9.useState)(null);
-    var [expanded2, setExpanded] = (0, import_react9.useState)(null);
+    var [code, setCode] = (0, import_react7.useState)("");
+    var [busy, setBusy] = (0, import_react7.useState)(false);
+    var [sharing, setSharing] = (0, import_react7.useState)(null);
+    var [expanded2, setExpanded] = (0, import_react7.useState)(null);
     var run = (task, title = "Sharing") => _async_to_generator(function* () {
       if (busy || !ownerId || ownerId !== currentUserId)
         return;
@@ -31650,7 +28890,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         yield task();
       } catch (error) {
         if (ownerId === currentUserId)
-          import_react_native29.Alert.alert(title, error?.message || "Something went wrong.");
+          import_react_native27.Alert.alert(title, error?.message || "Something went wrong.");
       } finally {
         setBusy(false);
       }
@@ -31745,7 +28985,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (e) {
       }
     };
-    var remove = (item) => import_react_native29.Alert.alert("Delete \u201C" + item.name + "\u201D?", "This saved copy is removed. Your current profile stays as it is.", [
+    var remove = (item) => import_react_native27.Alert.alert("Delete \u201C" + item.name + "\u201D?", "This saved copy is removed. Your current profile stays as it is.", [
       {
         text: "Cancel",
         style: "cancel"
@@ -31788,7 +29028,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } : item));
       setRenaming(null);
     };
-    return /* @__PURE__ */ jsxs(import_react_native29.View, {
+    return /* @__PURE__ */ jsxs(import_react_native27.View, {
       style: {
         gap: 20
       },
@@ -31891,7 +29131,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var active = JSON.stringify(savedSnapshot(data)) === currentJson;
           var appearance = studioPreviewAppearance(data, realUser);
           var badges = studioBadgeIcons(data, ownerId ?? "");
-          return /* @__PURE__ */ jsxs(import_react_native29.View, {
+          return /* @__PURE__ */ jsxs(import_react_native27.View, {
             style: {
               gap: 10
             },
@@ -31910,7 +29150,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   details: data.customActivity.details
                 } : null
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -31918,7 +29158,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   paddingHorizontal: 2
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native29.View, {
+                  /* @__PURE__ */ jsxs(import_react_native27.View, {
                     style: {
                       flex: 1,
                       gap: 2
@@ -31973,7 +29213,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }) : null
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -32002,7 +29242,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               }),
               expanded2 === item.id ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native29.View, {
+                  /* @__PURE__ */ jsxs(import_react_native27.View, {
                     style: {
                       flexDirection: "row",
                       flexWrap: "wrap",
@@ -32034,7 +29274,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsxs(import_react_native29.View, {
+                  /* @__PURE__ */ jsxs(import_react_native27.View, {
                     style: {
                       flexDirection: "row",
                       flexWrap: "wrap",
@@ -32057,7 +29297,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       })
                     ]
                   }),
-                  sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native29.View, {
+                  sharing === item.id ? /* @__PURE__ */ jsxs(import_react_native27.View, {
                     style: {
                       gap: 8
                     },
@@ -32081,7 +29321,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           item.share.id
                         ]
                       }) : null,
-                      /* @__PURE__ */ jsxs(import_react_native29.View, {
+                      /* @__PURE__ */ jsxs(import_react_native27.View, {
                         style: {
                           flexDirection: "row",
                           gap: 8
@@ -32367,8 +29607,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function CustomColorPicker({ title, initialColor, onApply }) {
-    var [color, setColor] = (0, import_react9.useState)(initialColor);
-    return /* @__PURE__ */ jsxs(import_react_native29.ScrollView, {
+    var [color, setColor] = (0, import_react7.useState)(initialColor);
+    return /* @__PURE__ */ jsxs(import_react_native27.ScrollView, {
       contentContainerStyle: {
         padding: 12,
         paddingBottom: 48,
@@ -32377,7 +29617,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       keyboardShouldPersistTaps: "handled",
       children: [
         /* @__PURE__ */ jsx(Card2, {
-          children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+          children: /* @__PURE__ */ jsxs(import_react_native27.View, {
             style: {
               padding: 16,
               gap: 12
@@ -32422,13 +29662,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function FakeProfile() {
-    var editorOwner = (0, import_react9.useRef)(currentUserId);
-    var [activeTab, setActiveTab] = (0, import_react9.useState)("overview");
-    var [showDetails, setShowDetails] = (0, import_react9.useState)(false);
+    var editorOwner = (0, import_react7.useRef)(currentUserId);
+    var [activeTab, setActiveTab] = (0, import_react7.useState)("overview");
+    var [showDetails, setShowDetails] = (0, import_react7.useState)(false);
     useProxy(settings);
-    var [, redraw] = (0, import_react9.useReducer)((value) => value + 1, 0);
+    var [, redraw] = (0, import_react7.useReducer)((value) => value + 1, 0);
     var navigation2 = NavigationNative.useNavigation();
-    (0, import_react9.useEffect)(() => {
+    (0, import_react7.useEffect)(() => {
       fakeProfileEditorOpen = true;
       profileSyncListeners.add(redraw);
       var active = true;
@@ -32480,7 +29720,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (error) {
         diagnostics.last = error?.message || "Could not open the picker.";
         redraw();
-        import_react_native29.Alert.alert("FakeProfile", diagnostics.last);
+        import_react_native27.Alert.alert("FakeProfile", diagnostics.last);
       }
     })();
     var clearMedia = (field) => {
@@ -32576,7 +29816,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ]
         });
       } catch (error) {
-        import_react_native29.Alert.alert("Couldn't open badges", error?.message || "Try opening the editor again.");
+        import_react_native27.Alert.alert("Couldn't open badges", error?.message || "Try opening the editor again.");
       }
     };
     var chooseGiftBadge = () => {
@@ -32612,7 +29852,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     };
     var MediaEditor = ({ label: label2, field, banner = false }) => {
       var value = preview[field];
-      return /* @__PURE__ */ jsxs(import_react_native29.View, {
+      return /* @__PURE__ */ jsxs(import_react_native27.View, {
         style: {
           width: "100%",
           gap: 9,
@@ -32629,7 +29869,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             color: "text-muted",
             children: "Choose your file, then refresh here to load it."
           }),
-          /* @__PURE__ */ jsxs(import_react_native29.View, {
+          /* @__PURE__ */ jsxs(import_react_native27.View, {
             style: {
               width: "100%",
               gap: 8
@@ -32638,7 +29878,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(ActionButton, {
                 label: "Upload",
                 onPress: () => {
-                  void require_react_native().Linking.openURL("https://getcloudcord.com/upload").catch(() => import_react_native29.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser."));
+                  void require_react_native().Linking.openURL("https://getcloudcord.com/upload").catch(() => import_react_native27.Alert.alert("Couldn't open uploads", "Open getcloudcord.com/upload in your browser."));
                 }
               }),
               /* @__PURE__ */ jsx(ActionButton, {
@@ -32653,13 +29893,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     refreshPreview();
                     redraw();
                   } catch (error) {
-                    import_react_native29.Alert.alert("Couldn't refresh", error?.message || "Try again later.");
+                    import_react_native27.Alert.alert("Couldn't refresh", error?.message || "Try again later.");
                   }
                 })())()
               })
             ]
           }),
-          value?.uri && /* @__PURE__ */ jsxs(import_react_native29.View, {
+          value?.uri && /* @__PURE__ */ jsxs(import_react_native27.View, {
             style: {
               width: "100%",
               borderRadius: 12,
@@ -32667,7 +29907,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               backgroundColor: "#1e1f22"
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native29.View, {
+              /* @__PURE__ */ jsx(import_react_native27.View, {
                 style: banner ? {
                   width: "100%",
                   aspectRatio: 2.5,
@@ -32680,7 +29920,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   alignSelf: "center",
                   marginVertical: 12
                 },
-                children: /* @__PURE__ */ jsx(import_react_native29.Image, {
+                children: /* @__PURE__ */ jsx(import_react_native27.Image, {
                   source: {
                     uri: value.uri
                   },
@@ -32691,7 +29931,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }
                 })
               }),
-              /* @__PURE__ */ jsxs(import_react_native29.View, {
+              /* @__PURE__ */ jsxs(import_react_native27.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -32742,16 +29982,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     })();
     var K2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
-    var [showPreview, setShowPreview] = (0, import_react9.useState)(false);
-    var [copyId, setCopyId] = (0, import_react9.useState)("");
-    var [copying, setCopying] = (0, import_react9.useState)(false);
-    var [catalog, setCatalog] = (0, import_react9.useState)(collectiblesCatalog);
-    var [catalogStatus, setCatalogStatus] = (0, import_react9.useState)({
+    var [showPreview, setShowPreview] = (0, import_react7.useState)(false);
+    var [copyId, setCopyId] = (0, import_react7.useState)("");
+    var [copying, setCopying] = (0, import_react7.useState)(false);
+    var [catalog, setCatalog] = (0, import_react7.useState)(collectiblesCatalog);
+    var [catalogStatus, setCatalogStatus] = (0, import_react7.useState)({
       loading: !collectiblesCatalog
     });
-    var catalogMounted = (0, import_react9.useRef)(false);
-    var catalogRevision = (0, import_react9.useRef)(0);
-    (0, import_react9.useEffect)(() => {
+    var catalogMounted = (0, import_react7.useRef)(false);
+    var catalogRevision = (0, import_react7.useRef)(0);
+    (0, import_react7.useEffect)(() => {
       catalogMounted.current = true;
       return () => {
         catalogMounted.current = false;
@@ -32777,9 +30017,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           });
       });
     };
-    var [decorations, setDecorations] = (0, import_react9.useState)([]);
-    var [decorationsLoading, setDecorationsLoading] = (0, import_react9.useState)(true);
-    (0, import_react9.useEffect)(() => {
+    var [decorations, setDecorations] = (0, import_react7.useState)([]);
+    var [decorationsLoading, setDecorationsLoading] = (0, import_react7.useState)(true);
+    (0, import_react7.useEffect)(() => {
       if (activeTab !== "cosmetics")
         return;
       if (!catalog)
@@ -32810,7 +30050,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var appearance = studioPreviewAppearance(preview, realCurrentUser);
     var syncLabel = profileSyncLabel();
     var canSync = Boolean(currentUserId && preview.enabled && !Reflect.get(rootSettings, "fakeProfilePreviewBackup") && syncLabel !== "Syncing\u2026" && syncLabel !== "Retry scheduled");
-    return /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native27.ScrollView, {
       style: {
         flex: 1,
         width: "100%"
@@ -32824,7 +30064,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         paddingBottom: 48
       },
       keyboardShouldPersistTaps: "handled",
-      children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native27.View, {
         style: {
           width: "100%",
           gap: 24
@@ -32840,7 +30080,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             quickLook: showPreview,
             onQuickLook: () => setShowPreview(!showPreview)
           }),
-          /* @__PURE__ */ jsxs(import_react_native29.View, {
+          /* @__PURE__ */ jsxs(import_react_native27.View, {
             style: {
               flexDirection: "row",
               gap: 8
@@ -32859,7 +30099,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             ]
           }),
           showPreview ? /* @__PURE__ */ jsx(Card2, {
-            children: /* @__PURE__ */ jsx(import_react_native29.View, {
+            children: /* @__PURE__ */ jsx(import_react_native27.View, {
               style: {
                 padding: 16
               },
@@ -33126,7 +30366,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "custom" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native29.View, {
+            children: /* @__PURE__ */ jsx(import_react_native27.View, {
               style: {
                 padding: 16
               },
@@ -33135,7 +30375,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "profile" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33178,7 +30418,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       onPress: () => _async_to_generator(function* () {
                         var target = resolveCopyTarget(copyId);
                         if (!target) {
-                          import_react_native29.Alert.alert("Couldn't find that person", "Use their user ID (long-press them \u2192 Copy User ID), or the username of someone you share a server with.");
+                          import_react_native27.Alert.alert("Couldn't find that person", "Use their user ID (long-press them \u2192 Copy User ID), or the username of someone you share a server with.");
                           return;
                         }
                         setCopying(true);
@@ -33198,7 +30438,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           redraw();
                           showToast("Copied " + (copied.displayName || copied.username || "their profile"));
                         } catch (error) {
-                          import_react_native29.Alert.alert("Couldn't copy", error?.message || "Try again.");
+                          import_react_native27.Alert.alert("Couldn't copy", error?.message || "Try again.");
                         } finally {
                           setCopying(false);
                         }
@@ -33258,7 +30498,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           }
                         }
                         if (!uri) {
-                          import_react_native29.Alert.alert("No profile picture", "Set a profile picture first.");
+                          import_react_native27.Alert.alert("No profile picture", "Set a profile picture first.");
                           return;
                         }
                         update("bannerMedia", {
@@ -33359,7 +30599,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "cosmetics" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33494,7 +30734,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "name" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33505,7 +30745,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   description: "Font, effect and colors for your display name.",
                   children: [
                     /* @__PURE__ */ jsx(NameStylePreview, {}),
-                    /* @__PURE__ */ jsxs(import_react_native29.View, {
+                    /* @__PURE__ */ jsxs(import_react_native27.View, {
                       style: {
                         borderRadius: 16,
                         overflow: "hidden"
@@ -33619,7 +30859,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                             placeholderTextColor: "#777"
                           })
                         }),
-                        /* @__PURE__ */ jsx(import_react_native29.View, {
+                        /* @__PURE__ */ jsx(import_react_native27.View, {
                           style: {
                             borderRadius: 16,
                             overflow: "hidden"
@@ -33664,7 +30904,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "status" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33811,7 +31051,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "dates" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native29.View, {
+            children: /* @__PURE__ */ jsx(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33836,7 +31076,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }) : null,
           activeTab === "badges" ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 24
@@ -33870,7 +31110,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         }, true)
                       }))
                     }),
-                    preview.selectedBadges?.oldname ? /* @__PURE__ */ jsxs(import_react_native29.View, {
+                    preview.selectedBadges?.oldname ? /* @__PURE__ */ jsxs(import_react_native27.View, {
                       style: {
                         gap: 8,
                         marginTop: 4
@@ -33923,7 +31163,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         }))
                       ]
                     }),
-                    preview.nitroEnabled ? /* @__PURE__ */ jsxs(import_react_native29.View, {
+                    preview.nitroEnabled ? /* @__PURE__ */ jsxs(import_react_native27.View, {
                       style: {
                         gap: 8
                       },
@@ -34004,7 +31244,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     var badge = ACTIVITY_BADGES.find((item) => item.key === group.id);
                     var tierIndex = picked && badge ? badge.tiers.findIndex(([name]) => name === picked.name) : -1;
                     var unit = group.id === "account_age" ? "Years" : group.id === "game_variety" ? "Games played" : "Hours";
-                    return /* @__PURE__ */ jsxs(import_react_native29.View, {
+                    return /* @__PURE__ */ jsxs(import_react_native27.View, {
                       style: {
                         gap: 8
                       },
@@ -34042,7 +31282,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   title: "Badge order",
                   description: "Top to bottom is the order on your profile.",
                   children: [
-                    editableBadgeRows().map((badge, index, rows) => /* @__PURE__ */ jsxs(import_react_native29.View, {
+                    editableBadgeRows().map((badge, index, rows) => /* @__PURE__ */ jsxs(import_react_native27.View, {
                       style: {
                         flexDirection: "row",
                         alignItems: "center",
@@ -34050,7 +31290,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         paddingVertical: 6
                       },
                       children: [
-                        /* @__PURE__ */ jsx(import_react_native29.Image, {
+                        /* @__PURE__ */ jsx(import_react_native27.Image, {
                           source: badge.source || {
                             uri: badge.iconSrc || (/^[a-f0-9]{32}$/i.test(badge.icon || "") ? `https://cdn.discordapp.com/badge-icons/${badge.icon}.png` : badge.icon)
                           },
@@ -34064,7 +31304,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                           },
                           resizeMode: "contain"
                         }),
-                        /* @__PURE__ */ jsx(import_react_native29.View, {
+                        /* @__PURE__ */ jsx(import_react_native27.View, {
                           style: {
                             flex: 1
                           },
@@ -34074,7 +31314,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                             children: badge.description || badge.id
                           })
                         }),
-                        /* @__PURE__ */ jsx(import_react_native29.Pressable, {
+                        /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                           accessibilityRole: "button",
                           accessibilityLabel: preview.hiddenBadgeIds.includes(badge.id) ? "Show badge" : "Hide badge",
                           onPress: () => update("hiddenBadgeIds", preview.hiddenBadgeIds.includes(badge.id) ? preview.hiddenBadgeIds.filter((id) => id !== badge.id) : [
@@ -34093,7 +31333,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         [
                           -1,
                           1
-                        ].map((direction) => /* @__PURE__ */ jsx(import_react_native29.Pressable, {
+                        ].map((direction) => /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                           accessibilityRole: "button",
                           accessibilityLabel: direction === -1 ? "Move badge up" : "Move badge down",
                           disabled: direction === -1 ? index === 0 : index === rows.length - 1,
@@ -34132,7 +31372,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             "dates"
           ].includes(activeTab) ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 16,
                 gap: 12
@@ -34191,12 +31431,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     try {
                       var confirmed = yield publishSharedProfile();
                       if (confirmed && currentUserId === ownerId && profileSyncLabel() === "Synced")
-                        import_react_native29.Alert.alert("Profile synced", "CloudCord accepted the current profile for sharing.");
+                        import_react_native27.Alert.alert("Profile synced", "CloudCord accepted the current profile for sharing.");
                     } catch (error) {
                       if (currentUserId !== ownerId || rootSettings.fakeProfileLocalOnly)
                         return;
                       diagnostics.last = error?.message || "Could not sync this profile";
-                      import_react_native29.Alert.alert("FakeProfile", diagnostics.last);
+                      import_react_native27.Alert.alert("FakeProfile", diagnostics.last);
                     }
                     redraw();
                   })())()
@@ -34211,7 +31451,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }),
           showDetails ? /* @__PURE__ */ jsx(Card2, {
             border: "strong",
-            children: /* @__PURE__ */ jsxs(import_react_native29.View, {
+            children: /* @__PURE__ */ jsxs(import_react_native27.View, {
               style: {
                 padding: 14,
                 gap: 5
@@ -34301,7 +31541,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react9, import_react_native29, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react7, import_react_native27, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -34334,8 +31574,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_modules2();
       init_common();
       init_components();
-      import_react9 = __toESM(require_react());
-      import_react_native29 = __toESM(require_react_native());
+      import_react7 = __toESM(require_react());
+      import_react_native27 = __toESM(require_react_native());
       TableRow3.Icon = function TableRowIcon2(props) {
         var S2 = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports));
         return /* @__PURE__ */ jsx(S2.RowIcon, {
@@ -35536,7 +32776,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           {
             key: "render",
             value: function render() {
-              return this.state.failed ? /* @__PURE__ */ jsxs(import_react_native29.View, {
+              return this.state.failed ? /* @__PURE__ */ jsxs(import_react_native27.View, {
                 children: [
                   /* @__PURE__ */ jsx(Text, {
                     variant: "heading-lg/bold",
@@ -35563,7 +32803,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         ]);
         return NamePreviewBoundary2;
-      }(import_react9.Component);
+      }(import_react7.Component);
       SHARE_VISIBILITIES = [
         {
           value: "unlisted",
@@ -35630,235 +32870,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "#E91E63",
         "#607D8B"
       ];
-    }
-  });
-
-  // src/core/ui/settings/components/ScaledPluginSettings.tsx
-  function ScaledPluginSettings({ component: Component2 }) {
-    if (typeof Component2 !== "function") {
-      return /* @__PURE__ */ jsx(import_react_native30.View, {
-        style: {
-          padding: 16
-        },
-        children: /* @__PURE__ */ jsx(import_react_native30.Text, {
-          style: {
-            color: "#ffffff"
-          },
-          children: "This plugin does not provide a mobile-compatible settings component."
-        })
-      });
-    }
-    return /* @__PURE__ */ jsx(import_react_native30.ScrollView, {
-      style: {
-        flex: 1
-      },
-      contentContainerStyle: {
-        paddingBottom: 90,
-        paddingHorizontal: 12
-      },
-      showsVerticalScrollIndicator: true,
-      children: /* @__PURE__ */ jsx(import_react_native30.View, {
-        style: {
-          width: "100%",
-          paddingRight: 24,
-          overflow: "visible"
-        },
-        children: /* @__PURE__ */ jsx(Component2, {})
-      })
-    });
-  }
-  var import_react_native30;
-  var init_ScaledPluginSettings = __esm({
-    "src/core/ui/settings/components/ScaledPluginSettings.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_jsxRuntime();
-      import_react_native30 = __toESM(require_react_native());
-    }
-  });
-
-  // src/core/ui/settings/pages/StoreCloud/index.tsx
-  var StoreCloud_exports = {};
-  __export(StoreCloud_exports, {
-    default: () => StoreCloud
-  });
-  function StoreCloud() {
-    useProxy(VdPluginManager.plugins);
-    var [busy, setBusy] = (0, import_react10.useState)(false);
-    var [refresh, setRefresh] = (0, import_react10.useState)(0);
-    var plugin2 = VdPluginManager.plugins[PLUGIN_URL];
-    var SettingsComponent = plugin2?.enabled ? VdPluginManager.getSettings(PLUGIN_URL) : null;
-    function installOrStart() {
-      return _async_to_generator(function* () {
-        if (busy)
-          return;
-        setBusy(true);
-        try {
-          if (!VdPluginManager.plugins[PLUGIN_URL]) {
-            yield VdPluginManager.installPlugin(PLUGIN_URL, true);
-            showToast("StoreCloud installed", findAssetId("Check"));
-          } else if (!VdPluginManager.plugins[PLUGIN_URL].enabled) {
-            yield VdPluginManager.startPlugin(PLUGIN_URL);
-            showToast("StoreCloud started", findAssetId("Check"));
-          } else {
-            showToast("StoreCloud is already enabled", findAssetId("Check"));
-          }
-          setRefresh((x2) => x2 + 1);
-        } catch (error) {
-          console.error("[CloudCord] StoreCloud install/start failed", error);
-          showToast(error?.message ?? "StoreCloud failed");
-        } finally {
-          setBusy(false);
-        }
-      })();
-    }
-    function refetchPlugin() {
-      return _async_to_generator(function* () {
-        if (busy)
-          return;
-        setBusy(true);
-        try {
-          if (VdPluginManager.plugins[PLUGIN_URL]?.enabled) {
-            VdPluginManager.stopPlugin(PLUGIN_URL, false);
-          }
-          yield VdPluginManager.fetchPlugin(PLUGIN_URL);
-          yield VdPluginManager.startPlugin(PLUGIN_URL);
-          showToast("StoreCloud refreshed", findAssetId("Check"));
-          setRefresh((x2) => x2 + 1);
-        } catch (error) {
-          console.error("[CloudCord] StoreCloud refresh failed", error);
-          showToast(error?.message ?? "StoreCloud refresh failed");
-        } finally {
-          setBusy(false);
-        }
-      })();
-    }
-    function removePlugin() {
-      return _async_to_generator(function* () {
-        if (busy)
-          return;
-        setBusy(true);
-        try {
-          if (VdPluginManager.plugins[PLUGIN_URL]) {
-            yield VdPluginManager.removePlugin(PLUGIN_URL);
-          }
-          showToast("StoreCloud removed");
-          setRefresh((x2) => x2 + 1);
-        } catch (error) {
-          console.error("[CloudCord] StoreCloud remove failed", error);
-          showToast(error?.message ?? "StoreCloud remove failed");
-        } finally {
-          setBusy(false);
-        }
-      })();
-    }
-    if (SettingsComponent) {
-      return /* @__PURE__ */ jsx(ScaledPluginSettings, {
-        component: SettingsComponent
-      }, `storecloud-settings-${refresh}`);
-    }
-    return /* @__PURE__ */ jsx(import_react_native31.ScrollView, {
-      style: {
-        flex: 1
-      },
-      contentContainerStyle: {
-        paddingBottom: 38
-      },
-      children: /* @__PURE__ */ jsxs(Stack, {
-        style: {
-          paddingVertical: 24,
-          paddingHorizontal: 12
-        },
-        spacing: 24,
-        children: [
-          /* @__PURE__ */ jsxs(TableRowGroup, {
-            title: "CloudSync",
-            children: [
-              /* @__PURE__ */ jsxs(import_react_native31.View, {
-                style: {
-                  paddingHorizontal: 12,
-                  paddingBottom: 12
-                },
-                children: [
-                  /* @__PURE__ */ jsx(Text, {
-                    variant: "heading-md/semibold",
-                    color: "text-normal",
-                    children: "CloudSync"
-                  }),
-                  /* @__PURE__ */ jsx(Text, {
-                    variant: "text-sm/medium",
-                    color: "text-muted",
-                    children: "Connect StoreCloud to sync supported settings and manage cloud backups on this device."
-                  })
-                ]
-              }),
-              /* @__PURE__ */ jsx(TableRow, {
-                arrow: true,
-                label: plugin2 ? "Start StoreCloud" : "Enable StoreCloud",
-                subLabel: busy ? "Please wait..." : "Loads the StoreCloud sync engine",
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: {
-                    uri: STORECLOUD_ICON
-                  }
-                }),
-                onPress: installOrStart
-              }),
-              plugin2 && /* @__PURE__ */ jsx(TableRow, {
-                arrow: true,
-                label: "Refresh StoreCloud",
-                subLabel: "Refreshes the StoreCloud sync engine",
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: findAssetId("RetryIcon")
-                }),
-                onPress: refetchPlugin
-              }),
-              plugin2 && /* @__PURE__ */ jsx(TableRow, {
-                arrow: true,
-                label: "Disable StoreCloud",
-                subLabel: "Removes the StoreCloud sync engine",
-                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
-                  source: findAssetId("TrashIcon") ?? findAssetId("CircleXIcon-primary")
-                }),
-                onPress: removePlugin
-              })
-            ]
-          }),
-          /* @__PURE__ */ jsx(Card, {
-            border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native31.View, {
-              style: {
-                padding: 12
-              },
-              children: /* @__PURE__ */ jsx(Text, {
-                variant: "text-sm/medium",
-                color: "text-muted",
-                children: "StoreCloud uses the existing mobile sync engine for OAuth, settings synchronization, backups, and files."
-              })
-            })
-          })
-        ]
-      })
-    });
-  }
-  var import_react10, import_react_native31, PLUGIN_URL, STORECLOUD_ICON;
-  var init_StoreCloud = __esm({
-    "src/core/ui/settings/pages/StoreCloud/index.tsx"() {
-      "use strict";
-      init_asyncIteratorSymbol();
-      init_promiseAllSettled();
-      init_async_to_generator();
-      init_jsxRuntime();
-      init_plugins();
-      init_storage();
-      init_ScaledPluginSettings();
-      init_assets();
-      init_toasts();
-      init_components();
-      import_react10 = __toESM(require_react());
-      import_react_native31 = __toESM(require_react_native());
-      PLUGIN_URL = "https://revenge.nexpid.xyz/cloud-sync/";
-      STORECLOUD_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
     }
   });
 
@@ -36696,9 +33707,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
 
   // src/core/ui/components/AddonPage.tsx
   function InputAlert2(props) {
-    var [value, setValue] = (0, import_react11.useState)("");
-    var [error, setError] = (0, import_react11.useState)("");
-    var [isFetching, setIsFetching] = (0, import_react11.useState)(false);
+    var [value, setValue] = (0, import_react8.useState)("");
+    var [error, setError] = (0, import_react8.useState)("");
+    var [isFetching, setIsFetching] = (0, import_react8.useState)(false);
     function onConfirmWrapper() {
       setIsFetching(true);
       props.fetchFn(value).then(() => dismissAlert("AddonInputAlert")).catch((e) => e instanceof Error ? setError(e.message) : String(e)).finally(() => setIsFetching(false));
@@ -36725,7 +33736,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             state: error ? "error" : void 0,
             errorMessage: error || void 0
           }),
-          /* @__PURE__ */ jsx(import_react_native32.ScrollView, {
+          /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
             horizontal: true,
             showsHorizontalScrollIndicator: false,
             style: {
@@ -36760,19 +33771,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function AddonPage({ CardComponent, ...props }) {
-    var [search, setSearch] = (0, import_react11.useState)("");
+    var [search, setSearch] = (0, import_react8.useState)("");
     var query = search.trim();
-    var [enabledOnly, setEnabledOnly] = (0, import_react11.useState)(false);
-    var [sort, setSort] = (0, import_react11.useState)();
+    var [enabledOnly, setEnabledOnly] = (0, import_react8.useState)(false);
+    var [sort, setSort] = (0, import_react8.useState)();
     var sortFn = sort ? props.sortOptions?.[sort] : void 0;
     var defaultSortLabel = query ? "Relevance" : "Default order";
     var activeSortLabel = sort ?? defaultSortLabel;
-    var [filter, setFilter] = (0, import_react11.useState)("");
+    var [filter, setFilter] = (0, import_react8.useState)("");
     var { bottom: bottomInset } = useSafeAreaInsets();
     var navigation2 = NavigationNative.useNavigation();
     var commandSearch = query.startsWith("/") && props.searchCommands;
     var matchesFilter = props.filterOptions?.[filter] ?? (commandSearch ? void 0 : props.defaultFilter);
-    (0, import_react11.useEffect)(() => {
+    (0, import_react8.useEffect)(() => {
       if (props.OptionsActionSheetComponent) {
         navigation2.setOptions({
           headerRight: () => /* @__PURE__ */ jsx(IconButton, {
@@ -36786,7 +33797,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }, [
       navigation2
     ]);
-    var items = (0, import_react11.useMemo)(() => {
+    var items = (0, import_react8.useMemo)(() => {
       var values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
       return values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
     }, [
@@ -36796,7 +33807,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       enabledOnly,
       matchesFilter
     ]);
-    var results = (0, import_react11.useMemo)(() => {
+    var results = (0, import_react8.useMemo)(() => {
       var matches = commandSearch ? commandSearch(items, query).map((obj) => ({
         obj
       })) : query ? import_fuzzysort.default.go(query, items, {
@@ -36812,7 +33823,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       query,
       commandSearch
     ]);
-    var onInstallPress = (0, import_react11.useCallback)(() => {
+    var onInstallPress = (0, import_react8.useCallback)(() => {
       if (!props.installAction)
         return () => {
         };
@@ -36827,7 +33838,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     }, []);
     if (results.length === 0 && !query && !enabledOnly && !filter && !props.ListHeaderComponent) {
-      return /* @__PURE__ */ jsxs(import_react_native32.View, {
+      return /* @__PURE__ */ jsxs(import_react_native28.View, {
         style: {
           gap: 32,
           flexGrow: 1,
@@ -36835,13 +33846,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           alignItems: "center"
         },
         children: [
-          /* @__PURE__ */ jsxs(import_react_native32.View, {
+          /* @__PURE__ */ jsxs(import_react_native28.View, {
             style: {
               gap: 8,
               alignItems: "center"
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native32.Image, {
+              /* @__PURE__ */ jsx(import_react_native28.Image, {
                 source: findAssetId("empty_quick_switcher")
               }),
               /* @__PURE__ */ jsx(Text, {
@@ -36860,12 +33871,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         ]
       });
     }
-    var headerElement = /* @__PURE__ */ jsxs(import_react_native32.View, {
+    var headerElement = /* @__PURE__ */ jsxs(import_react_native28.View, {
       style: {
         paddingBottom: 8
       },
       children: [
-        settings.safeMode?.enabled && /* @__PURE__ */ jsxs(import_react_native32.View, {
+        settings.safeMode?.enabled && /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             marginBottom: 10
           },
@@ -36878,7 +33889,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             props.safeModeHint?.footer
           ]
         }),
-        /* @__PURE__ */ jsxs(import_react_native32.View, {
+        /* @__PURE__ */ jsxs(import_react_native28.View, {
           style: {
             flexDirection: "row",
             gap: 8
@@ -36952,14 +33963,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           keyboardShouldPersistTaps: "handled",
           estimatedItemSize: 136,
           ListHeaderComponent: headerElement,
-          ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native32.View, {
+          ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native28.View, {
             style: {
               gap: 12,
               padding: 12,
               alignItems: "center"
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native32.Image, {
+              /* @__PURE__ */ jsx(import_react_native28.Image, {
                 source: findAssetId("devices_not_found")
               }),
               /* @__PURE__ */ jsx(Text, {
@@ -36983,7 +33994,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             paddingHorizontal: 12,
             paddingBottom: 90
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native32.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native28.View, {
             style: {
               height: 8
             }
@@ -37002,7 +34013,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]
     });
   }
-  var import_fuzzysort, import_react11, import_react_native32, showSimpleActionSheet2, hideActionSheet;
+  var import_fuzzysort, import_react8, import_react_native28, showSimpleActionSheet2, hideActionSheet;
   var init_AddonPage = __esm({
     "src/core/ui/components/AddonPage.tsx"() {
       "use strict";
@@ -37021,8 +34032,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_components2();
       init_dist();
       import_fuzzysort = __toESM(require_fuzzysort());
-      import_react11 = __toESM(require_react());
-      import_react_native32 = __toESM(require_react_native());
+      import_react8 = __toESM(require_react());
+      import_react_native28 = __toESM(require_react_native());
       ({ showSimpleActionSheet: showSimpleActionSheet2, hideActionSheet } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
     }
   });
@@ -64962,7 +61973,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         var input = args[0];
         if (!rendered || !input?.message || input.isInlineReplyPreview || input.isEditing)
           return rendered;
-        var delay = getCxMessageLatency(input.message, options, UserStore2.getCurrentUser()?.id);
+        var delay = getCxMessageLatency(input.message, options, UserStore.getCurrentUser()?.id);
         if (!delay)
           return rendered;
         var label2 = !delay.delta ? "Possible legacy Android client" : delay.ahead ? "Clock ahead by about " + delay.delta : "Estimated send delay: " + delay.delta;
@@ -65138,7 +62149,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     };
   }
   function NavigationButton({ label: label2, text, onPress }) {
-    return /* @__PURE__ */ jsx(import_react_native33.Pressable, {
+    return /* @__PURE__ */ jsx(import_react_native29.Pressable, {
       accessibilityRole: "button",
       accessibilityLabel: label2,
       onPress,
@@ -65148,7 +62159,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         alignItems: "center",
         justifyContent: "center"
       },
-      children: /* @__PURE__ */ jsx(import_react_native33.Text, {
+      children: /* @__PURE__ */ jsx(import_react_native29.Text, {
         style: {
           color: resolveSemanticColor(semanticColors.INTERACTIVE_TEXT_DEFAULT),
           fontSize: text === "\u2191" ? 20 : 10,
@@ -65162,7 +62173,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var latency = React2.useSyncExternalStore(voicePing.subscribe, () => voicePing.read(channelId));
     if (!latency || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsx(import_react_native33.Text, {
+    return /* @__PURE__ */ jsx(import_react_native29.Text, {
       accessibilityLabel: "Voice latency",
       style: {
         textAlign: "center",
@@ -65179,7 +62190,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var elapsed = React2.useSyncExternalStore(callClock.subscribe, () => callClock.read(channelId));
     if (!elapsed || settings.safeMode?.enabled)
       return null;
-    return /* @__PURE__ */ jsxs(import_react_native33.Text, {
+    return /* @__PURE__ */ jsxs(import_react_native29.Text, {
       style: {
         textAlign: "center",
         fontSize: 12,
@@ -65199,7 +62210,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       userId
     ]);
     var elapsed = React2.useSyncExternalStore(subscribe, () => voiceMemberClock.read(userId, channelId));
-    return elapsed ? /* @__PURE__ */ jsx(import_react_native33.Text, {
+    return elapsed ? /* @__PURE__ */ jsx(import_react_native29.Text, {
       accessibilityLabel: "Call time " + elapsed,
       style: {
         marginStart: 6,
@@ -65216,20 +62227,20 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var count = React2.useSyncExternalStore(voiceCounts.subscribe, () => voiceCounts.read(channel));
     if (!count)
       return content;
-    return /* @__PURE__ */ jsxs(import_react_native33.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       style: {
         flex: 1,
         flexDirection: "row",
         alignItems: "center"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native33.View, {
+        /* @__PURE__ */ jsx(import_react_native29.View, {
           style: {
             flex: 1
           },
           children: content
         }),
-        /* @__PURE__ */ jsx(import_react_native33.Text, {
+        /* @__PURE__ */ jsx(import_react_native29.Text, {
           accessibilityLabel: "Voice occupancy " + count,
           style: {
             marginStart: 4,
@@ -65277,7 +62288,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     if (!row || typeof voice?.getVoiceStateForUser !== "function")
       throw new Error("Discord's voice members are unavailable");
     var stopClock = voiceMemberClock.bind({
-      account: () => UserStore2.getCurrentUser()?.id,
+      account: () => UserStore.getCurrentUser()?.id,
       state: (id) => voice.getVoiceStateForUser(id),
       channelGuild: (id) => ChannelStore.getChannel(id)?.guild_id,
       enabled: () => !settings.safeMode?.enabled,
@@ -65475,7 +62486,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     if (splitSender)
       throw new Error("A CX message splitter is already active");
     var sender = createCxSplitSender({
-      currentUser: () => UserStore2?.getCurrentUser?.(),
+      currentUser: () => UserStore?.getCurrentUser?.(),
       channel: (id) => ChannelStore?.getChannel?.(id),
       enabled: () => splitSender === sender && !settings.safeMode?.enabled,
       failed: () => {
@@ -65539,7 +62550,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           return invoke(args);
         if (pending2)
           return;
-        var account = UserStore2?.getCurrentUser?.()?.id;
+        var account = UserStore?.getCurrentUser?.()?.id;
         var selected = SelectedChannelStore?.getChannelId?.();
         var request = {};
         pending2 = request;
@@ -65548,7 +62559,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             pending2 = void 0;
         };
         try {
-          import_react_native33.Alert.alert("Confirm message", body, [
+          import_react_native29.Alert.alert("Confirm message", body, [
             {
               text: "Cancel",
               style: "cancel",
@@ -65560,7 +62571,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 if (pending2 !== request)
                   return;
                 dismiss();
-                if (active && !settings.safeMode?.enabled && account && account === UserStore2?.getCurrentUser?.()?.id && selected === SelectedChannelStore?.getChannelId?.() && draft?.text === text && draft?.params?.channel?.id === channel)
+                if (active && !settings.safeMode?.enabled && account && account === UserStore?.getCurrentUser?.()?.id && selected === SelectedChannelStore?.getChannelId?.() && draft?.text === text && draft?.params?.channel?.id === channel)
                   invoke(args);
               }
             }
@@ -65704,7 +62715,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   label: "Open Sticker Link",
                   onPress: () => {
                     if (enabled())
-                      void import_react_native33.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
+                      void import_react_native29.Linking.openURL(value).catch(() => showToast("Couldn't open the sticker link."));
                   }
                 })
               ]
@@ -65815,7 +62826,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             label: label2,
             onPress: () => {
               if (enabled())
-                void import_react_native33.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
+                void import_react_native29.Linking.openURL(url2).catch(() => showToast("Couldn't open image search."));
             }
           }))
         });
@@ -65834,7 +62845,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       var name = getCxImageTitle(link, full);
       return name ? () => {
         if (enabled())
-          import_react_native33.Alert.alert(label2, name);
+          import_react_native29.Alert.alert(label2, name);
       } : void 0;
     });
     return () => {
@@ -66238,20 +63249,20 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           borderRadius: 3,
           backgroundColor
         };
-        return /* @__PURE__ */ jsxs(import_react_native33.View, {
+        return /* @__PURE__ */ jsxs(import_react_native29.View, {
           style: {
             flexDirection: "row",
             gap: 4
           },
           accessible: false,
           children: [
-            /* @__PURE__ */ jsx(import_react_native33.View, {
+            /* @__PURE__ */ jsx(import_react_native29.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native33.View, {
+            /* @__PURE__ */ jsx(import_react_native29.View, {
               style: dot
             }),
-            /* @__PURE__ */ jsx(import_react_native33.View, {
+            /* @__PURE__ */ jsx(import_react_native29.View, {
               style: dot
             })
           ]
@@ -66355,7 +63366,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     ], (element) => {
       if (element.key !== "guild-channel-user-list" || element.props.getItemSize != null)
         return element;
-      if (import_react_native33.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
+      if (import_react_native29.PixelRatio.getFontScale() > 1 || fontScale?.getState?.()?.fontScale > 1)
         return element;
       return React2.cloneElement(element, {
         getItemSize: 44
@@ -66635,7 +63646,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     if (typeof actions?.selectVoiceChannel !== "function" || typeof voice?.getVoiceStatesForChannel !== "function" || typeof permission?.can !== "function" || bits?.CONNECT == null || bits?.VIEW_CHANNEL == null || bits?.MOVE_MEMBERS == null || !sheet || !Row2?.Group)
       throw new Error("Discord's voice queue controls are unavailable");
     var queue = createCxVoiceQueue({
-      account: () => UserStore2.getCurrentUser()?.id,
+      account: () => UserStore.getCurrentUser()?.id,
       currentVoice: () => SelectedChannelStore.getVoiceChannelId(),
       room(id) {
         var channel = ChannelStore.getChannel(id);
@@ -66644,7 +63655,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         return getCxVoiceQueueRoom(channel, voice.getVoiceStatesForChannel(id));
       },
       join: (id) => actions.selectVoiceChannel(id),
-      prompt: (title, body, label2, confirm, cancel) => import_react_native33.Alert.alert(title, body, [
+      prompt: (title, body, label2, confirm, cancel) => import_react_native29.Alert.alert(title, body, [
         {
           text: "Cancel",
           style: "cancel",
@@ -66742,7 +63753,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   }
   function registerCopyChannelDetails(effect, enabled) {
     return registerChannelSheetEntry("cx-" + effect, enabled, (channel) => {
-      var copy = getCxChannelCopy(effect, channel, (id) => UserStore2?.getUser?.(id)?.username);
+      var copy = getCxChannelCopy(effect, channel, (id) => UserStore?.getUser?.(id)?.username);
       if (!copy)
         return;
       return {
@@ -66906,7 +63917,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   if (field.key === "icon")
                     open(value, field.width, field.width);
                   else
-                    import_react_native33.Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
+                    import_react_native29.Image.getSize(value, (width, height) => open(value, width, height), () => open(value, 1024, 384));
                 } else {
                   void copyMobileMenuInformation(value, available);
                 }
@@ -66939,9 +63950,9 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         return handlers.map((handler) => handler.name === "DraftStore" && typeof handler.actionHandler === "function" ? {
           ...handler,
           actionHandler(action) {
-            var userId = UserStore2?.getCurrentUser?.()?.id;
+            var userId = UserStore?.getCurrentUser?.()?.id;
             var result = handler.actionHandler.call(this, action);
-            if (action !== payload || !enabled() || !isCxProfileUserId(userId) || UserStore2?.getCurrentUser?.()?.id !== userId)
+            if (action !== payload || !enabled() || !isCxProfileUserId(userId) || UserStore?.getCurrentUser?.()?.id !== userId)
               return result;
             var entry = store.getState?.()?.[userId]?.[channelId]?.[draftType];
             if (entry?.draft === draft.slice(0, limit))
@@ -67036,7 +64047,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     return registerMessageMenuActions(enabled, ({ message, channel }, close) => {
       if (!message || !channel)
         return [];
-      var getToggle = (candidate) => getCxEmbedToggle(candidate, channel.id, UserStore2?.getCurrentUser?.()?.id, {
+      var getToggle = (candidate) => getCxEmbedToggle(candidate, channel.id, UserStore?.getCurrentUser?.()?.id, {
         canEmbed: !channel.guild_id || Permissions?.EMBED_LINKS != null && permissionStore?.can?.(Permissions.EMBED_LINKS, channel) === true,
         canManage: !!channel.guild_id && Permissions?.MANAGE_MESSAGES != null && permissionStore?.can?.(Permissions.MANAGE_MESSAGES, channel) === true
       });
@@ -67189,7 +64200,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               if (!settings.safeMode?.enabled && (gestures.edit || gestures.reply) && channelId === SelectedChannelStore?.getChannelId?.()) {
                 var id = getNativeSyntheticEventData(event)?.messageId;
                 var message = isCxProfileUserId(id) ? MessageStore?.getMessage?.(channelId, id) : void 0;
-                var action = getCxMessageGesture(message, UserStore2?.getCurrentUser?.()?.id, gestures);
+                var action = getCxMessageGesture(message, UserStore?.getCurrentUser?.()?.id, gestures);
                 if (action === "edit")
                   return onInitiateEdit(event);
                 if (action === "reply")
@@ -67589,7 +64600,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     return registerProfileMenuEntry({
       key: action,
       getItems(id, guildId) {
-        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore2, GuildMemberStore);
+        var getCopy = () => getCxProfileMenuCopy(action, id, UserProfileStore, guildId, UserStore, GuildMemberStore);
         if ((scope === "server" || scope === "identity") && !getCopy())
           return [];
         return [
@@ -67614,9 +64625,9 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var pageSize = 8;
     var search = query.trim().toLowerCase();
     var matches = items.filter((item) => item.name.toLowerCase().includes(search));
-    return /* @__PURE__ */ jsxs(import_react_native33.View, {
+    return /* @__PURE__ */ jsxs(import_react_native29.View, {
       children: [
-        /* @__PURE__ */ jsx(import_react_native33.TextInput, {
+        /* @__PURE__ */ jsx(import_react_native29.TextInput, {
           accessibilityLabel: "Search saved channels",
           placeholder: "Search saved channels",
           value: query,
@@ -67629,7 +64640,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             color: resolveSemanticColor(semanticColors.TEXT_DEFAULT)
           }
         }),
-        /* @__PURE__ */ jsx(import_react_native33.ScrollView, {
+        /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
           style: {
             maxHeight: 270
           },
@@ -67668,7 +64679,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       throw new Error("Discord's note editor is unavailable");
     var getStorage = () => localUserNotesStorage ??= createStorageAsync("plugins/storage/cloudcord.cx-user-notes.json");
     var key = (account) => (tags ? "tags:" : channel ? "channel:" : "") + account;
-    var notes = createCxUserNotes(() => UserStore2.getCurrentUser()?.id, (account) => _async_to_generator(function* () {
+    var notes = createCxUserNotes(() => UserStore.getCurrentUser()?.id, (account) => _async_to_generator(function* () {
       return (yield getStorage())[key(account)];
     })(), (account, mutate) => _async_to_generator(function* () {
       var storage = yield getStorage();
@@ -67680,7 +64691,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       var draft = initial;
       openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
         title: label2,
-        extraContent: /* @__PURE__ */ jsx(import_react_native33.TextInput, {
+        extraContent: /* @__PURE__ */ jsx(import_react_native29.TextInput, {
           accessibilityLabel: tags ? "Private tags" : "Private note",
           defaultValue: initial,
           multiline: true,
@@ -67738,7 +64749,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           }
           var items = ids.map((id) => ({
             id,
-            name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id), (user) => UserStore2?.getUser?.(user)?.username, (guild) => GuildStore?.getGuild?.(guild)?.name)
+            name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id), (user) => UserStore?.getUser?.(user)?.username, (guild) => GuildStore?.getGuild?.(guild)?.name)
           })).sort((a, b3) => a.name.localeCompare(b3.name));
           openAlert(browseKey, /* @__PURE__ */ jsx(AlertModal5, {
             title: "Saved channel notes",
@@ -67763,7 +64774,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       findLocalUserTags = notes.search;
     else
       clearLocalNotes[kind] = () => {
-        void notes.clear(() => new Promise((resolve) => import_react_native33.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
+        void notes.clear(() => new Promise((resolve) => import_react_native29.Alert.alert(channel ? "Clear local channel notes?" : "Clear local user notes?", "This removes every " + (channel ? "channel" : "user") + " note for this account on this device.", [
           {
             text: "Cancel",
             style: "cancel",
@@ -67800,7 +64811,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var stop = registerProfileMenuEntry({
       key: "profile-media",
       getItems(id) {
-        var user = UserStore2?.getUser?.(id);
+        var user = UserStore?.getUser?.(id);
         if (!user)
           return [];
         return getCxProfileMedia(id, user, UserProfileStore?.getUserProfile?.(id)?.banner).flatMap((asset) => [
@@ -67835,7 +64846,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               if (asset.kind === "Avatar")
                 open(512, 512);
               else
-                import_react_native33.Image.getSize(asset.url, open, () => open(1024, 384));
+                import_react_native29.Image.getSize(asset.url, open, () => open(1024, 384));
             }
           },
           {
@@ -67903,7 +64914,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       registerIncomingRules(rules) {
         var active = true;
         var context = {
-          currentUser: () => UserStore2?.getCurrentUser?.()?.id,
+          currentUser: () => UserStore?.getCurrentUser?.()?.id,
           channel: (id) => ChannelStore?.getChannel?.(id),
           replyAuthor: (channel, id) => MessageStore?.getMessage?.(channel, id)?.author,
           blocked: (id) => RelationshipStore?.isBlocked?.(id) === true,
@@ -67914,16 +64925,16 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
             muted: (id, channel) => isCxNotificationMuted(id, channel, UserGuildSettingsStore),
             notify: ({ title, body }) => {
-              var account = UserStore2?.getCurrentUser?.()?.id;
+              var account = UserStore?.getCurrentUser?.()?.id;
               setTimeout(() => {
-                if (active && !settings.safeMode?.enabled && account === UserStore2?.getCurrentUser?.()?.id)
+                if (active && !settings.safeMode?.enabled && account === UserStore?.getCurrentUser?.()?.id)
                   showToast(body ? title + ": " + body : title);
               }, 0);
             }
           },
           openLink: (link, channel, user) => setTimeout(() => {
             if (active && !settings.safeMode?.enabled && context.currentUser() === user && context.selectedChannel() === channel)
-              void import_react_native33.Linking.openURL(link).catch(() => {
+              void import_react_native29.Linking.openURL(link).catch(() => {
               });
           }, 0),
           notify: (body) => setTimeout(() => {
@@ -67936,7 +64947,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           notify: context.notify,
           isFriend: (id) => RelationshipStore?.isFriend?.(id) === true,
           userName: (id) => {
-            var user = UserStore2?.getUser?.(id);
+            var user = UserStore?.getUser?.(id);
             return user?.globalName || user?.username;
           },
           channelName: (id) => ChannelStore?.getChannel?.(id)?.name,
@@ -67998,11 +65009,11 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               throw new Error("Missing screen-share alert options");
             var voice = findByStoreName("VoiceStateStore");
             return bindCxVoiceShareAlerts({
-              account: () => UserStore2.getCurrentUser()?.id,
+              account: () => UserStore.getCurrentUser()?.id,
               channel: () => SelectedChannelStore.getVoiceChannelId() ?? void 0,
               states: (id) => voice?.getVoiceStatesForChannel?.(id),
               notify(user, kind) {
-                var name = UserStore2.getUser(user)?.username ?? "Someone";
+                var name = UserStore.getUser(user)?.username ?? "Someone";
                 showToast(name + (kind === "stream" ? " started sharing their screen." : " turned on their camera."));
               },
               enabled,
@@ -68014,7 +65025,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               throw new Error("Missing camera tone options");
             var voice1 = findByStoreName("VoiceStateStore");
             return bindCxCameraTone({
-              account: () => UserStore2.getCurrentUser()?.id,
+              account: () => UserStore.getCurrentUser()?.id,
               selected() {
                 var id = SelectedChannelStore.getVoiceChannelId();
                 var channel = id && ChannelStore.getChannel(id);
@@ -68146,7 +65157,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 var link = getCxSteamLink(options.href);
                 if (!link?.mobile || blockedDomains.isBlockedDomain(link.https) !== null)
                   return invoke(args);
-                void import_react_native33.Linking.openURL(link.https).catch(() => {
+                void import_react_native29.Linking.openURL(link.https).catch(() => {
                   if (enabled())
                     showToast("Couldn't open the Steam link.");
                 });
@@ -68268,7 +65279,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   label: "Decode Base64",
                   run() {
                     close();
-                    import_react_native33.Alert.alert("Decoded Base64", decoded, [
+                    import_react_native29.Alert.alert("Decoded Base64", decoded, [
                       {
                         text: "Close",
                         style: "cancel"
@@ -68286,7 +65297,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               ];
             }, false);
           case "hide-profile-banner-images":
-            return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore2?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
+            return hideCxProfileBannerImages(findByProps("getUserAvatarURL", "getUserBannerURL"), (id) => id === UserStore?.getCurrentUser?.()?.id || RelationshipStore?.isFriend?.(id) === true, enabled);
           case "quote-message":
             if (!effectOptions || !("includeLink" in effectOptions))
               throw new Error("Missing quote options");
@@ -68356,7 +65367,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               read: ReadStateStore,
               enabled,
               selected: () => SelectedChannelStore?.getChannelId?.(),
-              user: () => UserStore2?.getCurrentUser?.()?.id,
+              user: () => UserStore?.getCurrentUser?.()?.id,
               jump: (target) => actions.jumpToMessage(target)
             });
           }
@@ -68496,7 +65507,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         var editor = findByProps("editMessage", "startEditMessage");
         if (typeof editor?.editMessage !== "function")
           throw new Error("Discord message edits are unavailable");
-        var currentUser = () => UserStore2?.getCurrentUser?.()?.id;
+        var currentUser = () => UserStore?.getCurrentUser?.()?.id;
         var handle = createCxPreviousSendHandler(rule, {
           currentUser,
           previous(channel, own) {
@@ -68567,7 +65578,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         });
       },
       getUserAvatarUrl(id) {
-        var user = id ? UserStore2?.getUser?.(id) : UserStore2?.getCurrentUser?.();
+        var user = id ? UserStore?.getUser?.(id) : UserStore?.getCurrentUser?.();
         if (user)
           return findByProps("getUserAvatarURL", "getGuildIconURL")?.getUserAvatarURL(user, true, 1024);
       },
@@ -68630,10 +65641,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               },
               prepareChannel() {
                 var channelId = context.channel?.id;
-                var accountId = UserStore2?.getCurrentUser?.()?.id;
+                var accountId = UserStore?.getCurrentUser?.()?.id;
                 if (!channelId || !accountId)
                   return;
-                var isCurrent = () => !settings.safeMode?.enabled && UserStore2?.getCurrentUser?.()?.id === accountId;
+                var isCurrent = () => !settings.safeMode?.enabled && UserStore?.getCurrentUser?.()?.id === accountId;
                 return {
                   reply(content) {
                     if (isCurrent())
@@ -68659,9 +65670,9 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     var ids = guild ? GuildMemberStore?.getMemberIds?.(guild) ?? [] : [];
                     return formatCxRandomMember(input, ids.map((userId) => ({
                       userId
-                    })), UserStore2?.getCurrentUser?.()?.id);
+                    })), UserStore?.getCurrentUser?.()?.id);
                   }
-                  return formatCxRoleMembers(input, guild, guild ? GuildMemberStore?.getMembers?.(guild) ?? [] : [], (id) => UserStore2?.getUser?.(id));
+                  return formatCxRoleMembers(input, guild, guild ? GuildMemberStore?.getMembers?.(guild) ?? [] : [], (id) => UserStore?.getUser?.(id));
                 }
                 var track = SpotifyStore?.getTrack?.();
                 if (track)
@@ -68896,7 +65907,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         refreshRememberedAppearance();
       }
     }
-    return /* @__PURE__ */ jsx(import_react_native33.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native29.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16
@@ -68914,7 +65925,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           }),
           !kind && showCatalog && /* @__PURE__ */ jsxs(Fragment, {
             children: [
-              /* @__PURE__ */ jsx(import_react_native33.TextInput, {
+              /* @__PURE__ */ jsx(import_react_native29.TextInput, {
                 accessibilityLabel: "Search CX catalog",
                 placeholder: "Search name, feature or /command",
                 placeholderTextColor: "#b5bac1",
@@ -68933,13 +65944,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   padding: 12
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native33.View, {
+              /* @__PURE__ */ jsx(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
                   gap: 6
                 },
-                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native33.Pressable, {
+                children: CX_CATALOG_CATEGORIES.map((value) => /* @__PURE__ */ jsx(import_react_native29.Pressable, {
                   accessibilityRole: "button",
                   accessibilityLabel: `Filter by ${value}`,
                   accessibilityState: {
@@ -68961,7 +65972,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     borderColor: resolveSemanticColor(category === value ? semanticColors.INTERACTIVE_TEXT_DEFAULT : semanticColors.BORDER_SUBTLE),
                     backgroundColor: resolveSemanticColor(semanticColors.CARD_BACKGROUND_DEFAULT)
                   },
-                  children: /* @__PURE__ */ jsx(import_react_native33.Text, {
+                  children: /* @__PURE__ */ jsx(import_react_native29.Text, {
                     style: {
                       color: resolveSemanticColor(semanticColors.TEXT_DEFAULT),
                       fontWeight: category === value ? "700" : "400"
@@ -69034,13 +66045,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               })
             ]
           }),
-          !entry && /* @__PURE__ */ jsx(import_react_native33.Text, {
+          !entry && /* @__PURE__ */ jsx(import_react_native29.Text, {
             style: {
               color: "#b5bac1"
             },
             children: "Paste the contents of a .cx file to review it."
           }),
-          !entry && /* @__PURE__ */ jsx(import_react_native33.TextInput, {
+          !entry && /* @__PURE__ */ jsx(import_react_native29.TextInput, {
             accessibilityLabel: "CX source",
             placeholder: kind === "plugin" ? 'plugin "My Plugin":' : 'theme "Midnight":',
             placeholderTextColor: "#b5bac1",
@@ -69079,7 +66090,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   ...candidate.review.commands ?? []
                 ].join("\n")
               }),
-              candidate && candidate.review.numberOptions.filter((option) => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency").map((option) => /* @__PURE__ */ jsxs(import_react_native33.View, {
+              candidate && candidate.review.numberOptions.filter((option) => option.effect === "jumbo-emoji-limit" || option.effect === "message-latency").map((option) => /* @__PURE__ */ jsxs(import_react_native29.View, {
                 style: {
                   flexDirection: "row",
                   alignItems: "center",
@@ -69088,7 +66099,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   paddingVertical: 6
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native33.Text, {
+                  /* @__PURE__ */ jsxs(import_react_native29.Text, {
                     style: {
                       color: "#fff",
                       flex: 1
@@ -69103,7 +66114,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                       ")"
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native33.TextInput, {
+                  /* @__PURE__ */ jsx(import_react_native29.TextInput, {
                     accessibilityLabel: option.label,
                     keyboardType: "number-pad",
                     selectTextOnFocus: true,
@@ -69248,7 +66259,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               })
             ]
           }),
-          /* @__PURE__ */ jsx(import_react_native33.Text, {
+          /* @__PURE__ */ jsx(import_react_native29.Text, {
             accessibilityLiveRegion: "polite",
             style: {
               color: "#b5bac1"
@@ -69259,7 +66270,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native33, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore2, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, failedRestores, rememberedAppearanceListeners, rememberedAppearanceUpdates;
+  var import_react_native29, session, callClock, voiceMemberClock, voiceCounts, voicePing, navigationControls, timestamps, timestampFields, timestampUsers, stopTimestamps, channelNames, stopChannelNames, UserStore, ChannelStore, MessageStore, EmojiStore, RelationshipStore, UserProfileStore, GuildMemberStore, GuildStore, GuildChannelStore, ActiveJoinedThreadsStore, ReadStateStore, SpotifyStore, SelectedChannelStore, PresenceStore, UserGuildSettingsStore, splitSender, getReadStores, acknowledgeServers, appearanceBindings, expressionSheetBinding, blurredMedia, attachmentQualityBinding, memberRowScope, staticTypingDots, hasUploadAnonymiser, renderedTreeOriginals, textAttachmentUrl, maxTextAttachmentBytes, messageGestures, expressionPickerBinding, settingsEntryVisibility, channelDrawerWidths, reducedMotionAppearance, profileMenuActions, stopProfileMenuHooks, clearLocalNotes, browseLocalChannelNotes, findLocalUserTags, localUserNotesStorage, mobileCatalogPlugins, appearanceHost, rememberedCatalog, failedRestores, rememberedAppearanceListeners, rememberedAppearanceUpdates;
   var init_CxExtensions = __esm({
     "src/core/ui/settings/pages/CxExtensions/index.tsx"() {
       "use strict";
@@ -69305,7 +66316,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_cx();
       init_common();
       init_components();
-      import_react_native33 = __toESM(require_react_native());
+      import_react_native29 = __toESM(require_react_native());
       session = createCxSession();
       callClock = createCxCallClock();
       voiceMemberClock = createCxVoiceMemberClock();
@@ -69333,7 +66344,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         titles: 0,
         dashless: 0
       };
-      UserStore2 = findByStoreNameLazy("UserStore");
+      UserStore = findByStoreNameLazy("UserStore");
       ChannelStore = findByStoreNameLazy("ChannelStore");
       MessageStore = findByStoreNameLazy("MessageStore");
       EmojiStore = findByStoreNameLazy("EmojiStore");
@@ -69406,12 +66417,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             return registerHiddenAppearancePaths(mobile.hideComponentPaths);
           if ("scrollIndicators" in mobile) {
             var scrollViews = /* @__PURE__ */ new Set([
-              import_react_native33.ScrollView,
-              import_react_native33.FlatList,
-              import_react_native33.SectionList,
-              import_react_native33.Animated?.ScrollView,
-              import_react_native33.Animated?.FlatList,
-              import_react_native33.Animated?.SectionList
+              import_react_native29.ScrollView,
+              import_react_native29.FlatList,
+              import_react_native29.SectionList,
+              import_react_native29.Animated?.ScrollView,
+              import_react_native29.Animated?.FlatList,
+              import_react_native29.Animated?.SectionList
             ]);
             var components = [
               ...scrollViews
@@ -69587,7 +66598,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             return registerReducedMotion();
           if ("mentionHighlight" in style) {
             var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-            var highlightColor = (0, import_react_native33.processColor)(style.mentionHighlight);
+            var highlightColor = (0, import_react_native29.processColor)(style.mentionHighlight);
             if (typeof highlightColor !== "number")
               throw new Error("Discord's message highlight color is unavailable");
             return overrideCxMethods(renderer, {
@@ -69628,7 +66639,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 var input = args[0];
                 if (!presentation || typeof presentation !== "object" || !input?.message?.content || input.isInlineReplyPreview || !("constrainedWidth" in presentation) || typeof presentation.constrainedWidth !== "number")
                   return presentation;
-                var width = style.width * import_react_native33.PixelRatio.getFontScale();
+                var width = style.width * import_react_native29.PixelRatio.getFontScale();
                 return Number.isFinite(width) && width > 0 && presentation.constrainedWidth > width ? {
                   ...presentation,
                   constrainedWidth: width
@@ -69669,7 +66680,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               }
               if (typeof icon3.value === "string" && "size" in icon3 && typeof icon3.animate === "boolean") {
                 return React2.cloneElement(element, {
-                  children: /* @__PURE__ */ jsx(import_react_native33.View, {
+                  children: /* @__PURE__ */ jsx(import_react_native29.View, {
                     style: iconStyle,
                     children
                   })
@@ -69819,19 +66830,19 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
 
   // src/core/ui/components/AddonCard.tsx
   function AddonCard(props) {
-    var styles2 = useStyles3();
+    var styles2 = useStyles2();
     return /* @__PURE__ */ jsx(Card, {
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 6,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native34.View, {
+          /* @__PURE__ */ jsxs(import_react_native30.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
               gap: 8
             },
             children: [
-              /* @__PURE__ */ jsxs(import_react_native34.View, {
+              /* @__PURE__ */ jsxs(import_react_native30.View, {
                 style: styles2.headerLeading,
                 children: [
                   /* @__PURE__ */ jsx(Text, {
@@ -69844,10 +66855,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native34.View, {
+              /* @__PURE__ */ jsxs(import_react_native30.View, {
                 style: styles2.headerTrailing,
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native34.View, {
+                  /* @__PURE__ */ jsxs(import_react_native30.View, {
                     style: styles2.actions,
                     children: [
                       props.overflowActions && /* @__PURE__ */ jsx(IconButton, {
@@ -69886,7 +66897,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     value: props.toggleValue(),
                     accessibilityLabel: props.headerLabel,
                     onValueChange: props.onToggleChange
-                  }) : /* @__PURE__ */ jsx(import_react_native34.TouchableOpacity, {
+                  }) : /* @__PURE__ */ jsx(import_react_native30.TouchableOpacity, {
                     accessibilityRole: "radio",
                     accessibilityLabel: props.headerLabel,
                     accessibilityState: {
@@ -69913,7 +66924,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native34, hideActionSheet2, showSimpleActionSheet3, useStyles3;
+  var import_react_native30, hideActionSheet2, showSimpleActionSheet3, useStyles2;
   var init_AddonCard = __esm({
     "src/core/ui/components/AddonCard.tsx"() {
       "use strict";
@@ -69926,10 +66937,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_wrappers();
       init_color();
       init_styles();
-      import_react_native34 = __toESM(require_react_native());
+      import_react_native30 = __toESM(require_react_native());
       ({ hideActionSheet: hideActionSheet2 } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet")));
       ({ showSimpleActionSheet: showSimpleActionSheet3 } = lazyDestructure(() => findByProps("showSimpleActionSheet")));
-      useStyles3 = createStyles({
+      useStyles2 = createStyles({
         headerLeading: {
           flex: 1,
           minWidth: 0,
@@ -70062,7 +67073,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             color: "text-muted",
             children: addon.warningMessage
           }),
-          /* @__PURE__ */ jsxs(import_react_native35.View, {
+          /* @__PURE__ */ jsxs(import_react_native31.View, {
             style: {
               flexDirection: "row",
               flexWrap: "wrap",
@@ -70156,12 +67167,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       shown.sort((a, b3) => a.name.localeCompare(b3.name));
     else
       shown.reverse();
-    return /* @__PURE__ */ jsxs(import_react_native35.View, {
+    return /* @__PURE__ */ jsxs(import_react_native31.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native35.View, {
+        /* @__PURE__ */ jsxs(import_react_native31.View, {
           style: {
             paddingHorizontal: 12,
             paddingVertical: 8,
@@ -70173,7 +67184,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               isRound: true,
               onChangeText: setSearch
             }),
-            /* @__PURE__ */ jsxs(import_react_native35.View, {
+            /* @__PURE__ */ jsxs(import_react_native31.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -70215,7 +67226,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               color: "text-muted",
               children: "Third-party plugins run code in your client. Install plugins from authors you trust."
             }),
-            !!error && /* @__PURE__ */ jsxs(import_react_native35.View, {
+            !!error && /* @__PURE__ */ jsxs(import_react_native31.View, {
               style: {
                 gap: 6
               },
@@ -70246,7 +67257,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             paddingHorizontal: 12,
             paddingBottom: 48
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native35.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native31.View, {
             style: {
               height: 8
             }
@@ -70270,7 +67281,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       ]
     });
   }
-  var import_react_native35, pluginIndex;
+  var import_react_native31, pluginIndex;
   var init_PluginBrowser = __esm({
     "src/core/ui/settings/pages/PluginBrowser/index.tsx"() {
       "use strict";
@@ -70288,7 +67299,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_common();
       init_components();
       init_Search();
-      import_react_native35 = __toESM(require_react_native());
+      import_react_native31 = __toESM(require_react_native());
       pluginIndex = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
     }
   });
@@ -70359,12 +67370,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       preview2.accent,
       preview2.text
     ];
-    return /* @__PURE__ */ jsx(import_react_native36.View, {
+    return /* @__PURE__ */ jsx(import_react_native32.View, {
       style: {
         flexDirection: "row",
         gap: 6
       },
-      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native36.View, {
+      children: colors.map((c2, i) => /* @__PURE__ */ jsx(import_react_native32.View, {
         style: {
           width: 22,
           height: 22,
@@ -70387,7 +67398,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       children: /* @__PURE__ */ jsxs(Stack, {
         spacing: 8,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native36.View, {
+          /* @__PURE__ */ jsxs(import_react_native32.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -70395,7 +67406,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               gap: 12
             },
             children: [
-              /* @__PURE__ */ jsxs(import_react_native36.View, {
+              /* @__PURE__ */ jsxs(import_react_native32.View, {
                 style: {
                   flex: 1
                 },
@@ -70427,13 +67438,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             numberOfLines: 2,
             children: theme.description
           }),
-          /* @__PURE__ */ jsxs(import_react_native36.View, {
+          /* @__PURE__ */ jsxs(import_react_native32.View, {
             style: {
               flexDirection: "row",
               gap: 8
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native36.View, {
+              /* @__PURE__ */ jsx(import_react_native32.View, {
                 style: {
                   flex: 1
                 },
@@ -70445,7 +67456,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   onPress: () => change(theme, active ? "reset" : "use")
                 })
               }),
-              installed && /* @__PURE__ */ jsx(import_react_native36.View, {
+              installed && /* @__PURE__ */ jsx(import_react_native32.View, {
                 style: {
                   flex: 1
                 },
@@ -70530,12 +67541,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     ].some((value) => value.toLowerCase().includes(q3))));
     if (alphabetical)
       shown.sort((a, b3) => a.name.localeCompare(b3.name));
-    return /* @__PURE__ */ jsxs(import_react_native36.View, {
+    return /* @__PURE__ */ jsxs(import_react_native32.View, {
       style: {
         flex: 1
       },
       children: [
-        /* @__PURE__ */ jsxs(import_react_native36.View, {
+        /* @__PURE__ */ jsxs(import_react_native32.View, {
           style: {
             paddingHorizontal: 12,
             paddingTop: 12,
@@ -70546,7 +67557,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               placeholder: "Search themes or authors",
               onChangeText: setQuery
             }),
-            !!list && /* @__PURE__ */ jsxs(import_react_native36.View, {
+            !!list && /* @__PURE__ */ jsxs(import_react_native32.View, {
               style: {
                 flexDirection: "row",
                 flexWrap: "wrap",
@@ -70576,7 +67587,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             })
           ]
         }),
-        error ? /* @__PURE__ */ jsxs(import_react_native36.View, {
+        error ? /* @__PURE__ */ jsxs(import_react_native32.View, {
           style: {
             alignItems: "center",
             gap: 8,
@@ -70618,7 +67629,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             padding: 12,
             paddingBottom: 48
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native36.View, {
+          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native32.View, {
             style: {
               height: 10
             }
@@ -70641,7 +67652,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       ]
     });
   }
-  var import_react_native36, CLOUDCORD_INDEX, MARKETPLACE;
+  var import_react_native32, CLOUDCORD_INDEX, MARKETPLACE;
   var init_ThemeStore = __esm({
     "src/core/ui/settings/pages/ThemeStore/index.tsx"() {
       "use strict";
@@ -70656,7 +67667,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_components();
       init_Search();
       init_toasts();
-      import_react_native36 = __toESM(require_react_native());
+      import_react_native32 = __toESM(require_react_native());
       CLOUDCORD_INDEX = "https://raw.githubusercontent.com/cloudcord-mod/hub/main/themes/mobile/index.json";
       MARKETPLACE = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
     }
@@ -70842,9 +67853,9 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   function RevengeFontsExtractor({ fonts: fonts2, setName }) {
     var currentTheme = getCurrentTheme().data;
     var themeFonts = currentTheme.fonts;
-    var [fontName, setFontName] = (0, import_react12.useState)(guessFontName(Object.values(themeFonts)));
-    var [error, setError] = (0, import_react12.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native37.View, {
+    var [fontName, setFontName] = (0, import_react9.useState)(guessFontName(Object.values(themeFonts)));
+    var [error, setError] = (0, import_react9.useState)(void 0);
+    return /* @__PURE__ */ jsxs(import_react_native33.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -70894,10 +67905,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     });
   }
   function JsonFontImporter({ fonts: fonts2, setName, setSource }) {
-    var [fontLink, setFontLink] = (0, import_react12.useState)("");
-    var [saving, setSaving] = (0, import_react12.useState)(false);
-    var [error, setError] = (0, import_react12.useState)(void 0);
-    return /* @__PURE__ */ jsxs(import_react_native37.View, {
+    var [fontLink, setFontLink] = (0, import_react9.useState)("");
+    var [saving, setSaving] = (0, import_react9.useState)(false);
+    var [error, setError] = (0, import_react9.useState)(void 0);
+    return /* @__PURE__ */ jsxs(import_react_native33.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -70938,9 +67949,9 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     });
   }
   function EntryEditorActionSheet(props) {
-    var [familyName, setFamilyName] = (0, import_react12.useState)(props.name);
-    var [fontUrl, setFontUrl] = (0, import_react12.useState)(props.fontEntries[props.name]);
-    return /* @__PURE__ */ jsxs(import_react_native37.View, {
+    var [familyName, setFamilyName] = (0, import_react9.useState)(props.name);
+    var [fontUrl, setFontUrl] = (0, import_react9.useState)(props.fontEntries[props.name]);
+    return /* @__PURE__ */ jsxs(import_react_native33.View, {
       style: {
         padding: 8,
         paddingBottom: 16,
@@ -70994,18 +68005,18 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     }), "FontEditorActionSheet");
   }
   function NewEntryRow({ fontName, fontEntry }) {
-    var nameRef = (0, import_react12.useRef)();
-    var urlRef = (0, import_react12.useRef)();
-    var [nameSet, setNameSet] = (0, import_react12.useState)(false);
-    var [error, setError] = (0, import_react12.useState)();
-    return /* @__PURE__ */ jsxs(import_react_native37.View, {
+    var nameRef = (0, import_react9.useRef)();
+    var urlRef = (0, import_react9.useRef)();
+    var [nameSet, setNameSet] = (0, import_react9.useState)(false);
+    var [error, setError] = (0, import_react9.useState)();
+    return /* @__PURE__ */ jsxs(import_react_native33.View, {
       style: {
         flexDirection: "row",
         gap: 8,
         justifyContent: "flex-start"
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native37.View, {
+        /* @__PURE__ */ jsx(import_react_native33.View, {
           style: {
             flex: 1
           },
@@ -71059,11 +68070,11 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     });
   }
   function FontEditor(props) {
-    var [name, setName] = (0, import_react12.useState)(props.name);
-    var [source, setSource] = (0, import_react12.useState)(props.name && fonts[props.name].source);
-    var [importing, setIsImporting] = (0, import_react12.useState)(false);
-    var [errors, setErrors] = (0, import_react12.useState)();
-    var memoEntry = (0, import_react12.useMemo)(() => {
+    var [name, setName] = (0, import_react9.useState)(props.name);
+    var [source, setSource] = (0, import_react9.useState)(props.name && fonts[props.name].source);
+    var [importing, setIsImporting] = (0, import_react9.useState)(false);
+    var [errors, setErrors] = (0, import_react9.useState)();
+    var memoEntry = (0, import_react9.useMemo)(() => {
       return createProxy(props.name ? {
         ...fonts[props.name].main
       } : {}).proxy;
@@ -71073,7 +68084,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var fontEntries = useProxy(memoEntry);
     var navigation2 = NavigationNative.useNavigation();
     var [, forceUpdate] = React.useReducer(() => ({}), 0);
-    return /* @__PURE__ */ jsx(import_react_native37.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native33.ScrollView, {
       style: {
         flex: 1
       },
@@ -71204,7 +68215,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             color: "text-feedback-critical",
             children: "Some font entries cannot be imported. Please modify the entries and try again."
           }),
-          /* @__PURE__ */ jsx(import_react_native37.View, {
+          /* @__PURE__ */ jsx(import_react_native33.View, {
             style: {
               flexDirection: "row",
               justifyContent: "flex-end",
@@ -71247,7 +68258,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react12, import_react_native37, actionSheet2, openAlert2, AlertModal3, AlertActionButton3;
+  var import_react9, import_react_native33, actionSheet2, openAlert2, AlertModal3, AlertActionButton3;
   var init_FontEditor = __esm({
     "src/core/ui/settings/pages/Fonts/FontEditor.tsx"() {
       "use strict";
@@ -71266,8 +68277,8 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_components();
       init_wrappers();
       init_components2();
-      import_react12 = __toESM(require_react());
-      import_react_native37 = __toESM(require_react_native());
+      import_react9 = __toESM(require_react());
+      import_react_native33 = __toESM(require_react_native());
       actionSheet2 = findByPropsLazy("hideActionSheet");
       ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
       ({ AlertModal: AlertModal3, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
@@ -71282,19 +68293,19 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     return /* @__PURE__ */ jsx(Card, {
       children: /* @__PURE__ */ jsx(Stack, {
         spacing: 16,
-        children: /* @__PURE__ */ jsxs(import_react_native38.View, {
+        children: /* @__PURE__ */ jsxs(import_react_native34.View, {
           style: {
             flexDirection: "row",
             alignItems: "center"
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native38.View, {
+            /* @__PURE__ */ jsx(import_react_native34.View, {
               children: /* @__PURE__ */ jsx(Text, {
                 variant: "heading-lg/semibold",
                 children: font.name
               })
             }),
-            /* @__PURE__ */ jsx(import_react_native38.View, {
+            /* @__PURE__ */ jsx(import_react_native34.View, {
               style: {
                 marginLeft: "auto"
               },
@@ -71340,7 +68351,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native38, useToken2;
+  var import_react_native34, useToken2;
   var init_FontCard = __esm({
     "src/core/ui/settings/pages/Fonts/FontCard.tsx"() {
       "use strict";
@@ -71358,7 +68369,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_metro();
       init_common();
       init_components();
-      import_react_native38 = __toESM(require_react_native());
+      import_react_native34 = __toESM(require_react_native());
       init_FontEditor();
       ({ useToken: useToken2 } = lazyDestructure(() => findByProps("useToken")));
     }
@@ -71441,7 +68452,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var discoverLabel = isPlugin ? "Discover plugins" : "Discover themes";
     var discover = wrapOnPress(void 0, navigation2, () => isPlugin ? Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports)) : Promise.resolve().then(() => (init_ThemeStore(), ThemeStore_exports)), discoverLabel, void 0, "push");
     var openFonts = wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_Fonts(), Fonts_exports)), "Fonts", void 0, "push");
-    return /* @__PURE__ */ jsxs(import_react_native39.View, {
+    return /* @__PURE__ */ jsxs(import_react_native35.View, {
       style: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -71498,7 +68509,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     return /* @__PURE__ */ jsx(AddonCard, {
       headerLabel: entry.name,
       descriptionLabel: entry.description,
-      preview: palette2.length > 0 ? /* @__PURE__ */ jsx(import_react_native39.View, {
+      preview: palette2.length > 0 ? /* @__PURE__ */ jsx(import_react_native35.View, {
         accessible: true,
         accessibilityLabel: `Theme colors: ${palette2.join(", ")}`,
         style: {
@@ -71507,7 +68518,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           overflow: "hidden",
           borderRadius: 5
         },
-        children: palette2.map((color) => /* @__PURE__ */ jsx(import_react_native39.View, {
+        children: palette2.map((color) => /* @__PURE__ */ jsx(import_react_native35.View, {
           style: {
             flex: 1,
             backgroundColor: color
@@ -71535,7 +68546,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     });
   }
-  var import_react_native39;
+  var import_react_native35;
   var init_AddonCard2 = __esm({
     "src/core/ui/settings/pages/CxExtensions/AddonCard.tsx"() {
       "use strict";
@@ -71550,7 +68561,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_toasts();
       init_common();
       init_components();
-      import_react_native39 = __toESM(require_react_native());
+      import_react_native35 = __toESM(require_react_native());
       init_CxExtensions();
     }
   });
@@ -71605,14 +68616,14 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       variant: "heading-lg/semibold",
       children: highlightedNode?.length ? highlightedNode : plugin2.name
     });
-    return /* @__PURE__ */ jsxs(import_react_native40.View, {
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         flexDirection: "row",
         alignItems: "center",
         gap: 6
       },
       children: [
-        icon3 && /* @__PURE__ */ jsx(import_react_native40.Image, {
+        icon3 && /* @__PURE__ */ jsx(import_react_native36.Image, {
           style: styles2.smallIcon,
           source: icon3
         }),
@@ -71633,7 +68644,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     }, i));
     var badges = plugin2.getBadges();
     var authorText = highlightedNode?.length ? highlightedNode : plugin2.authors.map((a) => a.name).join(", ");
-    return /* @__PURE__ */ jsxs(import_react_native40.View, {
+    return /* @__PURE__ */ jsxs(import_react_native36.View, {
       style: {
         flexDirection: "row",
         flexWrap: "wrap",
@@ -71649,9 +68660,9 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             authorText
           ]
         }),
-        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native40.View, {
+        badges.length > 0 && /* @__PURE__ */ jsx(import_react_native36.View, {
           style: styles2.badgesContainer,
-          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native40.Image, {
+          children: badges.map((b3, i) => /* @__PURE__ */ jsx(import_react_native36.Image, {
             source: b3.source,
             style: styles2.badgeIcon
           }, i))
@@ -71674,8 +68685,8 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   }
   function PluginCard2({ result, item: plugin2 }) {
     plugin2.usePluginState();
-    var [toggling, setToggling] = (0, import_react13.useState)(false);
-    var cardContextValue = (0, import_react13.useMemo)(() => ({
+    var [toggling, setToggling] = (0, import_react10.useState)(false);
+    var cardContextValue = (0, import_react10.useMemo)(() => ({
       plugin: plugin2,
       result
     }), [
@@ -71689,13 +68700,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         children: /* @__PURE__ */ jsxs(Stack, {
           spacing: 16,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native40.View, {
+            /* @__PURE__ */ jsxs(import_react_native36.View, {
               style: {
                 flexDirection: "row",
                 justifyContent: "space-between"
               },
               children: [
-                /* @__PURE__ */ jsxs(import_react_native40.View, {
+                /* @__PURE__ */ jsxs(import_react_native36.View, {
                   style: {
                     flexShrink: 1
                   },
@@ -71704,13 +68715,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     /* @__PURE__ */ jsx(Authors, {})
                   ]
                 }),
-                /* @__PURE__ */ jsx(import_react_native40.View, {
+                /* @__PURE__ */ jsx(import_react_native36.View, {
                   children: /* @__PURE__ */ jsxs(Stack, {
                     spacing: 12,
                     direction: "horizontal",
                     children: [
                       /* @__PURE__ */ jsx(Actions, {}),
-                      /* @__PURE__ */ jsx(import_react_native40.View, {
+                      /* @__PURE__ */ jsx(import_react_native36.View, {
                         style: core ? {
                           opacity: 0.5
                         } : void 0,
@@ -71742,7 +68753,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_chroma_js4, import_react13, import_react_native40, CardContext, useCardContext, Actions;
+  var import_chroma_js4, import_react10, import_react_native36, CardContext, useCardContext, Actions;
   var init_PluginCard = __esm({
     "src/core/ui/settings/pages/Plugins/components/PluginCard.tsx"() {
       "use strict";
@@ -71757,15 +68768,15 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_components();
       init_sheets();
       import_chroma_js4 = __toESM(require_chroma());
-      import_react13 = __toESM(require_react());
-      import_react_native40 = __toESM(require_react_native());
+      import_react10 = __toESM(require_react());
+      import_react_native36 = __toESM(require_react_native());
       init_plugins4();
-      CardContext = /* @__PURE__ */ (0, import_react13.createContext)(null);
-      useCardContext = () => (0, import_react13.useContext)(CardContext);
+      CardContext = /* @__PURE__ */ (0, import_react10.createContext)(null);
+      useCardContext = () => (0, import_react10.useContext)(CardContext);
       Actions = () => {
         var { plugin: plugin2 } = useCardContext();
         var navigation2 = NavigationNative.useNavigation();
-        return /* @__PURE__ */ jsxs(import_react_native40.View, {
+        return /* @__PURE__ */ jsxs(import_react_native36.View, {
           style: {
             flexDirection: "row",
             gap: 6
@@ -71797,24 +68808,24 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   });
 
   // src/metro/common/stores.ts
-  var UserStore3;
+  var UserStore2;
   var init_stores = __esm({
     "src/metro/common/stores.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_wrappers();
-      UserStore3 = findByStoreNameLazy("UserStore");
+      UserStore2 = findByStoreNameLazy("UserStore");
     }
   });
 
   // src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx
   function TitleComponent({ plugin: plugin2 }) {
     var users = FluxUtils.useStateFromStoresArray([
-      UserStore3
+      UserStore2
     ], () => {
       plugin2.authors?.forEach((a) => a.id && maybeFetchUser(a.id));
-      return plugin2.authors?.map((a) => UserStore3.getUser(a.id));
+      return plugin2.authors?.map((a) => UserStore2.getUser(a.id));
     });
     var { authors } = plugin2;
     var authorTextNode = [];
@@ -71833,23 +68844,23 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         _loop2(author);
       authorTextNode.pop();
     }
-    return /* @__PURE__ */ jsxs(import_react_native41.View, {
+    return /* @__PURE__ */ jsxs(import_react_native37.View, {
       style: {
         gap: 4
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native41.View, {
+        /* @__PURE__ */ jsx(import_react_native37.View, {
           children: /* @__PURE__ */ jsx(Text, {
             variant: "heading-xl/semibold",
             children: plugin2.name
           })
         }),
-        /* @__PURE__ */ jsx(import_react_native41.View, {
+        /* @__PURE__ */ jsx(import_react_native37.View, {
           style: {
             flexDirection: "row",
             flexShrink: 1
           },
-          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native41.View, {
+          children: authors?.length && /* @__PURE__ */ jsxs(import_react_native37.View, {
             style: {
               flexDirection: "row",
               gap: 8,
@@ -71879,7 +68890,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       ]
     });
   }
-  var import_react_native41, showUserProfileActionSheet, maybeFetchUser;
+  var import_react_native37, showUserProfileActionSheet, maybeFetchUser;
   var init_TitleComponent = __esm({
     "src/core/ui/settings/pages/Plugins/sheets/TitleComponent.tsx"() {
       "use strict";
@@ -71891,9 +68902,54 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_common();
       init_components();
       init_stores();
-      import_react_native41 = __toESM(require_react_native());
+      import_react_native37 = __toESM(require_react_native());
       showUserProfileActionSheet = findByNameLazy("showUserProfileActionSheet");
       ({ getUser: maybeFetchUser } = lazyDestructure(() => findByProps("getUser", "fetchProfile")));
+    }
+  });
+
+  // src/core/ui/settings/components/ScaledPluginSettings.tsx
+  function ScaledPluginSettings({ component: Component2 }) {
+    if (typeof Component2 !== "function") {
+      return /* @__PURE__ */ jsx(import_react_native38.View, {
+        style: {
+          padding: 16
+        },
+        children: /* @__PURE__ */ jsx(import_react_native38.Text, {
+          style: {
+            color: "#ffffff"
+          },
+          children: "This plugin does not provide a mobile-compatible settings component."
+        })
+      });
+    }
+    return /* @__PURE__ */ jsx(import_react_native38.ScrollView, {
+      style: {
+        flex: 1
+      },
+      contentContainerStyle: {
+        paddingBottom: 90,
+        paddingHorizontal: 12
+      },
+      showsVerticalScrollIndicator: true,
+      children: /* @__PURE__ */ jsx(import_react_native38.View, {
+        style: {
+          width: "100%",
+          paddingRight: 24,
+          overflow: "visible"
+        },
+        children: /* @__PURE__ */ jsx(Component2, {})
+      })
+    });
+  }
+  var import_react_native38;
+  var init_ScaledPluginSettings = __esm({
+    "src/core/ui/settings/components/ScaledPluginSettings.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_jsxRuntime();
+      import_react_native38 = __toESM(require_react_native());
     }
   });
 
@@ -71914,7 +68970,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   }
   function PluginInfoActionSheet({ plugin: plugin2, navigation: navigation2 }) {
     plugin2.usePluginState();
-    var [loading, setLoading] = (0, import_react14.useState)(false);
+    var [loading, setLoading] = (0, import_react11.useState)(false);
     var isVendettaPlugin = plugin2.id.includes("/");
     var isCorePlugin2 = plugin2.id.startsWith("bunny.") || plugin2.id.startsWith("vendetta.");
     var copyPluginUrl = () => {
@@ -72010,13 +69066,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       });
     };
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native42.ScrollView, {
+      children: /* @__PURE__ */ jsxs(import_react_native39.ScrollView, {
         contentContainerStyle: {
           gap: 12,
           marginBottom: 12
         },
         children: [
-          /* @__PURE__ */ jsx(import_react_native42.View, {
+          /* @__PURE__ */ jsx(import_react_native39.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -72029,7 +69085,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               plugin: plugin2
             })
           }),
-          /* @__PURE__ */ jsxs(import_react_native42.View, {
+          /* @__PURE__ */ jsxs(import_react_native39.View, {
             style: {
               flexDirection: "row",
               justifyContent: "center",
@@ -72101,7 +69157,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react14, import_react_native42;
+  var import_react11, import_react_native39;
   var init_PluginInfoActionSheet = __esm({
     "src/core/ui/settings/pages/Plugins/sheets/PluginInfoActionSheet.tsx"() {
       "use strict";
@@ -72118,8 +69174,8 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_storage();
       init_storage2();
       init_assets();
-      import_react14 = __toESM(require_react());
-      import_react_native42 = __toESM(require_react_native());
+      import_react11 = __toESM(require_react());
+      import_react_native39 = __toESM(require_react_native());
       init_TitleComponent();
       init_ScaledPluginSettings();
     }
@@ -72302,7 +69358,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           return /* @__PURE__ */ jsx(AddonActions, {
             kind: "plugin"
           });
-        return /* @__PURE__ */ jsxs(import_react_native43.View, {
+        return /* @__PURE__ */ jsxs(import_react_native40.View, {
           style: {
             marginVertical: 12,
             marginHorizontal: 10
@@ -72313,7 +69369,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             }),
             /* @__PURE__ */ jsx(Card, {
               border: "strong",
-              children: /* @__PURE__ */ jsxs(import_react_native43.View, {
+              children: /* @__PURE__ */ jsxs(import_react_native40.View, {
                 style: {
                   flex: 1,
                   justifyContent: "center",
@@ -72321,7 +69377,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   flexDirection: "row"
                 },
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native43.View, {
+                  /* @__PURE__ */ jsxs(import_react_native40.View, {
                     style: {
                       gap: 6,
                       flexShrink: 1
@@ -72338,7 +69394,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native43.View, {
+                  /* @__PURE__ */ jsx(import_react_native40.View, {
                     style: {
                       marginLeft: "auto"
                     },
@@ -72358,7 +69414,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                               contentContainerStyle: {
                                 padding: 8
                               },
-                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native43.View, {
+                              ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native40.View, {
                                 style: {
                                   height: 8
                                 }
@@ -72430,7 +69486,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     });
   }
-  var import_react_native43, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
+  var import_react_native40, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -72456,7 +69512,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_metro();
       init_common();
       init_components();
-      import_react_native43 = __toESM(require_react_native());
+      import_react_native40 = __toESM(require_react_native());
       init_bunny();
       init_vendetta();
       ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
@@ -72494,23 +69550,23 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   }
   function TitleComponent2({ theme }) {
     var { authors } = theme.data;
-    return /* @__PURE__ */ jsxs(import_react_native44.View, {
+    return /* @__PURE__ */ jsxs(import_react_native41.View, {
       style: {
         gap: 4
       },
       children: [
-        /* @__PURE__ */ jsx(import_react_native44.View, {
+        /* @__PURE__ */ jsx(import_react_native41.View, {
           children: /* @__PURE__ */ jsx(Text, {
             variant: "heading-xl/semibold",
             children: theme.data.name
           })
         }),
-        /* @__PURE__ */ jsx(import_react_native44.View, {
+        /* @__PURE__ */ jsx(import_react_native41.View, {
           style: {
             flexDirection: "row",
             flexShrink: 1
           },
-          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native44.TouchableOpacity, {
+          children: authors && authors.length > 0 && /* @__PURE__ */ jsx(import_react_native41.TouchableOpacity, {
             style: {
               flexDirection: "row",
               gap: 8,
@@ -72534,11 +69590,11 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     });
   }
   function ThemeInfoActionSheet({ theme, navigation: navigation2 }) {
-    var [themeState, setThemeState] = (0, import_react15.useState)({
+    var [themeState, setThemeState] = (0, import_react12.useState)({
       ...theme
     });
-    var [loading, setLoading] = (0, import_react15.useState)(false);
-    (0, import_react15.useEffect)(() => {
+    var [loading, setLoading] = (0, import_react12.useState)(false);
+    (0, import_react12.useEffect)(() => {
       var interval = setInterval(() => {
         setThemeState({
           ...theme
@@ -72602,13 +69658,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     };
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native44.ScrollView, {
+      children: /* @__PURE__ */ jsxs(import_react_native41.ScrollView, {
         contentContainerStyle: {
           gap: 12,
           marginBottom: 12
         },
         children: [
-          /* @__PURE__ */ jsx(import_react_native44.View, {
+          /* @__PURE__ */ jsx(import_react_native41.View, {
             style: {
               flexDirection: "row",
               alignItems: "center",
@@ -72621,7 +69677,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               theme: themeState
             })
           }),
-          /* @__PURE__ */ jsxs(import_react_native44.View, {
+          /* @__PURE__ */ jsxs(import_react_native41.View, {
             style: {
               flexDirection: "row",
               justifyContent: "center",
@@ -72672,7 +69728,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react15, import_react_native44;
+  var import_react12, import_react_native41;
   var init_ThemeInfoActionSheet = __esm({
     "src/core/ui/settings/pages/Themes/sheets/ThemeInfoActionSheet.tsx"() {
       "use strict";
@@ -72684,8 +69740,8 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_sheets();
       init_components();
       init_common();
-      import_react15 = __toESM(require_react());
-      import_react_native44 = __toESM(require_react_native());
+      import_react12 = __toESM(require_react());
+      import_react_native41 = __toESM(require_react_native());
       init_toasts();
       init_alerts2();
       init_themes();
@@ -72819,7 +69875,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
               title: "Options"
             }),
-            /* @__PURE__ */ jsxs(import_react_native45.View, {
+            /* @__PURE__ */ jsxs(import_react_native42.View, {
               style: {
                 paddingVertical: 20,
                 gap: 12
@@ -72905,7 +69961,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     });
   }
-  var import_react_native45;
+  var import_react_native42;
   var init_Themes = __esm({
     "src/core/ui/settings/pages/Themes/index.tsx"() {
       "use strict";
@@ -72925,7 +69981,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_settings();
       init_storage2();
       init_components();
-      import_react_native45 = __toESM(require_react_native());
+      import_react_native42 = __toESM(require_react_native());
     }
   });
 
@@ -72962,7 +70018,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       navigation2
     ]);
     var hasThemes = isThemeSupported();
-    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
       contentContainerStyle: {
         paddingBottom: 38
       },
@@ -73001,7 +70057,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native46;
+  var import_react_native43;
   var init_Addons = __esm({
     "src/core/ui/settings/pages/Addons/index.tsx"() {
       "use strict";
@@ -73009,7 +70065,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
-      import_react_native46 = __toESM(require_react_native());
+      import_react_native43 = __toESM(require_react_native());
       init_common();
       init_components();
       init_loader();
@@ -73018,69 +70074,2947 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     }
   });
 
-  // src/core/ui/settings/pages/Tools/index.tsx
-  var Tools_exports = {};
-  __export(Tools_exports, {
-    default: () => Tools
+  // src/lib/api/cxTesting/cx-testing-queues.json
+  var cx_testing_queues_default;
+  var init_cx_testing_queues = __esm({
+    "src/lib/api/cxTesting/cx-testing-queues.json"() {
+      cx_testing_queues_default = [
+        [
+          ["mobile/all-call-time-counter", "AllCallTimeCounter", "Shared declarative CX"],
+          ["mobile/chat-buttons-begone", "ChatButtonsBegone", "Shared declarative CX"],
+          ["mobile/dashless", "Dashless", "Shared declarative CX"],
+          ["mobile/equius-s-typing-quirk", "Equius'sTypingQuirk", "Shared declarative CX"],
+          ["mobile/file-name-randomization", "FileNameRandomization", "Shared declarative CX"],
+          ["mobile/hide-disabled-emojis", "HideDisabledEmojis", "Shared declarative CX"],
+          ["mobile/link-converter", "LinkConverter", "Shared declarative CX"],
+          ["mobile/no-reply-ping", "NoReplyPing", "Shared declarative CX"],
+          ["mobile/profile-media", "ProfileMedia", "Shared declarative CX"],
+          ["mobile/rot13-text", "ROT13 Text", "Shared declarative CX"],
+          ["mobile/sollux-typing-quirk", "SolluxTypingQuirk", "Shared declarative CX"],
+          ["mobile/user-notes", "UserNotes", "Shared declarative CX"],
+          ["mobile/vriska-s-typing-quirk", "Vriska'sTypingQuirk", "Shared declarative CX"],
+          ["gpl/add-attachments", "AddAttachments", "Desktop CX pack"],
+          ["gpl/alt-krisp-switch", "AltKrispSwitch", "Desktop CX pack"],
+          ["gpl/always-expand-roles", "AlwaysExpandRoles", "Desktop CX pack"],
+          ["gpl/animalese", "Animalese", "Desktop CX pack"],
+          ["gpl/anti-move-deco", "AntiMoveDeco", "Desktop CX pack"],
+          ["gpl/apple-music-rich-presence", "AppleMusicRichPresence", "Desktop CX pack"],
+          ["gpl/auto-dndwhile-playing", "AutoDNDWhilePlaying", "Desktop CX pack"],
+          ["gpl/auto-zipper", "AutoZipper", "Desktop CX pack"],
+          ["gpl/better-activities", "BetterActivities", "Desktop CX pack"],
+          ["gpl/better-ban-reasons", "BetterBanReasons", "Desktop CX pack"],
+          ["gpl/better-folders", "BetterFolders", "Desktop CX pack"],
+          ["gpl/better-gif-picker", "BetterGifPicker", "Desktop CX pack"],
+          ["gpl/better-plus-reacts", "BetterPlusReacts", "Desktop CX pack"],
+          ["gpl/better-screen-share", "BetterScreenShare", "Desktop CX pack"],
+          ["gpl/better-upload-button", "BetterUploadButton", "Desktop CX pack"],
+          ["gpl/bigger-code-blocks", "BiggerCodeBlocks", "Desktop CX pack"],
+          ["gpl/bigger-stream-preview", "BiggerStreamPreview", "Desktop CX pack"],
+          ["gpl/blur-images-until-hover", "BlurImagesUntilHover", "Desktop CX pack"],
+          ["gpl/bold-usernames", "BoldUsernames", "Desktop CX pack"],
+          ["gpl/bypass-status", "BypassStatus", "Desktop CX pack"],
+          ["gpl/cancel-friend-request", "CancelFriendRequest", "Desktop CX pack"],
+          ["gpl/channel-notes", "ChannelNotes", "Desktop CX pack"],
+          ["gpl/clan-switcher", "ClanSwitcher", "Desktop CX pack"],
+          ["gpl/cleaner-channel-groups", "CleanerChannelGroups", "Desktop CX pack"],
+          ["gpl/clickable-roles", "ClickableRoles", "Desktop CX pack"],
+          ["gpl/client-theme", "ClientTheme", "Desktop CX pack"],
+          ["gpl/cloud-cord-core", "CloudCord Core", "Desktop CX pack"],
+          ["gpl/cloud-cord-verification", "CloudCordVerification", "Desktop CX pack"],
+          ["gpl/color-sighted", "ColorSighted", "Desktop CX pack"],
+          ["gpl/compact-compose", "CompactCompose", "Desktop CX pack"],
+          ["gpl/compact-server-list", "CompactServerList", "Desktop CX pack"],
+          ["gpl/content-warning", "ContentWarning", "Desktop CX pack"],
+          ["gpl/copy-media-link", "CopyMediaLink", "Desktop CX pack"],
+          ["gpl/copy-sticker-links", "CopyStickerLinks", "Desktop CX pack"],
+          ["gpl/crash-handler", "CrashHandler", "Desktop CX pack"],
+          ["gpl/custom-app-icons", "CustomAppIcons", "Desktop CX pack"],
+          ["gpl/custom-folder-icons", "CustomFolderIcons", "Desktop CX pack"],
+          ["gpl/custom-rpc", "CustomRPC", "Desktop CX pack"],
+          ["gpl/custom-stream-preview", "CustomStreamPreview", "Desktop CX pack"],
+          ["gpl/cx-extensions", "CxExtensions", "Desktop CX pack"],
+          ["gpl/decode-base64", "DecodeBase64", "Desktop CX pack"],
+          ["gpl/dev-companion", "DevCompanion", "Desktop CX pack"],
+          ["gpl/disable-cameras", "DisableCameras", "Desktop CX pack"],
+          ["gpl/dm-read-receipt", "DmReadReceipt", "Desktop CX pack"],
+          ["gpl/download-all-attachments", "DownloadAllAttachments", "Desktop CX pack"],
+          ["gpl/dragify", "Dragify", "Desktop CX pack"],
+          ["gpl/encrypted-message", "EncryptedMessage", "Desktop CX pack"],
+          ["gpl/equissant", "Equissant", "Desktop CX pack"],
+          ["gpl/experiments", "Experiments", "Desktop CX pack"],
+          ["gpl/expression-cloner", "ExpressionCloner", "Desktop CX pack"],
+          ["gpl/fake-lag", "FakeLag", "Desktop CX pack"],
+          ["gpl/fake-nitro", "FakeNitro", "Desktop CX pack"],
+          ["gpl/fast-delete-channels", "FastDeleteChannels", "Desktop CX pack"],
+          ["gpl/favorite-emoji-first", "FavoriteEmojiFirst", "Desktop CX pack"],
+          ["gpl/file-splitter", "FileSplitter", "Desktop CX pack"],
+          ["gpl/find-reply", "FindReply", "Desktop CX pack"],
+          ["gpl/fix-images-quality", "FixImagesQuality", "Desktop CX pack"],
+          ["gpl/fix-youtube-embeds", "FixYoutubeEmbeds", "Desktop CX pack"],
+          ["gpl/follow-voice-user", "FollowVoiceUser", "Desktop CX pack"],
+          ["gpl/forward-anywhere", "ForwardAnywhere", "Desktop CX pack"],
+          ["gpl/friend-invites", "FriendInvites", "Desktop CX pack"],
+          ["gpl/friend-tags", "FriendTags", "Desktop CX pack"],
+          ["gpl/full-vcpfp", "FullVCPFP", "Desktop CX pack"],
+          ["gpl/ghosted", "Ghosted", "Desktop CX pack"],
+          ["gpl/gif-paste", "GifPaste", "Desktop CX pack"],
+          ["gpl/global-badges", "GlobalBadges", "Desktop CX pack"],
+          ["gpl/greet-sticker-picker", "GreetStickerPicker", "Desktop CX pack"],
+          ["gpl/hide-add-server-button", "HideAddServerButton", "Desktop CX pack"],
+          ["gpl/hide-badges", "HideBadges", "Desktop CX pack"],
+          ["gpl/hide-call-buttons", "HideCallButtons", "Desktop CX pack"],
+          ["gpl/hide-chat-buttons", "HideChatButtons", "Desktop CX pack"],
+          ["gpl/hide-discover-button", "HideDiscoverButton", "Desktop CX pack"],
+          ["gpl/hide-edited-label", "HideEditedLabel", "Desktop CX pack"],
+          ["gpl/hide-empty-folders", "HideEmptyFolders", "Desktop CX pack"],
+          ["gpl/hide-gift-button", "HideGiftButton", "Desktop CX pack"],
+          ["gpl/hide-image-alt-text", "HideImageAltText", "Desktop CX pack"],
+          ["gpl/hide-jump-to-present", "HideJumpToPresent", "Desktop CX pack"],
+          ["gpl/hide-member-activities", "HideMemberActivities", "Desktop CX pack"],
+          ["gpl/hide-messages", "HideMessages", "Desktop CX pack"],
+          ["gpl/hide-nitro-tab", "HideNitroTab", "Desktop CX pack"],
+          ["gpl/hide-profile-effects", "HideProfileEffects", "Desktop CX pack"],
+          ["gpl/hide-reactions-bar", "HideReactionsBar", "Desktop CX pack"],
+          ["gpl/hide-scrollbars", "HideScrollbars", "Desktop CX pack"],
+          ["gpl/hide-server-banners", "HideServerBanners", "Desktop CX pack"],
+          ["gpl/hide-spoiler-warnings", "HideSpoilerWarnings", "Desktop CX pack"],
+          ["gpl/hide-stickers", "HideStickers", "Desktop CX pack"],
+          ["gpl/hide-system-messages", "HideSystemMessages", "Desktop CX pack"],
+          ["gpl/hide-typing-indicator", "HideTypingIndicator", "Desktop CX pack"],
+          ["gpl/hide-user-panel-activity", "HideUserPanelActivity", "Desktop CX pack"],
+          ["gpl/high-contrast-text", "HighContrastText", "Desktop CX pack"],
+          ["gpl/home-typing", "HomeTyping", "Desktop CX pack"],
+          ["gpl/husk", "Husk", "Desktop CX pack"],
+          ["gpl/id-translater", "ID Translater", "Desktop CX pack"],
+          ["gpl/ignore-calls", "IgnoreCalls", "Desktop CX pack"],
+          ["gpl/image-link", "ImageLink", "Desktop CX pack"],
+          ["gpl/ingtoninator", "Ingtoninator", "Desktop CX pack"],
+          ["gpl/invisible-chat", "InvisibleChat", "Desktop CX pack"],
+          ["gpl/iremember-you", "IRememberYou", "Desktop CX pack"],
+          ["gpl/jump-to-top", "JumpToTop", "Desktop CX pack"],
+          ["gpl/keyboard-sounds", "KeyboardSounds", "Desktop CX pack"],
+          ["gpl/last-active", "LastActive", "Desktop CX pack"],
+          ["gpl/leet-text", "LeetText", "Desktop CX pack", "leet-text.cx"],
+          ["gpl/local-times", "LocalTimes", "Desktop CX pack"],
+          ["gpl/media-playback-speed", "MediaPlaybackSpeed", "Desktop CX pack"],
+          ["gpl/mention-colors", "MentionColors", "Desktop CX pack"],
+          ["gpl/message-colors", "MessageColors", "Desktop CX pack"],
+          ["gpl/message-link-embeds", "MessageLinkEmbeds", "Desktop CX pack"],
+          ["gpl/message-logger-enhanced", "MessageLoggerEnhanced", "Desktop CX pack"],
+          ["gpl/message-reminders", "MessageReminders", "Desktop CX pack"],
+          ["gpl/message-vault", "MessageVault", "Desktop CX pack"],
+          ["gpl/monospace-chat", "MonospaceChat", "Desktop CX pack"],
+          ["gpl/more-quick-reactions", "MoreQuickReactions", "Desktop CX pack"],
+          ["gpl/motion-blur", "MotionBlur", "Desktop CX pack"],
+          ["gpl/music-rich-presence", "MusicRichPresence", "Desktop CX pack"],
+          ["gpl/mutual-server-members", "MutualServerMembers", "Desktop CX pack"],
+          ["gpl/never-pause-previews", "NeverPausePreviews", "Desktop CX pack"],
+          ["gpl/no-animations", "NoAnimations", "Desktop CX pack"],
+          ["gpl/no-devtools-warning", "NoDevtoolsWarning", "Desktop CX pack"],
+          ["gpl/no-f1", "NoF1", "Desktop CX pack"],
+          ["gpl/no-middle-click-paste", "NoMiddleClickPaste", "Desktop CX pack"],
+          ["gpl/no-onboarding-delay", "NoOnboardingDelay", "Desktop CX pack"],
+          ["gpl/no-push-to-talk", "NoPushToTalk", "Desktop CX pack"],
+          ["gpl/no-role-headers", "NoRoleHeaders", "Desktop CX pack"],
+          ["gpl/no-shadows", "NoShadows", "Desktop CX pack"],
+          ["gpl/notification-title", "NotificationTitle", "Desktop CX pack"],
+          ["gpl/no-unblock-to-jump", "NoUnblockToJump", "Desktop CX pack"],
+          ["gpl/open-in-app", "OpenInApp", "Desktop CX pack"],
+          ["gpl/party-mode", "PartyMode", "Desktop CX pack"],
+          ["gpl/permissions-viewer", "PermissionsViewer", "Desktop CX pack"],
+          ["gpl/pin-dms", "PinDMs", "Desktop CX pack"],
+          ["gpl/plain-folder-icon", "PlainFolderIcon", "Desktop CX pack"],
+          ["gpl/polish-wording", "PolishWording", "Desktop CX pack"],
+          ["gpl/profile-spoofer", "ProfileSpoofer", "Desktop CX pack"],
+          ["gpl/questify", "Questify", "Desktop CX pack"],
+          ["gpl/quick-reply", "QuickReply", "Desktop CX pack"],
+          ["gpl/quoter", "Quoter", "Desktop CX pack"],
+          ["gpl/reaction-timestamps", "ReactionTimestamps", "Desktop CX pack"],
+          ["gpl/read-all-notifications-button", "ReadAllNotificationsButton", "Desktop CX pack"],
+          ["gpl/relationship-notifier", "RelationshipNotifier", "Desktop CX pack"],
+          ["gpl/reorder-attachments", "ReorderAttachments", "Desktop CX pack"],
+          ["gpl/reply-ping-control", "ReplyPingControl", "Desktop CX pack"],
+          ["gpl/reverse-image-search", "ReverseImageSearch", "Desktop CX pack"],
+          ["gpl/rich-presence", "RichPresence", "Desktop CX pack"],
+          ["gpl/rounded-chat-bar", "RoundedChatBar", "Desktop CX pack"],
+          ["gpl/rpceditor", "RPCEditor", "Desktop CX pack"],
+          ["gpl/screen-recorder", "ScreenRecorder", "Desktop CX pack"],
+          ["gpl/secret-ring-tone-enabler", "SecretRingToneEnabler", "Desktop CX pack"],
+          ["gpl/self-forward", "SelfForward", "Desktop CX pack"],
+          ["gpl/server-info", "ServerInfo", "Desktop CX pack"],
+          ["gpl/server-search", "ServerSearch", "Desktop CX pack"],
+          ["gpl/shiki-codeblocks", "ShikiCodeblocks", "Desktop CX pack"],
+          ["gpl/show-badges-in-chat", "ShowBadgesInChat", "Desktop CX pack"],
+          ["gpl/show-hidden-things", "ShowHiddenThings", "Desktop CX pack"],
+          ["gpl/show-resource-channels", "ShowResourceChannels", "Desktop CX pack"],
+          ["gpl/show-timeout-duration", "ShowTimeoutDuration", "Desktop CX pack"],
+          ["gpl/signature", "Signature", "Desktop CX pack"],
+          ["gpl/silent-edit", "SilentEdit", "Desktop CX pack"],
+          ["gpl/sinbop-stream-fixes", "SinbopStreamFixes", "Desktop CX pack"],
+          ["gpl/smaller-avatars-in-chat", "SmallerAvatarsInChat", "Desktop CX pack"],
+          ["gpl/smooth-type", "SmoothType", "Desktop CX pack"],
+          ["gpl/soft-corners", "SoftCorners", "Desktop CX pack"],
+          ["gpl/song-spotlight", "SongSpotlight", "Desktop CX pack"],
+          ["gpl/space-out", "SpaceOut", "Desktop CX pack"],
+          ["gpl/spotify-activity-toggle", "SpotifyActivityToggle", "Desktop CX pack"],
+          ["gpl/square-avatars", "SquareAvatars", "Desktop CX pack"],
+          ["gpl/status-presets", "StatusPresets", "Desktop CX pack"],
+          ["gpl/stereo-screenshare-audio", "StereoScreenshareAudio", "Desktop CX pack"],
+          ["gpl/sticky-date-dividers", "StickyDateDividers", "Desktop CX pack"],
+          ["gpl/streamer-mode-on", "StreamerModeOn", "Desktop CX pack"],
+          ["gpl/summaries", "Summaries", "Desktop CX pack"],
+          ["gpl/suspicious-links", "SuspiciousLinks", "Desktop CX pack"],
+          ["gpl/text-screenshot", "TextScreenshot", "Desktop CX pack"],
+          ["gpl/thin-scrollbars", "ThinScrollbars", "Desktop CX pack"],
+          ["gpl/timezones", "Timezones", "Desktop CX pack"],
+          ["gpl/toggle-video-bind", "ToggleVideoBind", "Desktop CX pack"],
+          ["gpl/transparent-chat-bar", "TransparentChatBar", "Desktop CX pack"],
+          ["gpl/typing-tweaks", "TypingTweaks", "Desktop CX pack"],
+          ["gpl/universal-mention", "UniversalMention", "Desktop CX pack"],
+          ["gpl/unlimited-favorite-gifs", "UnlimitedFavoriteGIFs", "Desktop CX pack"],
+          ["gpl/unsuppress-embeds", "UnsuppressEmbeds", "Desktop CX pack"],
+          ["gpl/user-pfp", "UserPFP", "Desktop CX pack"],
+          ["gpl/usrbg", "USRBG", "Desktop CX pack"],
+          ["gpl/vc-narrator", "VcNarrator", "Desktop CX pack"],
+          ["gpl/vibe-check", "VibeCheck", "Desktop CX pack"],
+          ["gpl/view-raw-variant", "ViewRawVariant", "Desktop CX pack"],
+          ["gpl/voice-chat-double-click", "VoiceChatDoubleClick", "Desktop CX pack"],
+          ["gpl/voice-fake-detector", "VoiceFakeDetector", "Desktop CX pack"],
+          ["gpl/voice-messages-in-background", "VoiceMessagesInBackground", "Desktop CX pack"],
+          ["gpl/voice-server-info", "VoiceServerInfo", "Desktop CX pack"],
+          ["gpl/volume-booster", "VolumeBooster", "Desktop CX pack"],
+          ["gpl/web-context-menus", "WebContextMenus", "Desktop CX pack"],
+          ["gpl/web-rich-presence", "WebRichPresence", "Desktop CX pack"],
+          ["gpl/wellbeing", "Wellbeing", "Desktop CX pack"],
+          ["gpl/whos-watching", "WhosWatching", "Desktop CX pack"],
+          ["gpl/wiggly-text", "WigglyText", "Desktop CX pack"],
+          ["gpl/write-upper-case", "WriteUpperCase", "Desktop CX pack"],
+          ["gpl/zero-width-sanitizer", "ZeroWidthSanitizer", "Desktop CX pack"],
+          ["discover-66", "\u{1F384} Christmas Counter", "Discover CX preview"],
+          ["discover-73", "Animal Commands", "Discover CX preview"],
+          ["discover-36", "Bluetooth Audio Fix", "Discover CX preview"],
+          ["discover-21", "Char Counter", "Discover CX preview"],
+          ["discover-64", "ClipboardGIFSend", "Discover CX preview"],
+          ["discover-32", "Dislate Lite", "Discover CX preview"],
+          ["discover-37", "Force Timestamp Locale", "Discover CX preview"],
+          ["discover-95", "Geastures+", "Discover CX preview"],
+          ["discover-1", "Global Badges", "Discover CX preview"],
+          ["discover-52", "HideBlockedAndIgnoredMessages", "Discover CX preview"],
+          ["discover-91", "Keyword Tracker", "Discover CX preview"],
+          ["discover-68", "Let it Snow", "Discover CX preview"],
+          ["discover-20", "Monet Theme", "Discover CX preview"],
+          ["discover-38", "Mute New Guilds", "Discover CX preview"],
+          ["discover-40", "NoAutoReplyMention", "Discover CX preview"],
+          ["discover-10", "NoDelete", "Discover CX preview"],
+          ["discover-57", "NSFW Blur", "Discover CX preview"],
+          ["discover-88", "PermissionViewer", "Discover CX preview"],
+          ["discover-19", "Plugin Browser", "Discover CX preview"],
+          ["discover-29", "Quick Delete", "Discover CX preview"],
+          ["discover-78", "Realmoji", "Discover CX preview"],
+          ["discover-94", "SearchActionSheet", "Discover CX preview"],
+          ["discover-44", "Show Tag", "Discover CX preview"],
+          ["discover-83", "SilentDelete", "Discover CX preview"],
+          ["discover-15", "SpotifyPreview", "Discover CX preview"],
+          ["discover-77", "Text Replace", "Discover CX preview"],
+          ["discover-48", "UserPFP", "Discover CX preview"],
+          ["discover-3", "ViewRaw", "Discover CX preview"]
+        ],
+        [
+          ["mobile/better-chat-names", "BetterChatNames", "Shared declarative CX"],
+          ["mobile/copy-bios", "CopyBios", "Shared declarative CX"],
+          ["mobile/double-click-edit", "DoubleClickEdit", "Shared declarative CX"],
+          ["mobile/eridan-typing-quirk", "EridanTypingQuirk", "Shared declarative CX"],
+          ["mobile/foreign-copy-handler", "foreignCopyHandler", "Shared declarative CX"],
+          ["mobile/high-res-profile-images", "High-Res Profile Images", "Shared declarative CX"],
+          ["mobile/nepeta-s-typing-quirk", "Nepeta'sTypingQuirk", "Shared declarative CX"],
+          ["mobile/notify-when-muted", "NotifyWhenMuted", "Shared declarative CX"],
+          ["mobile/read-all-notifications", "ReadAllNotifications", "Shared declarative CX"],
+          ["mobile/scroll-to-latest", "ScrollToLatest", "Shared declarative CX"],
+          ["mobile/terezi-typing-quirk", "TereziTypingQuirk", "Shared declarative CX"],
+          ["mobile/user-tags", "UserTags", "Shared declarative CX"],
+          ["gpl/1-fa", "1FA", "Desktop CX pack"],
+          ["gpl/advanced-permissions", "AdvancedPermissions", "Desktop CX pack"],
+          ["gpl/always-animate", "AlwaysAnimate", "Desktop CX pack"],
+          ["gpl/always-trust", "AlwaysTrust", "Desktop CX pack"],
+          ["gpl/anonymise-file-names", "AnonymiseFileNames", "Desktop CX pack"],
+          ["gpl/anti-nickname", "AntiNickname", "Desktop CX pack"],
+          ["gpl/at-someone", "AtSomeone", "Desktop CX pack"],
+          ["gpl/auto-jump-to-message", "AutoJumpToMessage", "Desktop CX pack"],
+          ["gpl/avatar-grabber", "AvatarGrabber", "Desktop CX pack"],
+          ["gpl/better-audio-player", "BetterAudioPlayer", "Desktop CX pack"],
+          ["gpl/better-blocked-users", "BetterBlockedUsers", "Desktop CX pack"],
+          ["gpl/better-gif-alt-text", "BetterGifAltText", "Desktop CX pack"],
+          ["gpl/better-image-editor", "BetterImageEditor", "Desktop CX pack"],
+          ["gpl/better-role-context", "BetterRoleContext", "Desktop CX pack"],
+          ["gpl/better-sessions", "BetterSessions", "Desktop CX pack"],
+          ["gpl/bigger-avatars-in-chat", "BiggerAvatarsInChat", "Desktop CX pack"],
+          ["gpl/bigger-jumbo-emojis", "BiggerJumboEmojis", "Desktop CX pack"],
+          ["gpl/block-keywords", "BlockKeywords", "Desktop CX pack"],
+          ["gpl/blur-nsfw", "BlurNSFW", "Desktop CX pack"],
+          ["gpl/bookmarks", "Bookmarks", "Desktop CX pack"],
+          ["gpl/calculator", "Calculator", "Desktop CX pack"],
+          ["gpl/centered-chat", "CenteredChat", "Desktop CX pack"],
+          ["gpl/channel-tabs", "ChannelTabs", "Desktop CX pack"],
+          ["gpl/clap-text", "ClapText", "Desktop CX pack"],
+          ["gpl/cleaner-discord", "CleanerDiscord", "Desktop CX pack"],
+          ["gpl/click-sparkles", "ClickSparkles", "Desktop CX pack"],
+          ["gpl/clips-enhancements", "ClipsEnhancements", "Desktop CX pack"],
+          ["gpl/cloud-cord-accent", "CloudCordAccent", "Desktop CX pack"],
+          ["gpl/collapsible-ui", "CollapsibleUI", "Desktop CX pack"],
+          ["gpl/color-text", "ColorText", "Desktop CX pack", "color-text.cx"],
+          ["gpl/compact-member-list", "CompactMemberList", "Desktop CX pack"],
+          ["gpl/console-janitor", "ConsoleJanitor", "Desktop CX pack"],
+          ["gpl/copy-emoji-markdown", "CopyEmojiMarkdown", "Desktop CX pack"],
+          ["gpl/copy-profile-colors", "CopyProfileColors", "Desktop CX pack"],
+          ["gpl/copy-user-mention", "CopyUserMention", "Desktop CX pack"],
+          ["gpl/ctrl-enter-save", "CtrlEnterSave", "Desktop CX pack"],
+          ["gpl/custom-commands", "CustomCommands", "Desktop CX pack"],
+          ["gpl/custom-idle", "CustomIdle", "Desktop CX pack"],
+          ["gpl/custom-sounds", "CustomSounds", "Desktop CX pack"],
+          ["gpl/custom-timestamps", "CustomTimestamps", "Desktop CX pack"],
+          ["gpl/dearrow", "Dearrow", "Desktop CX pack"],
+          ["gpl/decor", "Decor", "Desktop CX pack"],
+          ["gpl/dim-inactive-channels", "DimInactiveChannels", "Desktop CX pack"],
+          ["gpl/disable-deep-links", "DisableDeepLinks", "Desktop CX pack"],
+          ["gpl/dont-round-my-timestamps", "DontRoundMyTimestamps", "Desktop CX pack"],
+          ["gpl/draft-navigator", "DraftNavigator", "Desktop CX pack"],
+          ["gpl/element-highlighter", "ElementHighlighter", "Desktop CX pack"],
+          ["gpl/equibop-stream-fixes", "EquibopStreamFixes", "Desktop CX pack"],
+          ["gpl/event-logs", "EventLogs", "Desktop CX pack"],
+          ["gpl/export-dm", "ExportDM", "Desktop CX pack"],
+          ["gpl/f8-break", "F8Break", "Desktop CX pack"],
+          ["gpl/fake-messages", "FakeMessages", "Desktop CX pack"],
+          ["gpl/fake-profile-themes", "FakeProfileThemes", "Desktop CX pack"],
+          ["gpl/fast-gif-picker", "FastGifPicker", "Desktop CX pack"],
+          ["gpl/favorite-gif-search", "FavoriteGifSearch", "Desktop CX pack"],
+          ["gpl/file-upload", "FileUpload", "Desktop CX pack"],
+          ["gpl/fix-codeblock-gap", "FixCodeblockGap", "Desktop CX pack"],
+          ["gpl/fix-screenshare", "FixScreenshare", "Desktop CX pack"],
+          ["gpl/floating-chat-bar", "FloatingChatBar", "Desktop CX pack"],
+          ["gpl/font-loader", "FontLoader", "Desktop CX pack"],
+          ["gpl/frequent-quick-switcher", "FrequentQuickSwitcher", "Desktop CX pack"],
+          ["gpl/friendship-ranks", "FriendshipRanks", "Desktop CX pack"],
+          ["gpl/full-search-context", "FullSearchContext", "Desktop CX pack"],
+          ["gpl/game-activity-toggle", "GameActivityToggle", "Desktop CX pack"],
+          ["gpl/gif-collections", "GifCollections", "Desktop CX pack"],
+          ["gpl/gif-provider-switcher", "GifProviderSwitcher", "Desktop CX pack"],
+          ["gpl/google-that", "GoogleThat", "Desktop CX pack"],
+          ["gpl/guild-picker-dumper", "GuildPickerDumper", "Desktop CX pack"],
+          ["gpl/hide-apps-button", "HideAppsButton", "Desktop CX pack"],
+          ["gpl/hide-boost-goal", "HideBoostGoal", "Desktop CX pack"],
+          ["gpl/hide-channel-topic", "HideChannelTopic", "Desktop CX pack"],
+          ["gpl/hide-clan-tags", "HideClanTags", "Desktop CX pack"],
+          ["gpl/hide-dm-search", "HideDmSearch", "Desktop CX pack"],
+          ["gpl/hide-embeds", "HideEmbeds", "Desktop CX pack"],
+          ["gpl/hide-friend-requests-badge", "HideFriendRequestsBadge", "Desktop CX pack"],
+          ["gpl/hide-guild-boost-tag", "HideGuildBoostTag", "Desktop CX pack"],
+          ["gpl/hide-inbox-button", "HideInboxButton", "Desktop CX pack"],
+          ["gpl/hide-keyboard-tips", "HideKeyboardTips", "Desktop CX pack"],
+          ["gpl/hide-member-list-button", "HideMemberListButton", "Desktop CX pack"],
+          ["gpl/hide-nameplates", "HideNameplates", "Desktop CX pack"],
+          ["gpl/hide-notification-bell", "HideNotificationBell", "Desktop CX pack"],
+          ["gpl/hide-quests-tab", "HideQuestsTab", "Desktop CX pack"],
+          ["gpl/hide-reply-previews", "HideReplyPreviews", "Desktop CX pack"],
+          ["gpl/hide-send-button", "HideSendButton", "Desktop CX pack"],
+          ["gpl/hide-servers", "HideServers", "Desktop CX pack"],
+          ["gpl/hide-status-emojis", "HideStatusEmojis", "Desktop CX pack"],
+          ["gpl/hide-stream-previews", "HideStreamPreviews", "Desktop CX pack"],
+          ["gpl/hide-threads-button", "HideThreadsButton", "Desktop CX pack"],
+          ["gpl/hide-unread-pills", "HideUnreadPills", "Desktop CX pack"],
+          ["gpl/hide-voice-panel-tips", "HideVoicePanelTips", "Desktop CX pack"],
+          ["gpl/highlight-links", "HighlightLinks", "Desktop CX pack"],
+          ["gpl/hop-on", "HopOn", "Desktop CX pack"],
+          ["gpl/hype-squad-switcher", "HypeSquadSwitcher", "Desktop CX pack"],
+          ["gpl/idle-auto-restart", "IdleAutoRestart", "Desktop CX pack"],
+          ["gpl/ilove-spam", "ILoveSpam", "Desktop CX pack"],
+          ["gpl/image-zoom", "ImageZoom", "Desktop CX pack"],
+          ["gpl/in-role", "InRole", "Desktop CX pack"],
+          ["gpl/invite-defaults", "InviteDefaults", "Desktop CX pack"],
+          ["gpl/jumpscare", "Jumpscare", "Desktop CX pack"],
+          ["gpl/keep-current-channel", "KeepCurrentChannel", "Desktop CX pack"],
+          ["gpl/keyword-notify", "KeywordNotify", "Desktop CX pack"],
+          ["gpl/last-fmrich-presence", "LastFMRichPresence", "Desktop CX pack"],
+          ["gpl/limitless-screenshare", "LimitlessScreenshare", "Desktop CX pack"],
+          ["gpl/login-with-qr", "LoginWithQR", "Desktop CX pack"],
+          ["gpl/member-count", "MemberCount", "Desktop CX pack"],
+          ["gpl/message-burst", "MessageBurst", "Desktop CX pack"],
+          ["gpl/message-fetch-timer", "MessageFetchTimer", "Desktop CX pack"],
+          ["gpl/message-link-tooltip", "MessageLinkTooltip", "Desktop CX pack"],
+          ["gpl/message-notifier", "MessageNotifier", "Desktop CX pack"],
+          ["gpl/message-tags", "MessageTags", "Desktop CX pack"],
+          ["gpl/mic-loopback-tester", "MicLoopbackTester", "Desktop CX pack"],
+          ["gpl/more-commands", "MoreCommands", "Desktop CX pack"],
+          ["gpl/more-stickers", "MoreStickers", "Desktop CX pack"],
+          ["gpl/moyai", "Moyai", "Desktop CX pack"],
+          ["gpl/muted-channels-faded", "MutedChannelsFaded", "Desktop CX pack"],
+          ["gpl/narrow-channel-list", "NarrowChannelList", "Desktop CX pack"],
+          ["gpl/new-guild-settings", "NewGuildSettings", "Desktop CX pack"],
+          ["gpl/no-blocked-messages", "NoBlockedMessages", "Desktop CX pack"],
+          ["gpl/no-dmwhile-streaming", "NoDMWhileStreaming", "Desktop CX pack"],
+          ["gpl/no-masked-url-paste", "NoMaskedUrlPaste", "Desktop CX pack"],
+          ["gpl/no-mosaic", "NoMosaic", "Desktop CX pack"],
+          ["gpl/no-pending-count", "NoPendingCount", "Desktop CX pack"],
+          ["gpl/no-reply-mention", "NoReplyMention", "Desktop CX pack"],
+          ["gpl/no-rpc", "NoRPC", "Desktop CX pack"],
+          ["gpl/no-system-badge", "NoSystemBadge", "Desktop CX pack"],
+          ["gpl/notification-volume", "NotificationVolume", "Desktop CX pack"],
+          ["gpl/oneko", "oneko", "Desktop CX pack"],
+          ["gpl/orbolay-bridge", "OrbolayBridge", "Desktop CX pack"],
+          ["gpl/pause-invites-forever", "PauseInvitesForever", "Desktop CX pack"],
+          ["gpl/pet-pet", "PetPet", "Desktop CX pack"],
+          ["gpl/ping-notifications", "PingNotifications", "Desktop CX pack"],
+          ["gpl/platform-indicators", "PlatformIndicators", "Desktop CX pack"],
+          ["gpl/preview-message", "PreviewMessage", "Desktop CX pack"],
+          ["gpl/pull-user-into-voice", "PullUserIntoVoice", "Desktop CX pack"],
+          ["gpl/quick-delete", "QuickDelete", "Desktop CX pack"],
+          ["gpl/quick-theme-switcher", "QuickThemeSwitcher", "Desktop CX pack"],
+          ["gpl/random-voice", "RandomVoice", "Desktop CX pack"],
+          ["gpl/readable-line-length", "ReadableLineLength", "Desktop CX pack"],
+          ["gpl/realtime-timestamps", "RealtimeTimestamps", "Desktop CX pack"],
+          ["gpl/remind-me", "RemindMe", "Desktop CX pack"],
+          ["gpl/repeat-messages", "RepeatMessages", "Desktop CX pack"],
+          ["gpl/reply-timestamp", "ReplyTimestamp", "Desktop CX pack"],
+          ["gpl/review-db", "ReviewDB", "Desktop CX pack"],
+          ["gpl/role-color-everywhere", "RoleColorEverywhere", "Desktop CX pack"],
+          ["gpl/rounded-images", "RoundedImages", "Desktop CX pack"],
+          ["gpl/save-favorite-gifs", "SaveFavoriteGIFs", "Desktop CX pack"],
+          ["gpl/search-fix", "SearchFix", "Desktop CX pack"],
+          ["gpl/sed-enhanced", "SedEnhanced", "Desktop CX pack"],
+          ["gpl/send-timestamps", "SendTimestamps", "Desktop CX pack"],
+          ["gpl/server-list-indicators", "ServerListIndicators", "Desktop CX pack"],
+          ["gpl/set-as-profile-image", "SetAsProfileImage", "Desktop CX pack"],
+          ["gpl/ship-calc", "ShipCalc", "Desktop CX pack"],
+          ["gpl/show-connections", "ShowConnections", "Desktop CX pack"],
+          ["gpl/show-message-embeds", "ShowMessageEmbeds", "Desktop CX pack"],
+          ["gpl/show-roles-in-chat", "ShowRolesInChat", "Desktop CX pack"],
+          ["gpl/show-typing-users", "ShowTypingUsers", "Desktop CX pack"],
+          ["gpl/silence-users", "SilenceUsers", "Desktop CX pack"],
+          ["gpl/silent-message-toggle", "SilentMessageToggle", "Desktop CX pack"],
+          ["gpl/sincord-helper", "SincordHelper", "Desktop CX pack"],
+          ["gpl/smaller-chat-text", "SmallerChatText", "Desktop CX pack"],
+          ["gpl/smooth-ui", "SmoothUI", "Desktop CX pack"],
+          ["gpl/soggy", "Soggy", "Desktop CX pack"],
+          ["gpl/sort-friends", "SortFriends", "Desktop CX pack"],
+          ["gpl/spacious-messages", "SpaciousMessages", "Desktop CX pack"],
+          ["gpl/spotify-crack", "SpotifyCrack", "Desktop CX pack"],
+          ["gpl/starify", "Starify", "Desktop CX pack"],
+          ["gpl/status-while-active", "StatusWhileActive", "Desktop CX pack"],
+          ["gpl/sticker-blocker", "StickerBlocker", "Desktop CX pack"],
+          ["gpl/stop-auto-unread", "StopAutoUnread", "Desktop CX pack"],
+          ["gpl/streaming-codec-disabler", "StreamingCodecDisabler", "Desktop CX pack"],
+          ["gpl/super-reaction-tweaks", "SuperReactionTweaks", "Desktop CX pack"],
+          ["gpl/talk-in-reverse", "TalkInReverse", "Desktop CX pack"],
+          ["gpl/theme-attributes", "ThemeAttributes", "Desktop CX pack"],
+          ["gpl/tidal-embeds", "TidalEmbeds", "Desktop CX pack"],
+          ["gpl/title", "Title", "Desktop CX pack"],
+          ["gpl/tone-indicators", "ToneIndicators", "Desktop CX pack"],
+          ["gpl/trivia-ai", "TriviaAI", "Desktop CX pack"],
+          ["gpl/unindent", "Unindent", "Desktop CX pack"],
+          ["gpl/universal-volume", "UniversalVolume", "Desktop CX pack"],
+          ["gpl/unlocked-avatar-zoom", "UnlockedAvatarZoom", "Desktop CX pack"],
+          ["gpl/url-highlighter", "UrlHighlighter", "Desktop CX pack"],
+          ["gpl/userplugin-installer", "UserpluginInstaller", "Desktop CX pack"],
+          ["gpl/valid-reply", "ValidReply", "Desktop CX pack"],
+          ["gpl/vc-narrator-custom", "VcNarratorCustom", "Desktop CX pack"],
+          ["gpl/view-icons", "ViewIcons", "Desktop CX pack"],
+          ["gpl/voice-buttons", "VoiceButtons", "Desktop CX pack"],
+          ["gpl/voice-chat-utilities", "VoiceChatUtilities", "Desktop CX pack"],
+          ["gpl/voice-join-messages", "VoiceJoinMessages", "Desktop CX pack"],
+          ["gpl/voice-message-transcriber", "VoiceMessageTranscriber", "Desktop CX pack"],
+          ["gpl/voice-stats", "VoiceStats", "Desktop CX pack"],
+          ["gpl/wait-for-slot", "WaitForSlot", "Desktop CX pack"],
+          ["gpl/web-keybinds", "WebKeybinds", "Desktop CX pack"],
+          ["gpl/web-rtcleak-prevent", "WebRTCLeakPrevent", "Desktop CX pack"],
+          ["gpl/whitelisted-emojis", "WhitelistedEmojis", "Desktop CX pack"],
+          ["gpl/wider-channel-list", "WiderChannelList", "Desktop CX pack"],
+          ["gpl/wiki-lookup", "WikiLookup", "Desktop CX pack"],
+          ["gpl/xsoverlay", "XSOverlay", "Desktop CX pack"],
+          ["gpl/zip-preview", "ZipPreview", "Desktop CX pack"],
+          ["discover-17", "AltMediaPicker", "Discover CX preview"],
+          ["discover-30", "Better Chat Buttons", "Discover CX preview"],
+          ["discover-89", "BringBackTenor", "Discover CX preview"],
+          ["discover-85", "Chatbox Avatar", "Discover CX preview"],
+          ["discover-18", "Cloud Sync", "Discover CX preview"],
+          ["discover-74", "FavouriteAnything", "Discover CX preview"],
+          ["discover-28", "Freemoji", "Discover CX preview"],
+          ["discover-63", "Gif Categories", "Discover CX preview"],
+          ["discover-80", "GuildLurk", "Discover CX preview"],
+          ["discover-70", "HypeSquadSwitcher", "Discover CX preview"],
+          ["discover-55", "KonoChan-Randomizer", "Discover CX preview"],
+          ["discover-49", "LoginSound", "Discover CX preview"],
+          ["discover-39", "MoreConfirm", "Discover CX preview"],
+          ["discover-35", "NexxUtils", "Discover CX preview"],
+          ["discover-12", "NoBandwidthKick", "Discover CX preview"],
+          ["discover-41", "NoIdle", "Discover CX preview"],
+          ["discover-71", "Override User Avatars", "Discover CX preview"],
+          ["discover-86", "Piratifier", "Discover CX preview"],
+          ["discover-47", "Plugin Embeds", "Discover CX preview"],
+          ["discover-62", "Radial Status v1.0.1", "Discover CX preview"],
+          ["discover-65", "RemoveBanner", "Discover CX preview"],
+          ["discover-93", "Server Drawer", "Discover CX preview"],
+          ["discover-45", "shutupClyde", "Discover CX preview"],
+          ["discover-69", "SilentLeave", "Discover CX preview"],
+          ["discover-90", "StreamQuality", "Discover CX preview"],
+          ["discover-25", "Use System Emoji", "Discover CX preview"],
+          ["discover-84", "UwUify", "Discover CX preview"]
+        ],
+        [
+          ["mobile/call-time-counter", "CallTimeCounter", "Shared declarative CX"],
+          ["mobile/count-lines", "Count Lines", "Shared declarative CX"],
+          ["mobile/double-click-to-reply", "DoubleClickToReply", "Shared declarative CX"],
+          ["mobile/feferi-typing-quirk", "FeferiTypingQuirk", "Shared declarative CX"],
+          ["mobile/gamzee-s-typing-quirk", "Gamzee'sTypingQuirk", "Shared declarative CX"],
+          ["mobile/hold-your-tongue", "HoldYourTongue", "Shared declarative CX"],
+          ["mobile/no-confirm-pin", "NoConfirmPin", "Shared declarative CX"],
+          ["mobile/open-steam-links-in-app", "OpenSteamLinksInApp", "Shared declarative CX"],
+          ["mobile/reverse-text", "ReverseText", "Shared declarative CX"],
+          ["mobile/show-ping", "ShowPing", "Shared declarative CX"],
+          ["mobile/unique-lines", "Unique Lines", "Shared declarative CX"],
+          ["mobile/voice-count", "VoiceCount", "Shared declarative CX"],
+          ["gpl/account-panel-server-profile", "AccountPanelServerProfile", "Desktop CX pack"],
+          ["gpl/all-connections-enabled", "AllConnectionsEnabled", "Desktop CX pack"],
+          ["gpl/always-expand-profiles", "AlwaysExpandProfiles", "Desktop CX pack"],
+          ["gpl/amoled-mode", "AmoledMode", "Desktop CX pack"],
+          ["gpl/anti-delete-message", "AntiDeleteMessage", "Desktop CX pack"],
+          ["gpl/anti-soap-hide-soap", "AntiSoap (hideSoap)", "Desktop CX pack"],
+          ["gpl/auto-disconnect-and-auto-mute", "AutoDisconnectAndAutoMute", "Desktop CX pack"],
+          ["gpl/auto-vaporwave", "AutoVaporwave", "Desktop CX pack"],
+          ["gpl/banners-everywhere", "BannersEverywhere", "Desktop CX pack"],
+          ["gpl/better-backreading", "BetterBackreading", "Desktop CX pack"],
+          ["gpl/better-commands", "BetterCommands", "Desktop CX pack"],
+          ["gpl/better-gif-load", "BetterGifLoad", "Desktop CX pack"],
+          ["gpl/better-invites", "BetterInvites", "Desktop CX pack"],
+          ["gpl/better-role-dot", "BetterRoleDot", "Desktop CX pack"],
+          ["gpl/better-settings", "BetterSettings", "Desktop CX pack"],
+          ["gpl/bigger-chat-text", "BiggerChatText", "Desktop CX pack"],
+          ["gpl/bigger-server-icons", "BiggerServerIcons", "Desktop CX pack"],
+          ["gpl/block-krisp", "BlockKrisp", "Desktop CX pack"],
+          ["gpl/bold-text", "BoldText", "Desktop CX pack"],
+          ["gpl/bypass-pin-prompt", "BypassPinPrompt", "Desktop CX pack"],
+          ["gpl/call-timer", "CallTimer", "Desktop CX pack"],
+          ["gpl/channel-badges", "ChannelBadges", "Desktop CX pack"],
+          ["gpl/character-counter", "CharacterCounter", "Desktop CX pack"],
+          ["gpl/clean-channel-name", "CleanChannelName", "Desktop CX pack"],
+          ["gpl/clear-urls", "ClearURLs", "Desktop CX pack"],
+          ["gpl/client-side-block", "ClientSideBlock", "Desktop CX pack"],
+          ["gpl/clip-upload", "ClipUpload", "Desktop CX pack"],
+          ["gpl/cloud-cord-store", "CloudCordStore", "Desktop CX pack"],
+          ["gpl/colorful-mentions", "ColorfulMentions", "Desktop CX pack"],
+          ["gpl/command-palette", "CommandPalette", "Desktop CX pack"],
+          ["gpl/compact-messages", "CompactMessages", "Desktop CX pack"],
+          ["gpl/console-shortcuts", "ConsoleShortcuts", "Desktop CX pack"],
+          ["gpl/copy-file-contents", "CopyFileContents", "Desktop CX pack"],
+          ["gpl/copy-status-urls", "CopyStatusUrls", "Desktop CX pack"],
+          ["gpl/copy-user-urls", "CopyUserURLs", "Desktop CX pack"],
+          ["gpl/cursor-buddy", "CursorBuddy", "Desktop CX pack"],
+          ["gpl/custom-cursor", "CustomCursor", "Desktop CX pack"],
+          ["gpl/custom-reaction-buttons", "CustomReactionButtons", "Desktop CX pack"],
+          ["gpl/custom-status-timeouts", "CustomStatusTimeouts", "Desktop CX pack"],
+          ["gpl/custom-user-colors", "CustomUserColors", "Desktop CX pack"],
+          ["gpl/declutter", "Declutter", "Desktop CX pack"],
+          ["gpl/default-status-forever", "DefaultStatusForever", "Desktop CX pack"],
+          ["gpl/disable-call-idle", "DisableCallIdle", "Desktop CX pack"],
+          ["gpl/discord-dev-banner", "DiscordDevBanner", "Desktop CX pack"],
+          ["gpl/double-emoji", "DoubleEmoji", "Desktop CX pack"],
+          ["gpl/drag-favorite-emotes", "DragFavoriteEmotes", "Desktop CX pack"],
+          ["gpl/embedded-urls", "EmbeddedURLs", "Desktop CX pack"],
+          ["gpl/equicord-toolbox", "EquicordToolbox", "Desktop CX pack"],
+          ["gpl/exit-sounds", "ExitSounds", "Desktop CX pack"],
+          ["gpl/export-messages", "ExportMessages", "Desktop CX pack"],
+          ["gpl/fake-deafen", "FakeDeafen", "Desktop CX pack"],
+          ["gpl/fake-mute", "FakeMute", "Desktop CX pack"],
+          ["gpl/fake-tools", "FakeTools", "Desktop CX pack"],
+          ["gpl/favorite-anything", "FavoriteAnything", "Desktop CX pack"],
+          ["gpl/favourite-anything", "FavouriteAnything", "Desktop CX pack"],
+          ["gpl/file-viewer", "FileViewer", "Desktop CX pack"],
+          ["gpl/fix-file-extensions", "FixFileExtensions", "Desktop CX pack"],
+          ["gpl/fix-spotify-embeds", "FixSpotifyEmbeds", "Desktop CX pack"],
+          ["gpl/focus-mode", "FocusMode", "Desktop CX pack"],
+          ["gpl/force-owner-crown", "ForceOwnerCrown", "Desktop CX pack"],
+          ["gpl/friend-codes", "FriendCodes", "Desktop CX pack"],
+          ["gpl/friends-since", "FriendsSince", "Desktop CX pack"],
+          ["gpl/full-user-in-chatbox", "FullUserInChatbox", "Desktop CX pack"],
+          ["gpl/game-mode", "GameMode", "Desktop CX pack"],
+          ["gpl/gif-maker", "GifMaker", "Desktop CX pack"],
+          ["gpl/git-hub-repos", "GitHubRepos", "Desktop CX pack"],
+          ["gpl/grayscale-images", "GrayscaleImages", "Desktop CX pack"],
+          ["gpl/hide-active-now", "HideActiveNow", "Desktop CX pack"],
+          ["gpl/hide-avatar-decorations", "HideAvatarDecorations", "Desktop CX pack"],
+          ["gpl/hide-bot-tags", "HideBotTags", "Desktop CX pack"],
+          ["gpl/hide-character-count", "HideCharacterCount", "Desktop CX pack"],
+          ["gpl/hide-custom-statuses", "HideCustomStatuses", "Desktop CX pack"],
+          ["gpl/hide-download-apps-button", "HideDownloadAppsButton", "Desktop CX pack"],
+          ["gpl/hide-emoji-button", "HideEmojiButton", "Desktop CX pack"],
+          ["gpl/hide-gif-button", "HideGifButton", "Desktop CX pack"],
+          ["gpl/hide-help-button", "HideHelpButton", "Desktop CX pack"],
+          ["gpl/hide-join-messages", "HideJoinMessages", "Desktop CX pack"],
+          ["gpl/hide-media", "HideMedia", "Desktop CX pack"],
+          ["gpl/hide-mention-badges", "HideMentionBadges", "Desktop CX pack"],
+          ["gpl/hide-new-messages-bar", "HideNewMessagesBar", "Desktop CX pack"],
+          ["gpl/hide-pins-button", "HidePinsButton", "Desktop CX pack"],
+          ["gpl/hide-reactions", "HideReactions", "Desktop CX pack"],
+          ["gpl/hide-role-icons", "HideRoleIcons", "Desktop CX pack"],
+          ["gpl/hide-server-banner", "HideServerBanner", "Desktop CX pack"],
+          ["gpl/hide-shop-tab", "HideShopTab", "Desktop CX pack"],
+          ["gpl/hide-sticker-button", "HideStickerButton", "Desktop CX pack"],
+          ["gpl/hide-suggested-channels", "HideSuggestedChannels", "Desktop CX pack"],
+          ["gpl/hide-timestamps", "HideTimestamps", "Desktop CX pack"],
+          ["gpl/hide-upload-button", "HideUploadButton", "Desktop CX pack"],
+          ["gpl/hide-voice-user-avatars", "HideVoiceUserAvatars", "Desktop CX pack"],
+          ["gpl/highlight-mentions", "HighlightMentions", "Desktop CX pack"],
+          ["gpl/hover-highlight-messages", "HoverHighlightMessages", "Desktop CX pack"],
+          ["gpl/icon-viewer", "IconViewer", "Desktop CX pack"],
+          ["gpl/ignore-activities", "IgnoreActivities", "Desktop CX pack"],
+          ["gpl/image-filename", "ImageFilename", "Desktop CX pack"],
+          ["gpl/implicit-relationships", "ImplicitRelationships", "Desktop CX pack"],
+          ["gpl/instant-screenshare", "InstantScreenshare", "Desktop CX pack"],
+          ["gpl/irc-colors", "IrcColors", "Desktop CX pack"],
+          ["gpl/jump-to", "JumpTo", "Desktop CX pack"],
+          ["gpl/keyboard-navigation", "KeyboardNavigation", "Desktop CX pack"],
+          ["gpl/larger-chat-text", "LargerChatText", "Desktop CX pack"],
+          ["gpl/last-online", "LastOnline", "Desktop CX pack"],
+          ["gpl/loading-quotes", "LoadingQuotes", "Desktop CX pack"],
+          ["gpl/markdown-tables", "MarkdownTables", "Desktop CX pack"],
+          ["gpl/mention-avatars", "MentionAvatars", "Desktop CX pack"],
+          ["gpl/message-click-actions", "MessageClickActions", "Desktop CX pack"],
+          ["gpl/message-latency", "MessageLatency", "Desktop CX pack"],
+          ["gpl/message-logger", "MessageLogger", "Desktop CX pack"],
+          ["gpl/message-peek", "MessagePeek", "Desktop CX pack"],
+          ["gpl/message-translate", "MessageTranslate", "Desktop CX pack"],
+          ["gpl/middle-click-tweaks", "MiddleClickTweaks", "Desktop CX pack"],
+          ["gpl/more-jumbo-emoji", "MoreJumboEmoji", "Desktop CX pack"],
+          ["gpl/more-user-tags", "MoreUserTags", "Desktop CX pack"],
+          ["gpl/music-controls", "MusicControls", "Desktop CX pack"],
+          ["gpl/mutual-group-dms", "MutualGroupDMs", "Desktop CX pack"],
+          ["gpl/neon-glow", "NeonGlow", "Desktop CX pack"],
+          ["gpl/new-plugins-manager", "NewPluginsManager", "Desktop CX pack"],
+          ["gpl/no-chat-bar-border", "NoChatBarBorder", "Desktop CX pack"],
+          ["gpl/no-draft-length-limit", "NoDraftLengthLimit", "Desktop CX pack"],
+          ["gpl/no-message-hover-bar", "NoMessageHoverBar", "Desktop CX pack"],
+          ["gpl/no-nitro-upsell", "NoNitroUpsell", "Desktop CX pack"],
+          ["gpl/no-profile-themes", "NoProfileThemes", "Desktop CX pack"],
+          ["gpl/normalize-message-links", "NormalizeMessageLinks", "Desktop CX pack"],
+          ["gpl/no-server-emojis", "NoServerEmojis", "Desktop CX pack"],
+          ["gpl/no-system-helper", "NoSystemHelper", "Desktop CX pack"],
+          ["gpl/no-typing-animation", "NoTypingAnimation", "Desktop CX pack"],
+          ["gpl/one-ping-per-dm", "OnePingPerDM", "Desktop CX pack"],
+          ["gpl/override-forum-defaults", "OverrideForumDefaults", "Desktop CX pack"],
+          ["gpl/permission-free-will", "PermissionFreeWill", "Desktop CX pack"],
+          ["gpl/picture-in-picture", "PictureInPicture", "Desktop CX pack"],
+          ["gpl/pin-icon", "PinIcon", "Desktop CX pack"],
+          ["gpl/platform-spoofer", "PlatformSpoofer", "Desktop CX pack"],
+          ["gpl/profile-sets", "ProfileSets", "Desktop CX pack"],
+          ["gpl/purge-dms", "PurgeDMs", "Desktop CX pack"],
+          ["gpl/quick-mention", "QuickMention", "Desktop CX pack"],
+          ["gpl/quote-message", "QuoteMessage", "Desktop CX pack", "quote-message.cx"],
+          ["gpl/react-error-decoder", "ReactErrorDecoder", "Desktop CX pack"],
+          ["gpl/readable-spoilers", "ReadableSpoilers", "Desktop CX pack"],
+          ["gpl/recent-dmswitcher", "RecentDMSwitcher", "Desktop CX pack"],
+          ["gpl/remix-revived", "RemixRevived", "Desktop CX pack"],
+          ["gpl/replace-google-search", "ReplaceGoogleSearch", "Desktop CX pack"],
+          ["gpl/reveal-all-spoilers", "RevealAllSpoilers", "Desktop CX pack"],
+          ["gpl/rich-magnet-links", "RichMagnetLinks", "Desktop CX pack"],
+          ["gpl/rounded-avatars-square", "RoundedAvatarsSquare", "Desktop CX pack"],
+          ["gpl/round-server-icons", "RoundServerIcons", "Desktop CX pack"],
+          ["gpl/scheduled-messages", "ScheduledMessages", "Desktop CX pack"],
+          ["gpl/secret-guard", "SecretGuard", "Desktop CX pack"],
+          ["gpl/sekai-stickers", "SekaiStickers", "Desktop CX pack"],
+          ["gpl/server-clone", "ServerClone", "Desktop CX pack"],
+          ["gpl/server-pinner", "ServerPinner", "Desktop CX pack"],
+          ["gpl/share-perms", "SharePerms", "Desktop CX pack"],
+          ["gpl/show-all-message-buttons", "ShowAllMessageButtons", "Desktop CX pack"],
+          ["gpl/show-hidden-channels", "ShowHiddenChannels", "Desktop CX pack"],
+          ["gpl/show-me-your-name", "ShowMeYourName", "Desktop CX pack"],
+          ["gpl/show-song-name", "ShowSongName", "Desktop CX pack"],
+          ["gpl/sidebar-chat", "SidebarChat", "Desktop CX pack"],
+          ["gpl/silent-delete", "SilentDelete", "Desktop CX pack"],
+          ["gpl/silent-typing", "SilentTyping", "Desktop CX pack"],
+          ["gpl/sincord-toolbox", "SincordToolbox", "Desktop CX pack"],
+          ["gpl/smooth-scrolling", "SmoothScrolling", "Desktop CX pack"],
+          ["gpl/snowfall", "Snowfall", "Desktop CX pack"],
+          ["gpl/song-link", "SongLink", "Desktop CX pack"],
+          ["gpl/sort-reactions", "SortReactions", "Desktop CX pack"],
+          ["gpl/split-large-messages", "SplitLargeMessages", "Desktop CX pack"],
+          ["gpl/spotify-share-commands", "SpotifyShareCommands", "Desktop CX pack"],
+          ["gpl/startup-timings", "StartupTimings", "Desktop CX pack"],
+          ["gpl/steam-status-sync", "SteamStatusSync", "Desktop CX pack"],
+          ["gpl/sticker-paste", "StickerPaste", "Desktop CX pack"],
+          ["gpl/streaks", "Streaks", "Desktop CX pack"],
+          ["gpl/stream-proof", "StreamProof", "Desktop CX pack"],
+          ["gpl/surface-translate", "SurfaceTranslate", "Desktop CX pack"],
+          ["gpl/text-replace", "TextReplace", "Desktop CX pack"],
+          ["gpl/theme-library", "ThemeLibrary", "Desktop CX pack"],
+          ["gpl/tiktok-tts", "TiktokTTS", "Desktop CX pack"],
+          ["gpl/toast-notifications", "ToastNotifications", "Desktop CX pack"],
+          ["gpl/translate", "Translate", "Desktop CX pack"],
+          ["gpl/typing-indicator", "TypingIndicator", "Desktop CX pack"],
+          ["gpl/unit-converter", "UnitConverter", "Desktop CX pack"],
+          ["gpl/unlimited-accounts", "UnlimitedAccounts", "Desktop CX pack"],
+          ["gpl/unread-count-badge", "UnreadCountBadge", "Desktop CX pack"],
+          ["gpl/user-messages-pronouns", "UserMessagesPronouns", "Desktop CX pack"],
+          ["gpl/user-voice-show", "UserVoiceShow", "Desktop CX pack"],
+          ["gpl/valid-user", "ValidUser", "Desktop CX pack"],
+          ["gpl/vcpanel-settings", "VCPanelSettings", "Desktop CX pack"],
+          ["gpl/view-raw", "ViewRaw", "Desktop CX pack"],
+          ["gpl/voice-channel-log", "VoiceChannelLog", "Desktop CX pack"],
+          ["gpl/voice-download", "VoiceDownload", "Desktop CX pack"],
+          ["gpl/voice-messages", "VoiceMessages", "Desktop CX pack"],
+          ["gpl/voice-rejoin", "VoiceRejoin", "Desktop CX pack"],
+          ["gpl/voice-vumeters", "VoiceVUMeters", "Desktop CX pack"],
+          ["gpl/webcam-start-notifier", "WebcamStartNotifier", "Desktop CX pack"],
+          ["gpl/webpack-tarball", "WebpackTarball", "Desktop CX pack"],
+          ["gpl/web-screen-share-fixes", "WebScreenShareFixes", "Desktop CX pack"],
+          ["gpl/who-reacted", "WhoReacted", "Desktop CX pack"],
+          ["gpl/wider-chat", "WiderChat", "Desktop CX pack"],
+          ["gpl/word-count", "WordCount", "Desktop CX pack"],
+          ["gpl/youtube-adblock", "YoutubeAdblock", "Desktop CX pack"],
+          ["discover-75", "\u{1F1FA}\u{1F1F8} GTA VI Countdown", "Discover CX preview"],
+          ["discover-13", "AlwaysTrust", "Discover CX preview"],
+          ["discover-87", "BetterCommandPopout", "Discover CX preview"],
+          ["discover-79", "BypassPinPrompt", "Discover CX preview"],
+          ["discover-14", "ClientThemes", "Discover CX preview"],
+          ["discover-60", "Commands", "Discover CX preview"],
+          ["discover-8", "FileSizeOnPicker", "Discover CX preview"],
+          ["discover-16", "FreeStickers", "Discover CX preview"],
+          ["discover-72", "GifRoulette", "Discover CX preview"],
+          ["discover-51", "Hidden Channels", "Discover CX preview"],
+          ["discover-81", "InfoCommands", "Discover CX preview"],
+          ["discover-42", "Last.fm", "Discover CX preview"],
+          ["discover-26", "Message Preview", "Discover CX preview"],
+          ["discover-61", "Multi Scrobbler", "Discover CX preview"],
+          ["discover-9", "No Embed Copy", "Discover CX preview"],
+          ["discover-7", "NoCompression", "Discover CX preview"],
+          ["discover-23", "NoTrack", "Discover CX preview"],
+          ["discover-46", "Pastelize", "Discover CX preview"],
+          ["discover-33", "PlatformIndicators", "Discover CX preview"],
+          ["discover-54", "Plugins List", "Discover CX preview"],
+          ["discover-58", "Read All", "Discover CX preview"],
+          ["discover-92", "RemoveUserBanner", "Discover CX preview"],
+          ["discover-43", "Show Image Links", "Discover CX preview"],
+          ["discover-56", "Silent Messages", "Discover CX preview"],
+          ["discover-2", "SlowmodeExtended", "Discover CX preview"],
+          ["discover-24", "Tenor Gif Fix", "Discover CX preview"],
+          ["discover-34", "UserBG", "Discover CX preview"],
+          ["discover-82", "ValidUser", "Discover CX preview"]
+        ]
+      ];
+    }
   });
-  function Tools() {
-    var hidden = useProxy(settings).cloudcordHiddenTabs ?? [];
-    var navigation2 = NavigationNative.useNavigation();
-    var actions = React2.useMemo(() => ({
-      previews: wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
-        return {
-          default: (yield Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))).PreviewsPage
+
+  // src/lib/api/cxTesting/index.ts
+  function testingUserId(store) {
+    try {
+      return store?.getCurrentUser?.()?.id;
+    } catch (e) {
+      return void 0;
+    }
+  }
+  function useTestingUserId(react, store) {
+    var [userId, setUserId] = react.useState(testingUserId(store));
+    react.useEffect(() => {
+      var read = () => setUserId(testingUserId(store));
+      read();
+      try {
+        store?.addChangeListener?.(read);
+        return () => {
+          try {
+            store?.removeChangeListener?.(read);
+          } catch (e) {
+          }
         };
-      })(), "Previews", void 0, "push"),
-      account: wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
-        return {
-          default: (yield Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))).AccountToolsPage
-        };
-      })(), "Account Tools", void 0, "push")
-    }), [
-      navigation2
+      } catch (e) {
+        return void 0;
+      }
+    }, [
+      store
     ]);
-    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
+    return userId;
+  }
+  function getTestingAssignment(userId, platform) {
+    if (!userId)
+      return;
+    var tester = testers.get(userId);
+    if (tester?.platform !== platform)
+      return;
+    return {
+      userId,
+      platform: tester.platform,
+      label: tester.label,
+      entries: tester.queue < 0 ? retests : (platform === "windows" ? entries : mobileQueues)[tester.queue]
+    };
+  }
+  function testingStorageKey(assignment) {
+    return "cloudcord.cx.testing.v1." + assignment.userId + "." + assignment.platform;
+  }
+  function loadResults(value, assignment) {
+    var records = {};
+    if (!value || typeof value !== "object")
+      return records;
+    for (var { id } of assignment.entries) {
+      var result = value[id];
+      if (!result || ![
+        "Pass",
+        "Fail",
+        "Blocked"
+      ].includes(result.status))
+        continue;
+      if (typeof result.cloudcord !== "string" || typeof result.discord !== "string" || typeof result.error !== "string")
+        continue;
+      records[id] = result;
+    }
+    return records;
+  }
+  function exportTestingResults(assignment, records) {
+    var csv = (fields) => fields.map((value) => {
+      var safe = /^[\s\uFEFF]*[=+\-@]/.test(value) ? "'" + value : value;
+      return '"' + safe.replaceAll('"', '""') + '"';
+    }).join(",");
+    return [
+      csv([
+        "Plugin ID",
+        "Plugin",
+        "Platform",
+        "Status",
+        "CloudCord build",
+        "Discord build",
+        "Exact error or blocker"
+      ]),
+      ...assignment.entries.flatMap(({ id, name }) => {
+        var result = records[id];
+        return result ? [
+          csv([
+            id,
+            name,
+            assignment.platform,
+            result.status,
+            result.cloudcord,
+            result.discord,
+            result.error
+          ])
+        ] : [];
+      })
+    ].join("\r\n");
+  }
+  function useTestingReview(react, assignment, storage, initialBuild, authorized) {
+    var [records, setRecords] = react.useState(void 0);
+    var [search, setSearch] = react.useState("");
+    var [position, setPosition] = react.useState(0);
+    var [build, setBuild] = react.useState(initialBuild);
+    var [draft, setDraft] = react.useState(void 0);
+    var [message, setMessage] = react.useState("");
+    var [saving, setSaving] = react.useState(false);
+    var pending2 = react.useRef(false);
+    var storageRef = react.useRef(storage);
+    storageRef.current = storage;
+    react.useEffect(() => {
+      var closed = false;
+      Promise.resolve().then(() => storageRef.current.read()).then((value) => {
+        if (!closed)
+          setRecords(loadResults(value, assignment));
+      }, () => {
+        if (!closed)
+          setMessage("Could not load saved tests.");
+      });
+      return () => {
+        closed = true;
+      };
+    }, [
+      assignment.userId,
+      assignment.platform
+    ]);
+    var query = search.trim().toLowerCase();
+    var filtered = assignment.entries.filter((entry2) => !query || entry2.name.toLowerCase().includes(query) || entry2.id.includes(query));
+    var index = Math.min(position, Math.max(0, filtered.length - 1));
+    var entry = filtered[index];
+    var review = entry ? records?.[entry.id] : void 0;
+    var error = draft && draft.id === entry?.id ? draft.error : review?.error ?? "";
+    function save(status) {
+      return _async_to_generator(function* () {
+        if (!entry || !records || pending2.current || !authorized())
+          return;
+        var cloudcord = build.cloudcord.trim();
+        var discord = build.discord.trim();
+        if (!cloudcord || !discord) {
+          setMessage("Enter both build numbers.");
+          return;
+        }
+        if (status !== "Pass" && !error.trim()) {
+          setMessage("Enter the exact error or blocker.");
+          return;
+        }
+        var next = {
+          ...records,
+          [entry.id]: {
+            status,
+            cloudcord,
+            discord,
+            error: status === "Pass" ? "" : error
+          }
+        };
+        pending2.current = true;
+        setSaving(true);
+        try {
+          yield storageRef.current.write(next);
+          setRecords(next);
+          setDraft(void 0);
+          setMessage("Saved " + status + ".");
+        } catch (e) {
+          setMessage("Could not save this result.");
+        } finally {
+          pending2.current = false;
+          setSaving(false);
+        }
+      })();
+    }
+    return {
+      entry,
+      review,
+      error,
+      message,
+      saving,
+      ready: records !== void 0,
+      search,
+      build,
+      completed: Object.keys(records ?? {}).length,
+      count: filtered.length,
+      index,
+      searchFor(value) {
+        setSearch(value);
+        setPosition(0);
+        setDraft(void 0);
+        setMessage("");
+      },
+      move(step) {
+        setPosition(Math.max(0, Math.min(index + step, filtered.length - 1)));
+        setDraft(void 0);
+        setMessage("");
+      },
+      setBuild(field, value) {
+        setBuild((previous) => ({
+          ...previous,
+          [field]: value
+        }));
+      },
+      setError(value) {
+        if (entry)
+          setDraft({
+            id: entry.id,
+            error: value
+          });
+      },
+      save,
+      export() {
+        return records && authorized() ? exportTestingResults(assignment, records) : void 0;
+      }
+    };
+  }
+  var testers, entries, sharedGroup, mobileOrder, mobileQueues, retests;
+  var init_cxTesting = __esm({
+    "src/lib/api/cxTesting/index.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_cx_testing_queues();
+      testers = /* @__PURE__ */ new Map([
+        [
+          "1429837711602094201",
+          {
+            platform: "windows",
+            label: "Desktop 1",
+            queue: 0
+          }
+        ],
+        [
+          "463515440606609419",
+          {
+            platform: "windows",
+            label: "Desktop 2",
+            queue: 1
+          }
+        ],
+        [
+          "1569533258461614171",
+          {
+            platform: "ios",
+            label: "Mobile 1",
+            queue: 0
+          }
+        ],
+        [
+          "1539587971840483359",
+          {
+            platform: "android",
+            label: "Mobile 2",
+            queue: 1
+          }
+        ],
+        [
+          "1205417504718192680",
+          {
+            platform: "ios",
+            label: "Mobile 3",
+            queue: 2
+          }
+        ],
+        [
+          "801526290623627315",
+          {
+            platform: "ios",
+            label: "iOS shared plugin retests",
+            queue: -1
+          }
+        ]
+      ]);
+      entries = cx_testing_queues_default.map((queue) => queue.map(([id, name, group]) => ({
+        id,
+        name,
+        group
+      })));
+      sharedGroup = "Shared declarative CX";
+      mobileOrder = [
+        sharedGroup,
+        "Discover CX preview",
+        "Desktop CX pack"
+      ];
+      mobileQueues = entries.map((queue) => [
+        ...queue
+      ].sort((a, b3) => mobileOrder.indexOf(a.group) - mobileOrder.indexOf(b3.group)));
+      retests = entries.flat().filter((entry) => entry.group === sharedGroup).sort((a, b3) => a.name.localeCompare(b3.name));
+    }
+  });
+
+  // src/lib/api/pluginTesting.ts
+  function currentTestingAssignment() {
+    return getTestingAssignment(testingUserId(UserStore3), import_react_native44.Platform.OS);
+  }
+  function useMobileTestingAssignment() {
+    var userId = useTestingUserId(React2, UserStore3);
+    return getTestingAssignment(userId, import_react_native44.Platform.OS);
+  }
+  var import_react_native44, UserStore3;
+  var init_pluginTesting = __esm({
+    "src/lib/api/pluginTesting.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_cxTesting();
+      init_common();
+      init_wrappers();
+      import_react_native44 = __toESM(require_react_native());
+      UserStore3 = findByStoreNameLazy("UserStore");
+    }
+  });
+
+  // src/core/ui/settings/pages/StoreCloud/index.tsx
+  var StoreCloud_exports = {};
+  __export(StoreCloud_exports, {
+    default: () => StoreCloud
+  });
+  function StoreCloud() {
+    useProxy(VdPluginManager.plugins);
+    var [busy, setBusy] = (0, import_react13.useState)(false);
+    var [refresh, setRefresh] = (0, import_react13.useState)(0);
+    var plugin2 = VdPluginManager.plugins[PLUGIN_URL];
+    var SettingsComponent = plugin2?.enabled ? VdPluginManager.getSettings(PLUGIN_URL) : null;
+    function installOrStart() {
+      return _async_to_generator(function* () {
+        if (busy)
+          return;
+        setBusy(true);
+        try {
+          if (!VdPluginManager.plugins[PLUGIN_URL]) {
+            yield VdPluginManager.installPlugin(PLUGIN_URL, true);
+            showToast("StoreCloud installed", findAssetId("Check"));
+          } else if (!VdPluginManager.plugins[PLUGIN_URL].enabled) {
+            yield VdPluginManager.startPlugin(PLUGIN_URL);
+            showToast("StoreCloud started", findAssetId("Check"));
+          } else {
+            showToast("StoreCloud is already enabled", findAssetId("Check"));
+          }
+          setRefresh((x2) => x2 + 1);
+        } catch (error) {
+          console.error("[CloudCord] StoreCloud install/start failed", error);
+          showToast(error?.message ?? "StoreCloud failed");
+        } finally {
+          setBusy(false);
+        }
+      })();
+    }
+    function refetchPlugin() {
+      return _async_to_generator(function* () {
+        if (busy)
+          return;
+        setBusy(true);
+        try {
+          if (VdPluginManager.plugins[PLUGIN_URL]?.enabled) {
+            VdPluginManager.stopPlugin(PLUGIN_URL, false);
+          }
+          yield VdPluginManager.fetchPlugin(PLUGIN_URL);
+          yield VdPluginManager.startPlugin(PLUGIN_URL);
+          showToast("StoreCloud refreshed", findAssetId("Check"));
+          setRefresh((x2) => x2 + 1);
+        } catch (error) {
+          console.error("[CloudCord] StoreCloud refresh failed", error);
+          showToast(error?.message ?? "StoreCloud refresh failed");
+        } finally {
+          setBusy(false);
+        }
+      })();
+    }
+    function removePlugin() {
+      return _async_to_generator(function* () {
+        if (busy)
+          return;
+        setBusy(true);
+        try {
+          if (VdPluginManager.plugins[PLUGIN_URL]) {
+            yield VdPluginManager.removePlugin(PLUGIN_URL);
+          }
+          showToast("StoreCloud removed");
+          setRefresh((x2) => x2 + 1);
+        } catch (error) {
+          console.error("[CloudCord] StoreCloud remove failed", error);
+          showToast(error?.message ?? "StoreCloud remove failed");
+        } finally {
+          setBusy(false);
+        }
+      })();
+    }
+    if (SettingsComponent) {
+      return /* @__PURE__ */ jsx(ScaledPluginSettings, {
+        component: SettingsComponent
+      }, `storecloud-settings-${refresh}`);
+    }
+    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
+      style: {
+        flex: 1
+      },
       contentContainerStyle: {
         paddingBottom: 38
       },
-      children: /* @__PURE__ */ jsx(Stack, {
+      children: /* @__PURE__ */ jsxs(Stack, {
         style: {
           paddingVertical: 24,
           paddingHorizontal: 12
         },
-        children: /* @__PURE__ */ jsxs(TableRowGroup, {
-          title: "Tools",
-          children: [
-            !hidden.includes("CLOUDCORD_PREVIEWS") && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Previews",
-              onPress: actions.previews
-            }),
-            !hidden.includes("CLOUDCORD_ACCOUNT_TOOLS") && /* @__PURE__ */ jsx(TableRow, {
-              arrow: true,
-              label: "Account Tools",
-              onPress: actions.account
+        spacing: 24,
+        children: [
+          /* @__PURE__ */ jsxs(TableRowGroup, {
+            title: "CloudSync",
+            children: [
+              /* @__PURE__ */ jsxs(import_react_native45.View, {
+                style: {
+                  paddingHorizontal: 12,
+                  paddingBottom: 12
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Text, {
+                    variant: "heading-md/semibold",
+                    color: "text-normal",
+                    children: "CloudSync"
+                  }),
+                  /* @__PURE__ */ jsx(Text, {
+                    variant: "text-sm/medium",
+                    color: "text-muted",
+                    children: "Connect StoreCloud to sync supported settings and manage cloud backups on this device."
+                  })
+                ]
+              }),
+              /* @__PURE__ */ jsx(TableRow, {
+                arrow: true,
+                label: plugin2 ? "Start StoreCloud" : "Enable StoreCloud",
+                subLabel: busy ? "Please wait..." : "Loads the StoreCloud sync engine",
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: {
+                    uri: STORECLOUD_ICON
+                  }
+                }),
+                onPress: installOrStart
+              }),
+              plugin2 && /* @__PURE__ */ jsx(TableRow, {
+                arrow: true,
+                label: "Refresh StoreCloud",
+                subLabel: "Refreshes the StoreCloud sync engine",
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: findAssetId("RetryIcon")
+                }),
+                onPress: refetchPlugin
+              }),
+              plugin2 && /* @__PURE__ */ jsx(TableRow, {
+                arrow: true,
+                label: "Disable StoreCloud",
+                subLabel: "Removes the StoreCloud sync engine",
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: findAssetId("TrashIcon") ?? findAssetId("CircleXIcon-primary")
+                }),
+                onPress: removePlugin
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsx(Card, {
+            border: "strong",
+            children: /* @__PURE__ */ jsx(import_react_native45.View, {
+              style: {
+                padding: 12
+              },
+              children: /* @__PURE__ */ jsx(Text, {
+                variant: "text-sm/medium",
+                color: "text-muted",
+                children: "StoreCloud uses the existing mobile sync engine for OAuth, settings synchronization, backups, and files."
+              })
             })
-          ]
-        })
+          })
+        ]
       })
     });
   }
-  var import_react_native47;
-  var init_Tools = __esm({
-    "src/core/ui/settings/pages/Tools/index.tsx"() {
+  var import_react13, import_react_native45, PLUGIN_URL, STORECLOUD_ICON;
+  var init_StoreCloud = __esm({
+    "src/core/ui/settings/pages/StoreCloud/index.tsx"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
+      init_plugins();
       init_storage();
-      init_settings();
-      init_shared();
+      init_ScaledPluginSettings();
+      init_assets();
+      init_toasts();
+      init_components();
+      import_react13 = __toESM(require_react());
+      import_react_native45 = __toESM(require_react_native());
+      PLUGIN_URL = "https://revenge.nexpid.xyz/cloud-sync/";
+      STORECLOUD_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
+    }
+  });
+
+  // src/lib/api/botcord.ts
+  function snapshot() {
+    return {
+      accounts: state.accounts.slice(),
+      activeAccountId: state.activeAccountId,
+      recentDMs: {
+        ...state.recentDMs
+      },
+      loaded: state.loaded
+    };
+  }
+  function notify() {
+    for (var listener of listeners) {
+      try {
+        listener();
+      } catch (e) {
+      }
+    }
+  }
+  function secretBridge(method, ...args) {
+    var bridge = globalThis.__RAIN_BRIDGE_CALL_SYNC__;
+    if (typeof bridge !== "function")
+      return {
+        ok: false
+      };
+    try {
+      var response = bridge({
+        rain: {
+          method: "botcord.secret." + method,
+          args
+        }
+      });
+      if (!response || response.error)
+        return {
+          ok: false
+        };
+      return {
+        ok: true,
+        value: response.result
+      };
+    } catch (e) {
+      return {
+        ok: false
+      };
+    }
+  }
+  function cleanAccount(value) {
+    if (!value || typeof value !== "object")
+      return null;
+    var id = typeof value.id === "string" ? value.id : "";
+    var username = typeof value.username === "string" ? value.username : "";
+    var token = normalizeBotToken(typeof value.token === "string" && value.token ? value.token : id ? keychainGet(id.slice(0, 64)) : "");
+    if (!id || !username || !token)
+      return null;
+    return {
+      id: id.slice(0, 64),
+      username: username.slice(0, 128),
+      avatar: typeof value.avatar === "string" ? value.avatar.slice(0, 256) : null,
+      token: token.slice(0, 512)
+    };
+  }
+  function sanitizeState(value) {
+    var accounts = Array.isArray(value?.accounts) ? value.accounts.slice(0, MAX_ACCOUNTS).map(cleanAccount).filter(Boolean) : [];
+    var active = typeof value?.activeAccountId === "string" && accounts.some((a) => a.id === value.activeAccountId) ? value.activeAccountId : accounts[0]?.id ?? null;
+    var recentDMs = {};
+    if (value?.recentDMs && typeof value.recentDMs === "object") {
+      for (var account of accounts) {
+        var rows = Array.isArray(value.recentDMs[account.id]) ? value.recentDMs[account.id] : [];
+        recentDMs[account.id] = rows.slice(0, 100).map((row) => {
+          var recipient = row?.recipient || {};
+          if (typeof row?.channelId !== "string" || typeof recipient?.id !== "string")
+            return null;
+          return {
+            channelId: row.channelId.slice(0, 64),
+            recipient: {
+              id: recipient.id.slice(0, 64),
+              username: typeof recipient.username === "string" ? recipient.username.slice(0, 128) : void 0,
+              global_name: typeof recipient.global_name === "string" ? recipient.global_name.slice(0, 128) : null,
+              avatar: typeof recipient.avatar === "string" ? recipient.avatar.slice(0, 256) : null,
+              bot: Boolean(recipient.bot)
+            },
+            lastOpenedAt: typeof row.lastOpenedAt === "number" ? row.lastOpenedAt : 0
+          };
+        }).filter(Boolean);
+      }
+    }
+    return {
+      accounts,
+      activeAccountId: active,
+      recentDMs,
+      loaded: true
+    };
+  }
+  function persist() {
+    return _async_to_generator(function* () {
+      var secure = keychainAvailable() && state.accounts.every((account) => keychainSet(account.id, account.token));
+      var accounts = secure ? state.accounts.map(({ token: _token, ...rest }) => rest) : state.accounts;
+      var payload = JSON.stringify({
+        accounts,
+        activeAccountId: state.activeAccountId,
+        recentDMs: state.recentDMs
+      });
+      yield NativeFileModule.writeFile("documents", FILE_PATH, payload, "utf8");
+    })();
+  }
+  function resetCorruptStore() {
+    return _async_to_generator(function* () {
+      for (var account of state.accounts)
+        keychainDelete(account.id);
+      state = {
+        ...DEFAULT_STATE,
+        loaded: true
+      };
+      try {
+        yield NativeFileModule.writeFile("documents", FILE_PATH, JSON.stringify({
+          accounts: [],
+          activeAccountId: null,
+          recentDMs: {}
+        }), "utf8");
+      } catch (e) {
+      }
+    })();
+  }
+  function ensureBotCordLoaded() {
+    return _async_to_generator(function* () {
+      if (state.loaded)
+        return;
+      if (loadPromise)
+        return loadPromise;
+      loadPromise = (() => _async_to_generator(function* () {
+        try {
+          var fullPath = `${NativeFileModule.getConstants().DocumentsDirPath}/${FILE_PATH}`;
+          if (!(yield NativeFileModule.fileExists(fullPath))) {
+            yield resetCorruptStore();
+            return;
+          }
+          var size = yield NativeFileModule.getSize(fullPath);
+          if (typeof size === "number" && size > MAX_FILE_BYTES) {
+            yield resetCorruptStore();
+            return;
+          }
+          var raw = yield NativeFileModule.readFile(fullPath, "utf8");
+          if (!raw || raw.length > MAX_FILE_BYTES) {
+            yield resetCorruptStore();
+            return;
+          }
+          var parsed = JSON.parse(raw);
+          state = sanitizeState(parsed);
+          if (Array.isArray(parsed?.accounts) && parsed.accounts.some((account) => typeof account?.token === "string" && account.token) && keychainAvailable())
+            yield persist();
+        } catch (e) {
+          yield resetCorruptStore();
+        } finally {
+          state.loaded = true;
+          loadPromise = null;
+          notify();
+        }
+      })())();
+      return loadPromise;
+    })();
+  }
+  function useBotCordState() {
+    var [value, setValue] = import_react14.default.useState(() => snapshot());
+    import_react14.default.useEffect(() => {
+      var active = true;
+      var update = () => active && setValue(snapshot());
+      listeners.add(update);
+      ensureBotCordLoaded().then(update).catch(update);
+      return () => {
+        active = false;
+        listeners.delete(update);
+      };
+    }, []);
+    return value;
+  }
+  function normalizeBotToken(token) {
+    return token.trim().replace(/^Bot\s+/i, "");
+  }
+  function getBotUser(token) {
+    return _async_to_generator(function* () {
+      var cleanToken = normalizeBotToken(token);
+      var response = yield fetch("https://discord.com/api/v10/users/@me", {
+        headers: {
+          Authorization: `Bot ${cleanToken}`
+        }
+      });
+      if (!response.ok)
+        throw new Error("Invalid bot token or Discord rejected the request.");
+      var user = yield response.json();
+      return {
+        id: user.id,
+        username: user.global_name || user.username || `Bot ${user.id}`,
+        avatar: user.avatar,
+        token: cleanToken
+      };
+    })();
+  }
+  function addBotAccount(token) {
+    return _async_to_generator(function* () {
+      var account = yield getBotUser(token);
+      yield ensureBotCordLoaded();
+      var existing = state.accounts.findIndex((a) => a.id === account.id);
+      if (existing === -1)
+        state.accounts = [
+          ...state.accounts,
+          account
+        ].slice(-MAX_ACCOUNTS);
+      else
+        state.accounts = state.accounts.map((a, i) => i === existing ? account : a);
+      state.activeAccountId = account.id;
+      yield persist();
+      notify();
+      return account;
+    })();
+  }
+  function removeBotAccount(id) {
+    return _async_to_generator(function* () {
+      yield ensureBotCordLoaded();
+      state.accounts = state.accounts.filter((a) => a.id !== id);
+      keychainDelete(id);
+      if (state.activeAccountId === id)
+        state.activeAccountId = state.accounts[0]?.id ?? null;
+      yield persist();
+      notify();
+    })();
+  }
+  function setActiveBotAccount(id) {
+    return _async_to_generator(function* () {
+      yield ensureBotCordLoaded();
+      state.activeAccountId = id && state.accounts.some((a) => a.id === id) ? id : state.accounts[0]?.id ?? null;
+      yield persist();
+      notify();
+    })();
+  }
+  function readDiscordError(response) {
+    return _async_to_generator(function* () {
+      try {
+        var body = yield response.json();
+        return typeof body?.message === "string" ? body.message : null;
+      } catch (e) {
+        return null;
+      }
+    })();
+  }
+  function botFetch(token, path) {
+    return _async_to_generator(function* () {
+      var _loop2 = function* (attempt2) {
+        var response = yield fetch(`https://discord.com/api/v10${path}`, {
+          headers: {
+            Authorization: `Bot ${normalizeBotToken(token)}`,
+            Accept: "application/json"
+          }
+        });
+        if (response.ok)
+          return {
+            v: response.json()
+          };
+        var message = yield readDiscordError(response);
+        if ((response.status === 429 || response.status >= 500) && attempt2 < 2) {
+          yield new Promise((resolve) => setTimeout(resolve, 400 * (attempt2 + 1)));
+          return "continue";
+        }
+        if (response.status === 403)
+          throw new Error("This bot needs View Channel and Read Message History permissions (403).");
+        throw new Error(message ? `${message} (${response.status})` : `Discord API request failed (${response.status}).`);
+      };
+      for (var attempt = 0; attempt < 3; attempt++) {
+        var _ret = yield* _loop2(attempt);
+        if (_type_of(_ret) === "object")
+          return _ret.v;
+      }
+      throw new Error("Discord did not respond after three attempts.");
+    })();
+  }
+  function getBotGuilds(token) {
+    return botFetch(token, "/users/@me/guilds");
+  }
+  function getBotGuildChannels(token, guildId) {
+    return botFetch(token, `/guilds/${guildId}/channels`);
+  }
+  function getBotChannelMessages(token, channelId) {
+    return botFetch(token, `/channels/${channelId}/messages?limit=25`);
+  }
+  function getBotGuildMembers(token, guildId) {
+    return _async_to_generator(function* () {
+      var members = [];
+      var after2 = "0";
+      while (true) {
+        var page = yield botFetch(token, `/guilds/${guildId}/members?limit=1000&after=${after2}`);
+        members.push(...page);
+        if (page.length < 1e3)
+          break;
+        var next = page[page.length - 1]?.user?.id;
+        if (!next || next === after2)
+          break;
+        after2 = next;
+      }
+      return members;
+    })();
+  }
+  function createBotDM(token, recipient) {
+    return _async_to_generator(function* () {
+      var response = yield fetch("https://discord.com/api/v10/users/@me/channels", {
+        method: "POST",
+        headers: {
+          Authorization: `Bot ${normalizeBotToken(token)}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          recipient_id: recipient.id
+        })
+      });
+      if (!response.ok) {
+        var message = yield readDiscordError(response);
+        throw new Error(message ? `${message} (${response.status})` : `Failed to open DM (${response.status}).`);
+      }
+      var channel = yield response.json();
+      yield ensureBotCordLoaded();
+      var account = state.accounts.find((a) => normalizeBotToken(a.token) === normalizeBotToken(token));
+      if (account) {
+        var current = state.recentDMs[account.id] ?? [];
+        state.recentDMs = {
+          ...state.recentDMs,
+          [account.id]: [
+            {
+              channelId: channel.id,
+              recipient: {
+                id: recipient.id,
+                username: recipient.username,
+                global_name: recipient.global_name,
+                avatar: recipient.avatar,
+                bot: Boolean(recipient.bot)
+              },
+              lastOpenedAt: Date.now()
+            },
+            ...current.filter((dm) => dm.recipient.id !== recipient.id)
+          ].slice(0, 100)
+        };
+        yield persist();
+        notify();
+      }
+      return channel;
+    })();
+  }
+  function sendBotMessage(token, channelId, content, attachment) {
+    return _async_to_generator(function* () {
+      var body;
+      var headers = {
+        Authorization: `Bot ${normalizeBotToken(token)}`
+      };
+      if (attachment?.uri) {
+        var form = new FormData();
+        form.append("payload_json", JSON.stringify({
+          content
+        }));
+        form.append("files[0]", {
+          uri: attachment.uri,
+          name: attachment.name || `image-${Date.now()}.jpg`,
+          type: attachment.type || "image/jpeg"
+        });
+        body = form;
+      } else {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify({
+          content
+        });
+      }
+      var response = yield fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
+        method: "POST",
+        headers,
+        body
+      });
+      if (!response.ok) {
+        var message = yield readDiscordError(response);
+        throw new Error(message ? `${message} (${response.status})` : `Failed to send message (${response.status}).`);
+      }
+      return response.json();
+    })();
+  }
+  var import_react14, FILE_PATH, SECRET_PREFIX, MAX_FILE_BYTES, MAX_ACCOUNTS, DEFAULT_STATE, state, loadPromise, listeners, keychainAvailable, keychainGet, keychainSet, keychainDelete;
+  var init_botcord = __esm({
+    "src/lib/api/botcord.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_type_of();
+      init_modules();
+      import_react14 = __toESM(require_react());
+      FILE_PATH = "botcord/accounts.json";
+      SECRET_PREFIX = "bot-token:";
+      MAX_FILE_BYTES = 256 * 1024;
+      MAX_ACCOUNTS = 50;
+      DEFAULT_STATE = {
+        accounts: [],
+        activeAccountId: null,
+        recentDMs: {},
+        loaded: false
+      };
+      state = {
+        ...DEFAULT_STATE
+      };
+      loadPromise = null;
+      listeners = /* @__PURE__ */ new Set();
+      keychainAvailable = () => secretBridge("delete", SECRET_PREFIX + "probe").ok;
+      keychainGet = (id) => {
+        var result = secretBridge("get", SECRET_PREFIX + id);
+        return result.ok && typeof result.value === "string" ? result.value : "";
+      };
+      keychainSet = (id, token) => secretBridge("set", SECRET_PREFIX + id, token).value === true;
+      keychainDelete = (id) => {
+        secretBridge("delete", SECRET_PREFIX + id);
+      };
+    }
+  });
+
+  // src/core/ui/settings/pages/BotCord/index.tsx
+  var BotCord_exports = {};
+  __export(BotCord_exports, {
+    default: () => BotCord
+  });
+  function nativeColor(value, fallback) {
+    try {
+      if (typeof value === "string")
+        return value;
+      if (isSemanticColor(value)) {
+        var resolved = resolveSemanticColor(value);
+        if (typeof resolved === "string" && resolved)
+          return resolved;
+      }
+    } catch (e) {
+    }
+    return fallback;
+  }
+  function ApiAvatar({ user, size = 40 }) {
+    var uri = avatarUrl(user, 128);
+    var colors = getNativeColors();
+    if (uri)
+      return /* @__PURE__ */ jsx(import_react_native46.Image, {
+        source: {
+          uri
+        },
+        style: {
+          width: size,
+          height: size,
+          borderRadius: size / 2
+        }
+      });
+    var label2 = displayName(user).trim().slice(0, 2).toUpperCase() || "?";
+    return /* @__PURE__ */ jsx(import_react_native46.View, {
+      style: {
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: colors.input
+      },
+      children: /* @__PURE__ */ jsx(Text, {
+        variant: "text-sm/semibold",
+        children: label2
+      })
+    });
+  }
+  function MessageRow({ message }) {
+    var styles2 = useStyles3();
+    var author = message.author || {};
+    var time = message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    }) : "";
+    var reactionCount = message.reactions?.reduce((sum, reaction) => sum + (reaction.count || 0), 0) || 0;
+    return /* @__PURE__ */ jsxs(import_react_native46.View, {
+      style: styles2.row,
+      children: [
+        /* @__PURE__ */ jsx(ApiAvatar, {
+          user: author,
+          size: 40
+        }),
+        /* @__PURE__ */ jsxs(import_react_native46.View, {
+          style: styles2.messageBody,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native46.View, {
+              style: styles2.nameLine,
+              children: [
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-md/semibold",
+                  children: displayName(author)
+                }),
+                author.bot ? /* @__PURE__ */ jsx(Text, {
+                  variant: "text-xs/semibold",
+                  color: "text-brand",
+                  children: "APP"
+                }) : null,
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-xs/normal",
+                  color: "text-muted",
+                  children: time
+                })
+              ]
+            }),
+            !!message.content && /* @__PURE__ */ jsx(Text, {
+              selectable: true,
+              variant: "text-md/normal",
+              children: message.content
+            }),
+            !!message.attachments?.length && /* @__PURE__ */ jsx(import_react_native46.View, {
+              style: {
+                marginTop: 6,
+                gap: 6
+              },
+              children: message.attachments.map((attachment, index) => {
+                var uri = attachment.url || attachment.proxy_url;
+                var type = String(attachment.content_type || "");
+                var isImage = type.startsWith("image/") || /\.(png|jpe?g|gif|webp)(?:$|\?)/i.test(String(uri || attachment.filename || ""));
+                return isImage && uri ? /* @__PURE__ */ jsx(import_react_native46.Image, {
+                  source: {
+                    uri
+                  },
+                  resizeMode: "cover",
+                  style: {
+                    width: 260,
+                    height: 180,
+                    maxWidth: "100%",
+                    borderRadius: 8,
+                    backgroundColor: tokens.colors.BACKGROUND_SECONDARY
+                  }
+                }, attachment.id || `${attachment.filename}-${index}`) : /* @__PURE__ */ jsx(Text, {
+                  variant: "text-sm/normal",
+                  color: "text-link",
+                  children: attachment.filename || "Attachment"
+                }, attachment.id || `${attachment.filename}-${index}`);
+              })
+            }),
+            !!message.embeds?.length && /* @__PURE__ */ jsxs(Text, {
+              variant: "text-sm/normal",
+              color: "text-muted",
+              children: [
+                message.embeds.length,
+                " embed",
+                message.embeds.length === 1 ? "" : "s"
+              ]
+            }),
+            reactionCount > 0 && /* @__PURE__ */ jsxs(Text, {
+              variant: "text-sm/normal",
+              color: "text-muted",
+              children: [
+                "Reactions: ",
+                reactionCount
+              ]
+            })
+          ]
+        })
+      ]
+    });
+  }
+  function AccountSheet({ accounts, active, onMain }) {
+    return /* @__PURE__ */ jsx(ActionSheet, {
+      children: /* @__PURE__ */ jsxs(import_react_native46.View, {
+        style: {
+          paddingHorizontal: 12,
+          paddingBottom: 20
+        },
+        children: [
+          /* @__PURE__ */ jsx(Text, {
+            variant: "heading-lg/extrabold",
+            children: "Switch account"
+          }),
+          /* @__PURE__ */ jsxs(Stack, {
+            spacing: 4,
+            style: {
+              marginTop: 10
+            },
+            children: [
+              accounts.map((account) => /* @__PURE__ */ jsx(ActionSheetRow, {
+                label: account.username,
+                icon: /* @__PURE__ */ jsx(ApiAvatar, {
+                  user: account,
+                  size: 32
+                }),
+                onPress: () => _async_to_generator(function* () {
+                  yield setActiveBotAccount(account.id);
+                  hideSheet("BOTCORD_ACCOUNT");
+                })()
+              }, account.id)),
+              /* @__PURE__ */ jsx(ActionSheetRow, {
+                label: "Back to Discord",
+                onPress: () => {
+                  hideSheet("BOTCORD_ACCOUNT");
+                  onMain();
+                }
+              }),
+              /* @__PURE__ */ jsx(ActionSheetRow, {
+                label: "Log out bot",
+                variant: "destructive",
+                onPress: () => _async_to_generator(function* () {
+                  yield removeBotAccount(active.id);
+                  hideSheet("BOTCORD_ACCOUNT");
+                  onMain();
+                })()
+              })
+            ]
+          })
+        ]
+      })
+    });
+  }
+  function BotClient({ accounts, activeId, onExit }) {
+    var styles2 = useStyles3();
+    var nativeColors2 = getNativeColors();
+    var navigation2 = NavigationNative.useNavigation();
+    var state2 = useBotCordState();
+    var active = accounts.find((a) => a.id === activeId) ?? accounts[0] ?? null;
+    var [guilds, setGuilds] = (0, import_react15.useState)([]);
+    var [channels2, setChannels] = (0, import_react15.useState)([]);
+    var [guild, setGuild] = (0, import_react15.useState)(null);
+    var [channel, setChannel] = (0, import_react15.useState)(null);
+    var [messages, setMessages] = (0, import_react15.useState)([]);
+    var [composer, setComposer] = (0, import_react15.useState)("");
+    var [selectedImage, setSelectedImage] = (0, import_react15.useState)(null);
+    var [loading, setLoading] = (0, import_react15.useState)(false);
+    var [error, setError] = (0, import_react15.useState)(null);
+    var [screen, setScreen] = (0, import_react15.useState)("messages");
+    var [members, setMembers] = (0, import_react15.useState)([]);
+    var [memberSearch, setMemberSearch] = (0, import_react15.useState)("");
+    var [memberStatus, setMemberStatus] = (0, import_react15.useState)("");
+    var listRef = (0, import_react15.useRef)(null);
+    (0, import_react15.useEffect)(() => {
+      if (!active)
+        return;
+      setLoading(true);
+      setError(null);
+      setGuild(null);
+      setChannel(null);
+      setChannels([]);
+      setMessages([]);
+      setSelectedImage(null);
+      setMembers([]);
+      setMemberStatus("");
+      setScreen("messages");
+      getBotGuilds(active.token).then(setGuilds).catch((e) => setError(String(e))).finally(() => setLoading(false));
+    }, [
+      active?.id
+    ]);
+    (0, import_react15.useEffect)(() => {
+      if (!active || !channel?.id)
+        return;
+      var disposed = false;
+      var refresh = () => _async_to_generator(function* () {
+        try {
+          var remote = yield getBotChannelMessages(active.token, channel.id);
+          if (disposed)
+            return;
+          var chronological = remote.slice().reverse();
+          setMessages((current) => {
+            var optimistic = current.filter((message) => String(message?.id || "").startsWith("local-"));
+            return [
+              ...chronological,
+              ...optimistic
+            ];
+          });
+        } catch (e) {
+        }
+      })();
+      var timer = setInterval(refresh, 1500);
+      return () => {
+        disposed = true;
+        clearInterval(timer);
+      };
+    }, [
+      active?.id,
+      channel?.id
+    ]);
+    var openGuild = (nextGuild) => _async_to_generator(function* () {
+      if (!active)
+        return;
+      setGuild(nextGuild);
+      setChannel(null);
+      setMessages([]);
+      setScreen("guild");
+      setLoading(true);
+      setError(null);
+      try {
+        var nextChannels = yield getBotGuildChannels(active.token, nextGuild.id);
+        setChannels(nextChannels.sort((a, b3) => (a.position ?? 0) - (b3.position ?? 0)));
+      } catch (e) {
+        setError(String(e));
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var openMessages = () => {
+      setGuild(null);
+      setChannel(null);
+      setMessages([]);
+      setScreen("messages");
+      setError(null);
+    };
+    var openChannel = (nextChannel) => _async_to_generator(function* () {
+      if (!active)
+        return;
+      setLoading(true);
+      setError(null);
+      try {
+        var result = yield getBotChannelMessages(active.token, nextChannel.id);
+        setChannel(nextChannel);
+        setMessages(result.reverse());
+      } catch (e) {
+        setError(String(e));
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var openRecentDM = (dm) => _async_to_generator(function* () {
+      yield openChannel({
+        id: dm.channelId,
+        name: displayName(dm.recipient),
+        recipients: [
+          dm.recipient
+        ],
+        type: 1,
+        botcordDM: true
+      });
+    })();
+    var loadAllMembers = () => _async_to_generator(function* () {
+      if (!active)
+        return;
+      setScreen("members");
+      setMemberSearch("");
+      setError(null);
+      if (members.length > 0) {
+        setMemberStatus(`${members.length} available members`);
+        return;
+      }
+      setMemberStatus("Loading members");
+      var dedup = /* @__PURE__ */ new Map();
+      var completed = 0;
+      for (var i = 0; i < guilds.length; i += 4) {
+        var batch = guilds.slice(i, i + 4);
+        var results = yield Promise.all(batch.map((g2) => getBotGuildMembers(active.token, g2.id).catch(() => [])));
+        for (var rows of results) {
+          for (var member of rows) {
+            var user = member?.user;
+            if (user?.id && user.id !== active.id && !dedup.has(user.id))
+              dedup.set(user.id, member);
+          }
+        }
+        completed += batch.length;
+        setMemberStatus(`Loading ${completed} of ${guilds.length}`);
+      }
+      var all = Array.from(dedup.values());
+      setMembers(all);
+      setMemberStatus(`${all.length} available members`);
+    })();
+    var openMemberDM = (member) => _async_to_generator(function* () {
+      if (!active || !member?.user?.id)
+        return;
+      setLoading(true);
+      setError(null);
+      try {
+        var dm = yield createBotDM(active.token, member.user);
+        setChannel({
+          ...dm,
+          name: displayName(member.user),
+          recipients: [
+            member.user
+          ],
+          botcordDM: true
+        });
+        var result = yield getBotChannelMessages(active.token, dm.id);
+        setMessages(result.reverse());
+      } catch (e) {
+        setError(String(e));
+      } finally {
+        setLoading(false);
+      }
+    })();
+    var pickImage = () => _async_to_generator(function* () {
+      setError(null);
+      try {
+        var imagePicker = findByProps("launchImageLibrary");
+        var asset = null;
+        if (imagePicker?.launchImageLibrary) {
+          var result = yield new Promise((resolve, reject) => {
+            try {
+              var returned = imagePicker.launchImageLibrary({
+                mediaType: "photo",
+                selectionLimit: 1,
+                includeBase64: false,
+                assetRepresentationMode: "current"
+              }, resolve);
+              if (returned?.then)
+                returned.then(resolve, reject);
+            } catch (error2) {
+              reject(error2);
+            }
+          });
+          if (result?.didCancel)
+            return;
+          if (result?.errorCode)
+            throw new Error(result.errorMessage || "Could not open photos.");
+          asset = result?.assets?.[0];
+        } else {
+          var filePicker = findByProps("pickSingle", "isCancel");
+          if (!filePicker?.pickSingle)
+            throw new Error("Photo picker unavailable.");
+          try {
+            asset = yield filePicker.pickSingle({
+              type: filePicker.types?.images || "image/*",
+              mode: "import",
+              copyTo: "documentDirectory"
+            });
+          } catch (error2) {
+            if (filePicker.isCancel?.(error2))
+              return;
+            throw error2;
+          }
+        }
+        var uri = asset?.fileCopyUri || asset?.uri;
+        if (!uri)
+          return;
+        setSelectedImage({
+          uri,
+          name: asset?.fileName || asset?.name || `image-${Date.now()}.jpg`,
+          type: asset?.type || "image/jpeg",
+          width: asset?.width,
+          height: asset?.height
+        });
+      } catch (e) {
+        setError(String(e));
+      }
+    })();
+    var send = () => _async_to_generator(function* () {
+      if (!active || !channel || !composer.trim() && !selectedImage)
+        return;
+      var content = composer.trim();
+      var image = selectedImage;
+      var optimisticId = `local-${Date.now()}`;
+      var optimistic = {
+        id: optimisticId,
+        content,
+        author: active,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        attachments: image ? [
+          {
+            id: "0",
+            filename: image.name,
+            url: image.uri,
+            proxy_url: image.uri,
+            content_type: image.type
+          }
+        ] : [],
+        botcordPending: true
+      };
+      setComposer("");
+      setSelectedImage(null);
+      setError(null);
+      setMessages((old) => [
+        ...old,
+        optimistic
+      ]);
+      requestAnimationFrame(() => listRef.current?.scrollToEnd?.({
+        animated: true
+      }));
+      try {
+        var sent = yield sendBotMessage(active.token, channel.id, content, image || void 0);
+        setMessages((old) => old.map((message) => message.id === optimisticId ? sent : message));
+      } catch (e) {
+        setMessages((old) => old.filter((message) => message.id !== optimisticId));
+        setComposer(content);
+        setSelectedImage(image);
+        setError(String(e));
+      }
+    })();
+    if (!active)
+      return null;
+    var categories = channels2.filter((c2) => c2.type === 4);
+    var textChannels = (parentId) => channels2.filter((c2) => [
+      0,
+      5,
+      10,
+      11,
+      12
+    ].includes(c2.type) && (c2.parent_id || null) === parentId);
+    var recentDMs = state2.recentDMs?.[active.id] ?? [];
+    var filteredMembers = members.filter((member) => {
+      var q3 = memberSearch.trim().toLowerCase();
+      if (!q3)
+        return true;
+      return `${member.nick || ""} ${member.user?.global_name || ""} ${member.user?.username || ""}`.toLowerCase().includes(q3);
+    });
+    var openAccounts = () => showSheet("BOTCORD_ACCOUNT", AccountSheet, {
+      accounts,
+      active,
+      onMain: () => {
+        onExit();
+        navigation2.goBack?.();
+      }
+    });
+    var returnFromChat = () => {
+      var wasDm = Boolean(channel?.botcordDM);
+      setChannel(null);
+      setMessages([]);
+      setComposer("");
+      setSelectedImage(null);
+      setError(null);
+      if (wasDm) {
+        setGuild(null);
+        setChannels([]);
+        setScreen("messages");
+      } else {
+        setScreen("guild");
+      }
+    };
+    if (channel) {
+      var dmUser = channel.recipients?.[0];
+      return /* @__PURE__ */ jsxs(import_react_native46.KeyboardAvoidingView, {
+        style: styles2.root,
+        behavior: import_react_native46.Platform.OS === "ios" ? "padding" : void 0,
+        keyboardVerticalOffset: 0,
+        children: [
+          /* @__PURE__ */ jsxs(import_react_native46.View, {
+            style: styles2.header,
+            children: [
+              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+                accessibilityRole: "button",
+                accessibilityLabel: "Back",
+                onPress: returnFromChat,
+                hitSlop: 10,
+                style: ({ pressed }) => ({
+                  width: 64,
+                  height: 36,
+                  flexShrink: 0,
+                  borderRadius: 18,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: nativeColors2.selected,
+                  opacity: pressed ? 0.7 : 1,
+                  zIndex: 20
+                }),
+                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                  style: {
+                    color: nativeColors2.text,
+                    fontSize: 15,
+                    fontWeight: "600"
+                  },
+                  children: "Back"
+                })
+              }),
+              dmUser ? /* @__PURE__ */ jsx(ApiAvatar, {
+                user: dmUser,
+                size: 32
+              }) : null,
+              /* @__PURE__ */ jsxs(import_react_native46.View, {
+                style: {
+                  flex: 1
+                },
+                children: [
+                  /* @__PURE__ */ jsx(Text, {
+                    variant: "heading-md/semibold",
+                    numberOfLines: 1,
+                    children: channel.botcordDM ? displayName(dmUser) : channel.name
+                  }),
+                  !channel.botcordDM && guild ? /* @__PURE__ */ jsx(Text, {
+                    variant: "text-xs/normal",
+                    color: "text-muted",
+                    numberOfLines: 1,
+                    children: guild.name
+                  }) : null
+                ]
+              }),
+              /* @__PURE__ */ jsx(PressableScale, {
+                onPress: openAccounts,
+                children: /* @__PURE__ */ jsx(ApiAvatar, {
+                  user: active,
+                  size: 32
+                })
+              })
+            ]
+          }),
+          error ? /* @__PURE__ */ jsx(import_react_native46.View, {
+            style: {
+              paddingHorizontal: 12,
+              paddingVertical: 8
+            },
+            children: /* @__PURE__ */ jsx(Text, {
+              variant: "text-sm/medium",
+              color: "text-feedback-critical",
+              children: error
+            })
+          }) : null,
+          loading ? /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/normal",
+            color: "text-muted",
+            style: {
+              padding: 10,
+              textAlign: "center"
+            },
+            children: "Loading"
+          }) : null,
+          /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+            ref: listRef,
+            style: {
+              flex: 1
+            },
+            data: messages,
+            keyExtractor: (m2, i) => m2.id || String(i),
+            renderItem: ({ item }) => /* @__PURE__ */ jsx(MessageRow, {
+              message: item
+            }),
+            contentContainerStyle: {
+              paddingVertical: 6
+            },
+            keyboardDismissMode: import_react_native46.Platform.OS === "ios" ? "interactive" : "on-drag",
+            keyboardShouldPersistTaps: "handled",
+            onContentSizeChange: () => listRef.current?.scrollToEnd?.({
+              animated: false
+            })
+          }),
+          selectedImage ? /* @__PURE__ */ jsxs(import_react_native46.View, {
+            style: {
+              height: 72,
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 10,
+              backgroundColor: tokens.colors.BACKGROUND_PRIMARY
+            },
+            children: [
+              /* @__PURE__ */ jsx(import_react_native46.Image, {
+                source: {
+                  uri: selectedImage.uri
+                },
+                style: {
+                  width: 56,
+                  height: 56,
+                  borderRadius: 8,
+                  backgroundColor: tokens.colors.BACKGROUND_SECONDARY
+                }
+              }),
+              /* @__PURE__ */ jsx(import_react_native46.Text, {
+                numberOfLines: 1,
+                style: {
+                  flex: 1,
+                  color: nativeColors2.text,
+                  fontSize: 14
+                },
+                children: selectedImage.name
+              }),
+              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+                onPress: () => setSelectedImage(null),
+                hitSlop: 8,
+                style: ({ pressed }) => ({
+                  height: 34,
+                  paddingHorizontal: 12,
+                  borderRadius: 17,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: nativeColors2.selected,
+                  opacity: pressed ? 0.7 : 1
+                }),
+                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                  style: {
+                    color: nativeColors2.text,
+                    fontSize: 13,
+                    fontWeight: "600"
+                  },
+                  children: "Remove"
+                })
+              })
+            ]
+          }) : null,
+          /* @__PURE__ */ jsxs(import_react_native46.View, {
+            style: styles2.composer,
+            children: [
+              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+                accessibilityRole: "button",
+                accessibilityLabel: "Add photo",
+                onPress: pickImage,
+                hitSlop: 6,
+                style: ({ pressed }) => ({
+                  width: 52,
+                  height: 44,
+                  flexShrink: 0,
+                  borderRadius: 22,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: nativeColors2.selected,
+                  opacity: pressed ? 0.7 : 1
+                }),
+                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                  style: {
+                    color: nativeColors2.text,
+                    fontSize: 13,
+                    fontWeight: "600"
+                  },
+                  children: "Photo"
+                })
+              }),
+              /* @__PURE__ */ jsx(import_react_native46.TextInput, {
+                value: composer,
+                placeholder: channel.botcordDM ? `Message ${displayName(dmUser)}` : `Message #${channel.name}`,
+                placeholderTextColor: nativeColors2.muted,
+                onChangeText: setComposer,
+                maxLength: 2e3,
+                returnKeyType: "send",
+                onSubmitEditing: () => {
+                  if (composer.trim() || selectedImage)
+                    send();
+                },
+                style: {
+                  width: 0,
+                  minWidth: 0,
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  height: 44,
+                  paddingHorizontal: 14,
+                  paddingVertical: 0,
+                  borderRadius: 22,
+                  backgroundColor: nativeColors2.input,
+                  color: nativeColors2.text,
+                  fontSize: 16
+                }
+              }),
+              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+                accessibilityRole: "button",
+                accessibilityLabel: "Send message",
+                disabled: !composer.trim() && !selectedImage,
+                onPress: send,
+                hitSlop: 6,
+                style: ({ pressed }) => ({
+                  width: 52,
+                  height: 44,
+                  flexShrink: 0,
+                  borderRadius: 22,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: !composer.trim() && !selectedImage ? 0.45 : pressed ? 0.72 : 1,
+                  backgroundColor: nativeColors2.brand
+                }),
+                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                  style: {
+                    color: nativeColors2.inverse,
+                    fontSize: 13,
+                    fontWeight: "600"
+                  },
+                  children: "Send"
+                })
+              })
+            ]
+          })
+        ]
+      });
+    }
+    return /* @__PURE__ */ jsxs(import_react_native46.View, {
+      style: styles2.root,
+      children: [
+        /* @__PURE__ */ jsxs(import_react_native46.View, {
+          style: styles2.header,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native46.View, {
+              style: {
+                flex: 1
+              },
+              children: [
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "heading-md/semibold",
+                  numberOfLines: 1,
+                  children: screen === "members" ? "New Message" : screen === "messages" ? "Messages" : guild?.name || "BotCord"
+                }),
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-xs/normal",
+                  color: "text-muted",
+                  numberOfLines: 1,
+                  children: active.username
+                })
+              ]
+            }),
+            screen === "members" ? /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+              accessibilityRole: "button",
+              accessibilityLabel: "Back",
+              onPress: openMessages,
+              hitSlop: 8,
+              style: ({ pressed }) => ({
+                paddingHorizontal: 8,
+                height: 36,
+                justifyContent: "center",
+                opacity: pressed ? 0.65 : 1
+              }),
+              children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                style: {
+                  color: nativeColors2.text,
+                  fontSize: 16,
+                  fontWeight: "600"
+                },
+                children: "Back"
+              })
+            }) : /* @__PURE__ */ jsx(Button, {
+              size: "sm",
+              variant: "secondary",
+              text: "New Message",
+              onPress: loadAllMembers
+            }),
+            /* @__PURE__ */ jsx(PressableScale, {
+              onPress: openAccounts,
+              children: /* @__PURE__ */ jsx(ApiAvatar, {
+                user: active,
+                size: 32
+              })
+            })
+          ]
+        }),
+        error ? /* @__PURE__ */ jsx(import_react_native46.View, {
+          style: {
+            paddingHorizontal: 12,
+            paddingVertical: 8
+          },
+          children: /* @__PURE__ */ jsx(Text, {
+            variant: "text-sm/medium",
+            color: "text-feedback-critical",
+            children: error
+          })
+        }) : null,
+        loading ? /* @__PURE__ */ jsx(Text, {
+          variant: "text-sm/normal",
+          color: "text-muted",
+          style: {
+            padding: 8,
+            textAlign: "center"
+          },
+          children: "Loading"
+        }) : null,
+        /* @__PURE__ */ jsxs(import_react_native46.View, {
+          style: styles2.navigator,
+          children: [
+            /* @__PURE__ */ jsxs(import_react_native46.View, {
+              style: styles2.guildRail,
+              children: [
+                /* @__PURE__ */ jsx(PressableScale, {
+                  onPress: openMessages,
+                  style: styles2.guildButton,
+                  children: /* @__PURE__ */ jsx(IconButton, {
+                    size: "lg",
+                    variant: screen === "messages" ? "primary" : "secondary",
+                    icon: findAssetId("HomeIcon") || findAssetId("MessagesIcon") || findAssetId("ChatIcon"),
+                    onPress: openMessages
+                  })
+                }),
+                /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                  data: guilds,
+                  keyExtractor: (g2) => g2.id,
+                  showsVerticalScrollIndicator: false,
+                  renderItem: ({ item }) => {
+                    var uri = guildIconUrl(item);
+                    return /* @__PURE__ */ jsx(PressableScale, {
+                      onPress: () => openGuild(item),
+                      style: styles2.guildButton,
+                      children: uri ? /* @__PURE__ */ jsx(import_react_native46.Image, {
+                        source: {
+                          uri
+                        },
+                        style: styles2.guildImage
+                      }) : /* @__PURE__ */ jsx(import_react_native46.View, {
+                        style: styles2.guildImage,
+                        children: /* @__PURE__ */ jsx(Text, {
+                          variant: "text-sm/semibold",
+                          children: item.name?.slice(0, 2).toUpperCase()
+                        })
+                      })
+                    });
+                  }
+                })
+              ]
+            }),
+            /* @__PURE__ */ jsx(import_react_native46.View, {
+              style: styles2.sidebar,
+              children: screen === "messages" ? /* @__PURE__ */ jsxs(Fragment, {
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native46.View, {
+                    style: styles2.sidebarHeader,
+                    children: [
+                      /* @__PURE__ */ jsx(Text, {
+                        variant: "heading-md/semibold",
+                        style: {
+                          flex: 1
+                        },
+                        children: "Direct Messages"
+                      }),
+                      /* @__PURE__ */ jsx(Button, {
+                        size: "sm",
+                        variant: "secondary",
+                        text: "New Message",
+                        onPress: loadAllMembers
+                      })
+                    ]
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                    data: recentDMs,
+                    keyExtractor: (dm) => dm.channelId,
+                    renderItem: ({ item }) => /* @__PURE__ */ jsxs(PressableScale, {
+                      onPress: () => openRecentDM(item),
+                      style: styles2.dmRow,
+                      children: [
+                        /* @__PURE__ */ jsx(ApiAvatar, {
+                          user: item.recipient,
+                          size: 36
+                        }),
+                        /* @__PURE__ */ jsxs(import_react_native46.View, {
+                          style: {
+                            flex: 1
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx(Text, {
+                              variant: "text-md/medium",
+                              numberOfLines: 1,
+                              children: displayName(item.recipient)
+                            }),
+                            item.recipient.bot ? /* @__PURE__ */ jsx(Text, {
+                              variant: "text-xs/normal",
+                              color: "text-muted",
+                              children: "APP"
+                            }) : null
+                          ]
+                        })
+                      ]
+                    }),
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native46.View, {
+                      style: styles2.listEmpty,
+                      children: /* @__PURE__ */ jsx(Text, {
+                        variant: "text-md/normal",
+                        color: "text-muted",
+                        children: "No recent direct messages. Use New Message to choose a member."
+                      })
+                    })
+                  })
+                ]
+              }) : screen === "members" ? /* @__PURE__ */ jsxs(Fragment, {
+                children: [
+                  /* @__PURE__ */ jsxs(import_react_native46.View, {
+                    style: styles2.sidebarHeader,
+                    children: [
+                      /* @__PURE__ */ jsx(Button, {
+                        size: "sm",
+                        variant: "secondary",
+                        text: "Back",
+                        onPress: openMessages
+                      }),
+                      /* @__PURE__ */ jsxs(import_react_native46.View, {
+                        style: {
+                          flex: 1
+                        },
+                        children: [
+                          /* @__PURE__ */ jsx(Text, {
+                            variant: "heading-md/semibold",
+                            children: "New Message"
+                          }),
+                          /* @__PURE__ */ jsx(Text, {
+                            variant: "text-xs/normal",
+                            color: "text-muted",
+                            children: memberStatus
+                          })
+                        ]
+                      })
+                    ]
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native46.View, {
+                    style: styles2.search,
+                    children: /* @__PURE__ */ jsx(TextInput, {
+                      size: "md",
+                      value: memberSearch,
+                      placeholder: "Search members",
+                      onChange: (value) => setMemberSearch(typeof value === "string" ? value : value?.nativeEvent?.text ?? "")
+                    })
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                    data: filteredMembers,
+                    keyExtractor: (member, i) => member.user?.id || String(i),
+                    keyboardShouldPersistTaps: "handled",
+                    initialNumToRender: 18,
+                    maxToRenderPerBatch: 18,
+                    windowSize: 7,
+                    removeClippedSubviews: true,
+                    renderItem: ({ item }) => /* @__PURE__ */ jsxs(PressableScale, {
+                      onPress: () => openMemberDM(item),
+                      style: styles2.dmRow,
+                      children: [
+                        /* @__PURE__ */ jsx(ApiAvatar, {
+                          user: item.user,
+                          size: 36
+                        }),
+                        /* @__PURE__ */ jsxs(import_react_native46.View, {
+                          style: {
+                            flex: 1
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx(Text, {
+                              variant: "text-md/medium",
+                              numberOfLines: 1,
+                              children: item.nick || displayName(item.user)
+                            }),
+                            item.nick && item.nick !== displayName(item.user) ? /* @__PURE__ */ jsx(Text, {
+                              variant: "text-xs/normal",
+                              color: "text-muted",
+                              numberOfLines: 1,
+                              children: displayName(item.user)
+                            }) : item.user?.bot ? /* @__PURE__ */ jsx(Text, {
+                              variant: "text-xs/normal",
+                              color: "text-muted",
+                              children: "APP"
+                            }) : null
+                          ]
+                        })
+                      ]
+                    }),
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native46.View, {
+                      style: styles2.listEmpty,
+                      children: /* @__PURE__ */ jsx(Text, {
+                        variant: "text-md/normal",
+                        color: "text-muted",
+                        children: "No members are available from the bot's servers."
+                      })
+                    })
+                  })
+                ]
+              }) : /* @__PURE__ */ jsxs(Fragment, {
+                children: [
+                  /* @__PURE__ */ jsx(import_react_native46.View, {
+                    style: styles2.sidebarHeader,
+                    children: /* @__PURE__ */ jsx(Text, {
+                      variant: "heading-md/semibold",
+                      numberOfLines: 1,
+                      children: guild?.name
+                    })
+                  }),
+                  /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                    data: [
+                      ...textChannels(null),
+                      ...categories.flatMap((cat) => [
+                        {
+                          ...cat,
+                          botcordCategory: true
+                        },
+                        ...textChannels(cat.id)
+                      ])
+                    ],
+                    keyExtractor: (item) => `${item.botcordCategory ? "cat" : "chan"}-${item.id}`,
+                    renderItem: ({ item }) => item.botcordCategory ? /* @__PURE__ */ jsx(Text, {
+                      variant: "text-xs/bold",
+                      color: "text-muted",
+                      style: styles2.category,
+                      children: String(item.name || "CATEGORY").toUpperCase()
+                    }) : /* @__PURE__ */ jsx(PressableScale, {
+                      onPress: () => openChannel(item),
+                      style: styles2.channelRow,
+                      children: /* @__PURE__ */ jsx(Text, {
+                        variant: "text-md/medium",
+                        color: "text-muted",
+                        children: item.name
+                      })
+                    }),
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native46.View, {
+                      style: styles2.listEmpty,
+                      children: /* @__PURE__ */ jsx(Text, {
+                        variant: "text-md/normal",
+                        color: "text-muted",
+                        children: "No message channels available."
+                      })
+                    })
+                  })
+                ]
+              })
+            })
+          ]
+        })
+      ]
+    });
+  }
+  function BotCord() {
+    var state2 = useBotCordState();
+    var [token, setToken] = (0, import_react15.useState)("");
+    var [adding, setAdding] = (0, import_react15.useState)(false);
+    var [error, setError] = (0, import_react15.useState)(null);
+    var [opened, setOpened] = (0, import_react15.useState)(false);
+    var accounts = state2.accounts;
+    var active = (0, import_react15.useMemo)(() => accounts.find((a) => a.id === state2.activeAccountId) ?? accounts[0] ?? null, [
+      accounts,
+      state2.activeAccountId
+    ]);
+    if (opened && active)
+      return /* @__PURE__ */ jsx(BotClient, {
+        accounts,
+        activeId: active.id,
+        onExit: () => setOpened(false)
+      });
+    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
+      style: {
+        flex: 1
+      },
+      contentContainerStyle: {
+        paddingBottom: 38
+      },
+      children: /* @__PURE__ */ jsxs(Stack, {
+        style: {
+          paddingVertical: 24,
+          paddingHorizontal: 12
+        },
+        spacing: 16,
+        children: [
+          /* @__PURE__ */ jsxs(import_react_native46.View, {
+            children: [
+              /* @__PURE__ */ jsx(Text, {
+                variant: "heading-xl/bold",
+                children: "BotCord"
+              }),
+              /* @__PURE__ */ jsx(Text, {
+                variant: "text-sm/normal",
+                color: "text-muted",
+                children: "Bot accounts use Discord's mobile components and stay only on this device."
+              })
+            ]
+          }),
+          /* @__PURE__ */ jsxs(TableRowGroup, {
+            title: "Bot Accounts",
+            children: [
+              accounts.map((account) => /* @__PURE__ */ jsx(TableRow, {
+                label: account.username,
+                subLabel: state2.activeAccountId === account.id ? "Active bot" : `Bot ID: ${account.id}`,
+                icon: /* @__PURE__ */ jsx(TableRow.Icon, {
+                  source: findAssetId("RobotIcon") || findAssetId("AppsIcon")
+                }),
+                onPress: () => _async_to_generator(function* () {
+                  yield setActiveBotAccount(account.id);
+                  setOpened(true);
+                })(),
+                trailing: /* @__PURE__ */ jsx(Button, {
+                  size: "sm",
+                  variant: "secondary",
+                  text: "Remove",
+                  onPress: () => removeBotAccount(account.id)
+                })
+              }, account.id)),
+              !state2.loaded ? /* @__PURE__ */ jsx(TableRow, {
+                label: "Loading bot accounts"
+              }) : null,
+              state2.loaded && accounts.length === 0 ? /* @__PURE__ */ jsx(TableRow, {
+                label: "No bot accounts added yet"
+              }) : null
+            ]
+          }),
+          /* @__PURE__ */ jsx(TableRowGroup, {
+            title: "Add Bot Account",
+            children: /* @__PURE__ */ jsx(TableRow, {
+              label: /* @__PURE__ */ jsxs(import_react_native46.View, {
+                style: {
+                  width: "100%",
+                  gap: 10
+                },
+                children: [
+                  /* @__PURE__ */ jsx(TextInput, {
+                    size: "lg",
+                    value: token,
+                    placeholder: "Bot token",
+                    onChange: setToken,
+                    secureTextEntry: true,
+                    state: error ? "error" : void 0,
+                    errorMessage: error || void 0
+                  }),
+                  /* @__PURE__ */ jsx(Button, {
+                    size: "md",
+                    variant: "primary",
+                    text: "Add Bot Account",
+                    loading: adding,
+                    disabled: adding || !token.trim(),
+                    onPress: () => _async_to_generator(function* () {
+                      setAdding(true);
+                      setError(null);
+                      try {
+                        yield addBotAccount(token);
+                        setToken("");
+                      } catch (e) {
+                        setError(String(e));
+                      } finally {
+                        setAdding(false);
+                      }
+                    })()
+                  })
+                ]
+              })
+            })
+          }),
+          active ? /* @__PURE__ */ jsx(Button, {
+            size: "lg",
+            variant: "primary",
+            text: `Open as ${active.username}`,
+            onPress: () => setOpened(true)
+          }) : null
+        ]
+      })
+    });
+  }
+  var import_react15, import_react_native46, useStyles3, avatarUrl, guildIconUrl, displayName, getNativeColors;
+  var init_BotCord = __esm({
+    "src/core/ui/settings/pages/BotCord/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_assets();
+      init_botcord();
+      init_sheets();
+      init_color();
+      init_styles();
+      init_metro();
       init_common();
       init_components();
-      import_react_native47 = __toESM(require_react_native());
+      import_react15 = __toESM(require_react());
+      import_react_native46 = __toESM(require_react_native());
+      useStyles3 = createStyles({
+        root: {
+          flex: 1,
+          backgroundColor: tokens.colors.BACKGROUND_PRIMARY
+        },
+        header: {
+          minHeight: 56,
+          paddingHorizontal: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          backgroundColor: tokens.colors.BACKGROUND_PRIMARY
+        },
+        navigator: {
+          flex: 1,
+          flexDirection: "row",
+          backgroundColor: tokens.colors.BACKGROUND_SECONDARY
+        },
+        guildRail: {
+          width: 72,
+          backgroundColor: "#1e1f22",
+          paddingVertical: 8
+        },
+        sidebar: {
+          flex: 1,
+          backgroundColor: tokens.colors.BACKGROUND_SECONDARY
+        },
+        sidebarHeader: {
+          minHeight: 54,
+          paddingHorizontal: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8
+        },
+        row: {
+          flexDirection: "row",
+          gap: 10,
+          paddingHorizontal: 12,
+          paddingVertical: 7
+        },
+        messageBody: {
+          flex: 1
+        },
+        nameLine: {
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 6,
+          flexWrap: "wrap"
+        },
+        composer: {
+          height: 60,
+          width: "100%",
+          paddingHorizontal: 10,
+          paddingVertical: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          flexShrink: 0,
+          backgroundColor: tokens.colors.BACKGROUND_PRIMARY
+        },
+        category: {
+          paddingHorizontal: 12,
+          paddingTop: 14,
+          paddingBottom: 4
+        },
+        channelRow: {
+          paddingHorizontal: 12,
+          paddingVertical: 10
+        },
+        guildButton: {
+          width: 72,
+          height: 56,
+          alignItems: "center",
+          justifyContent: "center"
+        },
+        guildImage: {
+          width: 48,
+          height: 48,
+          borderRadius: 24
+        },
+        dmRow: {
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          paddingHorizontal: 12,
+          paddingVertical: 8
+        },
+        search: {
+          paddingHorizontal: 10,
+          paddingBottom: 8
+        },
+        listEmpty: {
+          padding: 20
+        }
+      });
+      avatarUrl = (user, size = 128) => user?.avatar ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=${size}` : null;
+      guildIconUrl = (guild, size = 128) => guild?.icon ? `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=${size}` : null;
+      displayName = (user) => user?.global_name || user?.username || "Unknown";
+      getNativeColors = () => ({
+        text: nativeColor(tokens.colors.TEXT_NORMAL, "#f2f3f5"),
+        muted: nativeColor(tokens.colors.TEXT_MUTED, "#b5bac1"),
+        input: nativeColor(tokens.colors.BACKGROUND_MODIFIER_ACCENT, "#2b2d31"),
+        selected: nativeColor(tokens.colors.BACKGROUND_MODIFIER_SELECTED, "#35373c"),
+        brand: nativeColor(tokens.colors.BRAND_500, "#5865f2"),
+        inverse: nativeColor(tokens.colors.WHITE_500, "#ffffff")
+      });
     }
   });
 
@@ -73147,7 +73081,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         })
       ]
     });
-    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16,
@@ -73196,7 +73130,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 ]
               }),
               field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native48.View, {
+              /* @__PURE__ */ jsxs(import_react_native47.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -73226,7 +73160,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native48.View, {
+              /* @__PURE__ */ jsxs(import_react_native47.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -73278,7 +73212,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       assignment
     }, assignment.userId) : null;
   }
-  var import_react_native48;
+  var import_react_native47;
   var init_TestingPlugins = __esm({
     "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
       "use strict";
@@ -73291,6 +73225,135 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_fs();
       init_modules();
       init_pluginTesting();
+      init_common();
+      init_components();
+      import_react_native47 = __toESM(require_react_native());
+    }
+  });
+
+  // src/core/ui/settings/pages/Tools/index.tsx
+  var Tools_exports = {};
+  __export(Tools_exports, {
+    default: () => Tools
+  });
+  function Tools() {
+    var preferences = useProxy(settings);
+    var hidden = preferences.cloudcordHiddenTabs ?? [];
+    var assigned = useMobileTestingAssignment();
+    var navigation2 = NavigationNative.useNavigation();
+    var actions = React2.useMemo(() => ({
+      previews: wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+        return {
+          default: (yield Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))).PreviewsPage
+        };
+      })(), "Previews", void 0, "push"),
+      account: wrapOnPress(void 0, navigation2, () => _async_to_generator(function* () {
+        return {
+          default: (yield Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))).AccountToolsPage
+        };
+      })(), "Account Tools", void 0, "push"),
+      sync: wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_StoreCloud(), StoreCloud_exports)), "CloudSync", void 0, "push"),
+      bot: wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_BotCord(), BotCord_exports)), "Botcord", void 0, "push"),
+      testing: wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_TestingPlugins(), TestingPlugins_exports)), "Testing Plugins", void 0, "push"),
+      diagnostics: wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)), "Diagnostics", void 0, "push")
+    }), [
+      navigation2
+    ]);
+    var cloudIcon = findAssetId("CloudIcon") || findAssetId("CloudArrowUpIcon");
+    var groups = [
+      {
+        title: "Customize",
+        items: [
+          {
+            key: "CLOUDCORD_PREVIEWS",
+            label: "Previews",
+            action: actions.previews
+          }
+        ]
+      },
+      {
+        title: "Accounts and data",
+        items: [
+          {
+            key: "CLOUDCORD_ACCOUNT_TOOLS",
+            label: "Account Tools",
+            action: actions.account
+          },
+          {
+            key: "STORE_CLOUD",
+            label: "CloudSync",
+            action: actions.sync,
+            icon: cloudIcon
+          },
+          {
+            key: "BOTCORD",
+            label: "Botcord",
+            action: actions.bot
+          }
+        ]
+      },
+      {
+        title: "Testing and support",
+        items: [
+          {
+            key: "CLOUDCORD_TESTING_PLUGINS",
+            label: "Testing Plugins",
+            action: actions.testing,
+            visible: Boolean(assigned)
+          },
+          {
+            key: "CLOUDCORD_DIAGNOSTICS",
+            label: "Diagnostics",
+            action: actions.diagnostics,
+            visible: preferences.cloudcordDiagnosticsEnabled === true
+          }
+        ]
+      }
+    ];
+    var order = new Map((preferences.cloudcordTabOrder ?? []).map((key, index) => [
+      key,
+      index
+    ]));
+    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
+      contentContainerStyle: {
+        paddingBottom: 38
+      },
+      children: /* @__PURE__ */ jsx(Stack, {
+        style: {
+          paddingVertical: 24,
+          paddingHorizontal: 12
+        },
+        spacing: 24,
+        children: groups.map(({ title, items }) => {
+          var visible = items.filter((item) => item.visible !== false && !hidden.includes(item.key)).sort((a, b3) => (order.get(a.key) ?? Infinity) - (order.get(b3.key) ?? Infinity));
+          return !!visible.length && /* @__PURE__ */ jsx(TableRowGroup, {
+            title,
+            children: visible.map((item) => /* @__PURE__ */ jsx(TableRow, {
+              arrow: true,
+              label: item.label,
+              icon: item.icon ? /* @__PURE__ */ jsx(TableRow.Icon, {
+                source: item.icon
+              }) : void 0,
+              onPress: item.action
+            }, item.key))
+          }, title);
+        })
+      })
+    });
+  }
+  var import_react_native48;
+  var init_Tools = __esm({
+    "src/core/ui/settings/pages/Tools/index.tsx"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      init_async_to_generator();
+      init_jsxRuntime();
+      init_storage();
+      init_assets();
+      init_pluginTesting();
+      init_settings();
+      init_shared();
       init_common();
       init_components();
       import_react_native48 = __toESM(require_react_native());
@@ -73337,24 +73400,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var baseItems = [
       coreItem,
       {
-        key: "BOTCORD",
-        title: () => "Botcord",
-        icon: safeAsset("RobotIcon", "AppsIcon"),
-        render: () => Promise.resolve().then(() => (init_BotCord(), BotCord_exports))
-      },
-      {
         key: "FAKE_PROFILE",
         title: () => "Profile",
         icon: safeAsset("UserIcon", "SettingsIcon"),
         render: () => Promise.resolve().then(() => (init_FakeProfile(), FakeProfile_exports))
-      },
-      {
-        key: "STORE_CLOUD",
-        title: () => "CloudSync",
-        icon: {
-          uri: "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png"
-        },
-        render: () => Promise.resolve().then(() => (init_StoreCloud(), StoreCloud_exports))
       },
       {
         key: "BUNNY_PLUGINS",
@@ -73366,36 +73415,14 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         key: "CLOUDCORD_TOOLS",
         title: () => "Tools",
         icon: safeAsset("WrenchIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_Tools(), Tools_exports)),
-        usePredicate: () => {
-          var hidden = useProxy(settings).cloudcordHiddenTabs ?? [];
-          return !hidden.includes("CLOUDCORD_PREVIEWS") || !hidden.includes("CLOUDCORD_ACCOUNT_TOOLS");
-        }
-      },
-      {
-        key: "CLOUDCORD_TESTING_PLUGINS",
-        title: () => "Testing Plugins",
-        icon: safeAsset("AppsIcon", "WrenchIcon"),
-        render: () => Promise.resolve().then(() => (init_TestingPlugins(), TestingPlugins_exports)),
-        usePredicate: () => Boolean(useMobileTestingAssignment())
-      },
-      {
-        key: "CLOUDCORD_DIAGNOSTICS",
-        title: () => "Diagnostics",
-        icon: safeAsset("WrenchIcon", "SettingsIcon"),
-        render: () => Promise.resolve().then(() => (init_Diagnostics(), Diagnostics_exports)),
-        usePredicate: () => useProxy(settings).cloudcordDiagnosticsEnabled === true
+        render: () => Promise.resolve().then(() => (init_Tools(), Tools_exports))
       }
     ];
     var defaultOrder = [
       "CLOUDCORD",
       "FAKE_PROFILE",
       "BUNNY_PLUGINS",
-      "CLOUDCORD_TOOLS",
-      "STORE_CLOUD",
-      "BOTCORD",
-      "CLOUDCORD_TESTING_PLUGINS",
-      "CLOUDCORD_DIAGNOSTICS"
+      "CLOUDCORD_TOOLS"
     ];
     var configurableKeys = new Set(defaultOrder.filter((key) => key !== "CLOUDCORD"));
     var configuredOrder = settings.cloudcordTabOrder ?? [];
@@ -73456,7 +73483,6 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_storage();
       init_assets();
       init_settings();
-      init_pluginTesting();
       init_settings2();
     }
   });
@@ -74255,7 +74281,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "24f150776e771f2a9c1aa10055d3ba8c0cfbff28";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fe369b85a4929bf1d65f03d50f89f1a6238dae4a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
