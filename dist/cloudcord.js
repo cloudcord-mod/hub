@@ -40617,6 +40617,18 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           scope: "none",
           format: (id) => "<@" + id + ">"
         },
+        "account-created": {
+          label: "Copy Account Creation Timestamp",
+          scope: "none",
+          format: (id) => {
+            if (!isCxProfileUserId(id) || id.startsWith("0"))
+              return;
+            var snowflake3 = BigInt(id);
+            if (snowflake3 > 0xffffffffffffffffn)
+              return;
+            return "<t:" + Math.floor((Number(snowflake3 >> 22n) + 14200704e5) / 1e3) + ":F>";
+          }
+        },
         "username": {
           label: "Copy Username",
           scope: "identity"
@@ -49491,6 +49503,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-account-creation-timestamp.cx
+  var copy_account_creation_timestamp_default;
+  var init_copy_account_creation_timestamp = __esm({
+    "../examples/cx/catalog/plugins/copy-account-creation-timestamp.cx"() {
+      copy_account_creation_timestamp_default = 'plugin "CopyAccountCreationTimestamp":\n  needs profilemenu.copy\n  on profile menu copy account-created\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-attachment-links.cx
   var copy_attachment_links_default;
   var init_copy_attachment_links = __esm({
@@ -53598,6 +53618,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_compact_messages();
       init_compact_server_list();
       init_compare_lines();
+      init_copy_account_creation_timestamp();
       init_copy_attachment_links();
       init_copy_attachment_names();
       init_copy_bios();
@@ -54553,6 +54574,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ],
             appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20",
             privateCommands: true
+          },
+          {
+            name: "CopyAccountCreationTimestamp",
+            source: copy_account_creation_timestamp_default,
+            description: "Copy Account Creation Timestamp",
+            categories: [
+              "Profiles"
+            ]
           },
           {
             name: "CopyAttachmentLinks",
@@ -68149,7 +68178,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f0bfdaa78ca7865a709b9053b6e30f24ecd23fa8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7bc2774a5630ec8f53104f186a6bb273e33a230b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
