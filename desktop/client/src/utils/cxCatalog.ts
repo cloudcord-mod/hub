@@ -32,6 +32,7 @@ import plugin_catalog_call_time_counter from "../../../../examples/cx/catalog/pl
 import plugin_catalog_centered_chat from "../../../../examples/cx/catalog/plugins/centered-chat.cx";
 import plugin_catalog_chat_buttons_begone from "../../../../examples/cx/catalog/plugins/chat-buttons-begone.cx";
 import plugin_catalog_chat_link_focus_ring from "../../../../examples/cx/catalog/plugins/chat-link-focus-ring.cx";
+import plugin_catalog_chat_reading_width from "../../../../examples/cx/catalog/plugins/chat-reading-width.cx";
 import plugin_catalog_checklist_progress from "../../../../examples/cx/catalog/plugins/checklist-progress.cx";
 import plugin_catalog_clap_text from "../../../../examples/cx/catalog/plugins/clap-text.cx";
 import plugin_catalog_clean_channel_name from "../../../../examples/cx/catalog/plugins/clean-channel-name.cx";
@@ -695,6 +696,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CenteredChat", source: plugin_catalog_centered_chat, description: "center the message list on wide screens", categories: ["Appearance"], appearanceRevision: "b83a7ec1531049c64d41b5b2401a77ad421f81966abb0957703cbb3757b96d71" },
         { name: "ChatButtonsBegone", source: plugin_catalog_chat_buttons_begone, description: "Hide the listed interface elements on this device", keywords: "Hide the chat attachment button Hide the chat gift button Hide the GIF picker shortcut Hide the sticker picker shortcut Hide the composer expression picker shortcut Hide the chat apps button Hide the Shop entry Hide the threads shortcut in the channel header Hide avatar decorations Hide profile badge rows Hide profile effects", categories: ["Appearance","Profiles"], appearanceRevision: "3706198cb3727ca7e084f17a16727961e83d7511b733fff3f50b4d0ac980b433" },
         { name: "ChatLinkFocusRing", source: plugin_catalog_chat_link_focus_ring, description: "Outline chat links during keyboard navigation", desktopOnly: true, categories: ["Appearance"] },
+        { name: "ChatReadingWidth", source: plugin_catalog_chat_reading_width, description: "Limit the width of message text in wide chat panes", desktopOnly: true, categories: ["Appearance"] },
         { name: "Checklist Progress", source: plugin_catalog_checklist_progress, description: "/checklistprogress", commands: ["checklistprogress"], categories: ["Commands"], appearanceRevision: "edaaa6c353ed5ae0b1226b53fa0768367fd5e83c8f293c765142041ef542216d", privateCommands: true },
         { name: "ClapText", source: plugin_catalog_clap_text, description: "/clap", commands: ["clap"], categories: ["Chat","Commands"] },
         { name: "CleanChannelName", source: plugin_catalog_clean_channel_name, description: "Remove decorations from displayed channel names", categories: ["Appearance"], appearanceRevision: "c8c232817b30c0a5dd3cd694d9a1da0fbb7156039cdf59dbb1b932a124c004cc" },

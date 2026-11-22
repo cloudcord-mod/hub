@@ -1,0 +1,3 @@
+plugin "ChatReadingWidth":
+  needs appearance.style
+  style chat-reading-width

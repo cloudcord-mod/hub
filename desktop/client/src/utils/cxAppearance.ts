@@ -679,6 +679,11 @@ export const cxAppearanceTargets = {
         css: '[class*="messageContent_"] a[href] { white-space: normal !important; overflow-wrap: anywhere !important; }',
         desktopOnly: true, style: {},
     },
+    "chat-reading-width": {
+        plugin: "ChatReadingWidth", label: "Limit the width of message text in wide chat panes",
+        css: '[class*="messageContent_"] { max-inline-size: min(100%, 75ch) !important; }',
+        desktopOnly: true, style: {},
+    },
     "floating-chat-bar": {
         plugin: "FloatingChatBar", label: "lift the chat bar above the bottom edge",
         css: 'form [class*="channelTextArea"] { margin-bottom: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 25%); }',
