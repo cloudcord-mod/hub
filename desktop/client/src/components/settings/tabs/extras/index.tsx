@@ -5,8 +5,9 @@
  */
 
 import "@sincordplugins/fakeProfile/editor.css";
+import "../addons/styles.css";
 
-import { CloudIcon } from "@components/Icons";
+import { CloudIcon, CogWheel, IDIcon, ImageIcon, InfoIcon, NotesIcon, PluginIcon } from "@components/Icons";
 import { ExtrasPanel } from "@sincordplugins/fakeProfile/extras";
 import { React } from "@webpack/common";
 
@@ -23,12 +24,16 @@ export function ToolsTab({ bot, sync, testing, diagnostics }: { bot: boolean; sy
         nextTool = undefined;
         return tool;
     });
-    const groups: { title: string; tools: { id: Tool; label: string; visible?: boolean; }[]; }[] = [
-        { title: "Customize", tools: [{ id: "tweaks", label: "Tweaks" }, { id: "previews", label: "Previews" }] },
-        { title: "Accounts and data", tools: [{ id: "account", label: "Account Tools" }, { id: "sync", label: "CloudSync", visible: sync }, { id: "bot", label: "Botcord", visible: bot }] },
-        { title: "Testing and support", tools: [{ id: "testing", label: "Testing Plugins", visible: testing }, { id: "diagnostics", label: "Diagnostics", visible: diagnostics }] },
-    ];
-    const section = groups.some(group => group.tools.some(tool => tool.id === selected && tool.visible !== false)) ? selected : "tweaks";
+    const tools = [
+        { id: "tweaks", label: "Tweaks", Icon: CogWheel },
+        { id: "previews", label: "Previews", Icon: ImageIcon },
+        { id: "account", label: "Account Tools", Icon: IDIcon },
+        { id: "sync", label: "CloudSync", Icon: CloudIcon, visible: sync },
+        { id: "bot", label: "Botcord", Icon: PluginIcon, visible: bot },
+        { id: "testing", label: "Testing Plugins", Icon: NotesIcon, visible: testing },
+        { id: "diagnostics", label: "Diagnostics", Icon: InfoIcon, visible: diagnostics },
+    ].filter(tool => tool.visible !== false) as { id: Tool; label: string; Icon: typeof CloudIcon; }[];
+    const section = tools.some(tool => tool.id === selected) ? selected : "tweaks";
     let content: React.ReactNode;
     switch (section) {
         case "previews": content = <ExtrasPanel section="previews" />; break;
@@ -58,22 +63,28 @@ export function ToolsTab({ bot, sync, testing, diagnostics }: { bot: boolean; sy
             content = <Page />;
         }
     }
-    return <div className="cpx-root cpx-page">
-        <div className="cpx-inline cpx-tools-groups">
-            {groups.map(({ title, tools }) => {
-                const visible = tools.filter(tool => tool.visible !== false);
-                return !!visible.length && <div key={title} role="group" aria-label={title} className="cpx-tools-group">
-                    <span>{title}</span>
-                    <div className="cpx-inline">
-                        {visible.map(({ id, label }) => <button key={id} type="button"
-                            className={`cpx-btn ${section === id ? "cpx-btn-primary" : "cpx-btn-ghost"}`}
-                            aria-pressed={section === id} onClick={() => setSelected(id)}>
-                            {id === "sync" && <CloudIcon width={16} height={16} />}{label}
-                        </button>)}
-                    </div>
-                </div>;
-            })}
+    return <>
+        <nav className="cc-addons-seg" role="tablist" aria-label="Tools">
+            {tools.map(({ id, label, Icon }, index) => <button key={id} id={`cloudcord-tool-${id}`}
+                type="button" role="tab" aria-selected={section === id} aria-controls="cloudcord-tools-panel"
+                tabIndex={section === id ? 0 : -1}
+                className={`cc-addons-seg-item${section === id ? " cc-addons-seg-active" : ""}`}
+                onClick={() => setSelected(id)}
+                onKeyDown={event => {
+                    const direction = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+                    const next = event.key === "Home" ? 0 : event.key === "End" ? tools.length - 1
+                        : direction ? (index + direction + tools.length) % tools.length : -1;
+                    if (next < 0) return;
+                    event.preventDefault();
+                    setSelected(tools[next].id);
+                    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>("[role=tab]")[next]?.focus();
+                }}>
+                <Icon width={16} height={16} className="cc-addons-seg-icon" />{label}
+            </button>)}
+        </nav>
+        <div id="cloudcord-tools-panel" key={section} role="tabpanel"
+            aria-labelledby={`cloudcord-tool-${section}`} className="cpx-root cpx-page cc-addons-page">
+            {content}
         </div>
-        <React.Fragment key={section}>{content}</React.Fragment>
-    </div>;
+    </>;
 }

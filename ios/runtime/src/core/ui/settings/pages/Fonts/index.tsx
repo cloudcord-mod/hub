@@ -4,6 +4,7 @@ import FontEditor from "@core/ui/settings/pages/Fonts/FontEditor";
 import { useProxy } from "@core/vendetta/storage";
 import { FontDefinition, fonts } from "@lib/addons/fonts";
 import googleFonts from "@lib/addons/fonts/googleFonts.json";
+import { isFontSupported } from "@lib/api/native/loader";
 import { settings } from "@lib/api/settings";
 import { NavigationNative } from "@metro/common";
 import { Button } from "@metro/common/components";
@@ -22,7 +23,7 @@ export default function Fonts() {
     useProxy(settings);
     useProxy(fonts);
 
-    const [discover, setDiscover] = useState(false);
+    const [discover, setDiscover] = useState(!isFontSupported());
     const installed = Object.values(fonts).filter(font => typeof font === "object" && font?.spec === 1);
     const navigation = NavigationNative.useNavigation();
 
@@ -41,7 +42,7 @@ export default function Fonts() {
                 onPress={() => setDiscover(value => !value)} />}
             safeModeHint={{ message: Strings.SAFE_MODE_NOTICE_FONTS }}
             CardComponent={FontCard}
-            installAction={{
+            installAction={isFontSupported() ? {
                 label: "Install a font",
                 onPress: () => {
                     navigation.push("BUNNY_CUSTOM_PAGE", {
@@ -49,7 +50,7 @@ export default function Fonts() {
                         render: () => <FontEditor />
                     });
                 }
-            }}
+            } : undefined}
         />
     );
 }

@@ -238,6 +238,7 @@ export default definePlugin({
                 Component: FakeProfileTab,
                 Icon: UserIcon
             }),
+            buildEntry({ key: "cloudcord_tools", title: "Tools", Component: ToolsTab, Icon: MainSettingsIcon }),
             buildEntry({
                 key: "cloudcord_cloud_sync",
                 title: "Add-ons",
@@ -245,7 +246,6 @@ export default definePlugin({
                 Component: AddonsTab,
                 Icon: PluginsIcon
             }),
-            buildEntry({ key: "cloudcord_tools", title: "Tools", Component: ToolsTab, Icon: MainSettingsIcon }),
         ].filter(isTruthy);
 
         const cloudcordSection: SettingsLayoutNode = {

@@ -21,7 +21,7 @@ for (const enabled of [undefined, false, true, false]) {
     const layout = layoutContext.builder.buildLayout({ key: '$Root', buildLayout: () => [{ key: 'user_section' }] });
     const entries = layout.find(node => node.key === 'cloudcord_section').buildLayout();
     assert.deepEqual(Array.from(entries, node => node.key),
-        ['cloudcord_main', 'cloudcord_fake_profile', 'cloudcord_cloud_sync', 'cloudcord_tools']);
+        ['cloudcord_main', 'cloudcord_fake_profile', 'cloudcord_tools', 'cloudcord_cloud_sync']);
     assert.ok(entries.some(node => node.key === 'cloudcord_cloud_sync' && node.Component === 'addons'));
     assert.equal(entries.filter(node => node.key === 'cloudcord_tools' && node.Component === 'tools').length, 1);
     assert.ok(!entries.some(node => ['cloudcord_previews', 'cloudcord_account_tools'].includes(node.key)));
@@ -29,8 +29,10 @@ for (const enabled of [undefined, false, true, false]) {
 const mobile = fs.readFileSync('../../ios/runtime/src/core/ui/settings/index.ts', 'utf8');
 const mobileTools = fs.readFileSync('../../ios/runtime/src/core/ui/settings/pages/Tools/index.tsx', 'utf8');
 assert.match(mobileTools, /visible: preferences\.cloudcordDiagnosticsEnabled === true/);
-assert.match(mobileTools, /findAssetId\("CloudIcon"\)/);
+assert.match(mobileTools, /label: "CloudSync"[^\n]*icon: "CloudIcon"/);
 assert.doesNotMatch(mobileTools, /PupuIcon/);
+const mobileAddons = fs.readFileSync('../../ios/runtime/src/core/ui/settings/pages/Addons/index.tsx', 'utf8');
+assert.match(mobileAddons, /^ *<TableRow arrow label="Fonts"/m, 'Fonts has its own row beside Themes');
 const mobileState = {}, sections = [];
 const mobileContext = vm.createContext({ settings: mobileState, PupuIcon: 'icon', Strings: { THEMES: 'Themes', FONTS: 'Fonts' }, version: 'test',
     findAssetId: () => 1, isThemeSupported: () => true, isFontSupported: () => true, useProxy: value => value, registerSection: section => sections.push(section) });
@@ -39,7 +41,7 @@ vm.runInContext(esbuild.transformSync(mobileSource, { loader: 'ts' }).code, mobi
 mobileContext.initSettings();
 const mobileRows = sections.find(section => section.name === 'CloudCord').items;
 assert.deepEqual(Array.from(mobileRows.filter(row => !row.nativeSection), row => row.key),
-    ['CLOUDCORD', 'BUNNY_PLUGINS', 'CLOUDCORD_TOOLS']);
+    ['CLOUDCORD', 'CLOUDCORD_TOOLS', 'BUNNY_PLUGINS']);
 const workflow = fs.readFileSync('../../.github/workflows/cloudcord.yml', 'utf8');
 assert.match(workflow, /items\.append\(fake_profile_item\)/);
 assert.doesNotMatch(workflow, /items\.append\((?:store_cloud|botcord|diagnostics)_item\)/);

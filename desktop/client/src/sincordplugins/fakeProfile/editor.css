@@ -396,9 +396,6 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 }
 
 .cpx-chat-preview-content { min-width: 0; }
-.cpx-tools-groups { align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
-.cpx-tools-group > span { color: var(--text-muted); font-size: .8rem; }
-.cpx-tools-group .cpx-inline { margin-top: .25rem; }
 .cpx-chat-preview-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 .cpx-chat-preview-heading strong { min-width: 0; }
 .cpx-chat-preview-heading .cpx-card-tag { flex: none; }

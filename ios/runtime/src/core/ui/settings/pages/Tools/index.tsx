@@ -24,32 +24,26 @@ export default function Tools() {
         testing: wrapOnPress(undefined, navigation, () => import("@core/ui/settings/pages/TestingPlugins"), "Testing Plugins", undefined, "push"),
         diagnostics: wrapOnPress(undefined, navigation, () => import("@core/ui/settings/pages/Diagnostics"), "Diagnostics", undefined, "push"),
     }), [navigation]);
-    const cloudIcon = findAssetId("CloudIcon") || findAssetId("CloudArrowUpIcon");
-    const groups = [
-        { title: "Customize", items: [
-            { key: "CLOUDCORD_PREVIEWS", label: "Previews", action: actions.previews },
-        ] },
-        { title: "Accounts and data", items: [
-            { key: "CLOUDCORD_ACCOUNT_TOOLS", label: "Account Tools", action: actions.account },
-            { key: "STORE_CLOUD", label: "CloudSync", action: actions.sync, icon: cloudIcon },
-            { key: "BOTCORD", label: "Botcord", action: actions.bot },
-        ] },
-        { title: "Testing and support", items: [
-            { key: "CLOUDCORD_TESTING_PLUGINS", label: "Testing Plugins", action: actions.testing, visible: Boolean(assigned) },
-            { key: "CLOUDCORD_DIAGNOSTICS", label: "Diagnostics", action: actions.diagnostics, visible: preferences.cloudcordDiagnosticsEnabled === true },
-        ] },
+    const tools = [
+        { key: "CLOUDCORD_PREVIEWS", label: "Previews", description: "Preview profile and visual changes", icon: "ImageIcon", action: actions.previews },
+        { key: "CLOUDCORD_ACCOUNT_TOOLS", label: "Account Tools", description: "Manage account options", icon: "UserIcon", action: actions.account },
+        { key: "STORE_CLOUD", label: "CloudSync", description: "Manage cloud sync", icon: "CloudIcon", action: actions.sync },
+        { key: "BOTCORD", label: "Botcord", description: "Open Botcord tools", icon: "RobotIcon", action: actions.bot },
+        { key: "CLOUDCORD_TESTING_PLUGINS", label: "Testing Plugins", description: "Review assigned plugins", icon: "PuzzlePieceIcon", action: actions.testing, visible: Boolean(assigned) },
+        { key: "CLOUDCORD_DIAGNOSTICS", label: "Diagnostics", description: "View runtime diagnostics", icon: "WrenchIcon", action: actions.diagnostics, visible: preferences.cloudcordDiagnosticsEnabled === true },
     ];
     const order = new Map((preferences.cloudcordTabOrder ?? []).map((key, index) => [key, index]));
+    const visible = tools.filter(item => item.visible !== false && !hidden.includes(item.key))
+        .sort((a, b) => (order.get(a.key) ?? Infinity) - (order.get(b.key) ?? Infinity));
     return <ScrollView contentContainerStyle={{ paddingBottom: 38 }}>
         <Stack style={{ paddingVertical: 24, paddingHorizontal: 12 }} spacing={24}>
-            {groups.map(({ title, items }) => {
-                const visible = items.filter(item => item.visible !== false && !hidden.includes(item.key))
-                    .sort((a, b) => (order.get(a.key) ?? Infinity) - (order.get(b.key) ?? Infinity));
-                return !!visible.length && <TableRowGroup key={title} title={title}>
-                    {visible.map(item => <TableRow key={item.key} arrow label={item.label}
-                        icon={item.icon ? <TableRow.Icon source={item.icon} /> : undefined} onPress={item.action} />)}
-                </TableRowGroup>;
-            })}
+            <TableRowGroup title="Tools">
+                {visible.map(item => {
+                    const icon = findAssetId(item.icon) || findAssetId("SettingsIcon");
+                    return <TableRow key={item.key} arrow label={item.label} subLabel={item.description}
+                        icon={icon ? <TableRow.Icon source={icon} /> : undefined} onPress={item.action} />;
+                })}
+            </TableRowGroup>
         </Stack>
     </ScrollView>;
 }

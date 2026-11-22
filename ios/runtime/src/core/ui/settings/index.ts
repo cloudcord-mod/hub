@@ -60,7 +60,7 @@ export default function initSettings() {
             }
         ];
 
-    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "BUNNY_PLUGINS", "CLOUDCORD_TOOLS"];
+    const defaultOrder = ["CLOUDCORD", "FAKE_PROFILE", "CLOUDCORD_TOOLS", "BUNNY_PLUGINS"];
     const configurableKeys = new Set(defaultOrder.filter(key => key !== "CLOUDCORD"));
     const configuredOrder = settings.cloudcordTabOrder ?? [];
     const orderIndex = new Map(configuredOrder.map((key, index) => [key, index]));

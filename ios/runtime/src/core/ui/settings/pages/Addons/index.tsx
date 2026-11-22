@@ -27,7 +27,7 @@ export default function Addons() {
             <TableRowGroup title="Add-ons">
                 <TableRow arrow label="Plugins" subLabel="Manage and configure your plugins" icon={icon("PuzzlePieceIcon", "AppsIcon", "SettingsIcon")} onPress={() => open("Plugins", () => require("@core/ui/settings/pages/Plugins"))} />
                 {hasThemes && <TableRow arrow label="Themes" subLabel="Manage your Discord themes" icon={icon("PaintPaletteIcon", "ThemeIcon", "SettingsIcon")} onPress={() => open("Themes", () => require("@core/ui/settings/pages/Themes"))} />}
-                {!hasThemes && isFontSupported() && <TableRow arrow label="Fonts" subLabel="Choose and manage fonts" icon={icon("LettersIcon", "TextIcon")} onPress={() => open("Fonts", () => require("@core/ui/settings/pages/Fonts"))} />}
+                <TableRow arrow label="Fonts" subLabel={isFontSupported() ? "Browse and apply fonts" : "Browse fonts · applying requires a compatible loader"} icon={icon("LettersIcon", "TextIcon")} onPress={() => open("Fonts", () => require("@core/ui/settings/pages/Fonts"))} />
             </TableRowGroup>
         </Stack>
     </ScrollView>;
