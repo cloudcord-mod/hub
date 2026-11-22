@@ -36908,6 +36908,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-boost-tier-cards": hideMobileComponent("HideBoostTierCards", "the tier comparison cards on the server boost page", "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingTierCards.tsx"),
+        "hide-boost-perk-cards": hideMobileComponent("HideBoostPerkCards", "the top perks cards on the server boost page", "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingTopPerksCards.tsx"),
+        "hide-profile-upsell-card": hideMobileComponent("HideProfileUpsellCard", "the general upsell card on profiles", "modules/user_profile/native/UserProfileUpsellCard.tsx"),
         "hide-voice-soundboard-shortcut": hideMobileComponent("HideVoiceSoundboardShortcut", "the soundboard shortcut in the voice panel", "modules/voice_panel/native/controls/buttons/VoicePanelSoundboardButton.tsx"),
         "hide-voice-header-chat-shortcut": hideMobileComponent("HideVoiceHeaderChatShortcut", "the chat shortcut in the voice panel header", "modules/voice_panel/native/header/VoicePanelHeaderChatButton.tsx"),
         "hide-emoji-unicode-shortcut": hideMobileComponent("HideEmojiUnicodeShortcut", "the Unicode category shortcut in the emoji picker", "modules/emoji_picker/native/components/categories/EmojiPickerCategoriesUnicodeShortcutItem.tsx"),
@@ -50982,6 +50985,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-boost-perk-cards.cx
+  var hide_boost_perk_cards_default;
+  var init_hide_boost_perk_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-boost-perk-cards.cx"() {
+      hide_boost_perk_cards_default = 'plugin "HideBoostPerkCards":\n  needs appearance.hide\n  hide hide-boost-perk-cards\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-boost-progress-tip.cx
   var hide_boost_progress_tip_default;
   var init_hide_boost_progress_tip = __esm({
@@ -50995,6 +51006,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_boost_recognition_cards = __esm({
     "../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx"() {
       hide_boost_recognition_cards_default = 'plugin "HideBoostRecognitionCards":\n  needs appearance.hide\n  hide hide-boost-recognition-cards\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-boost-tier-cards.cx
+  var hide_boost_tier_cards_default;
+  var init_hide_boost_tier_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-boost-tier-cards.cx"() {
+      hide_boost_tier_cards_default = 'plugin "HideBoostTierCards":\n  needs appearance.hide\n  hide hide-boost-tier-cards\n';
     }
   });
 
@@ -51651,6 +51670,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_profile_roles_card = __esm({
     "../examples/cx/catalog/plugins/hide-profile-roles-card.cx"() {
       hide_profile_roles_card_default = 'plugin "HideProfileRolesCard":\n  needs appearance.hide\n  hide hide-profile-roles-card\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-upsell-card.cx
+  var hide_profile_upsell_card_default;
+  var init_hide_profile_upsell_card = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-upsell-card.cx"() {
+      hide_profile_upsell_card_default = 'plugin "HideProfileUpsellCard":\n  needs appearance.hide\n  hide hide-profile-upsell-card\n';
     }
   });
 
@@ -54782,8 +54809,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_badges();
       init_hide_blocked_and_ignored_messages();
       init_hide_boost_goal();
+      init_hide_boost_perk_cards();
       init_hide_boost_progress_tip();
       init_hide_boost_recognition_cards();
+      init_hide_boost_tier_cards();
       init_hide_bot_tags();
       init_hide_call_activities_tip();
       init_hide_call_buttons();
@@ -54866,6 +54895,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_overscroll_banner();
       init_hide_profile_personal_widgets();
       init_hide_profile_roles_card();
+      init_hide_profile_upsell_card();
       init_hide_profile_wishlist_suggestions();
       init_hide_profile_wishlist_tip();
       init_hide_profile_your_friends_card();
@@ -56644,6 +56674,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "812688497568203e8e885e392fdfce9b4797a09ad2ceaf1d970a7b863f9e9b03"
           },
           {
+            name: "HideBoostPerkCards",
+            source: hide_boost_perk_cards_default,
+            description: "Hide the top perks cards on the server boost page",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "06312db5b8cee94c3a4c1500834123dd85d12ed1dd181685324b13f4d442fe97"
+          },
+          {
             name: "HideBoostProgressTip",
             source: hide_boost_progress_tip_default,
             description: "Hide the server boost progress tooltip",
@@ -56662,6 +56702,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "54c3f3af4e1ca07a919192a5a7d05a8348b1a2a907353d62df351008bcae149c"
+          },
+          {
+            name: "HideBoostTierCards",
+            source: hide_boost_tier_cards_default,
+            description: "Hide the tier comparison cards on the server boost page",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c9c37273317baa20c2bf97f86e73de64c092c210ce4332455ebfd560776ab9e4"
           },
           {
             name: "HideBotTags",
@@ -57444,6 +57494,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "208f02f9a949274f4e599d3239f6af62b3eb52010e5a8ee2305a818ffc2447b7"
+          },
+          {
+            name: "HideProfileUpsellCard",
+            source: hide_profile_upsell_card_default,
+            description: "Hide the general upsell card on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "dbe7f5f4fba6e40fa6536b49fd43fcabbbf06ed4ad6fb62f8be1c7ce2693a3ec"
           },
           {
             name: "HideProfileWishlistSuggestions",
@@ -70087,7 +70147,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "19c08999929b0ca7ed2db4569f812deb0e13946c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f22f0dcef2623946772b89a575a8c26d4414e04a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
