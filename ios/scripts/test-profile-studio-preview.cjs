@@ -185,9 +185,9 @@ assert.equal(legacyGradient.accent, "#123456");
 
 layout = "profile";
 const previewDesktop = data => flatten(ProfilePreview({ data, fallbackName: "Native", fallbackUsername: "native", fallbackAvatar: "avatar", fallbackSurface }));
-const bannerStyle = nodes => nodes.find(node => /^(cpx-card|cpx-dc)-banner$/.test(node.props.className)).props.style;
+const bannerImage = nodes => flatten(nodes.find(node => /^(cpx-card|cpx-dc)-banner$/.test(node.props.className))).find(node => node.type === "img");
 const frameColor = nodes => nodes.find(node => node.props.className === "cpx-card ").props.style["--cpx-accent"];
-assert.equal(bannerStyle(previewDesktop({})).backgroundImage, `url("${nativeBanner}")`);
+assert.equal(bannerImage(previewDesktop({})).props.src, nativeBanner);
 assert.equal(frameColor(previewDesktop({ nitro: false, accentColor: 0xffffff })), "#000000");
 assert.equal(frameColor(previewDesktop({ nitro: true, accentColor: 0xffffff })), "#ffffff");
 assert.ok(previewDesktop({}).some(node => node.props.role === "img" && node.props["aria-label"] === "Status: idle"));
@@ -208,7 +208,15 @@ assert.ok(containsText(desktopPopout, "Frame: Starlight"));
 assert.ok(containsText(desktopPopout, "Effect: Snowfall"));
 assert.deepEqual(flatten(desktopPopout.find(node => node.props.className === "cpx-dc-badges")).filter(node => node.type === "img")
     .map(node => node.props.src), badgeIcons);
-assert.equal(bannerStyle(previewDesktop({ banner: "https://example.com/draft.png" })).backgroundImage, 'url("https://example.com/draft.png")');
+const draftBanner = { banner: "https://example.com/draft.png" };
+const draftBannerImage = bannerImage(previewDesktop(draftBanner));
+assert.equal(draftBannerImage.props.src, draftBanner.banner);
+draftBannerImage.props.onError();
+const fallbackBannerImage = bannerImage(previewDesktop(draftBanner));
+assert.equal(fallbackBannerImage.props.src, nativeBanner);
+fallbackBannerImage.props.onError();
+assert.equal(bannerImage(previewDesktop(draftBanner)), undefined);
+avatarAttempt = 0;
 assert.equal(previewDesktop({ bio: "Draft bio" }).find(node => node.props.className === "cpx-dc-bio").props.children, "Draft bio");
 assert.ok(previewDesktop({}).some(node => node.props.children === nativeProfile.pronouns));
 

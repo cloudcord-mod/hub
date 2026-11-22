@@ -247,6 +247,8 @@ textarea.cpx-input { min-height: 96px; resize: vertical; line-height: 1.45; }
 .cpx-dc-themed { padding: 4px; background: linear-gradient(var(--dc-primary), var(--dc-secondary)); }
 .cpx-dc-inner { position: relative; border-radius: 4px; overflow: hidden; container: cpx-profile-popout / inline-size; }
 .cpx-dc-themed .cpx-dc-inner { background: linear-gradient(rgb(0 0 0 / 45%), rgb(0 0 0 / 55%)); }
+.cpx-card-banner, .cpx-dc-banner { overflow: hidden; }
+.cpx-card-banner > img, .cpx-dc-banner > img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .cpx-dc-banner { height: 92px; background: var(--background-base-lowest, var(--background-tertiary)) center / cover no-repeat; }
 .cpx-dc-avatar { position: absolute; top: 52px; left: 14px; width: 80px; height: 80px; }
 .cpx-dc-avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 6px var(--dc-bg); background: var(--dc-bg); }

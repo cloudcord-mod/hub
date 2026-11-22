@@ -230,7 +230,7 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
                 <p>Hey! This is how your profile looks in chat.</p>
             </div>
         </div> : mode === "popout" ? <DiscordProfileCard data={data} fallbackName={fallbackName} fallbackUsername={fallbackUsername} fallbackAvatar={fallbackAvatar} fallbackSurface={fallbackSurface} decorationUrl={decorationUrl} nameplateUrl={nameplateUrl} badges={badges} frameName={frameName} effectName={effectName} /> : <div className={`cpx-card ${frameName ? "cpx-card-framed" : ""}`} style={primary ? { "--cpx-accent": primary, "--cpx-accent2": accent } as React.CSSProperties : undefined}>
-            <div className="cpx-card-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
+            <PreviewBanner key={JSON.stringify([banner, fallbackSurface?.banner])} className="cpx-card-banner" src={banner} fallback={fallbackSurface?.banner} color={bannerColor} />
             <div className="cpx-card-avatar">
                 <PreviewAvatar key={avatarKey} src={avatar} fallback={fallbackAvatar} name={name} className="cpx-card-avatar-img" />
                 {decorationUrl && <img className="cpx-card-decoration" src={decorationUrl} alt="" />}
@@ -254,6 +254,15 @@ export function ProfilePreview({ data, fallbackName, fallbackUsername, fallbackA
             {onSaved && <button type="button" className="cpx-btn cpx-btn-ghost" onClick={onSaved}>Saved looks</button>}
         </div>}
     </aside>;
+}
+
+function PreviewBanner({ src, fallback, color, className }: { src?: string; fallback?: string; color?: string; className: string; }) {
+    const [attempt, setAttempt] = React.useState(0);
+    const active = [src || fallback, src && src !== fallback ? fallback : undefined][attempt];
+
+    return <div className={className} style={{ backgroundColor: color }}>
+        {active && <img key={active} src={active} alt="" onError={() => setAttempt(attempt + 1)} />}
+    </div>;
 }
 
 function PreviewAvatar({ src, fallback, name, className }: { src: string; fallback: string; name: string; className: string; }) {
@@ -280,7 +289,7 @@ export function DiscordProfileCard({ data, fallbackName, fallbackUsername, fallb
     const activity = data.customActivity;
     return <div className={`cpx-dc ${themed ? "cpx-dc-themed" : ""}`} style={themed ? { "--dc-primary": primary, "--dc-secondary": accent } as React.CSSProperties : undefined}>
         <div className="cpx-dc-inner">
-            <div className="cpx-dc-banner" style={{ backgroundImage: banner ? `url("${banner.replace(/"/g, "%22")}")` : undefined, backgroundColor: bannerColor }} />
+            <PreviewBanner key={JSON.stringify([banner, fallbackSurface?.banner])} className="cpx-dc-banner" src={banner} fallback={fallbackSurface?.banner} color={bannerColor} />
             <div className="cpx-dc-avatar">
                 <PreviewAvatar key={JSON.stringify([data.avatar, fallbackAvatar])} src={data.avatar || fallbackAvatar} fallback={fallbackAvatar} name={data.globalName || fallbackName} className="cpx-dc-avatar-img" />
                 {decorationUrl && <img className="cpx-dc-decoration" src={decorationUrl} alt="" />}
