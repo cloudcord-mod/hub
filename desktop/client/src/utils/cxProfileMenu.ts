@@ -15,6 +15,7 @@ export const cxProfileMenuActions = {
     "server-nickname": { label: "Copy Server Nickname", scope: "server" },
     "server-avatar-link": { label: "Copy Server Avatar Link", scope: "server" },
     "server-banner-link": { label: "Copy Server Profile Banner Link", scope: "server" },
+    "server-joined": { label: "Copy Server Join Timestamp", scope: "server" },
     "profile-colors": { label: "Copy Profile Colors", scope: "user", unavailable: "No profile colors found." },
     "server-profile-colors": { label: "Copy Server Profile Colors", scope: "server" },
 } as const;
@@ -53,7 +54,7 @@ type ProfileStore = {
 };
 type UserStore = { getUser?: (id: string) => { username?: unknown; globalName?: unknown; } | null | undefined; };
 type MemberStore = {
-    getMember?: (guildId: string, id: string) => { nick?: unknown; avatar?: unknown; } | null | undefined;
+    getMember?: (guildId: string, id: string) => { nick?: unknown; avatar?: unknown; joinedAt?: unknown; joined_at?: unknown; } | null | undefined;
 };
 
 function nonBlankText(value: unknown) {
@@ -71,6 +72,15 @@ export function getCxProfileMenuCopy(action: CxProfileMenuAction, id: string, pr
         }
         if (action === "server-nickname" && guildId) {
             return nonBlankText(members?.getMember?.(guildId, id)?.nick);
+        }
+        if (action === "server-joined") {
+            if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id)) return;
+            const member = members?.getMember?.(guildId, id);
+            const joined = member?.joinedAt ?? member?.joined_at;
+            if (typeof joined !== "string" || !/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$/.test(joined)) return;
+            const timestamp = Date.parse(joined);
+            if (Number.isFinite(timestamp) && timestamp > 0) return "<t:" + Math.floor(timestamp / 1000) + ":F>";
+            return;
         }
         if (action === "server-avatar-link" || action === "server-banner-link") {
             if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id)) return;

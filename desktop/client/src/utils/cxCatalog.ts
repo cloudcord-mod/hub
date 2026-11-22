@@ -70,6 +70,7 @@ import plugin_catalog_copy_role_name from "../../../../examples/cx/catalog/plugi
 import plugin_catalog_copy_server_avatar_link from "../../../../examples/cx/catalog/plugins/copy-server-avatar-link.cx";
 import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plugins/copy-server-bio.cx";
 import plugin_catalog_copy_server_details from "../../../../examples/cx/catalog/plugins/copy-server-details.cx";
+import plugin_catalog_copy_server_join_timestamp from "../../../../examples/cx/catalog/plugins/copy-server-join-timestamp.cx";
 import plugin_catalog_copy_server_media_links from "../../../../examples/cx/catalog/plugins/copy-server-media-links.cx";
 import plugin_catalog_copy_server_nickname from "../../../../examples/cx/catalog/plugins/copy-server-nickname.cx";
 import plugin_catalog_copy_server_profile_banner_link from "../../../../examples/cx/catalog/plugins/copy-server-profile-banner-link.cx";
@@ -588,6 +589,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyServerAvatarLink", source: plugin_catalog_copy_server_avatar_link, description: "Copy Server Avatar Link", categories: ["Profiles"] },
         { name: "CopyServerBio", source: plugin_catalog_copy_server_bio, description: "Copy Server Bio", categories: ["Profiles"] },
         { name: "Copy Server Details", source: plugin_catalog_copy_server_details, description: "Copy the selected server's name or description", categories: ["Servers & channels"] },
+        { name: "CopyServerJoinTimestamp", source: plugin_catalog_copy_server_join_timestamp, description: "Copy Server Join Timestamp", categories: ["Profiles"] },
         { name: "Copy Server Media Links", source: plugin_catalog_copy_server_media_links, description: "Copy links to the selected server's icon and banner", categories: ["Media","Servers & channels"] },
         { name: "CopyServerNickname", source: plugin_catalog_copy_server_nickname, description: "Copy Server Nickname", categories: ["Profiles"] },
         { name: "CopyServerProfileBannerLink", source: plugin_catalog_copy_server_profile_banner_link, description: "Copy Server Profile Banner Link", categories: ["Profiles"] },

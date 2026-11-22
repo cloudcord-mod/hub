@@ -1,0 +1,3 @@
+plugin "CopyServerJoinTimestamp":
+  needs profilemenu.copy
+  on profile menu copy server-joined
