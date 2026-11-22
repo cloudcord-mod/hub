@@ -36900,6 +36900,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-game-community-promo": hideMobileComponent("HideGameCommunityPromo", "the card promoting other game communities", "modules/game_community_upsell/native/GameCommunityMultiGuildUpsellCard.tsx"),
+        "hide-outbound-promotion-cards": hideMobileComponent("HideOutboundPromotionCards", "external offer cards on premium surfaces", "components_native/premium/OutboundPromotionCard.tsx"),
+        "hide-premium-marketing-banner": hideMobileComponent("HidePremiumMarketingBanner", "the banner tile on the premium promotions page", "modules/premium/promotions/native/MarketingPageBannerTile.tsx"),
+        "hide-boost-recognition-cards": hideMobileComponent("HideBoostRecognitionCards", "the booster recognition cards on the server boost marketing page", "modules/guild_boosting/native/marketing_redesign/GuildBoostingMarketingBoosterRecognitionCards.tsx"),
         "hide-scheduled-message-draft-tip": hideMobileComponent("HideScheduledMessageDraftTip", "the scheduled-message draft tooltip", "modules/scheduled_messages/native/ScheduledMessageDraftCoachmark.tsx"),
         "hide-you-settings-tip": hideMobileComponent("HideYouSettingsTip", "the settings shortcut tooltip on the You tab", "modules/main_tabs_v2/native/tabs/you/YouSettingsCoachmark.tsx"),
         "hide-game-claim-card": hideMobileComponent("HideGameClaimCard", "the game claim promotion card in eligible servers", "modules/game_claim/native/GameClaimCoachmark.tsx"),
@@ -50704,6 +50708,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx
+  var hide_boost_recognition_cards_default;
+  var init_hide_boost_recognition_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx"() {
+      hide_boost_recognition_cards_default = 'plugin "HideBoostRecognitionCards":\n  needs appearance.hide\n  hide hide-boost-recognition-cards\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-bot-tags.cx
   var hide_bot_tags_default;
   var init_hide_bot_tags = __esm({
@@ -50920,6 +50932,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-game-community-promo.cx
+  var hide_game_community_promo_default;
+  var init_hide_game_community_promo = __esm({
+    "../examples/cx/catalog/plugins/hide-game-community-promo.cx"() {
+      hide_game_community_promo_default = 'plugin "HideGameCommunityPromo":\n  needs appearance.hide\n  hide hide-game-community-promo\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-gif-button.cx
   var hide_gif_button_default;
   var init_hide_gif_button = __esm({
@@ -51120,6 +51140,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-outbound-promotion-cards.cx
+  var hide_outbound_promotion_cards_default;
+  var init_hide_outbound_promotion_cards = __esm({
+    "../examples/cx/catalog/plugins/hide-outbound-promotion-cards.cx"() {
+      hide_outbound_promotion_cards_default = 'plugin "HideOutboundPromotionCards":\n  needs appearance.hide\n  hide hide-outbound-promotion-cards\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-pins-button.cx
   var hide_pins_button_default;
   var init_hide_pins_button = __esm({
@@ -51141,6 +51169,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_premium_group_promotion = __esm({
     "../examples/cx/catalog/plugins/hide-premium-group-promotion.cx"() {
       hide_premium_group_promotion_default = 'plugin "HidePremiumGroupPromotion":\n  needs appearance.hide\n  hide premium-group-promotion\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-premium-marketing-banner.cx
+  var hide_premium_marketing_banner_default;
+  var init_hide_premium_marketing_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-premium-marketing-banner.cx"() {
+      hide_premium_marketing_banner_default = 'plugin "HidePremiumMarketingBanner":\n  needs appearance.hide\n  hide hide-premium-marketing-banner\n';
     }
   });
 
@@ -54210,6 +54246,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_blocked_and_ignored_messages();
       init_hide_boost_goal();
       init_hide_boost_progress_tip();
+      init_hide_boost_recognition_cards();
       init_hide_bot_tags();
       init_hide_call_activities_tip();
       init_hide_call_buttons();
@@ -54237,6 +54274,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_empty_folders();
       init_hide_friend_requests_badge();
       init_hide_game_claim_card();
+      init_hide_game_community_promo();
       init_hide_gif_button();
       init_hide_gif_favorite_button();
       init_hide_gif_search_suggestions();
@@ -54262,9 +54300,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_notification_bell();
       init_hide_orb_wallet_nitro_promotion();
       init_hide_orb_wallet_seasonal_promotion();
+      init_hide_outbound_promotion_cards();
       init_hide_pins_button();
       init_hide_powerup_unlock_tip();
       init_hide_premium_group_promotion();
+      init_hide_premium_marketing_banner();
       init_hide_profile_activity_badges();
       init_hide_profile_activity_timebar();
       init_hide_profile_banner_images();
@@ -55969,6 +56009,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "1d6378a948edebe2f07e6390da4e0dff29121bcc249e40d38a8a058e1b8ca0de"
           },
           {
+            name: "HideBoostRecognitionCards",
+            source: hide_boost_recognition_cards_default,
+            description: "Hide the booster recognition cards on the server boost marketing page",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "54c3f3af4e1ca07a919192a5a7d05a8348b1a2a907353d62df351008bcae149c"
+          },
+          {
             name: "HideBotTags",
             source: hide_bot_tags_default,
             description: "Hide APP and BOT tags",
@@ -56225,6 +56275,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "e06c36c1379dfbfbd22049ecf024ebf3b88e4be4e393fcf2df0c35be8cf77494"
           },
           {
+            name: "HideGameCommunityPromo",
+            source: hide_game_community_promo_default,
+            description: "Hide the card promoting other game communities",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "8a17e7433b5bfea666645bcd31e454ef1729ed6236fd72fee5ae55898939f8c5"
+          },
+          {
             name: "HideGifButton",
             source: hide_gif_button_default,
             description: "Hide the GIF picker shortcut",
@@ -56454,6 +56514,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             ]
           },
           {
+            name: "HideOutboundPromotionCards",
+            source: hide_outbound_promotion_cards_default,
+            description: "Hide external offer cards on premium surfaces",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "4a3f01281d0af0c4f184367a740165f4199b332be09d1f66cae36403ab6394d5"
+          },
+          {
             name: "HidePinsButton",
             source: hide_pins_button_default,
             description: "Hide the pinned messages shortcut",
@@ -56480,6 +56550,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HidePremiumMarketingBanner",
+            source: hide_premium_marketing_banner_default,
+            description: "Hide the banner tile on the premium promotions page",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "508126ef428933e2220d3d92219d41a375cf541c65f9fb3b88bc4b234baa907a"
           },
           {
             name: "HideProfileActivityBadges",
@@ -69032,7 +69112,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8f09f61b494dd377e87a38b70228a1851068f76d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c2716b057809f01dc58b6e0ea49ea94a34aa1a79";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
