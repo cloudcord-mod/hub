@@ -37953,6 +37953,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           desktopOnly: true,
           style: {}
         },
+        "visible-keyboard-focus": {
+          plugin: "VisibleKeyboardFocus",
+          label: "Show a stronger outline on controls reached with the keyboard",
+          css: ':where(button, a[href], input, textarea, select, [role="button"], [tabindex], [contenteditable="true"]):focus-visible { outline: 2px solid var(--focus-primary, #00a8fc) !important; outline-offset: -2px !important; }',
+          desktopOnly: true,
+          style: {}
+        },
         "message-stickers": {
           plugin: "HideStickers",
           label: "stickers in chat",
@@ -54835,6 +54842,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/visible-keyboard-focus.cx
+  var visible_keyboard_focus_default;
+  var init_visible_keyboard_focus = __esm({
+    "../examples/cx/catalog/plugins/visible-keyboard-focus.cx"() {
+      visible_keyboard_focus_default = 'plugin "VisibleKeyboardFocus":\n  needs appearance.style\n  style visible-keyboard-focus\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/voice-count.cx
   var voice_count_default;
   var init_voice_count = __esm({
@@ -56357,6 +56372,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_view_group_dm_icon();
       init_view_role_icon();
       init_view_server_media();
+      init_visible_keyboard_focus();
       init_voice_count();
       init_voice_join_messages();
       init_vote_tally();
@@ -61930,6 +61946,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Media",
               "Servers & channels"
+            ]
+          },
+          {
+            name: "VisibleKeyboardFocus",
+            source: visible_keyboard_focus_default,
+            description: "Show a stronger outline on controls reached with the keyboard",
+            desktopOnly: true,
+            categories: [
+              "Appearance"
             ]
           },
           {
@@ -72250,7 +72275,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3eac61ed68643bfa4f5062183b9d053c43772dcc";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1fc95a140d8b80a4a576e92c08f099eed05399d6";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
