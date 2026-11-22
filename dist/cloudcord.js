@@ -36882,6 +36882,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       catalogOriginal: true
     };
   }
+  function hideMobileComponent(plugin2, label2, path) {
+    return {
+      plugin: plugin2,
+      label: label2,
+      css: "",
+      mobileOnly: true,
+      mobile: {
+        hideComponentPaths: [
+          path
+        ]
+      }
+    };
+  }
   var cxAppearanceTargets;
   var init_cxAppearance = __esm({
     "src/lib/api/cxAppearance.ts"() {
@@ -36889,6 +36902,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-app-launcher-intro": hideMobileComponent("HideAppLauncherIntro", "the Apps launcher introduction", "modules/app_launcher/native/onboarding/banner/AppLauncherOnboardingBanner.tsx"),
+        "hide-app-launcher-recommendations": hideMobileComponent("HideAppLauncherRecommendations", "recommendations in the Apps launcher", "modules/app_launcher/native/screens/home/recommendations/RecommendationsBanner.tsx"),
+        "hide-contact-sync-promotion": hideMobileComponent("HideContactSyncPromotion", "the contact sync promotion", "modules/contact_sync/native/components/ContactSyncUpsellCTA.tsx"),
+        "hide-double-tap-reaction-tip": hideMobileComponent("HideDoubleTapReactionTip", "the double-tap reaction tip above the composer", "modules/double_tap_to_react/native/DoubleTapToReactChatInputBanner.tsx"),
+        "hide-gift-badge-progress": hideMobileComponent("HideGiftBadgeProgress", "the gifting badge progress banner", "modules/premium/gifting/native/views/GiftingBadgeProgressBanner.tsx"),
+        "hide-gift-wishlist-banner": hideMobileComponent("HideGiftWishlistBanner", "the gift wishlist banner", "modules/premium/native/gifting/PremiumGiftWishlistBanner.tsx"),
+        "hide-saved-messages-promotion": hideMobileComponent("HideSavedMessagesPromotion", "the Nitro upsell in Saved Messages", "modules/saved_messages/native/NitroLimitUpsellBar.tsx"),
+        "hide-gif-search-suggestions": hideMobileComponent("HideGifSearchSuggestions", "suggested searches in the GIF picker", "modules/gif_picker/native/GIFPickerSearchSuggestions.tsx"),
+        "hide-emoji-search-promotion": hideMobileComponent("HideEmojiSearchPromotion", "the Nitro upsell in emoji search", "modules/emoji_picker/native/components/EmojiPickerPremiumSearchUpsell.tsx"),
+        "hide-server-tag-promotion": hideMobileComponent("HideServerTagPromotion", "the server tag upsell in server settings", "modules/guild_settings/native/GuildSettingsServerTagUpsellCard.tsx"),
         // PlainFolderIcon by botato (GPL-3.0-or-later).
         "plain-folder-icon": {
           plugin: "PlainFolderIcon",
@@ -37158,8 +37181,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideProfileFriendRequestBanner",
           label: "friend request banners in profiles",
           css: '[class^="friendRequestBanner_"], [class*=" friendRequestBanner_"] { display: none !important; }',
-          desktopOnly: true,
-          mobile: [],
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileIncomingFriendRequest.tsx"
+            ]
+          },
           catalogOriginal: true
         },
         "message-length-promotion": hideDesktopClass("HideMessageLengthPromotion", "the Nitro promotion shown with long messages", "messageLengthUpsellContainer"),
@@ -49562,6 +49588,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-app-launcher-intro.cx
+  var hide_app_launcher_intro_default;
+  var init_hide_app_launcher_intro = __esm({
+    "../examples/cx/catalog/plugins/hide-app-launcher-intro.cx"() {
+      hide_app_launcher_intro_default = 'plugin "HideAppLauncherIntro":\n  needs appearance.hide\n  hide hide-app-launcher-intro\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-app-launcher-recommendations.cx
+  var hide_app_launcher_recommendations_default;
+  var init_hide_app_launcher_recommendations = __esm({
+    "../examples/cx/catalog/plugins/hide-app-launcher-recommendations.cx"() {
+      hide_app_launcher_recommendations_default = 'plugin "HideAppLauncherRecommendations":\n  needs appearance.hide\n  hide hide-app-launcher-recommendations\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-apps-button.cx
   var hide_apps_button_default;
   var init_hide_apps_button = __esm({
@@ -49642,6 +49684,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-contact-sync-promotion.cx
+  var hide_contact_sync_promotion_default;
+  var init_hide_contact_sync_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-contact-sync-promotion.cx"() {
+      hide_contact_sync_promotion_default = 'plugin "HideContactSyncPromotion":\n  needs appearance.hide\n  hide hide-contact-sync-promotion\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-custom-statuses.cx
   var hide_custom_statuses_default;
   var init_hide_custom_statuses = __esm({
@@ -49671,6 +49721,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_dm_search = __esm({
     "../examples/cx/catalog/plugins/hide-dm-search.cx"() {
       hide_dm_search_default = 'plugin "HideDmSearch":\n  needs appearance.hide\n  hide dm-list-search\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-double-tap-reaction-tip.cx
+  var hide_double_tap_reaction_tip_default;
+  var init_hide_double_tap_reaction_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-double-tap-reaction-tip.cx"() {
+      hide_double_tap_reaction_tip_default = 'plugin "HideDoubleTapReactionTip":\n  needs appearance.hide\n  hide hide-double-tap-reaction-tip\n';
     }
   });
 
@@ -49706,6 +49764,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-emoji-search-promotion.cx
+  var hide_emoji_search_promotion_default;
+  var init_hide_emoji_search_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-emoji-search-promotion.cx"() {
+      hide_emoji_search_promotion_default = 'plugin "HideEmojiSearchPromotion":\n  needs appearance.hide\n  hide hide-emoji-search-promotion\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-empty-folders.cx
   var hide_empty_folders_default;
   var init_hide_empty_folders = __esm({
@@ -49730,11 +49796,35 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-gif-search-suggestions.cx
+  var hide_gif_search_suggestions_default;
+  var init_hide_gif_search_suggestions = __esm({
+    "../examples/cx/catalog/plugins/hide-gif-search-suggestions.cx"() {
+      hide_gif_search_suggestions_default = 'plugin "HideGifSearchSuggestions":\n  needs appearance.hide\n  hide hide-gif-search-suggestions\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-gift-badge-progress.cx
+  var hide_gift_badge_progress_default;
+  var init_hide_gift_badge_progress = __esm({
+    "../examples/cx/catalog/plugins/hide-gift-badge-progress.cx"() {
+      hide_gift_badge_progress_default = 'plugin "HideGiftBadgeProgress":\n  needs appearance.hide\n  hide hide-gift-badge-progress\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-gift-button.cx
   var hide_gift_button_default;
   var init_hide_gift_button = __esm({
     "../examples/cx/catalog/plugins/hide-gift-button.cx"() {
       hide_gift_button_default = 'plugin "HideGiftButton":\n  needs appearance.hide\n  hide chat-gift-button\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-gift-wishlist-banner.cx
+  var hide_gift_wishlist_banner_default;
+  var init_hide_gift_wishlist_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-gift-wishlist-banner.cx"() {
+      hide_gift_wishlist_banner_default = 'plugin "HideGiftWishlistBanner":\n  needs appearance.hide\n  hide hide-gift-wishlist-banner\n';
     }
   });
 
@@ -49978,6 +50068,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-saved-messages-promotion.cx
+  var hide_saved_messages_promotion_default;
+  var init_hide_saved_messages_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-saved-messages-promotion.cx"() {
+      hide_saved_messages_promotion_default = 'plugin "HideSavedMessagesPromotion":\n  needs appearance.hide\n  hide hide-saved-messages-promotion\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-scrollbars.cx
   var hide_scrollbars_default;
   var init_hide_scrollbars = __esm({
@@ -50007,6 +50105,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_server_banners = __esm({
     "../examples/cx/catalog/plugins/hide-server-banners.cx"() {
       hide_server_banners_default = 'plugin "HideServerBanners":\n  needs appearance.hide\n  hide server-banners\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-server-tag-promotion.cx
+  var hide_server_tag_promotion_default;
+  var init_hide_server_tag_promotion = __esm({
+    "../examples/cx/catalog/plugins/hide-server-tag-promotion.cx"() {
+      hide_server_tag_promotion_default = 'plugin "HideServerTagPromotion":\n  needs appearance.hide\n  hide hide-server-tag-promotion\n';
     }
   });
 
@@ -52632,6 +52738,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_active_now();
       init_hide_add_friend_hint();
       init_hide_add_server_button();
+      init_hide_app_launcher_intro();
+      init_hide_app_launcher_recommendations();
       init_hide_apps_button();
       init_hide_avatar_decorations();
       init_hide_badges();
@@ -52642,18 +52750,24 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_channel_topic();
       init_hide_character_count();
       init_hide_clan_tags();
+      init_hide_contact_sync_promotion();
       init_hide_custom_statuses();
       init_hide_disabled_emojis();
       init_hide_discover_button();
       init_hide_dm_search();
+      init_hide_double_tap_reaction_tip();
       init_hide_download_apps_button();
       init_hide_edited_label();
       init_hide_embeds();
       init_hide_emoji_button();
+      init_hide_emoji_search_promotion();
       init_hide_empty_folders();
       init_hide_friend_requests_badge();
       init_hide_gif_button();
+      init_hide_gif_search_suggestions();
+      init_hide_gift_badge_progress();
       init_hide_gift_button();
+      init_hide_gift_wishlist_banner();
       init_hide_guild_boost_tag();
       init_hide_help_button();
       init_hide_image_alt_text();
@@ -52684,10 +52798,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_reactions();
       init_hide_reply_previews();
       init_hide_role_icons();
+      init_hide_saved_messages_promotion();
       init_hide_scrollbars();
       init_hide_send_button();
       init_hide_server_banner();
       init_hide_server_banners();
+      init_hide_server_tag_promotion();
       init_hide_shop_tab();
       init_hide_soundboard_nitro_banner();
       init_hide_spoiler_warnings();
@@ -54085,6 +54201,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f"
           },
           {
+            name: "HideAppLauncherIntro",
+            source: hide_app_launcher_intro_default,
+            description: "Hide the Apps launcher introduction",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "ce7dcfafd46c3e9a304f179a75d79c4305955819ddd5b53dfb683e5e5f652d93"
+          },
+          {
+            name: "HideAppLauncherRecommendations",
+            source: hide_app_launcher_recommendations_default,
+            description: "Hide recommendations in the Apps launcher",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "3578c09c61c7bd97ca8d3e6d627476cf7633d5e4de2f50203bf84bab6673566c"
+          },
+          {
             name: "HideAppsButton",
             source: hide_apps_button_default,
             description: "Hide the chat apps button",
@@ -54177,6 +54313,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "6d2231275be6c0e73ae8d96c0540194b7f13e1b24703a1ae7b979a930091d921"
           },
           {
+            name: "HideContactSyncPromotion",
+            source: hide_contact_sync_promotion_default,
+            description: "Hide the contact sync promotion",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "b53140224dc8cf752876e2bd4a6e91807d4a56d90f78f7dcd6347a476b542348"
+          },
+          {
             name: "HideCustomStatuses",
             source: hide_custom_statuses_default,
             description: "Hide custom statuses in the member list",
@@ -54211,6 +54357,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "79f297b8d184eb4122607ece68a542b4d27faf21f99acf347627bf7a223de877"
+          },
+          {
+            name: "HideDoubleTapReactionTip",
+            source: hide_double_tap_reaction_tip_default,
+            description: "Hide the double-tap reaction tip above the composer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "21c1f2df489c54450585250e57c9f126df0cb7577935f1a84b576fe2fea756bd"
           },
           {
             name: "HideDownloadAppsButton",
@@ -54249,6 +54405,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "14be6bcbbb139ddab33206f05050697b5d9c13b8b0047356a96c56ef88e5cd20"
           },
           {
+            name: "HideEmojiSearchPromotion",
+            source: hide_emoji_search_promotion_default,
+            description: "Hide the Nitro upsell in emoji search",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "8d565a893f4e193c3f8855c188b8150d40bd7aef7d800e86da8250f6f59ded88"
+          },
+          {
             name: "HideEmptyFolders",
             source: hide_empty_folders_default,
             description: "Hide empty expanded server folders",
@@ -54276,6 +54442,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "d7af74fc801892989cd4bed7856bf4f73b673f8e14548316368442fd81e166cf"
           },
           {
+            name: "HideGifSearchSuggestions",
+            source: hide_gif_search_suggestions_default,
+            description: "Hide suggested searches in the GIF picker",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "b827be2027141767b08deeba23ea88217ed2d75f1821af1765ab0c9d3606e844"
+          },
+          {
+            name: "HideGiftBadgeProgress",
+            source: hide_gift_badge_progress_default,
+            description: "Hide the gifting badge progress banner",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "f5142301c6aa7f978ba0198c59757ccb800df6190c622413f1df0b90da72e186"
+          },
+          {
             name: "HideGiftButton",
             source: hide_gift_button_default,
             description: "Hide the chat gift button",
@@ -54283,6 +54469,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "d1392300974c2c311c2ba67e55d4dd5340d720455db58c084beb4e7a867e46b0"
+          },
+          {
+            name: "HideGiftWishlistBanner",
+            source: hide_gift_wishlist_banner_default,
+            description: "Hide the gift wishlist banner",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "f9b174f7bfc2d5e61f72706d348288ed1ffa64fede6a85411e5b27b0debecc11"
           },
           {
             name: "HideGuildBoostTag",
@@ -54496,11 +54692,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "HideProfileFriendRequestBanner",
             source: hide_profile_friend_request_banner_default,
             description: "Hide friend request banners in profiles",
-            desktopOnly: true,
             categories: [
               "Appearance",
               "Profiles"
-            ]
+            ],
+            appearanceRevision: "332b0b42a3d4a75fa9c2af61953e2c25814ff68f8559c033cf6a038d1afe823a"
           },
           {
             name: "HideProfileMutuals",
@@ -54559,6 +54755,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "cc6561a15d7e0cbffb8b492de879e458ca8cfa52510a8081e8614e9f589037fa"
           },
           {
+            name: "HideSavedMessagesPromotion",
+            source: hide_saved_messages_promotion_default,
+            description: "Hide the Nitro upsell in Saved Messages",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "5c7dfd96eb5c9e1ae835bc02b146d77646dc516decf54e1f65eeb3c7f0fbd686"
+          },
+          {
             name: "HideScrollbars",
             source: hide_scrollbars_default,
             description: "Hide scroll indicators",
@@ -54593,6 +54799,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideServerTagPromotion",
+            source: hide_server_tag_promotion_default,
+            description: "Hide the server tag upsell in server settings",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640"
           },
           {
             name: "HideShopTab",
@@ -66115,7 +66331,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d19a0a6aae2c2b1a6bb6e58a93855d93dd1ad385";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "130f1d7636de54dc2e22abdff4ac31e8bd829514";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
