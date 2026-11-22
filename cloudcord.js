@@ -41190,6 +41190,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           label: "Adjust the volume of Discord notifications and in-app sounds",
           desktopOnly: true
         },
+        "mute-in-app-message-sounds": {
+          permission: "notifications.volume",
+          label: "Mute new-message sounds while Discord is open",
+          mobileOnly: true
+        },
         "flat-attachments": {
           permission: "appearance.style",
           label: "Show chat attachments individually without the media grid"
@@ -51401,6 +51406,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/mute-in-app-message-sounds.cx
+  var mute_in_app_message_sounds_default;
+  var init_mute_in_app_message_sounds = __esm({
+    "../examples/cx/catalog/plugins/mute-in-app-message-sounds.cx"() {
+      mute_in_app_message_sounds_default = 'plugin "MuteInAppMessageSounds":\n  needs notifications.volume\n  use mute-in-app-message-sounds\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/muted-channels-faded.cx
   var muted_channels_faded_default;
   var init_muted_channels_faded = __esm({
@@ -53764,6 +53777,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_monospace_chat();
       init_more_commands();
       init_more_jumbo_emoji();
+      init_mute_in_app_message_sounds();
       init_muted_channels_faded();
       init_narrow_channel_list();
       init_nepeta_s_typing_quirk();
@@ -56647,6 +56661,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "57138d95b6782f1ed3d13194e9a974ac1eac4baf35b4ba6838615083a57173ad"
+          },
+          {
+            name: "MuteInAppMessageSounds",
+            source: mute_in_app_message_sounds_default,
+            description: "Mute new-message sounds while Discord is open",
+            mobileOnly: true,
+            categories: [
+              "Chat"
+            ]
           },
           {
             name: "MutedChannelsFaded",
@@ -62427,6 +62450,11 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           }
           case "notification-volume":
             throw new Error("Notification volume control is available on desktop and browser.");
+          case "mute-in-app-message-sounds":
+            return overrideCxMethods(findByFilePath("modules/notifications/native/playInAppMessageSound.tsx"), {
+              default: () => void 0,
+              playInAppMessageSound: () => void 0
+            }, enabled);
           case "reveal-spoilers-shortcut":
             throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
           case "reply-timestamp":
@@ -68032,7 +68060,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ec972000495f9c6531fdde487472ab04efc9c125";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c1ecda01e32ca972114b3158166ba2c3a70488ae";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
