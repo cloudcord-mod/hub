@@ -38875,6 +38875,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
           return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
         },
+        formatSpoiler(text) {
+          if (!text.trim())
+            return;
+          var escaped = text.replace(/[\\|]/g, "\\$&");
+          return planningBlock(escaped.split(/\r\n|\r|\n/).map((line) => line.trim() ? "||" + line + "||" : line).join("\n"));
+        },
+        formatMarkdownList(text, mode) {
+          if (mode !== "bullet" && mode !== "numbered")
+            return;
+          var lines = text.split(/\r\n|\r|\n/).map((line) => line.trim()).filter(Boolean);
+          if (!lines.length)
+            return;
+          return planningBlock(lines.map((line, index) => (mode === "bullet" ? "- " : index + 1 + ". ") + line).join("\n"));
+        },
         escapeHtml(text) {
           if (!text)
             return;
@@ -50853,6 +50867,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/format-markdown-list.cx
+  var format_markdown_list_default;
+  var init_format_markdown_list = __esm({
+    "../examples/cx/catalog/plugins/format-markdown-list.cx"() {
+      format_markdown_list_default = 'plugin "Format Markdown List":\n  needs commands.register\n  needs reply.local\n  on command "formatlist":\n    input "text" text\n    input "mode" text\n    reply "${formatMarkdownList(text, mode)}" else "Enter one item per line and choose bullet or numbered."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/format-spoiler.cx
+  var format_spoiler_default;
+  var init_format_spoiler = __esm({
+    "../examples/cx/catalog/plugins/format-spoiler.cx"() {
+      format_spoiler_default = 'plugin "Format Spoiler":\n  needs commands.register\n  needs reply.local\n  on command "formatspoiler":\n    input "text" text\n    reply "${formatSpoiler(text)}" else "Enter text to wrap as a Discord spoiler."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/friend-invites.cx
   var friend_invites_default;
   var init_friend_invites = __esm({
@@ -54847,6 +54877,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_force_owner_crown();
       init_foreign_copy_handler();
       init_format_code_block();
+      init_format_markdown_list();
+      init_format_spoiler();
       init_friend_invites();
       init_gamzee_s_typing_quirk();
       init_google_that();
@@ -56556,6 +56588,32 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "376cafda7086045c053f3582f3d4ebd021390b22c0888121bab36248b73a18eb",
+            privateCommands: true
+          },
+          {
+            name: "Format Markdown List",
+            source: format_markdown_list_default,
+            description: "/formatlist",
+            commands: [
+              "formatlist"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "2af24847d2b98468eda53b03e42121217b87205ce56661edfea2866f66665693",
+            privateCommands: true
+          },
+          {
+            name: "Format Spoiler",
+            source: format_spoiler_default,
+            description: "/formatspoiler",
+            commands: [
+              "formatspoiler"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "261a5c4e73e2195ef382ea91f219d4a7aea64da3da8563e83130c9315c3b9a62",
             privateCommands: true
           },
           {
@@ -70263,7 +70321,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "951ea7d26265d47bf965a4581d399df20e778939";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3f5ab1786bd3e5cb670de27492a1c9b807c866c8";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
