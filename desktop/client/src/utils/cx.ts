@@ -12,6 +12,7 @@ import { cxCalendarPeriods, cxTimestampSurfaces, type CxTimestampFormats, type C
 import { createCxUploadAnonymiser, type CxUploadAnonymiser, type CxUploadNaming } from "./cxUploadNames";
 import type { CxVoiceCountOptions } from "./cxVoiceCount";
 import type { CxCameraToneOptions } from "./cxCameraTone";
+import type { CxVoiceShareOptions } from "./cxVoiceShareAlerts";
 import type { CxMutedVoiceOptions } from "./cxMutedVoice";
 import type { CxVoiceQueueOptions } from "./cxVoiceQueue";
 import type { CxVoiceMemberOptions } from "./cxVoiceMemberClock";
@@ -40,6 +41,7 @@ export { bindCxMutedVoice } from "./cxMutedVoice";
 export { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "./cxUserNotes";
 export { createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "./cxVoiceCount";
 export { bindCxCameraTone, type CxCameraToneOptions } from "./cxCameraTone";
+export { bindCxVoiceShareAlerts } from "./cxVoiceShareAlerts";
 export { createCxVoiceQueue, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "./cxVoiceQueue";
 export { createCxVoiceMemberClock, type CxVoiceMemberOptions } from "./cxVoiceMemberClock";
 export { createCxCallClock } from "./cxCallClock";
@@ -122,6 +124,7 @@ const permissionLabels = {
     "calls.suppressring": "Silence incoming call rings from the listed users and group DMs",
     "voice.latency": "Read your current voice connection latency",
     "voice.channelcount": "Show the number of connected users next to visible voice and stage channels",
+    "voice.sharealerts": "Watch screen sharing and optional camera starts in your current call and show local alerts",
     "voice.cameratone": "Play local sounds when camera state changes in your current voice call",
     "voice.mutedtone": "Read Discord's local speaking-while-muted flag and play a local alert",
     "voice.waitslot": "Watch a voice channel you queue for and join when you confirm or enable auto-join",
@@ -223,7 +226,7 @@ type CxJumboEmojiOptions = { jumboEmojiLimit: number; };
 type CxNotificationVolumeOptions = { notificationVolume: number; };
 export type CxMessageLatencyOptions = { latency: number; detectDiscordKotlin: boolean; showMillis: boolean; ignoreSelf: boolean; };
 type CxNumberOption = { effect: "avatar-crop-zoom" | "jumbo-emoji-limit" | "notification-volume" | "message-latency"; label: string; value: number; min: number; max: number; unit: string; };
-type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxJumboEmojiOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
+type CxNativeOptions = CxVoiceMemberOptions | CxVoiceQueueOptions | CxCameraToneOptions | CxVoiceShareOptions | CxVoiceCountOptions | CxMutedVoiceOptions | CxQuoteOptions | CxAvatarCropOptions | CxJumboEmojiOptions | CxNotificationVolumeOptions | CxMessageLatencyOptions;
 
 type CxPlugin = {
     kind: "plugin";
@@ -246,6 +249,7 @@ type CxPlugin = {
     voiceMemberOptions?: CxVoiceMemberOptions;
     voiceQueueOptions?: CxVoiceQueueOptions;
     cameraToneOptions?: CxCameraToneOptions;
+    voiceShareOptions?: CxVoiceShareOptions;
     mutedVoiceOptions?: CxMutedVoiceOptions;
     voiceCountOptions?: CxVoiceCountOptions;
     quoteOptions?: CxQuoteOptions;
@@ -430,6 +434,7 @@ export function parseCx(source: string): CxDocument {
     let voiceQueueOptions: CxVoiceQueueOptions | undefined;
     let mutedVoiceOptions: CxMutedVoiceOptions | undefined;
     let cameraToneOptions: CxCameraToneOptions | undefined;
+    let voiceShareOptions: CxVoiceShareOptions | undefined;
     let voiceCountOptions: CxVoiceCountOptions | undefined;
     let quoteOptions: CxQuoteOptions | undefined;
     let uploadNaming: CxUploadNaming | undefined;
@@ -559,6 +564,16 @@ export function parseCx(source: string): CxDocument {
                 if (flags.some(flag => !["auto-join", "quiet"].includes(flag)) || new Set(flags).size !== flags.length)
                     throw new Error("Voice queue options are auto-join and quiet");
                 voiceQueueOptions = { autoJoin: flags.includes("auto-join"), quiet: flags.includes("quiet") };
+            } else if (name === "screen-share-alert") {
+                const flags = effect[2]?.split(" ") ?? [];
+                const delays = flags.filter(flag => /^cooldown-(?:0|[1-9]\d?|1[01]\d|120)$/.test(flag));
+                if (delays.length > 1 || new Set(flags).size !== flags.length
+                    || flags.some(flag => flag !== "camera" && flag !== "include-self" && !delays.includes(flag)))
+                    throw new Error("Screen-share alert options are camera, include-self, and cooldown-0 through cooldown-120");
+                voiceShareOptions = {
+                    camera: flags.includes("camera"), includeSelf: flags.includes("include-self"),
+                    cooldownSeconds: delays.length ? Number(delays[0].slice(9)) : 30,
+                };
             } else if (name === "webcam-start-notifier") {
                 const scope = effect[2] ?? "all";
                 if (scope !== "all" && scope !== "dm-only" && scope !== "server-only")
@@ -825,7 +840,7 @@ export function parseCx(source: string): CxDocument {
         throw new Error("Remove unused CX permissions");
     return {
         kind: "plugin", name, commands, permissions: [...permissions], messageTransforms: transforms, sendConfirmation, suppressReplyPing,
-        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, jumboEmojiOptions, notificationVolumeOptions, messageLatencyOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
+        hiddenTargets: [...hiddenTargets], optionalHides, styledTargets: [...styledTargets], timestamps, nativeEffects: [...nativeEffects], avatarResolution, avatarCropOptions, jumboEmojiOptions, notificationVolumeOptions, messageLatencyOptions, voiceMemberOptions, voiceQueueOptions, cameraToneOptions, voiceShareOptions, mutedVoiceOptions, voiceCountOptions, quoteOptions, uploadNaming, previousRule, profileActions: [...profileActions], incoming,
     };
 }
 
@@ -865,6 +880,8 @@ export function reviewCx(source: string) {
                     return label + " (" + (Number.isFinite(limit) ? limit : "unlimited") + ")";
                 }
                 if (effect === "notification-volume") return label + " (" + document.notificationVolumeOptions!.notificationVolume + "%)";
+                if (effect === "screen-share-alert" && document.voiceShareOptions?.camera)
+                    return label + " or turns on their camera";
                 if (effect === "wait-for-slot" && document.voiceQueueOptions?.autoJoin)
                     return "Automatically join the selected voice channel when its slot opens";
                 return label;
@@ -1039,6 +1056,7 @@ function bindCx(source: string, host: CxHost, approved: readonly CxPermission[],
             "all-call-time-counter": document.voiceMemberOptions,
             "wait-for-slot": document.voiceQueueOptions,
             "webcam-start-notifier": document.cameraToneOptions,
+            "screen-share-alert": document.voiceShareOptions,
             "notify-when-muted": document.mutedVoiceOptions,
             "voice-channel-count": document.voiceCountOptions,
             "quote-message": document.quoteOptions,

@@ -1,0 +1,3 @@
+plugin "ScreenShareAlert":
+  needs voice.sharealerts
+  use screen-share-alert

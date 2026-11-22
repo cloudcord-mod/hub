@@ -351,7 +351,7 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const dispatch = event => rejectBulkAck && event.type === "BULK_ACK"
             ? Promise.reject(new Error("Could not acknowledge channels")) : acknowledged.push(event);
         const channelSelections = new Set(), rtcListeners = new Set(), voiceListeners = new Set();
-        const voiceEventListeners = new Map(["VOICE_STATE_UPDATES", "VOICE_CHANNEL_SELECT", "PASSIVE_UPDATE_V1", "PASSIVE_UPDATE_V2", "CONNECTION_OPEN", "LOGOUT", "RTC_CONNECTION_PING"]
+        const voiceEventListeners = new Map(["VOICE_STATE_UPDATES", "VOICE_CHANNEL_SELECT", "STREAM_CREATE", "STREAM_DELETE", "PASSIVE_UPDATE_V1", "PASSIVE_UPDATE_V2", "CONNECTION_OPEN", "LOGOUT", "RTC_CONNECTION_PING"]
             .map(name => [name, new Set()]));
         const listenersFor = name => {
             if (name === "RTC_CONNECTION_STATE") return rtcListeners;
@@ -3737,6 +3737,44 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 assert.equal(queueSounds.length, soundsStart + 2);
             }
             click(render(), "Disable WebcamStartNotifier");
+            assert.ok([...voiceEventListeners.values()].every(listeners => !listeners.size));
+            currentVoice = savedVoice;
+            queueOccupants = savedOccupants;
+        }
+        {
+            const port = cxCatalog.plugins.find(entry => entry.name === "ScreenShareAlert").source;
+            assert.throws(() => activateCx(port, host, ["voice.cameratone"]), /approval/);
+            assert.throws(() => parseCx(port.replace("use screen-share-alert", "use screen-share-alert cooldown-121")), /Screen-share alert options/);
+            const camera = parseCx(port.replace("use screen-share-alert", "use screen-share-alert camera cooldown-0"));
+            assert.equal(camera.voiceShareOptions.camera, true);
+            assert.equal(camera.voiceShareOptions.cooldownSeconds, 0);
+            const savedVoice = currentVoice, savedOccupants = queueOccupants;
+            currentVoice = queueChannel.id;
+            const voice = { userId: sender, channelId: queueChannel.id, selfStream: false, selfVideo: false };
+            queueOccupants = { [sender]: voice, [other]: { ...voice, userId: other, selfStream: true } };
+            const emit = (event, payload) => voiceEventListeners.get(event).forEach(listener => listener(payload));
+            const streamKey = "guild:" + guildId + ":" + queueChannel.id + ":" + sender;
+            const start = notifications.length;
+            selectCatalog("ScreenShareAlert");
+            click(render(), "Allow for this session");
+            emit("VOICE_STATE_UPDATES", { voiceStates: [{ ...voice, selfVideo: true }, { ...voice, userId: other, selfStream: true }] });
+            assert.equal(notifications.length, start, "opening current calls seeds active streams without a notification");
+            emit("STREAM_CREATE", { streamKey: "call:" + secondVoice + ":" + sender });
+            emit("STREAM_CREATE", { streamKey: "call:" + queueChannel.id + ":" + me });
+            assert.equal(notifications.length, start, "alerts stay in the selected call and ignore yourself by default");
+            emit("STREAM_CREATE", { streamKey });
+            emit("VOICE_STATE_UPDATES", { voiceStates: [{ ...voice, selfStream: true }] });
+            emit("STREAM_DELETE", { streamKey });
+            emit("STREAM_CREATE", { streamKey });
+            assert.equal(notifications.length, start + 1);
+            assert.match(notifications[start], /started sharing their screen/);
+            if (!desktop) {
+                settings.safeMode = { enabled: true };
+                emit("STREAM_CREATE", { streamKey: "call:" + queueChannel.id + ":" + other });
+                settings.safeMode = undefined;
+                assert.equal(notifications.length, start + 1);
+            }
+            click(render(), "Disable ScreenShareAlert");
             assert.ok([...voiceEventListeners.values()].every(listeners => !listeners.size));
             currentVoice = savedVoice;
             queueOccupants = savedOccupants;

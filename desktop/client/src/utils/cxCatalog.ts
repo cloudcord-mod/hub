@@ -291,6 +291,7 @@ import plugin_catalog_rounded_avatars_square from "../../../../examples/cx/catal
 import plugin_catalog_rounded_chat_bar from "../../../../examples/cx/catalog/plugins/rounded-chat-bar.cx";
 import plugin_catalog_rounded_images from "../../../../examples/cx/catalog/plugins/rounded-images.cx";
 import plugin_catalog_scheduled_messages from "../../../../examples/cx/catalog/plugins/scheduled-messages.cx";
+import plugin_catalog_screen_share_alert from "../../../../examples/cx/catalog/plugins/screen-share-alert.cx";
 import plugin_catalog_scroll_to_latest from "../../../../examples/cx/catalog/plugins/scroll-to-latest.cx";
 import plugin_catalog_sed_enhanced from "../../../../examples/cx/catalog/plugins/sed-enhanced.cx";
 import plugin_catalog_send_timestamps from "../../../../examples/cx/catalog/plugins/send-timestamps.cx";
@@ -761,6 +762,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "RoundedChatBar", source: plugin_catalog_rounded_chat_bar, description: "round the chat bar", categories: ["Appearance"], appearanceRevision: "a1b819ce91635dd9353e95423d84f0334072934369d4d60635ba720593976761" },
         { name: "RoundedImages", source: plugin_catalog_rounded_images, description: "Rounder corners on images and videos in chat", desktopOnly: true, categories: ["Appearance"] },
         { name: "ScheduledMessages", source: plugin_catalog_scheduled_messages, description: "/schedule", commands: ["schedule"], categories: ["Chat","Commands"] },
+        { name: "ScreenShareAlert", source: plugin_catalog_screen_share_alert, description: "Show local alerts when someone starts sharing in your current voice call", categories: ["Voice & calls"] },
         { name: "ScrollToLatest", source: plugin_catalog_scroll_to_latest, description: "Open channels at the latest message and mark them read", categories: ["Servers & channels"] },
         { name: "SedEnhanced", source: plugin_catalog_sed_enhanced, description: "Edit your own previous text message when you send a correction or quick follow-up", categories: ["Chat"] },
         { name: "SendTimestamps", source: plugin_catalog_send_timestamps, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },

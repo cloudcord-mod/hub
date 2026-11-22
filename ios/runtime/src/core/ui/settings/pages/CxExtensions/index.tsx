@@ -2,7 +2,7 @@ import { onEditMessage, onSendMessage } from "@core/plugins/shared/sendMessage";
 import { instead } from "@lib/api/patcher";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxProfileMenuAction, type CxUploadAnonymiser } from "@lib/api/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel, type CxVoiceCountOptions } from "@lib/api/cx";
-import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
+import { bindCxCameraTone, bindCxMutedVoice, bindCxVoiceShareAlerts, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxSearchMediaSource, type CxVoiceQueueOptions } from "@lib/api/cx";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@lib/api/cx";
 import { canRememberCxExtension, CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, MAX_REMEMBERED_CX_EXTENSIONS, searchCxCatalog } from "@lib/api/cx";
 import { cxCatalog } from "@lib/api/cxCatalog";
@@ -2336,6 +2336,21 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "voice-channel-count":
                     if (!effectOptions || !("showEmpty" in effectOptions)) throw new Error("Missing voice count options");
                     return registerVoiceChannelCount(effectOptions, enabled);
+                case "screen-share-alert": {
+                    if (!effectOptions || !("includeSelf" in effectOptions)) throw new Error("Missing screen-share alert options");
+                    const voice = findByStoreName("VoiceStateStore");
+                    return bindCxVoiceShareAlerts({
+                        account: () => UserStore.getCurrentUser()?.id,
+                        channel: () => SelectedChannelStore.getVoiceChannelId() ?? undefined,
+                        states: id => voice?.getVoiceStatesForChannel?.(id),
+                        notify(user, kind) {
+                            const name = UserStore.getUser(user)?.username ?? "Someone";
+                            showToast(name + (kind === "stream" ? " started sharing their screen." : " turned on their camera."));
+                        },
+                        enabled,
+                        dispatcher: FluxDispatcher,
+                    }, effectOptions);
+                }
                 case "webcam-start-notifier": {
                     if (!effectOptions || !("scope" in effectOptions)) throw new Error("Missing camera tone options");
                     const voice = findByStoreName("VoiceStateStore");

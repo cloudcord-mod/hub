@@ -15,7 +15,7 @@ import { CopyIcon, UpArrowIcon } from "@components/Icons";
 import { buildCxMessageQuote, buildCxRepeatMessage, getCxEmbedToggle, getCxPinAction, getCxSpotifySongName, sortCxReactions, type CxSpotifyActivity } from "@utils/cx";
 import { animateCxAssets, bindCxSocialEvents, createCxPlusReactionHandler, createCxPreviousSendHandler, createCxSession, createCxSplitSender, cxAppearanceTargets, cxProfileMenuActions, CX_INLINE_EDITOR_LIMIT, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, getCxProfileMenuCopy, isCxProfileUserId, markCxServersRead, MAX_CX_SOURCE, overrideCxMethods, raiseCxAvatarResolution, reviewCx, runCxFriendInvites, runCxIncomingRules, type CxUploadAnonymiser } from "@utils/cx";
 import { createCxVoicePing, createCxVoiceCount, isCxVoiceCountChannel, isCxVoiceCountFull, type CxVoiceCountChannel } from "@utils/cx";
-import { bindCxCameraTone, bindCxMutedVoice, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
+import { bindCxCameraTone, bindCxMutedVoice, bindCxVoiceShareAlerts, createCxVoiceQueue, getCxImageSearchOptions, getCxSteamLink, getCxVoiceQueueRoom, type CxVoiceQueueOptions } from "@utils/cx";
 import { escapeRegExp } from "@utils/text";
 import { addMessageAccessory, removeMessageAccessory } from "@api/MessageAccessories";
 import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages } from "@utils/cx";
@@ -1059,6 +1059,20 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                     if (!effectOptions || !("serverMute" in effectOptions)) throw new Error("Missing mute alert options");
                     return bindCxMutedVoice(MediaEngineStore, () => Boolean(SelectedChannelStore.getVoiceChannelId()),
                         () => { playAudio("user_leave"); }, effectOptions);
+                case "screen-share-alert":
+                    if (!effectOptions || !("includeSelf" in effectOptions)) throw new Error("Missing screen-share alert options");
+                    return bindCxVoiceShareAlerts({
+                        account: () => UserStore.getCurrentUser()?.id,
+                        channel: () => SelectedChannelStore.getVoiceChannelId() ?? undefined,
+                        states: id => VoiceStateStore?.getVoiceStatesForChannel?.(id),
+                        notify(user, kind) {
+                            const title = kind === "stream" ? "Screen share started" : "Camera enabled";
+                            const name = UserStore.getUser(user)?.username ?? "Someone";
+                            const body = name + (kind === "stream" ? " started sharing their screen." : " turned on their camera.");
+                            void showNotification({ title, body });
+                        },
+                        dispatcher: FluxDispatcher,
+                    }, effectOptions);
                 case "webcam-start-notifier":
                     if (!effectOptions || !("scope" in effectOptions)) throw new Error("Missing camera tone options");
                     return bindCxCameraTone({

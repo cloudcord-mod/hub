@@ -69,6 +69,7 @@ export const cxNativeEffects = {
     "scroll-to-latest": { permission: "channels.markonopen", label: "Open channels at the latest message and mark them read" },
     "show-voice-ping": { permission: "voice.latency", label: "Show your live call latency in milliseconds" },
     "voice-channel-count": { permission: "voice.channelcount", label: "Show occupancy and capacity in the channel list" },
+    "screen-share-alert": { permission: "voice.sharealerts", label: "Show local alerts when someone starts sharing in your current voice call" },
     "webcam-start-notifier": { permission: "voice.cameratone", label: "Play different tones when someone turns their camera on or off" },
     "notify-when-muted": { permission: "voice.mutedtone", label: "Play a sound when you try to speak while muted" },
     "wait-for-slot": { permission: "voice.waitslot", label: "Queue for a full voice channel and respond when a slot opens" },
