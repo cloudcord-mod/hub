@@ -37271,9 +37271,30 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideRoleIcons",
           label: "role icons",
           css: 'img[class*="roleIcon"] { display: none !important; }',
-          mobile: [
-            "RoleIcon"
-          ]
+          mobile: {
+            messagePresentation: "roleIcon",
+            legacyComponents: [
+              "RoleIcon"
+            ]
+          }
+        },
+        "hide-chat-attachments": {
+          plugin: "HideChatAttachments",
+          label: "file and media attachments in chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messagePresentation: "attachments"
+          }
+        },
+        "hide-chat-role-dots": {
+          plugin: "HideChatRoleDots",
+          label: "role color dots next to names in chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messagePresentation: "shouldShowRoleDot"
+          }
         },
         "server-tags": {
           plugin: "HideClanTags",
@@ -50781,11 +50802,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-chat-attachments.cx
+  var hide_chat_attachments_default;
+  var init_hide_chat_attachments = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-attachments.cx"() {
+      hide_chat_attachments_default = 'plugin "HideChatAttachments":\n  needs appearance.hide\n  hide hide-chat-attachments\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx
   var hide_chat_input_refresh_tip_default;
   var init_hide_chat_input_refresh_tip = __esm({
     "../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx"() {
       hide_chat_input_refresh_tip_default = 'plugin "HideChatInputRefreshTip":\n  needs appearance.hide\n  hide hide-chat-input-refresh-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-chat-role-dots.cx
+  var hide_chat_role_dots_default;
+  var init_hide_chat_role_dots = __esm({
+    "../examples/cx/catalog/plugins/hide-chat-role-dots.cx"() {
+      hide_chat_role_dots_default = 'plugin "HideChatRoleDots":\n  needs appearance.hide\n  hide hide-chat-role-dots\n';
     }
   });
 
@@ -54270,7 +54307,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_channel_list_tips();
       init_hide_channel_topic();
       init_hide_character_count();
+      init_hide_chat_attachments();
       init_hide_chat_input_refresh_tip();
+      init_hide_chat_role_dots();
       init_hide_clan_tags();
       init_hide_composer_emoji_promo();
       init_hide_contact_sync_promotion();
@@ -56093,6 +56132,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113"
           },
           {
+            name: "HideChatAttachments",
+            source: hide_chat_attachments_default,
+            description: "Hide file and media attachments in chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "eadd0623581b9ca2709e566983428ff4b3e8a35f4ea913338c5c311d95bb9de9"
+          },
+          {
             name: "HideChatInputRefreshTip",
             source: hide_chat_input_refresh_tip_default,
             description: "Hide the redesigned chat input tip",
@@ -56101,6 +56150,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36"
+          },
+          {
+            name: "HideChatRoleDots",
+            source: hide_chat_role_dots_default,
+            description: "Hide role color dots next to names in chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "aea9c80e488fef746d51483621339a35d64d4c00014bd1dab2e5c5f30afe5979"
           },
           {
             name: "HideClanTags",
@@ -64495,11 +64554,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               var presentation = invoke(args);
               if (!presentation || typeof presentation !== "object")
                 return presentation;
-              if (mobile.messagePresentation === "edited") {
-                if ("edited" in presentation && presentation.edited === true)
+              if (mobile.messagePresentation === "edited" || mobile.messagePresentation === "shouldShowRoleDot") {
+                var field = mobile.messagePresentation;
+                if (presentation[field] === true)
                   return {
                     ...presentation,
-                    edited: false
+                    [field]: false
                   };
               } else if (mobile.messagePresentation === "timestamps") {
                 if ("timestamp" in presentation && typeof presentation.timestamp === "string") {
@@ -64510,20 +64570,20 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     timestampAccessibilityLabel: void 0
                   };
                 }
-              } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL") {
-                var field = mobile.messagePresentation;
-                if (field in presentation && presentation[field] != null)
+              } else if (mobile.messagePresentation === "referencedMessage" || mobile.messagePresentation === "avatarDecorationURL" || mobile.messagePresentation === "roleIcon") {
+                var field1 = mobile.messagePresentation;
+                if (field1 in presentation && presentation[field1] != null)
                   return {
                     ...presentation,
-                    [field]: void 0
+                    [field1]: void 0
                   };
               } else {
-                var field1 = mobile.messagePresentation;
-                var items = presentation[field1];
+                var field2 = mobile.messagePresentation;
+                var items = presentation[field2];
                 if (Array.isArray(items) && items.length)
                   return {
                     ...presentation,
-                    [field1]: []
+                    [field2]: []
                   };
               }
               return presentation;
@@ -69129,7 +69189,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a815e0319d4a3082229432d0f8e39c3d1c729004";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "828e175ccc6fb9f3aab9aa1c810baf2825b02ca1";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
