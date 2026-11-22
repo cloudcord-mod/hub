@@ -1,11 +1,12 @@
-import { isCxProfileUserId } from "./cxProfileMenu";
+import { formatCxCreationTimestamp, isCxProfileUserId } from "./cxProfileMenu";
 
-export type CxServerMenuEffect = "view-server-media" | "copy-server-media-links" | "copy-server-splash-links" | "copy-server-details" | "view-group-dm-icon";
+export type CxServerMenuEffect = "view-server-media" | "copy-server-media-links" | "copy-server-splash-links" | "copy-server-details" | "copy-server-created" | "view-group-dm-icon";
 
 export function getCxServerMenuFields(effect: CxServerMenuEffect) {
     if (effect === "view-group-dm-icon") return [{ key: "icon", label: "View Group Icon", width: 512 }] as const;
     if (effect === "copy-server-details")
         return [{ key: "name", label: "Copy Server Name" }, { key: "description", label: "Copy Server Description" }] as const;
+    if (effect === "copy-server-created") return [{ key: "created", label: "Copy Server Creation Timestamp" }] as const;
     if (effect === "copy-server-splash-links")
         return [{ key: "splash", label: "Copy Invite Splash Link" }, { key: "discoverySplash", label: "Copy Discovery Splash Link" }] as const;
     const view = effect === "view-server-media";
@@ -25,8 +26,9 @@ export function getCxGuildAssetUrl(path: "icons" | "banners" | "channel-icons" |
 export function getCxServerMenuValue(guild: {
     id?: unknown; name?: unknown; description?: unknown; icon?: unknown; banner?: unknown;
     splash?: unknown; discoverySplash?: unknown; discovery_splash?: unknown;
-} | undefined, id: string, field: "name" | "description" | "icon" | "banner" | "splash" | "discoverySplash") {
+} | undefined, id: string, field: "name" | "description" | "icon" | "banner" | "splash" | "discoverySplash" | "created") {
     if (!guild || guild.id !== id || !isCxProfileUserId(id)) return;
+    if (field === "created") return formatCxCreationTimestamp(id);
     if (field === "icon" || field === "banner")
         return getCxGuildAssetUrl(field === "icon" ? "icons" : "banners", id, guild[field]);
     if (field === "splash") return getCxGuildAssetUrl("splashes", id, guild.splash);

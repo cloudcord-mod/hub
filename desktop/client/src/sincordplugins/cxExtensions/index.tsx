@@ -1136,6 +1136,7 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "copy-server-media-links":
                 case "copy-server-splash-links":
                 case "copy-server-details":
+                case "copy-server-created":
                 case "view-group-dm-icon":
                     return registerServerMenuActions(effect);
                 case "hide-suggested-channels":

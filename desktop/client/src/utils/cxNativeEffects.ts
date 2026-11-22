@@ -44,6 +44,7 @@ export const cxNativeEffects = {
     "copy-server-media-links": { permission: "servers.mediacopy", label: "Copy links to the selected server's icon and banner" },
     "copy-server-splash-links": { permission: "servers.mediacopy", label: "Copy invite and discovery splash links from the selected server" },
     "copy-server-details": { permission: "servers.detailscopy", label: "Copy the selected server's name or description" },
+    "copy-server-created": { permission: "servers.detailscopy", label: "Copy the selected server’s creation timestamp" },
     "view-group-dm-icon": { permission: "channels.iconview", label: "View the selected group DM's icon" },
     "hide-suggested-channels": { permission: "appearance.hide", label: "Hide the suggested channels section" },
     "copy-text-attachment": { permission: "attachments.clipboard", label: "Copy the contents of the selected text attachment" },

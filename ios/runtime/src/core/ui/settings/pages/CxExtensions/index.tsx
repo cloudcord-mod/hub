@@ -2622,6 +2622,7 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                 case "copy-server-media-links":
                 case "copy-server-splash-links":
                 case "copy-server-details":
+                case "copy-server-created":
                 case "view-group-dm-icon":
                     return registerMobileServerMenu(effect, enabled);
                 case "hide-suggested-channels": {

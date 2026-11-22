@@ -1306,6 +1306,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             button(roleActions({ guild: { id: guildId } }), "Copy Invite Splash Link").props.action();
             assert.equal(clipboardWrites.pop(), "https://cdn.discordapp.com/splashes/" + guildId + "/" + icon + ".png?size=4096");
             click(render(), "Disable Copy Server Splash Links");
+            selectCatalog("Copy Server Creation Timestamp");
+            click(render(), "Allow for this session");
+            button(roleActions({ guild: { id: guildId } }), "Copy Server Creation Timestamp").props.action();
+            assert.equal(clipboardWrites.pop(), "<t:" + Math.floor((Number(BigInt(guildId) >> 22n) + 1420070400000) / 1000) + ":F>");
+            click(render(), "Disable Copy Server Creation Timestamp");
             serverMenuData.icon = "https://example.com/not-a-discord-icon";
             serverMenu[0].props.action();
             assert.equal(viewedProfiles.length, 0);
@@ -1387,6 +1392,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             await new Promise(setImmediate);
             assert.equal(clipboardWrites.pop(), "https://cdn.discordapp.com/discovery-splashes/" + guildId + "/" + icon + ".png?size=4096");
             click(render(), "Disable Copy Server Splash Links");
+            selectCatalog("Copy Server Creation Timestamp");
+            click(render(), "Allow for this session");
+            button(serverMenu(), "Copy Server Creation Timestamp").props.onPress();
+            await new Promise(setImmediate);
+            assert.equal(clipboardWrites.pop(), "<t:" + Math.floor((Number(BigInt(guildId) >> 22n) + 1420070400000) / 1000) + ":F>");
+            click(render(), "Disable Copy Server Creation Timestamp");
             const groupProps = { channel: { id: menuGroupId } };
             groupMenuData = { id: menuGroupId, type: 1, icon };
             assert.ok(!button(getMenu(ChannelLongPressActionSheetConnected, groupProps), "View Group Icon"));
