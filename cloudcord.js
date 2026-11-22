@@ -29266,6 +29266,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     disabled: active,
                     grow: true,
                     onPress: () => {
+                      if (!ownerId || ownerId !== currentUserId)
+                        return;
                       onUse(item.data);
                       redraw();
                       showToast("Now using \u201C" + item.name + "\u201D");
@@ -74335,7 +74337,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "785d58b8b76adcc8bd075e25aeddfeb6fc2b3d23";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2085ae2cb1a2b8cc06f7993fd5d9d783cb30aef7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
