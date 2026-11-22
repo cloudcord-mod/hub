@@ -1,0 +1,3 @@
+plugin "HideYouTrialOffer":
+  needs appearance.hide
+  hide hide-you-trial-offer

@@ -1,0 +1,3 @@
+plugin "HideProfileAppWidgets":
+  needs appearance.hide
+  hide hide-profile-app-widgets

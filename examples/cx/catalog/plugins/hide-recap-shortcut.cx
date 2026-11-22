@@ -1,0 +1,3 @@
+plugin "HideRecapShortcut":
+  needs appearance.hide
+  hide hide-recap-shortcut

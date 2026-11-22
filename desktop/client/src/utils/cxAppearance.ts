@@ -17,6 +17,11 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-you-trial-offer": hideMobileComponent("HideYouTrialOffer", "the expiring trial offer card on the You tab", "modules/main_tabs_v2/native/tabs/you/YouExpiringTrialOfferCard.tsx"),
+    "hide-recap-shortcut": hideMobileComponent("HideRecapShortcut", "the In Case You Missed It shortcut in the You bar", "modules/main_tabs_v2/native/you_bar/YouBarICYMIButton.tsx"),
+    "hide-shop-nitro-unlock-button": hideMobileComponent("HideShopNitroUnlockButton", "the Unlock with Nitro button in the Shop", "modules/collectibles/native/UnlockWithNitroButton.tsx"),
+    "hide-profile-game-friends": hideMobileComponent("HideProfileGameFriends", "the game friends card on profiles", "modules/user_profile/native/UserProfileGameFriendsCard.tsx"),
+    "hide-profile-app-widgets": hideMobileComponent("HideProfileAppWidgets", "application widgets displayed on profiles", "modules/user_profile/native/UserProfileApplicationWidgetCard.tsx"),
     "hide-app-search-intro": hideMobileComponent("HideAppSearchIntro", "the app search introduction banner", "modules/app_launcher/native/onboarding/banner/AppLauncherGlobalSearchOnboardingBanner.tsx"),
     "hide-recap-server-recommendations": hideMobileComponent("HideRecapServerRecommendations", "server recommendations in the In Case You Missed It recap", "modules/icymi/native/ICYMIServerRecommendationRow.tsx"),
     "hide-profile-overscroll-banner": hideMobileComponent("HideProfileOverscrollBanner", "the profile banner extension shown during overscroll", "modules/user_profile/native/UserProfileOverscrollBanner.tsx"),

@@ -1,0 +1,3 @@
+plugin "HideShopNitroUnlockButton":
+  needs appearance.hide
+  hide hide-shop-nitro-unlock-button
