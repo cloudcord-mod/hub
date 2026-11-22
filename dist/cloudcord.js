@@ -48357,6 +48357,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function normalizeCatalogSearch(value) {
     return value.normalize("NFKD").toLowerCase().replace(RegExp("\\p{M}", "gu"), "").replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), " ").trim();
   }
+  function catalogSearchCommands(commands3) {
+    if (!commands3?.length)
+      return;
+    var cached = cxCommandSearchIndex.get(commands3);
+    if (cached?.original.length === commands3.length && commands3.every((name, index) => name === cached.original[index]))
+      return cached.compact;
+    var compact = commands3.map((command) => normalizeCatalogSearch(command).replaceAll(" ", ""));
+    cxCommandSearchIndex.set(commands3, {
+      original: [
+        ...commands3
+      ],
+      compact
+    });
+    return compact;
+  }
   function catalogSearchFields(entry) {
     var { name, description, keywords } = entry;
     var cached = cxSearchIndex.get(entry);
@@ -48380,7 +48395,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         exact1.push(entry12);
       else if (compactQuery && compactName === compactQuery)
         normalized.push(entry12);
-      else if (compactQuery && entry12.commands?.some((command) => normalizeCatalogSearch(command).replaceAll(" ", "") === compactQuery))
+      else if (compactQuery && catalogSearchCommands(entry12.commands)?.includes(compactQuery))
         commandMatches.push(entry12);
       else if (lowerName.includes(query) || compactQuery && compactName.includes(compactQuery))
         partial1.push(entry12);
@@ -48403,7 +48418,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       var prefix2 = [];
       var partial = [];
       for (var entry of entries2) {
-        var commands3 = entry.commands?.map((command) => normalizeCatalogSearch(command).replaceAll(" ", ""));
+        var commands3 = catalogSearchCommands(entry.commands);
         if (commands3?.includes(compactQuery))
           exact.push(entry);
         else if (commands3?.some((command) => command.startsWith(compactQuery)))
@@ -49749,7 +49764,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       }
     };
   }
-  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES, maxPrivateCxCommandPlugins, maxOtherCxExtensions, MAX_REMEMBERED_CX_EXTENSIONS, cxSearchIndex;
+  var MAX_CX_SOURCE, CX_INLINE_EDITOR_LIMIT, permissionLabels, leetCharacters, textFunctions, textExpression, argumentNames, actionPermissions, getActionPermissions, sendsMessage, CX_CATALOG_CATEGORIES, maxPrivateCxCommandPlugins, maxOtherCxExtensions, MAX_REMEMBERED_CX_EXTENSIONS, cxSearchIndex, cxCommandSearchIndex;
   var init_cx = __esm({
     "src/lib/api/cx.ts"() {
       "use strict";
@@ -49984,6 +49999,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       maxOtherCxExtensions = 16;
       MAX_REMEMBERED_CX_EXTENSIONS = maxPrivateCxCommandPlugins + maxOtherCxExtensions;
       cxSearchIndex = /* @__PURE__ */ new WeakMap();
+      cxCommandSearchIndex = /* @__PURE__ */ new WeakMap();
     }
   });
 
@@ -71955,7 +71971,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fdce66a90000a526e2996e9f618f546d75c26ad4";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "04d668bfa71b30fd7d3650a184e61a8822229fdd";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
