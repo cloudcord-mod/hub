@@ -36920,6 +36920,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "disable-inline-attachment-media": {
+          plugin: "DisableInlineAttachmentMedia",
+          label: "inline media previews for chat attachments",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messageRenderOption: "inlineAttachmentMedia"
+          }
+        },
+        "disable-inline-embed-media": {
+          plugin: "DisableInlineEmbedMedia",
+          label: "inline media previews inside link embeds",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messageRenderOption: "inlineEmbedMedia"
+          }
+        },
         "disable-chat-gif-autoplay": {
           plugin: "DisableChatGifAutoplay",
           label: "automatic GIF playback in native chat",
@@ -50720,6 +50738,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/disable-inline-attachment-media.cx
+  var disable_inline_attachment_media_default;
+  var init_disable_inline_attachment_media = __esm({
+    "../examples/cx/catalog/plugins/disable-inline-attachment-media.cx"() {
+      disable_inline_attachment_media_default = 'plugin "DisableInlineAttachmentMedia":\n  needs appearance.hide\n  hide disable-inline-attachment-media\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/disable-inline-embed-media.cx
+  var disable_inline_embed_media_default;
+  var init_disable_inline_embed_media = __esm({
+    "../examples/cx/catalog/plugins/disable-inline-embed-media.cx"() {
+      disable_inline_embed_media_default = 'plugin "DisableInlineEmbedMedia":\n  needs appearance.hide\n  hide disable-inline-embed-media\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/discord-countdown.cx
   var discord_countdown_default;
   var init_discord_countdown = __esm({
@@ -55471,6 +55505,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_dim_inactive_channels();
       init_disable_chat_emoji_animation();
       init_disable_chat_gif_autoplay();
+      init_disable_inline_attachment_media();
+      init_disable_inline_embed_media();
       init_discord_countdown();
       init_discord_link_details();
       init_discord_timestamp();
@@ -56986,6 +57022,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "26be71396727cf7bb54acdf14786f6ac51197dc97f3c8e2f601f572cfb8b9e98"
+          },
+          {
+            name: "DisableInlineAttachmentMedia",
+            source: disable_inline_attachment_media_default,
+            description: "Hide inline media previews for chat attachments",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "8dd523702d9c348e286109c15d832789f0f7901f8ffb9241a8262728ebf21c88"
+          },
+          {
+            name: "DisableInlineEmbedMedia",
+            source: disable_inline_embed_media_default,
+            description: "Hide inline media previews inside link embeds",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "419e5a7ceab6e636ca3cbdb47d5221c4cd0153da4ae64380843b952447399077"
           },
           {
             name: "Discord Countdown",
@@ -71533,7 +71589,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d08e1ac595abe5f0a9031d16e470f909bf1936a8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c11b23eba2dee3a8f99e4818f622d3f1e31916e1";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
