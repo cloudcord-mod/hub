@@ -292,6 +292,7 @@ import plugin_catalog_number_base_converter from "../../../../examples/cx/catalo
 import plugin_catalog_number_lines from "../../../../examples/cx/catalog/plugins/number-lines.cx";
 import plugin_catalog_number_summary from "../../../../examples/cx/catalog/plugins/number-summary.cx";
 import plugin_catalog_open_steam_links_in_app from "../../../../examples/cx/catalog/plugins/open-steam-links-in-app.cx";
+import plugin_catalog_ordered_line_diff from "../../../../examples/cx/catalog/plugins/ordered-line-diff.cx";
 import plugin_catalog_percentage_change from "../../../../examples/cx/catalog/plugins/percentage-change.cx";
 import plugin_catalog_ping_notifications from "../../../../examples/cx/catalog/plugins/ping-notifications.cx";
 import plugin_catalog_plain_folder_icon from "../../../../examples/cx/catalog/plugins/plain-folder-icon.cx";
@@ -797,6 +798,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Number Lines", source: plugin_catalog_number_lines, description: "/numberlines", commands: ["numberlines"], categories: ["Commands"], appearanceRevision: "f5de3b17703e21bef468195788bce4b4bb57740a98a95c72b8a16a35264d27da", privateCommands: true },
         { name: "Number Summary", source: plugin_catalog_number_summary, description: "/numberstats", commands: ["numberstats"], categories: ["Commands"], appearanceRevision: "e16972be7e88755d2e1cc051bdd4502a2c1f29a1d8ecc180e35d2d369ca284cb", privateCommands: true },
         { name: "OpenSteamLinksInApp", source: plugin_catalog_open_steam_links_in_app, description: "Send clicked Steam links to the Steam app", categories: ["Media"] },
+        { name: "Ordered Line Diff", source: plugin_catalog_ordered_line_diff, description: "/linediff", commands: ["linediff"], categories: ["Commands"], appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302", privateCommands: true },
         { name: "Percentage Change", source: plugin_catalog_percentage_change, description: "/percentchange", commands: ["percentchange"], categories: ["Commands"], appearanceRevision: "98598cf956f339fb070b75b8220a194f225240307f145b193881b19a870a3d1e", privateCommands: true },
         { name: "PingNotifications", source: plugin_catalog_ping_notifications, description: "Show message previews for the selected mentions, friends, and direct messages", categories: ["Chat"] },
         { name: "PlainFolderIcon", source: plugin_catalog_plain_folder_icon, description: "Replace the mini server icons in collapsed folders with a plain folder icon", desktopOnly: true, categories: ["Appearance"] },

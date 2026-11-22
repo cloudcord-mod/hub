@@ -407,6 +407,37 @@ export const cxCommandFunctions = {
             .join("\n").replaceAll(codeFence, "`\u200b``");
         return changes.length <= 3900 ? codeFence + "diff\n" + changes + "\n" + codeFence : "Line changes are too long for one reply.";
     },
+    orderedLineDiff(before: string, after: string) {
+        const lines = (value: string) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
+        const left = lines(before);
+        const right = lines(after);
+        if (left.length > 160 || right.length > 160) return "Use up to 160 lines per input.";
+        const columns = right.length + 1;
+        const matches = new Uint16Array((left.length + 1) * columns);
+        for (let i = left.length - 1; i >= 0; i--) {
+            for (let j = right.length - 1; j >= 0; j--) {
+                const slot = i * columns + j;
+                matches[slot] = left[i] === right[j] ? 1 + matches[slot + columns + 1]
+                    : Math.max(matches[slot + 1], matches[slot + columns]);
+            }
+        }
+        if (left.length === right.length && matches[0] === left.length) return "Both inputs match in order.";
+        const output: string[] = [];
+        let i = 0;
+        let j = 0;
+        while (i < left.length || j < right.length) {
+            if (i < left.length && j < right.length && left[i] === right[j]) {
+                output.push("  " + left[i++]);
+                j++;
+            } else if (i < left.length && (j === right.length || matches[(i + 1) * columns + j] >= matches[i * columns + j + 1])) {
+                output.push("- " + left[i++]);
+            } else {
+                output.push("+ " + right[j++]);
+            }
+        }
+        const text = output.join("\n").replaceAll(codeFence, "`\u200b``");
+        return text.length <= 3900 ? codeFence + "diff\n" + text + "\n" + codeFence : "The diff is too long for one reply.";
+    },
     wordFrequency(text: string) {
         const counts = new Map<string, number>();
         for (const word of text.toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{M}\p{N}]*/gu) ?? []) {

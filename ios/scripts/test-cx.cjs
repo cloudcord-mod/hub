@@ -2879,6 +2879,11 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["commonlines", { first: "alpha\r\nbeta\r\nalpha", second: "beta\nother\nalpha" }, /^\x60\x60\x60\nalpha\nbeta\n\x60\x60\x60$/],
                 ["commonlines", { first: "Alpha\n", second: "alpha\n" }, /^No matching nonempty lines/],
             ]],
+            ["Ordered Line Diff", [
+                ["linediff", { before: "a\r\nb\nc", after: "b\na\nc" }, /\n- a\n  b\n\+ a\n  c\n/],
+                ["linediff", { before: "a\nb\n", after: "a\r\nb" }, /^Both inputs match in order/],
+                ["linediff", { after: "new" }, /\n\+ new\n/],
+            ]],
             ["Remove Blank Lines", [
                 ["removeblanklines", { text: "  a\r\n\t\r\n b\n" }, /^  a\n b$/],
             ]],

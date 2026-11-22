@@ -1,0 +1,7 @@
+plugin "Ordered Line Diff":
+  needs commands.register
+  needs reply.local
+  on command "linediff":
+    input "before" text optional
+    input "after" text optional
+    reply "${orderedLineDiff(before, after)}"
