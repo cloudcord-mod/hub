@@ -39,21 +39,46 @@ const dispatcher = {
     unsubscribe(_event, callback) { dispatchSubscriptions.delete(callback); },
 };
 const styles = new Set();
-const head = {
-    appendChild(element) { styles.add(element); return element; },
-    removeChild(element) { styles.delete(element); return element; },
-};
+const parents = new Map();
+function container() {
+    return {
+        appendChild(element) {
+            parents.set(element, this);
+            styles.add(element);
+            return element;
+        },
+        removeChild(element) {
+            if (!this.contains(element)) throw new Error("Element is not a child of this container");
+            parents.delete(element);
+            styles.delete(element);
+            return element;
+        },
+        contains(element) { return parents.get(element) === this; },
+    };
+}
+function storage() {
+    const entries = new Map();
+    return {
+        getItem(key) { return entries.get(String(key)) ?? null; },
+        setItem(key, value) { entries.set(String(key), String(value)); },
+        removeItem(key) { entries.delete(String(key)); },
+    };
+}
+globalThis.localStorage = storage();
+globalThis.sessionStorage = storage();
 globalThis.document = {
-    documentElement: {}, head, addEventListener() {}, removeEventListener() {},
+    documentElement: container(), head: container(), body: container(),
+    addEventListener() {}, removeEventListener() {},
     getElementById(id) { return [...styles].find(element => element.id === id) ?? null; },
     createElement(tag) {
         const attributes = new Map();
         const element = {
             style: { transform: "", transition: "" },
             get isConnected() { return styles.has(element); },
+            get parentNode() { return parents.get(element) ?? null; },
             setAttribute(name, value) { attributes.set(name, String(value)); },
             getAttribute(name) { return attributes.get(name) ?? null; },
-            remove() { head.removeChild(element); },
+            remove() { element.parentNode?.removeChild(element); },
         };
         if (tag === "canvas") element.getContext = kind => kind === "2d" ? { canvas: element } : null;
         return element;
