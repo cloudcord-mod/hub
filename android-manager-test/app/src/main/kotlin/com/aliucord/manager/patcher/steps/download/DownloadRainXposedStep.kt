@@ -19,11 +19,11 @@ class DownloadRainXposedStep : DownloadStep() {
     override val targetUrl = "bundled:cloudcord-module.apk"
 
     companion object {
-        val BUNDLED_VERSION = SemVer.parse("1.0.3")
+        val BUNDLED_VERSION = SemVer.parse("1.0.4")
     }
     override suspend fun execute(container: StepRunner) {
         container.log("Preparing bundled CloudCord Xposed module")
-        container.log("Bundled CloudCord runtime: a7469156f (module 1.0.3, obfuscated script delegate support)")
+        container.log("Bundled CloudCord loader 1.0.4 (verified stable runtime manifest)")
         targetFile.parentFile!!.mkdirs()
         context.assets.open("cloudcord-module.apk").use { input ->
             targetFile.outputStream().use { output -> input.copyTo(output) }
