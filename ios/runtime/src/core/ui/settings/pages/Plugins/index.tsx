@@ -10,7 +10,7 @@ import { isCorePlugin, isPluginInstalled, pluginSettings, registeredPlugins, cor
 import { Author } from "@lib/addons/types";
 import { findAssetId } from "@lib/api/assets";
 import { settings } from "@lib/api/settings";
-import { CX_CATALOG_CATEGORIES } from "@lib/api/cx";
+import { CX_CATALOG_CATEGORIES, searchCxCatalog } from "@lib/api/cx";
 import { useObservable } from "@lib/api/storage";
 import { showToast } from "@lib/ui/toasts";
 import { BUNNY_PROXY_PREFIX, VD_PROXY_PREFIX } from "@lib/utils/constants";
@@ -42,6 +42,8 @@ type PluginRow = UnifiedPluginModel | (CxAddonRow & { alternate?: boolean });
 type PluginPageProps = Partial<ComponentProps<typeof AddonPage<PluginRow>>> & { useItems: () => PluginRow[]; };
 const isPluginRowEnabled = (item: PluginRow) => "source" in item ? item.active : item.isEnabled();
 const showDefaultRow = (item: PluginRow) => !("source" in item && item.alternate);
+const searchPluginCommands = (items: readonly PluginRow[], query: string) =>
+  searchCxCatalog(items.filter((item): item is CxAddonRow => "source" in item), query);
 const pluginFilters = {
   ...Object.fromEntries(CX_CATALOG_CATEGORIES.filter(category => category !== "All" && category !== "Themes")
     .map(category => [category, (item: PluginRow) => "source" in item && item.categories?.includes(category) === true])),
@@ -65,6 +67,7 @@ function PluginPage(props: PluginPageProps) {
       title={Strings.PLUGINS}
       filterOptions={pluginFilters}
       defaultFilter={showDefaultRow}
+      searchCommands={searchPluginCommands}
       searchKeywords={[
         "name",
         "description",

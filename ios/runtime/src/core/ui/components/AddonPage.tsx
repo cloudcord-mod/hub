@@ -22,6 +22,7 @@ interface AddonPageProps<T extends object, I = any> {
     title: string;
     items: I[];
     searchKeywords: SearchKeywords<T>;
+    searchCommands?: (items: readonly T[], query: string) => readonly T[];
     sortOptions?: Record<string, (a: T, b: T) => number>;
     filterOptions?: Record<string, (item: T) => boolean>;
     defaultFilter?: (item: T) => boolean;
@@ -140,10 +141,13 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         const items = values.filter(item => isNotNil(item) && typeof item === "object"
             && (!matchesFilter || matchesFilter(item))
             && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
+        if (search.trimStart().startsWith("/") && props.searchCommands) {
+            return props.searchCommands(items, search).map(obj => ({ obj }));
+        }
         if (!search && sortFn) items.sort(sortFn);
 
         return fuzzysort.go(search, items, { keys: props.searchKeywords, all: true });
-    }, [props.items, props.isEnabled, sortFn, search, enabledOnly, matchesFilter]);
+    }, [props.items, props.resolveItem, props.isEnabled, props.searchCommands, props.searchKeywords, sortFn, search, enabledOnly, matchesFilter]);
 
     const onInstallPress = useCallback(() => {
         if (!props.installAction) return () => { };

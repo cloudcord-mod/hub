@@ -151,6 +151,7 @@ const mobileList = () => {
     cursor = 0;
     return walk(MobileAddonPage({
         CardComponent: "Card", title: "Plugins", items: mobileItems, searchKeywords: ["name"],
+        searchCommands: (rows, query) => query === "/changed" ? rows.filter(row => row.needsReview) : [],
         filterOptions: { "Private commands": row => row.privateCommands, "Needs review": row => row.needsReview },
         defaultFilter: row => !row.alternate,
     })).find(node => node.type === "FlashList");
@@ -162,7 +163,13 @@ const selectMobileFilter = label => {
     filterSheet.options.find(option => option.label === label).onPress();
 };
 assert.deepEqual(mobileRows(), ["Native", "Changed"]);
+const searchMobile = value => walk(mobileList().props.ListHeaderComponent)
+    .find(node => node.type === "Search").props.onChangeText(value);
+searchMobile("/changed");
+assert.deepEqual(mobileRows(), ["Changed"], "slash search uses the command matcher");
 selectMobileFilter("Private commands");
+assert.deepEqual(mobileRows(), [], "slash search respects the selected filter");
+searchMobile("");
 assert.deepEqual(mobileRows(), ["Command"]);
 selectMobileFilter("Needs review");
 assert.deepEqual(mobileRows(), ["Changed"]);
