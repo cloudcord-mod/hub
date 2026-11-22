@@ -223,7 +223,7 @@ export default function Diagnostics() {
             loader: debug.bunny.loader,
             broadcastCheck,
             diagnosticsCapture: settings.cloudcordDiagnosticsCapture === true,
-            runtimeUrl: loaderConfig.customLoadUrl.enabled ? loaderConfig.customLoadUrl.url : "stable",
+            runtimeSource: loaderConfig.customLoadUrl.enabled ? "custom" : "stable",
             profileIdentity: (() => {
                 const state = (globalThis as any).__CLOUDCORD_PROFILE_DIAGNOSTICS__;
                 return state ? {
@@ -287,15 +287,21 @@ export default function Diagnostics() {
             <TableRowGroup title="CloudCord version">
                 <TableSwitchRow
                     label="Use custom runtime"
-                    subLabel="Switch between the stable runtime and a specific CloudCord bundle URL"
+                    subLabel="Restart Discord to apply a change to the runtime source"
                     icon={<TableRow.Icon source={{ uri: PupuIcon }} />}
                     value={loaderConfig.customLoadUrl.enabled}
                     onValueChange={(value: boolean) => loaderConfig.customLoadUrl.enabled = value}
                 />
                 {loaderConfig.customLoadUrl.enabled && <TableRow label={<View style={{ width: "100%", gap: 10 }}>
                     <TextInput size="lg" value={loaderConfig.customLoadUrl.url} placeholder="https://…/cc.js" onChange={(value: any) => loaderConfig.customLoadUrl.url = typeof value === "string" ? value : value?.nativeEvent?.text ?? ""} />
-                    <Button text="Apply and reload" onPress={() => BundleUpdaterManager.reload()} />
                 </View>} />}
+                <TableRow label="Reload runtime" onPress={async () => {
+                    try {
+                        await BundleUpdaterManager.reload();
+                    } catch {
+                        showToast("Could not reload the runtime. Close and reopen Discord to apply the selected source.");
+                    }
+                }} />
                 {versions.map((version, index) => <TableRow
                     key={version.sha}
                     label={index === 0 ? "Current stable" : `Previous version ${index}`}
