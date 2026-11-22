@@ -107,9 +107,12 @@ export async function resolvePluginName(base, dirent) {
             throw new Error(`Invalid plugin ${fullPath}: could not resolve entry point`);
         })();
 
+    const definition = /export default definePlugin\(\{\r?\n([\s\S]*?)^\}\);/m.exec(content)?.[1] ?? "";
     return PluginDefinitionNameMatcher.exec(content)?.[3]
+        ?? /^    name:\s*(["'`])(.+?)\1/m.exec(definition)?.[2]
+        ?? /export default defineTweak\(\s*(["'])((?:[^"'])+)\1/.exec(content)?.[2]
         ?? (() => {
-            throw new Error(`Invalid plugin ${fullPath}: must contain definePlugin call with simple string name property as first property`);
+            throw new Error(`Invalid plugin ${fullPath}: must contain definePlugin call with a simple string name property`);
         })();
 }
 
@@ -132,9 +135,9 @@ export const makeAllPackagesExternalPlugin = {
 };
 
 /**
- * @type {(kind: "web" | "discordDesktop" | "vesktop" | "sinbop") => import("esbuild").Plugin}
+ * @type {(kind: "web" | "discordDesktop" | "vesktop" | "sinbop", onPlugin?: (name: string) => void) => import("esbuild").Plugin}
  */
-export const globPlugins = kind => ({
+export const globPlugins = (kind, onPlugin) => ({
     name: "glob-plugins",
     setup: build => {
         const filter = /^~plugins$/;
@@ -182,6 +185,9 @@ export const globPlugins = kind => ({
                         }
                     }
 
+                    if (onPlugin && !userPlugin && !dir.includes("/_")) {
+                        onPlugin(await resolvePluginName(fullDir, file));
+                    }
                     const folderName = `src/${dir}/${fileName}`;
 
                     const mod = `p${i}`;

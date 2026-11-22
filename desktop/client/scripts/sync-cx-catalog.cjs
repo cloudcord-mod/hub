@@ -7,6 +7,7 @@ const { buildSync } = require("esbuild");
 const root = path.resolve(__dirname, "../../..");
 const catalogPath = path.join(root, "desktop/client/src/utils/cxCatalog.ts");
 const desktopPluginTarget = 700;
+const mobilePluginTarget = 500;
 
 function loadCxRuntime() {
     const interpreter = { exports: {} };
@@ -129,25 +130,63 @@ function buildCatalog(additions = new Map()) {
         "};",
         "",
     ].join("\n");
-    return { source, plugins: groups.plugins.length, desktopPlugins, nonLinuxDesktopPlugins, mobilePlugins, themes: groups.themes.length, names, commands, pluginFiles, pluginBodies };
+    return { source, desktopEntries: groups.plugins, plugins: groups.plugins.length, desktopPlugins, nonLinuxDesktopPlugins, mobilePlugins, themes: groups.themes.length, names, commands, pluginFiles, pluginBodies };
+}
+
+async function desktopReleaseCounts(source) {
+    const { globPlugins } = await import("./build/common.mjs");
+    const counts = {};
+    const originalDirectory = process.cwd();
+    try {
+        process.chdir(path.join(root, "desktop/client"));
+        for (const [label, kind] of [["desktop", "discordDesktop"], ["browser", "web"]]) {
+            const names = new Set();
+            const add = name => names.add(name.toLowerCase().replace(/[^a-z0-9]/g, ""));
+            for (const entry of source) {
+                if (!entry.mobileOnly && !entry.linuxOnly) add(entry.name);
+            }
+            let load;
+            globPlugins(kind, add).setup({
+                onResolve() {},
+                onLoad(_options, handler) { load = handler; },
+            });
+            await load();
+            counts[label] = names.size;
+        }
+    } finally {
+        process.chdir(originalDirectory);
+    }
+    return counts;
+}
+
+async function main() {
+    const catalog = buildCatalog();
+    const { source, desktopPlugins, nonLinuxDesktopPlugins, mobilePlugins, themes } = catalog;
+    const mode = process.argv[2];
+    if (mode === "--release") {
+        const counts = await desktopReleaseCounts(catalog.desktopEntries);
+        console.log(`Combined plugins: ${counts.desktop} desktop, ${counts.browser} browser`);
+        if (Math.min(counts.desktop, counts.browser) < desktopPluginTarget || themes !== 100) {
+            throw new Error(`Release requires ${desktopPluginTarget} distinct plugins per desktop build and 100 themes.`);
+        }
+        if (mobilePlugins < mobilePluginTarget) {
+            throw new Error(`Complete mobile CX release requires at least ${mobilePluginTarget} plugins. Found ${mobilePlugins}.`);
+        }
+    }
+    if (mode === "--check" || mode === "--release") {
+        if (fs.readFileSync(catalogPath, "utf8").replaceAll("\r\n", "\n") !== source) {
+            throw new Error("Generated CX catalog is stale. Run node scripts/sync-cx-catalog.cjs.");
+        }
+    } else if (!mode) fs.writeFileSync(catalogPath, source);
+    else throw new Error("Use --check, --release, or no flag to regenerate");
+    console.log(`CX catalog has ${desktopPlugins} desktop plugins (${nonLinuxDesktopPlugins} outside Linux), ${mobilePlugins}/${mobilePluginTarget} mobile plugins and ${themes}/100 themes`);
 }
 
 if (require.main === module) {
-    try {
-        const { source, desktopPlugins, nonLinuxDesktopPlugins, mobilePlugins, themes } = buildCatalog();
-        const mode = process.argv[2];
-        if (mode === "--release" && (desktopPlugins !== desktopPluginTarget || themes !== 100)) {
-            throw new Error(`Complete desktop CX release requires ${desktopPluginTarget} plugins and 100 themes. Found ${desktopPlugins} plugins and ${themes} themes.`);
-        }
-        if (mode === "--check" || mode === "--release") {
-            if (fs.readFileSync(catalogPath, "utf8").replaceAll("\r\n", "\n") !== source) throw new Error("Shared CX catalog needs regeneration");
-        } else if (mode === undefined) fs.writeFileSync(catalogPath, source);
-        else throw new Error("Use --check, --release, or no flag to regenerate");
-        console.log(`CX catalog has ${desktopPlugins}/${desktopPluginTarget} desktop plugins (${nonLinuxDesktopPlugins} outside Linux), ${mobilePlugins} mobile plugins and ${themes}/100 themes`);
-    } catch (error) {
+    main().catch(error => {
         console.error(error.message);
         process.exitCode = 1;
-    }
+    });
 }
 
 module.exports = { buildCatalog, catalogPath, desktopPluginTarget, loadCxParser, loadCxRuntime, pluginBody, pluginPlatforms };
