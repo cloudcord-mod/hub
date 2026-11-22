@@ -7,7 +7,7 @@ import isValidHttpUrl from "@lib/utils/isValidHttpUrl";
 import { lazyDestructure, proxyLazy } from "@lib/utils/lazy";
 import { findByProps } from "@metro";
 import { clipboard, NavigationNative } from "@metro/common";
-import { AlertActionButton, AlertModal, Button, FlashList, FloatingActionButton, HelpMessage, IconButton, Stack, TableSwitchRow, Text, TextInput, useSafeAreaInsets } from "@metro/common/components";
+import { AlertActionButton, AlertModal, Button, FlashList, FloatingActionButton, IconButton, Stack, TableSwitchRow, Text, TextInput, useSafeAreaInsets } from "@metro/common/components";
 import { ErrorBoundary, Search } from "@ui/components";
 import { isNotNil } from "es-toolkit";
 import fuzzysort from "fuzzysort";
@@ -185,9 +185,9 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     const headerElement = (
         <View style={{ paddingBottom: 8 }}>
             {settings.safeMode?.enabled && <View style={{ marginBottom: 10 }}>
-                <HelpMessage messageType={0}>
+                <Text variant="text-sm/medium" color="text-muted">
                     {props.safeModeHint?.message}
-                </HelpMessage>
+                </Text>
                 {props.safeModeHint?.footer}
             </View>}
             <View style={{ flexDirection: "row", gap: 8 }}>
