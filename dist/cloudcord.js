@@ -36920,6 +36920,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-launcher-apps-intro": hideMobileComponent("HideLauncherAppsIntro", "the apps introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/AppsBanner.tsx"),
+        "hide-launcher-bots-intro": hideMobileComponent("HideLauncherBotsIntro", "the bots introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/BotsBanner.tsx"),
+        "hide-launcher-activities-intro": hideMobileComponent("HideLauncherActivitiesIntro", "the activities introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/ActivitiesBanner.tsx"),
         "disable-inline-attachment-media": {
           plugin: "DisableInlineAttachmentMedia",
           label: "inline media previews for chat attachments",
@@ -51925,6 +51928,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-launcher-activities-intro.cx
+  var hide_launcher_activities_intro_default;
+  var init_hide_launcher_activities_intro = __esm({
+    "../examples/cx/catalog/plugins/hide-launcher-activities-intro.cx"() {
+      hide_launcher_activities_intro_default = 'plugin "HideLauncherActivitiesIntro":\n  needs appearance.hide\n  hide hide-launcher-activities-intro\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-launcher-apps-intro.cx
+  var hide_launcher_apps_intro_default;
+  var init_hide_launcher_apps_intro = __esm({
+    "../examples/cx/catalog/plugins/hide-launcher-apps-intro.cx"() {
+      hide_launcher_apps_intro_default = 'plugin "HideLauncherAppsIntro":\n  needs appearance.hide\n  hide hide-launcher-apps-intro\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-launcher-bots-intro.cx
+  var hide_launcher_bots_intro_default;
+  var init_hide_launcher_bots_intro = __esm({
+    "../examples/cx/catalog/plugins/hide-launcher-bots-intro.cx"() {
+      hide_launcher_bots_intro_default = 'plugin "HideLauncherBotsIntro":\n  needs appearance.hide\n  hide hide-launcher-bots-intro\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-live-stage-cards.cx
   var hide_live_stage_cards_default;
   var init_hide_live_stage_cards = __esm({
@@ -55660,6 +55687,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_join_messages();
       init_hide_jump_to_present();
       init_hide_keyboard_tips();
+      init_hide_launcher_activities_intro();
+      init_hide_launcher_apps_intro();
+      init_hide_launcher_bots_intro();
       init_hide_live_stage_cards();
       init_hide_media_message_preview();
       init_hide_member_activities();
@@ -58292,6 +58322,36 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideLauncherActivitiesIntro",
+            source: hide_launcher_activities_intro_default,
+            description: "Hide the activities introduction banner in the launcher",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "f2c484ce82276c7a19a53ba82b1ad4d276b46a5a7a9cf0a8dae6cdd6184099af"
+          },
+          {
+            name: "HideLauncherAppsIntro",
+            source: hide_launcher_apps_intro_default,
+            description: "Hide the apps introduction banner in the launcher",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "ce164eaeaf25af9f13175ee99b4f9bc16be617ed1eaf61dd04be756290bc4e91"
+          },
+          {
+            name: "HideLauncherBotsIntro",
+            source: hide_launcher_bots_intro_default,
+            description: "Hide the bots introduction banner in the launcher",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "4cb0fdf94df637a2382c1d2656ecc37835cf7763e94a943843e970fb7abfa3c8"
           },
           {
             name: "HideLiveStageCards",
@@ -71649,7 +71709,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2d5509681925446ede587b9406211b74cd804f81";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "59386c7ad76a72de02c490e4c6e744854006e94f";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
