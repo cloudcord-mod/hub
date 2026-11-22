@@ -76,7 +76,7 @@ import re
 from xml.etree import ElementTree
 
 for node in ElementTree.parse("pipeline-results/recovery-long-press.txt").iter("node"):
-    if node.get("text", "").casefold() == "download update":
+    if node.get("text", "").casefold() == "use stable runtime":
         x1, y1, x2, y2 = map(int, re.findall(r"\d+", node.get("bounds", "")))
         print((x1 + x2) // 2, (y1 + y2) // 2)
         break
