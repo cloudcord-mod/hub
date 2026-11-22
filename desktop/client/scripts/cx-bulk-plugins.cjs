@@ -347,9 +347,12 @@ function matchAppearanceStyles(stylesheet, appearance) {
     if (!stylesheet) return;
     let rules = appearanceMatchers.get(appearance);
     if (!rules) {
-        rules = Object.entries(appearance).filter(([, rule]) => !rule.desktopOnly).map(target => {
-            const css = normalizeAppearanceStyles(target[1].css);
-            return { target, css, hides: css && "mobile" in target[1] && hideSelectors(css) };
+        rules = Object.entries(appearance).filter(([, rule]) => !rule.desktopOnly).flatMap(target => {
+            const rule = target[1];
+            return [rule.css, rule.legacyCss].filter(Boolean).map(stylesheet => {
+                const css = normalizeAppearanceStyles(stylesheet);
+                return { target, css, hides: css && "mobile" in rule && hideSelectors(css) };
+            });
         }).filter(rule => rule.css).sort((a, b) => b.css.length - a.css.length);
         appearanceMatchers.set(appearance, rules);
     }

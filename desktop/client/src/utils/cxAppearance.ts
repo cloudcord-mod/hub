@@ -781,6 +781,8 @@ export const cxAppearanceTargets = {
         plugin: "BlurImagesUntilHover", label: "conceal chat images and videos until you hover or focus their controls",
         css: '[class*="imageWrapper"] img, [class*="imageWrapper"] video { filter: blur(18px); transition: filter .2s; } '
             + '[class*="imageWrapper"]:is(:hover, :focus-within) img, [class*="imageWrapper"]:is(:hover, :focus-within) video { filter: none; }',
+        legacyCss: '[class*="imageWrapper"] img, [class*="imageWrapper"] video { filter: blur(18px); transition: filter .2s; } '
+            + '[class*="imageWrapper"]:hover img, [class*="imageWrapper"]:hover video { filter: none; }',
         style: { blurredMedia: "all" },
     },
     "blur-nsfw-attachments": {
