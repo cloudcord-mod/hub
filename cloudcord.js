@@ -37055,7 +37055,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "hide-quest-orb-multiplier-pill": hideMobileComponent("HideQuestOrbMultiplierPill", "the Orb multiplier perk label on quests", "modules/quests/native/QuestOrbMultiplierPerkPill.tsx"),
         "hide-settings-premium-new-badge": hideMobileComponent("HideSettingsPremiumNewBadge", "the dismissible New badge on premium settings", "modules/user_settings/defs/native/DismissiblePremiumNewBadge.tsx"),
         "hide-orb-onboarding-pill": hideMobileComponent("HideOrbOnboardingPill", "the Orb onboarding pill", "modules/virtual_currency/native/OrbOnboardingPill.tsx"),
-        "hide-profile-about-me": hideMobileComponent("HideProfileAboutMe", "the About Me card on profiles", "modules/user_profile/native/UserProfileAboutMeCard.tsx"),
+        "hide-profile-about-me": {
+          plugin: "HideProfileAboutMe",
+          label: "the About Me section on profiles",
+          catalogOriginal: "hide-profile-about-me.cx",
+          css: "",
+          mobile: {
+            hideComponentPaths: [
+              "modules/user_profile/native/UserProfileAboutMeCard.tsx"
+            ]
+          }
+        },
         "hide-profile-roles-card": hideMobileComponent("HideProfileRolesCard", "the server roles card on profiles", "modules/user_profile/native/UserProfileRolesCard.tsx"),
         "hide-profile-personal-widgets": hideMobileComponent("HideProfilePersonalWidgets", "personal widgets displayed on profiles", "modules/user_profile/native/UserProfilePersonalWidgetCard.tsx"),
         "hide-profile-your-friends-card": hideMobileComponent("HideProfileYourFriendsCard", "the Your Friends card on profiles", "modules/user_profile/native/UserProfileYourFriendsCard.tsx"),
@@ -58843,8 +58853,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           {
             name: "HideProfileAboutMe",
             source: hide_profile_about_me_default,
-            description: "Hide the About Me card on profiles",
-            mobileOnly: true,
+            description: "Hide the About Me section on profiles",
             categories: [
               "Appearance"
             ],
@@ -72023,7 +72032,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8e90449fab400a20d95db95f7fb937b4b206d6f7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d540e21c6eb1a960443c70eb2a4d7cdf7918067c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
