@@ -113,7 +113,9 @@ let settingsDeclared = false;
 try {
     new Function("require", "module", ${JSON.stringify(script)})(require, module);
     const candidate = module.exports?.default ?? module.exports;
-    if (!candidate || typeof candidate !== "object") throw new Error("Preview did not export a plugin object");
+    if (!candidate || typeof candidate !== "object") {
+        throw new Error("Expected a plugin object, got " + (candidate === null ? "null" : typeof candidate));
+    }
     hooks = ["onLoad", "onUnload", "start", "stop"].filter(key => typeof candidate[key] === "function");
     settingsDeclared = Boolean(candidate.settings);
     if (!hooks.length && !settingsDeclared) throw new Error("Preview has no recognizable lifecycle or settings");
