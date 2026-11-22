@@ -37300,10 +37300,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideReactions",
           label: "message reactions",
           css: '[class*="reactions_"] { display: none !important; }',
-          mobile: [
-            "MessageReactions",
-            "MessageReactionsContent"
-          ]
+          mobile: {
+            messagePresentation: "reactions",
+            legacyComponents: [
+              "MessageReactions",
+              "MessageReactionsContent"
+            ]
+          }
         },
         "profile-effects": {
           plugin: "HideProfileEffects",
@@ -64320,11 +64323,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
                     ...presentation,
                     [field]: void 0
                   };
-              } else if ("stickers" in presentation && Array.isArray(presentation.stickers) && presentation.stickers.length) {
-                return {
-                  ...presentation,
-                  stickers: []
-                };
+              } else {
+                var field1 = mobile.messagePresentation;
+                var items = presentation[field1];
+                if (Array.isArray(items) && items.length)
+                  return {
+                    ...presentation,
+                    [field1]: []
+                  };
               }
               return presentation;
             }
@@ -68929,7 +68935,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a21472a98e25e28768fd4090607bad74354967d3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "89677937ce237703a2b27b2001397d9589af3fdf";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
