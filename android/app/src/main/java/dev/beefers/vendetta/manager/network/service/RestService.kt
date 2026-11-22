@@ -22,7 +22,7 @@ class RestService(
     suspend fun getLatestRelease(repo: String) = withContext(Dispatchers.IO) {
         require(repo == "cloudcord-mod/release-hub") { "Untrusted Manager update repository" }
         httpService.request<List<Release>> {
-            url("https://api.github.com/repos/cloudcord-mod/release-hub/releases")
+            url("https://api.github.com/repos/cloudcord-mod/hub/releases")
             parameter("per_page", 100)
             timeout { requestTimeoutMillis = 15_000 }
         }.transform { releases ->

@@ -17,6 +17,8 @@ class ReleaseTest {
 
     @Test fun acceptsPinnedManagerAsset() {
         assertEquals(asset, Release("manager-101", assets = listOf(asset)).managerAsset)
+        val canonical = asset.copy(downloadUrl = asset.downloadUrl.replace("/release-hub/", "/hub/"))
+        assertEquals(canonical, Release("manager-101", assets = listOf(canonical)).managerAsset)
     }
 
     @Test fun rejectsWrongRepositoryOrTagOrAsset() {
