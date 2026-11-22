@@ -353,6 +353,86 @@ export function normalizeProfileAppearance(data: any): ProfileAppearance {
     return result;
 }
 
+const portableLookFormat = "cloudcord.saved-look";
+const portableLookLimit = 3_450_000;
+const portableImageLimit = 1_700_000;
+
+function portableLookText(value: unknown, limit: number, multiline = false) {
+    if (typeof value !== "string") return "";
+    const clean = value.replace(/[\x00-\x08\x0b-\x1f\x7f\u202a-\u202e\u2066-\u2069]/g, "");
+    return (multiline ? clean : clean.replace(/[\n\t]/g, " ")).slice(0, limit);
+}
+
+function portableLookImage(value: unknown): string {
+    if (typeof value !== "string" || value.length > portableImageLimit) return "";
+    return /^data:image\/(?:png|webp|gif|jpeg);base64,[A-Za-z0-9+/]+={0,2}$/.test(value)
+        ? value : customPreviewURL(value);
+}
+
+function portableLookProfile(data: Record<string, unknown>) {
+    const { customFriends, customConnections, ...appearance } = normalizeProfileAppearance({
+        displayNameStyles: data.displayNameStyles, serverTag: data.serverTag, nameplate: data.nameplate,
+        profileEffect: data.profileEffect, profileFrame: data.profileFrame, customActivity: data.customActivity,
+        customStatus: data.customStatus, presenceStatus: data.presenceStatus,
+    });
+    const number = (value: unknown, min: number, max: number) =>
+        typeof value === "number" && Number.isSafeInteger(value) && value >= min && value <= max ? value : undefined;
+    const date = (value: unknown) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "";
+    const badges = (value: unknown) => Array.isArray(value)
+        ? [...new Set(value.filter((id): id is string => typeof id === "string" && /^[a-z\d_-]{1,80}$/i.test(id)))].slice(0, 80)
+        : [];
+    const decorationAsset = typeof data.decorationAsset === "string" && /^(?:a_)?[a-f0-9]{32}$/i.test(data.decorationAsset)
+        ? data.decorationAsset : undefined;
+    return {
+        ...appearance,
+        username: portableLookText(data.username, 32),
+        globalName: portableLookText(data.globalName, 32),
+        bio: portableLookText(data.bio, 512, true),
+        pronouns: portableLookText(data.pronouns, 40),
+        avatar: portableLookImage(data.avatar),
+        banner: portableLookImage(data.banner),
+        avatarDecoration: portableLookImage(data.avatarDecoration),
+        avatarDecorationSku: typeof data.avatarDecorationSku === "string" && SNOWFLAKE.test(data.avatarDecorationSku) ? data.avatarDecorationSku : undefined,
+        decorationAsset,
+        decorationSkuId: typeof data.decorationSkuId === "string" && SNOWFLAKE.test(data.decorationSkuId) ? data.decorationSkuId : undefined,
+        primaryColor: number(data.primaryColor, 0, 0xffffff),
+        accentColor: number(data.accentColor, 0, 0xffffff),
+        badgeFlags: number(data.badgeFlags, 0, 0x7fffffff) ?? 0,
+        customBadgeIds: badges(data.customBadgeIds),
+        hiddenBadgeIds: badges(data.hiddenBadgeIds),
+        badgeOrder: badges(data.badgeOrder),
+        replaceRealBadges: data.replaceRealBadges === true,
+        nitro: data.nitro === true,
+        nitroLevel: number(data.nitroLevel, -1, 64),
+        nitroSince: date(data.nitroSince),
+        boostMonths: number(data.boostMonths, -1, 64),
+        giftLevel: number(data.giftLevel, -1, 64),
+        createdAt: date(data.createdAt),
+        signupDate: date(data.signupDate),
+        oldName: portableLookText(data.oldName, 32),
+    };
+}
+
+export function encodePortableLook(name: string, data: Record<string, unknown>) {
+    const profile = portableLookProfile(data);
+    if ((data.avatar && !profile.avatar) || (data.banner && !profile.banner))
+        throw new Error("A picture can't be copied. Use a smaller image or an HTTPS image link.");
+    const text = JSON.stringify({ format: portableLookFormat, version: 1, name: portableLookText(name, 40).trim() || "Saved look", profile });
+    if (text.length > portableLookLimit) throw new Error("This look is too large to copy. Try using links for its pictures.");
+    return text;
+}
+
+export function decodePortableLook(text: unknown) {
+    if (typeof text !== "string" || text.length > portableLookLimit || !text.trim())
+        throw new Error("Copy a saved CloudCord look to your clipboard first.");
+    let data: any;
+    try { data = JSON.parse(text); }
+    catch { throw new Error("The clipboard does not contain a valid CloudCord look."); }
+    if (data?.format !== portableLookFormat || data.version !== 1 || !data.profile || typeof data.profile !== "object" || Array.isArray(data.profile))
+        throw new Error("Copy a saved CloudCord look to your clipboard first.");
+    return { name: portableLookText(data.name, 40).trim() || "Imported look", profile: portableLookProfile(data.profile) };
+}
+
 /** Discord's own rule (its STREAMING check): twitch.tv/<name> or youtube.com/watch?v=<id>.
  * Short and live YouTube links are rewritten to the watch form so they qualify. */
 export const DISCORD_STREAM_URL = /^https?:\/\/(?:www\.)?(twitch\.tv\/(.+)|youtube.com\/watch\?v=)/;

@@ -22,7 +22,7 @@ import { installConnectionSettings } from "@utils/connectionSettings";
 import { appearanceOptions, availableServerTags, Catalog, copyProfilePresentation, customDiscordMediaURL, isProfileViewUserId, nameplateAssetURL, nativeCollectibles, customSocialValidationErrors, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, ProfileAppearance, profileAvatarPresentation, setProfilePresentationFields } from "@utils/profileAppearance";
 import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@webpack";
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
-import { profileMentionAliasScore } from "@utils/profileAppearance";
+import { decodePortableLook, encodePortableLook, profileMentionAliasScore } from "@utils/profileAppearance";
 
 import { CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, ProfileBadge } from "@api/Badges";
 import { applyBadgeLayout, badgeLayoutKey, defaultBadgeOrder, moveBadgeOrder } from "@api/BadgeLayout";
@@ -3196,6 +3196,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
     const [name, setName] = React.useState("");
     const [renaming, setRenaming] = React.useState<string | null>(null);
     const [renameText, setRenameText] = React.useState("");
+    const [transferring, setTransferring] = React.useState(false);
     const commit = (next: SavedProfile[]) => {
         if (!writeSavedProfiles(userId, next)) return false;
         setItems(next);
@@ -3213,6 +3214,27 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
         onLoad(loadSavedLook(current, item.data));
         showToast(`Loaded "${item.name}". Press Save to use it.`, Toasts.Type.SUCCESS);
     };
+    const transfer = async (task: () => Promise<void>) => {
+        if (transferring || activeUserId() !== userId) return;
+        setTransferring(true);
+        try { await task(); }
+        catch (error) {
+            if (activeUserId() === userId) showToast(error instanceof Error ? error.message : "Couldn't transfer this look.", Toasts.Type.FAILURE);
+        } finally { setTransferring(false); }
+    };
+    const importLook = () => transfer(async () => {
+        const look = decodePortableLook(await navigator.clipboard.readText());
+        if (activeUserId() !== userId) return;
+        const item = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), name: look.name,
+            savedAt: Date.now(), data: savedSnapshot(fromSharedProfile(look.profile)) };
+        if (commit([item, ...readSavedProfiles(userId)])) showToast(`Saved "${item.name}" on this device.`, Toasts.Type.SUCCESS);
+    });
+    const copyLook = (item: SavedProfile) => transfer(async () => {
+        const profile = toSharedProfile(item.data);
+        const backup = encodePortableLook(item.name, { ...profile, accentColor: item.data.accentColor2 ?? item.data.accentColor });
+        await navigator.clipboard.writeText(backup);
+        if (activeUserId() === userId) showToast("Copied look to the clipboard.", Toasts.Type.SUCCESS);
+    });
     const date = (time: number) => new Date(time).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
     return <>
         <Section title="Saved profiles" description="Keep copies of this account’s custom profile on this device.">
@@ -3220,6 +3242,9 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                 <input className="cpx-input" value={name} maxLength={40} placeholder={`Name, like "Main" or "Profile ${items.length + 1}"`} onChange={event => setName(event.currentTarget.value)} onKeyDown={event => { if (event.key === "Enter") saveCurrent(); }} />
                 <button type="button" className="cpx-btn cpx-btn-primary" onClick={saveCurrent}>Save current look</button>
             </div>
+        </Section>
+        <Section title="Move a saved look" description="Copy a look, transfer the copied text, then import it on the other device.">
+            <button type="button" className="cpx-btn" disabled={transferring} onClick={importLook}>Import from clipboard</button>
         </Section>
         {!items.length && <span className="cpx-hint">No saved profiles yet. Set up your profile, then save it here to come back to it later.</span>}
         <div className="cpx-saved-grid">
@@ -3244,6 +3269,7 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
                     </div>
                     <div className="cpx-saved-actions">
                         <button type="button" className="cpx-btn cpx-btn-primary" disabled={active} onClick={() => load(item)}>{active ? "In use" : "Use profile"}</button>
+                        <button type="button" className="cpx-btn cpx-btn-ghost" disabled={transferring} onClick={() => copyLook(item)}>Copy look</button>
                         <button type="button" className="cpx-icon-btn" aria-label="Update with current profile" title="Replace with your current profile" onClick={() => {
                             if (commit(items.map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)))
                                 showToast(`Updated "${item.name}".`, Toasts.Type.SUCCESS);

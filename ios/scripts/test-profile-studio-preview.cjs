@@ -36,6 +36,40 @@ function flatten(value) {
 
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
 const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
+const { encodePortableLook, decodePortableLook } = profileAppearance;
+const portablePicture = "data:image/png;base64,aW1hZ2U=";
+const portableLook = encodePortableLook("My saved look", {
+    username: "preview", globalName: "Preview User", bio: "First line\nSecond line",
+    avatar: portablePicture, banner: "https://cdn.example/landscape.png",
+    primaryColor: 0, accentColor: 0x123456, badgeOrder: ["nitro", "active", "active"],
+    profileFrame: { skuId: "123456789012345678" }, profileEffect: { skuId: "123456789012345679" },
+    serverTag: { tag: "CLOD", guildId: "123456789012345677", badge: "" },
+    share: { token: "private-edit-token" }, localOnly: true, ownerId: "000000000000000000",
+    customFriends: [{ username: "private-friend" }], customConnections: [{ accountId: "private-connection" }],
+});
+const decodedLook = decodePortableLook(portableLook);
+assert.equal(decodedLook.name, "My saved look");
+assert.equal(decodedLook.profile.avatar, portablePicture);
+assert.equal(decodedLook.profile.banner, "https://cdn.example/landscape.png");
+assert.equal(decodedLook.profile.bio, "First line\nSecond line");
+assert.equal(decodedLook.profile.primaryColor, 0);
+assert.equal(decodedLook.profile.accentColor, 0x123456);
+assert.equal(decodedLook.profile.profileFrame.skuId, "123456789012345678");
+assert.equal(decodedLook.profile.profileEffect.skuId, "123456789012345679");
+assert.deepEqual(Array.from(decodedLook.profile.badgeOrder), ["nitro", "active"]);
+assert.doesNotMatch(portableLook, /private-edit-token|localOnly|ownerId|private-friend|private-connection/);
+assert.throws(() => decodePortableLook("ordinary clipboard content"), /valid CloudCord look/);
+assert.throws(() => decodePortableLook(portableLook.replace('"version":1', '"version":2')), /Copy a saved/);
+assert.throws(() => decodePortableLook("x".repeat(3_450_001)), /Copy a saved/);
+assert.throws(() => encodePortableLook("Local file", { avatar: "file:///private/picture.png" }), /picture can't be copied/);
+const malformedLook = JSON.parse(portableLook);
+malformedLook.profile.avatar = "javascript:alert(1)";
+malformedLook.profile.banner = "https://user:password@cdn.example/private.png";
+malformedLook.profile.primaryColor = -1;
+const sanitizedLook = decodePortableLook(JSON.stringify(malformedLook));
+assert.equal(sanitizedLook.profile.avatar, "");
+assert.equal(sanitizedLook.profile.banner, "");
+assert.equal(sanitizedLook.profile.primaryColor, undefined);
 const mobileProfile = { name: "Preview User", username: "preview", tagText: "CLOD", tagIcon: "https://getcloudcord.com/tag.png", frame: "Starlight", effect: "Snowfall",
     nameplate: "https://cdn.example/nameplate.png", bio: "My bio", badges: ["https://cdn.example/badge.png"] };
 const mobileRender = profile => flatten(PreviewCard(profile));
@@ -239,8 +273,44 @@ async function testMobilePreviewOpening() {
     assert.equal(livePreviewOpened, false, "a failure on the previous account must not change this account's preview");
 }
 
-testMobilePreviewOpening().then(() => {
-    console.log("PASS Profile Studio modes, native profile fields, preview fallback, two-tone previews and saved-look wiring");
+async function testPortableTransfer() {
+    for (const platform of ["desktop", "mobile"]) {
+        const desktop = platform === "desktop";
+        const hookSource = desktop ? savedPanelSource.slice(savedPanelSource.indexOf("const transfer ="), savedPanelSource.indexOf("const date ="))
+            : page.slice(page.indexOf("const copyLook ="), page.indexOf("const importCode =", page.indexOf("const copyLook =")));
+        const writes = [], storage = [];
+        let pendingRead, account = id;
+        const clipboard = {
+            readText: () => new Promise(resolve => { pendingRead = resolve; }),
+            writeText: async text => writes.push(text),
+        };
+        const context = {
+            ...profileAppearance, userId: id, ownerId: id, currentUserId: id, transferring: false,
+            activeUserId: () => account, setTransferring() {}, commit: items => { storage.push(items); return true; },
+            readSavedProfiles: () => [{ name: "Existing" }], showToast() {}, Toasts: { Type: { SUCCESS: 1, FAILURE: 2 } },
+            fromSharedProfile: profile => profile, previewFromShared: profile => profile, savedSnapshot: profile => profile,
+            toSharedProfile: item => item, ownSharedProfile: async item => item, run: async task => task(),
+            navigator: { clipboard }, findByProps: () => ({ getString: clipboard.readText, setString: clipboard.writeText }),
+        };
+        const methods = vm.runInNewContext(transformSync(hookSource + "\n({ copyLook, importLook });", { loader: "ts" }).code, context);
+        await methods.copyLook({ name: "Private backup", data: decodedLook.profile });
+        assert.equal(decodePortableLook(writes[0]).profile.avatar, portablePicture);
+        const reading = methods.importLook();
+        pendingRead(portableLook);
+        await reading;
+        assert.equal(storage[0][0].name, "My saved look");
+        assert.equal(storage[0][1].name, "Existing");
+        assert.equal(storage[0][0].share, undefined);
+        const stale = methods.importLook();
+        account = context.currentUserId = "123456789012345679";
+        pendingRead(portableLook);
+        await stale;
+        assert.equal(storage.length, 1, platform + " rechecks the account after reading the clipboard");
+    }
+}
+
+Promise.all([testMobilePreviewOpening(), testPortableTransfer()]).then(() => {
+    console.log("PASS Profile Studio previews, saved looks and cross-platform clipboard transfer");
 }).catch(error => {
     console.error(error);
     process.exitCode = 1;

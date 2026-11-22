@@ -443,7 +443,7 @@ jobs:
           import { withTimeout } from "@lib/utils/asyncTimeout";
           import { fetchProfileResponse } from "@lib/utils/profileSyncNetwork";
           import { ACTIVITY_TYPES, appearanceOptions, availableServerTags, copyProfilePresentation, customServerTagIcon, createNativeSocialFriendsReader, customDiscordMediaURL, customSocialValidationErrors, isProfileViewUserId, nameplateAssetURL, nativeActivities, nativeCollectibles, nativeSocialFriends, nativeSocialProfile, nativeProfileAppearance, nativeProfilePreviewSurface, normalizeProfileAppearance, normalizeProfileViewUsers, parseCatalog, parseServerTagIcon, PRESENCE_STATUSES, profileAvatarPresentation, profilePreviewColor, serverTagIconURL, streamURL } from "@lib/api/profileAppearance";
-          import { profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon } from "@lib/api/profileAppearance";
+          import { decodePortableLook, encodePortableLook, profileMentionAliasScore, profilePreviewStatus, profilePreviewTagIcon } from "@lib/api/profileAppearance";
           import type { Catalog, ProfileActivity, ProfileNameplate } from "@lib/api/profileAppearance";
           import type { CustomFriendPreview, CustomConnectionPreview, ProfileAppearance } from "@lib/api/profileAppearance";
           function CustomSocialEditor(props: any) { const Component = require("@core/ui/settings/components/CustomSocial").CustomSocialEditor; return <Component {...props} />; }
@@ -4703,7 +4703,31 @@ jobs:
               const [busy, setBusy] = useState(false);
               const [sharing, setSharing] = useState<string | null>(null);
               const [publicShares, setPublicShares] = useState<any[] | null>(null);
-              const run = async (task: () => Promise<void>) => { if (!ownerId || ownerId !== currentUserId) return; setBusy(true); try { await task(); } catch (error: any) { if (ownerId === currentUserId) Alert.alert("Sharing", error?.message || "Something went wrong."); } finally { setBusy(false); } };
+              const run = async (task: () => Promise<void>, title = "Sharing") => { if (busy || !ownerId || ownerId !== currentUserId) return; setBusy(true); try { await task(); } catch (error: any) { if (ownerId === currentUserId) Alert.alert(title, error?.message || "Something went wrong."); } finally { setBusy(false); } };
+              const copyLook = (item: SavedProfile) => run(async () => {
+                  const clipboard = findByProps("getString", "setString") as any;
+                  if (typeof clipboard?.setString !== "function") throw new Error("Clipboard is unavailable.");
+                  const profile = await ownSharedProfile(item.data);
+                  if (ownerId !== currentUserId) return;
+                  if ((item.data.avatarMedia?.uri && !profile.avatar) || (item.data.bannerMedia?.uri && !profile.banner))
+                      throw new Error("A picture couldn't be read on this device. Use a smaller image or an HTTPS image link.");
+                  await clipboard.setString(encodePortableLook(item.name, profile));
+                  if (ownerId === currentUserId) showToast("Copied look to the clipboard.");
+              }, "Saved looks");
+              const importLook = () => run(async () => {
+                  const clipboard = findByProps("getString", "setString") as any;
+                  if (typeof clipboard?.getString !== "function") throw new Error("Clipboard is unavailable.");
+                  const look = decodePortableLook(await clipboard.getString());
+                  if (ownerId !== currentUserId) return;
+                  const data = savedSnapshot({
+                      ...previewFromShared(look.profile),
+                      hiddenBadgeIds: look.profile.hiddenBadgeIds,
+                      badgeOrder: look.profile.badgeOrder,
+                  });
+                  commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), name: look.name, savedAt: Date.now(), data },
+                      ...readSavedProfiles(ownerId)]);
+                  showToast("Saved “" + look.name + "” on this device.");
+              }, "Saved looks");
               const importCode = (value: string) => run(async () => {
                   const id = shareCodeFrom(value);
                   if (!id) throw new Error("Paste a share link or code.");
@@ -4743,6 +4767,9 @@ jobs:
                           <S.Field label="Name"><TextInput value={name} placeholder={"Main, Alt or Profile " + (items.length + 1)} maxLength={40} onChangeText={setName} /></S.Field>
                           <S.Button label="Save current look" primary onPress={saveCurrent} />
                       </S.Section>
+                      <S.Section title="Move a saved look" description="Copy a look, transfer the copied text, then import it on the other device.">
+                          <S.Button label="Import from clipboard" disabled={busy} onPress={importLook} />
+                      </S.Section>
                   </S.Panel>
                   {!items.length ? <Text variant="text-sm/medium" color="text-muted">No saved profiles yet. Set up your profile, then save it here to come back to it later.</Text> : null}
                   {items.map(item => {
@@ -4774,6 +4801,7 @@ jobs:
                               <S.Button label="Update" onPress={() => { commit(items.map(other => other.id === item.id ? { ...other, data: savedSnapshot(current), savedAt: Date.now() } : other)); showToast("Updated \u201c" + item.name + "\u201d"); }} />
                               <S.Button label="Delete" danger onPress={() => remove(item)} />
                           </View>
+                          <S.Button label="Copy look" disabled={busy} onPress={() => copyLook(item)} />
                   {sharing === item.id ? <View style={{ gap: 8 }}>
                       <S.Chips options={SHARE_VISIBILITIES} value={item.share?.visibility ?? "unlisted"} onChange={(value: ShareVisibility) => shareItem(item, value)} />
                       {item.share && item.share.visibility !== "private" ? <Text variant="text-sm/medium" color="text-normal" selectable>{shareLink(item.share.id)}</Text> : null}
