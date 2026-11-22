@@ -984,6 +984,23 @@ export const cxCommandFunctions = {
         return "Resize to " + scaledW + " × " + scaledH + " px\n" + action + ": "
             + Math.abs(targetW - scaledW) + " px horizontally, " + Math.abs(targetH - scaledH) + " px vertically";
     },
+    imagePrintSize(width: string, height: string, ppi: string) {
+        const columns = integerText(width), rows = integerText(height), density = integerText(ppi);
+        if (!columns || !rows || !density || columns < 1 || rows < 1 || density < 1) return;
+        const dimensions = (factor: number) => [columns, rows].map(pixels =>
+            String(Number((pixels / density * factor).toPrecision(6)))).join(" × ");
+        return dimensions(1) + " in · " + dimensions(2.54) + " cm";
+    },
+    videoFramePosition(index: string, fps: string) {
+        const frame = integerText(index), rate = Number(fps);
+        if (frame === undefined || frame < 0 || !/^\d{1,4}(?:\.\d{1,3})?$/.test(fps) || rate < 1 || rate > 1000) return;
+        const milliseconds = Math.round(frame / rate * 1000);
+        if (!Number.isSafeInteger(milliseconds)) return;
+        const seconds = Math.floor(milliseconds / 1000);
+        const clock = [Math.floor(seconds / 3600), Math.floor(seconds / 60) % 60, seconds % 60]
+            .map(part => String(part).padStart(2, "0")).join(":");
+        return clock + "." + String(milliseconds % 1000).padStart(3, "0");
+    },
     imagePixelCount(width: string, height: string) {
         const columns = integerText(width), rows = integerText(height);
         if (columns === undefined || rows === undefined || columns < 1 || rows < 1 || columns > 1_000_000 || rows > 1_000_000) return;

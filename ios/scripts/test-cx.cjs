@@ -2968,6 +2968,14 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["fitimage", { source: "1920x1080", box: "1000×1000", mode: "contain" }, /1000 × 562 px\nPadding: 0 px horizontally, 438 px vertically/],
                 ["fitimage", { source: "1920x1080", box: "1000x1000", mode: "cover" }, /1778 × 1000 px\nCrop: 778 px horizontally, 0 px vertically/],
             ]],
+            ["Image Print Size", [
+                ["printsize", { width: "3000", height: "2400", ppi: "300" }, /^10 × 8 in · 25\.4 × 20\.32 cm$/],
+                ["printsize", { width: "3000", height: "2400", ppi: "0" }, /^Enter pixel dimensions/],
+            ]],
+            ["Video Frame Position", [
+                ["frameposition", { index: "61", fps: "30" }, /^00:00:02\.033$/],
+                ["frameposition", { index: "0", fps: "24" }, /^00:00:00\.000$/],
+            ]],
             ["Image Pixel Count", [
                 ["pixelcount", { width: "3840", height: "2160" }, /^8294400 pixels · 8\.2944 MP$/],
                 ["pixelcount", { width: "0", height: "2160" }, /^Enter whole-number/],

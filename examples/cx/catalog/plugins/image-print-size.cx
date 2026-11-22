@@ -1,0 +1,8 @@
+plugin "Image Print Size":
+  needs commands.register
+  needs reply.local
+  on command "printsize":
+    input "width" text
+    input "height" text
+    input "ppi" text
+    reply "${imagePrintSize(width, height, ppi)}" else "Enter pixel dimensions and a positive pixels-per-inch value."

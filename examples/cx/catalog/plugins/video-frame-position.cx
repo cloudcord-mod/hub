@@ -1,0 +1,7 @@
+plugin "Video Frame Position":
+  needs commands.register
+  needs reply.local
+  on command "frameposition":
+    input "index" text
+    input "fps" text
+    reply "${videoFramePosition(index, fps)}" else "Enter a zero-based frame index and a frame rate from 1 to 1000."

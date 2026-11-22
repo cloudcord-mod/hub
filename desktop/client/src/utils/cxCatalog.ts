@@ -339,6 +339,7 @@ import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
 import plugin_catalog_image_pixel_count from "../../../../examples/cx/catalog/plugins/image-pixel-count.cx";
+import plugin_catalog_image_print_size from "../../../../examples/cx/catalog/plugins/image-print-size.cx";
 import plugin_catalog_improve_contrast from "../../../../examples/cx/catalog/plugins/improve-contrast.cx";
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
 import plugin_catalog_indent_lines from "../../../../examples/cx/catalog/plugins/indent-lines.cx";
@@ -506,6 +507,7 @@ import plugin_catalog_user_tags from "../../../../examples/cx/catalog/plugins/us
 import plugin_catalog_utf_8_byte_count from "../../../../examples/cx/catalog/plugins/utf-8-byte-count.cx";
 import plugin_catalog_vibe_check from "../../../../examples/cx/catalog/plugins/vibe-check.cx";
 import plugin_catalog_video_frame_count from "../../../../examples/cx/catalog/plugins/video-frame-count.cx";
+import plugin_catalog_video_frame_position from "../../../../examples/cx/catalog/plugins/video-frame-position.cx";
 import plugin_catalog_video_size_estimate from "../../../../examples/cx/catalog/plugins/video-size-estimate.cx";
 import plugin_catalog_view_group_dm_icon from "../../../../examples/cx/catalog/plugins/view-group-dm-icon.cx";
 import plugin_catalog_view_role_icon from "../../../../examples/cx/catalog/plugins/view-role-icon.cx";
@@ -972,6 +974,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ImageFilename", source: plugin_catalog_image_filename, description: "Show image filenames and GIF links", categories: ["Media"] },
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
         { name: "Image Pixel Count", source: plugin_catalog_image_pixel_count, description: "/pixelcount", commands: ["pixelcount"], categories: ["Commands"], appearanceRevision: "b7370fa1ee7f6e7422f8be5d8b9551705f5438c878d0fe239911bdfd3699ecae", privateCommands: true },
+        { name: "Image Print Size", source: plugin_catalog_image_print_size, description: "/printsize", commands: ["printsize"], categories: ["Commands"], appearanceRevision: "a223ac136df378fba61cd2fd33ef04c30995c8918389861f81d84bd32a043343", privateCommands: true },
         { name: "Improve Contrast", source: plugin_catalog_improve_contrast, description: "/improvecontrast", commands: ["improvecontrast"], categories: ["Commands"], appearanceRevision: "a5f2ddbbf7bdc8258da75b5c2540054215e0528fcb069b39682fcc973c144776", privateCommands: true },
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
         { name: "Indent Lines", source: plugin_catalog_indent_lines, description: "/indentlines", commands: ["indentlines"], categories: ["Commands"], appearanceRevision: "105e91032887863c35b9e5e1d74a847c62af5d275cceafa7e2d79320cd272d65", privateCommands: true },
@@ -1139,6 +1142,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "UTF-8 Byte Count", source: plugin_catalog_utf_8_byte_count, description: "/utf8size", commands: ["utf8size"], categories: ["Commands"], appearanceRevision: "8780ff0a5aa64eab83768a7a9b7d2335dd22e2162c7c944c327ff06be5a9bdfc", privateCommands: true },
         { name: "VibeCheck", source: plugin_catalog_vibe_check, description: "/vibe", commands: ["vibe"], categories: ["Chat","Commands"] },
         { name: "Video Frame Count", source: plugin_catalog_video_frame_count, description: "/framecount", commands: ["framecount"], categories: ["Commands"], appearanceRevision: "05bbc7b2a9de22b4b85f1792f5b967269fc9dc356581b753d84da9049a942cf0", privateCommands: true },
+        { name: "Video Frame Position", source: plugin_catalog_video_frame_position, description: "/frameposition", commands: ["frameposition"], categories: ["Commands"], appearanceRevision: "0ea8362e6e24695d1f4f497fd64870848b18a683ae47815afdfad4d6877d9d32", privateCommands: true },
         { name: "Video Size Estimate", source: plugin_catalog_video_size_estimate, description: "/videosize", commands: ["videosize"], categories: ["Commands"], appearanceRevision: "97d0539fc2b4f0f2846916d89aa7527a5a1f2cadd478c519a29e4554475f991e", privateCommands: true },
         { name: "View Group DM Icon", source: plugin_catalog_view_group_dm_icon, description: "View the selected group DM's icon", categories: ["Media","Servers & channels"] },
         { name: "ViewRoleIcon", source: plugin_catalog_view_role_icon, description: "Open the selected server role's icon in Discord's image viewer", categories: ["Media","Servers & channels"] },
