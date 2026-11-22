@@ -36920,6 +36920,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-channel-list-style-promo": hideMobileComponent("HideChannelListStylePromo", "the Nitro upsell under channel list appearance previews", "modules/user_settings/appearance/native/components/SettingsAppearanceChannelListPreviewNitroUpsell.tsx"),
+        "hide-settings-gift-badge-progress": hideMobileComponent("HideSettingsGiftBadgeProgress", "gifting badge progress in Premium settings", "modules/user_settings/premium/native/UserSettingsGiftingBadgeProgress.tsx"),
+        "hide-dismissible-profile-upsells": hideMobileComponent("HideDismissibleProfileUpsells", "dismissible offers on profiles", "modules/user_profile/native/UserProfileDismissibleUpsells.tsx"),
         "hide-channel-unread-count": hideMobileComponent("HideChannelUnreadCount", "numeric unread badges in the mobile channel list", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelUnreadBadge.tsx"),
         "hide-recap-entry-badges": hideMobileComponent("HideRecapEntryBadges", "badges on content entries in the recap", "modules/icymi/native/content_inventory/Badges.tsx"),
         "hide-recap-custom-status": hideMobileComponent("HideRecapCustomStatus", "custom status updates in the recap", "modules/icymi/native/content_inventory/CustomStatusEntryRow.tsx"),
@@ -51150,6 +51153,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-channel-list-style-promo.cx
+  var hide_channel_list_style_promo_default;
+  var init_hide_channel_list_style_promo = __esm({
+    "../examples/cx/catalog/plugins/hide-channel-list-style-promo.cx"() {
+      hide_channel_list_style_promo_default = 'plugin "HideChannelListStylePromo":\n  needs appearance.hide\n  hide hide-channel-list-style-promo\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-channel-list-tips.cx
   var hide_channel_list_tips_default;
   var init_hide_channel_list_tips = __esm({
@@ -51275,6 +51286,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_discover_button = __esm({
     "../examples/cx/catalog/plugins/hide-discover-button.cx"() {
       hide_discover_button_default = 'plugin "HideDiscoverButton":\n  needs appearance.style\n  style hide-discover-button\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-dismissible-profile-upsells.cx
+  var hide_dismissible_profile_upsells_default;
+  var init_hide_dismissible_profile_upsells = __esm({
+    "../examples/cx/catalog/plugins/hide-dismissible-profile-upsells.cx"() {
+      hide_dismissible_profile_upsells_default = 'plugin "HideDismissibleProfileUpsells":\n  needs appearance.hide\n  hide hide-dismissible-profile-upsells\n';
     }
   });
 
@@ -51995,6 +52014,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_server_theme_tip = __esm({
     "../examples/cx/catalog/plugins/hide-server-theme-tip.cx"() {
       hide_server_theme_tip_default = 'plugin "HideServerThemeTip":\n  needs appearance.hide\n  hide hide-server-theme-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-settings-gift-badge-progress.cx
+  var hide_settings_gift_badge_progress_default;
+  var init_hide_settings_gift_badge_progress = __esm({
+    "../examples/cx/catalog/plugins/hide-settings-gift-badge-progress.cx"() {
+      hide_settings_gift_badge_progress_default = 'plugin "HideSettingsGiftBadgeProgress":\n  needs appearance.hide\n  hide hide-settings-gift-badge-progress\n';
     }
   });
 
@@ -54978,6 +55005,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_bounties_scroll_prompt();
       init_hide_call_activities_tip();
       init_hide_call_buttons();
+      init_hide_channel_list_style_promo();
       init_hide_channel_list_tips();
       init_hide_channel_topic();
       init_hide_channel_unread_count();
@@ -54994,6 +55022,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_custom_statuses();
       init_hide_disabled_emojis();
       init_hide_discover_button();
+      init_hide_dismissible_profile_upsells();
       init_hide_display_name_styles_tip();
       init_hide_dm_add_friends_widget();
       init_hide_dm_friend_suggestions();
@@ -55084,6 +55113,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_server_live_notice();
       init_hide_server_tag_promotion();
       init_hide_server_theme_tip();
+      init_hide_settings_gift_badge_progress();
       init_hide_settings_premium_new_badge();
       init_hide_shop_button_tip();
       init_hide_shop_featured_collections();
@@ -56970,6 +57000,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4"
           },
           {
+            name: "HideChannelListStylePromo",
+            source: hide_channel_list_style_promo_default,
+            description: "Hide the Nitro upsell under channel list appearance previews",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "ab7d6aedb6dfce5fca4298fd2e90004c165c2ebb6636b552b5c81ad33d545a63"
+          },
+          {
             name: "HideChannelListTips",
             source: hide_channel_list_tips_default,
             description: "Hide feature tips in the server channel list header",
@@ -57122,6 +57162,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideDismissibleProfileUpsells",
+            source: hide_dismissible_profile_upsells_default,
+            description: "Hide dismissible offers on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "0065a5154d6694c6af5879214c83029ba9061a6f2879348932865c0d915a7159"
           },
           {
             name: "HideDisplayNameStylesTip",
@@ -57983,6 +58033,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "fcf3ec61162e3f78d941d24c2b2ffec00e111bbb1cca794bce45461c77443b4e"
+          },
+          {
+            name: "HideSettingsGiftBadgeProgress",
+            source: hide_settings_gift_badge_progress_default,
+            description: "Hide gifting badge progress in Premium settings",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "18e48bb180ace705ba0a398f642dcff16b36c9c352c378fe863e112b6730d142"
           },
           {
             name: "HideSettingsPremiumNewBadge",
@@ -70442,7 +70502,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d9e3137519aea826e066f9af3cadff7a5b1ea3a6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7a005dfc0738813eea276d23b8beabbb8b3d2ff7";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
