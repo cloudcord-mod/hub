@@ -130,6 +130,21 @@ assert.equal(containsText(mobileRender(mobileProfile), "Frame: Starlight"), fals
 assert.deepEqual(media(mobileRender({ name: "No cosmetics", username: "plain" })), []);
 
 const { ProfilePreview } = load("desktop/client/src/sincordplugins/fakeProfile/editorUi.tsx");
+for (const [mode, avatarClass] of [
+    ["profile", "cpx-card-avatar-img"],
+    ["popout", "cpx-dc-avatar-img"],
+    ["chat", "cpx-chat-avatar"],
+]) {
+    const render = () => flatten(ProfilePreview({
+        data: { avatar: avatarPreview.avatar }, fallbackName: "Nova", fallbackUsername: "nova", fallbackAvatar: "",
+    }));
+    layout = mode;
+    const image = render().find(node => node.type === "img" && node.props.className === avatarClass);
+    assert.equal(image?.props.src, avatarPreview.avatar, mode);
+    image.props.onError();
+    assert.ok(render().some(node => node.type === "span" && node.props.className === avatarClass + " cpx-avatar-fallback" && node.props.children === "N"), mode);
+    avatarFailed = false;
+}
 layout = "chat";
 const desktop = flatten(ProfilePreview({
     data: { globalName: mobileProfile.name, serverTag: { tag: mobileProfile.tagText, icon: mobileProfile.tagIcon } },
