@@ -36920,6 +36920,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-gift-button-animation": hideMobileComponent("HideGiftButtonAnimation", "the decorative animation on the chat gift button", "modules/chat_input/native/GiftIconTrinketsAnimation.tsx"),
+        "hide-app-launcher-button-animation": hideMobileComponent("HideAppLauncherButtonAnimation", "the app launcher button introduction animation", "modules/app_launcher/native/onboarding/AppLauncherOnboardingChatInputButtonAnimation.tsx"),
+        "hide-super-reaction-animation": hideMobileComponent("HideSuperReactionAnimation", "the Super Reaction animation in chat", "modules/messages/native/burst_reactions/BurstReactionAnimation.tsx"),
         "hide-stage-boost-promo": hideMobileComponent("HideStageBoostPromo", "the boost upsell in Stage channels", "modules/guild_scheduled_events/native/components/StageChannelUpsell.tsx"),
         "hide-app-recommendation-rows": hideMobileComponent("HideAppRecommendationRows", "individual recommended app rows in the launcher", "modules/app_launcher/native/base_components/RecommendationAppRow.tsx"),
         "hide-premium-upsell-gradient": hideMobileComponent("HidePremiumUpsellGradient", "the decorative gradient behind premium upsells", "modules/premium/roadblocks/native/views/PremiumUpsellGradientBackground.tsx"),
@@ -51014,6 +51017,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-app-launcher-button-animation.cx
+  var hide_app_launcher_button_animation_default;
+  var init_hide_app_launcher_button_animation = __esm({
+    "../examples/cx/catalog/plugins/hide-app-launcher-button-animation.cx"() {
+      hide_app_launcher_button_animation_default = 'plugin "HideAppLauncherButtonAnimation":\n  needs appearance.hide\n  hide hide-app-launcher-button-animation\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-app-launcher-intro.cx
   var hide_app_launcher_intro_default;
   var init_hide_app_launcher_intro = __esm({
@@ -51467,6 +51478,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_gift_badge_progress = __esm({
     "../examples/cx/catalog/plugins/hide-gift-badge-progress.cx"() {
       hide_gift_badge_progress_default = 'plugin "HideGiftBadgeProgress":\n  needs appearance.hide\n  hide hide-gift-badge-progress\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-gift-button-animation.cx
+  var hide_gift_button_animation_default;
+  var init_hide_gift_button_animation = __esm({
+    "../examples/cx/catalog/plugins/hide-gift-button-animation.cx"() {
+      hide_gift_button_animation_default = 'plugin "HideGiftButtonAnimation":\n  needs appearance.hide\n  hide hide-gift-button-animation\n';
     }
   });
 
@@ -52219,6 +52238,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_suggested_channels = __esm({
     "../examples/cx/catalog/plugins/hide-suggested-channels.cx"() {
       hide_suggested_channels_default = 'plugin "HideSuggestedChannels":\n  needs appearance.hide\n  use hide-suggested-channels\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-super-reaction-animation.cx
+  var hide_super_reaction_animation_default;
+  var init_hide_super_reaction_animation = __esm({
+    "../examples/cx/catalog/plugins/hide-super-reaction-animation.cx"() {
+      hide_super_reaction_animation_default = 'plugin "HideSuperReactionAnimation":\n  needs appearance.hide\n  hide hide-super-reaction-animation\n';
     }
   });
 
@@ -55032,6 +55059,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_activity_cards();
       init_hide_add_friend_hint();
       init_hide_add_server_button();
+      init_hide_app_launcher_button_animation();
       init_hide_app_launcher_intro();
       init_hide_app_launcher_recommendations();
       init_hide_app_recommendation_rows();
@@ -55089,6 +55117,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_gif_favorite_button();
       init_hide_gif_search_suggestions();
       init_hide_gift_badge_progress();
+      init_hide_gift_button_animation();
       init_hide_gift_button();
       init_hide_gift_wishlist_banner();
       init_hide_guild_boost_tag();
@@ -55183,6 +55212,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_stickers();
       init_hide_stream_previews();
       init_hide_suggested_channels();
+      init_hide_super_reaction_animation();
       init_hide_system_messages();
       init_hide_thread_suggestions();
       init_hide_threads_button();
@@ -56875,6 +56905,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "4b2a4545c224b409d398e1eb88d9d14845ff99c3880ee0c830bf4a7aa2635b6f"
           },
           {
+            name: "HideAppLauncherButtonAnimation",
+            source: hide_app_launcher_button_animation_default,
+            description: "Hide the app launcher button introduction animation",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "dbe46592775b83cb2865f691d4a17e9f502bf4a84d9c249614982db5a883f7b4"
+          },
+          {
             name: "HideAppLauncherIntro",
             source: hide_app_launcher_intro_default,
             description: "Hide the Apps launcher introduction",
@@ -57424,6 +57464,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "f5142301c6aa7f978ba0198c59757ccb800df6190c622413f1df0b90da72e186"
+          },
+          {
+            name: "HideGiftButtonAnimation",
+            source: hide_gift_button_animation_default,
+            description: "Hide the decorative animation on the chat gift button",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "49f34439fc9c2edc0540d0544a956d466a21d71304657cc03efed926e140d910"
           },
           {
             name: "HideGiftButton",
@@ -58323,6 +58373,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "3f1a5c689eb15245e51159b852079aa18b3d56764577b8d55489097b53b47523"
+          },
+          {
+            name: "HideSuperReactionAnimation",
+            source: hide_super_reaction_animation_default,
+            description: "Hide the Super Reaction animation in chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "70b79727ea4c5e1a41e55dd5c6beaf13294e24159911f91af25d44f6e3131ab9"
           },
           {
             name: "HideSystemMessages",
@@ -70602,7 +70662,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fa540b7b702738e6461f3c50f051d4d8def2fd63";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e474255d36044f22e4f13d41d861dbf592fc9854";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
