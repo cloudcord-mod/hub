@@ -71,6 +71,7 @@ jobs:
 
       - name: Check mobile badge and refresh regressions
         run: |
+          NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-official-badge-contrast.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-mobile-report-regressions.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-profile-refresh.cjs
           NODE_PATH=/tmp/cloudcord-theme-tests/node_modules node ios/scripts/test-profile-refresh-budget.cjs
