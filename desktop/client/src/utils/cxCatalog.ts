@@ -171,7 +171,9 @@ import plugin_catalog_hide_bounties_promo_header from "../../../../examples/cx/c
 import plugin_catalog_hide_bounties_scroll_prompt from "../../../../examples/cx/catalog/plugins/hide-bounties-scroll-prompt.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
+import plugin_catalog_hide_channel_list_dividers from "../../../../examples/cx/catalog/plugins/hide-channel-list-dividers.cx";
 import plugin_catalog_hide_channel_list_style_promo from "../../../../examples/cx/catalog/plugins/hide-channel-list-style-promo.cx";
+import plugin_catalog_hide_channel_list_subtitles from "../../../../examples/cx/catalog/plugins/hide-channel-list-subtitles.cx";
 import plugin_catalog_hide_channel_list_tips from "../../../../examples/cx/catalog/plugins/hide-channel-list-tips.cx";
 import plugin_catalog_hide_channel_topic from "../../../../examples/cx/catalog/plugins/hide-channel-topic.cx";
 import plugin_catalog_hide_channel_unread_count from "../../../../examples/cx/catalog/plugins/hide-channel-unread-count.cx";
@@ -249,6 +251,7 @@ import plugin_catalog_hide_powerup_unlock_tip from "../../../../examples/cx/cata
 import plugin_catalog_hide_premium_features_background from "../../../../examples/cx/catalog/plugins/hide-premium-features-background.cx";
 import plugin_catalog_hide_premium_group_promotion from "../../../../examples/cx/catalog/plugins/hide-premium-group-promotion.cx";
 import plugin_catalog_hide_premium_marketing_banner from "../../../../examples/cx/catalog/plugins/hide-premium-marketing-banner.cx";
+import plugin_catalog_hide_premium_offer_divider from "../../../../examples/cx/catalog/plugins/hide-premium-offer-divider.cx";
 import plugin_catalog_hide_premium_upsell_gradient from "../../../../examples/cx/catalog/plugins/hide-premium-upsell-gradient.cx";
 import plugin_catalog_hide_profile_about_me from "../../../../examples/cx/catalog/plugins/hide-profile-about-me.cx";
 import plugin_catalog_hide_profile_activity_badges from "../../../../examples/cx/catalog/plugins/hide-profile-activity-badges.cx";
@@ -818,7 +821,9 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBountiesScrollPrompt", source: plugin_catalog_hide_bounties_scroll_prompt, description: "Hide the scroll prompt in the Bounties modal", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5396fe64555b90748fd34f964c37ace0d3d4ccd8c5e92173c00dd0b11e309d2f" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
+        { name: "HideChannelListDividers", source: plugin_catalog_hide_channel_list_dividers, description: "Hide separator lines in the server channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "7dd68cee61df799a8c7f5f6a959851dd93e96aa22ae6a320c89e26fb04d651d1" },
         { name: "HideChannelListStylePromo", source: plugin_catalog_hide_channel_list_style_promo, description: "Hide the Nitro upsell under channel list appearance previews", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ab7d6aedb6dfce5fca4298fd2e90004c165c2ebb6636b552b5c81ad33d545a63" },
+        { name: "HideChannelListSubtitles", source: plugin_catalog_hide_channel_list_subtitles, description: "Hide secondary text below mobile channel names", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ab516d98f15a999031006d696376d3370f99a90c0eac7781380d855cf65404c1" },
         { name: "HideChannelListTips", source: plugin_catalog_hide_channel_list_tips, description: "Hide feature tips in the server channel list header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9b23014e616ac1c5e2008e72a500b01828d12f51d51c20b6841f6be8aefc3a56" },
         { name: "HideChannelTopic", source: plugin_catalog_hide_channel_topic, description: "Hide channel topics", categories: ["Appearance"], appearanceRevision: "79414d895258b347a6dc13cba58453948a75bb443e8bdc7ddc54f40e94b5a3c4" },
         { name: "HideChannelUnreadCount", source: plugin_catalog_hide_channel_unread_count, description: "Hide numeric unread badges in the mobile channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "32b8f58a4c15fc552cfa1f8f1f8f5585733111888cccbe5ddfebb8d7f369baa6" },
@@ -896,6 +901,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HidePremiumFeaturesBackground", source: plugin_catalog_hide_premium_features_background, description: "Hide the decorative background behind the Premium features list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "78ea8485d5984a83997473d6ff3c257e6a474bd8d7cfec38eec843af9ea89027" },
         { name: "HidePremiumGroupPromotion", source: plugin_catalog_hide_premium_group_promotion, description: "Hide the premium group promotion in the offer dialog", desktopOnly: true, categories: ["Appearance"] },
         { name: "HidePremiumMarketingBanner", source: plugin_catalog_hide_premium_marketing_banner, description: "Hide the banner tile on the premium promotions page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "508126ef428933e2220d3d92219d41a375cf541c65f9fb3b88bc4b234baa907a" },
+        { name: "HidePremiumOfferDivider", source: plugin_catalog_hide_premium_offer_divider, description: "Hide decorative separators in Premium offer sheets", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "4288078d52ea3b18a53870ff0b97de78c772c6d6709dbb1f29f251ea2578edf3" },
         { name: "HidePremiumUpsellGradient", source: plugin_catalog_hide_premium_upsell_gradient, description: "Hide the decorative gradient behind premium upsells", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "8c6f0023b1acc28b86408652ffd22245330f646c66de1a68bee457a7499890a8" },
         { name: "HideProfileAboutMe", source: plugin_catalog_hide_profile_about_me, description: "Hide the About Me card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "36a3ef3cfc0d2a2b5992948b8590a90f78faff8ef37ffaaf96479bc65fbf06d6" },
         { name: "HideProfileActivityBadges", source: plugin_catalog_hide_profile_activity_badges, description: "Hide activity badges on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5eb45da8e6b8f4b64553b82a09ba64b96f22ac4ab0faf9d8ae00b93eda857a40" },

@@ -1,0 +1,3 @@
+plugin "HideChannelListDividers":
+  needs appearance.hide
+  hide hide-channel-list-dividers

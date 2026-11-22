@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-channel-list-dividers": hideMobileComponent("HideChannelListDividers", "separator lines in the server channel list", "modules/channel_list_v2/native/components/Divider.tsx"),
+    "hide-premium-offer-divider": hideMobileComponent("HidePremiumOfferDivider", "decorative separators in Premium offer sheets", "modules/premium/roadblocks/native/views/PremiumUpsellSectionDivider.tsx"),
+    "hide-channel-list-subtitles": hideMobileComponent("HideChannelListSubtitles", "secondary text below mobile channel names", "modules/launchpad/native/shared/ChannelSubtitle.tsx", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelSubtitle.tsx"),
     "hide-launcher-apps-intro": hideMobileComponent("HideLauncherAppsIntro", "the apps introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/AppsBanner.tsx"),
     "hide-launcher-bots-intro": hideMobileComponent("HideLauncherBotsIntro", "the bots introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/BotsBanner.tsx"),
     "hide-launcher-activities-intro": hideMobileComponent("HideLauncherActivitiesIntro", "the activities introduction banner in the launcher", "modules/app_launcher/native/onboarding/banner/ActivitiesBanner.tsx"),
