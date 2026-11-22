@@ -41120,8 +41120,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "message-latency": {
           permission: "messages.senddelay",
-          label: "Show an estimated send-delay indicator on messages",
-          desktopOnly: true
+          label: "Show an estimated send-delay indicator on messages"
         },
         "message-word-count": {
           permission: "messages.wordcount",
@@ -47112,6 +47111,88 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // src/lib/api/cxMessageLatency.ts
+  function stringDelta(delta, showMillis) {
+    var diff = {
+      days: Math.floor(delta / (60 * 60 * 24 * 1e3)),
+      hours: Math.floor(delta / (60 * 60 * 1e3) % 24),
+      minutes: Math.floor(delta / (60 * 1e3) % 60),
+      seconds: Math.floor(delta / 1e3 % 60),
+      milliseconds: Math.floor(delta % 1e3)
+    };
+    var str = (k) => diff[k] > 0 ? `${diff[k]} ${diff[k] > 1 ? k : k.substring(0, k.length - 1)}` : null;
+    var keys = Object.keys(diff);
+    var ts = keys.reduce((prev, k) => {
+      var s = str(k);
+      return prev + (s != null ? (prev !== "" ? (showMillis ? k === "milliseconds" : k === "seconds") ? " and " : " " : "") + s : "");
+    }, "");
+    return ts || "0 seconds";
+  }
+  function snowflakeTime(value) {
+    if (typeof value !== "string" || !/^[1-9]\d{16,19}$/.test(value))
+      return;
+    var number = BigInt(value);
+    if (number <= 0xffffffffffffffffn)
+      return Number(number >> 22n);
+  }
+  function getCxMessageLatency(message, options, account) {
+    var { latency, detectDiscordKotlin, showMillis, ignoreSelf } = options;
+    var { id, nonce, author } = message;
+    if (!author || author.bot || ignoreSelf && account !== void 0 && author.id === account)
+      return null;
+    var sent = snowflakeTime(id), started = snowflakeTime(nonce);
+    if (sent === void 0 || started === void 0)
+      return null;
+    var isDiscordKotlin = false;
+    var delta = sent - started;
+    if (!Number.isFinite(delta))
+      return null;
+    if (!showMillis) {
+      delta = Math.round(delta / 1e3) * 1e3;
+    }
+    if (-delta >= DISCORD_KT_DELAY - 864e5) {
+      isDiscordKotlin = detectDiscordKotlin;
+      delta += DISCORD_KT_DELAY;
+    }
+    var abs = Math.abs(delta);
+    var ahead = abs !== delta;
+    var latencyMillis = latency * 1e3;
+    var displayDelay = abs >= latencyMillis ? stringDelta(abs, showMillis) : null;
+    var TROLL_LIMIT = 2 * 60 * 1e3;
+    var fill = isDiscordKotlin ? [
+      "status-positive",
+      "status-positive",
+      "text-muted"
+    ] : delta >= TROLL_LIMIT || ahead ? [
+      "text-muted",
+      "text-muted",
+      "text-muted"
+    ] : delta >= latencyMillis * 2 ? [
+      "status-danger",
+      "text-muted",
+      "text-muted"
+    ] : [
+      "status-warning",
+      "status-warning",
+      "text-muted"
+    ];
+    return abs >= latencyMillis || isDiscordKotlin ? {
+      delta: displayDelay,
+      ahead,
+      fill,
+      isDiscordKotlin
+    } : null;
+  }
+  var DISCORD_KT_DELAY;
+  var init_cxMessageLatency = __esm({
+    "src/lib/api/cxMessageLatency.ts"() {
+      "use strict";
+      init_asyncIteratorSymbol();
+      init_promiseAllSettled();
+      DISCORD_KT_DELAY = 1471228928;
+    }
+  });
+
   // src/lib/api/cx.ts
   function selectCxAppearanceOption(selected, target, checked) {
     return checked ? [
@@ -48560,6 +48641,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cxVoiceMemberClock();
       init_cxCallClock();
       init_cxNavigation();
+      init_cxMessageLatency();
       MAX_CX_SOURCE = 512 * 1024;
       CX_INLINE_EDITOR_LIMIT = 32 * 1024;
       permissionLabels = {
@@ -55569,7 +55651,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "MessageLatency",
             source: message_latency_default,
             description: "Show an estimated send-delay indicator on messages",
-            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -57843,6 +57924,43 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     restoreRememberedCxAppearance: () => restoreRememberedCxAppearance,
     useCxAddonRows: () => useCxAddonRows
   });
+  function registerMessageLatency(options, enabled) {
+    var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+    return overrideCxMethods(renderer, {
+      default(args, invoke) {
+        var rendered = invoke(args);
+        var input = args[0];
+        if (!rendered || !input?.message || input.isInlineReplyPreview || input.isEditing)
+          return rendered;
+        var delay = getCxMessageLatency(input.message, options, UserStore2.getCurrentUser()?.id);
+        if (!delay)
+          return rendered;
+        var label2 = !delay.delta ? "Possible legacy Android client" : delay.ahead ? "Clock ahead by about " + delay.delta : "Estimated send delay: " + delay.delta;
+        if (Array.isArray(rendered.content) && rendered.content.length) {
+          return {
+            ...rendered,
+            content: [
+              ...rendered.content,
+              {
+                type: "text",
+                content: "\n" + label2
+              }
+            ]
+          };
+        }
+        if (typeof rendered.timestamp === "string" && rendered.timestamp)
+          return {
+            ...rendered,
+            timestamp: rendered.timestamp + " \xB7 " + label2,
+            timestampAccessibilityLabel: [
+              rendered.timestampAccessibilityLabel ?? rendered.timestamp,
+              label2
+            ].join(". ")
+          };
+        return rendered;
+      }
+    }, enabled);
+  }
   function registerReplyTimestamps(enabled) {
     var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
     var store = findByStoreName("ReferencedMessageStore");
@@ -61264,7 +61382,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "reply-timestamp":
             return registerReplyTimestamps(enabled);
           case "message-latency":
-            throw new Error("The send-delay indicator is available on desktop and browser.");
+            if (!effectOptions || !("latency" in effectOptions))
+              throw new Error("Missing send-delay options");
+            return registerMessageLatency(effectOptions, enabled);
           case "animated-assets":
             return animateCxAssets(findByProps("getUserAvatarURL", "getGuildIconURL"), false, enabled);
           case "floor-relative-time":
@@ -61964,6 +62084,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_cx();
       init_cx();
       init_cxCatalog();
+      init_cx();
       init_cx();
       init_cx();
       init_cx();
@@ -66791,7 +66912,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fec55195b1bb507f717b6d8c3ce0b68394da54dc";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "08f2c0cd34345bd302ee015acb17ae9f344e167c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
