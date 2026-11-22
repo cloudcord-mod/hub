@@ -23943,51 +23943,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function isCurrentUser(id) {
     return !!id && !!currentUserId && id === currentUserId;
   }
-  function canOpenNativeBadgeEditor344() {
-    if (import_react_native27.Platform.OS !== "ios")
-      return false;
-    try {
-      return /^344(?:\.|$)/.test(String(NativeClientInfoModule?.getConstants().Version));
-    } catch (e) {
-      return false;
-    }
-  }
-  function openNativeBadgeEditor344(ownerId, notify2 = true) {
-    if (!ownerId || !isCurrentUser(ownerId) || !canOpenNativeBadgeEditor344())
-      return false;
-    try {
-      var sheet = findByFilePath("modules/badges/native/CustomizeBadgesSheet.tsx", true) ?? findByName("CustomizeBadgesSheet");
-      if (!sheet && NativeClientInfoModule.getConstants().Version === "344.1") {
-        var moduleId = 14229;
-        var dependencies = metroModules[moduleId]?.dependencyMap;
-        if (dependencies?.length === 53 && [
-          31,
-          19,
-          17,
-          8022,
-          1519,
-          8518,
-          676,
-          5593
-        ].every((id, index) => dependencies[index] === id)) {
-          sheet = globalThis.__r(moduleId)?.default;
-        }
-      }
-      if (typeof sheet !== "function" && (!sheet || typeof sheet !== "object" || !sheet.$$typeof)) {
-        if (notify2)
-          showToast("Discord's badge editor is unavailable in this session.");
-        return false;
-      }
-      showSheet("Customize Badges", sheet, {
-        analyticsLocations: []
-      });
-      return true;
-    } catch (e) {
-      if (notify2)
-        showToast("Discord's badge editor couldn't open.");
-      return false;
-    }
-  }
   function addPatch(method, parent, handler) {
     if (!parent?.[method])
       return;
@@ -24641,12 +24596,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           if (!rendered?.props)
             return;
           var renderedId = String(rendered.props.id || "");
-          var owner = renderedUserId(rendered.props) || renderedUserId(rendered.props.badge);
-          var originalPress = rendered.props.onPress;
-          var onPress = isCurrentUser(owner) && canOpenNativeBadgeEditor344() ? (...args) => {
-            if (!openNativeBadgeEditor344(owner, false))
-              originalPress?.(...args);
-          } : originalPress;
           var props = /^(?:cloudcord-|fakeprofile-)/.test(renderedId) ? badgeRenderProps.get(rendered.props.id) : void 0;
           var label2 = String(props?.label || rendered.props.accessibilityLabel || rendered.props.label || rendered.props.description || "Badge");
           if (props) {
@@ -24663,16 +24612,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               return /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: label2,
-                onPress: onPress ?? (() => import_react_native27.Alert.alert(label2)),
+                onPress: rendered.props.onPress ?? (() => import_react_native27.Alert.alert(label2)),
                 children: image
               });
             }
             Object.assign(rendered.props, props);
           }
-          if (onPress !== originalPress)
-            return /* @__PURE__ */ (0, import_react7.cloneElement)(rendered, {
-              onPress
-            });
         });
         diagnostics.patches += 1;
       } catch (e) {
@@ -31139,10 +31084,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   title: "Badges",
                   description: "Pick as many as you like.",
                   children: [
-                    canOpenNativeBadgeEditor344() ? /* @__PURE__ */ jsx(K2.Button, {
-                      label: "Customize Discord badges",
-                      onPress: () => openNativeBadgeEditor344(editorOwner.current)
-                    }) : null,
                     /* @__PURE__ */ jsx(ToggleRow, {
                       label: "Hide my real badges",
                       subLabel: "Show only the badges picked here",
@@ -31614,9 +31555,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_cloudcord_decorations();
       init_storage();
       init_patcher();
-      init_modules();
       init_toasts();
-      init_sheets();
       init_jsx();
       init_asyncTimeout();
       init_profileSyncNetwork();
@@ -31630,7 +31569,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_settings();
       init_plugins4();
       init_metro();
-      init_wrappers();
       init_modules2();
       init_common();
       init_components();
@@ -74356,7 +74294,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d8e116c3b1f26e123041a37a42d1a7998ad81aa5";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ace18e3cc8d5f8f8d4b4c75340cbd8f50ba2baf0";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
