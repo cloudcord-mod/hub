@@ -36920,6 +36920,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "disable-chat-gif-autoplay": {
+          plugin: "DisableChatGifAutoplay",
+          label: "automatic GIF playback in native chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messageRenderOption: "gifAutoPlay"
+          }
+        },
+        "disable-chat-emoji-animation": {
+          plugin: "DisableChatEmojiAnimation",
+          label: "animated emoji and reactions in native chat",
+          css: "",
+          mobileOnly: true,
+          mobile: {
+            messageRenderOption: "animateEmoji"
+          }
+        },
         "hide-home-drawer-streaming-subtitle": hideMobileComponent("HideHomeDrawerStreamingSubtitle", "streaming status text in the home drawer", "modules/home_drawer/native/subtitles/StreamingSubtitle.tsx"),
         "hide-home-drawer-typing-subtitle": hideMobileComponent("HideHomeDrawerTypingSubtitle", "typing status text in the home drawer", "modules/home_drawer/native/subtitles/TypingSubtitle.tsx"),
         "hide-home-drawer-voice-subtitle": hideMobileComponent("HideHomeDrawerVoiceSubtitle", "voice activity text in the home drawer", "modules/home_drawer/native/subtitles/VoiceSubtitle.tsx"),
@@ -50686,6 +50704,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/disable-chat-emoji-animation.cx
+  var disable_chat_emoji_animation_default;
+  var init_disable_chat_emoji_animation = __esm({
+    "../examples/cx/catalog/plugins/disable-chat-emoji-animation.cx"() {
+      disable_chat_emoji_animation_default = 'plugin "DisableChatEmojiAnimation":\n  needs appearance.hide\n  hide disable-chat-emoji-animation\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/disable-chat-gif-autoplay.cx
+  var disable_chat_gif_autoplay_default;
+  var init_disable_chat_gif_autoplay = __esm({
+    "../examples/cx/catalog/plugins/disable-chat-gif-autoplay.cx"() {
+      disable_chat_gif_autoplay_default = 'plugin "DisableChatGifAutoplay":\n  needs appearance.hide\n  hide disable-chat-gif-autoplay\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/discord-countdown.cx
   var discord_countdown_default;
   var init_discord_countdown = __esm({
@@ -55435,6 +55469,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_declutter();
       init_decode_base64();
       init_dim_inactive_channels();
+      init_disable_chat_emoji_animation();
+      init_disable_chat_gif_autoplay();
       init_discord_countdown();
       init_discord_link_details();
       init_discord_timestamp();
@@ -56930,6 +56966,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "160f84b67cdbe906ff267e13c45e81408f856278e15e24e2286e5b66e88c0663"
+          },
+          {
+            name: "DisableChatEmojiAnimation",
+            source: disable_chat_emoji_animation_default,
+            description: "Hide animated emoji and reactions in native chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c415c2d639fb38d8bc6c3646f9afa852d91515bf5ea2c220d881d35433caeb79"
+          },
+          {
+            name: "DisableChatGifAutoplay",
+            source: disable_chat_gif_autoplay_default,
+            description: "Hide automatic GIF playback in native chat",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "26be71396727cf7bb54acdf14786f6ac51197dc97f3c8e2f601f572cfb8b9e98"
           },
           {
             name: "Discord Countdown",
@@ -66807,12 +66863,33 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               stopLegacy();
             };
           }
+          if ("messageRenderOption" in mobile) {
+            var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+            return overrideCxMethods(renderer, {
+              default(args, invoke) {
+                var input = args[0];
+                var key = mobile.messageRenderOption;
+                if (input?.options?.[key] !== true)
+                  return invoke(args);
+                return invoke([
+                  {
+                    ...input,
+                    options: {
+                      ...input.options,
+                      [key]: false
+                    }
+                  },
+                  ...args.slice(1)
+                ]);
+              }
+            }, () => !settings.safeMode?.enabled);
+          }
           if (!("messagePresentation" in mobile))
             return registerJsxAppearance(mobile, () => null);
-          var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
-          if (typeof renderer?.default !== "function" && "legacyComponents" in mobile)
+          var renderer1 = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+          if (typeof renderer1?.default !== "function" && "legacyComponents" in mobile)
             return registerJsxAppearance(mobile.legacyComponents, () => null);
-          var stopRenderer = overrideCxMethods(renderer, {
+          var stopRenderer = overrideCxMethods(renderer1, {
             default(args, invoke) {
               var presentation = invoke(args);
               if (!presentation || typeof presentation !== "object")
@@ -71456,7 +71533,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f91c33c266916ce096b6f6d29e78298d66e05ab";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d08e1ac595abe5f0a9031d16e470f909bf1936a8";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
