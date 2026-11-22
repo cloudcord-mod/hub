@@ -1,0 +1,3 @@
+plugin "HideMediaMessagePreview":
+  needs appearance.hide
+  hide hide-media-message-preview

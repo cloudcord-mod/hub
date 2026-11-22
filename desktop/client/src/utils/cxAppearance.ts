@@ -17,6 +17,8 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-media-message-preview": hideMobileComponent("HideMediaMessagePreview", "the source-message preview in the media viewer", "modules/media_viewer/native/components/message_preview/MediaMessagePreview.tsx"),
+    "hide-sticker-pack-banner": hideMobileComponent("HideStickerPackBanner", "the banner in sticker pack details", "modules/stickers/native/StickerPackBanner.tsx"),
     "hide-channel-list-style-promo": hideMobileComponent("HideChannelListStylePromo", "the Nitro upsell under channel list appearance previews", "modules/user_settings/appearance/native/components/SettingsAppearanceChannelListPreviewNitroUpsell.tsx"),
     "hide-settings-gift-badge-progress": hideMobileComponent("HideSettingsGiftBadgeProgress", "gifting badge progress in Premium settings", "modules/user_settings/premium/native/UserSettingsGiftingBadgeProgress.tsx"),
     "hide-dismissible-profile-upsells": hideMobileComponent("HideDismissibleProfileUpsells", "dismissible offers on profiles", "modules/user_profile/native/UserProfileDismissibleUpsells.tsx"),

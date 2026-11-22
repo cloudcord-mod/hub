@@ -203,6 +203,7 @@ import plugin_catalog_hide_join_messages from "../../../../examples/cx/catalog/p
 import plugin_catalog_hide_jump_to_present from "../../../../examples/cx/catalog/plugins/hide-jump-to-present.cx";
 import plugin_catalog_hide_keyboard_tips from "../../../../examples/cx/catalog/plugins/hide-keyboard-tips.cx";
 import plugin_catalog_hide_live_stage_cards from "../../../../examples/cx/catalog/plugins/hide-live-stage-cards.cx";
+import plugin_catalog_hide_media_message_preview from "../../../../examples/cx/catalog/plugins/hide-media-message-preview.cx";
 import plugin_catalog_hide_member_activities from "../../../../examples/cx/catalog/plugins/hide-member-activities.cx";
 import plugin_catalog_hide_member_list_button from "../../../../examples/cx/catalog/plugins/hide-member-list-button.cx";
 import plugin_catalog_hide_mention_badges from "../../../../examples/cx/catalog/plugins/hide-mention-badges.cx";
@@ -278,6 +279,7 @@ import plugin_catalog_hide_spoiler_warnings from "../../../../examples/cx/catalo
 import plugin_catalog_hide_status_emojis from "../../../../examples/cx/catalog/plugins/hide-status-emojis.cx";
 import plugin_catalog_hide_sticker_autocomplete from "../../../../examples/cx/catalog/plugins/hide-sticker-autocomplete.cx";
 import plugin_catalog_hide_sticker_button from "../../../../examples/cx/catalog/plugins/hide-sticker-button.cx";
+import plugin_catalog_hide_sticker_pack_banner from "../../../../examples/cx/catalog/plugins/hide-sticker-pack-banner.cx";
 import plugin_catalog_hide_sticker_picker_promotions from "../../../../examples/cx/catalog/plugins/hide-sticker-picker-promotions.cx";
 import plugin_catalog_hide_sticker_search_suggestions from "../../../../examples/cx/catalog/plugins/hide-sticker-search-suggestions.cx";
 import plugin_catalog_hide_stickers from "../../../../examples/cx/catalog/plugins/hide-stickers.cx";
@@ -801,6 +803,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideJumpToPresent", source: plugin_catalog_hide_jump_to_present, description: "Hide the jump-to-present bar", categories: ["Appearance"], appearanceRevision: "25897139625060ef49ccc528560da8c0ddb33ff1db9b774e757ba40650703a7d" },
         { name: "HideKeyboardTips", source: plugin_catalog_hide_keyboard_tips, description: "Hides the keyboard tips under the chat bar", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideLiveStageCards", source: plugin_catalog_hide_live_stage_cards, description: "Hide live Stage cards in Happening Now", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6da62a057179f0765698517278064713d5c3824890881f7eda94cd60b27636a9" },
+        { name: "HideMediaMessagePreview", source: plugin_catalog_hide_media_message_preview, description: "Hide the source-message preview in the media viewer", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b38b32c928f3ded6619a8bdd5a23bbd7f2022fcafe34bae370ffcb232f503bfa" },
         { name: "HideMemberActivities", source: plugin_catalog_hide_member_activities, description: "Hide game and music activity text in the member list", categories: ["Appearance"], appearanceRevision: "efcbd78248bb6f5d22c117a37c14dbf80295b01a55761aee8866dbba3a7f0dda" },
         { name: "HideMemberListButton", source: plugin_catalog_hide_member_list_button, description: "Hides the member list toggle in the channel header", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideMentionBadges", source: plugin_catalog_hide_mention_badges, description: "Hide mention count badges", categories: ["Appearance"], appearanceRevision: "71ff42f973686ad65b32085da67363ea82e0ddace83c2b3f3091f855bce2eaef" },
@@ -876,6 +879,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideStatusEmojis", source: plugin_catalog_hide_status_emojis, description: "Hide emojis in custom status bubbles", categories: ["Appearance"], appearanceRevision: "863bbb51f3b1d5c1c32cd6c8bbf52e32b16f9a6bd64f94a36d06f32eea77fea3" },
         { name: "HideStickerAutocomplete", source: plugin_catalog_hide_sticker_autocomplete, description: "Hide sticker suggestions while typing in chat", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideStickerButton", source: plugin_catalog_hide_sticker_button, description: "Hide the sticker picker shortcut", categories: ["Appearance"], appearanceRevision: "7aa0a5bdf382195bf48b3579640eb8a1ab819a0b8e480fe8b34f6a571e2542db" },
+        { name: "HideStickerPackBanner", source: plugin_catalog_hide_sticker_pack_banner, description: "Hide the banner in sticker pack details", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "1868a3d8725ce179b775d047a2155669ce77279fe66bd70272a4c2d7085958a3" },
         { name: "HideStickerPickerPromotions", source: plugin_catalog_hide_sticker_picker_promotions, description: "Hide shop and promotional cards in the sticker picker", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideStickerSearchSuggestions", source: plugin_catalog_hide_sticker_search_suggestions, description: "Hide suggested searches in the sticker picker", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideStickers", source: plugin_catalog_hide_stickers, description: "Hide stickers in chat", categories: ["Appearance"], appearanceRevision: "26af7d108cb384ee165e988d7d79c0f6c341bcf0682b782d8f811e6c4ce4362f" },
