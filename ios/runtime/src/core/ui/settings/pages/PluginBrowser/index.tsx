@@ -1,504 +1,192 @@
-import { React, NavigationNative } from "@metro/common";
-import { View } from "react-native";
-import { Stack, Button, IconButton, Text, Card, FlashList } from "@metro/common/components";
-import { findAssetId } from "@lib/api/assets";
-import safeFetch from "@lib/utils/safeFetch";
-import { showToast } from "@ui/toasts";
-import Search from "@ui/components/Search";
 import { VdPluginManager } from "@core/vendetta/plugins";
-import { installTheme, themes, removeTheme } from "@lib/addons/themes";
-import { clipboard } from "@metro/common";
-import { hideSheet, showSheet } from "@lib/ui/sheets";
-import { AlertActionButton } from "@lib/ui/components/wrappers";
+import { useProxy } from "@core/vendetta/storage";
+import { findAssetId } from "@lib/api/assets";
 import { dismissAlert, openAlert } from "@lib/ui/alerts";
-import { ActionSheet, AlertModal, AlertActions, TableRow, TableRowGroup } from "@metro/common/components";
-import { lazyDestructure } from "@lib/utils/lazy";
-import { findByProps } from "@metro";
+import { AlertActionButton } from "@lib/ui/components/wrappers";
+import { showToast } from "@lib/ui/toasts";
+import safeFetch from "@lib/utils/safeFetch";
+import { clipboard, React } from "@metro/common";
+import { AlertActions, AlertModal, Button, Card, FlashList, Stack, Text } from "@metro/common/components";
+import Search from "@ui/components/Search";
+import { View } from "react-native";
 
-const { showSimpleActionSheet } = lazyDestructure(() => findByProps("showSimpleActionSheet"));
-const { hideActionSheet } = lazyDestructure(() => findByProps("hideActionSheet"));
+const pluginIndex = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
 
-interface BaseAddonData {
+interface PluginData {
     name: string;
     description: string;
     authors: string[];
     installUrl: string;
-}
-
-interface PluginData extends BaseAddonData {
-    status: "working" | "broken" | "warning" | string;
-    sourceUrl: string;
+    sourceUrl?: string;
+    status?: string;
     warningMessage?: string;
 }
 
-interface ThemeData extends BaseAddonData {}
-
-type AddonData = PluginData | ThemeData;
-
-const PLUGIN_URL = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
-const THEME_URL = "https://raw.githubusercontent.com/kmmiio99o/theme-marketplace/refs/heads/main/themes.json";
-
-function normalizeIdFromInstallUrl(url: string) {
-    return url.endsWith("/") ? url : url + "/";
+function pluginDirectory(value: unknown) {
+    if (typeof value !== "string" || value.length > 2048 || /[\s\\]/.test(value) || !/^https:\/\//i.test(value)) return;
+    try {
+        const url = new URL(value);
+        if (url.username || url.password || url.search || url.hash) return;
+        url.pathname = url.pathname.replace(/\/+$/, "") + "/";
+        return url.href;
+    } catch { /* Invalid catalog entry. */ }
 }
 
-// @ts-ignore (i cant be bothered to type these)
-function InstallButton({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
-    const normId = normalizeIdFromInstallUrl(addon.installUrl);
-    const [installed, setInstalled] = React.useState(() =>
-        isPluginMode ? Boolean(VdPluginManager.plugins[normId]) : Boolean(themes[addon.installUrl])
-    );
+function parsePluginIndex(value: unknown): PluginData[] {
+    const rows = Array.isArray(value) ? value
+        : (value as { OFFICIAL_PLUGINS?: unknown; } | null)?.OFFICIAL_PLUGINS;
+    if (!Array.isArray(rows)) throw new Error("The plugin catalog returned an invalid list.");
 
-    React.useEffect(() => {
-        setInstalled(isPluginMode ? Boolean(VdPluginManager.plugins[normId]) : Boolean(themes[addon.installUrl]));
-    }, [addon.installUrl, setRefreshTick, isPluginMode]);
-
-    const installAddon = async () => {
-        if (installing.has(normId)) return;
-        setInstalling((prev: Iterable<unknown> | null | undefined) => new Set(prev).add(normId));
-        try {
-            if (isPluginMode) {
-                await VdPluginManager.installPlugin(normId, true);
-            } else {
-                await installTheme(addon.installUrl);
-            }
-            showToast(`Installed ${addon.name}`, findAssetId("CheckIcon"));
-            setInstalled(true);
-        } catch (e) {
-            showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-        } finally {
-            setInstalling((prev: Iterable<unknown> | null | undefined) => { const s = new Set(prev); s.delete(normId); return s; });
-            setRefreshTick((t: number) => t + 1);
-        }
-    };
-
-    const uninstallAddon = async () => {
-        try {
-            if (isPluginMode) {
-                await VdPluginManager.removePlugin(normId);
-            } else {
-                await removeTheme(addon.installUrl);
-            }
-            showToast(`Uninstalled ${addon.name}`, findAssetId("TrashIcon"));
-            setInstalled(false);
-        } catch (e) {
-            showToast(e instanceof Error ? e.message : String(e), findAssetId("CircleXIcon-primary"));
-        } finally {
-            setRefreshTick((t: number) => t + 1);
-        }
-    };
-
-    const promptInstall = () => {
-        if (!isPluginMode) return installAddon();
-
-        const plugin = addon as PluginData;
-        const needsWarn = (plugin.status && plugin.status !== "working") || (plugin.warningMessage && plugin.warningMessage.trim().length > 0);
-        if (!needsWarn) return installAddon();
-
-        const lines: string[] = [];
-        if (plugin.status && plugin.status !== "working") {
-            if (plugin.status === "broken") lines.push("This plugin is marked as broken, please be aware you may encounter issues");
-            else if (plugin.status === "warning") lines.push("This plugin may have issues");
-            else lines.push(`Status: ${plugin.status}`);
-        }
-        if (plugin.warningMessage) lines.push(plugin.warningMessage);
-
-        openAlert("plugins-list-install-warning", (
-            <AlertModal
-                title="Warning!"
-                content="This plugin may not work as expected."
-                extraContent={<Text variant="text-sm/normal" color="text-muted">{lines.join("\n\n")}</Text>}
-                actions={<AlertActions>
-                    <AlertActionButton
-                        text="Install Anyway"
-                        variant="primary"
-                        onPress={() => { dismissAlert("plugins-list-install-warning"); installAddon(); }}
-                    />
-                    <AlertActionButton
-                        text="Cancel"
-                        variant="secondary"
-                        onPress={() => dismissAlert("plugins-list-install-warning")}
-                    />
-                </AlertActions>}
-            />
-        ));
-    };
-
-    return (
-        <Button
-            size="sm"
-            loading={installing.has(normId)}
-            text={!installed ? (installing.has(normId) ? "Installing..." : "Install") : "Uninstall"}
-            disabled={installing.has(normId)}
-            onPress={!installed ? promptInstall : uninstallAddon}
-            variant={!installed ? "primary" : "destructive"}
-            icon={findAssetId(!installed ? "DownloadIcon" : "TrashIcon")}
-        />
-    );
-}
-
-// @ts-ignore (i cant be bothered to type these)
-function TrailingButtons({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
-    const copyAddonLink = () => {
-        clipboard.setString(addon.installUrl);
-        // @ts-ignore
-        showToast.showCopyToClipboard?.();
-    };
-
-    const copySourceUrl = () => {
-        const plugin = addon as PluginData;
-        clipboard.setString(plugin.sourceUrl);
-        // @ts-ignore
-        showToast.showCopyToClipboard?.();
-    };
-
-    const openAddonMenu = () => {
-        const actions = [
-            {
-                label: `Copy ${isPluginMode ? 'Plugin' : 'Theme'} Link`,
-                icon: findAssetId("CopyIcon"),
-                onPress: copyAddonLink
-            }
-        ];
-
-        if (isPluginMode && (addon as PluginData).sourceUrl) {
-            actions.push({
-                label: "Copy Source URL",
-                icon: findAssetId("CopyIcon"),
-                onPress: copySourceUrl
-            });
-        }
-
-        const sheetKey = `${isPluginMode ? 'plugin' : 'theme'}-menu`;
-        showSheet(sheetKey, () => (
-            <ActionSheet>
-                <TableRowGroup title={`${isPluginMode ? 'Plugin' : 'Theme'} Info`}>
-                    {actions.map((action, index) => (
-                        <TableRow
-                            key={index}
-                            label={action.label}
-                            icon={<TableRow.Icon source={action.icon} />}
-                            onPress={() => {
-                                action.onPress();
-                                hideSheet(sheetKey);
-                            }}
-                        />
-                    ))}
-                </TableRowGroup>
-            </ActionSheet>
-        ));
-    };
-
-    return (
-        <Stack spacing={8} direction="horizontal">
-            <IconButton
-                size="sm"
-                onPress={openAddonMenu}
-                variant="secondary"
-                icon={findAssetId("MoreHorizontalIcon")}
-            />
-            <InstallButton
-                addon={addon}
-                isPluginMode={isPluginMode}
-                installing={installing}
-                setInstalling={setInstalling}
-                setRefreshTick={setRefreshTick}
-            />
-        </Stack>
-    );
-}
-
-// @ts-ignore (i cant be bothered to type these)
-function AddonCard({ addon, isPluginMode, installing, setInstalling, setRefreshTick }) {
-    const { name, description, authors } = addon;
-    const plugin = addon as PluginData;
-
-    let statusColor = "text-normal";
-    if (isPluginMode) {
-        if (plugin.status === "working") statusColor = "#4ADE80";
-        if (plugin.status === "broken") statusColor = "#EF4444";
-        if (plugin.status === "warning") statusColor = "#F59E0B";
+    const results = new Map<string, PluginData>();
+    for (const row of rows) {
+        const installUrl = pluginDirectory(row?.installUrl);
+        if (!installUrl || results.has(installUrl) || typeof row?.name !== "string" || !row.name.trim()) continue;
+        results.set(installUrl, {
+            name: row.name.trim(),
+            description: typeof row.description === "string" ? row.description : "",
+            authors: Array.isArray(row.authors) ? row.authors.filter((author: unknown) => typeof author === "string") : [],
+            installUrl,
+            sourceUrl: typeof row.sourceUrl === "string" && /^https:\/\/[^ \t\r\n]+$/i.test(row.sourceUrl) ? row.sourceUrl : undefined,
+            status: typeof row.status === "string" ? row.status.trim().toLowerCase() : undefined,
+            warningMessage: typeof row.warningMessage === "string" ? row.warningMessage.trim() : undefined,
+        });
     }
-
-    return (
-        <Card>
-            <Stack spacing={16}>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                    <View style={{ flexShrink: 1 }}>
-                        <Text numberOfLines={1} variant="heading-lg/semibold">
-                            {name}
-                        </Text>
-                        <Text variant="text-md/semibold" color="text-muted">
-                            by {authors?.join(", ") || "Unknown"}
-                        </Text>
-                        {isPluginMode && (
-                            <Text variant="text-md/semibold" style={{ color: statusColor }}>
-                                Status: {plugin.status}
-                            </Text>
-                        )}
-                    </View>
-                    <View>
-                        <TrailingButtons
-                            addon={addon}
-                            isPluginMode={isPluginMode}
-                            installing={installing}
-                            setInstalling={setInstalling}
-                            setRefreshTick={setRefreshTick}
-                        />
-                    </View>
-                </View>
-                <Text variant="text-md/medium">
-                    {description}
-                </Text>
-                {isPluginMode && plugin.warningMessage && (
-                    <Text variant="text-sm/medium" color="text-muted">
-                        Warning: {plugin.warningMessage}
-                    </Text>
-                )}
-            </Stack>
-        </Card>
-    );
+    return [...results.values()];
 }
 
-enum Sort {
-    DateNewest = "Newest",
-    DateOldest = "Oldest",
-    NameAZ = "Name (A–Z)",
-    NameZA = "Name (Z–A)",
-    WorkingFirst = "Working First",
-    BrokenFirst = "Broken First",
+function PluginCard({ addon, installed, busy, change }: {
+    addon: PluginData;
+    installed: boolean;
+    busy: boolean;
+    change(addon: PluginData, remove: boolean): Promise<void>;
+}) {
+    const confirm = () => {
+        if (installed || (addon.status === "working" && !addon.warningMessage)) {
+            void change(addon, installed);
+            return;
+        }
+        const key = "plugin-catalog-install";
+        openAlert(key, <AlertModal title={"Install " + addon.name + "?"}
+            content={addon.warningMessage || "The catalog reports this plugin as untested or potentially incompatible."}
+            actions={<AlertActions>
+                <AlertActionButton text="Install" variant="primary" onPress={() => {
+                    dismissAlert(key);
+                    void change(addon, false);
+                }} />
+                <AlertActionButton text="Cancel" variant="secondary" onPress={() => dismissAlert(key)} />
+            </AlertActions>} />);
+    };
+    const copy = async (url: string) => {
+        try {
+            await clipboard.setString(url);
+            showToast("Link copied", findAssetId("CheckIcon"));
+        } catch {
+            showToast("Couldn't copy the link", findAssetId("CircleXIcon-primary"));
+        }
+    };
+    const status = addon.status === "working" ? "Reported working" : addon.status === "warning" ? "May have issues"
+        : addon.status === "broken" ? "Reported broken" : "Status unknown";
+    return <Card>
+        <Stack spacing={8}>
+            <Text variant="heading-md/semibold">{addon.name}</Text>
+            <Text variant="text-sm/medium" color="text-muted">
+                {[addon.authors.join(", "), status, installed ? "Installed" : ""].filter(Boolean).join(" · ")}
+            </Text>
+            {!!addon.description && <Text variant="text-md/medium">{addon.description}</Text>}
+            {!!addon.warningMessage && <Text variant="text-sm/medium" color="text-muted">{addon.warningMessage}</Text>}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                <Button size="sm" text={installed ? "Uninstall" : "Install"} variant={installed ? "destructive" : "primary"}
+                    loading={busy} disabled={busy} onPress={confirm} />
+                <Button size="sm" text="Copy plugin link" variant="secondary" onPress={() => void copy(addon.installUrl)} />
+                {!!addon.sourceUrl && <Button size="sm" text="Copy source link" variant="secondary" onPress={() => void copy(addon.sourceUrl!)} />}
+            </View>
+        </Stack>
+    </Card>;
 }
 
 export default function BrowserPage() {
-    const navigation = NavigationNative.useNavigation();
-
-    const [mode, setMode] = React.useState<"plugins" | "themes">("plugins");
+    const library = useProxy(VdPluginManager.plugins);
     const [plugins, setPlugins] = React.useState<PluginData[]>([]);
-    const [themesList, setThemesList] = React.useState<ThemeData[]>([]);
     const [loading, setLoading] = React.useState(true);
-    const [error, setError] = React.useState<string | null>(null);
-    const [searchQuery, setSearchQuery] = React.useState("");
-    const [installing, setInstalling] = React.useState<Set<string>>(new Set());
-    const [refreshTick, setRefreshTick] = React.useState(0);
-    const [sort, setSort] = React.useState<Sort>(Sort.DateNewest);
+    const [error, setError] = React.useState("");
+    const [search, setSearch] = React.useState("");
+    const [workingOnly, setWorkingOnly] = React.useState(true);
+    const [installedOnly, setInstalledOnly] = React.useState(false);
+    const [alphabetical, setAlphabetical] = React.useState(false);
+    const [busyIds, setBusyIds] = React.useState<Set<string>>(() => new Set());
+    const actions = React.useRef(new Set<string>());
+    const refreshing = React.useRef(false);
 
-    React.useEffect(() => {
-        navigation.setOptions({
-            title: "Browser"
-        });
-    }, [navigation]);
-
-    const fetchData = React.useCallback(async (isPluginMode: boolean) => {
+    const refresh = async () => {
+        if (refreshing.current) return;
+        refreshing.current = true;
         setLoading(true);
-        setError(null);
-        try {
-            const url = isPluginMode ? PLUGIN_URL : THEME_URL;
-            const response = await safeFetch(url);
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            const data = await response.json();
-
-            let addonList: AddonData[] = [];
-            if (Array.isArray(data)) {
-                addonList = data;
-            } else if (isPluginMode && data.OFFICIAL_PLUGINS) {
-                addonList = data.OFFICIAL_PLUGINS;
-            } else if (!isPluginMode) {
-                // Handle any other structure for themes - try common property names
-                addonList = data.OFFICIAL_THEMES || data.themes || data.THEMES || data.items || [];
-            }
-
-            if (isPluginMode) {
-                setPlugins(addonList as PluginData[]);
-            } else {
-                setThemesList(addonList as ThemeData[]);
-            }
-        } catch (e) {
-            setError(e instanceof Error ? e.message : String(e));
-            if (isPluginMode) {
-                setPlugins([]);
-            } else {
-                setThemesList([]);
-            }
-        } finally {
+        setError("");
+        try { setPlugins(parsePluginIndex(await (await safeFetch(pluginIndex)).json())); }
+        catch (failure) { setError(failure instanceof Error ? failure.message : String(failure)); }
+        finally {
+            refreshing.current = false;
             setLoading(false);
         }
-    }, []);
-
-    const fetchPlugins = React.useCallback(() => fetchData(true), [fetchData]);
-    const fetchThemes = React.useCallback(() => fetchData(false), [fetchData]);
-
-    React.useEffect(() => {
-        fetchPlugins();
-        fetchThemes();
-    }, [fetchPlugins, fetchThemes]);
-
-    const filterList = (list: AddonData[]) => {
-        if (!list) return [] as AddonData[];
-        const q = searchQuery.toLowerCase();
-        if (!q) return list;
-        return list.filter(p =>
-            p.name.toLowerCase().includes(q)
-            || p.description.toLowerCase().includes(q)
-            || (p.authors || []).some(a => a.toLowerCase().includes(q))
-        );
     };
+    React.useEffect(() => { void refresh(); }, []);
 
-    const sortedAndFiltered = React.useMemo(() => {
-        const list = filterList(mode === "plugins" ? plugins : themesList);
-
-        const getStatusPriority = (status: PluginData["status"], sortBy: Sort): number => {
-            if (sortBy === Sort.WorkingFirst) {
-                return status === "working" || status === "warning" ? 0 : 1;
-            }
-            if (sortBy === Sort.BrokenFirst) {
-                return status === "broken" ? 0 : 1;
-            }
-            return 0;
-        };
-
-        switch (sort) {
-            case Sort.DateNewest:
-                return [...list].reverse();
-            case Sort.DateOldest:
-                return [...list];
-            case Sort.NameAZ:
-                return [...list].sort((a, b) => a.name.localeCompare(b.name));
-            case Sort.NameZA:
-                return [...list].sort((a, b) => b.name.localeCompare(a.name));
-            case Sort.WorkingFirst:
-                if (mode === "plugins") {
-                    return [...list].sort((a, b) => {
-                        const pa = getStatusPriority((a as PluginData).status, Sort.WorkingFirst);
-                        const pb = getStatusPriority((b as PluginData).status, Sort.WorkingFirst);
-                        return pa !== pb ? pa - pb : a.name.localeCompare(b.name);
-                    });
-                }
-                return list;
-            case Sort.BrokenFirst:
-                if (mode === "plugins") {
-                    return [...list].sort((a, b) => {
-                        const pa = getStatusPriority((a as PluginData).status, Sort.BrokenFirst);
-                        const pb = getStatusPriority((b as PluginData).status, Sort.BrokenFirst);
-                        return pa !== pb ? pa - pb : a.name.localeCompare(b.name);
-                    });
-                }
-                return list;
-            default:
-                return list;
+    async function change(addon: PluginData, remove: boolean) {
+        const id = addon.installUrl;
+        if (actions.current.has(id)) return;
+        actions.current.add(id);
+        setBusyIds(new Set(actions.current));
+        try {
+            if (remove) await VdPluginManager.removePlugin(id);
+            else await VdPluginManager.installPlugin(id);
+            showToast((remove ? "Uninstalled " : "Installed ") + addon.name, findAssetId("CheckIcon"));
+        } catch (failure) {
+            showToast(failure instanceof Error ? failure.message : String(failure), findAssetId("CircleXIcon-primary"));
+        } finally {
+            actions.current.delete(id);
+            setBusyIds(new Set(actions.current));
         }
-    }, [plugins, themesList, mode, searchQuery, sort]);
-
-    if (error) {
-        return (
-            <View style={{ flex: 1, paddingHorizontal: 8, justifyContent: "center", alignItems: "center" }}>
-                <Card style={{ gap: 8 }}>
-                    <Text style={{ textAlign: "center" }} variant="heading-lg/bold">
-                        An error occurred while fetching the repository
-                    </Text>
-                    <Text style={{ textAlign: "center" }} variant="text-sm/medium" color="text-muted">
-                        {error}
-                    </Text>
-                    <Button
-                        size="lg"
-                        text="Refetch"
-                        onPress={() => fetchData(mode === "plugins")}
-                        icon={findAssetId("RetryIcon")}
-                    />
-                </Card>
-            </View>
-        );
     }
 
-    return (
-        <View style={{ flex: 1 }}>
-            <View style={{ paddingHorizontal: 10 }}>
-                <Stack spacing={12}>
-                    <View style={{ flexDirection: "row", paddingTop: 10 }}>
-                        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-                            <Button
-                                size="md"
-                                text="Plugins"
-                                variant={mode === "plugins" ? "primary" : "secondary"}
-                                onPress={() => setMode("plugins")}
-                                style={{ flex: 1 }}
-                            />
-                            <View style={{ width: 8 }} />
-                            <Button
-                                size="md"
-                                text="Themes"
-                                variant={mode === "themes" ? "primary" : "secondary"}
-                                onPress={() => setMode("themes")}
-                                style={{ flex: 1 }}
-                            />
-                        </View>
-                    </View>
+    const query = search.trim().toLowerCase();
+    const shown = plugins.filter(addon =>
+        (!workingOnly || addon.status === "working" || Boolean(library[addon.installUrl]))
+        && (!installedOnly || Boolean(library[addon.installUrl]))
+        && (!query || [addon.name, addon.description, ...addon.authors].some(value => value.toLowerCase().includes(query))));
+    if (alphabetical) shown.sort((a, b) => a.name.localeCompare(b.name));
+    else shown.reverse();
 
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingBottom: 6 }}>
-                        <Search
-                            placeholder={`Search ${mode}...`}
-                            isRound={true}
-                            onChangeText={setSearchQuery}
-                            style={{ flex: 1 }}
-                        />
-                        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                        <IconButton
-                            size="md"
-                            variant="tertiary"
-                            icon={findAssetId("MoreVerticalIcon")}
-                            disabled={!!searchQuery}
-                            onPress={() => showSimpleActionSheet({
-                                key: "AddonListSortOptions",
-                                header: {
-                                    title: "Sort Options",
-                                    onClose: () => hideActionSheet("AddonListSortOptions"),
-                                },
-                                options: Object.entries(Sort).map(([key, value]) => ({
-                                    label: value,
-                                    onPress: () => {
-                                        setSort(value as Sort);
-                                    }
-                                }))
-                            })}
-                        />
-                    </View>
-
-                    </View>
-                </Stack>
+    return <View style={{ flex: 1 }}>
+        <View style={{ paddingHorizontal: 12, paddingVertical: 8, gap: 8 }}>
+            <Search placeholder="Search plugins or authors" isRound onChangeText={setSearch} />
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
+                <Button size="sm" text="Working only" variant={workingOnly ? "primary" : "secondary"} onPress={() => setWorkingOnly(value => !value)} />
+                <Button size="sm" text="Installed only" variant={installedOnly ? "primary" : "secondary"} onPress={() => setInstalledOnly(value => !value)} />
+                <Button size="sm" text="Sort A–Z" variant={alphabetical ? "primary" : "secondary"} onPress={() => setAlphabetical(value => !value)} />
             </View>
-
-            <FlashList
-                data={sortedAndFiltered}
-                refreshing={loading}
-                onRefresh={mode === "plugins" ? fetchPlugins : fetchThemes}
-                estimatedItemSize={200}
-                contentContainerStyle={{ paddingBottom: 90, paddingHorizontal: 5 }}
-                ListHeaderComponent={mode === "plugins" ? (
-                    <View style={{ paddingVertical: 6, paddingHorizontal: 8 }}>
-                        <Card border="strong">
-                            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", flexDirection: "row" }}>
-                                <View style={{ gap: 6, flexShrink: 1 }}>
-                                    <Text variant="heading-md/bold">Unproxied Plugins</Text>
-                                    <Text variant="text-sm/medium" color="text-muted">
-                                        Plugins installed from this source have not been checked for safety, install at your own risk
-                                    </Text>
-                                </View>
-                            </View>
-                        </Card>
-                    </View>
-                ) : null}
-                //@ts-ignore
-                renderItem={({ item: addon }) => (
-                    <View style={{ paddingVertical: 6, paddingHorizontal: 8 }}>
-                        <AddonCard
-                            addon={addon}
-                            isPluginMode={mode === "plugins"}
-                            installing={installing}
-                            setInstalling={setInstalling}
-                            setRefreshTick={setRefreshTick}
-                        />
-                    </View>
-                )}
-            />
+            {!loading && <Text variant="text-sm/medium" color="text-muted">
+                {shown.length} of {plugins.length} · Status reported by the catalog
+            </Text>}
+            <Text variant="text-sm/medium" color="text-muted">Third-party plugins run code in your client. Install plugins from authors you trust.</Text>
+            {!!error && <View style={{ gap: 6 }}>
+                <Text variant="text-sm/medium" color="text-muted">{error}</Text>
+                <Button size="sm" text="Try again" variant="secondary" onPress={() => void refresh()} />
+            </View>}
         </View>
-    );
+        <FlashList
+            data={shown}
+            extraData={busyIds}
+            refreshing={loading}
+            onRefresh={() => void refresh()}
+            estimatedItemSize={168}
+            keyExtractor={(addon: PluginData) => addon.installUrl}
+            contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 48 }}
+            ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+            ListEmptyComponent={!error && <Text variant="text-md/medium" color="text-muted" style={{ padding: 24, textAlign: "center" }}>
+                {loading ? "Loading plugins…" : "No plugins match these filters."}
+            </Text>}
+            renderItem={({ item }: { item: PluginData; }) =>
+                <PluginCard addon={item} installed={Boolean(library[item.installUrl])} busy={busyIds.has(item.installUrl)} change={change} />}
+        />
+    </View>;
 }

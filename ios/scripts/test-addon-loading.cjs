@@ -163,5 +163,75 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
     await row.change(row.theme, "reset");
     assert.equal(active, null);
     assert.equal(themeList().data.length, 1, "restoring Discord's default must preserve the installed theme");
-    console.log('PASS add-on failed-import recovery, duplicate-tap isolation, valid routing and lazy marketplace native lookup');
+    const browserFile = 'ios/runtime/src/core/ui/settings/pages/PluginBrowser/index.tsx';
+    vm.runInNewContext(compile(browserFile) + "\nmodule.exports.parsePluginIndex = parsePluginIndex;", { ...browser, URL });
+    const normalizeIndex = browser.module.exports.parsePluginIndex;
+    const sample = normalizeIndex({ OFFICIAL_PLUGINS: [
+        { name: "One", installUrl: "https://example.org/one", status: " Working ", authors: ["Author", false] },
+        { name: "Duplicate", installUrl: "https://example.org/one/" },
+        { name: "Invalid", installUrl: "https://example.org/two?other=1" },
+        null,
+    ] });
+    assert.equal(sample.length, 1, "duplicate catalog URLs must give one install card");
+    assert.equal(sample[0].installUrl, "https://example.org/one/");
+    assert.equal(sample[0].status, "working");
+    assert.deepEqual(Array.from(sample[0].authors), ["Author"]);
+    assert.throws(() => normalizeIndex({ error: true }), /invalid list/);
+
+    const updates = [];
+    let manifest = { name: "Plugin", hash: "old", main: "./index.js", authors: [] };
+    let download;
+    const pluginContext = { module: { exports: {} }, require(name) {
+        if (name === "@core/vendetta/storage") return {
+            awaitStorage: async () => {}, createMMKVBackend() {}, createStorage: () => ({}),
+            purgeStorage: async () => {}, wrapSync: value => value,
+        };
+        if (name === "@lib/api/settings") return { settings: {} };
+        if (name === "@lib/utils/logger") return { logger: { error: (...args) => updates.push(args) } };
+        if (name === "@lib/utils/constants") return { VD_PROXY_PREFIX: "legacy:", BUNNY_PROXY_PREFIX: "modern:" };
+        return {};
+    } };
+    vm.runInNewContext(compile('ios/runtime/src/core/vendetta/plugins.ts'), pluginContext);
+    const manager = pluginContext.module.exports.VdPluginManager;
+    const source = "https://example.org/plugin/";
+    const requests = [];
+    manager.pluginFetch = async url => {
+        requests.push(url);
+        return url.endsWith("manifest.json") ? { json: async () => manifest } : { text: download };
+    };
+    download = async () => "({ old: true })";
+    await Promise.all([manager.installPlugin(source.slice(0, -1), false), manager.installPlugin(source, false)]);
+    assert.deepEqual(requests, [source + "manifest.json", source + "index.js"]);
+    const original = manager.plugins[source];
+
+    manifest = { ...manifest, hash: "new", main: "dist/index.js" };
+    download = async () => { throw Error("offline"); };
+    await assert.rejects(manager.fetchPlugin(source), /Failed to fetch JS/);
+    assert.equal(manager.plugins[source], original, "a failed update must preserve the previous hash and source");
+    download = async () => "({ new: true })";
+    await manager.fetchPlugin(source);
+    assert.equal(manager.plugins[source].manifest.hash, "new");
+    assert.equal(manager.plugins[source].js, "({ new: true })");
+
+    manifest = { ...manifest, main: "../index.js" };
+    await assert.rejects(manager.fetchPlugin(source), /Invalid plugin manifest/);
+    assert.equal(manager.plugins[source].manifest.main, "dist/index.js");
+
+    let finishDownload;
+    manifest = { ...manifest, main: "index.js", hash: "latest" };
+    download = () => new Promise(resolve => { finishDownload = resolve; });
+    const inflight = manager.fetchPlugin(source);
+    await new Promise(resolve => setImmediate(resolve));
+    await manager.removePlugin(source);
+    finishDownload("({ latest: true })");
+    await assert.rejects(inflight, /changed during download/);
+    assert.equal(manager.plugins[source], undefined, "an update must not restore a removed plugin");
+
+    manager.plugins[source] = { ...original, enabled: false, update: true };
+    download = async () => { throw Error("offline"); };
+    await manager.initPlugins();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(updates.length, 1);
+    assert.equal(manager.plugins[source].manifest.hash, "old");
+    console.log('PASS add-on routing, catalog normalization, duplicate installs and failed update recovery');
 })().catch(error => { console.error(error); process.exitCode = 1; });

@@ -35,6 +35,16 @@ export interface VendettaPlugin {
 
 const plugins = wrapSync(createStorage<Record<string, VendettaPlugin>>(createMMKVBackend("VENDETTA_PLUGINS")));
 const pluginInstance: Record<string, EvaledPlugin> = {};
+const pendingFetches = new Map<string, Promise<void>>();
+const pendingInstalls = new Map<string, Promise<void>>();
+
+function pluginMain(manifest: PluginManifest) {
+    const value = manifest.main || "index.js";
+    if (typeof value !== "string" || value.length > 256) return;
+    const main = value.replace(/^\.\//, "");
+    if (!/^(?:[\w.-]+\/)*[\w.-]+$/.test(main) || main.split("/").some(part => part === ".." || part === ".")) return;
+    return main;
+}
 
 export const VdPluginManager = {
     plugins,
@@ -48,43 +58,66 @@ export const VdPluginManager = {
         return await safeFetch(url, { cache: "no-store" });
     },
 
-    async fetchPlugin(id: string) {
+    fetchPlugin(id: string) {
         if (!id.endsWith("/")) id += "/";
-        const existingPlugin = plugins[id];
+        const pending = pendingFetches.get(id);
+        if (pending) return pending;
 
-        let pluginManifest: PluginManifest;
-
-        try {
-            pluginManifest = await (await this.pluginFetch(id + "manifest.json")).json();
-        } catch {
-            throw new Error(`Failed to fetch manifest for ${id}`);
-        }
-
-        let pluginJs: string | undefined;
-
-        if (existingPlugin?.manifest.hash !== pluginManifest.hash) {
+        const fetch = async () => {
+            const existingPlugin = plugins[id];
+            let manifest: PluginManifest;
             try {
-                // by polymanifest spec, plugins should always specify their main file, but just in case
-                pluginJs = await (await this.pluginFetch(id + (pluginManifest.main || "index.js"))).text();
-            } catch { } // Empty catch, checked below
-        }
+                manifest = await (await this.pluginFetch(id + "manifest.json")).json();
+            } catch {
+                throw new Error(`Failed to fetch manifest for ${id}`);
+            }
+            const main = manifest && pluginMain(manifest);
+            if (!main || typeof manifest.name !== "string" || !manifest.name.trim()
+                || typeof manifest.hash !== "string" || !manifest.hash.trim()) {
+                throw new Error(`Invalid plugin manifest for ${id}`);
+            }
 
-        if (!pluginJs && !existingPlugin) throw new Error(`Failed to fetch JS for ${id}`);
+            let js = existingPlugin?.js;
+            if (!js || existingPlugin?.manifest?.hash !== manifest.hash || pluginMain(existingPlugin.manifest) !== main) {
+                try {
+                    js = await (await this.pluginFetch(id + main)).text();
+                    if (!js.trim()) throw new Error("Empty plugin file");
+                } catch {
+                    throw new Error(`Failed to fetch JS for ${id}`);
+                }
+            }
+            if (plugins[id] !== existingPlugin) throw new Error(`Plugin changed during download for ${id}`);
 
-        plugins[id] = {
-            id: id,
-            manifest: pluginManifest,
-            enabled: existingPlugin?.enabled ?? false,
-            update: existingPlugin?.update ?? true,
-            js: pluginJs ?? existingPlugin.js,
+            plugins[id] = {
+                id,
+                manifest: {
+                    ...manifest,
+                    description: typeof manifest.description === "string" ? manifest.description : "",
+                    authors: Array.isArray(manifest.authors) ? manifest.authors.filter(author => typeof author?.name === "string") : [],
+                },
+                enabled: existingPlugin?.enabled ?? false,
+                update: existingPlugin?.update ?? true,
+                js,
+            };
         };
+        const request = Promise.resolve().then(fetch).finally(() => pendingFetches.delete(id));
+        pendingFetches.set(id, request);
+        return request;
     },
 
     async installPlugin(id: string, enabled = true) {
+        if (typeof id !== "string") throw new Error("Invalid plugin link");
         if (!id.endsWith("/")) id += "/";
-        if (typeof id !== "string" || id in plugins) throw new Error("Plugin already installed");
-        await this.fetchPlugin(id);
-        if (enabled) await this.startPlugin(id);
+        const pending = pendingInstalls.get(id);
+        if (pending) return pending;
+        if (id in plugins) throw new Error("Plugin already installed");
+        const install = async () => {
+            await this.fetchPlugin(id);
+            if (enabled) await this.startPlugin(id);
+        };
+        const request = Promise.resolve().then(install).finally(() => pendingInstalls.delete(id));
+        pendingInstalls.set(id, request);
+        return request;
     },
 
     /**
@@ -172,10 +205,17 @@ export const VdPluginManager = {
         const allIds = Object.keys(plugins);
 
         if (!settings.safeMode?.enabled) {
-            // Loop over any plugin that is enabled, update it if allowed, then start it.
-            Promise.allSettled(allIds.filter(pl => plugins[pl].enabled).map(async pl => (plugins[pl].update && await this.fetchPlugin(pl).catch((e: Error) => logger.error(e.message)), await this.startPlugin(pl))));
-            // Wait for the above to finish, then update all disabled plugins that are allowed to.
-            allIds.filter(pl => !plugins[pl].enabled && plugins[pl].update).forEach(pl => this.fetchPlugin(pl));
+            for (const id of allIds) {
+                const plugin = plugins[id];
+                if (!plugin.enabled && !plugin.update) continue;
+                void (async () => {
+                    if (plugin.update) {
+                        try { await this.fetchPlugin(id); }
+                        catch (error) { logger.error(`Couldn't update plugin ${id}`, error); }
+                    }
+                    if (!settings.safeMode?.enabled && plugins[id]?.enabled) await this.startPlugin(id);
+                })().catch(error => logger.error(`Couldn't start plugin ${id}`, error));
+            }
         }
 
         return () => this.stopAllPlugins();

@@ -85,12 +85,6 @@ export default function initSettings() {
                 usePredicate: () => Boolean(useMobileTestingAssignment()),
             },
             {
-                key: "CLOUDCORD_PLUGIN_BROWSER",
-                title: () => "Discover plugins",
-                icon: safeAsset("ChannelListMagnifyingGlassIcon", "SearchIcon", "AppsIcon"),
-                render: () => import("@core/ui/settings/pages/PluginBrowser")
-            },
-            {
                 key: "CLOUDCORD_DIAGNOSTICS",
                 title: () => "Diagnostics",
                 icon: safeAsset("WrenchIcon", "SettingsIcon"),
