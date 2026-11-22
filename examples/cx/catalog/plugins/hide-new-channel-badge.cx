@@ -1,0 +1,3 @@
+plugin "HideNewChannelBadge":
+  needs appearance.hide
+  hide hide-new-channel-badge

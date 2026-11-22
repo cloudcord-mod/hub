@@ -1,0 +1,3 @@
+plugin "HideQuestOrbMultiplierPill":
+  needs appearance.hide
+  hide hide-quest-orb-multiplier-pill

@@ -17,6 +17,11 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-new-channel-badge": hideMobileComponent("HideNewChannelBadge", "the New label on recently added channels", "modules/channel_list_v2/native/components/NewBadge.tsx"),
+    "hide-recap-new-content-pill": hideMobileComponent("HideRecapNewContentPill", "the new-content pill in the recap", "modules/icymi/native/NewContentPill.tsx"),
+    "hide-quest-orb-multiplier-pill": hideMobileComponent("HideQuestOrbMultiplierPill", "the Orb multiplier perk label on quests", "modules/quests/native/QuestOrbMultiplierPerkPill.tsx"),
+    "hide-settings-premium-new-badge": hideMobileComponent("HideSettingsPremiumNewBadge", "the dismissible New badge on premium settings", "modules/user_settings/defs/native/DismissiblePremiumNewBadge.tsx"),
+    "hide-orb-onboarding-pill": hideMobileComponent("HideOrbOnboardingPill", "the Orb onboarding pill", "modules/virtual_currency/native/OrbOnboardingPill.tsx"),
     "hide-profile-about-me": hideMobileComponent("HideProfileAboutMe", "the About Me card on profiles", "modules/user_profile/native/UserProfileAboutMeCard.tsx"),
     "hide-profile-roles-card": hideMobileComponent("HideProfileRolesCard", "the server roles card on profiles", "modules/user_profile/native/UserProfileRolesCard.tsx"),
     "hide-profile-personal-widgets": hideMobileComponent("HideProfilePersonalWidgets", "personal widgets displayed on profiles", "modules/user_profile/native/UserProfilePersonalWidgetCard.tsx"),

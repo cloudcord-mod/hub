@@ -592,7 +592,8 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             "ICYMIServerRecommendationRow", "UserProfileOverscrollBanner", "YouExpiringTrialOfferCard", "YouBarICYMIButton",
             "UnlockWithNitroButton", "UserProfileGameFriendsCard", "UserProfileApplicationWidgetCard",
             "UserProfileAboutMeCard", "UserProfileRolesCard", "UserProfilePersonalWidgetCard",
-            "UserProfileYourFriendsCard", "YouBannerDecorations"].map(name => [
+            "UserProfileYourFriendsCard", "YouBannerDecorations", "NewBadge", "NewContentPill",
+            "QuestOrbMultiplierPerkPill", "DismissiblePremiumNewBadge", "OrbOnboardingPill"].map(name => [
             name, { $$typeof: Symbol.for("react.memo"), displayName: name, type: renderHeader },
         ]));
         const hiddenComponentModules = Object.values(moduleBox.exports.cxAppearanceTargets).flatMap(rule =>

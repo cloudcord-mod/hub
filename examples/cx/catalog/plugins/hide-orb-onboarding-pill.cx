@@ -1,0 +1,3 @@
+plugin "HideOrbOnboardingPill":
+  needs appearance.hide
+  hide hide-orb-onboarding-pill

@@ -1,0 +1,3 @@
+plugin "HideSettingsPremiumNewBadge":
+  needs appearance.hide
+  hide hide-settings-premium-new-badge
