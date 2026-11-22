@@ -4770,8 +4770,10 @@ jobs:
               };
               const currentJson = JSON.stringify(savedSnapshot(current));
               const saveCurrent = () => {
-                  const label = (name.trim() || "Profile " + (items.length + 1)).slice(0, 40);
-                  commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label, savedAt: Date.now(), data: savedSnapshot(current) }, ...items]);
+                  if (!ownerId || ownerId !== currentUserId) return;
+                  const latest = readSavedProfiles(ownerId);
+                  const label = (name.trim() || "Profile " + (latest.length + 1)).slice(0, 40);
+                  commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label, savedAt: Date.now(), data: savedSnapshot(current) }, ...latest]);
                   setName("");
                   showToast("Saved \u201c" + label + "\u201d");
               };

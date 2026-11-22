@@ -3214,8 +3214,9 @@ function SavedProfilesPanel({ current, userId, onLoad, fallbackName, fallbackUse
     };
     const currentJson = JSON.stringify(savedSnapshot(current));
     const saveCurrent = () => {
-        const label = name.trim() || `Profile ${items.length + 1}`;
-        if (!commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label.slice(0, 40), savedAt: Date.now(), data: savedSnapshot(current) }, ...items])) return;
+        const latest = readSavedProfiles(userId);
+        const label = (name.trim() || `Profile ${latest.length + 1}`).slice(0, 40);
+        if (!commit([{ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: label, savedAt: Date.now(), data: savedSnapshot(current) }, ...latest])) return;
         setName("");
         showToast(`Saved "${label}".`,  Toasts.Type.SUCCESS);
     };

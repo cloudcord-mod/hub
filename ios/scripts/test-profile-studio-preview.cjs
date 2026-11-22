@@ -320,6 +320,7 @@ assert.match(savedPanelSource, /frameName=\{data\.profileFrame \? frameFor\(data
 assert.match(savedPanelSource, /effectName=\{data\.profileEffect \? effectFor\(data\.profileEffect\.skuId\)/);
 let canSave = false;
 let savedRows;
+let persistedLooks = [];
 let lookName = "Main";
 const savedMessages = [];
 const savedPanel = vm.runInNewContext(transformSync(savedPanelSource + "\nSavedProfilesPanel;", { loader: "tsx" }).code, {
@@ -329,7 +330,11 @@ const savedPanel = vm.runInNewContext(transformSync(savedPanelSource + "\nSavedP
         useState: initial => typeof initial === "function" ? [initial(), rows => { savedRows = rows; }]
             : [initial === "" ? lookName : initial, value => { if (initial === "") lookName = value; }],
     },
-    Section: "Section", activeUserId: () => id, readSavedProfiles: () => [], writeSavedProfiles: () => canSave, savedSnapshot: data => data,
+    Section: "Section", activeUserId: () => id, readSavedProfiles: () => persistedLooks, writeSavedProfiles: (_owner, rows) => {
+        if (!canSave) return false;
+        persistedLooks = rows;
+        return true;
+    }, savedSnapshot: data => data,
     showToast: message => savedMessages.push(message), Toasts: { Type: { SUCCESS: "success" } },
 });
 const pressSave = () => flatten(savedPanel({ current: {}, userId: id })).find(node => node.type === "button").props.onClick();
@@ -342,6 +347,14 @@ pressSave();
 assert.equal(savedRows[0].name, "Main");
 assert.equal(lookName, "");
 assert.equal(savedMessages.length, 1);
+
+const previouslySaved = persistedLooks;
+persistedLooks = [];
+const saveWithoutRerender = flatten(savedPanel({ current: {}, userId: id })).find(node => node.type === "button").props.onClick;
+persistedLooks = previouslySaved;
+saveWithoutRerender();
+saveWithoutRerender();
+assert.equal(persistedLooks.map(item => item.name).join(", "), "Profile 3, Profile 2, Main");
 
 async function testMobilePreviewOpening() {
     const handoff = page.slice(page.indexOf("const openPreview = async"), page.indexOf("const K = require", page.indexOf("const openPreview = async")));
