@@ -36900,6 +36900,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-you-trial-offer": hideMobileComponent("HideYouTrialOffer", "the expiring trial offer card on the You tab", "modules/main_tabs_v2/native/tabs/you/YouExpiringTrialOfferCard.tsx"),
+        "hide-recap-shortcut": hideMobileComponent("HideRecapShortcut", "the In Case You Missed It shortcut in the You bar", "modules/main_tabs_v2/native/you_bar/YouBarICYMIButton.tsx"),
+        "hide-shop-nitro-unlock-button": hideMobileComponent("HideShopNitroUnlockButton", "the Unlock with Nitro button in the Shop", "modules/collectibles/native/UnlockWithNitroButton.tsx"),
+        "hide-profile-game-friends": hideMobileComponent("HideProfileGameFriends", "the game friends card on profiles", "modules/user_profile/native/UserProfileGameFriendsCard.tsx"),
+        "hide-profile-app-widgets": hideMobileComponent("HideProfileAppWidgets", "application widgets displayed on profiles", "modules/user_profile/native/UserProfileApplicationWidgetCard.tsx"),
         "hide-app-search-intro": hideMobileComponent("HideAppSearchIntro", "the app search introduction banner", "modules/app_launcher/native/onboarding/banner/AppLauncherGlobalSearchOnboardingBanner.tsx"),
         "hide-recap-server-recommendations": hideMobileComponent("HideRecapServerRecommendations", "server recommendations in the In Case You Missed It recap", "modules/icymi/native/ICYMIServerRecommendationRow.tsx"),
         "hide-profile-overscroll-banner": hideMobileComponent("HideProfileOverscrollBanner", "the profile banner extension shown during overscroll", "modules/user_profile/native/UserProfileOverscrollBanner.tsx"),
@@ -51312,6 +51317,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-app-widgets.cx
+  var hide_profile_app_widgets_default;
+  var init_hide_profile_app_widgets = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-app-widgets.cx"() {
+      hide_profile_app_widgets_default = 'plugin "HideProfileAppWidgets":\n  needs appearance.hide\n  hide hide-profile-app-widgets\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-banner-images.cx
   var hide_profile_banner_images_default;
   var init_hide_profile_banner_images = __esm({
@@ -51341,6 +51354,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_profile_friend_request_banner = __esm({
     "../examples/cx/catalog/plugins/hide-profile-friend-request-banner.cx"() {
       hide_profile_friend_request_banner_default = 'plugin "HideProfileFriendRequestBanner":\n  needs appearance.hide\n  hide profile-friend-request-banner\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-game-friends.cx
+  var hide_profile_game_friends_default;
+  var init_hide_profile_game_friends = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-game-friends.cx"() {
+      hide_profile_game_friends_default = 'plugin "HideProfileGameFriends":\n  needs appearance.hide\n  hide hide-profile-game-friends\n';
     }
   });
 
@@ -51413,6 +51434,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_recap_server_recommendations = __esm({
     "../examples/cx/catalog/plugins/hide-recap-server-recommendations.cx"() {
       hide_recap_server_recommendations_default = 'plugin "HideRecapServerRecommendations":\n  needs appearance.hide\n  hide hide-recap-server-recommendations\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-recap-shortcut.cx
+  var hide_recap_shortcut_default;
+  var init_hide_recap_shortcut = __esm({
+    "../examples/cx/catalog/plugins/hide-recap-shortcut.cx"() {
+      hide_recap_shortcut_default = 'plugin "HideRecapShortcut":\n  needs appearance.hide\n  hide hide-recap-shortcut\n';
     }
   });
 
@@ -51541,6 +51570,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_shop_limited_time_badges = __esm({
     "../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx"() {
       hide_shop_limited_time_badges_default = 'plugin "HideShopLimitedTimeBadges":\n  needs appearance.hide\n  hide hide-shop-limited-time-badges\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-shop-nitro-unlock-button.cx
+  var hide_shop_nitro_unlock_button_default;
+  var init_hide_shop_nitro_unlock_button = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-nitro-unlock-button.cx"() {
+      hide_shop_nitro_unlock_button_default = 'plugin "HideShopNitroUnlockButton":\n  needs appearance.hide\n  hide hide-shop-nitro-unlock-button\n';
     }
   });
 
@@ -51757,6 +51794,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_you_settings_tip = __esm({
     "../examples/cx/catalog/plugins/hide-you-settings-tip.cx"() {
       hide_you_settings_tip_default = 'plugin "HideYouSettingsTip":\n  needs appearance.hide\n  hide hide-you-settings-tip\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-you-trial-offer.cx
+  var hide_you_trial_offer_default;
+  var init_hide_you_trial_offer = __esm({
+    "../examples/cx/catalog/plugins/hide-you-trial-offer.cx"() {
+      hide_you_trial_offer_default = 'plugin "HideYouTrialOffer":\n  needs appearance.hide\n  hide hide-you-trial-offer\n';
     }
   });
 
@@ -54445,10 +54490,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_premium_marketing_banner();
       init_hide_profile_activity_badges();
       init_hide_profile_activity_timebar();
+      init_hide_profile_app_widgets();
       init_hide_profile_banner_images();
       init_hide_profile_connections();
       init_hide_profile_effects();
       init_hide_profile_friend_request_banner();
+      init_hide_profile_game_friends();
       init_hide_profile_mutuals();
       init_hide_profile_nitro_card();
       init_hide_profile_notes();
@@ -54458,6 +54505,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_quests_tab();
       init_hide_reactions();
       init_hide_recap_server_recommendations();
+      init_hide_recap_shortcut();
       init_hide_reply_previews();
       init_hide_role_icons();
       init_hide_saved_messages_promotion();
@@ -54474,6 +54522,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_shop_button_tip();
       init_hide_shop_featured_collections();
       init_hide_shop_limited_time_badges();
+      init_hide_shop_nitro_unlock_button();
       init_hide_shop_orbs_tip();
       init_hide_shop_tab();
       init_hide_shop_this_look_tip();
@@ -54501,6 +54550,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_voice_panel_tips();
       init_hide_voice_user_avatars();
       init_hide_you_settings_tip();
+      init_hide_you_trial_offer();
       init_high_contrast_text();
       init_high_res_profile_images();
       init_highlight_links();
@@ -56782,6 +56832,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "a4f2b8a3365692099cd125181785282a06e13d22e28ec0c5a546686646d822da"
           },
           {
+            name: "HideProfileAppWidgets",
+            source: hide_profile_app_widgets_default,
+            description: "Hide application widgets displayed on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "761e923a0bda62ade267918746f68a9c5844a6d3d6298bccce8ab44f52cf7fe8"
+          },
+          {
             name: "Hide Profile Banner Images",
             source: hide_profile_banner_images_default,
             description: "Hide Discord-hosted profile banner images except your own and those of friends",
@@ -56819,6 +56879,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Profiles"
             ],
             appearanceRevision: "332b0b42a3d4a75fa9c2af61953e2c25814ff68f8559c033cf6a038d1afe823a"
+          },
+          {
+            name: "HideProfileGameFriends",
+            source: hide_profile_game_friends_default,
+            description: "Hide the game friends card on profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c4c146289bcedabd38cb983115253d3141121a11d5f8d2097a903cb640c5b57f"
           },
           {
             name: "HideProfileMutuals",
@@ -56907,6 +56977,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "77aa33e16568aa2df33f63b467ae1a2fef42bafa503e49a6098fe7462146b474"
+          },
+          {
+            name: "HideRecapShortcut",
+            source: hide_recap_shortcut_default,
+            description: "Hide the In Case You Missed It shortcut in the You bar",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "cd5cfc69ca09ade37c4341985b1767ea4e1224386df158874cd7075dbb0e6017"
           },
           {
             name: "HideReplyPreviews",
@@ -57061,6 +57141,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "768c11081eb04523c28f1e2fc2d7d3ab32317c4e142c32dff2132c2597ef329a"
+          },
+          {
+            name: "HideShopNitroUnlockButton",
+            source: hide_shop_nitro_unlock_button_default,
+            description: "Hide the Unlock with Nitro button in the Shop",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "9da200574358d6c41341719b72569705284dbb2ab1ecc3d004b6662597d1ddd4"
           },
           {
             name: "HideShopOrbsTip",
@@ -57313,6 +57403,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "a675e48f836e167b9f5695b8d55e653b6c4f5fe64b714e4cae579d136aa9911f"
+          },
+          {
+            name: "HideYouTrialOffer",
+            source: hide_you_trial_offer_default,
+            description: "Hide the expiring trial offer card on the You tab",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "9c0a5b4d1bf7f53d3706b10be3690c6e2e87551587dea910b98a82ea0507f8ad"
           },
           {
             name: "HighContrastText",
@@ -69333,7 +69433,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b8d6c59f7d44499c485f9cc6c5a8384c08ab668";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "68c03d4688a4b665c73b9be56b437762fc233a4e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
