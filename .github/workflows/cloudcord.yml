@@ -238,6 +238,7 @@ jobs:
           cp "../ios/runtime/src/entry.ts" "src/entry.ts"
           cp "../ios/runtime/src/recoveryGesture.ts" "src/recoveryGesture.ts"
           cp "../ios/runtime/src/index.ts" "src/index.ts"
+          cp "../ios/runtime/src/lib/addons/fonts/index.ts" "src/lib/addons/fonts/index.ts"
           cp "../ios/runtime/src/metro/internals/caches.ts" "src/metro/internals/caches.ts"
           cp "../ios/runtime/src/metro/common/index.ts" "src/metro/common/index.ts"
           cp "../ios/runtime/src/metro/internals/modules.ts" "src/metro/internals/modules.ts"

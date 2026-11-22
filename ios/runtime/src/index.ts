@@ -5,7 +5,7 @@ import { initFetchI18nStrings } from "@core/i18n";
 import initSettings from "@core/ui/settings";
 import { initVendettaObject } from "@core/vendetta/api";
 import { VdPluginManager } from "@core/vendetta/plugins";
-import { updateFonts } from "@lib/addons/fonts";
+import { restoreSelectedFontFiles } from "@lib/addons/fonts";
 import { initThemes } from "@lib/addons/themes";
 import { initPlugins, updatePlugins } from "@lib/addons/plugins";
 import { patchCommands } from "@lib/api/commands";
@@ -56,7 +56,6 @@ export default async () => {
     // settings separately and applies the version-specific fallbacks.
     await Promise.all([
         runStartupTask("themes", () => initThemes()),
-        runStartupTask("fonts", () => updateFonts()),
         runStartupTask("events", () => injectFluxInterceptor()),
         patchSettings(),
         runStartupTask("logging", () => patchLogHook()),
@@ -74,6 +73,9 @@ export default async () => {
     ]).then(
         u => u.forEach(f => f && lib.unload.push(f))
     );
+
+    // Missing font files can be repaired without holding up settings or startup.
+    void runStartupTask("font files", restoreSelectedFontFiles);
 
     // Keep the catalog and native appearance adapters off the startup path
     // until storage confirms the user chose to remember an appearance.
