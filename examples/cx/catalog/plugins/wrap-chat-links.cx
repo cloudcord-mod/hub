@@ -1,0 +1,3 @@
+plugin "WrapChatLinks":
+  needs appearance.style
+  style wrap-chat-links

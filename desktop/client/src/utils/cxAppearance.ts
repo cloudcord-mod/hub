@@ -664,6 +664,11 @@ export const cxAppearanceTargets = {
         css: '[class*="messageContent_"] pre > code { white-space: pre-wrap !important; overflow-wrap: anywhere; }',
         desktopOnly: true, style: {},
     },
+    "wrap-chat-links": {
+        plugin: "WrapChatLinks", label: "Wrap long links to fit narrow chat panes",
+        css: '[class*="messageContent_"] a[href] { white-space: normal !important; overflow-wrap: anywhere !important; }',
+        desktopOnly: true, style: {},
+    },
     "floating-chat-bar": {
         plugin: "FloatingChatBar", label: "lift the chat bar above the bottom edge",
         css: 'form [class*="channelTextArea"] { margin-bottom: 8px; box-shadow: 0 4px 16px rgb(0 0 0 / 25%); }',
