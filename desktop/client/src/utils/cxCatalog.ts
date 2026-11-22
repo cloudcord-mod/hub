@@ -125,6 +125,8 @@ import plugin_catalog_follow_voice_user from "../../../../examples/cx/catalog/pl
 import plugin_catalog_force_owner_crown from "../../../../examples/cx/catalog/plugins/force-owner-crown.cx";
 import plugin_catalog_foreign_copy_handler from "../../../../examples/cx/catalog/plugins/foreign-copy-handler.cx";
 import plugin_catalog_format_code_block from "../../../../examples/cx/catalog/plugins/format-code-block.cx";
+import plugin_catalog_format_markdown_list from "../../../../examples/cx/catalog/plugins/format-markdown-list.cx";
+import plugin_catalog_format_spoiler from "../../../../examples/cx/catalog/plugins/format-spoiler.cx";
 import plugin_catalog_friend_invites from "../../../../examples/cx/catalog/plugins/friend-invites.cx";
 import plugin_catalog_gamzee_s_typing_quirk from "../../../../examples/cx/catalog/plugins/gamzee-s-typing-quirk.cx";
 import plugin_catalog_google_that from "../../../../examples/cx/catalog/plugins/google-that.cx";
@@ -714,6 +716,8 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "ForceOwnerCrown", source: plugin_catalog_force_owner_crown, description: "Show the server owner’s native crown in the member list", categories: ["Appearance"], appearanceRevision: "edc36d4471c31f6f755970457bfc7cfbb465664f77dc2974bdf19b287052ce0a" },
         { name: "foreignCopyHandler", source: plugin_catalog_foreign_copy_handler, description: "Add Copy Channel Name and Copy Category Name actions", categories: ["Servers & channels"] },
         { name: "Format Code Block", source: plugin_catalog_format_code_block, description: "/formatcodeblock", commands: ["formatcodeblock"], categories: ["Commands"], appearanceRevision: "376cafda7086045c053f3582f3d4ebd021390b22c0888121bab36248b73a18eb", privateCommands: true },
+        { name: "Format Markdown List", source: plugin_catalog_format_markdown_list, description: "/formatlist", commands: ["formatlist"], categories: ["Commands"], appearanceRevision: "2af24847d2b98468eda53b03e42121217b87205ce56661edfea2866f66665693", privateCommands: true },
+        { name: "Format Spoiler", source: plugin_catalog_format_spoiler, description: "/formatspoiler", commands: ["formatspoiler"], categories: ["Commands"], appearanceRevision: "261a5c4e73e2195ef382ea91f219d4a7aea64da3da8563e83130c9315c3b9a62", privateCommands: true },
         { name: "FriendInvites", source: plugin_catalog_friend_invites, description: "/create-friend-invite · /view-friend-invites · /revoke-friend-invites", commands: ["create-friend-invite","view-friend-invites","revoke-friend-invites"], categories: ["Commands","Profiles"] },
         { name: "Gamzee'sTypingQuirk", source: plugin_catalog_gamzee_s_typing_quirk, description: "Apply 1 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "GoogleThat", source: plugin_catalog_google_that, description: "/googlethat", commands: ["googlethat"], categories: ["Chat","Commands"] },

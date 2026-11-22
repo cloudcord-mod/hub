@@ -1,0 +1,6 @@
+plugin "Format Spoiler":
+  needs commands.register
+  needs reply.local
+  on command "formatspoiler":
+    input "text" text
+    reply "${formatSpoiler(text)}" else "Enter text to wrap as a Discord spoiler."

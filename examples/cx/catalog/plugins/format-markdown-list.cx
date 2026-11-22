@@ -1,0 +1,7 @@
+plugin "Format Markdown List":
+  needs commands.register
+  needs reply.local
+  on command "formatlist":
+    input "text" text
+    input "mode" text
+    reply "${formatMarkdownList(text, mode)}" else "Enter one item per line and choose bullet or numbered."

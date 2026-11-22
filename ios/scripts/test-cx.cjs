@@ -2984,6 +2984,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["indentlines", { text: "a\r\n\r\nb", spaces: "2" }, /\n  a\n\n  b\n/],
                 ["indentlines", { text: "a", spaces: "17" }, /^Enter a whole number/],
             ]],
+            ["Format Spoiler", [
+                ["formatspoiler", { text: "A|B\r\n\r\nC" }, /\|\|A\\\|B\|\|\n\n\|\|C\|\|/],
+            ]],
+            ["Format Markdown List", [
+                ["formatlist", { text: "One\n\n Two ", mode: "numbered" }, /1\. One\n2\. Two/],
+                ["formatlist", { text: "One", mode: "other" }, /^Enter one item/],
+            ]],
             ["Format Code Block", [
                 ["formatcodeblock", { text: "let x = 1;", language: "js" }, /^\x60{3}js\nlet x = 1;\n\x60{3}$/],
                 ["formatcodeblock", { text: "let x = 1;", language: "js\nhello" }, /^Enter code/],

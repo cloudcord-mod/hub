@@ -305,6 +305,17 @@ export const cxCommandFunctions = {
         const escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
         return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
     },
+    formatSpoiler(text: string) {
+        if (!text.trim()) return;
+        const escaped = text.replace(/[\\|]/g, "\\$&");
+        return planningBlock(escaped.split(/\r\n|\r|\n/).map(line => line.trim() ? "||" + line + "||" : line).join("\n"));
+    },
+    formatMarkdownList(text: string, mode: string) {
+        if (mode !== "bullet" && mode !== "numbered") return;
+        const lines = text.split(/\r\n|\r|\n/).map(line => line.trim()).filter(Boolean);
+        if (!lines.length) return;
+        return planningBlock(lines.map((line, index) => (mode === "bullet" ? "- " : (index + 1) + ". ") + line).join("\n"));
+    },
     escapeHtml(text: string) {
         if (!text) return;
         const entities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
