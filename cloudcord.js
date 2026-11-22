@@ -36596,6 +36596,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function AddonPage({ CardComponent, ...props }) {
     var [search, setSearch] = (0, import_react11.useState)("");
+    var query = search.trim();
     var [enabledOnly, setEnabledOnly] = (0, import_react11.useState)(false);
     var [sortFn, setSortFn] = (0, import_react11.useState)(() => null);
     var [filter, setFilter] = (0, import_react11.useState)("");
@@ -36621,14 +36622,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (props.resolveItem)
         values = values.map(props.resolveItem).filter(isNotNil);
       var items = values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
-      if (search.trimStart().startsWith("/") && props.searchCommands) {
-        return props.searchCommands(items, search).map((obj) => ({
+      if (query.startsWith("/") && props.searchCommands) {
+        return props.searchCommands(items, query).map((obj) => ({
           obj
         }));
       }
-      if (!search && sortFn)
+      if (!query && sortFn)
         items.sort(sortFn);
-      return import_fuzzysort.default.go(search, items, {
+      return import_fuzzysort.default.go(query, items, {
         keys: props.searchKeywords,
         all: true
       });
@@ -36639,7 +36640,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       props.searchCommands,
       props.searchKeywords,
       sortFn,
-      search,
+      query,
       enabledOnly,
       matchesFilter
     ]);
@@ -36657,7 +36658,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         onPress?.();
       }
     }, []);
-    if (results.length === 0 && !search && !enabledOnly && !filter && !props.ListHeaderComponent) {
+    if (results.length === 0 && !query && !enabledOnly && !filter && !props.ListHeaderComponent) {
       return /* @__PURE__ */ jsxs(import_react_native31.View, {
         style: {
           gap: 32,
@@ -36724,7 +36725,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             props.sortOptions && /* @__PURE__ */ jsx(IconButton, {
               icon: findAssetId("ArrowsUpDownIcon"),
               variant: "tertiary",
-              disabled: !!search,
+              disabled: !!query,
               onPress: () => showSimpleActionSheet2({
                 key: "AddonListSortOptions",
                 header: {
@@ -36788,7 +36789,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(Text, {
                 variant: "text-lg/semibold",
                 color: "text-default",
-                children: filter ? "No plugins match these filters." : enabledOnly && !search ? "No add-ons are enabled." : "No add-ons found."
+                children: filter ? "No plugins match these filters." : enabledOnly && !query ? "No add-ons are enabled." : "No add-ons found."
+              }),
+              (filter || enabledOnly) && /* @__PURE__ */ jsx(Button, {
+                variant: "secondary",
+                size: "sm",
+                text: "Clear filters",
+                onPress: () => {
+                  setFilter("");
+                  setEnabledOnly(false);
+                }
               })
             ]
           }),
@@ -70321,7 +70331,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3f5ab1786bd3e5cb670de27492a1c9b807c866c8";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d02b3b2969562c6136e38bbf732763805cdb5b5e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
