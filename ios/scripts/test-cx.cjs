@@ -3041,6 +3041,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["expandtabs", { text: "ab\tX\r\n\tY", width: "4" }, /ab  X\n    Y/],
                 ["expandtabs", { text: "a\tb", width: "0" }, /^Enter text/],
             ]],
+            ["Escape Regex", [
+                ["escaperegex", { text: "a+b[0]/c" }, /a\\\+b\\\[0\\\]\\\/c/],
+            ]],
+            ["Count Text Matches", [
+                ["countmatches", { text: "ababABab", phrase: "ab" }, /^3 exact matches$/],
+                ["countmatches", { text: "aaaa", phrase: "aaa" }, /^1 exact match$/],
+            ]],
             ["Format Spoiler", [
                 ["formatspoiler", { text: "A|B\r\n\r\nC" }, /\|\|A\\\|B\|\|\n\n\|\|C\|\|/],
             ]],

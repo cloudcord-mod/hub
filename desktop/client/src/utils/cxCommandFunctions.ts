@@ -312,6 +312,21 @@ export const cxCommandFunctions = {
         try { return decodeURIComponent(text); }
         catch { return "This text contains an invalid URL escape."; }
     },
+    escapeRegex(text: string) {
+        if (!text) return;
+        return planningBlock(text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")
+            .replace(/\r/g, "\\r").replace(/\n/g, "\\n"));
+    },
+    countTextMatches(text: string, phrase: string) {
+        if (!text || !phrase) return;
+        let count = 0;
+        let offset = 0;
+        while ((offset = text.indexOf(phrase, offset)) !== -1) {
+            count++;
+            offset += phrase.length;
+        }
+        return count + (count === 1 ? " exact match" : " exact matches");
+    },
     escapeMarkdown(text: string) {
         const escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
         return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";

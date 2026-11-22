@@ -1,0 +1,7 @@
+plugin "Count Text Matches":
+  needs commands.register
+  needs reply.local
+  on command "countmatches":
+    input "text" text
+    input "phrase" text
+    reply "${countTextMatches(text, phrase)}" else "Enter text and a nonempty phrase to count."

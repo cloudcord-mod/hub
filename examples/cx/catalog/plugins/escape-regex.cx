@@ -1,0 +1,6 @@
+plugin "Escape Regex":
+  needs commands.register
+  needs reply.local
+  on command "escaperegex":
+    input "text" text
+    reply "${escapeRegex(text)}" else "Enter text to escape for a regular expression."

@@ -85,6 +85,7 @@ import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/p
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
 import plugin_catalog_count_lines from "../../../../examples/cx/catalog/plugins/count-lines.cx";
+import plugin_catalog_count_text_matches from "../../../../examples/cx/catalog/plugins/count-text-matches.cx";
 import plugin_catalog_csv_column from "../../../../examples/cx/catalog/plugins/csv-column.cx";
 import plugin_catalog_csv_to_markdown from "../../../../examples/cx/catalog/plugins/csv-to-markdown.cx";
 import plugin_catalog_csv_to_tsv from "../../../../examples/cx/catalog/plugins/csv-to-tsv.cx";
@@ -113,6 +114,7 @@ import plugin_catalog_embedded_urls from "../../../../examples/cx/catalog/plugin
 import plugin_catalog_encode_base64 from "../../../../examples/cx/catalog/plugins/encode-base64.cx";
 import plugin_catalog_equius_s_typing_quirk from "../../../../examples/cx/catalog/plugins/equius-s-typing-quirk.cx";
 import plugin_catalog_eridan_typing_quirk from "../../../../examples/cx/catalog/plugins/eridan-typing-quirk.cx";
+import plugin_catalog_escape_regex from "../../../../examples/cx/catalog/plugins/escape-regex.cx";
 import plugin_catalog_event_window from "../../../../examples/cx/catalog/plugins/event-window.cx";
 import plugin_catalog_expand_tabs from "../../../../examples/cx/catalog/plugins/expand-tabs.cx";
 import plugin_catalog_extract_line_range from "../../../../examples/cx/catalog/plugins/extract-line-range.cx";
@@ -725,6 +727,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention, description: "Copy User Mention", categories: ["Profiles"] },
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls, description: "Copy User URL", categories: ["Profiles"] },
         { name: "Count Lines", source: plugin_catalog_count_lines, description: "/countlines", commands: ["countlines"], categories: ["Commands"], appearanceRevision: "b762bfd7abac4b8961da1b10a0ab3d1e05ca3b99d63847161a05cf2959713d18", privateCommands: true },
+        { name: "Count Text Matches", source: plugin_catalog_count_text_matches, description: "/countmatches", commands: ["countmatches"], categories: ["Commands"], appearanceRevision: "c4ad9bf10c15aa9dd16232f23544b8ce36addec7aec9aff772c40ab43787dd67", privateCommands: true },
         { name: "CSV Column", source: plugin_catalog_csv_column, description: "/csvcolumn", commands: ["csvcolumn"], categories: ["Commands"], appearanceRevision: "800c6be07325cda7e27b1c20a1a9bfdc01242503e624c4be933e2f2da6d365e5", privateCommands: true },
         { name: "CSV to Markdown", source: plugin_catalog_csv_to_markdown, description: "/csvtomarkdown", commands: ["csvtomarkdown"], categories: ["Commands"], appearanceRevision: "28510940096edb24802769a0291f2eed25961ede9fd68d06ea41675d01c673e1", privateCommands: true },
         { name: "CSV to TSV", source: plugin_catalog_csv_to_tsv, description: "/csvtotsv", commands: ["csvtotsv"], categories: ["Commands"], appearanceRevision: "a2bb7ff2aaaf7cf411a5f76068115e98a6c209fe5dc0a58d8b1af87caf10f81c", privateCommands: true },
@@ -753,6 +756,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Encode Base64", source: plugin_catalog_encode_base64, description: "/encodebase64", commands: ["encodebase64"], categories: ["Commands"], appearanceRevision: "d695cbf61031f6f60e1492fcc9e387c435f14933328eab0416384d9fa7d3ab7c", privateCommands: true },
         { name: "Equius'sTypingQuirk", source: plugin_catalog_equius_s_typing_quirk, description: "Apply 9 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "EridanTypingQuirk", source: plugin_catalog_eridan_typing_quirk, description: "Apply 4 text rules to message sends and preserve links", categories: ["Chat"] },
+        { name: "Escape Regex", source: plugin_catalog_escape_regex, description: "/escaperegex", commands: ["escaperegex"], categories: ["Commands"], appearanceRevision: "39717d3c4cc4cc1ea826a8f705b930d7da3d660558a0cf6f14be118000576a29", privateCommands: true },
         { name: "Event Window", source: plugin_catalog_event_window, description: "/eventwindow", commands: ["eventwindow"], categories: ["Commands"], appearanceRevision: "2b493a66f732896ad09e295f4ebdcdd2cff9375cc7b045d97269f351d91b2f3e", privateCommands: true },
         { name: "Expand Tabs", source: plugin_catalog_expand_tabs, description: "/expandtabs", commands: ["expandtabs"], categories: ["Commands"], appearanceRevision: "f2195ebbbfc81dfe5d88192560bdbd24c1cc0975a591e7650a63ae6004b3f46b", privateCommands: true },
         { name: "Extract Line Range", source: plugin_catalog_extract_line_range, description: "/linerange", commands: ["linerange"], categories: ["Commands"], appearanceRevision: "bf377de933d188bafcc7f0ccd195aad3a03ed09d551e2a521c4b6ddf12b350bf", privateCommands: true },
