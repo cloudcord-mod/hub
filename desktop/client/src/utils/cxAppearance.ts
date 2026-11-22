@@ -311,7 +311,8 @@ export const cxAppearanceTargets = {
     },
     "hide-chat-role-name-colors": {
         plugin: "HideChatRoleNameColors", label: "role colors on names in chat",
-        css: "", mobileOnly: true,
+        catalogOriginal: "hide-chat-role-name-colors.cx",
+        css: '[id^="chat-messages-"] :is([class^="username_"], [class*=" username_"]) { color: var(--text-default, var(--text-normal)) !important; }',
         mobile: { messagePresentation: "shouldShowRoleOnName" },
     },
     "server-tags": {
