@@ -39,14 +39,19 @@ function flatten(value) {
 
 const { PreviewCard } = load("ios/runtime/src/core/ui/settings/components/ProfileStudio.tsx");
 const avatarPreview = { name: "Nova", username: "nova", avatar: "https://example.com/avatar.png", fallbackAvatar: "https://example.com/native-avatar.png" };
-const avatarImage = flatten(PreviewCard(avatarPreview)).find(node => node.type === "Image" && node.props.source?.uri === avatarPreview.avatar);
-assert.ok(avatarImage);
-avatarImage.props.onError();
-const mobileFallback = flatten(PreviewCard(avatarPreview)).find(node => node.type === "Image" && node.props.source?.uri === avatarPreview.fallbackAvatar);
-assert.ok(mobileFallback);
-mobileFallback.props.onError();
-assert.ok(flatten(PreviewCard(avatarPreview)).some(node => node.type === "Text" && node.props.children === "N"));
-avatarAttempt = 0;
+for (const mode of ["Profile", "Popout", "Chat"]) {
+    layout = mode;
+    const render = () => flatten(PreviewCard(avatarPreview));
+    const avatarImage = render().find(node => node.type === "Image" && node.props.source?.uri === avatarPreview.avatar);
+    assert.ok(avatarImage, mode);
+    avatarImage.props.onError();
+    const mobileFallback = render().find(node => node.type === "Image" && node.props.source?.uri === avatarPreview.fallbackAvatar);
+    assert.ok(mobileFallback, mode);
+    mobileFallback.props.onError();
+    assert.ok(render().some(node => node.type === "Text" && node.props.children === "N"), mode);
+    avatarAttempt = 0;
+}
+layout = undefined;
 const profileAppearance = load("desktop/client/src/utils/profileAppearance.ts");
 const { encodePortableLook, decodePortableLook } = profileAppearance;
 const looks = [

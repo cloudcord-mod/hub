@@ -452,7 +452,7 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
                 </View>
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
-        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} banner={banner} primary={primary} secondary={accent} bannerColor={bannerColor}
+        </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} fallbackAvatar={fallbackAvatar} banner={banner} primary={primary} secondary={accent} bannerColor={bannerColor}
             decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} frame={frame} effect={effect} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             {primary && accent && accent !== primary ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "55%", borderBottomLeftRadius: R.lg, borderBottomRightRadius: R.lg, backgroundColor: accent }} /> : null}
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: bannerColor || primary || C.raised() }}>
