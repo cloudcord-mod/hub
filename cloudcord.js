@@ -41115,6 +41115,33 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     if (effect === "copy-raw-text") {
       return item("raw-text", "Copy Raw Text", content);
     }
+    if (effect === "copy-mentioned-ids") {
+      var mentions = [
+        ...content.matchAll(/<(@&|@!?|#)([1-9]\d{16,19})>/g)
+      ];
+      return [
+        [
+          "users",
+          /^@!?$/,
+          "Copy Mentioned User IDs"
+        ],
+        [
+          "roles",
+          /^@&$/,
+          "Copy Mentioned Role IDs"
+        ],
+        [
+          "channels",
+          /^#$/,
+          "Copy Mentioned Channel IDs"
+        ]
+      ].flatMap(([key, kind, label2]) => {
+        var ids = mentions.filter(([, type, id]) => kind.test(type) && BigInt(id) <= 0xffffffffffffffffn).map(([, , id]) => id);
+        return item("mentioned-" + key, label2, [
+          ...new Set(ids)
+        ].join("\n"));
+      });
+    }
     if (effect === "copy-attachment-names") {
       var names = (message?.attachments ?? []).flatMap((file) => typeof file?.filename === "string" && file.filename.trim() ? [
         file.filename.replace(/[\r\n]+/g, " ")
@@ -41811,6 +41838,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         "copy-replied-message-link": {
           permission: "messages.copyreference",
           label: "Copy the link to the message this reply references"
+        },
+        "copy-mentioned-ids": {
+          permission: "messages.copyreference",
+          label: "Copy user, role, and channel IDs written as mentions in the selected message"
         },
         "reveal-spoilers-shortcut": {
           permission: "messages.revealspoilers",
@@ -50004,6 +50035,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-mentioned-ids.cx
+  var copy_mentioned_ids_default;
+  var init_copy_mentioned_ids = __esm({
+    "../examples/cx/catalog/plugins/copy-mentioned-ids.cx"() {
+      copy_mentioned_ids_default = 'plugin "CopyMentionedIds":\n  needs messages.copyreference\n  use copy-mentioned-ids\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-message-code.cx
   var copy_message_code_default;
   var init_copy_message_code = __esm({
@@ -54561,6 +54600,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_emoji_markdown();
       init_copy_file_contents();
       init_copy_media_link();
+      init_copy_mentioned_ids();
       init_copy_message_code();
       init_copy_message_info();
       init_copy_message_links();
@@ -55655,6 +55695,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Add a clipboard action to media and link menus",
             categories: [
               "Media"
+            ]
+          },
+          {
+            name: "CopyMentionedIds",
+            source: copy_mentioned_ids_default,
+            description: "Copy user, role, and channel IDs written as mentions in the selected message",
+            categories: [
+              "Chat"
             ]
           },
           {
@@ -63983,6 +64031,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "copy-message-info":
           case "copy-attachment-links":
           case "copy-replied-message-link":
+          case "copy-mentioned-ids":
             return registerMessageMenuActions(enabled, ({ message, channel }, close) => getCxMessageClipboard(effect, message, channel).map(({ label: label2, text }) => ({
               label: label2,
               run() {
@@ -69896,7 +69945,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "da0a7f11468c8d645e3a0344fc6143425c1259f2";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a62e78c3904ad3f56d68cea15c6145fb4ea9e4c5";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
