@@ -217,6 +217,8 @@ jobs:
           mkdir -p src/lib/ui/components/wrappers
           cp "../ios/runtime/src/lib/ui/components/wrappers/AlertModal.tsx" "src/lib/ui/components/wrappers/AlertModal.tsx"
           cp "../ios/runtime/src/lib/api/native/loader.ts" "src/lib/api/native/loader.ts"
+          cp "../ios/runtime/src/core/debug/safeMode.ts" "src/core/debug/safeMode.ts"
+          cp "../ios/runtime/src/core/ui/reporter/components/ErrorBoundaryScreen.tsx" "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"
           cp "../ios/runtime/src/lib/api/debug.ts" "src/lib/api/debug.ts"
           cp "../ios/runtime/src/lib/api/native/fs.ts" "src/lib/api/native/fs.ts"
           cp "../ios/runtime/src/lib/api/native/modules/index.ts" "src/lib/api/native/modules/index.ts"
