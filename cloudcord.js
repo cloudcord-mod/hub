@@ -36900,6 +36900,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-shop-featured-collections": hideMobileComponent("HideShopFeaturedCollections", "featured collections in the Shop", "modules/collectibles/native/FeaturedBlock.tsx"),
+        "hide-shop-limited-time-badges": hideMobileComponent("HideShopLimitedTimeBadges", "limited-time labels on Shop collectibles", "modules/collectibles/native/LimitedTimeBadge.tsx"),
         "hide-dm-friend-suggestions": hideMobileComponent("HideDmFriendSuggestions", "suggested friends and their heading from the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriend.tsx", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriendsHeader.tsx"),
         "hide-dm-add-friends-widget": hideMobileComponent("HideDmAddFriendsWidget", "the Add Friends widget in the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemAddFriendsWidget.tsx"),
         "hide-dm-wave-button": hideMobileComponent("HideDmWaveButton", "the wave shortcut on eligible DM rows", "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelWave.tsx"),
@@ -50740,6 +50742,22 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-shop-featured-collections.cx
+  var hide_shop_featured_collections_default;
+  var init_hide_shop_featured_collections = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-featured-collections.cx"() {
+      hide_shop_featured_collections_default = 'plugin "HideShopFeaturedCollections":\n  needs appearance.hide\n  hide hide-shop-featured-collections\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx
+  var hide_shop_limited_time_badges_default;
+  var init_hide_shop_limited_time_badges = __esm({
+    "../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx"() {
+      hide_shop_limited_time_badges_default = 'plugin "HideShopLimitedTimeBadges":\n  needs appearance.hide\n  hide hide-shop-limited-time-badges\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-shop-orbs-tip.cx
   var hide_shop_orbs_tip_default;
   var init_hide_shop_orbs_tip = __esm({
@@ -53499,6 +53517,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_server_live_notice();
       init_hide_server_tag_promotion();
       init_hide_shop_button_tip();
+      init_hide_shop_featured_collections();
+      init_hide_shop_limited_time_badges();
       init_hide_shop_orbs_tip();
       init_hide_shop_tab();
       init_hide_shop_this_look_tip();
@@ -55728,6 +55748,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848"
+          },
+          {
+            name: "HideShopFeaturedCollections",
+            source: hide_shop_featured_collections_default,
+            description: "Hide featured collections in the Shop",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "daa25863e067d4624b5affaded88ee76ce45516516f3aae7958b773166a1c00c"
+          },
+          {
+            name: "HideShopLimitedTimeBadges",
+            source: hide_shop_limited_time_badges_default,
+            description: "Hide limited-time labels on Shop collectibles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "768c11081eb04523c28f1e2fc2d7d3ab32317c4e142c32dff2132c2597ef329a"
           },
           {
             name: "HideShopOrbsTip",
@@ -67701,7 +67741,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2dbb019c68ddb38f0279cb06ab4a977525cd2450";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "25e0147a5dd03a5175cc22b3c26dc59714273208";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
