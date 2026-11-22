@@ -24,7 +24,6 @@ import dev.beefers.vendetta.manager.installer.util.Logger
 import dev.beefers.vendetta.manager.utils.DiscordVersion
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.delay
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.io.File
@@ -264,11 +263,6 @@ class StepRunner(
                 return error
             }
 
-            // Add delay for human psychology and
-            // better group visibility in UI (the active group can change way too fast)
-            if (!preferenceManager.isDeveloper && step.durationMs < 1000) {
-                delay(1000L - step.durationMs)
-            }
         }
 
         completed = true
