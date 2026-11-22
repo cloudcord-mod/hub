@@ -83,8 +83,8 @@ const nativePlugins = {
 const catalog = {
     plugin: [
         { id: "plugin:Shared", name: "Shared", description: "Catalog version", active: true },
-        { id: "plugin:Local", name: "Local", description: "Off", active: false, privateCommands: true },
-        { id: "plugin:Disabled", name: "Disabled", description: "Changed after approval", active: false, needsReview: true },
+        { id: "plugin:Local", name: "Local", description: "Off", commands: ["off"], active: false, privateCommands: true },
+        { id: "plugin:Disabled", name: "Disabled", description: "Changed after approval", commands: ["turnoff"], active: false, needsReview: true },
     ],
     theme: [{ id: "theme", name: "Palette", active: true }],
 };
@@ -92,7 +92,10 @@ const cxSearch = loadCxRuntime();
 const countMocks = {
     "@api/PluginManager": { plugins: nativePlugins, isPluginEnabled: name => name === "Shared" },
     "@api/Settings": { useSettings: () => ({ enabledThemes: ["a.css"], enabledThemeLinks: ["file"] }) },
-    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => query === "/off" ? catalog[kind].slice(1) : cxSearch.searchCxCatalog(catalog[kind], query) },
+    "@sincordplugins/cxExtensions": { useCxAddonRows: (kind, query) => {
+        assert.equal(query, "");
+        return catalog[kind];
+    } },
     "@utils/cx": cxSearch,
     "@utils/css": mocks["@utils/css"],
     "@webpack/common": commonHooks,

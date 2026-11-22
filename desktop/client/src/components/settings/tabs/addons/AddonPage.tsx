@@ -126,10 +126,10 @@ export function PluginsPage() {
         keywords: plugin.tags?.join(" "),
         plugin,
     })), [visible]);
-    const cxRows = cxAddons().useCxAddonRows("plugin", query);
     const allCxRows = cxAddons().useCxAddonRows("plugin", "");
-    const cxByName = new Map(allCxRows.map(entry => [entry.name.toLowerCase(), entry]));
-    const nativeByName = new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin]));
+    const cxRows = useMemo(() => searchCxCatalog(allCxRows, query), [allCxRows, query]);
+    const cxByName = useMemo(() => new Map(allCxRows.map(entry => [entry.name.toLowerCase(), entry])), [allCxRows]);
+    const nativeByName = useMemo(() => new Map(visible.map(plugin => [plugin.name.toLowerCase(), plugin])), [visible]);
 
     const commandSearch = query.trimStart().startsWith("/");
     const nativeMatches = useMemo(() => searchCxCatalog(nativeSearchRows, query), [nativeSearchRows, query]);
