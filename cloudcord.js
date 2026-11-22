@@ -36902,6 +36902,31 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-server-feed-description": {
+          plugin: "HideServerFeedDescription",
+          label: "Hide the description in the server feed header",
+          css: "",
+          mobileOnly: true,
+          style: {
+            component: "GuildFeedBanner",
+            props: {
+              hideDescription: true
+            }
+          }
+        },
+        "hide-server-feed-member-count": {
+          plugin: "HideServerFeedMemberCount",
+          label: "Hide the member count in the server feed header",
+          css: "",
+          mobileOnly: true,
+          style: {
+            component: "GuildFeedBanner",
+            props: {
+              hideMemberCount: true
+            }
+          }
+        },
+        "hide-server-live-notice": hideMobileComponent("HideServerLiveNotice", "the live event notice above the server channel list", "modules/guild_scheduled_events/native/guild_sidebar/GuildLiveChannelNotice.tsx"),
         "hide-gif-favorite-button": hideMobileComponent("HideGifFavoriteButton", "the favorite button when viewing GIFs", "modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"),
         "hide-composer-emoji-promo": hideMobileComponent("HideComposerEmojiPromo", "the premium emoji promotion in composer autocomplete", "modules/channel_text_area/native/ChannelAutocompleteEmojiUpsell.tsx"),
         "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),
@@ -50644,6 +50669,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-server-feed-description.cx
+  var hide_server_feed_description_default;
+  var init_hide_server_feed_description = __esm({
+    "../examples/cx/catalog/plugins/hide-server-feed-description.cx"() {
+      hide_server_feed_description_default = 'plugin "HideServerFeedDescription":\n  needs appearance.style\n  style hide-server-feed-description\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-server-feed-member-count.cx
+  var hide_server_feed_member_count_default;
+  var init_hide_server_feed_member_count = __esm({
+    "../examples/cx/catalog/plugins/hide-server-feed-member-count.cx"() {
+      hide_server_feed_member_count_default = 'plugin "HideServerFeedMemberCount":\n  needs appearance.style\n  style hide-server-feed-member-count\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-server-live-notice.cx
+  var hide_server_live_notice_default;
+  var init_hide_server_live_notice = __esm({
+    "../examples/cx/catalog/plugins/hide-server-live-notice.cx"() {
+      hide_server_live_notice_default = 'plugin "HideServerLiveNotice":\n  needs appearance.hide\n  hide hide-server-live-notice\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-server-tag-promotion.cx
   var hide_server_tag_promotion_default;
   var init_hide_server_tag_promotion = __esm({
@@ -53411,6 +53460,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_send_button();
       init_hide_server_banner();
       init_hide_server_banners();
+      init_hide_server_feed_description();
+      init_hide_server_feed_member_count();
+      init_hide_server_live_notice();
       init_hide_server_tag_promotion();
       init_hide_shop_button_tip();
       init_hide_shop_orbs_tip();
@@ -55562,6 +55614,36 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Appearance"
             ]
+          },
+          {
+            name: "HideServerFeedDescription",
+            source: hide_server_feed_description_default,
+            description: "Hide the description in the server feed header",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "0b91360c169d0ff361019736e7f075031ff7d83f65cde09c7636f749c8a1522e"
+          },
+          {
+            name: "HideServerFeedMemberCount",
+            source: hide_server_feed_member_count_default,
+            description: "Hide the member count in the server feed header",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "39fe7b993c1c301b4582971ef276104114f0e634d667c0a7c79140b911dc92bc"
+          },
+          {
+            name: "HideServerLiveNotice",
+            source: hide_server_live_notice_default,
+            description: "Hide the live event notice above the server channel list",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "02cedf54e3dcbd4628039da3c365116f739d2e1bfd79d50f992155546f1830df"
           },
           {
             name: "HideServerTagPromotion",
@@ -63122,7 +63204,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               style.component
             ], (element) => {
               if ("props" in style) {
-                return element.props[style.skipWhenTrue] === true ? element : React2.cloneElement(element, style.props);
+                return "skipWhenTrue" in style && element.props[style.skipWhenTrue] === true ? element : React2.cloneElement(element, style.props);
               }
               if (!("key" in style))
                 return React2.cloneElement(element, {
@@ -67550,7 +67632,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b4d38f08617069f866e61340f6134e98a6604c68";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "16940e133ce5523eeb877efd65febb03602e4387";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
