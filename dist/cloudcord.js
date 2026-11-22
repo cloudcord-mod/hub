@@ -38909,6 +38909,38 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           ].join("\n").replaceAll(codeFence, "`\u200B``");
           return changes.length <= 3900 ? codeFence + "diff\n" + changes + "\n" + codeFence : "Line changes are too long for one reply.";
         },
+        orderedLineDiff(before3, after2) {
+          var lines = (value) => value ? value.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/) : [];
+          var left = lines(before3);
+          var right = lines(after2);
+          if (left.length > 160 || right.length > 160)
+            return "Use up to 160 lines per input.";
+          var columns = right.length + 1;
+          var matches = new Uint16Array((left.length + 1) * columns);
+          for (var i = left.length - 1; i >= 0; i--) {
+            for (var j = right.length - 1; j >= 0; j--) {
+              var slot = i * columns + j;
+              matches[slot] = left[i] === right[j] ? 1 + matches[slot + columns + 1] : Math.max(matches[slot + 1], matches[slot + columns]);
+            }
+          }
+          if (left.length === right.length && matches[0] === left.length)
+            return "Both inputs match in order.";
+          var output = [];
+          var i1 = 0;
+          var j1 = 0;
+          while (i1 < left.length || j1 < right.length) {
+            if (i1 < left.length && j1 < right.length && left[i1] === right[j1]) {
+              output.push("  " + left[i1++]);
+              j1++;
+            } else if (i1 < left.length && (j1 === right.length || matches[(i1 + 1) * columns + j1] >= matches[i1 * columns + j1 + 1])) {
+              output.push("- " + left[i1++]);
+            } else {
+              output.push("+ " + right[j1++]);
+            }
+          }
+          var text = output.join("\n").replaceAll(codeFence, "`\u200B``");
+          return text.length <= 3900 ? codeFence + "diff\n" + text + "\n" + codeFence : "The diff is too long for one reply.";
+        },
         wordFrequency(text) {
           var counts = /* @__PURE__ */ new Map();
           for (var word of text.toLowerCase().match(RegExp("[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}]*", "gu")) ?? []) {
@@ -51695,6 +51727,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/ordered-line-diff.cx
+  var ordered_line_diff_default;
+  var init_ordered_line_diff = __esm({
+    "../examples/cx/catalog/plugins/ordered-line-diff.cx"() {
+      ordered_line_diff_default = 'plugin "Ordered Line Diff":\n  needs commands.register\n  needs reply.local\n  on command "linediff":\n    input "before" text optional\n    input "after" text optional\n    reply "${orderedLineDiff(before, after)}"\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/percentage-change.cx
   var percentage_change_default;
   var init_percentage_change = __esm({
@@ -53676,6 +53716,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_number_lines();
       init_number_summary();
       init_open_steam_links_in_app();
+      init_ordered_line_diff();
       init_percentage_change();
       init_ping_notifications();
       init_plain_folder_icon();
@@ -56758,6 +56799,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             categories: [
               "Media"
             ]
+          },
+          {
+            name: "Ordered Line Diff",
+            source: ordered_line_diff_default,
+            description: "/linediff",
+            commands: [
+              "linediff"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "c53f33fb2ee4a513c6ad4aabdcd75c96fabc529841831e75055930021cf63302",
+            privateCommands: true
           },
           {
             name: "Percentage Change",
@@ -67862,7 +67916,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "77443aeb27dcfd4b2f7fb5955439dbe49572dd54";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8cbeb62805a07488d6c227a3edb07bd74e80662d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
