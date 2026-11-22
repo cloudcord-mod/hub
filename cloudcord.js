@@ -21025,6 +21025,25 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       resizeMode: "contain"
     }) : null;
   }
+  function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }) {
+    var visibleStatus = status === "offline" ? "invisible" : status && Object.hasOwn(STATUS_COLORS, status) ? status : "online";
+    var label2 = visibleStatus === "invisible" ? "offline" : visibleStatus === "dnd" ? "do not disturb" : visibleStatus;
+    return /* @__PURE__ */ jsx(import_react_native24.View, {
+      accessible: true,
+      accessibilityLabel: `Status: ${label2}`,
+      style: {
+        position: "absolute",
+        right: 2,
+        bottom,
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        borderWidth,
+        borderColor,
+        backgroundColor: STATUS_COLORS[visibleStatus]
+      }
+    });
+  }
   function StudioAvatar({ uri, name }) {
     var [failed, setFailed] = (0, import_react6.useState)(false);
     if (uri && !failed) {
@@ -21153,18 +21172,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                         name
                       }, avatar)
                     }),
-                    /* @__PURE__ */ jsx(import_react_native24.View, {
-                      style: {
-                        position: "absolute",
-                        right: 2,
-                        bottom: 2,
-                        width: 22,
-                        height: 22,
-                        borderRadius: 11,
-                        borderWidth: 4,
-                        borderColor: C3.panel(),
-                        backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online
-                      }
+                    /* @__PURE__ */ jsx(StudioPresence, {
+                      status,
+                      borderColor: C3.panel(),
+                      bottom: 2
                     })
                   ]
                 }),
@@ -22624,20 +22635,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                       },
                       resizeMode: "contain"
                     }) : null,
-                    /* @__PURE__ */ jsx(import_react_native24.View, {
-                      accessible: true,
-                      accessibilityLabel: `Status: ${status || "online"}`,
-                      style: {
-                        position: "absolute",
-                        right: 2,
-                        bottom: 4,
-                        width: 22,
-                        height: 22,
-                        borderRadius: 11,
-                        borderWidth: 4,
-                        borderColor: card,
-                        backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online
-                      }
+                    /* @__PURE__ */ jsx(StudioPresence, {
+                      status,
+                      borderColor: card
                     })
                   ]
                 }),
@@ -22863,20 +22863,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               },
               resizeMode: "contain"
             }) : null,
-            /* @__PURE__ */ jsx(import_react_native24.View, {
-              accessible: true,
-              accessibilityLabel: `Status: ${status || "online"}`,
-              style: {
-                position: "absolute",
-                right: 2,
-                bottom: 4,
-                width: 22,
-                height: 22,
-                borderRadius: 11,
-                borderWidth: 5,
-                borderColor: ring,
-                backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online
-              }
+            /* @__PURE__ */ jsx(StudioPresence, {
+              status,
+              borderColor: ring,
+              borderWidth: 5
             })
           ]
         }),
@@ -71999,7 +71989,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "773a72a896f9c4c389de00cf3fafbaed5436aa83";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "382b3941c4e490cb8ee531db0d5600b04bb2cf43";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
