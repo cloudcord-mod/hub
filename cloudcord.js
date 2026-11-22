@@ -36900,6 +36900,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-boost-progress-tip": hideMobileComponent("HideBoostProgressTip", "the server boost progress tooltip", "modules/premium/powerups/native/BoostProgressBarCoachmark.tsx"),
+        "hide-powerup-unlock-tip": hideMobileComponent("HidePowerupUnlockTip", "the boost-to-unlock tooltip for server powerups", "modules/premium/powerups/native/GuildPowerupsBoostToUnlockCoachmark.tsx"),
+        "hide-server-theme-tip": hideMobileComponent("HideServerThemeTip", "the server theme introduction for members", "modules/premium/powerups/native/GuildThemeMemberCoachmark.tsx"),
+        "hide-nitro-tenure-tip": hideMobileComponent("HideNitroTenureTip", "the Nitro tenure badge tooltip", "modules/premium/tiered_tenure_badging/native/TieredTenureBadgeCoachmark.tsx"),
         "hide-shop-featured-collections": hideMobileComponent("HideShopFeaturedCollections", "featured collections in the Shop", "modules/collectibles/native/FeaturedBlock.tsx"),
         "hide-shop-limited-time-badges": hideMobileComponent("HideShopLimitedTimeBadges", "limited-time labels on Shop collectibles", "modules/collectibles/native/LimitedTimeBadge.tsx"),
         "hide-dm-friend-suggestions": hideMobileComponent("HideDmFriendSuggestions", "suggested friends and their heading from the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriend.tsx", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriendsHeader.tsx"),
@@ -50649,6 +50653,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-boost-progress-tip.cx
+  var hide_boost_progress_tip_default;
+  var init_hide_boost_progress_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-boost-progress-tip.cx"() {
+      hide_boost_progress_tip_default = 'plugin "HideBoostProgressTip":\n  needs appearance.hide\n  hide hide-boost-progress-tip\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-bot-tags.cx
   var hide_bot_tags_default;
   var init_hide_bot_tags = __esm({
@@ -51025,6 +51037,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-nitro-tenure-tip.cx
+  var hide_nitro_tenure_tip_default;
+  var init_hide_nitro_tenure_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-nitro-tenure-tip.cx"() {
+      hide_nitro_tenure_tip_default = 'plugin "HideNitroTenureTip":\n  needs appearance.hide\n  hide hide-nitro-tenure-tip\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-notification-bell.cx
   var hide_notification_bell_default;
   var init_hide_notification_bell = __esm({
@@ -51054,6 +51074,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_pins_button = __esm({
     "../examples/cx/catalog/plugins/hide-pins-button.cx"() {
       hide_pins_button_default = 'plugin "HidePinsButton":\n  needs appearance.hide\n  hide pinned-messages-button\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-powerup-unlock-tip.cx
+  var hide_powerup_unlock_tip_default;
+  var init_hide_powerup_unlock_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-powerup-unlock-tip.cx"() {
+      hide_powerup_unlock_tip_default = 'plugin "HidePowerupUnlockTip":\n  needs appearance.hide\n  hide hide-powerup-unlock-tip\n';
     }
   });
 
@@ -51254,6 +51282,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_server_tag_promotion = __esm({
     "../examples/cx/catalog/plugins/hide-server-tag-promotion.cx"() {
       hide_server_tag_promotion_default = 'plugin "HideServerTagPromotion":\n  needs appearance.hide\n  hide hide-server-tag-promotion\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-server-theme-tip.cx
+  var hide_server_theme_tip_default;
+  var init_hide_server_theme_tip = __esm({
+    "../examples/cx/catalog/plugins/hide-server-theme-tip.cx"() {
+      hide_server_theme_tip_default = 'plugin "HideServerThemeTip":\n  needs appearance.hide\n  hide hide-server-theme-tip\n';
     }
   });
 
@@ -54082,6 +54118,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_badges();
       init_hide_blocked_and_ignored_messages();
       init_hide_boost_goal();
+      init_hide_boost_progress_tip();
       init_hide_bot_tags();
       init_hide_call_activities_tip();
       init_hide_call_buttons();
@@ -54129,10 +54166,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_nameplates();
       init_hide_new_messages_bar();
       init_hide_nitro_tab();
+      init_hide_nitro_tenure_tip();
       init_hide_notification_bell();
       init_hide_orb_wallet_nitro_promotion();
       init_hide_orb_wallet_seasonal_promotion();
       init_hide_pins_button();
+      init_hide_powerup_unlock_tip();
       init_hide_premium_group_promotion();
       init_hide_profile_activity_badges();
       init_hide_profile_activity_timebar();
@@ -54158,6 +54197,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_server_feed_member_count();
       init_hide_server_live_notice();
       init_hide_server_tag_promotion();
+      init_hide_server_theme_tip();
       init_hide_shop_button_tip();
       init_hide_shop_featured_collections();
       init_hide_shop_limited_time_badges();
@@ -55822,6 +55862,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "812688497568203e8e885e392fdfce9b4797a09ad2ceaf1d970a7b863f9e9b03"
           },
           {
+            name: "HideBoostProgressTip",
+            source: hide_boost_progress_tip_default,
+            description: "Hide the server boost progress tooltip",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "1d6378a948edebe2f07e6390da4e0dff29121bcc249e40d38a8a058e1b8ca0de"
+          },
+          {
             name: "HideBotTags",
             source: hide_bot_tags_default,
             description: "Hide APP and BOT tags",
@@ -56260,6 +56310,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "77819d3881314900b8285f3145480dda07dbb4dd98a136765979e14f1e2d2706"
           },
           {
+            name: "HideNitroTenureTip",
+            source: hide_nitro_tenure_tip_default,
+            description: "Hide the Nitro tenure badge tooltip",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "130f18839eeb09b4ca99876555483be7a16ad14d5321ecb52b3b7bf329e58e13"
+          },
+          {
             name: "HideNotificationBell",
             source: hide_notification_bell_default,
             description: "Hide the channel notification settings shortcut",
@@ -56294,6 +56354,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67"
+          },
+          {
+            name: "HidePowerupUnlockTip",
+            source: hide_powerup_unlock_tip_default,
+            description: "Hide the boost-to-unlock tooltip for server powerups",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "fc174f9df6d011b4f746ef1de2f5cb3678025bfbefad4048eda0cf49f5ef4dea"
           },
           {
             name: "HidePremiumGroupPromotion",
@@ -56534,6 +56604,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "e16680d74954f25fb086f7f4ffe0624ec5385d133fa146134301b20fddf80640"
+          },
+          {
+            name: "HideServerThemeTip",
+            source: hide_server_theme_tip_default,
+            description: "Hide the server theme introduction for members",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "fcf3ec61162e3f78d941d24c2b2ffec00e111bbb1cca794bce45461c77443b4e"
           },
           {
             name: "HideShopButtonTip",
@@ -68767,7 +68847,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e2c433ebbb48247c4009475021e1722c7e67a6a1";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "af721c701b21f0021139454296a6a3faf027c83b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
