@@ -27,8 +27,21 @@ function pluginBody(source) {
     return source.split(/\r?\n/).slice(1).filter(line => line.trim()).join("\n");
 }
 
+function pluginPlatforms(plugin, { cxAppearanceTargets, cxNativeEffects }) {
+    if (plugin.kind !== "plugin") return { desktopOnly: false, mobileOnly: false, linuxOnly: false };
+    const targets = [...plugin.hiddenTargets, ...plugin.styledTargets].map(target => cxAppearanceTargets[target]);
+    const effects = plugin.nativeEffects.map(effect => cxNativeEffects[effect]);
+    const rules = [...targets, ...effects];
+    return {
+        desktopOnly: rules.some(rule => rule?.desktopOnly),
+        mobileOnly: rules.some(rule => rule?.mobileOnly),
+        linuxOnly: effects.some(effect => effect?.linuxOnly),
+    };
+}
+
 function buildCatalog(additions = new Map()) {
-    const { parseCx, reviewCx, cxAppearanceTargets, cxNativeEffects, getCxCatalogCategories, canRememberCxExtension, isPrivateCxCommand } = loadCxRuntime();
+    const runtime = loadCxRuntime();
+    const { parseCx, reviewCx, getCxCatalogCategories, canRememberCxExtension, isPrivateCxCommand } = runtime;
     const names = new Set();
     const commands = new Set();
     const groups = {};
@@ -73,16 +86,8 @@ function buildCatalog(additions = new Map()) {
             if (!/^[a-z0-9][a-z0-9-]*$/.test(stem)) throw new Error("Invalid CX filename: " + file);
             const binding = kind + (file === original ? "_base_" : "_catalog_") + stem.replaceAll("-", "_");
             imports.push(`import ${binding} from "${"../../../../" + file}";`);
-            const desktopOnly = parsed.kind === "plugin" && (
-                [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.desktopOnly)
-                || parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.desktopOnly)
-            );
-            const mobileOnly = parsed.kind === "plugin" && (
-                [...parsed.hiddenTargets, ...parsed.styledTargets].some(target => cxAppearanceTargets[target]?.mobileOnly)
-                || parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.mobileOnly)
-            );
+            const { desktopOnly, mobileOnly, linuxOnly } = pluginPlatforms(parsed, runtime);
             if (mobileOnly && desktopOnly) throw new Error(`Conflicting platform requirements in ${file}`);
-            const linuxOnly = parsed.kind === "plugin" && parsed.nativeEffects.some(effect => cxNativeEffects[effect]?.linuxOnly);
             const review = parsed.kind === "plugin" ? reviewCx(document) : undefined;
             const specific = review?.effects.slice(parsed.permissions?.length ?? 0) ?? [];
             const commandNames = declaredCommands?.map(command => command.name) ?? [];
@@ -145,4 +150,4 @@ if (require.main === module) {
     }
 }
 
-module.exports = { buildCatalog, catalogPath, desktopPluginTarget, loadCxParser, loadCxRuntime, pluginBody };
+module.exports = { buildCatalog, catalogPath, desktopPluginTarget, loadCxParser, loadCxRuntime, pluginBody, pluginPlatforms };

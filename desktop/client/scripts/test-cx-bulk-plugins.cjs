@@ -78,6 +78,15 @@ assert.deepEqual(batchPorts.skipped.map(({ file }) => file), ["existing", "inval
 assert.match(batchPorts.skipped[2].reason, /duplicate CX command/);
 assert.deepEqual([...selectReadyPorts([candidate], { ...catalog, desktopPlugins: desktopPluginTarget }, runtime).files], []);
 assert.equal(selectReadyPorts([candidate], { ...catalog, desktopPlugins: desktopPluginTarget - 1 }, runtime).files.size, 1);
+const mobileOnlyPort = {
+    name: "Hide drawer subtitles", file: "mobile-only",
+    cx: 'plugin "Hide drawer subtitles":\n  needs appearance.hide\n  hide hide-home-drawer-mention-subtitle\n  hide hide-home-drawer-unread-subtitle\n',
+};
+const lastDesktopSlot = selectReadyPorts([mobileOnlyPort, candidate], { ...catalog, desktopPlugins: desktopPluginTarget - 1 }, runtime);
+assert.equal(lastDesktopSlot.files.size, 2, "mobile-only ports do not consume desktop slots");
+const fullDesktop = selectReadyPorts([candidate, mobileOnlyPort], { ...catalog, desktopPlugins: desktopPluginTarget }, runtime);
+assert.equal(fullDesktop.files.size, 1);
+assert.match(fullDesktop.skipped[0].reason, /desktop catalog limit/);
 
 const silentMessageAlias = {
     name: "AutoSilentMessage", file: "upstream-alias",

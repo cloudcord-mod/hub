@@ -1873,20 +1873,23 @@ function portFiles(ports) {
 }
 
 function selectReadyPorts(ports, baseline, runtime) {
-    const { pluginBody } = require("./sync-cx-catalog.cjs");
+    const { pluginBody, pluginPlatforms } = require("./sync-cx-catalog.cjs");
     const files = new Map();
     const bodies = new Map(baseline.pluginBodies);
     const names = new Set(baseline.names);
     const commands = new Set(baseline.commands);
     const skipped = [];
+    let desktopCount = baseline.desktopPlugins;
     for (const port of ports) {
         try {
             const candidate = portFiles([port]);
             const [[filename, source]] = candidate;
             if (files.get(filename) === source) continue;
-            if (baseline.desktopPlugins + files.size >= desktopPluginTarget) throw new Error("catalog limit reached");
             if (baseline.pluginFiles.has(filename) || files.has(filename)) throw new Error("duplicate CX filename " + filename);
             const plugin = runtime.parseCx(source);
+            const { desktopOnly, mobileOnly } = pluginPlatforms(plugin, runtime);
+            if (desktopOnly && mobileOnly) throw new Error("conflicting platform requirements");
+            if (!mobileOnly && desktopCount >= desktopPluginTarget) throw new Error("desktop catalog limit reached");
             const name = plugin.name.trim().toLowerCase();
             if (names.has(name)) throw new Error("duplicate CX name " + plugin.name);
             const conflict = plugin.commands?.find(command => commands.has(command.name));
@@ -1896,6 +1899,7 @@ function selectReadyPorts(ports, baseline, runtime) {
             if (equivalent) throw new Error("duplicate CX plugin behavior already provided by " + equivalent);
             verifyPorts(candidate, runtime);
             files.set(filename, source);
+            if (!mobileOnly) desktopCount++;
             bodies.set(body, plugin.name);
             names.add(name);
             for (const command of plugin.commands) commands.add(command.name);
