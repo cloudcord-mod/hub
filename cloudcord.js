@@ -37502,9 +37502,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideAppsButton",
           label: "the chat apps button",
           css: 'button[aria-label="Apps"] { display: none !important; }',
-          mobile: [
-            "ChatInputActionButtonApps"
-          ]
+          mobile: {
+            hideComponentPaths: [
+              "modules/chat_input/native/action_buttons/ChatInputActionButtonApps.tsx"
+            ]
+          }
         },
         "chat-upload-button": {
           plugin: "HideUploadButton",
@@ -37534,17 +37536,21 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           plugin: "HideCharacterCount",
           label: "the chat character counter",
           css: '[class*="characterCount"] { display: none !important; }',
-          mobile: [
-            "ChatInputCharCounter"
-          ]
+          mobile: {
+            hideComponentPaths: [
+              "modules/chat_input/native/accessories/ChatInputCharCounter.tsx"
+            ]
+          }
         },
         "chat-send-button": {
           plugin: "HideSendButton",
           label: "the chat send button",
           css: 'button[aria-label="Send Message"] { display: none !important; }',
-          mobile: [
-            "ChatInputSendButton"
-          ]
+          mobile: {
+            hideComponentPaths: [
+              "modules/chat_input/native/accessories/ChatInputSendButton.tsx"
+            ]
+          }
         },
         "dm-call-buttons": {
           plugin: "HideCallButtons",
@@ -67695,7 +67701,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "93e7036b8f7a720b87ef81751e2a8fc364c8318c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2dbb019c68ddb38f0279cb06ab4a977525cd2450";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
