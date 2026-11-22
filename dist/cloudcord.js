@@ -36908,6 +36908,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-voice-soundboard-shortcut": hideMobileComponent("HideVoiceSoundboardShortcut", "the soundboard shortcut in the voice panel", "modules/voice_panel/native/controls/buttons/VoicePanelSoundboardButton.tsx"),
+        "hide-voice-header-chat-shortcut": hideMobileComponent("HideVoiceHeaderChatShortcut", "the chat shortcut in the voice panel header", "modules/voice_panel/native/header/VoicePanelHeaderChatButton.tsx"),
+        "hide-emoji-unicode-shortcut": hideMobileComponent("HideEmojiUnicodeShortcut", "the Unicode category shortcut in the emoji picker", "modules/emoji_picker/native/components/categories/EmojiPickerCategoriesUnicodeShortcutItem.tsx"),
         "hide-active-channel-cards": hideMobileComponent("HideActiveChannelCards", "active text channel cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActiveChannel.tsx"),
         "hide-activity-cards": hideMobileComponent("HideActivityCards", "activity cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardActivity.tsx"),
         "hide-upcoming-event-cards": hideMobileComponent("HideUpcomingEventCards", "event cards in Happening Now", "modules/main_tabs_v2/native/shared_components/happening_now/HappeningNowCardEvent.tsx"),
@@ -51108,6 +51111,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-emoji-unicode-shortcut.cx
+  var hide_emoji_unicode_shortcut_default;
+  var init_hide_emoji_unicode_shortcut = __esm({
+    "../examples/cx/catalog/plugins/hide-emoji-unicode-shortcut.cx"() {
+      hide_emoji_unicode_shortcut_default = 'plugin "HideEmojiUnicodeShortcut":\n  needs appearance.hide\n  hide hide-emoji-unicode-shortcut\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-empty-folders.cx
   var hide_empty_folders_default;
   var init_hide_empty_folders = __esm({
@@ -51948,11 +51959,27 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-voice-header-chat-shortcut.cx
+  var hide_voice_header_chat_shortcut_default;
+  var init_hide_voice_header_chat_shortcut = __esm({
+    "../examples/cx/catalog/plugins/hide-voice-header-chat-shortcut.cx"() {
+      hide_voice_header_chat_shortcut_default = 'plugin "HideVoiceHeaderChatShortcut":\n  needs appearance.hide\n  hide hide-voice-header-chat-shortcut\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-voice-panel-tips.cx
   var hide_voice_panel_tips_default;
   var init_hide_voice_panel_tips = __esm({
     "../examples/cx/catalog/plugins/hide-voice-panel-tips.cx"() {
       hide_voice_panel_tips_default = 'plugin "HideVoicePanelTips":\n  needs appearance.style\n  style hide-voice-panel-tips\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-voice-soundboard-shortcut.cx
+  var hide_voice_soundboard_shortcut_default;
+  var init_hide_voice_soundboard_shortcut = __esm({
+    "../examples/cx/catalog/plugins/hide-voice-soundboard-shortcut.cx"() {
+      hide_voice_soundboard_shortcut_default = 'plugin "HideVoiceSoundboardShortcut":\n  needs appearance.hide\n  hide hide-voice-soundboard-shortcut\n';
     }
   });
 
@@ -54649,6 +54676,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_embeds();
       init_hide_emoji_button();
       init_hide_emoji_search_promotion();
+      init_hide_emoji_unicode_shortcut();
       init_hide_empty_folders();
       init_hide_friend_requests_badge();
       init_hide_game_claim_card();
@@ -54754,7 +54782,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_user_panel_activity();
       init_hide_voice_activity_cards();
       init_hide_voice_event_banner();
+      init_hide_voice_header_chat_shortcut();
       init_hide_voice_panel_tips();
+      init_hide_voice_soundboard_shortcut();
       init_hide_voice_user_avatars();
       init_hide_you_banner_decorations();
       init_hide_you_settings_tip();
@@ -56752,6 +56782,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "8d565a893f4e193c3f8855c188b8150d40bd7aef7d800e86da8250f6f59ded88"
           },
           {
+            name: "HideEmojiUnicodeShortcut",
+            source: hide_emoji_unicode_shortcut_default,
+            description: "Hide the Unicode category shortcut in the emoji picker",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "9b13cad362255389f538a60b36dcc4b0881273977807271fa1a3a21a76cce068"
+          },
+          {
             name: "HideEmptyFolders",
             source: hide_empty_folders_default,
             description: "Hide empty expanded server folders",
@@ -57751,6 +57791,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "1a6d421d15934212c4a4e66bc0ac31f15e3a23f33946a464be6faf07edea6576"
           },
           {
+            name: "HideVoiceHeaderChatShortcut",
+            source: hide_voice_header_chat_shortcut_default,
+            description: "Hide the chat shortcut in the voice panel header",
+            mobileOnly: true,
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ],
+            appearanceRevision: "26b508a7f1e90f2aff13fdccf70fe907e6e37ce616f6ecc674c58c01dad4cfb5"
+          },
+          {
             name: "HideVoicePanelTips",
             source: hide_voice_panel_tips_default,
             description: "Hides tips in the voice connection panel",
@@ -57759,6 +57810,17 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance",
               "Voice & calls"
             ]
+          },
+          {
+            name: "HideVoiceSoundboardShortcut",
+            source: hide_voice_soundboard_shortcut_default,
+            description: "Hide the soundboard shortcut in the voice panel",
+            mobileOnly: true,
+            categories: [
+              "Appearance",
+              "Voice & calls"
+            ],
+            appearanceRevision: "ba9f6e69e9c4cfa655b26faaeab17f73351d5430b3c0819f7b8b0f160c9a5bdf"
           },
           {
             name: "HideVoiceUserAvatars",
@@ -69834,7 +69896,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b624e9d45a647e8ee5e2418b7544d7da0bf17783";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "da0a7f11468c8d645e3a0344fc6143425c1259f2";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
