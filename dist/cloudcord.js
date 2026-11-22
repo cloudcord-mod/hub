@@ -41116,8 +41116,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "reply-timestamp": {
           permission: "messages.replytimestamp",
-          label: "Show the original message's timestamp on loaded reply previews",
-          desktopOnly: true
+          label: "Show the original message's timestamp on loaded reply previews"
         },
         "message-latency": {
           permission: "messages.senddelay",
@@ -45068,11 +45067,21 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   });
 
   // src/lib/api/cxTimestamps.ts
+  function parseTimestamp(input) {
+    return import_moment.default.isMoment(input) ? input : typeof input === "string" ? (0, import_moment.default)(input, import_moment.default.ISO_8601, true) : typeof input === "number" || Object.prototype.toString.call(input) === "[object Date]" ? (0, import_moment.default)(input) : void 0;
+  }
+  function formatCxReplyTimestamp(original, reply) {
+    var source = parseTimestamp(original);
+    var current = parseTimestamp(reply);
+    if (!source?.isValid() || !current?.isValid())
+      return;
+    return source.format(source.isSame(current, "day") ? "LT" : "L LT");
+  }
   function formatCxTimestamp(input, surface, formats) {
     var template = formats?.[surface];
     if (!template || input == null)
       return;
-    var date = import_moment.default.isMoment(input) ? input : typeof input === "string" ? (0, import_moment.default)(input, import_moment.default.ISO_8601, true) : typeof input === "number" || Object.prototype.toString.call(input) === "[object Date]" ? (0, import_moment.default)(input) : void 0;
+    var date = parseTimestamp(input);
     if (!date?.isValid())
       return;
     return template.split(/(\[(?:calendar|relative)\])/g).map((part) => {
@@ -56083,7 +56092,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "ReplyTimestamp",
             source: reply_timestamp_default,
             description: "Show the original message's timestamp on loaded reply previews",
-            desktopOnly: true,
             categories: [
               "Chat"
             ]
@@ -57835,6 +57843,45 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     restoreRememberedCxAppearance: () => restoreRememberedCxAppearance,
     useCxAddonRows: () => useCxAddonRows
   });
+  function registerReplyTimestamps(enabled) {
+    var renderer = findByFilePath("modules/messages/native/renderer/createMessageContent.tsx");
+    var store = findByStoreName("ReferencedMessageStore");
+    if (typeof store?.getMessageByReference !== "function")
+      throw new Error("Discord's reply preview store is unavailable");
+    return overrideCxMethods(renderer, {
+      default(args, invoke) {
+        var rendered = invoke(args);
+        var input = args[0];
+        var preview2 = rendered?.referencedMessage;
+        var content = preview2?.message?.content;
+        var reference = input?.message?.messageReference;
+        if (!Array.isArray(content) || !reference || input?.isInlineReplyPreview)
+          return rendered;
+        var original = store.getMessageByReference(reference);
+        if (original?.message == null)
+          return rendered;
+        var label2 = formatCxReplyTimestamp(original.message.timestamp, input?.message?.timestamp);
+        if (!label2)
+          return rendered;
+        return {
+          ...rendered,
+          referencedMessage: {
+            ...preview2,
+            message: {
+              ...preview2.message,
+              content: [
+                {
+                  type: "text",
+                  content: label2 + " \xB7 "
+                },
+                ...content
+              ]
+            }
+          }
+        };
+      }
+    }, enabled);
+  }
   function registerTimestampFormats(formats) {
     if (!stopTimestamps) {
       var enabled = () => !settings.safeMode?.enabled;
@@ -61215,7 +61262,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           case "reveal-spoilers-shortcut":
             throw new Error("The reveal-spoilers shortcut is available on desktop and browser.");
           case "reply-timestamp":
-            throw new Error("Reply timestamps are available on desktop and browser.");
+            return registerReplyTimestamps(enabled);
           case "message-latency":
             throw new Error("The send-delay indicator is available on desktop and browser.");
           case "animated-assets":
@@ -66744,7 +66791,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "03cf660d68f1f38d3ea1f160dae3c3f5f62dd324";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "fec55195b1bb507f717b6d8c3ce0b68394da54dc";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
