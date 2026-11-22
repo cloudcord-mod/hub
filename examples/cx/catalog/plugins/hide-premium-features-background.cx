@@ -1,0 +1,3 @@
+plugin "HidePremiumFeaturesBackground":
+  needs appearance.hide
+  hide hide-premium-features-background

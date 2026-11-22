@@ -1,0 +1,3 @@
+plugin "HideMobileHeaderGradient":
+  needs appearance.hide
+  hide hide-mobile-header-gradient

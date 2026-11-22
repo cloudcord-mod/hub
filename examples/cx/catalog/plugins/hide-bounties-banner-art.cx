@@ -1,0 +1,3 @@
+plugin "HideBountiesBannerArt":
+  needs appearance.hide
+  hide hide-bounties-banner-art

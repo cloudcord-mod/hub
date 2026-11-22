@@ -1,0 +1,3 @@
+plugin "HideQuestModalClouds":
+  needs appearance.hide
+  hide hide-quest-modal-clouds

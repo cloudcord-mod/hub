@@ -1,0 +1,3 @@
+plugin "HideShopNitroCoinArt":
+  needs appearance.hide
+  hide hide-shop-nitro-coin-art

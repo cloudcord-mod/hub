@@ -154,6 +154,7 @@ import plugin_catalog_hide_boost_progress_tip from "../../../../examples/cx/cata
 import plugin_catalog_hide_boost_recognition_cards from "../../../../examples/cx/catalog/plugins/hide-boost-recognition-cards.cx";
 import plugin_catalog_hide_boost_tier_cards from "../../../../examples/cx/catalog/plugins/hide-boost-tier-cards.cx";
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
+import plugin_catalog_hide_bounties_banner_art from "../../../../examples/cx/catalog/plugins/hide-bounties-banner-art.cx";
 import plugin_catalog_hide_bounties_promo_header from "../../../../examples/cx/catalog/plugins/hide-bounties-promo-header.cx";
 import plugin_catalog_hide_bounties_scroll_prompt from "../../../../examples/cx/catalog/plugins/hide-bounties-scroll-prompt.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
@@ -212,6 +213,7 @@ import plugin_catalog_hide_member_activities from "../../../../examples/cx/catal
 import plugin_catalog_hide_member_list_button from "../../../../examples/cx/catalog/plugins/hide-member-list-button.cx";
 import plugin_catalog_hide_mention_badges from "../../../../examples/cx/catalog/plugins/hide-mention-badges.cx";
 import plugin_catalog_hide_message_length_promotion from "../../../../examples/cx/catalog/plugins/hide-message-length-promotion.cx";
+import plugin_catalog_hide_mobile_header_gradient from "../../../../examples/cx/catalog/plugins/hide-mobile-header-gradient.cx";
 import plugin_catalog_hide_monthly_reward_promotions from "../../../../examples/cx/catalog/plugins/hide-monthly-reward-promotions.cx";
 import plugin_catalog_hide_nameplates from "../../../../examples/cx/catalog/plugins/hide-nameplates.cx";
 import plugin_catalog_hide_new_channel_badge from "../../../../examples/cx/catalog/plugins/hide-new-channel-badge.cx";
@@ -225,6 +227,7 @@ import plugin_catalog_hide_orb_wallet_seasonal_promotion from "../../../../examp
 import plugin_catalog_hide_outbound_promotion_cards from "../../../../examples/cx/catalog/plugins/hide-outbound-promotion-cards.cx";
 import plugin_catalog_hide_pins_button from "../../../../examples/cx/catalog/plugins/hide-pins-button.cx";
 import plugin_catalog_hide_powerup_unlock_tip from "../../../../examples/cx/catalog/plugins/hide-powerup-unlock-tip.cx";
+import plugin_catalog_hide_premium_features_background from "../../../../examples/cx/catalog/plugins/hide-premium-features-background.cx";
 import plugin_catalog_hide_premium_group_promotion from "../../../../examples/cx/catalog/plugins/hide-premium-group-promotion.cx";
 import plugin_catalog_hide_premium_marketing_banner from "../../../../examples/cx/catalog/plugins/hide-premium-marketing-banner.cx";
 import plugin_catalog_hide_premium_upsell_gradient from "../../../../examples/cx/catalog/plugins/hide-premium-upsell-gradient.cx";
@@ -247,6 +250,7 @@ import plugin_catalog_hide_profile_upsell_card from "../../../../examples/cx/cat
 import plugin_catalog_hide_profile_wishlist_suggestions from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx";
 import plugin_catalog_hide_profile_wishlist_tip from "../../../../examples/cx/catalog/plugins/hide-profile-wishlist-tip.cx";
 import plugin_catalog_hide_profile_your_friends_card from "../../../../examples/cx/catalog/plugins/hide-profile-your-friends-card.cx";
+import plugin_catalog_hide_quest_modal_clouds from "../../../../examples/cx/catalog/plugins/hide-quest-modal-clouds.cx";
 import plugin_catalog_hide_quest_orb_multiplier_pill from "../../../../examples/cx/catalog/plugins/hide-quest-orb-multiplier-pill.cx";
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
 import plugin_catalog_hide_reactions from "../../../../examples/cx/catalog/plugins/hide-reactions.cx";
@@ -274,6 +278,7 @@ import plugin_catalog_hide_settings_premium_new_badge from "../../../../examples
 import plugin_catalog_hide_shop_button_tip from "../../../../examples/cx/catalog/plugins/hide-shop-button-tip.cx";
 import plugin_catalog_hide_shop_featured_collections from "../../../../examples/cx/catalog/plugins/hide-shop-featured-collections.cx";
 import plugin_catalog_hide_shop_limited_time_badges from "../../../../examples/cx/catalog/plugins/hide-shop-limited-time-badges.cx";
+import plugin_catalog_hide_shop_nitro_coin_art from "../../../../examples/cx/catalog/plugins/hide-shop-nitro-coin-art.cx";
 import plugin_catalog_hide_shop_nitro_unlock_button from "../../../../examples/cx/catalog/plugins/hide-shop-nitro-unlock-button.cx";
 import plugin_catalog_hide_shop_orbs_tip from "../../../../examples/cx/catalog/plugins/hide-shop-orbs-tip.cx";
 import plugin_catalog_hide_shop_tab from "../../../../examples/cx/catalog/plugins/hide-shop-tab.cx";
@@ -764,6 +769,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBoostRecognitionCards", source: plugin_catalog_hide_boost_recognition_cards, description: "Hide the booster recognition cards on the server boost marketing page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "54c3f3af4e1ca07a919192a5a7d05a8348b1a2a907353d62df351008bcae149c" },
         { name: "HideBoostTierCards", source: plugin_catalog_hide_boost_tier_cards, description: "Hide the tier comparison cards on the server boost page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c9c37273317baa20c2bf97f86e73de64c092c210ce4332455ebfd560776ab9e4" },
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags, description: "Hide APP and BOT tags", categories: ["Appearance"], appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e" },
+        { name: "HideBountiesBannerArt", source: plugin_catalog_hide_bounties_banner_art, description: "Hide the decorative background behind the Bounties banner", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "66091d1ef3317e0879f74d38f467f49df3590196c7b233b59ec88fcbedd1c0df" },
         { name: "HideBountiesPromoHeader", source: plugin_catalog_hide_bounties_promo_header, description: "Hide the Bounties call-to-action header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "6990f7947a8f807783a8207e64b78bd3e661e08721992037e70300257b47e1c4" },
         { name: "HideBountiesScrollPrompt", source: plugin_catalog_hide_bounties_scroll_prompt, description: "Hide the scroll prompt in the Bounties modal", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "5396fe64555b90748fd34f964c37ace0d3d4ccd8c5e92173c00dd0b11e309d2f" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
@@ -822,6 +828,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideMemberListButton", source: plugin_catalog_hide_member_list_button, description: "Hides the member list toggle in the channel header", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideMentionBadges", source: plugin_catalog_hide_mention_badges, description: "Hide mention count badges", categories: ["Appearance"], appearanceRevision: "71ff42f973686ad65b32085da67363ea82e0ddace83c2b3f3091f855bce2eaef" },
         { name: "HideMessageLengthPromotion", source: plugin_catalog_hide_message_length_promotion, description: "Hide the Nitro promotion shown with long messages", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideMobileHeaderGradient", source: plugin_catalog_hide_mobile_header_gradient, description: "Hide the themed gradient behind mobile panel headers", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2195f7d2565a8ce8b3e4ca145aa4ff34ec200999fcb4c823a4cb457b9bc441d9" },
         { name: "HideMonthlyRewardPromotions", source: plugin_catalog_hide_monthly_reward_promotions, description: "Hide promotional cards in the monthly rewards panel", desktopOnly: true, categories: ["Appearance"] },
         { name: "HideNameplates", source: plugin_catalog_hide_nameplates, description: "Hide nameplates", categories: ["Appearance"], appearanceRevision: "a1a4921ec50253e74f70cee18c4210151654b56ab3af47085be01cb56028aa58" },
         { name: "HideNewChannelBadge", source: plugin_catalog_hide_new_channel_badge, description: "Hide the New label on recently added channels", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "02ad347b103d7161395232d2feb7485d9f95a783619ddd1894c04b22b179074e" },
@@ -835,6 +842,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideOutboundPromotionCards", source: plugin_catalog_hide_outbound_promotion_cards, description: "Hide external offer cards on premium surfaces", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "4a3f01281d0af0c4f184367a740165f4199b332be09d1f66cae36403ab6394d5" },
         { name: "HidePinsButton", source: plugin_catalog_hide_pins_button, description: "Hide the pinned messages shortcut", categories: ["Appearance"], appearanceRevision: "f7ca419827b2b04e6003671e983a38d57398662db12a9453f64491d5e8c82f67" },
         { name: "HidePowerupUnlockTip", source: plugin_catalog_hide_powerup_unlock_tip, description: "Hide the boost-to-unlock tooltip for server powerups", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "fc174f9df6d011b4f746ef1de2f5cb3678025bfbefad4048eda0cf49f5ef4dea" },
+        { name: "HidePremiumFeaturesBackground", source: plugin_catalog_hide_premium_features_background, description: "Hide the decorative background behind the Premium features list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "78ea8485d5984a83997473d6ff3c257e6a474bd8d7cfec38eec843af9ea89027" },
         { name: "HidePremiumGroupPromotion", source: plugin_catalog_hide_premium_group_promotion, description: "Hide the premium group promotion in the offer dialog", desktopOnly: true, categories: ["Appearance"] },
         { name: "HidePremiumMarketingBanner", source: plugin_catalog_hide_premium_marketing_banner, description: "Hide the banner tile on the premium promotions page", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "508126ef428933e2220d3d92219d41a375cf541c65f9fb3b88bc4b234baa907a" },
         { name: "HidePremiumUpsellGradient", source: plugin_catalog_hide_premium_upsell_gradient, description: "Hide the decorative gradient behind premium upsells", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "8c6f0023b1acc28b86408652ffd22245330f646c66de1a68bee457a7499890a8" },
@@ -857,6 +865,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideProfileWishlistSuggestions", source: plugin_catalog_hide_profile_wishlist_suggestions, description: "Hide suggested items on profile wishlists", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "d23c4eb8f183ca2a7f49fc9086f59dd68e5f6c031b000430c0670ea2754d0622" },
         { name: "HideProfileWishlistTip", source: plugin_catalog_hide_profile_wishlist_tip, description: "Hide the wishlist viewing tip on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "74d22841fc73e0f740b1819df239a6b3023720a18799b73e96b32cf90f67649f" },
         { name: "HideProfileYourFriendsCard", source: plugin_catalog_hide_profile_your_friends_card, description: "Hide the Your Friends card on profiles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "cf8643aab98028870a0f94da41616631a8478823ad49a5d77793a1cc1a85b389" },
+        { name: "HideQuestModalClouds", source: plugin_catalog_hide_quest_modal_clouds, description: "Hide the cloud artwork in Quest modals", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "2012c25e620bd5fe6dfd66d100633d0d84c8c7969045bd5dd72f656728f9f070" },
         { name: "HideQuestOrbMultiplierPill", source: plugin_catalog_hide_quest_orb_multiplier_pill, description: "Hide the Orb multiplier perk label on quests", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "03f19a71805dbf9465f5644be6b64fd64e68a18e496d5aa9b25caf615d8b7b5b" },
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry", categories: ["Appearance"], appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe" },
         { name: "HideReactions", source: plugin_catalog_hide_reactions, description: "Hide message reactions", categories: ["Appearance"], appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58" },
@@ -884,6 +893,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideShopButtonTip", source: plugin_catalog_hide_shop_button_tip, description: "Hide the Shop button introduction", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "b39faa8c61b991b3e0b89999c84eff7875a0722b2a01b7f62189d9997ee59848" },
         { name: "HideShopFeaturedCollections", source: plugin_catalog_hide_shop_featured_collections, description: "Hide featured collections in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "daa25863e067d4624b5affaded88ee76ce45516516f3aae7958b773166a1c00c" },
         { name: "HideShopLimitedTimeBadges", source: plugin_catalog_hide_shop_limited_time_badges, description: "Hide limited-time labels on Shop collectibles", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "768c11081eb04523c28f1e2fc2d7d3ab32317c4e142c32dff2132c2597ef329a" },
+        { name: "HideShopNitroCoinArt", source: plugin_catalog_hide_shop_nitro_coin_art, description: "Hide the fractional Nitro coin illustration in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "66f721875f59d8701b615c0f9a23fcd57286113c4365cdf840324b8fd4c73f01" },
         { name: "HideShopNitroUnlockButton", source: plugin_catalog_hide_shop_nitro_unlock_button, description: "Hide the Unlock with Nitro button in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9da200574358d6c41341719b72569705284dbb2ab1ecc3d004b6662597d1ddd4" },
         { name: "HideShopOrbsTip", source: plugin_catalog_hide_shop_orbs_tip, description: "Hide the Orbs badge introduction in the Shop", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c85b6065539f13b9ef0db320e0202a52659ad7c1524c8630cf4bc2a4a81e31fe" },
         { name: "HideShopTab", source: plugin_catalog_hide_shop_tab, description: "Hide the Shop entry", categories: ["Appearance"], appearanceRevision: "fec755aa3233322d5c3f9fb5d27a1617743d55a00148a9e092bb4011dcfe947d" },

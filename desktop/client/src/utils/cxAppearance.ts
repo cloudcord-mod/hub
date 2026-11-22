@@ -17,6 +17,11 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-shop-nitro-coin-art": hideMobileComponent("HideShopNitroCoinArt", "the fractional Nitro coin illustration in the Shop", "modules/collectibles/native/FractionalNitroCoinIllustration.tsx"),
+    "hide-mobile-header-gradient": hideMobileComponent("HideMobileHeaderGradient", "the themed gradient behind mobile panel headers", "modules/main_tabs_v2/native/panels/ThemedHeaderBackgroundGradient.tsx"),
+    "hide-bounties-banner-art": hideMobileComponent("HideBountiesBannerArt", "the decorative background behind the Bounties banner", "modules/quests/native/BountiesBannerBackground.tsx"),
+    "hide-quest-modal-clouds": hideMobileComponent("HideQuestModalClouds", "the cloud artwork in Quest modals", "modules/quests/native/QuestModalContentCloudBackground.tsx"),
+    "hide-premium-features-background": hideMobileComponent("HidePremiumFeaturesBackground", "the decorative background behind the Premium features list", "modules/user_settings/premium/native/PremiumFeaturesBackground.tsx"),
     "hide-gift-button-animation": hideMobileComponent("HideGiftButtonAnimation", "the decorative animation on the chat gift button", "modules/chat_input/native/GiftIconTrinketsAnimation.tsx"),
     "hide-app-launcher-button-animation": hideMobileComponent("HideAppLauncherButtonAnimation", "the app launcher button introduction animation", "modules/app_launcher/native/onboarding/AppLauncherOnboardingChatInputButtonAnimation.tsx"),
     "hide-super-reaction-animation": hideMobileComponent("HideSuperReactionAnimation", "the Super Reaction animation in chat", "modules/messages/native/burst_reactions/BurstReactionAnimation.tsx"),
