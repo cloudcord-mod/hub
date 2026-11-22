@@ -70,7 +70,7 @@ const STATUS_COLORS: Record<string, string> = { online: "#23A55A", idle: "#F0B23
 function StudioPresence({ status, borderColor, borderWidth = 4, bottom = 4 }: {
     status?: string; borderColor: string; borderWidth?: number; bottom?: number;
 }) {
-    const visibleStatus = status === "offline" ? "invisible" : status && Object.hasOwn(STATUS_COLORS, status) ? status : "online";
+    const visibleStatus = status === "offline" ? "invisible" : status && Object.prototype.hasOwnProperty.call(STATUS_COLORS, status) ? status : "online";
     const label = visibleStatus === "invisible" ? "offline" : visibleStatus === "dnd" ? "do not disturb" : visibleStatus;
     return <View accessible accessibilityLabel={`Status: ${label}`} style={{
         position: "absolute", right: 2, bottom, width: 22, height: 22, borderRadius: 11,
