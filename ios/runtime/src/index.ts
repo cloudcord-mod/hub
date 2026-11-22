@@ -77,14 +77,27 @@ export default async () => {
 
     // Keep the catalog and native appearance adapters off the startup path
     // until storage confirms the user chose to remember an appearance.
+    let cancelled = false;
+    let restoreTimer: ReturnType<typeof setTimeout> | undefined;
+    lib.unload.push(() => {
+        cancelled = true;
+        if (restoreTimer !== undefined) clearTimeout(restoreTimer);
+    });
     void Promise.resolve().then(async () => {
         const { settings } = require("@lib/api/settings") as typeof import("@lib/api/settings");
         const { awaitStorage } = require("@core/vendetta/storage") as typeof import("@core/vendetta/storage");
         await awaitStorage(settings);
-        if (settings.safeMode?.enabled || !settings.cxRememberedAppearance?.length) return;
-        const cleanup = await runStartupTask("CX appearance", () =>
-            require("@core/ui/settings/pages/CxExtensions").restoreRememberedCxAppearance());
-        if (cleanup) lib.unload.push(cleanup);
+        if (cancelled || settings.safeMode?.enabled || !settings.cxRememberedAppearance?.length) return;
+        restoreTimer = setTimeout(() => {
+            restoreTimer = undefined;
+            if (cancelled || settings.safeMode?.enabled) return;
+            void runStartupTask("CX appearance", () =>
+                require("@core/ui/settings/pages/CxExtensions").restoreRememberedCxAppearance()).then(cleanup => {
+                if (!cleanup) return;
+                if (cancelled) cleanup();
+                else lib.unload.push(cleanup);
+            }).catch(error => console.warn("CloudCord could not clean up CX appearance", error));
+        }, 0);
     }).catch(error => console.warn("CloudCord could not restore CX appearance", error));
 
     initDebugger()

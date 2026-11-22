@@ -45,6 +45,38 @@ const code = esbuild.transformSync(source, { loader: 'ts', format: 'cjs' }).code
         assert.equal(nativeLogs.at(-1), 'CloudCord is ready!', 'native readiness is emitted at completed startup');
         assert.equal(nativeLogs.filter(message => message === 'CloudCord is ready!').length, 1);
     }
+    for (const mode of ['restore', 'safe-mode', 'unload']) {
+        const module = { exports: {} };
+        const lib = { unload: [] };
+        const settings = { cxRememberedAppearance: [{}] };
+        let scheduled, restored = 0;
+        const noop = () => undefined;
+        const context = {
+            module, exports: module.exports, window: {}, __CLOUDCORD_BRIDGELESS__: true,
+            console: { log() {}, warn() {}, error: console.error },
+            setTimeout(callback) { scheduled = callback; return 1; },
+            clearTimeout() { scheduled = undefined; },
+            require(name) {
+                if (name === './lib') return lib;
+                if (name === '@lib/api/settings') return { settings };
+                if (name === '@lib/utils/logger') return { logger: { log() {} } };
+                if (name === '@core/vendetta/storage') return { awaitStorage: noop };
+                if (name === '@core/vendetta/plugins') return { VdPluginManager: { initPlugins: noop } };
+                if (name === '@core/ui/settings/pages/CxExtensions') return { restoreRememberedCxAppearance() { restored++; return noop; } };
+                return new Proxy({ __esModule: true, default: noop }, { get: (_, key) => key === '__esModule' ? true : noop });
+            }
+        };
+        vm.runInNewContext(code, context);
+        await module.exports.default();
+        await new Promise(setImmediate);
+        assert.ok(context.window.bunny);
+        assert.equal(restored, 0);
+        assert.equal(typeof scheduled, 'function');
+        if (mode === 'safe-mode') settings.safeMode = { enabled: true };
+        if (mode === 'unload') lib.unload.forEach(cleanup => cleanup());
+        scheduled?.();
+        assert.equal(restored, mode === 'restore' ? 1 : 0);
+    }
     const workflow = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
     assert.ok(!workflow.includes('await initLegacyRuntimeRefresh();'), 'Release patching must not restore the startup wait');
     console.log('PASS settings startup with pending, rejected and throwing legacy updates; bridgeless skip');
