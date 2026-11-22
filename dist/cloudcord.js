@@ -36642,7 +36642,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [filter, setFilter] = (0, import_react11.useState)("");
     var { bottom: bottomInset } = useSafeAreaInsets();
     var navigation2 = NavigationNative.useNavigation();
-    var matchesFilter = props.filterOptions?.[filter] ?? props.defaultFilter;
+    var commandSearch = query.startsWith("/") && props.searchCommands;
+    var matchesFilter = props.filterOptions?.[filter] ?? (commandSearch ? void 0 : props.defaultFilter);
     (0, import_react11.useEffect)(() => {
       if (props.OptionsActionSheetComponent) {
         navigation2.setOptions({
@@ -36662,8 +36663,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (props.resolveItem)
         values = values.map(props.resolveItem).filter(isNotNil);
       var items = values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
-      if (query.startsWith("/") && props.searchCommands) {
-        return props.searchCommands(items, query).map((obj) => ({
+      if (commandSearch) {
+        return commandSearch(items, query).map((obj) => ({
           obj
         }));
       }
@@ -36677,12 +36678,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       props.items,
       props.resolveItem,
       props.isEnabled,
-      props.searchCommands,
       props.searchKeywords,
       sortFn,
       query,
       enabledOnly,
-      matchesFilter
+      matchesFilter,
+      commandSearch
     ]);
     var onInstallPress = (0, import_react11.useCallback)(() => {
       if (!props.installAction)
@@ -72023,7 +72024,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "36df151e75c68521261a87dce307adfb9c447999";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "30c8e47e0aac069950bf49eb3ce527b8fc6a3c9a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
