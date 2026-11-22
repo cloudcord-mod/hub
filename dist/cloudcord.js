@@ -18033,10 +18033,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (storeViews.has(module))
       return storeViews.get(module);
     var view = Object.create(module);
+    var seen = /* @__PURE__ */ new Set();
     for (var owner = module; owner && owner !== Object.prototype; owner = Object.getPrototypeOf(owner)) {
       for (var key of Reflect.ownKeys(owner)) {
-        if (key === "constructor" || Object.prototype.hasOwnProperty.call(view, key))
+        if (key === "constructor" || seen.has(key))
           continue;
+        seen.add(key);
         var descriptor = Object.getOwnPropertyDescriptor(owner, key);
         if (typeof descriptor?.value === "function")
           Object.defineProperty(view, key, {
@@ -18044,6 +18046,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             writable: true,
             value: descriptor.value.bind(module)
           });
+        if (descriptor && ("get" in descriptor || "set" in descriptor)) {
+          Object.defineProperty(view, key, {
+            configurable: true,
+            enumerable: descriptor.enumerable,
+            get: descriptor.get?.bind(module),
+            set: descriptor.set?.bind(module)
+          });
+        }
       }
     }
     for (var key1 of [
@@ -72200,7 +72210,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "cfde8532d9f01a85132f16d6f2de0385bd4a0542";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1a81d6cc1b71c64a7f494702b6e962dbceaed68d";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
