@@ -17,6 +17,9 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-stage-boost-promo": hideMobileComponent("HideStageBoostPromo", "the boost upsell in Stage channels", "modules/guild_scheduled_events/native/components/StageChannelUpsell.tsx"),
+    "hide-app-recommendation-rows": hideMobileComponent("HideAppRecommendationRows", "individual recommended app rows in the launcher", "modules/app_launcher/native/base_components/RecommendationAppRow.tsx"),
+    "hide-premium-upsell-gradient": hideMobileComponent("HidePremiumUpsellGradient", "the decorative gradient behind premium upsells", "modules/premium/roadblocks/native/views/PremiumUpsellGradientBackground.tsx"),
     "hide-media-message-preview": hideMobileComponent("HideMediaMessagePreview", "the source-message preview in the media viewer", "modules/media_viewer/native/components/message_preview/MediaMessagePreview.tsx"),
     "hide-sticker-pack-banner": hideMobileComponent("HideStickerPackBanner", "the banner in sticker pack details", "modules/stickers/native/StickerPackBanner.tsx"),
     "hide-channel-list-style-promo": hideMobileComponent("HideChannelListStylePromo", "the Nitro upsell under channel list appearance previews", "modules/user_settings/appearance/native/components/SettingsAppearanceChannelListPreviewNitroUpsell.tsx"),

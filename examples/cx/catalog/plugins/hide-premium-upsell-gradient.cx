@@ -1,0 +1,3 @@
+plugin "HidePremiumUpsellGradient":
+  needs appearance.hide
+  hide hide-premium-upsell-gradient

@@ -1,0 +1,3 @@
+plugin "HideStageBoostPromo":
+  needs appearance.hide
+  hide hide-stage-boost-promo
