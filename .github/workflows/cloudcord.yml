@@ -1126,7 +1126,14 @@ jobs:
               const owner = rootSettings.fakeProfilePreviewOwner ?? rootSettings.fakeProfileOwnerId;
               return ownerId && owner === ownerId ? rootSettings.fakeProfilePreviewBackup as PreviewSettings | undefined : undefined;
           }
+          type ActiveMobileTemplate = { id: string; name: string; data: Partial<PreviewSettings> | null; };
+          let activeMobileTemplate: { ownerId: string; template: ActiveMobileTemplate; } | null = null;
+          function resumeMobileTemplate(ownerId: string | null): ActiveMobileTemplate | null {
+              if (!ownedTemplateBackup(ownerId)) return null;
+              return activeMobileTemplate?.ownerId === ownerId ? activeMobileTemplate.template : { id: "", name: "Template", data: null };
+          }
           function clearTemplateBackup() {
+              activeMobileTemplate = null;
               delete rootSettings.fakeProfilePreviewBackup;
               delete rootSettings.fakeProfilePreviewOwner;
           }
@@ -4546,9 +4553,9 @@ jobs:
           const TEMPLATE_CATEGORIES = ["Aesthetic", "Anime", "Gaming", "Minimal", "Dark", "Cute", "Funny", "Other"];
           const countTemplateUse = (id: string) => { fetch(SHARED_PROFILE_API + "/v1/shares/" + id + "/use", { method: "POST" }).catch(() => {}); };
           function ProfileTemplates({ ownerId, current, onUse, onPreview }: { ownerId: string | null; current: any; onUse: (data: any) => void; onPreview: (data: any | null) => void }) {
-              const [previewing, setPreviewing] = useState<{ id: string; name: string; data: any } | null>(null);
+              const [previewing, setPreviewing] = useState<ActiveMobileTemplate | null>(() => resumeMobileTemplate(ownerId));
               // A preview stays on while you go look at your profile; Stop (or the next app start) ends it.
-              useEffect(() => { if (ownedTemplateBackup(ownerId)) setPreviewing({ id: "", name: "Template", data: null }); }, [ownerId]);
+              useEffect(() => { setPreviewing(resumeMobileTemplate(ownerId)); }, [ownerId]);
               const S = require("@core/ui/settings/components/ProfileStudio");
               const [query, setQuery] = useState("");
               const [category, setCategory] = useState("");
@@ -4582,7 +4589,9 @@ jobs:
                   if (previewing?.id === id) { onPreview(null); setPreviewing(null); showToast("Preview stopped"); return; }
                   const template = await fetchTemplate(id);
                   onPreview(template.data);
-                  setPreviewing({ id, ...template });
+                  const selected = { id, ...template };
+                  if (ownerId && ownedTemplateBackup(ownerId)) activeMobileTemplate = { ownerId, template: selected };
+                  setPreviewing(selected);
                   showToast("Previewing \u201c" + template.name + "\u201d on your profile");
               });
               const use = (id: string) => run(async () => {

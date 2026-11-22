@@ -44,9 +44,15 @@ assert.equal(account.rootSettings.fakeProfileSaved[legacyViewer][0], legacyLook)
 account.rootSettings.fakeProfile = account.preview = { enabled: true, bio: 'temporary preview' };
 account.rootSettings.fakeProfilePreviewOwner = legacyViewer;
 account.rootSettings.fakeProfilePreviewBackup = { enabled: true, bio: 'saved profile' };
+const activeTemplate = { id: 'template-id', name: 'Night', data: { bio: 'temporary preview' } };
+account.activeTemplate = activeTemplate;
+vm.runInContext('activeMobileTemplate = { ownerId: currentUserId, template: activeTemplate };', account);
+assert.equal(account.resumeMobileTemplate(legacyViewer), activeTemplate, 'reopening keeps the selected template');
+assert.equal(account.resumeMobileTemplate(alternateViewer), null, 'another account cannot use the selected template');
 account.adoptProfileAccount({ id: alternateViewer });
 assert.equal(account.rootSettings.fakeProfileAccounts[legacyViewer].profile.bio, 'saved profile');
 assert.equal(account.rootSettings.fakeProfilePreviewBackup, undefined);
+assert.equal(vm.runInContext('activeMobileTemplate', account), null);
 assert.equal(Object.keys(account.rootSettings.cloudcordRealProfileUsersByAccount).length, 1, 'legacy device choices are adopted once');
 assert(source.includes('editorOwner.current !== currentUserId'), 'stale editors cannot edit another account');
 (async () => {
