@@ -13,9 +13,10 @@
 .cc-store-count { padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; color: #fff; background: var(--cc-accent); }
 .cc-store-search { display: flex; align-items: center; gap: 6px; width: 220px; padding: 6px 10px; border-radius: 6px; color: var(--interactive-normal, var(--text-muted));
     background: var(--background-base-lowest, var(--background-tertiary)); }
+.cc-store-search:focus-within { outline: 2px solid var(--focus-primary, var(--cc-accent)); }
 .cc-store-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; color: var(--text-default, var(--text-normal)); font-size: 13px; }
 .cc-store-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.cc-store-basic, .cc-store-advanced, .cc-store-views { display: flex; align-items: center; gap: 6px; }
+.cc-store-basic, .cc-store-advanced, .cc-store-views { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .cc-store-advanced { gap: 14px; }
 .cc-store-icon-btn, .cc-store-view { display: grid; place-items: center; padding: 4px; border-radius: 4px; background: none; color: var(--interactive-normal, var(--text-muted)); cursor: pointer; }
 .cc-store-icon-btn:hover, .cc-store-view:hover { color: var(--interactive-hover, var(--text-default)); background: var(--background-modifier-hover); }
@@ -53,4 +54,4 @@
 .cc-store-store-list { grid-template-columns: 1fr; }
 .cc-store-store-list .cc-store-store-card { flex-direction: row; }
 .cc-store-store-list .cc-store-thumb { width: 200px; flex: none; }
-.cc-store-more { height: 1px; }
+.cc-store-more { display: flex; justify-content: center; padding-block: 10px; }

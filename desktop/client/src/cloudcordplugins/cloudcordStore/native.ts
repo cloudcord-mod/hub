@@ -14,7 +14,7 @@ const ALLOWED_SOURCE = /^https:\/\/raw\.githubusercontent\.com\//;
 
 // The store API sends no CORS headers, so the renderer asks the main process.
 export async function fetchThemeStore(_: IpcMainInvokeEvent): Promise<string> {
-    const res = await fetch(STORE_URL, { headers: { "User-Agent": "CloudCord" } });
+    const res = await fetch(STORE_URL, { headers: { "User-Agent": "CloudCord" }, signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error(`Theme store returned ${res.status}`);
     return res.text();
 }

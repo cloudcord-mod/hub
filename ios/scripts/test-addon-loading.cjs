@@ -86,5 +86,82 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
     assert.equal(renderList().props.data.length, 0, 'the list stays open when the last enabled plugin is turned off');
     filter(renderList()).props.onValueChange(false);
     assert.equal(renderList().props.data.length, 2);
+    let themeCursor = 0;
+    let effectKey;
+    let cleanup;
+    let fetchFails = true;
+    let releaseInstall;
+    let installs = 0;
+    const themeState = [];
+    const wallpaper = "https://example.com/wallpaper.json";
+    const monochrome = "https://example.com/mono.json";
+    const library = {};
+    let active = null;
+    const storeReact = {
+        ...React,
+        useState(initial) {
+            const index = themeCursor++;
+            if (!(index in themeState)) themeState[index] = initial;
+            return [themeState[index], value => { themeState[index] = typeof value === "function" ? value(themeState[index]) : value; }];
+        },
+        useRef(value) {
+            const [ref] = this.useState({ current: value });
+            return ref;
+        },
+        useEffect(effect, [key]) {
+            if (key === effectKey) return;
+            cleanup?.();
+            effectKey = key;
+            cleanup = effect();
+        },
+    };
+    const store = { module: { exports: {} }, React: storeReact, require(name) {
+        if (name === "@metro/common") return { React: storeReact };
+        if (name === "@metro/common/components") return { Button: "Button", FlashList: "FlashList", Text: "Text" };
+        if (name === "@lib/api/assets") return { findAssetId: () => 1 };
+        if (name === "@ui/toasts") return { showToast() {} };
+        if (name === "@lib/utils/safeFetch") return async url => {
+            if (fetchFails) throw new Error("Offline");
+            return { json: async () => url.includes("kmmiio99o")
+                ? [{ installUrl: monochrome, name: "Monochrome" }]
+                : { themes: [{ id: wallpaper, name: "Wallpaper", hasBackground: true, authors: ["Alice", 42] }, null] } };
+        };
+        if (name === "@lib/addons/themes") return {
+            themes: library, getCurrentTheme: () => active,
+            installTheme: async url => { installs++; await new Promise(resolve => { releaseInstall = resolve; }); library[url] = { id: url }; },
+            selectTheme: theme => { active = theme; },
+            removeTheme: url => { delete library[url]; },
+        };
+        return {};
+    } };
+    vm.runInNewContext(compile('ios/runtime/src/core/ui/settings/pages/ThemeStore/index.tsx'), store);
+    const renderStore = () => { themeCursor = 0; return walk(store.module.exports.default()); };
+    const button = label => renderStore().find(node => node.type === "Button" && node.props.text === label);
+    const themeList = () => renderStore().find(node => node.type === "FlashList").props;
+    const settle = () => new Promise(resolve => setImmediate(resolve));
+    renderStore();
+    await settle();
+    fetchFails = false;
+    button("Try again").props.onPress();
+    renderStore();
+    await settle();
+    assert.equal(themeList().data.length, 2);
+    button("With backgrounds").props.onPress();
+    assert.deepEqual(Array.from(themeList().data, theme => theme.name), ["Wallpaper"]);
+    button("Installed only").props.onPress();
+    assert.equal(themeList().data.length, 0);
+    button("Installed only").props.onPress();
+    const row = themeList().renderItem({ item: themeList().data[0] }).props;
+    const installing = row.change(row.theme, "use");
+    await row.change(row.theme, "use");
+    assert.equal(installs, 1, "duplicate taps must share one theme install");
+    releaseInstall();
+    await installing;
+    assert.equal(active.id, wallpaper);
+    button("Installed only").props.onPress();
+    assert.equal(themeList().data.length, 1);
+    await row.change(row.theme, "reset");
+    assert.equal(active, null);
+    assert.equal(themeList().data.length, 1, "restoring Discord's default must preserve the installed theme");
     console.log('PASS add-on failed-import recovery, duplicate-tap isolation, valid routing and lazy marketplace native lookup');
 })().catch(error => { console.error(error); process.exitCode = 1; });

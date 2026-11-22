@@ -21,7 +21,7 @@ import { SettingsTab } from "@components/settings/tabs/BaseTab";
 import { classNameFactory } from "@utils/css";
 import { promptToRestart } from "@utils/promptToRestart";
 import type { PluginNative } from "@utils/types";
-import { showToast, useEffect, useMemo, useRef, useState } from "@webpack/common";
+import { Alerts, showToast, useEffect, useMemo, useRef, useState } from "@webpack/common";
 
 import { PluginCard } from "../plugins/PluginCard";
 import ThemesTab from "../../../ThemeSettings/ThemesTab";
@@ -62,7 +62,7 @@ export function AddonHeader({ title, count, query, setQuery }: { title: string; 
             <h2 className={cl("title")}>{title}<span className={cl("count")}>{count}</span></h2>
             <label className={cl("search")}>
                 <SearchIcon width={16} height={16} />
-                <input value={query} onChange={e => setQuery(e.currentTarget.value)} placeholder={`Search ${count} ${title.toLowerCase()}...`} />
+                <input type="search" aria-label={`Search ${title.toLowerCase()}`} value={query} onChange={e => setQuery(e.currentTarget.value)} placeholder={`Search ${title.toLowerCase()}`} />
             </label>
         </div>
     );
@@ -99,11 +99,12 @@ const PAGE = 48;
 function LoadMore({ onVisible }: { onVisible(): void; }) {
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        const io = new IntersectionObserver(e => { if (e[0].isIntersecting) onVisible(); }, { rootMargin: "600px" });
+        if (typeof IntersectionObserver !== "function") return;
+        const io = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) onVisible(); }, { rootMargin: "600px" });
         if (ref.current) io.observe(ref.current);
         return () => io.disconnect();
     });
-    return <div ref={ref} className={cl("more")} />;
+    return <div ref={ref} className={cl("more")}><button type="button" className={cl("mode")} onClick={onVisible}>Show more</button></div>;
 }
 
 export function PluginsPage() {
@@ -141,13 +142,19 @@ export function PluginsPage() {
 
     const onRestartNeeded = () => promptToRestart("reload", { subtitle: "Reload Discord to finish turning this plugin on or off." });
 
-    const disableAll = () => {
-        let changed = false;
-        for (const p of visible) if (Settings.plugins[p.name]?.enabled) { Settings.plugins[p.name].enabled = false; changed = true; }
-        for (const entry of allCxRows) if (entry.active) toggleCxAddon("plugin", entry, false);
-        force(n => n + 1);
-        if (changed) promptToRestart("reload", { subtitle: "Reload Discord to turn all plugins off." });
-    };
+    const disableAll = () => Alerts.show({
+        title: "Disable all plugins?",
+        body: "This turns off your enabled plugins. You can turn them back on individually.",
+        confirmText: "Disable all",
+        cancelText: "Cancel",
+        onConfirm: () => {
+            let changed = false;
+            for (const p of visible) if (Settings.plugins[p.name]?.enabled) { Settings.plugins[p.name].enabled = false; changed = true; }
+            for (const entry of allCxRows) if (entry.active) toggleCxAddon("plugin", entry, false);
+            force(n => n + 1);
+            if (changed) promptToRestart("reload", { subtitle: "Reload Discord to turn all plugins off." });
+        },
+    });
 
     return (
         <SettingsTab>
@@ -177,8 +184,8 @@ export function PluginsPage() {
                         </select>
                     </label>
                     <div className={cl("views")}>
-                        <button className={cl("view", { "view-on": !grid })} title="List view" onClick={() => setGrid(false)}><ListIcon /></button>
-                        <button className={cl("view", { "view-on": grid })} title="Grid view" onClick={() => setGrid(true)}><GridIcon /></button>
+                        <button className={cl("view", { "view-on": !grid })} title="List view" aria-pressed={!grid} onClick={() => setGrid(false)}><ListIcon /></button>
+                        <button className={cl("view", { "view-on": grid })} title="Grid view" aria-pressed={grid} onClick={() => setGrid(true)}><GridIcon /></button>
                     </div>
                 </div>
             </div>
@@ -231,9 +238,21 @@ interface StoreTheme {
 const Native = VencordNative.pluginHelpers.CloudCordStore as PluginNative<typeof import("../../../../cloudcordplugins/cloudcordStore/native")>;
 
 let storeCache: StoreTheme[] | null = null;
+let storeRequest: Promise<StoreTheme[]> | null = null;
 async function fetchStore() {
     if (storeCache) return storeCache;
-    return storeCache = JSON.parse(await Native.fetchThemeStore()) as StoreTheme[];
+    if (!storeRequest) storeRequest = Native.fetchThemeStore()
+        .then(raw => {
+            const entries: unknown = JSON.parse(raw);
+            if (!Array.isArray(entries)) throw new Error("Invalid theme catalog response");
+            return storeCache = entries.filter((entry): entry is StoreTheme => typeof entry?.id === "number"
+                && typeof entry.name === "string" && typeof entry.author?.display_name === "string"
+                && typeof entry.file_name === "string" && typeof entry.latest_source_url === "string"
+                && typeof entry.downloads === "number" && Array.isArray(entry.tags)
+                && entry.tags.every((tag: unknown) => typeof tag === "string"));
+        })
+        .finally(() => { storeRequest = null; });
+    return storeRequest;
 }
 
 const linkName = (url: string) => decodeURIComponent(url.split("/").pop() ?? url).replace(/\.theme\.css$|\.css$/i, "");
@@ -283,19 +302,29 @@ export function ThemesPage() {
     const [themes, setThemes] = useState<UserThemeHeader[] | null>(null);
     const [store, setStore] = useState<StoreTheme[] | null>(storeCache);
     const [storeError, setStoreError] = useState("");
+    const [browseSort, setBrowseSort] = useState<"name" | "popular">("name");
+    const [installedOnly, setInstalledOnly] = useState(false);
+    const [storeAttempt, setStoreAttempt] = useState(0);
     const [query, setQuery] = useState("");
     const [sort, setSort] = useState<Sort>("name");
     const [grid, setGrid] = useState(false);
     const [enabledOnly, setEnabledOnly] = useState(false);
     const [limit, setLimit] = useState(PAGE);
     const cxRows = cxAddons().useCxAddonRows("theme", query);
-    useEffect(() => setLimit(PAGE), [query, sort, enabledOnly]);
+    useEffect(() => setLimit(PAGE), [mode, query, sort, enabledOnly, browseSort, installedOnly]);
 
     const refresh = () => VencordNative.themes.getThemesList().then(list => setThemes(list.map(t => getThemeInfo(stripBOM(t.content), t.fileName))));
-    useEffect(() => { refresh(); fetchStore().then(setStore, () => { }); }, []);
     useEffect(() => {
-        if (mode === "browse" && !store) fetchStore().then(setStore, e => setStoreError(String(e?.message ?? e)));
-    }, [mode]);
+        void refresh().catch(() => showToast({ text: "Couldn't load your themes", variant: "critical" }));
+    }, []);
+    useEffect(() => {
+        let current = true;
+        void fetchStore().then(
+            entries => { if (current) { setStore(entries); setStoreError(""); } },
+            error => { if (current) setStoreError(String(error?.message ?? error)); },
+        );
+        return () => { current = false; };
+    }, [storeAttempt]);
 
     const isOn = (f: string) => settings.enabledThemes.includes(f);
     const setOn = (f: string, on: boolean) => {
@@ -306,23 +335,31 @@ export function ThemesPage() {
     const setLinkOn = (url: string, on: boolean) => {
         settings.enabledThemeLinks = on ? [...new Set([...settings.enabledThemeLinks, url])] : settings.enabledThemeLinks.filter(x => x !== url);
     };
-    const [busy, setBusy] = useState<string | null>(null);
+    const [busy, setBusy] = useState<{ file: string; action: "Installing" | "Removing"; } | null>(null);
+    const changingTheme = useRef(false);
     const installedFiles = new Set((themes ?? []).map(t => t.fileName));
-    const install = async (t: StoreTheme) => {
-        setBusy(t.file_name);
+    const changeTheme = async (file: string, action: "Installing" | "Removing", apply: () => Promise<void>) => {
+        if (changingTheme.current) return;
+        changingTheme.current = true;
+        setBusy({ file, action });
         try {
-            await Native.installTheme(t.latest_source_url, t.file_name);
+            await apply();
             await refresh();
-            setOn(t.file_name, true);
-        } catch (e) {
-            showToast({ text: "Couldn't install " + t.name, variant: "critical" } as any);
-        } finally { setBusy(null); }
+        } catch (error) {
+            showToast({ text: error instanceof Error ? error.message : String(error), variant: "critical" });
+        } finally {
+            changingTheme.current = false;
+            setBusy(null);
+        }
     };
-    const uninstall = async (fileName: string) => {
-        setOn(fileName, false);
+    const install = (t: StoreTheme) => changeTheme(t.file_name, "Installing", async () => {
+        await Native.installTheme(t.latest_source_url, t.file_name);
+        setOn(t.file_name, true);
+    });
+    const uninstall = (fileName: string) => changeTheme(fileName, "Removing", async () => {
         await Native.uninstallTheme(fileName);
-        await refresh();
-    };
+        setOn(fileName, false);
+    });
     const removeLink = (url: string) => {
         settings.themeLinks = settings.themeLinks.filter(x => x !== url);
         setLinkOn(url, false);
@@ -344,7 +381,7 @@ export function ThemesPage() {
         })),
     ].filter(r => match(r.name, r.author, r.description));
     installed.push(...cxRows.map(entry => ({
-        key: "cx:" + entry.name, name: entry.name, description: entry.description, on: entry.active,
+        key: entry.id + ":" + entry.name, name: entry.name, description: entry.description, on: entry.active,
         set: on => toggleCxAddon("theme", entry, on), options: entry.active ? () => reviewAddon("theme", entry) : undefined,
     })));
     const visibleInstalled = enabledOnly ? installed.filter(row => row.on) : installed;
@@ -352,8 +389,8 @@ export function ThemesPage() {
         .sort((a, b) => sort === "enabled" ? Number(b.on) - Number(a.on) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name));
 
     const browse = (store ?? [])
-        .filter(t => match(t.name, t.author.display_name, t.description, ...t.tags))
-        .sort((a, b) => sort === "enabled" ? b.downloads - a.downloads : a.name.localeCompare(b.name));
+        .filter(t => (!installedOnly || installedFiles.has(t.file_name)) && match(t.name, t.author.display_name, t.description, ...t.tags))
+        .sort((a, b) => (browseSort === "popular" ? b.downloads - a.downloads : 0) || a.name.localeCompare(b.name));
 
     const count = mode === "installed" ? visibleInstalled.length : browse.length;
 
@@ -363,28 +400,33 @@ export function ThemesPage() {
             <div className={cl("controls")}>
                 <div className={cl("basic")}>
                     <div className={cl("modes")}>
-                        <button className={cl("mode", { "mode-on": mode === "installed" })} onClick={() => setMode("installed")}>Installed</button>
-                        <button className={cl("mode", { "mode-on": mode === "browse" })} onClick={() => setMode("browse")}>Browse</button>
+                        <button className={cl("mode", { "mode-on": mode === "installed" })} aria-pressed={mode === "installed"} onClick={() => setMode("installed")}>Installed</button>
+                        <button className={cl("mode", { "mode-on": mode === "browse" })} aria-pressed={mode === "browse"} onClick={() => setMode("browse")}>Browse</button>
                     </div>
                     {!IS_WEB && (
                         <button className={cl("icon-btn")} title="Open themes folder" onClick={() => VencordNative.themes.openFolder()}><FolderIcon width={20} height={20} /></button>
                     )}
-                    <button className={cl("icon-btn")} title="Reload themes" onClick={refresh}><RefreshIcon /></button>
+                    <button className={cl("icon-btn")} title="Reload themes" onClick={() => void refresh().catch(() => showToast({ text: "Couldn’t reload your themes", variant: "critical" }))}><RefreshIcon /></button>
                     <button className={cl("icon-btn")} title="Theme links and advanced options" onClick={() => openSettingsTabModal(ThemesTab)}><LinkIcon /></button>
                     <button className={cl("mode")} onClick={() => reviewAddon("theme")}>Import theme</button>
                 </div>
                 <div className={cl("advanced")}>
-                    {mode === "installed" && <EnabledOnly value={enabledOnly} onChange={setEnabledOnly} />}
+                    {mode === "installed" ? <EnabledOnly value={enabledOnly} onChange={setEnabledOnly} /> :
+                        <button type="button" className={cl("mode", { "mode-on": installedOnly })} aria-pressed={installedOnly}
+                            onClick={() => setInstalledOnly(!installedOnly)}>Installed only</button>}
                     <label className={cl("select")}>
                         Sort by:
-                        <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
+                        {mode === "browse" ? <select value={browseSort} onChange={e => setBrowseSort(e.currentTarget.value === "popular" ? "popular" : "name")}>
                             <option value="name">Name</option>
-                            <option value="enabled">{mode === "browse" ? "Most downloaded" : "Enabled first"}</option>
-                        </select>
+                            <option value="popular">Most downloaded</option>
+                        </select> : <select value={sort} onChange={e => setSort(e.currentTarget.value as Sort)}>
+                            <option value="name">Name</option>
+                            <option value="enabled">Enabled first</option>
+                        </select>}
                     </label>
                     <div className={cl("views")}>
-                        <button className={cl("view", { "view-on": !grid })} title="List view" onClick={() => setGrid(false)}><ListIcon /></button>
-                        <button className={cl("view", { "view-on": grid })} title="Grid view" onClick={() => setGrid(true)}><GridIcon /></button>
+                        <button className={cl("view", { "view-on": !grid })} title="List view" aria-pressed={!grid} onClick={() => setGrid(false)}><ListIcon /></button>
+                        <button className={cl("view", { "view-on": grid })} title="Grid view" aria-pressed={grid} onClick={() => setGrid(true)}><GridIcon /></button>
                     </div>
                 </div>
             </div>
@@ -421,38 +463,44 @@ export function ThemesPage() {
             {mode === "installed" && visibleInstalled.length > limit && <LoadMore onVisible={() => setLimit(l => l + PAGE)} />}
 
             {mode === "browse" && (storeError
-                ? <div className={cl("empty")}>Couldn't load the theme store: {storeError}</div>
+                ? <div className={cl("empty")} role="alert">
+                    <p>Couldn't load the theme store. {storeError}</p>
+                    <button type="button" className={cl("mode")} onClick={() => { setStoreError(""); setStoreAttempt(attempt => attempt + 1); }}>Try again</button>
+                </div>
                 : !store
                     ? <div className={cl("empty")}>Loading themes…</div>
-                    : (
-                        <div className={cl("store", { "store-list": !grid })}>
-                            {browse.map(t => {
-                                const have = installedFiles.has(t.file_name);
-                                return (
-                                    <div key={t.id} className={cl("store-card")}>
-                                        <div className={cl("thumb")}>
-                                            {t.thumbnail_url && <img src={"https://betterdiscord.app" + t.thumbnail_url} alt="" loading="lazy" />}
-                                        </div>
-                                        <div className={cl("store-body")}>
-                                            <div className={cl("store-name")}>{t.name}<span className={cl("version")}>v{t.version}</span></div>
-                                            <div className={cl("store-author")}>by {t.author.display_name}</div>
-                                            <div className={cl("store-desc")}>{t.description}</div>
-                                            <div className={cl("store-foot")}>
-                                                <span className={cl("store-stats")}>{t.downloads.toLocaleString()} downloads · {t.likes} likes</span>
-                                                <button
-                                                    className={cl("install", { installed: have })}
-                                                    disabled={busy === t.file_name}
-                                                    onClick={() => have ? uninstall(t.file_name) : install(t)}
-                                                >
-                                                    {busy === t.file_name ? "Installing…" : have ? "Remove" : "Install"}
-                                                </button>
+                    : !browse.length
+                        ? <div className={cl("empty")} role="status">{installedOnly && !q ? "No catalog themes installed." : "No themes match your search."}</div>
+                        : <>
+                            <div className={cl("store", { "store-list": !grid })}>
+                                {browse.slice(0, limit).map(t => {
+                                    const have = installedFiles.has(t.file_name);
+                                    return (
+                                        <div key={t.id} className={cl("store-card")}>
+                                            <div className={cl("thumb")}>
+                                                {t.thumbnail_url && <img src={"https://betterdiscord.app" + t.thumbnail_url} alt="" loading="lazy" />}
+                                            </div>
+                                            <div className={cl("store-body")}>
+                                                <div className={cl("store-name")}>{t.name}<span className={cl("version")}>v{t.version}</span></div>
+                                                <div className={cl("store-author")}>by {t.author.display_name}</div>
+                                                <div className={cl("store-desc")}>{t.description}</div>
+                                                <div className={cl("store-foot")}>
+                                                    <span className={cl("store-stats")}>{t.downloads.toLocaleString()} downloads · {t.likes} likes</span>
+                                                    <button
+                                                        className={cl("install", { installed: have })}
+                                                        disabled={busy !== null || themes === null}
+                                                        onClick={() => have ? uninstall(t.file_name) : install(t)}
+                                                    >
+                                                        {busy?.file === t.file_name ? busy.action + "…" : have ? "Remove" : "Install"}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    ))}
+                                    );
+                                })}
+                            </div>
+                            {browse.length > limit && <LoadMore onVisible={() => setLimit(value => value + PAGE)} />}
+                        </>)}
         </SettingsTab>
     );
 }
