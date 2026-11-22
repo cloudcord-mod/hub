@@ -40,7 +40,7 @@ data class EndpointInfo(val paths: ArrayList<String>, val hash: String? = null, 
 @Serializable
 data class RuntimeManifest(val schema: Int = 1, val version: String, val url: String, val sha256: String, val size: Long)
 
-data class ResolvedBundle(val url: String, val sha256: String? = null, val size: Long? = null)
+data class ResolvedBundle(val url: String, val sha256: String? = null, val size: Long? = null, val version: String? = null)
 
 object UpdaterModule : Module() {
     private lateinit var config: LoaderConfig
@@ -58,7 +58,7 @@ object UpdaterModule : Module() {
     private const val ETAG_FILE = "etag.txt"
     private const val CONFIG_FILE = "loader.json"
 
-    private const val DEFAULT_MANIFEST_URL = "https://raw.githubusercontent.com/cloudcord-mod/hub/main/dist/runtime-manifest.json"
+    private const val DEFAULT_MANIFEST_URL = "https://raw.githubusercontent.com/cloudcord-mod/hub/refs/heads/main/dist/runtime-manifest.json"
     private const val MANIFEST_REFRESH_INTERVAL_MS = 5 * 60 * 1000L
     private val trustedRuntimeUrl = Regex(
         "https://raw[.]githubusercontent[.]com/(?:cloudcord-mod/hub|xohus/cloudcord)/[a-f0-9]{40}/dist/cc[.]js"
@@ -97,7 +97,8 @@ object UpdaterModule : Module() {
                 install(HttpRedirect) { checkHttpMethod = false }
             }.use { client ->
                 val target = resolveTargetBundle(client)
-                Log.i("Fetching verified CloudCord bundle: ${target.url}")
+                val revision = target.version?.takeIf { it.matches(Regex("[a-fA-F0-9]{40}")) }?.take(12)
+                Log.i(if (revision != null) "Checking stable CloudCord runtime $revision" else "Checking CloudCord runtime from the configured source")
 
                 val localMatches = target.sha256 == null || (bundle.exists() && sha256(bundle.readBytes()).equals(target.sha256, ignoreCase = true))
                 if (!localMatches && etag.exists()) etag.delete()
@@ -172,7 +173,7 @@ object UpdaterModule : Module() {
         if (!trustedRuntimeUrl.matches(manifest.url)) throw Exception("Runtime manifest points to an untrusted host.")
         if (!manifest.sha256.matches(Regex("^[0-9a-fA-F]{64}$"))) throw Exception("Runtime manifest SHA-256 is invalid.")
         if (manifest.size < MIN_BYTECODE_SIZE || manifest.size > MAX_BUNDLE_SIZE) throw Exception("Runtime manifest size is invalid.")
-        return ResolvedBundle(manifest.url, manifest.sha256.lowercase(), manifest.size)
+        return ResolvedBundle(manifest.url, manifest.sha256.lowercase(), manifest.size, manifest.version)
     }
 
     private fun sha256(bytes: ByteArray): String = MessageDigest.getInstance("SHA-256")
