@@ -1297,6 +1297,12 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const serverBannerUrl = "https://cdn.discordapp.com/banners/" + guildId + "/" + banner + ".gif?size=4096";
             assert.deepEqual(clipboardWrites.splice(0), [iconUrl, serverBannerUrl, "Test server", "Server description"]);
             assert.deepEqual(viewedProfiles.splice(0).map(item => [item.url, item.animated]), [[iconUrl, false], [serverBannerUrl, true]]);
+            selectCatalog("Copy Server Splash Links");
+            click(render(), "Allow for this session");
+            serverMenuData.splash = icon;
+            button(roleActions({ guild: { id: guildId } }), "Copy Invite Splash Link").props.action();
+            assert.equal(clipboardWrites.pop(), "https://cdn.discordapp.com/splashes/" + guildId + "/" + icon + ".png?size=4096");
+            click(render(), "Disable Copy Server Splash Links");
             serverMenuData.icon = "https://example.com/not-a-discord-icon";
             serverMenu[0].props.action();
             assert.equal(viewedProfiles.length, 0);
@@ -1369,6 +1375,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const bannerUrl = "https://cdn.discordapp.com/banners/" + guildId + "/" + banner + ".gif?size=4096";
             assert.deepEqual(clipboardWrites.splice(0), [iconUrl, bannerUrl, "Test server", "Server description"]);
             assert.deepEqual(viewedProfiles.splice(0).map(item => [item.uri, item.width, item.height]), [[iconUrl, 512, 512], [bannerUrl, 1200, 480]]);
+            selectCatalog("Copy Server Splash Links");
+            click(render(), "Allow for this session");
+            serverMenuData.discovery_splash = icon;
+            button(serverMenu(), "Copy Discovery Splash Link").props.onPress();
+            await new Promise(setImmediate);
+            assert.equal(clipboardWrites.pop(), "https://cdn.discordapp.com/discovery-splashes/" + guildId + "/" + icon + ".png?size=4096");
+            click(render(), "Disable Copy Server Splash Links");
             const groupProps = { channel: { id: menuGroupId } };
             groupMenuData = { id: menuGroupId, type: 1, icon };
             assert.ok(!button(getMenu(ChannelLongPressActionSheetConnected, groupProps), "View Group Icon"));

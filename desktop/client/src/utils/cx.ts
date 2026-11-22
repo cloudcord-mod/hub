@@ -105,7 +105,7 @@ const permissionLabels = {
     "spotify.activity": "Read your current Spotify track, album, or artist when the command runs",
     "servers.markread": "Mark unread server channels as read when you run the listed command",
     "servers.mediaview": "Open an icon or banner from the selected server in Discord’s image viewer",
-    "servers.mediacopy": "Copy the selected server's icon or banner link when you choose the corresponding menu action",
+    "servers.mediacopy": "Copy links to the selected server's images when you choose a menu action",
     "servers.detailscopy": "Copy the selected server's name or description when you choose the corresponding menu action",
     "channels.iconview": "Open the selected group DM's icon when you choose View Group Icon",
     "channels.markonopen": "Mark the channel you open as read through its newest known message",

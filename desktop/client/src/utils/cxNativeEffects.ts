@@ -39,6 +39,7 @@ export const cxNativeEffects = {
     "view-role-icon": { permission: "guild.rolemedia", label: "Open the selected server role's icon in Discord's image viewer" },
     "view-server-media": { permission: "servers.mediaview", label: "View the selected server's icon and banner" },
     "copy-server-media-links": { permission: "servers.mediacopy", label: "Copy links to the selected server's icon and banner" },
+    "copy-server-splash-links": { permission: "servers.mediacopy", label: "Copy invite and discovery splash links from the selected server" },
     "copy-server-details": { permission: "servers.detailscopy", label: "Copy the selected server's name or description" },
     "view-group-dm-icon": { permission: "channels.iconview", label: "View the selected group DM's icon" },
     "hide-suggested-channels": { permission: "appearance.hide", label: "Hide the suggested channels section" },

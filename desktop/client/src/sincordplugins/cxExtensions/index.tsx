@@ -1131,6 +1131,7 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                     return registerRoleMenuAction(effect);
                 case "view-server-media":
                 case "copy-server-media-links":
+                case "copy-server-splash-links":
                 case "copy-server-details":
                 case "view-group-dm-icon":
                     return registerServerMenuActions(effect);

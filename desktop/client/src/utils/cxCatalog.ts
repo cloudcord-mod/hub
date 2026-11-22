@@ -69,6 +69,7 @@ import plugin_catalog_copy_server_bio from "../../../../examples/cx/catalog/plug
 import plugin_catalog_copy_server_details from "../../../../examples/cx/catalog/plugins/copy-server-details.cx";
 import plugin_catalog_copy_server_media_links from "../../../../examples/cx/catalog/plugins/copy-server-media-links.cx";
 import plugin_catalog_copy_server_nickname from "../../../../examples/cx/catalog/plugins/copy-server-nickname.cx";
+import plugin_catalog_copy_server_splash_links from "../../../../examples/cx/catalog/plugins/copy-server-splash-links.cx";
 import plugin_catalog_copy_sticker_links from "../../../../examples/cx/catalog/plugins/copy-sticker-links.cx";
 import plugin_catalog_copy_user_mention from "../../../../examples/cx/catalog/plugins/copy-user-mention.cx";
 import plugin_catalog_copy_user_urls from "../../../../examples/cx/catalog/plugins/copy-user-urls.cx";
@@ -582,6 +583,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "Copy Server Details", source: plugin_catalog_copy_server_details, description: "Copy the selected server's name or description", categories: ["Servers & channels"] },
         { name: "Copy Server Media Links", source: plugin_catalog_copy_server_media_links, description: "Copy links to the selected server's icon and banner", categories: ["Media","Servers & channels"] },
         { name: "CopyServerNickname", source: plugin_catalog_copy_server_nickname, description: "Copy Server Nickname", categories: ["Profiles"] },
+        { name: "Copy Server Splash Links", source: plugin_catalog_copy_server_splash_links, description: "Copy invite and discovery splash links from the selected server", categories: ["Media","Servers & channels"] },
         { name: "CopyStickerLinks", source: plugin_catalog_copy_sticker_links, description: "Add Copy Sticker Link and Open Sticker Link actions", categories: ["Media"] },
         { name: "CopyUserMention", source: plugin_catalog_copy_user_mention, description: "Copy User Mention", categories: ["Profiles"] },
         { name: "CopyUserURLs", source: plugin_catalog_copy_user_urls, description: "Copy User URL", categories: ["Profiles"] },
