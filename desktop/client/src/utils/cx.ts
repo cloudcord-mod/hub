@@ -22,7 +22,7 @@ import { validateCxWallpaper } from "./cxWallpaper";
 import { cxProfileMenuActions, isCxProfileUserId, type CxProfileMenuAction } from "./cxProfileMenu";
 
 export { cxProfileMenuActions, getCxProfileMedia, getCxProfileMenuCopy, isCxProfileUserId, type CxProfileMenuAction } from "./cxProfileMenu";
-export { formatCxChannelName, getCxChannelNameCopy, getCxChannelNoteLabel, type CxChannelLabel } from "./cxChannelNames";
+export { formatCxChannelName, getCxChannelNameCopy, getCxChannelNoteLabel, getCxChannelTopicCopy, type CxChannelLabel } from "./cxChannelNames";
 export { isCxNotificationMuted, type CxMessageAlert } from "./cxIncoming";
 export { bindCxChannelOpenRead, formatCxRandomMember, formatCxRoleMembers, formatCxSpotify, markCxServersRead, markCxServersReadAndWait, runCxFriendInvites } from "./cxClientCommands";
 export { animateCxAssets, buildCxMessageQuote, buildCxRepeatMessage, cxNativeEffects, filterCxEmojiAutocomplete, fixCxFileExtensions, floorCxRelativeTime, formatCxWordCount, getCxEmbedToggle, getCxMessageGesture, getCxPinAction, getCxSpotifySongName, overrideCxMethods, raiseCxAvatarResolution, sortCxReactions, type CxQuoteMessage, type CxRepeatMessage, type CxSpotifyActivity } from "./cxNativeEffects";
@@ -112,7 +112,7 @@ const permissionLabels = {
     "channels.searchjump": "Look up the first or last matching Discord message in the selected channel when you choose a jump action",
     "messages.jumpblocked": "Jump to messages without changing your block or ignore list",
     "channels.jump": "Jump within the current channel when you choose the navigation control",
-    "channels.clipboard": "Copy the selected channel or category name when you choose its menu action",
+    "channels.clipboard": "Copy the selected channel or category details when you choose a menu action",
     "channels.notes": "Read and edit your private channel notes stored on this device",
     "profilemenu.copy": "Add the listed copy actions to user menus, including profile colors when specified. Writes to the clipboard only when selected.",
     "profilemenu.media": "Open or download the selected user's Discord avatar or banner when you choose a profile menu action.",

@@ -1,6 +1,11 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 
-export type CxChannelLabel = { id?: string; name?: string; type?: number; guild_id?: string | null; };
+export type CxChannelLabel = { id?: string; name?: string; type?: number; guild_id?: string | null; topic?: string | null; };
+
+export function getCxChannelTopicCopy(channel: CxChannelLabel) {
+    if (!channel.id || !/^\d{17,20}$/.test(channel.id) || !channel.guild_id || typeof channel.topic !== "string" || !channel.topic.trim()) return;
+    return { label: "Copy Channel Topic", name: channel.topic };
+}
 
 export function getCxChannelNameCopy(channel: CxChannelLabel & { recipients?: readonly string[]; }, username: (id: string) => string | undefined) {
     if (typeof channel.id !== "string" || !/^\d{17,20}$/.test(channel.id)) return;

@@ -2620,6 +2620,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
         const invokeCopy = action => action[desktop ? "action" : "onPress"]();
         invokeCopy(categoryCopy);
         invokeCopy(dmCopy);
+        selectCatalog("CopyChannelTopic");
+        click(render(), "Allow for this session");
+        assert.equal(getChannelAction(category, label => label === "Copy Channel Topic"), undefined);
+        const topicAction = getChannelAction({ id: repeatChannel, guild_id: guildId, topic: "Read the rules" }, label => label === "Copy Channel Topic");
+        invokeCopy(topicAction);
+        assert.equal(clipboardWrites.pop(), "Read the rules");
+        click(render(), "Disable CopyChannelTopic");
         const channelNotes = cxCatalog.plugins.find(entry => entry.name === "LocalChannelNotes").source;
         assert.throws(() => activateCx(channelNotes, host, ["profile.localnotes"]), /approval/);
         selectCatalog("LocalChannelNotes");

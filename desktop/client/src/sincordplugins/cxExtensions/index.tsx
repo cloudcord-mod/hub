@@ -23,7 +23,7 @@ import { decodeCxMessageBase64, getCxMessageClipboard, hideCxProfileBannerImages
 import { CX_CATALOG_CATEGORIES, type CxCatalogCategory, formatCxWordCount, searchCxCatalog } from "@utils/cx";
 import { copyToClipboard } from "@utils/clipboard";
 import { IS_LINUX, IS_MAC, IS_MOBILE } from "@utils/constants";
-import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxProfileMedia } from "@utils/cx";
+import { getCxChannelNameCopy, getCxChannelNoteLabel, getCxChannelTopicCopy, getCxProfileMedia } from "@utils/cx";
 import { createCxUserNotes, CX_USER_NOTE_LIMIT, type CxNoteEditor } from "@utils/cx";
 import { openImageModal } from "@utils/discord";
 import { saveFile } from "@utils/web";
@@ -143,15 +143,15 @@ function registerWaitForSlot(options: CxVoiceQueueOptions) {
     } catch (error) { try { stop(); } finally { throw error; } }
 }
 
-function registerCopyChannelName() {
+function registerCopyChannelDetails(topic: boolean) {
     let active = true;
     const patch: NavContextMenuPatchCallback = (children, props) => {
         if (!active || !props?.channel) return;
-        const copy = getCxChannelNameCopy(props.channel, id => UserStore.getUser(id)?.username);
+        const copy = topic ? getCxChannelTopicCopy(props.channel) : getCxChannelNameCopy(props.channel, id => UserStore.getUser(id)?.username);
         if (!copy) return;
-        children.push(<Menu.MenuItem id="cx-copy-channel-name" label={copy.label} action={() => {
+        children.push(<Menu.MenuItem id={topic ? "cx-copy-channel-topic" : "cx-copy-channel-name"} label={copy.label} action={() => {
             if (active) void copyToClipboard(copy.name).then(
-                () => showToast("Copied: " + copy.name), () => showToast("Couldn’t copy the channel name."),
+                () => showToast(topic ? "Copied channel topic" : "Copied: " + copy.name), () => showToast("Couldn’t copy the channel details."),
             );
         }} />);
     };
@@ -1124,7 +1124,8 @@ function createDesktopCxHost(pluginName: string): Parameters<typeof session.enab
                 case "channel-notes":
                     return registerLocalText("channels");
                 case "copy-channel-name":
-                    return registerCopyChannelName();
+                case "copy-channel-topic":
+                    return registerCopyChannelDetails(effect === "copy-channel-topic");
                 case "copy-role-color":
                 case "copy-role-name":
                 case "copy-role-mention":

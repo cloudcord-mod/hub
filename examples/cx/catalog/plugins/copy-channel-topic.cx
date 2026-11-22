@@ -1,0 +1,3 @@
+plugin "CopyChannelTopic":
+  needs channels.clipboard
+  use copy-channel-topic
