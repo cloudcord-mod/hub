@@ -124,6 +124,7 @@ import plugin_catalog_hide_boost_goal from "../../../../examples/cx/catalog/plug
 import plugin_catalog_hide_bot_tags from "../../../../examples/cx/catalog/plugins/hide-bot-tags.cx";
 import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/catalog/plugins/hide-call-activities-tip.cx";
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
+import plugin_catalog_hide_channel_list_tips from "../../../../examples/cx/catalog/plugins/hide-channel-list-tips.cx";
 import plugin_catalog_hide_channel_topic from "../../../../examples/cx/catalog/plugins/hide-channel-topic.cx";
 import plugin_catalog_hide_character_count from "../../../../examples/cx/catalog/plugins/hide-character-count.cx";
 import plugin_catalog_hide_chat_input_refresh_tip from "../../../../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx";
@@ -212,6 +213,7 @@ import plugin_catalog_hide_typing_indicator from "../../../../examples/cx/catalo
 import plugin_catalog_hide_unread_pills from "../../../../examples/cx/catalog/plugins/hide-unread-pills.cx";
 import plugin_catalog_hide_upload_button from "../../../../examples/cx/catalog/plugins/hide-upload-button.cx";
 import plugin_catalog_hide_user_panel_activity from "../../../../examples/cx/catalog/plugins/hide-user-panel-activity.cx";
+import plugin_catalog_hide_voice_event_banner from "../../../../examples/cx/catalog/plugins/hide-voice-event-banner.cx";
 import plugin_catalog_hide_voice_panel_tips from "../../../../examples/cx/catalog/plugins/hide-voice-panel-tips.cx";
 import plugin_catalog_hide_voice_user_avatars from "../../../../examples/cx/catalog/plugins/hide-voice-user-avatars.cx";
 import plugin_catalog_high_contrast_text from "../../../../examples/cx/catalog/plugins/high-contrast-text.cx";
@@ -613,6 +615,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideBotTags", source: plugin_catalog_hide_bot_tags, description: "Hide APP and BOT tags", categories: ["Appearance"], appearanceRevision: "63c903f6e8052d940e657112cadb478b207b6168deb9b7ac8de4d335e1886e3e" },
         { name: "HideCallActivitiesTip", source: plugin_catalog_hide_call_activities_tip, description: "Hide the Activities tooltip in private calls", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "0d05ef584bf0f44e3cba77b23792fd8018da12bfa37d247f4dd1fcc987a08bd2" },
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
+        { name: "HideChannelListTips", source: plugin_catalog_hide_channel_list_tips, description: "Hide feature tips in the server channel list header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9b23014e616ac1c5e2008e72a500b01828d12f51d51c20b6841f6be8aefc3a56" },
         { name: "HideChannelTopic", source: plugin_catalog_hide_channel_topic, description: "Hide channel topics", categories: ["Appearance"], appearanceRevision: "79414d895258b347a6dc13cba58453948a75bb443e8bdc7ddc54f40e94b5a3c4" },
         { name: "HideCharacterCount", source: plugin_catalog_hide_character_count, description: "Hide the chat character counter", categories: ["Appearance"], appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113" },
         { name: "HideChatInputRefreshTip", source: plugin_catalog_hide_chat_input_refresh_tip, description: "Hide the redesigned chat input tip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36" },
@@ -701,6 +704,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideUnreadPills", source: plugin_catalog_hide_unread_pills, description: "Hide the server sidebar unread pills", categories: ["Appearance"], appearanceRevision: "56e95404c1b3e0a231fad41928c51b64335d1d860b05c6be59dc011565e6c67b" },
         { name: "HideUploadButton", source: plugin_catalog_hide_upload_button, description: "Hide the chat attachment button", categories: ["Appearance"], appearanceRevision: "db36f02eba4a10f9e178f62ad8e1fc3e1c4dc9dfe6ad1bf6035b8865c4f75a50" },
         { name: "HideUserPanelActivity", source: plugin_catalog_hide_user_panel_activity, description: "Hides your activity line in the user panel", desktopOnly: true, categories: ["Appearance"] },
+        { name: "HideVoiceEventBanner", source: plugin_catalog_hide_voice_event_banner, description: "Hide the scheduled event banner in voice channels", mobileOnly: true, categories: ["Appearance","Voice & calls"], appearanceRevision: "1a6d421d15934212c4a4e66bc0ac31f15e3a23f33946a464be6faf07edea6576" },
         { name: "HideVoicePanelTips", source: plugin_catalog_hide_voice_panel_tips, description: "Hides tips in the voice connection panel", desktopOnly: true, categories: ["Appearance","Voice & calls"] },
         { name: "HideVoiceUserAvatars", source: plugin_catalog_hide_voice_user_avatars, description: "Hide avatars next to users in voice channels", categories: ["Appearance","Voice & calls"], appearanceRevision: "208bcea2901031db1d7d2886d1fd0f43d98dcfc3582575a4f0730e8dd1ff9703" },
         { name: "HighContrastText", source: plugin_catalog_high_contrast_text, description: "increase text contrast", categories: ["Appearance"], appearanceRevision: "450fe577d86be53325a97156868b1f133e40e2b4ee7c6af192af6088ed8d1332" },

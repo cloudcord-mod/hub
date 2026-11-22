@@ -17,6 +17,8 @@ function hideMobileComponent(plugin: string, label: string, path: string) {
 }
 
 export const cxAppearanceTargets = {
+    "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),
+    "hide-voice-event-banner": hideMobileComponent("HideVoiceEventBanner", "the scheduled event banner in voice channels", "modules/guild_scheduled_events/native/components/GuildEventVoiceBanner.tsx"),
     "hide-profile-activity-badges": hideMobileComponent("HideProfileActivityBadges", "activity badges on profiles", "modules/user_profile/native/UserProfileActivityBadges.tsx"),
     "hide-profile-activity-timebar": hideMobileComponent("HideProfileActivityTimebar", "the elapsed-time bar on profile activity cards", "modules/user_profile/native/UserProfileActivityTimebar.tsx"),
     "hide-profile-wishlist-suggestions": hideMobileComponent("HideProfileWishlistSuggestions", "suggested items on profile wishlists", "modules/user_profile/native/UserProfileWishlistSuggestionsGrid.tsx"),
@@ -201,7 +203,7 @@ export const cxAppearanceTargets = {
     "voice-stream-previews": {
         plugin: "HideStreamPreviews", label: "voice-channel stream previews",
         css: '[class*="streamPreview"] { display: none !important; }',
-        mobile: ["VoicePanelStreamPreview"],
+        mobile: { hideComponentPaths: ["modules/voice_panel/native/shared/VoicePanelStreamPreview.tsx"] },
     },
     "voice-user-avatars": {
         plugin: "HideVoiceUserAvatars", label: "avatars next to users in voice channels",

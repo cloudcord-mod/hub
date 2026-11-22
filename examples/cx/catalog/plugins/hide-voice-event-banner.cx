@@ -1,0 +1,3 @@
+plugin "HideVoiceEventBanner":
+  needs appearance.hide
+  hide hide-voice-event-banner
