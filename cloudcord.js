@@ -36920,6 +36920,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-home-drawer-streaming-subtitle": hideMobileComponent("HideHomeDrawerStreamingSubtitle", "streaming status text in the home drawer", "modules/home_drawer/native/subtitles/StreamingSubtitle.tsx"),
+        "hide-home-drawer-typing-subtitle": hideMobileComponent("HideHomeDrawerTypingSubtitle", "typing status text in the home drawer", "modules/home_drawer/native/subtitles/TypingSubtitle.tsx"),
+        "hide-home-drawer-voice-subtitle": hideMobileComponent("HideHomeDrawerVoiceSubtitle", "voice activity text in the home drawer", "modules/home_drawer/native/subtitles/VoiceSubtitle.tsx"),
         "hide-quest-dock-promo-backdrop": hideMobileComponent("HideQuestDockPromoBackdrop", "the Quest dock backdrop before joining a quest", "modules/quests/native/QuestDock/QuestDockUnenrolledBackground.tsx"),
         "hide-activity-preview-backdrop": hideMobileComponent("HideActivityPreviewBackdrop", "background artwork in embedded activity previews", "modules/activities/native/EmbeddedActivityBackgroundImageWithOverlay.tsx"),
         "hide-quest-dock-backdrop": hideMobileComponent("HideQuestDockBackdrop", "the blurred backdrop of the Quest dock", "modules/quests/native/QuestDock/QuestDockBlurredContentBackground.tsx"),
@@ -51681,6 +51684,30 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-home-drawer-streaming-subtitle.cx
+  var hide_home_drawer_streaming_subtitle_default;
+  var init_hide_home_drawer_streaming_subtitle = __esm({
+    "../examples/cx/catalog/plugins/hide-home-drawer-streaming-subtitle.cx"() {
+      hide_home_drawer_streaming_subtitle_default = 'plugin "HideHomeDrawerStreamingSubtitle":\n  needs appearance.hide\n  hide hide-home-drawer-streaming-subtitle\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-home-drawer-typing-subtitle.cx
+  var hide_home_drawer_typing_subtitle_default;
+  var init_hide_home_drawer_typing_subtitle = __esm({
+    "../examples/cx/catalog/plugins/hide-home-drawer-typing-subtitle.cx"() {
+      hide_home_drawer_typing_subtitle_default = 'plugin "HideHomeDrawerTypingSubtitle":\n  needs appearance.hide\n  hide hide-home-drawer-typing-subtitle\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-home-drawer-voice-subtitle.cx
+  var hide_home_drawer_voice_subtitle_default;
+  var init_hide_home_drawer_voice_subtitle = __esm({
+    "../examples/cx/catalog/plugins/hide-home-drawer-voice-subtitle.cx"() {
+      hide_home_drawer_voice_subtitle_default = 'plugin "HideHomeDrawerVoiceSubtitle":\n  needs appearance.hide\n  hide hide-home-drawer-voice-subtitle\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-image-alt-text.cx
   var hide_image_alt_text_default;
   var init_hide_image_alt_text = __esm({
@@ -55393,6 +55420,9 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_gift_wishlist_banner();
       init_hide_guild_boost_tag();
       init_hide_help_button();
+      init_hide_home_drawer_streaming_subtitle();
+      init_hide_home_drawer_typing_subtitle();
+      init_hide_home_drawer_voice_subtitle();
       init_hide_image_alt_text();
       init_hide_inbox_button();
       init_hide_join_messages();
@@ -57874,6 +57904,36 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "e8ed06f3a9370cfa1b44db2ee4ba4deb0e406c48e524f1870b8d84f03936666f"
+          },
+          {
+            name: "HideHomeDrawerStreamingSubtitle",
+            source: hide_home_drawer_streaming_subtitle_default,
+            description: "Hide streaming status text in the home drawer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "1769a20be524575443562af5c1178ab28a7d808ccf8ebdc39ed6ba59a5408baa"
+          },
+          {
+            name: "HideHomeDrawerTypingSubtitle",
+            source: hide_home_drawer_typing_subtitle_default,
+            description: "Hide typing status text in the home drawer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "c92e4bee1126d8d7257b3788a108108832439545046b056288ace27d76bb97d4"
+          },
+          {
+            name: "HideHomeDrawerVoiceSubtitle",
+            source: hide_home_drawer_voice_subtitle_default,
+            description: "Hide voice activity text in the home drawer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "dc800ba958ac22a8b0cddb5611d551bb701b1aab24840e912ecf8270df425568"
           },
           {
             name: "HideImageAltText",
@@ -71176,7 +71236,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "2c043e78c39567111c1934e2e3399be0ef76e7d2";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "76cb59149a91d93c071f9b771a31a447fb69fc03";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
