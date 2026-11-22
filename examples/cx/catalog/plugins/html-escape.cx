@@ -1,0 +1,6 @@
+plugin "HTML Escape":
+  needs commands.register
+  needs reply.local
+  on command "escapehtml":
+    input "text" text
+    reply "${escapeHtml(text)}" else "Enter text to escape."

@@ -305,6 +305,24 @@ export const cxCommandFunctions = {
         const escaped = text.replace(/[\\`*_{}\[\]()#+\-.!|>~]/g, "\\$&");
         return escaped.length <= 3900 ? escaped : "Escaped text is too long for one reply.";
     },
+    escapeHtml(text: string) {
+        if (!text) return;
+        const entities: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+        return planningBlock(text.replace(/[&<>"']/g, character => entities[character]));
+    },
+    indentLines(text: string, spaces: string) {
+        const width = integerText(spaces);
+        if (!text || width === undefined || width < 1 || width > 16) return;
+        const indent = " ".repeat(width);
+        return planningBlock(text.split(/\r\n|\r|\n/).map(line => line ? indent + line : line).join("\n"));
+    },
+    formatCodeBlock(text: string, language: string) {
+        const syntax = language.trim();
+        if (!text.trim() || !/^[a-z0-9_+-]{1,24}$/i.test(syntax)) return;
+        const code = text.replace(/`(?=``)/g, "`\u200b");
+        if (code.length <= 3800) return codeFence + syntax + "\n" + code + "\n" + codeFence;
+        return "The result is too long for one reply.";
+    },
     checkJson(text: string) {
         try { JSON.parse(text); return "Valid JSON."; }
         catch { return "Invalid JSON."; }

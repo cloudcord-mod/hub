@@ -1,0 +1,7 @@
+plugin "Indent Lines":
+  needs commands.register
+  needs reply.local
+  on command "indentlines":
+    input "text" text
+    input "spaces" text
+    reply "${indentLines(text, spaces)}" else "Enter a whole number from 1 to 16 for the indent."

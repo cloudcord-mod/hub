@@ -124,6 +124,7 @@ import plugin_catalog_focus_mode from "../../../../examples/cx/catalog/plugins/f
 import plugin_catalog_follow_voice_user from "../../../../examples/cx/catalog/plugins/follow-voice-user.cx";
 import plugin_catalog_force_owner_crown from "../../../../examples/cx/catalog/plugins/force-owner-crown.cx";
 import plugin_catalog_foreign_copy_handler from "../../../../examples/cx/catalog/plugins/foreign-copy-handler.cx";
+import plugin_catalog_format_code_block from "../../../../examples/cx/catalog/plugins/format-code-block.cx";
 import plugin_catalog_friend_invites from "../../../../examples/cx/catalog/plugins/friend-invites.cx";
 import plugin_catalog_gamzee_s_typing_quirk from "../../../../examples/cx/catalog/plugins/gamzee-s-typing-quirk.cx";
 import plugin_catalog_google_that from "../../../../examples/cx/catalog/plugins/google-that.cx";
@@ -294,11 +295,13 @@ import plugin_catalog_hold_your_tongue from "../../../../examples/cx/catalog/plu
 import plugin_catalog_hop_on from "../../../../examples/cx/catalog/plugins/hop-on.cx";
 import plugin_catalog_hover_highlight_messages from "../../../../examples/cx/catalog/plugins/hover-highlight-messages.cx";
 import plugin_catalog_hsl_color_converter from "../../../../examples/cx/catalog/plugins/hsl-color-converter.cx";
+import plugin_catalog_html_escape from "../../../../examples/cx/catalog/plugins/html-escape.cx";
 import plugin_catalog_ignore_calls from "../../../../examples/cx/catalog/plugins/ignore-calls.cx";
 import plugin_catalog_image_filename from "../../../../examples/cx/catalog/plugins/image-filename.cx";
 import plugin_catalog_image_link from "../../../../examples/cx/catalog/plugins/image-link.cx";
 import plugin_catalog_improve_contrast from "../../../../examples/cx/catalog/plugins/improve-contrast.cx";
 import plugin_catalog_in_role from "../../../../examples/cx/catalog/plugins/in-role.cx";
+import plugin_catalog_indent_lines from "../../../../examples/cx/catalog/plugins/indent-lines.cx";
 import plugin_catalog_ingtoninator from "../../../../examples/cx/catalog/plugins/ingtoninator.cx";
 import plugin_catalog_iso_week from "../../../../examples/cx/catalog/plugins/iso-week.cx";
 import plugin_catalog_join_lines from "../../../../examples/cx/catalog/plugins/join-lines.cx";
@@ -702,6 +705,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "FollowVoiceUser", source: plugin_catalog_follow_voice_user, description: "Edit the source to enter Discord IDs", categories: ["Voice & calls"] },
         { name: "ForceOwnerCrown", source: plugin_catalog_force_owner_crown, description: "Show the server owner’s native crown in the member list", categories: ["Appearance"], appearanceRevision: "edc36d4471c31f6f755970457bfc7cfbb465664f77dc2974bdf19b287052ce0a" },
         { name: "foreignCopyHandler", source: plugin_catalog_foreign_copy_handler, description: "Add Copy Channel Name and Copy Category Name actions", categories: ["Servers & channels"] },
+        { name: "Format Code Block", source: plugin_catalog_format_code_block, description: "/formatcodeblock", commands: ["formatcodeblock"], categories: ["Commands"], appearanceRevision: "376cafda7086045c053f3582f3d4ebd021390b22c0888121bab36248b73a18eb", privateCommands: true },
         { name: "FriendInvites", source: plugin_catalog_friend_invites, description: "/create-friend-invite · /view-friend-invites · /revoke-friend-invites", commands: ["create-friend-invite","view-friend-invites","revoke-friend-invites"], categories: ["Commands","Profiles"] },
         { name: "Gamzee'sTypingQuirk", source: plugin_catalog_gamzee_s_typing_quirk, description: "Apply 1 text rules to message sends and preserve links", categories: ["Chat"] },
         { name: "GoogleThat", source: plugin_catalog_google_that, description: "/googlethat", commands: ["googlethat"], categories: ["Chat","Commands"] },
@@ -872,11 +876,13 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HopOn", source: plugin_catalog_hop_on, description: "Edit the source to set the HTTPS destination", categories: ["Chat"] },
         { name: "HoverHighlightMessages", source: plugin_catalog_hover_highlight_messages, description: "Highlights the message under your cursor", desktopOnly: true, categories: ["Appearance"] },
         { name: "HSL Color Converter", source: plugin_catalog_hsl_color_converter, description: "/hsltohex", commands: ["hsltohex"], categories: ["Commands"], appearanceRevision: "824ea2d52eb31cc78fa7f8c0adf6709f71e12f0c529f7fbd60c9545fb18dc7de", privateCommands: true },
+        { name: "HTML Escape", source: plugin_catalog_html_escape, description: "/escapehtml", commands: ["escapehtml"], categories: ["Commands"], appearanceRevision: "a0f96e9b36ee69cd2b9df93ed39f296b65e170ec028f879622b68e975365f233", privateCommands: true },
         { name: "IgnoreCalls", source: plugin_catalog_ignore_calls, description: "Edit the source to enter Discord IDs", categories: ["Voice & calls"] },
         { name: "ImageFilename", source: plugin_catalog_image_filename, description: "Show image filenames and GIF links", categories: ["Media"] },
         { name: "ImageLink", source: plugin_catalog_image_link, description: "Show image links alongside their chat previews", categories: ["Media"] },
         { name: "Improve Contrast", source: plugin_catalog_improve_contrast, description: "/improvecontrast", commands: ["improvecontrast"], categories: ["Commands"], appearanceRevision: "a5f2ddbbf7bdc8258da75b5c2540054215e0528fcb069b39682fcc973c144776", privateCommands: true },
         { name: "InRole", source: plugin_catalog_in_role, description: "/inrole", commands: ["inrole"], categories: ["Commands","Servers & channels"] },
+        { name: "Indent Lines", source: plugin_catalog_indent_lines, description: "/indentlines", commands: ["indentlines"], categories: ["Commands"], appearanceRevision: "105e91032887863c35b9e5e1d74a847c62af5d275cceafa7e2d79320cd272d65", privateCommands: true },
         { name: "Ingtoninator", source: plugin_catalog_ingtoninator, description: "Change text before Discord sends messages you compose", categories: ["Chat"] },
         { name: "ISO Week", source: plugin_catalog_iso_week, description: "/isoweek", commands: ["isoweek"], categories: ["Commands"], appearanceRevision: "125cd29e1e041acf6a91bcc504d08364b02e83462597004b407a4fd77e93e9e5", privateCommands: true },
         { name: "Join Lines", source: plugin_catalog_join_lines, description: "/joinlines", commands: ["joinlines"], categories: ["Commands"], appearanceRevision: "7fe09a418a6341397253829916ab3fc523ae42d483a0c37a00c032d48430f135", privateCommands: true },

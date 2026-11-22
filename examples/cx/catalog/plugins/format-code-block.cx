@@ -1,0 +1,7 @@
+plugin "Format Code Block":
+  needs commands.register
+  needs reply.local
+  on command "formatcodeblock":
+    input "text" text
+    input "language" text
+    reply "${formatCodeBlock(text, language)}" else "Enter code and a short syntax label such as js or text."

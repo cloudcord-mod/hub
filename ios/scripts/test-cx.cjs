@@ -2975,6 +2975,17 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
                 ["linerange", { text: "One\r\nTwo\r\nThree\r\n", first: "2", last: "3" }, /Two\nThree/],
                 ["linerange", { text: "One", first: "1", last: "2" }, /^Enter valid/],
             ]],
+            ["HTML Escape", [
+                ["escapehtml", { text: '<a title="A&B">it\'s</a>' }, /&lt;a title=&quot;A&amp;B&quot;&gt;it&#39;s&lt;\/a&gt;/],
+            ]],
+            ["Indent Lines", [
+                ["indentlines", { text: "a\r\n\r\nb", spaces: "2" }, /\n  a\n\n  b\n/],
+                ["indentlines", { text: "a", spaces: "17" }, /^Enter a whole number/],
+            ]],
+            ["Format Code Block", [
+                ["formatcodeblock", { text: "let x = 1;", language: "js" }, /^\x60{3}js\nlet x = 1;\n\x60{3}$/],
+                ["formatcodeblock", { text: "let x = 1;", language: "js\nhello" }, /^Enter code/],
+            ]],
             ["Transpose CSV", [
                 ["transposecsv", { text: 'A,B\n"C,D","E""F"' }, /"A","C,D"\n"B","E""F"/],
                 ["transposecsv", { text: "A,B\nC" }, /^Paste a rectangular/],
