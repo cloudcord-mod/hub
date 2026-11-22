@@ -21172,6 +21172,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }),
             /* @__PURE__ */ jsxs(import_react_native24.Pressable, {
               accessibilityRole: "switch",
+              accessibilityLabel: "Custom profile",
               accessibilityState: {
                 checked: enabled
               },
@@ -21215,6 +21216,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             /* @__PURE__ */ jsxs(import_react_native24.View, {
               style: {
                 flexDirection: "row",
+                flexWrap: "wrap",
                 gap: GAP.sm
               },
               children: [
@@ -21237,6 +21239,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function Action({ label: label2, onPress, primary, danger, disabled, grow, selected }) {
+    var wrap = grow && selected === void 0;
     return /* @__PURE__ */ jsx(import_react_native24.Pressable, {
       accessibilityRole: selected === void 0 ? "button" : "tab",
       accessibilityState: {
@@ -21246,11 +21249,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       disabled,
       onPress,
       style: ({ pressed }) => ({
-        flex: grow ? 1 : void 0,
+        flex: grow && !wrap ? 1 : void 0,
+        flexGrow: wrap ? 1 : void 0,
+        flexBasis: wrap ? "40%" : void 0,
+        minWidth: wrap ? 132 : void 0,
         alignItems: "center",
         justifyContent: "center",
-        minHeight: 40,
+        minHeight: 44,
         paddingHorizontal: selected === void 0 ? GAP.lg : GAP.xs,
+        paddingVertical: GAP.xs,
         borderRadius: R2.sm,
         backgroundColor: danger ? C3.red : primary ? C3.brand : C3.raised(),
         opacity: disabled ? 0.45 : pressed ? 0.8 : 1
@@ -21258,7 +21265,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       children: /* @__PURE__ */ jsx(Text, {
         variant: "text-sm/bold",
         style: {
-          color: primary || danger ? "#FFFFFF" : C3.text()
+          color: primary || danger ? "#FFFFFF" : C3.text(),
+          textAlign: "center"
         },
         children: label2
       })
@@ -21285,7 +21293,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             alignItems: "center",
             gap: 6,
             paddingHorizontal: 14,
-            height: 38,
+            minHeight: 44,
+            paddingVertical: GAP.xs,
             borderRadius: 999,
             backgroundColor: on ? C3.brand : C3.panel(),
             borderWidth: 1,
@@ -71971,7 +71980,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "dc3dc8175c2a2c3fbe8d5dd26731eced017a8d1c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4d9b4579784385a75b46158a91ccb995c22a2c36";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
