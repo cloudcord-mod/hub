@@ -135,6 +135,17 @@ assert.equal(mobileRender(mobileProfile).find(node => node.props.children === mo
 selectTab(mobilePopout, "Chat").props.onPress();
 assert.deepEqual(media(mobileRender(mobileProfile)), [mobileProfile.tagIcon]);
 const decoration = "https://cdn.example/decoration.png";
+const fallbackDecoration = "https://cdn.example/native-decoration.png";
+const decorationPreview = { name: "Nova", username: "nova", decoration, fallbackDecoration };
+for (const mode of ["Profile", "Popout", "Chat"]) {
+    layout = mode;
+    const overlay = uri => mobileRender(decorationPreview).find(node => node.props.source?.uri === uri);
+    overlay(decoration).props.onError();
+    assert.ok(overlay(fallbackDecoration), mode);
+    overlay(fallbackDecoration).props.onError();
+    assert.equal(overlay(fallbackDecoration), undefined, mode);
+    avatarAttempt = 0;
+}
 assert.deepEqual(media(mobileRender({ ...mobileProfile, decoration })), [decoration, mobileProfile.tagIcon]);
 assert.equal(containsText(mobileRender(mobileProfile), "Frame: Starlight"), false);
 assert.deepEqual(media(mobileRender({ name: "No cosmetics", username: "plain" })), []);

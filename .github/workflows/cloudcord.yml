@@ -4733,12 +4733,14 @@ jobs:
               const accent = data.profileColorsEnabled ? profilePreviewColor(data.accentColor) : undefined;
               let realAvatar: string | undefined;
               try { realAvatar = realUser?.getAvatarURL?.(undefined, 128); } catch {}
+              const fallbackDecoration = nativePreviewDecoration(realUser, profile);
               return {
                   name: data.displayName || realUser?.globalName || realUser?.global_name || realUser?.username || "You",
                   username: data.username || realUser?.username || "username",
                   avatar: data.avatarMedia?.uri || realAvatar,
                   fallbackAvatar: realAvatar,
-                  decoration: data.avatarDecoration || nativePreviewDecoration(realUser, profile),
+                  decoration: data.avatarDecoration || fallbackDecoration,
+                  fallbackDecoration,
                   banner: data.bannerMedia?.uri || fallback.banner,
                   fallbackBanner: fallback.banner,
                   bio: data.bio ?? fallback.bio,

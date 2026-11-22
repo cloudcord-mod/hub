@@ -97,6 +97,14 @@ function StudioBanner({ uri, fallback }: { uri?: string; fallback?: string }) {
         resizeMode="cover" onError={() => setAttempt(attempt + 1)} /> : null;
 }
 
+function StudioDecoration({ uri, fallback, size, inset }: { uri?: string; fallback?: string; size: number; inset: number }) {
+    const [attempt, setAttempt] = useState(0);
+    const active = [uri || fallback, uri && uri !== fallback ? fallback : undefined][attempt];
+    return active ? <Image key={active} source={{ uri: active }} accessible={false} resizeMode="contain"
+        style={{ position: "absolute", top: inset, left: inset, width: size, height: size }}
+        onError={() => setAttempt(attempt + 1)} /> : null;
+}
+
 /** Hero header: banner, avatar, names, the main switch and preview buttons. */
 export function StudioHero({ name, username, avatar, fallbackAvatar, banner, fallbackBanner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }: {
     name: string; username: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; accent?: string; status?: string;
@@ -435,8 +443,8 @@ function PreviewCosmetics({ frame, effect }: { frame?: string; effect?: string }
 }
 
 /** A quick look at the edits; Discord draws the real profile, frames and effects included. */
-export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon }: {
-    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; nameplate?: string;
+export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, accent, bannerColor, decoration, fallbackDecoration, nameplate, tagText, tagIcon, status, customStatus, activity, bio, frame, effect, badges = [], officialBadgeIcon }: {
+    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; accent?: string; bannerColor?: string; decoration?: string; fallbackDecoration?: string; nameplate?: string;
     tagText?: string; tagIcon?: string; status?: string; customStatus?: string; activity?: { verb: string; name: string; details?: string } | null; bio?: string; frame?: string; effect?: string;
     badges?: string[]; officialBadgeIcon?: string;
 }) {
@@ -453,8 +461,7 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
                 <View style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
                     <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
                 </View>
-                {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -5, left: -5, width: 48, height: 48 }}
-                    resizeMode="contain" accessible={false} /> : null}
+                <StudioDecoration key={JSON.stringify([decoration, fallbackDecoration])} uri={decoration} fallback={fallbackDecoration} size={48} inset={-5} />
             </View>
             <View style={{ flex: 1, gap: 4 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
@@ -464,7 +471,7 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
                 <Text variant="text-sm/medium" style={{ color: C.muted() }}>Hey! This is how your profile looks in chat.</Text>
             </View>
         </View> : layout === "Popout" ? <DiscordProfileCard name={name} username={username} pronouns={pronouns} avatar={avatar} fallbackAvatar={fallbackAvatar} banner={banner} fallbackBanner={fallbackBanner} primary={primary} secondary={accent} bannerColor={bannerColor}
-            decoration={decoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} frame={frame} effect={effect} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
+            decoration={decoration} fallbackDecoration={fallbackDecoration} nameplate={nameplate} status={status} customStatus={customStatus} bio={bio} activity={activity} tagText={tagText} tagIcon={tagIcon} badges={badges} officialBadgeIcon={officialBadgeIcon} frame={frame} effect={effect} /> : <View style={{ borderRadius: R.lg, padding: 3, backgroundColor: edge }}>
             {primary && accent && accent !== primary ? <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "55%", borderBottomLeftRadius: R.lg, borderBottomRightRadius: R.lg, backgroundColor: accent }} /> : null}
             <View style={{ height: 88, borderTopLeftRadius: R.lg - 3, borderTopRightRadius: R.lg - 3, overflow: "hidden", backgroundColor: bannerColor || primary || C.raised() }}>
                 <StudioBanner key={JSON.stringify([banner, fallbackBanner])} uri={banner} fallback={fallbackBanner} />
@@ -474,7 +481,7 @@ export function PreviewCard({ name, username, pronouns, avatar, fallbackAvatar, 
                     <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: card, backgroundColor: C.raised(), overflow: "hidden" }}>
                         <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
                     </View>
-                    {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -10, left: -10, width: 104, height: 104 }} resizeMode="contain" /> : null}
+                    <StudioDecoration key={JSON.stringify([decoration, fallbackDecoration])} uri={decoration} fallback={fallbackDecoration} size={104} inset={-10} />
                     <StudioPresence status={status} borderColor={card} />
                 </View>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6, borderRadius: 8, overflow: "hidden", paddingVertical: 2 }}>
@@ -513,8 +520,8 @@ export { Input as DiscordInput };
 
 
 /** A card drawn like Discord's profile popout: banner, ringed avatar, badge pill, names, status and bio. */
-export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, secondary, bannerColor, decoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
-    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; nameplate?: string; status?: string;
+export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackAvatar, banner, fallbackBanner, primary, secondary, bannerColor, decoration, fallbackDecoration, nameplate, status, customStatus, bio, activity, tagText, tagIcon, frame, effect, badges = [], officialBadgeIcon }: {
+    name: string; username: string; pronouns?: string; avatar?: string; fallbackAvatar?: string; banner?: string; fallbackBanner?: string; primary?: string; secondary?: string; bannerColor?: string; decoration?: string; fallbackDecoration?: string; nameplate?: string; status?: string;
     customStatus?: string; bio?: string; activity?: { verb: string; name: string; details?: string } | null; tagText?: string; tagIcon?: string; badges?: string[]; officialBadgeIcon?: string;
     frame?: string; effect?: string;
 }) {
@@ -530,7 +537,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, fallbackA
             <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: ring, backgroundColor: ring, overflow: "hidden" }}>
                 <StudioAvatar key={JSON.stringify([avatar, fallbackAvatar])} uri={avatar} fallback={fallbackAvatar} name={name} />
             </View>
-            {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
+            <StudioDecoration key={JSON.stringify([decoration, fallbackDecoration])} uri={decoration} fallback={fallbackDecoration} size={96} inset={-6} />
             <StudioPresence status={status} borderColor={ring} borderWidth={5} />
         </View>
         {badges.length ? <View style={{ marginTop: 8, marginLeft: 110, marginRight: 10 }}>
