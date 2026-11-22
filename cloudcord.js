@@ -37113,7 +37113,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         },
         "hide-server-live-notice": hideMobileComponent("HideServerLiveNotice", "the live event notice above the server channel list", "modules/guild_scheduled_events/native/guild_sidebar/GuildLiveChannelNotice.tsx"),
-        "hide-gif-favorite-button": hideMobileComponent("HideGifFavoriteButton", "the favorite button when viewing GIFs", "modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"),
+        "hide-gif-favorite-button": {
+          plugin: "HideGifFavoriteButton",
+          label: "the favorite button when viewing GIFs",
+          css: 'button:is([class^="gifFavoriteButton_"], [class*=" gifFavoriteButton_"]) { display: none !important; }',
+          mobile: {
+            hideComponentPaths: [
+              "modules/media_viewer/native/components/overlay/MediaViewerOverlayButtonFavoriteGIF.tsx"
+            ]
+          }
+        },
         "hide-composer-emoji-promo": hideMobileComponent("HideComposerEmojiPromo", "the premium emoji promotion in composer autocomplete", "modules/channel_text_area/native/ChannelAutocompleteEmojiUpsell.tsx"),
         "hide-channel-list-tips": hideMobileComponent("HideChannelListTips", "feature tips in the server channel list header", "modules/channel_list_v2/native/GuildHeaderCoachmarks.tsx"),
         "hide-voice-event-banner": hideMobileComponent("HideVoiceEventBanner", "the scheduled event banner in voice channels", "modules/guild_scheduled_events/native/components/GuildEventVoiceBanner.tsx"),
@@ -58370,7 +58379,6 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             name: "HideGifFavoriteButton",
             source: hide_gif_favorite_button_default,
             description: "Hide the favorite button when viewing GIFs",
-            mobileOnly: true,
             categories: [
               "Appearance"
             ],
@@ -71987,7 +71995,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "99581defe42f5548dcfbc9347ec85081d561a1e7";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a29c6be12d4f6a92d60ce61783bcdff8be5e5664";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
