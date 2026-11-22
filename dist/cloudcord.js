@@ -36920,6 +36920,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-home-drawer-mention-subtitle": hideMobileComponent("HideHomeDrawerMentionSubtitle", "mention status text in the home drawer", "modules/home_drawer/native/subtitles/MentionSubtitle.tsx"),
+        "hide-home-drawer-unread-subtitle": hideMobileComponent("HideHomeDrawerUnreadSubtitle", "unread status text in the home drawer", "modules/home_drawer/native/subtitles/UnreadSubtitle.tsx"),
+        "hide-stage-backdrop": hideMobileComponent("HideStageBackdrop", "decorative background artwork in Stage channels", "modules/stage_channels/native/components/StageChannelBackground.tsx"),
+        "hide-profile-fixed-backdrop": hideMobileComponent("HideProfileFixedBackdrop", "the fixed backdrop behind profile content", "modules/user_profile/native/UserProfileFixedBackground.tsx"),
+        "hide-profile-banner": hideMobileComponent("HideProfileBanner", "banner images on mobile profiles", "modules/user_profile/native/UserProfileBanner.tsx"),
+        "hide-profile-activity-card-badges": hideMobileComponent("HideProfileActivityCardBadges", "badges within profile activity cards", "modules/user_profile/native/UserProfileActivityCardBadges.tsx"),
         "hide-channel-list-dividers": hideMobileComponent("HideChannelListDividers", "separator lines in the server channel list", "modules/channel_list_v2/native/components/Divider.tsx"),
         "hide-premium-offer-divider": hideMobileComponent("HidePremiumOfferDivider", "decorative separators in Premium offer sheets", "modules/premium/roadblocks/native/views/PremiumUpsellSectionDivider.tsx"),
         "hide-channel-list-subtitles": hideMobileComponent("HideChannelListSubtitles", "secondary text below mobile channel names", "modules/launchpad/native/shared/ChannelSubtitle.tsx", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelSubtitle.tsx"),
@@ -51912,6 +51918,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-home-drawer-mention-subtitle.cx
+  var hide_home_drawer_mention_subtitle_default;
+  var init_hide_home_drawer_mention_subtitle = __esm({
+    "../examples/cx/catalog/plugins/hide-home-drawer-mention-subtitle.cx"() {
+      hide_home_drawer_mention_subtitle_default = 'plugin "HideHomeDrawerMentionSubtitle":\n  needs appearance.hide\n  hide hide-home-drawer-mention-subtitle\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-home-drawer-streaming-subtitle.cx
   var hide_home_drawer_streaming_subtitle_default;
   var init_hide_home_drawer_streaming_subtitle = __esm({
@@ -51925,6 +51939,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_home_drawer_typing_subtitle = __esm({
     "../examples/cx/catalog/plugins/hide-home-drawer-typing-subtitle.cx"() {
       hide_home_drawer_typing_subtitle_default = 'plugin "HideHomeDrawerTypingSubtitle":\n  needs appearance.hide\n  hide hide-home-drawer-typing-subtitle\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-home-drawer-unread-subtitle.cx
+  var hide_home_drawer_unread_subtitle_default;
+  var init_hide_home_drawer_unread_subtitle = __esm({
+    "../examples/cx/catalog/plugins/hide-home-drawer-unread-subtitle.cx"() {
+      hide_home_drawer_unread_subtitle_default = 'plugin "HideHomeDrawerUnreadSubtitle":\n  needs appearance.hide\n  hide hide-home-drawer-unread-subtitle\n';
     }
   });
 
@@ -52216,6 +52238,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-activity-card-badges.cx
+  var hide_profile_activity_card_badges_default;
+  var init_hide_profile_activity_card_badges = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-activity-card-badges.cx"() {
+      hide_profile_activity_card_badges_default = 'plugin "HideProfileActivityCardBadges":\n  needs appearance.hide\n  hide hide-profile-activity-card-badges\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-activity-timebar.cx
   var hide_profile_activity_timebar_default;
   var init_hide_profile_activity_timebar = __esm({
@@ -52240,6 +52270,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-banner.cx
+  var hide_profile_banner_default;
+  var init_hide_profile_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-banner.cx"() {
+      hide_profile_banner_default = 'plugin "HideProfileBanner":\n  needs appearance.hide\n  hide hide-profile-banner\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-connections.cx
   var hide_profile_connections_default;
   var init_hide_profile_connections = __esm({
@@ -52253,6 +52291,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_profile_effects = __esm({
     "../examples/cx/catalog/plugins/hide-profile-effects.cx"() {
       hide_profile_effects_default = 'plugin "HideProfileEffects":\n  needs appearance.hide\n  hide profile-effects\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-profile-fixed-backdrop.cx
+  var hide_profile_fixed_backdrop_default;
+  var init_hide_profile_fixed_backdrop = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-fixed-backdrop.cx"() {
+      hide_profile_fixed_backdrop_default = 'plugin "HideProfileFixedBackdrop":\n  needs appearance.hide\n  hide hide-profile-fixed-backdrop\n';
     }
   });
 
@@ -52653,6 +52699,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_spoiler_warnings = __esm({
     "../examples/cx/catalog/plugins/hide-spoiler-warnings.cx"() {
       hide_spoiler_warnings_default = 'plugin "HideSpoilerWarnings":\n  needs appearance.hide\n  hide spoiler-media-label\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-stage-backdrop.cx
+  var hide_stage_backdrop_default;
+  var init_hide_stage_backdrop = __esm({
+    "../examples/cx/catalog/plugins/hide-stage-backdrop.cx"() {
+      hide_stage_backdrop_default = 'plugin "HideStageBackdrop":\n  needs appearance.hide\n  hide hide-stage-backdrop\n';
     }
   });
 
@@ -55746,8 +55800,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_gift_wishlist_banner();
       init_hide_guild_boost_tag();
       init_hide_help_button();
+      init_hide_home_drawer_mention_subtitle();
       init_hide_home_drawer_streaming_subtitle();
       init_hide_home_drawer_typing_subtitle();
+      init_hide_home_drawer_unread_subtitle();
       init_hide_home_drawer_voice_subtitle();
       init_hide_image_alt_text();
       init_hide_inbox_button();
@@ -55784,11 +55840,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_premium_upsell_gradient();
       init_hide_profile_about_me();
       init_hide_profile_activity_badges();
+      init_hide_profile_activity_card_badges();
       init_hide_profile_activity_timebar();
       init_hide_profile_app_widgets();
       init_hide_profile_banner_images();
+      init_hide_profile_banner();
       init_hide_profile_connections();
       init_hide_profile_effects();
+      init_hide_profile_fixed_backdrop();
       init_hide_profile_friend_request_banner();
       init_hide_profile_game_friends();
       init_hide_profile_mutuals();
@@ -55839,6 +55898,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_shop_wishlist_tip();
       init_hide_soundboard_nitro_banner();
       init_hide_spoiler_warnings();
+      init_hide_stage_backdrop();
       init_hide_stage_boost_promo();
       init_hide_status_emojis();
       init_hide_sticker_autocomplete();
@@ -58352,6 +58412,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "e8ed06f3a9370cfa1b44db2ee4ba4deb0e406c48e524f1870b8d84f03936666f"
           },
           {
+            name: "HideHomeDrawerMentionSubtitle",
+            source: hide_home_drawer_mention_subtitle_default,
+            description: "Hide mention status text in the home drawer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "d5cda1f6a59ca68f5c8a29f93b016d58d3c45619018eec258798d9b16ce27886"
+          },
+          {
             name: "HideHomeDrawerStreamingSubtitle",
             source: hide_home_drawer_streaming_subtitle_default,
             description: "Hide streaming status text in the home drawer",
@@ -58370,6 +58440,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "c92e4bee1126d8d7257b3788a108108832439545046b056288ace27d76bb97d4"
+          },
+          {
+            name: "HideHomeDrawerUnreadSubtitle",
+            source: hide_home_drawer_unread_subtitle_default,
+            description: "Hide unread status text in the home drawer",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "53eba1aa55d36a6a76ce1a92faaff82e4dc0662b5f498b73e8defc885ed01970"
           },
           {
             name: "HideHomeDrawerVoiceSubtitle",
@@ -58713,6 +58793,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "5eb45da8e6b8f4b64553b82a09ba64b96f22ac4ab0faf9d8ae00b93eda857a40"
           },
           {
+            name: "HideProfileActivityCardBadges",
+            source: hide_profile_activity_card_badges_default,
+            description: "Hide badges within profile activity cards",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "cc5121f8d7197816aa7dc357ee98840dddaa2c5d54aa1a175322948aeb6d7b77"
+          },
+          {
             name: "HideProfileActivityTimebar",
             source: hide_profile_activity_timebar_default,
             description: "Hide the elapsed-time bar on profile activity cards",
@@ -58742,6 +58832,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "c2654ca55ea9bf9aa21d8bb1cef13879d1c933a0c6c9ed27d5917ef051ec10db"
           },
           {
+            name: "HideProfileBanner",
+            source: hide_profile_banner_default,
+            description: "Hide banner images on mobile profiles",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "8ca49740b3496bac1e1c9fb258cf9ef6b65528b93578de09a2a05467c63072d5"
+          },
+          {
             name: "HideProfileConnections",
             source: hide_profile_connections_default,
             description: "Hide connections in profile cards",
@@ -58760,6 +58860,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Profiles"
             ],
             appearanceRevision: "8110c30799aff6431793b0a0c777fdda3acf3eea1ece8723bf08b4d08124acd3"
+          },
+          {
+            name: "HideProfileFixedBackdrop",
+            source: hide_profile_fixed_backdrop_default,
+            description: "Hide the fixed backdrop behind profile content",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "98dd9f8f2e77192a238cfe988c93ceb1ef304525a328d8145e73647f67290218"
           },
           {
             name: "HideProfileFriendRequestBanner",
@@ -59249,6 +59359,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "5319d784ea12ca01dd954473ebb2feee7755dea7b5714f7dfaa4c7026e9e46f6"
+          },
+          {
+            name: "HideStageBackdrop",
+            source: hide_stage_backdrop_default,
+            description: "Hide decorative background artwork in Stage channels",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "721708a081ce6e9395b842e67b2fb0cecbcc8d4b5d9a9302d9df610c6c0285a4"
           },
           {
             name: "HideStageBoostPromo",
@@ -71834,7 +71954,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c64814292c88cd2a4c0dda284976deca88a9bf21";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "024f128da33b4c097325395b17aa4eaaa0b75e47";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
