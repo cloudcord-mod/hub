@@ -47973,6 +47973,43 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     var permissions = document.permissions ?? [];
     return document.kind === "theme" || isPrivateCxCommand(permissions) || permissions.length > 0 && permissions.every((permission) => permission === "appearance.hide" || permission === "appearance.style");
   }
+  function getCxCatalogCategories(document) {
+    if (document.kind === "theme")
+      return [
+        "Themes"
+      ];
+    var permissions = document.permissions;
+    var hasPermission = (pattern) => permissions.some((permission) => pattern.test(permission));
+    var appearance = [
+      ...document.hiddenTargets,
+      ...document.optionalHides.keys(),
+      ...document.styledTargets
+    ];
+    var hasAppearanceTarget = (pattern) => appearance.some((target) => pattern.test(target));
+    return [
+      ...hasPermission(/^appearance\./) ? [
+        "Appearance"
+      ] : [],
+      ...hasPermission(/^(messages|replies|typing|notifications|drafts)\.|^links\.openonmessage$/) ? [
+        "Chat"
+      ] : [],
+      ...document.commands.length ? [
+        "Commands"
+      ] : [],
+      ...hasPermission(/^(media|emoji|attachments|stickers|uploads|spotify)\.|^profile(menu)?\.(avatar|media)$|^links\.steam$|^servers\.media(view|copy)$|^channels\.iconview$|^guild\.rolemedia$/) ? [
+        "Media"
+      ] : [],
+      ...hasPermission(/^(profile|profilemenu|friends)\./) || hasAppearanceTarget(/^profile-|^avatar-decorations$/) ? [
+        "Profiles"
+      ] : [],
+      ...hasPermission(/^(channels|servers|guild)\./) ? [
+        "Servers & channels"
+      ] : [],
+      ...hasPermission(/^(voice|calls)\./) || hasAppearanceTarget(/^(hide-)?voice-|^dm-call-buttons$/) ? [
+        "Voice & calls"
+      ] : []
+    ];
+  }
   function normalizeCatalogSearch(value) {
     return value.normalize("NFKD").toLowerCase().replace(RegExp("\\p{M}", "gu"), "").replace(RegExp("[^\\p{L}\\p{N}]+", "gu"), " ").trim();
   }
@@ -48727,10 +48764,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   function reviewCx(source) {
     var document = parseCx(source);
     var numberOptions = [];
+    var categories = getCxCatalogCategories(document);
     if (document.kind === "theme")
       return {
         kind: document.kind,
         name: document.name,
+        categories,
         permissions: [],
         effects: [
           "Change the app colors and background"
@@ -48777,6 +48816,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     return {
       kind: document.kind,
       name: document.name,
+      categories,
       permissions: document.permissions,
       numberOptions,
       appearanceOptions: [
@@ -49314,6 +49354,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       })),
       source: (id) => active.get(id)?.source,
       commands: (id) => active.get(id)?.commands,
+      categories: (id) => active.get(id)?.categories,
       isPrivateCommand: (id) => active.get(id)?.privateCommand ?? false,
       appearanceOptions(id) {
         var entry = active.get(id);
@@ -49346,7 +49387,8 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           options: review.appearanceOptions,
           binding: bindCx(source, host, approved, selected),
           privateCommand,
-          commands: review.commands?.map((command) => command.slice(1))
+          commands: review.commands?.map((command) => command.slice(1)),
+          categories: review.categories
         });
       },
       disable(id) {
@@ -64654,6 +64696,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
           needsReview,
           restoreFailed,
           commands: active ? session.commands(id) : entry.commands,
+          categories: active ? session.categories(id) : entry.categories,
           privateCommands: active ? session.isPrivateCommand(id) : entry.privateCommands
         };
       });
@@ -64663,9 +64706,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         source: session.source(id),
         active: true,
         commands: session.commands(id),
-        categories: session.commands(id)?.length ? [
-          "Commands"
-        ] : void 0,
+        categories: session.categories(id),
         privateCommands: session.isPrivateCommand(id)
       }));
       return [
@@ -70046,7 +70087,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5fda227b94faa938755cd318e2748f0b2b7bccd6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "19c08999929b0ca7ed2db4569f812deb0e13946c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
