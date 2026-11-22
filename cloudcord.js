@@ -38901,6 +38901,33 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return;
           return planningBlock(lines.map((line, index) => (mode === "bullet" ? "- " : index + 1 + ". ") + line).join("\n"));
         },
+        showInvisibleCharacters(text) {
+          if (!text)
+            return;
+          var labels = {
+            " ": "\xB7",
+            "	": "[TAB]",
+            "\xA0": "[NBSP]",
+            "\u200B": "[ZWSP]",
+            "\u200D": "[ZWJ]",
+            "\uFEFF": "[BOM]"
+          };
+          return planningBlock(text.replace(/[ \t\u00a0\u200b\u200d\uFEFF]|\r\n|\r|\n/g, (character) => labels[character] ?? (character === "\r\n" ? "[CRLF]\n" : character === "\n" ? "[LF]\n" : "[CR]\n")));
+        },
+        expandTabs(text, width) {
+          var size = integerText(width);
+          if (!text || size === void 0 || size < 1 || size > 16)
+            return;
+          var lines = text.split(/\r\n|\r|\n/).map((line) => {
+            var column = 0;
+            return Array.from(line, (character) => {
+              var advance = character === "	" ? size - column % size : 1;
+              column += advance;
+              return character === "	" ? " ".repeat(advance) : character;
+            }).join("");
+          });
+          return planningBlock(lines.join("\n"));
+        },
         escapeHtml(text) {
           if (!text)
             return;
@@ -50564,6 +50591,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/expand-tabs.cx
+  var expand_tabs_default;
+  var init_expand_tabs = __esm({
+    "../examples/cx/catalog/plugins/expand-tabs.cx"() {
+      expand_tabs_default = 'plugin "Expand Tabs":\n  needs commands.register\n  needs reply.local\n  on command "expandtabs":\n    input "text" text\n    input "width" text\n    reply "${expandTabs(text, width)}" else "Enter text and a tab width from 1 to 16."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/extract-line-range.cx
   var extract_line_range_default;
   var init_extract_line_range = __esm({
@@ -53363,6 +53398,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/show-invisible-characters.cx
+  var show_invisible_characters_default;
+  var init_show_invisible_characters = __esm({
+    "../examples/cx/catalog/plugins/show-invisible-characters.cx"() {
+      show_invisible_characters_default = 'plugin "Show Invisible Characters":\n  needs commands.register\n  needs reply.local\n  on command "showinvisibles":\n    input "text" text\n    reply "${showInvisibleCharacters(text)}" else "Enter text to inspect."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/show-ping.cx
   var show_ping_default;
   var init_show_ping = __esm({
@@ -54887,6 +54930,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
       init_event_window();
+      init_expand_tabs();
       init_extract_line_range();
       init_extract_mentions();
       init_fake_profile_themes();
@@ -55194,6 +55238,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_send_timestamps();
       init_shift_timestamp();
       init_ship_calc();
+      init_show_invisible_characters();
       init_show_ping();
       init_show_song_name();
       init_signature();
@@ -56431,6 +56476,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "2b493a66f732896ad09e295f4ebdcdd2cff9375cc7b045d97269f351d91b2f3e",
+            privateCommands: true
+          },
+          {
+            name: "Expand Tabs",
+            source: expand_tabs_default,
+            description: "/expandtabs",
+            commands: [
+              "expandtabs"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "f2195ebbbfc81dfe5d88192560bdbd24c1cc0975a591e7650a63ae6004b3f46b",
             privateCommands: true
           },
           {
@@ -59502,6 +59560,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Chat",
               "Commands"
             ]
+          },
+          {
+            name: "Show Invisible Characters",
+            source: show_invisible_characters_default,
+            description: "/showinvisibles",
+            commands: [
+              "showinvisibles"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "db147200de57ccf9db04e33480d80b06b98533c10eb3d0b13da212d78d779f1b",
+            privateCommands: true
           },
           {
             name: "ShowPing",
@@ -70371,7 +70442,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8de414ad70320520e8161478fb9d52d14b864c8c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d9e3137519aea826e066f9af3cadff7a5b1ea3a6";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
