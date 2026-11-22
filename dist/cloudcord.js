@@ -36882,16 +36882,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       catalogOriginal: true
     };
   }
-  function hideMobileComponent(plugin2, label2, path) {
+  function hideMobileComponent(plugin2, label2, ...paths) {
     return {
       plugin: plugin2,
       label: label2,
       css: "",
       mobileOnly: true,
       mobile: {
-        hideComponentPaths: [
-          path
-        ]
+        hideComponentPaths: paths
       }
     };
   }
@@ -36902,6 +36900,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-dm-friend-suggestions": hideMobileComponent("HideDmFriendSuggestions", "suggested friends and their heading from the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriend.tsx", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemSuggestedFriendsHeader.tsx"),
+        "hide-dm-add-friends-widget": hideMobileComponent("HideDmAddFriendsWidget", "the Add Friends widget in the DM list", "modules/main_tabs_v2/native/tabs/messages/items/MessagesItemAddFriendsWidget.tsx"),
+        "hide-dm-wave-button": hideMobileComponent("HideDmWaveButton", "the wave shortcut on eligible DM rows", "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelWave.tsx"),
         "hide-server-feed-description": {
           plugin: "HideServerFeedDescription",
           label: "Hide the description in the server feed header",
@@ -50229,11 +50230,35 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-dm-add-friends-widget.cx
+  var hide_dm_add_friends_widget_default;
+  var init_hide_dm_add_friends_widget = __esm({
+    "../examples/cx/catalog/plugins/hide-dm-add-friends-widget.cx"() {
+      hide_dm_add_friends_widget_default = 'plugin "HideDmAddFriendsWidget":\n  needs appearance.hide\n  hide hide-dm-add-friends-widget\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-dm-friend-suggestions.cx
+  var hide_dm_friend_suggestions_default;
+  var init_hide_dm_friend_suggestions = __esm({
+    "../examples/cx/catalog/plugins/hide-dm-friend-suggestions.cx"() {
+      hide_dm_friend_suggestions_default = 'plugin "HideDmFriendSuggestions":\n  needs appearance.hide\n  hide hide-dm-friend-suggestions\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-dm-search.cx
   var hide_dm_search_default;
   var init_hide_dm_search = __esm({
     "../examples/cx/catalog/plugins/hide-dm-search.cx"() {
       hide_dm_search_default = 'plugin "HideDmSearch":\n  needs appearance.hide\n  hide dm-list-search\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-dm-wave-button.cx
+  var hide_dm_wave_button_default;
+  var init_hide_dm_wave_button = __esm({
+    "../examples/cx/catalog/plugins/hide-dm-wave-button.cx"() {
+      hide_dm_wave_button_default = 'plugin "HideDmWaveButton":\n  needs appearance.hide\n  hide hide-dm-wave-button\n';
     }
   });
 
@@ -53405,7 +53430,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_disabled_emojis();
       init_hide_discover_button();
       init_hide_display_name_styles_tip();
+      init_hide_dm_add_friends_widget();
+      init_hide_dm_friend_suggestions();
       init_hide_dm_search();
+      init_hide_dm_wave_button();
       init_hide_double_tap_reaction_tip();
       init_hide_download_apps_button();
       init_hide_edited_label();
@@ -55105,6 +55133,26 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "b2f3e613dda86aa78c01940feeed87d0a2ef9e4f750df312df248c6b01e4ef50"
           },
           {
+            name: "HideDmAddFriendsWidget",
+            source: hide_dm_add_friends_widget_default,
+            description: "Hide the Add Friends widget in the DM list",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "d70d81c1c8f37e7b93193e2522ca9c5d43da4d77b09499cc268d3cfca3697c12"
+          },
+          {
+            name: "HideDmFriendSuggestions",
+            source: hide_dm_friend_suggestions_default,
+            description: "Hide suggested friends and their heading from the DM list",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "55c07bd0119ea63f75e4206513e58c36a1e4514d502b79940509ec0a77adfa5a"
+          },
+          {
             name: "HideDmSearch",
             source: hide_dm_search_default,
             description: "Hide the search button in the DM list",
@@ -55112,6 +55160,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "79f297b8d184eb4122607ece68a542b4d27faf21f99acf347627bf7a223de877"
+          },
+          {
+            name: "HideDmWaveButton",
+            source: hide_dm_wave_button_default,
+            description: "Hide the wave shortcut on eligible DM rows",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "281c59021bcf9eb4a3658d10a5f83f3ec3f1f34a829ffec8c17084cf17b71f10"
           },
           {
             name: "HideDoubleTapReactionTip",
@@ -67637,7 +67695,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "650cb9e0762772fbc9ba23aa87ad31f73f00b054";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "93e7036b8f7a720b87ef81751e2a8fc364c8318c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
