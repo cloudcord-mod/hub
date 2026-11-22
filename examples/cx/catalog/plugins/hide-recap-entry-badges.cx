@@ -1,0 +1,3 @@
+plugin "HideRecapEntryBadges":
+  needs appearance.hide
+  hide hide-recap-entry-badges

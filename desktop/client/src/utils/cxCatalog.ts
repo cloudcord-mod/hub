@@ -156,6 +156,7 @@ import plugin_catalog_hide_call_activities_tip from "../../../../examples/cx/cat
 import plugin_catalog_hide_call_buttons from "../../../../examples/cx/catalog/plugins/hide-call-buttons.cx";
 import plugin_catalog_hide_channel_list_tips from "../../../../examples/cx/catalog/plugins/hide-channel-list-tips.cx";
 import plugin_catalog_hide_channel_topic from "../../../../examples/cx/catalog/plugins/hide-channel-topic.cx";
+import plugin_catalog_hide_channel_unread_count from "../../../../examples/cx/catalog/plugins/hide-channel-unread-count.cx";
 import plugin_catalog_hide_character_count from "../../../../examples/cx/catalog/plugins/hide-character-count.cx";
 import plugin_catalog_hide_chat_attachments from "../../../../examples/cx/catalog/plugins/hide-chat-attachments.cx";
 import plugin_catalog_hide_chat_input_refresh_tip from "../../../../examples/cx/catalog/plugins/hide-chat-input-refresh-tip.cx";
@@ -241,6 +242,7 @@ import plugin_catalog_hide_quest_orb_multiplier_pill from "../../../../examples/
 import plugin_catalog_hide_quests_tab from "../../../../examples/cx/catalog/plugins/hide-quests-tab.cx";
 import plugin_catalog_hide_reactions from "../../../../examples/cx/catalog/plugins/hide-reactions.cx";
 import plugin_catalog_hide_recap_custom_status from "../../../../examples/cx/catalog/plugins/hide-recap-custom-status.cx";
+import plugin_catalog_hide_recap_entry_badges from "../../../../examples/cx/catalog/plugins/hide-recap-entry-badges.cx";
 import plugin_catalog_hide_recap_gaming_activity from "../../../../examples/cx/catalog/plugins/hide-recap-gaming-activity.cx";
 import plugin_catalog_hide_recap_new_content_pill from "../../../../examples/cx/catalog/plugins/hide-recap-new-content-pill.cx";
 import plugin_catalog_hide_recap_server_recommendations from "../../../../examples/cx/catalog/plugins/hide-recap-server-recommendations.cx";
@@ -747,6 +749,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideCallButtons", source: plugin_catalog_hide_call_buttons, description: "Hide the buttons to start calls in DMs", categories: ["Appearance","Voice & calls"], appearanceRevision: "b324a48e9b7ef46c69c4ad0249533fa83b8fb903625f1a940cc4ecea0fcd2ce4" },
         { name: "HideChannelListTips", source: plugin_catalog_hide_channel_list_tips, description: "Hide feature tips in the server channel list header", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "9b23014e616ac1c5e2008e72a500b01828d12f51d51c20b6841f6be8aefc3a56" },
         { name: "HideChannelTopic", source: plugin_catalog_hide_channel_topic, description: "Hide channel topics", categories: ["Appearance"], appearanceRevision: "79414d895258b347a6dc13cba58453948a75bb443e8bdc7ddc54f40e94b5a3c4" },
+        { name: "HideChannelUnreadCount", source: plugin_catalog_hide_channel_unread_count, description: "Hide numeric unread badges in the mobile channel list", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "32b8f58a4c15fc552cfa1f8f1f8f5585733111888cccbe5ddfebb8d7f369baa6" },
         { name: "HideCharacterCount", source: plugin_catalog_hide_character_count, description: "Hide the chat character counter", categories: ["Appearance"], appearanceRevision: "f6f7702ea896af11710733536e8f75cb4750a9c0c1e751fbf026054e03846113" },
         { name: "HideChatAttachments", source: plugin_catalog_hide_chat_attachments, description: "Hide file and media attachments in chat", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "eadd0623581b9ca2709e566983428ff4b3e8a35f4ea913338c5c311d95bb9de9" },
         { name: "HideChatInputRefreshTip", source: plugin_catalog_hide_chat_input_refresh_tip, description: "Hide the redesigned chat input tip", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c3c3b9abd3b4f991967e1be76baf73a82018146d2bf53f241a19c3fb6c4c1f36" },
@@ -832,6 +835,7 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "HideQuestsTab", source: plugin_catalog_hide_quests_tab, description: "Hide the Quests entry", categories: ["Appearance"], appearanceRevision: "5e60a8ae3bfada1d1e65c27a7c2d2f4640fb8809435a8ba93931faa0cea56afe" },
         { name: "HideReactions", source: plugin_catalog_hide_reactions, description: "Hide message reactions", categories: ["Appearance"], appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58" },
         { name: "HideRecapCustomStatus", source: plugin_catalog_hide_recap_custom_status, description: "Hide custom status updates in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "ab225e46d5889585cf028d9ac41a4683a8bf78d35579fcd4e3a728b1d828cfe2" },
+        { name: "HideRecapEntryBadges", source: plugin_catalog_hide_recap_entry_badges, description: "Hide badges on content entries in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "dbf0b9f5e811b87480a8b3515faec913a1ef29779db204169e83e5cb85b12da8" },
         { name: "HideRecapGamingActivity", source: plugin_catalog_hide_recap_gaming_activity, description: "Hide gaming activity entries in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "c6aa1efbf0d46dde768c74d4d77b08df1a57d1a6fa39bbb554e9168306302895" },
         { name: "HideRecapNewContentPill", source: plugin_catalog_hide_recap_new_content_pill, description: "Hide the new-content pill in the recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "e239a186a6a46a20ffc388a06fb118208fcc07140658a4b89ff83213d3e94962" },
         { name: "HideRecapServerRecommendations", source: plugin_catalog_hide_recap_server_recommendations, description: "Hide server recommendations in the In Case You Missed It recap", mobileOnly: true, categories: ["Appearance"], appearanceRevision: "77aa33e16568aa2df33f63b467ae1a2fef42bafa503e49a6098fe7462146b474" },

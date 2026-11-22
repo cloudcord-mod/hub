@@ -1,0 +1,3 @@
+plugin "HideChannelUnreadCount":
+  needs appearance.hide
+  hide hide-channel-unread-count

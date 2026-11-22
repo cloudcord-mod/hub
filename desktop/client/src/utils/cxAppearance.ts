@@ -17,6 +17,8 @@ function hideMobileComponent(plugin: string, label: string, ...paths: string[]) 
 }
 
 export const cxAppearanceTargets = {
+    "hide-channel-unread-count": hideMobileComponent("HideChannelUnreadCount", "numeric unread badges in the mobile channel list", "modules/main_tabs_v2/native/shared_components/guild_channels/ChannelUnreadBadge.tsx"),
+    "hide-recap-entry-badges": hideMobileComponent("HideRecapEntryBadges", "badges on content entries in the recap", "modules/icymi/native/content_inventory/Badges.tsx"),
     "hide-recap-custom-status": hideMobileComponent("HideRecapCustomStatus", "custom status updates in the recap", "modules/icymi/native/content_inventory/CustomStatusEntryRow.tsx"),
     "hide-recap-gaming-activity": hideMobileComponent("HideRecapGamingActivity", "gaming activity entries in the recap", "modules/icymi/native/content_inventory/GamingLikeEntryRow.tsx"),
     "hide-bounties-promo-header": hideMobileComponent("HideBountiesPromoHeader", "the Bounties call-to-action header", "modules/quests/native/BountiesCtaHeader.tsx"),
