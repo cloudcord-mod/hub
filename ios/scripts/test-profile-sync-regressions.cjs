@@ -20,7 +20,7 @@ assert.equal(accountLookup.activeUserId(), 'native-account');
 accountLookup.realGetCurrentUser = () => null;
 assert.equal(accountLookup.activeUserId(), null, 'logout cannot reuse a cached account ID for profile publishing');
 const ctx = testContext({ normalizeProfileAppearance: () => ({}), sharedDecorationAsset: value => value || '',
-    sharedProfileColorsEnabled: profileAppearance.sharedProfileColorsEnabled,
+    sharedProfileColorPair: profileAppearance.sharedProfileColorPair,
     REPLACE_BADGES_SYNC_ID: '__cc_replace_real_badges', getDecorationUrl: value => value, ALL_DECORATIONS: [] });
 vm.runInContext(compile(block(desktop, 'function fromSharedProfile(', 'const NITRO_LEVEL_MONTHS') + block(desktop, 'function toSharedProfile(', 'async function publishSharedProfile(')), ctx);
 assert.equal(ctx.fromSharedProfile({ nitro: false, nitroLevel: 0 }).nitro, false);
@@ -30,6 +30,10 @@ const syncedColors = { primaryColor: 0, accentColor: 0x123456 };
 assert.equal(ctx.fromSharedProfile(syncedColors).accentColor, 0, 'older profiles can use black without an enable flag');
 assert.equal(ctx.fromSharedProfile({ ...syncedColors, profileColorsEnabled: false }).accentColor, undefined);
 assert.equal(ctx.fromSharedProfile({ ...syncedColors, profileColorsEnabled: false }).accentColor2, undefined);
+assert.equal(ctx.fromSharedProfile({ primaryColor: "#123456", accentColor: -1 }).accentColor2, 0x123456);
+assert.equal(ctx.fromSharedProfile({ primaryColor: 0x1000000, accentColor: 0 }).accentColor, 0);
+assert.equal(ctx.fromSharedProfile({ accentColor: 0, accentColor2: "#abcdef" }).accentColor2, 0xabcdef);
+assert.equal(ctx.fromSharedProfile({ primaryColor: 1.5, accentColor: "invalid" }).accentColor, undefined);
 const shared = { replaceRealBadges: true, ...ctx.toSharedProfile({ replaceRealBadges: false, customBadgeIds: [] }) };
 assert.equal(shared.replaceRealBadges, false, 'an old true flag cannot override an explicit false save');
 assert.equal(ctx.fromSharedProfile(shared).replaceRealBadges, false);

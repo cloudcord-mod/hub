@@ -133,6 +133,20 @@ export function sharedProfileColorsEnabled(data?: { profileColorsEnabled?: unkno
     return data?.primaryColor != null || data?.accentColor != null;
 }
 
+export function sharedProfileColorPair(data?: { profileColorsEnabled?: unknown; primaryColor?: unknown; accentColor?: unknown; accentColor2?: unknown; } | null): [number, number] | undefined {
+    if (!sharedProfileColorsEnabled(data)) return;
+    const parse = (value: unknown) => {
+        const hex = profilePreviewColor(value);
+        return hex === undefined ? undefined : Number.parseInt(hex.slice(1), 16);
+    };
+    const primary = parse(data?.primaryColor);
+    const accent = parse(data?.accentColor);
+    const first = primary ?? accent;
+    if (first === undefined) return;
+    const second = data?.primaryColor != null ? accent : parse(data?.accentColor2);
+    return [first, second ?? first];
+}
+
 export function nativeProfilePreviewSurface(userId: string, profile?: DiscordProfileSurface | null, userBanner?: unknown) {
     const colors = profile?.themeColors ?? profile?.theme_colors;
     return {
