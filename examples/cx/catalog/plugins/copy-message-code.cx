@@ -1,0 +1,3 @@
+plugin "CopyMessageCode":
+  needs messages.copytext
+  use copy-message-code

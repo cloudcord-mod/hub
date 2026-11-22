@@ -1,0 +1,3 @@
+plugin "CopyMessageInfo":
+  needs messages.copyreference
+  use copy-message-info

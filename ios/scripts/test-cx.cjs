@@ -1446,13 +1446,13 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             const message = { id: sender, channel_id: repeatChannel, content: "> hello <@" + other + ">\r\n@everyone",
                 author: { id: other, globalName: "Quoted *name*" }, attachments: [{ filename: "example.png" }] };
             const expected = "> hello <@\u200b" + other + ">\n> @\u200beveryone\n> 📎 example.png\n— **Quoted \\*name\\*** · https://discord.com/channels/" + guildId + "/" + repeatChannel + "/" + sender + "\n";
-            const menu = () => {
+            const menu = (selected = message) => {
                 if (desktop) {
                     const entries = [];
-                    [...menuPatches].at(-1)(entries, { message });
+                    [...menuPatches].at(-1)(entries, { message: selected });
                     return entries;
                 }
-                const props = { message, channel: stores.ChannelStore.getChannel(repeatChannel),
+                const props = { message: selected, channel: stores.ChannelStore.getChannel(repeatChannel),
                     chatInputRef: { current: { insertText: (...args) => mentionActions.push(args) } } };
                 const wrapper = appearanceHooks.get(LongPressMessageActionSheet)(null, jsx(LongPressMessageActionSheet, props));
                 const sheet = wrapper.type(wrapper.props);
@@ -1513,6 +1513,30 @@ console.log("PASS CX permission review, denial, revocation, rollback, plugin and
             click(render(), "Disable CopyMessageReference");
             invoke("Copy Markdown Message Link");
             assert.equal(clipboardWrites.length, afterDisable);
+
+            const clipboardMessage = {
+                ...message, attachments: [{ filename: "a.png" }, { filename: "b.pdf", url: "https://example.net/b.pdf" }],
+                content: "[link](https://example.com/page_(test)). <https://example.com/page_(test)> https://[::1]\n"
+                    + "```js\nconst a = 1;\n```\n```sh\necho ok\n```",
+            };
+            for (const [name, label, expectedText] of [
+                ["CopyAttachmentNames", "Copy Attachment Names", "a.png\nb.pdf"],
+                ["CopyMessageLinks", "Copy Links from Message", "https://example.com/page_(test)\nhttps://[::1]"],
+                ["CopyMessageCode", "Copy Code from Message", "const a = 1;\n\necho ok"],
+                ["CopyMessageInfo", "Copy Message Info", JSON.stringify({
+                    messageId: sender, channelId: repeatChannel, authorId: other,
+                    sentAt: new Date(Number(BigInt(sender) >> 22n) + 1420070400000).toISOString(),
+                }, null, 2)],
+            ]) {
+                selectCatalog(name);
+                click(render(), "Allow for this session");
+                const copyAction = button(menu(clipboardMessage), label).props[desktop ? "action" : "onPress"];
+                copyAction();
+                assert.equal(clipboardWrites.pop(), expectedText);
+                click(render(), "Disable " + name);
+                copyAction();
+                assert.equal(clipboardWrites.length, afterDisable);
+            }
 
             selectCatalog("WordCount");
             click(render(), "Allow for this session");

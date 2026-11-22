@@ -46,10 +46,14 @@ import plugin_catalog_compact_member_list from "../../../../examples/cx/catalog/
 import plugin_catalog_compact_messages from "../../../../examples/cx/catalog/plugins/compact-messages.cx";
 import plugin_catalog_compact_server_list from "../../../../examples/cx/catalog/plugins/compact-server-list.cx";
 import plugin_catalog_compare_lines from "../../../../examples/cx/catalog/plugins/compare-lines.cx";
+import plugin_catalog_copy_attachment_names from "../../../../examples/cx/catalog/plugins/copy-attachment-names.cx";
 import plugin_catalog_copy_bios from "../../../../examples/cx/catalog/plugins/copy-bios.cx";
 import plugin_catalog_copy_emoji_markdown from "../../../../examples/cx/catalog/plugins/copy-emoji-markdown.cx";
 import plugin_catalog_copy_file_contents from "../../../../examples/cx/catalog/plugins/copy-file-contents.cx";
 import plugin_catalog_copy_media_link from "../../../../examples/cx/catalog/plugins/copy-media-link.cx";
+import plugin_catalog_copy_message_code from "../../../../examples/cx/catalog/plugins/copy-message-code.cx";
+import plugin_catalog_copy_message_info from "../../../../examples/cx/catalog/plugins/copy-message-info.cx";
+import plugin_catalog_copy_message_links from "../../../../examples/cx/catalog/plugins/copy-message-links.cx";
 import plugin_catalog_copy_message_reference from "../../../../examples/cx/catalog/plugins/copy-message-reference.cx";
 import plugin_catalog_copy_profile_colors from "../../../../examples/cx/catalog/plugins/copy-profile-colors.cx";
 import plugin_catalog_copy_profile_names from "../../../../examples/cx/catalog/plugins/copy-profile-names.cx";
@@ -527,10 +531,14 @@ export const cxCatalog: { plugins: CatalogEntry[]; themes: CatalogEntry[]; } = {
         { name: "CompactMessages", source: plugin_catalog_compact_messages, description: "Tighter spacing between messages", desktopOnly: true, categories: ["Appearance"] },
         { name: "CompactServerList", source: plugin_catalog_compact_server_list, description: "Makes the server list narrower", desktopOnly: true, categories: ["Appearance"] },
         { name: "Compare Lines", source: plugin_catalog_compare_lines, description: "/comparelines", commands: ["comparelines"], categories: ["Commands"], appearanceRevision: "ea83839a2b1484b6ca17376d5fe0eee5efc1af19057a401b9afde997e7a71b20", privateCommands: true },
+        { name: "CopyAttachmentNames", source: plugin_catalog_copy_attachment_names, description: "Copy the selected message’s attachment filenames", categories: ["Chat"] },
         { name: "CopyBios", source: plugin_catalog_copy_bios, description: "Copy Bio", categories: ["Profiles"] },
         { name: "CopyEmojiMarkdown", source: plugin_catalog_copy_emoji_markdown, description: "Add a Copy Emoji Markdown action to the emoji menu", categories: ["Media"] },
         { name: "CopyFileContents", source: plugin_catalog_copy_file_contents, description: "Copy the contents of the selected text attachment", categories: ["Media"] },
         { name: "CopyMediaLink", source: plugin_catalog_copy_media_link, description: "Add a clipboard action to media and link menus", categories: ["Media"] },
+        { name: "CopyMessageCode", source: plugin_catalog_copy_message_code, description: "Copy fenced code from the selected message", categories: ["Chat"] },
+        { name: "CopyMessageInfo", source: plugin_catalog_copy_message_info, description: "Copy the selected message’s IDs and UTC timestamp as JSON", categories: ["Chat"] },
+        { name: "CopyMessageLinks", source: plugin_catalog_copy_message_links, description: "Copy HTTP links from the selected message", categories: ["Chat"] },
         { name: "CopyMessageReference", source: plugin_catalog_copy_message_reference, description: "Copy the selected message’s Markdown link, timestamp, or author mention", categories: ["Chat"] },
         { name: "CopyProfileColors", source: plugin_catalog_copy_profile_colors, description: "Copy Profile Colors", keywords: "Copy Server Profile Colors", categories: ["Profiles"] },
         { name: "CopyProfileNames", source: plugin_catalog_copy_profile_names, description: "Copy Username", keywords: "Copy Display Name", categories: ["Profiles"] },

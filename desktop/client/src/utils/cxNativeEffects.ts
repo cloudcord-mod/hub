@@ -56,6 +56,10 @@ export const cxNativeEffects = {
     "decode-base64": { permission: "messages.decode", label: "Decode Base64 in the selected message and copy the result on request" },
     "copy-raw-text": { permission: "messages.copytext", label: "Add Copy Raw Text to message menus" },
     "copy-message-reference": { permission: "messages.copyreference", label: "Copy the selected message’s Markdown link, timestamp, or author mention" },
+    "copy-attachment-names": { permission: "messages.copytext", label: "Copy the selected message’s attachment filenames" },
+    "copy-message-links": { permission: "messages.copytext", label: "Copy HTTP links from the selected message" },
+    "copy-message-code": { permission: "messages.copytext", label: "Copy fenced code from the selected message" },
+    "copy-message-info": { permission: "messages.copyreference", label: "Copy the selected message’s IDs and UTC timestamp as JSON" },
     "reveal-spoilers-shortcut": { permission: "messages.revealspoilers", label: "Reveal spoilers in a message with Ctrl or Command-click, or in the current chat with Shift added", desktopOnly: true },
     "reply-timestamp": { permission: "messages.replytimestamp", label: "Show the original message's timestamp on loaded reply previews" },
     "message-latency": { permission: "messages.senddelay", label: "Show an estimated send-delay indicator on messages" },
@@ -141,16 +145,52 @@ export type CxQuoteMessage = {
     author?: { id?: string; username?: string; globalName?: string | null; global_name?: string | null; };
 };
 
-export function getCxMessageClipboard(effect: "copy-raw-text" | "copy-message-reference", message?: CxQuoteMessage,
+type CxMessageClipboardEffect = "copy-raw-text" | "copy-message-reference" | "copy-attachment-names"
+    | "copy-message-links" | "copy-message-code" | "copy-message-info";
+
+export function getCxMessageClipboard(effect: CxMessageClipboardEffect, message?: CxQuoteMessage,
     channel?: { id: string; guild_id?: string | null }) {
+    const item = (key: string, label: string, text: string) => text ? [{ key, label, text }] : [];
+    const content = typeof message?.content === "string" ? message.content : "";
     if (effect === "copy-raw-text") {
-        const text = message?.content;
-        return typeof text === "string" && text.length ? [{ key: "raw-text", label: "Copy Raw Text", text }] : [];
+        return item("raw-text", "Copy Raw Text", content);
+    }
+    if (effect === "copy-attachment-names") {
+        const names = (message?.attachments ?? []).flatMap(file =>
+            typeof file?.filename === "string" && file.filename.trim() ? [file.filename.replace(/[\r\n]+/g, " ")] : []);
+        return item("attachment-names", "Copy Attachment Names", names.join("\n"));
+    }
+    if (effect === "copy-message-links") {
+        const links = new Set<string>();
+        for (const match of content.matchAll(/https?:\/\/[^\s<>"`]+/gi)) {
+            let link = match[0].replace(/[.,!?;:]+$/, "");
+            for (const [open, close] of [["(", ")"], ["[", "]"], ["{", "}"]]) {
+                const extra = link.split(close).length - link.split(open).length;
+                for (let index = 0; index < extra && link.endsWith(close); index++) link = link.slice(0, -1);
+            }
+            try { if (new URL(link).hostname) links.add(link); }
+            catch { /* Ignore text that resembles a link without a host. */ }
+        }
+        return item("message-links", "Copy Links from Message", [...links].join("\n"));
+    }
+    if (effect === "copy-message-code") {
+        const blocks = [...content.matchAll(/(?:^|\n)[ \t]{0,3}(`{3,})[^\r\n`]*\r?\n([\s\S]*?)\r?\n[ \t]{0,3}\1[ \t]*(?=\r?\n|$)/g)];
+        return item("message-code", "Copy Code from Message", blocks.map(block => block[2]).filter(Boolean).join("\n\n"));
     }
     if (!message || !isCxProfileUserId(message.id)) return [];
     const snowflake = BigInt(message.id);
     if (snowflake > 0xffffffffffffffffn || message.id[0] === "0") return [];
-    const seconds = Math.floor((Number(snowflake >> 22n) + 1_420_070_400_000) / 1000);
+    const timestamp = Number(snowflake >> 22n) + 1_420_070_400_000;
+    const seconds = Math.floor(timestamp / 1000);
+    if (effect === "copy-message-info") {
+        if (!isCxProfileUserId(message.channel_id)) return [];
+        return item("message-info", "Copy Message Info", JSON.stringify({
+            messageId: message.id,
+            channelId: message.channel_id,
+            authorId: isCxProfileUserId(message.author?.id) ? message.author.id : undefined,
+            sentAt: new Date(timestamp).toISOString(),
+        }, null, 2));
+    }
     const items = [{ key: "message-timestamp", label: "Copy Message Timestamp", text: "<t:" + seconds + ":F>" }];
     const author = message.author?.id;
     if (isCxProfileUserId(author)) {

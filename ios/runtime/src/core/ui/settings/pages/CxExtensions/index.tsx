@@ -2686,6 +2686,10 @@ function createMobileCxHost(): Parameters<typeof session.enable>[1] {
                     return registerQuickMention(enabled);
                 case "copy-raw-text":
                 case "copy-message-reference":
+                case "copy-attachment-names":
+                case "copy-message-links":
+                case "copy-message-code":
+                case "copy-message-info":
                     return registerMessageMenuActions(enabled, ({ message, channel }, close) =>
                         getCxMessageClipboard(effect, message, channel).map(({ label, text }) => ({ label, run() {
                             try {

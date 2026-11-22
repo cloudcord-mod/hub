@@ -1,0 +1,3 @@
+plugin "CopyMessageLinks":
+  needs messages.copytext
+  use copy-message-links
