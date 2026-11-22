@@ -67,6 +67,17 @@ function TabIcon({ tab, active, size = 18 }: { tab: StudioTab; active?: boolean;
 // ---- Shell ----
 const STATUS_COLORS: Record<string, string> = { online: "#23A55A", idle: "#F0B232", dnd: "#F23F43", invisible: "#80848E", streaming: "#593695" };
 
+function StudioAvatar({ uri, name }: { uri?: string; name: string }) {
+    const [failed, setFailed] = useState(false);
+    if (uri && !failed) {
+        return <Image source={{ uri }} style={{ width: "100%", height: "100%" }} onError={() => setFailed(true)} />;
+    }
+    const initial = Array.from(name.trim())[0]?.toUpperCase() || "?";
+    return <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: C.raised() }}>
+        <Text variant="text-md/bold" style={{ color: C.text() }} numberOfLines={1}>{initial}</Text>
+    </View>;
+}
+
 /** Hero header: banner, avatar, names, the main switch and preview buttons. */
 export function StudioHero({ name, username, avatar, banner, accent, status, enabled, onToggle, syncLabel, onPreview, quickLook, onQuickLook }: {
     name: string; username: string; avatar?: string; banner?: string; accent?: string; status?: string;
@@ -85,7 +96,7 @@ export function StudioHero({ name, username, avatar, banner, accent, status, ena
             <View style={{ flexDirection: "row", alignItems: "flex-end", gap: GAP.md, marginTop: -36 }}>
                 <View style={{ width: 80, height: 80 }}>
                     <View style={{ width: 80, height: 80, borderRadius: 40, borderWidth: 5, borderColor: C.panel(), backgroundColor: C.raised(), overflow: "hidden" }}>
-                        {avatar ? <Image source={{ uri: avatar }} style={{ width: "100%", height: "100%" }} /> : null}
+                        <StudioAvatar key={avatar} uri={avatar} name={name} />
                     </View>
                     <View style={{ position: "absolute", right: 2, bottom: 2, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: C.panel(), backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
                 </View>
@@ -419,7 +430,9 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
             {(["Profile", "Popout", "Chat"] as const).map(mode => <Action key={mode} label={mode} grow primary={layout === mode} selected={layout === mode} onPress={() => setLayout(mode)} />)}
         </View>
         {layout === "Chat" ? <View style={{ flexDirection: "row", gap: GAP.md, padding: GAP.md, borderRadius: R.md, backgroundColor: card }}>
-            {avatar ? <Image source={{ uri: avatar }} style={{ width: 38, height: 38, borderRadius: 19 }} /> : null}
+            <View style={{ width: 38, height: 38, borderRadius: 19, overflow: "hidden" }}>
+                <StudioAvatar key={avatar} uri={avatar} name={name} />
+            </View>
             <View style={{ flex: 1, gap: 4 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 6 }}>
                     <Text variant="text-md/bold" numberOfLines={1} style={{ flexShrink: 1, color: C.text() }}>{name}</Text>
@@ -436,7 +449,7 @@ export function PreviewCard({ name, username, pronouns, avatar, banner, primary,
             <View style={{ backgroundColor: card, borderBottomLeftRadius: R.lg - 3, borderBottomRightRadius: R.lg - 3, padding: GAP.md, paddingTop: 50, gap: 6 }}>
                 <View style={{ position: "absolute", top: -42, left: 14, width: 84, height: 84 }}>
                     <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: card, backgroundColor: C.raised(), overflow: "hidden" }}>
-                        {avatar ? <Image source={{ uri: avatar }} style={{ width: "100%", height: "100%" }} /> : null}
+                        <StudioAvatar key={avatar} uri={avatar} name={name} />
                     </View>
                     {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -10, left: -10, width: 104, height: 104 }} resizeMode="contain" /> : null}
                     <View accessible accessibilityLabel={`Status: ${status || "online"}`} style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 4, borderColor: card, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
@@ -496,7 +509,7 @@ export function DiscordProfileCard({ name, username, pronouns, avatar, banner, p
         </View>
         <View style={{ position: "absolute", top: 54, left: 14, width: 84, height: 84 }}>
             <View style={{ width: 84, height: 84, borderRadius: 42, borderWidth: 6, borderColor: ring, backgroundColor: ring, overflow: "hidden" }}>
-                {avatar ? <Image source={{ uri: avatar }} style={{ width: "100%", height: "100%" }} /> : null}
+                <StudioAvatar key={avatar} uri={avatar} name={name} />
             </View>
             {decoration ? <Image source={{ uri: decoration }} style={{ position: "absolute", top: -6, left: -6, width: 96, height: 96 }} resizeMode="contain" /> : null}
             <View accessible accessibilityLabel={`Status: ${status || "online"}`} style={{ position: "absolute", right: 2, bottom: 4, width: 22, height: 22, borderRadius: 11, borderWidth: 5, borderColor: ring, backgroundColor: STATUS_COLORS[status || "online"] || STATUS_COLORS.online }} />
