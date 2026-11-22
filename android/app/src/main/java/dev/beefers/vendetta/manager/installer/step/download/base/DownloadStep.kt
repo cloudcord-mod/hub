@@ -19,7 +19,6 @@ import dev.beefers.vendetta.manager.utils.showToast
 import kotlinx.coroutines.CancellationException
 import org.koin.core.component.inject
 import java.io.File
-import kotlin.math.roundToInt
 
 /**
  * Specialized step used to download a file
@@ -113,12 +112,13 @@ abstract class DownloadStep: Step() {
         runner.logger.i("Download URL: $url")
         runner.logger.i("Download destination: ${destination.absolutePath}")
         runner.logger.i("Download start: $fileName")
-        var lastProgress: Float? = null
+        var lastPercent: Int? = null
         val result = downloadManager.download(url, destination) { newProgress ->
-            progress = newProgress
-            if (newProgress != lastProgress && newProgress != null) {
-                lastProgress = newProgress
-                runner.logger.d("$fileName download progress: ${(lastProgress!! * 100f).roundToInt()}%")
+            val percent = newProgress?.let { (it * 100f).toInt() }
+            if (percent != lastPercent) {
+                lastPercent = percent
+                progress = percent?.div(100f)
+                if (percent != null) runner.logger.d("$fileName download progress: $percent%")
             }
         }
 
