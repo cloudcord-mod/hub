@@ -38757,6 +38757,20 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return planningBlock(text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).map((line) => line ? "> " + line : ">").join("\n"));
         },
         removeBlankLines: (text) => text.split(/\r\n|\r|\n/).filter((line) => line.trim()).join("\n"),
+        filterLines(text, contains) {
+          if (!contains.trim())
+            return;
+          var query = contains.toLowerCase();
+          var lines = text.split(/\r\n|\r|\n/).filter((line) => line.toLowerCase().includes(query));
+          return lines.length ? planningBlock(lines.join("\n")) : "No matching lines.";
+        },
+        extractLineRange(text, first, last) {
+          var start = integerText(first), end = integerText(last);
+          var lines = text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/);
+          if (start === void 0 || end === void 0 || start < 1 || end < start || end > lines.length)
+            return;
+          return planningBlock(lines.slice(start - 1, end).join("\n"));
+        },
         reverseLineOrder: (text) => text.replace(/(?:\r\n|\r|\n)$/, "").split(/\r\n|\r|\n/).reverse().join("\n"),
         joinLines(text, separator) {
           if (separator.length > 32)
@@ -39741,6 +39755,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         csvToMarkdown(input) {
           return markdownTable(csvRows(input));
+        },
+        transposeCsv(input) {
+          if (input.length > 12e3)
+            return;
+          var rows = csvRows(input);
+          var columns = rows[0]?.length ?? 0;
+          if (!columns || columns > 32 || rows.length > 64 || rows.some((row) => row.length !== columns))
+            return;
+          var transposed = rows[0].map((_2, column) => rows.map((row) => '"' + row[column].replaceAll('"', '""') + '"').join(","));
+          return planningBlock(transposed.join("\n"));
         },
         csvColumn(input, column) {
           var position = integerText(column);
@@ -50358,6 +50382,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/extract-line-range.cx
+  var extract_line_range_default;
+  var init_extract_line_range = __esm({
+    "../examples/cx/catalog/plugins/extract-line-range.cx"() {
+      extract_line_range_default = 'plugin "Extract Line Range":\n  needs commands.register\n  needs reply.local\n  on command "linerange":\n    input "text" text\n    input "first" text\n    input "last" text\n    reply "${extractLineRange(text, first, last)}" else "Enter valid first and last line numbers."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/extract-mentions.cx
   var extract_mentions_default;
   var init_extract_mentions = __esm({
@@ -50574,6 +50606,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_file_transfer_estimate = __esm({
     "../examples/cx/catalog/plugins/file-transfer-estimate.cx"() {
       file_transfer_estimate_default = 'plugin "File Transfer Estimate":\n  needs commands.register\n  needs reply.local\n  on command "transferestimate":\n    input "size" text\n    input "megabits" text\n    reply "${transferEta(size, megabits)}" else "Enter a file size such as 300 MB and a connection speed in Mbps."\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/filter-lines.cx
+  var filter_lines_default;
+  var init_filter_lines = __esm({
+    "../examples/cx/catalog/plugins/filter-lines.cx"() {
+      filter_lines_default = 'plugin "Filter Lines":\n  needs commands.register\n  needs reply.local\n  on command "filterlines":\n    input "text" text\n    input "contains" text\n    reply "${filterLines(text, contains)}" else "Provide text and a literal search phrase."\n';
     }
   });
 
@@ -53181,6 +53221,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/transpose-csv.cx
+  var transpose_csv_default;
+  var init_transpose_csv = __esm({
+    "../examples/cx/catalog/plugins/transpose-csv.cx"() {
+      transpose_csv_default = 'plugin "Transpose CSV":\n  needs commands.register\n  needs reply.local\n  on command "transposecsv":\n    input "text" text\n    reply "${transposeCsv(text)}" else "Paste a rectangular CSV table with up to 64 rows and 32 columns."\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/trim-lines.cx
   var trim_lines_default;
   var init_trim_lines = __esm({
@@ -54392,12 +54440,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_equius_s_typing_quirk();
       init_eridan_typing_quirk();
       init_event_window();
+      init_extract_line_range();
       init_extract_mentions();
       init_fake_profile_themes();
       init_feferi_typing_quirk();
       init_file_name_randomization();
       init_file_size_converter();
       init_file_transfer_estimate();
+      init_filter_lines();
       init_fit_image();
       init_fix_codeblock_gap();
       init_fix_file_extensions();
@@ -54702,6 +54752,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_transfer_duration();
       init_translate();
       init_transparent_chat_bar();
+      init_transpose_csv();
       init_trim_lines();
       init_tsv_to_markdown();
       init_unicode_inspector();
@@ -55895,6 +55946,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             privateCommands: true
           },
           {
+            name: "Extract Line Range",
+            source: extract_line_range_default,
+            description: "/linerange",
+            commands: [
+              "linerange"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "bf377de933d188bafcc7f0ccd195aad3a03ed09d551e2a521c4b6ddf12b350bf",
+            privateCommands: true
+          },
+          {
             name: "Extract Mentions",
             source: extract_mentions_default,
             description: "/extractmentions",
@@ -55959,6 +56023,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Commands"
             ],
             appearanceRevision: "aabf12808161d7b7c5a6c83668b690e01e7f18b1b5f86bf712eea7594183c736",
+            privateCommands: true
+          },
+          {
+            name: "Filter Lines",
+            source: filter_lines_default,
+            description: "/filterlines",
+            commands: [
+              "filterlines"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "d0d8fa478df843e609eb1e2a81205c822db438d5f0d1d31f596b7e0d4964da8a",
             privateCommands: true
           },
           {
@@ -58977,6 +59054,19 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "98ea230adcebf8cd1de9242594ca7a30ec6d6b7a702802051c54ba4f3760251e"
+          },
+          {
+            name: "Transpose CSV",
+            source: transpose_csv_default,
+            description: "/transposecsv",
+            commands: [
+              "transposecsv"
+            ],
+            categories: [
+              "Commands"
+            ],
+            appearanceRevision: "3bd1c5b25daeeda2b83a92591289182ee31e8321201bbf94d57433875f5ac7cd",
+            privateCommands: true
           },
           {
             name: "Trim Lines",
@@ -69433,7 +69523,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "68c03d4688a4b665c73b9be56b437762fc233a4e";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ad59a719eb4254a4176066610e3086b1c3bba1cf";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
