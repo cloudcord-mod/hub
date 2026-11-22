@@ -36900,6 +36900,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       cxAppearanceTargets = {
+        "hide-app-search-intro": hideMobileComponent("HideAppSearchIntro", "the app search introduction banner", "modules/app_launcher/native/onboarding/banner/AppLauncherGlobalSearchOnboardingBanner.tsx"),
+        "hide-recap-server-recommendations": hideMobileComponent("HideRecapServerRecommendations", "server recommendations in the In Case You Missed It recap", "modules/icymi/native/ICYMIServerRecommendationRow.tsx"),
+        "hide-profile-overscroll-banner": hideMobileComponent("HideProfileOverscrollBanner", "the profile banner extension shown during overscroll", "modules/user_profile/native/UserProfileOverscrollBanner.tsx"),
         "hide-chat-thread-previews": {
           plugin: "HideChatThreadPreviews",
           label: "thread preview cards below chat messages",
@@ -50717,6 +50720,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-app-search-intro.cx
+  var hide_app_search_intro_default;
+  var init_hide_app_search_intro = __esm({
+    "../examples/cx/catalog/plugins/hide-app-search-intro.cx"() {
+      hide_app_search_intro_default = 'plugin "HideAppSearchIntro":\n  needs appearance.hide\n  hide hide-app-search-intro\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-apps-button.cx
   var hide_apps_button_default;
   var init_hide_apps_button = __esm({
@@ -51357,6 +51368,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/hide-profile-overscroll-banner.cx
+  var hide_profile_overscroll_banner_default;
+  var init_hide_profile_overscroll_banner = __esm({
+    "../examples/cx/catalog/plugins/hide-profile-overscroll-banner.cx"() {
+      hide_profile_overscroll_banner_default = 'plugin "HideProfileOverscrollBanner":\n  needs appearance.hide\n  hide hide-profile-overscroll-banner\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/hide-profile-wishlist-suggestions.cx
   var hide_profile_wishlist_suggestions_default;
   var init_hide_profile_wishlist_suggestions = __esm({
@@ -51386,6 +51405,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   var init_hide_reactions = __esm({
     "../examples/cx/catalog/plugins/hide-reactions.cx"() {
       hide_reactions_default = 'plugin "HideReactions":\n  needs appearance.hide\n  hide message-reactions\n';
+    }
+  });
+
+  // ../examples/cx/catalog/plugins/hide-recap-server-recommendations.cx
+  var hide_recap_server_recommendations_default;
+  var init_hide_recap_server_recommendations = __esm({
+    "../examples/cx/catalog/plugins/hide-recap-server-recommendations.cx"() {
+      hide_recap_server_recommendations_default = 'plugin "HideRecapServerRecommendations":\n  needs appearance.hide\n  hide hide-recap-server-recommendations\n';
     }
   });
 
@@ -54344,6 +54371,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_add_server_button();
       init_hide_app_launcher_intro();
       init_hide_app_launcher_recommendations();
+      init_hide_app_search_intro();
       init_hide_apps_button();
       init_hide_avatar_decorations();
       init_hide_badge_customization_tip();
@@ -54424,10 +54452,12 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_hide_profile_mutuals();
       init_hide_profile_nitro_card();
       init_hide_profile_notes();
+      init_hide_profile_overscroll_banner();
       init_hide_profile_wishlist_suggestions();
       init_hide_profile_wishlist_tip();
       init_hide_quests_tab();
       init_hide_reactions();
+      init_hide_recap_server_recommendations();
       init_hide_reply_previews();
       init_hide_role_icons();
       init_hide_saved_messages_promotion();
@@ -56053,6 +56083,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "3578c09c61c7bd97ca8d3e6d627476cf7633d5e4de2f50203bf84bab6673566c"
           },
           {
+            name: "HideAppSearchIntro",
+            source: hide_app_search_intro_default,
+            description: "Hide the app search introduction banner",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "139066a6c48a5295ea0c7e0387b823aa332a0c1c7ee93340cc85b59ff7ab603b"
+          },
+          {
             name: "HideAppsButton",
             source: hide_apps_button_default,
             description: "Hide the chat apps button",
@@ -56811,6 +56851,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             appearanceRevision: "44621fb025c00ea1584c339676b98267d76beef6faba3d1da94312ab63b15e83"
           },
           {
+            name: "HideProfileOverscrollBanner",
+            source: hide_profile_overscroll_banner_default,
+            description: "Hide the profile banner extension shown during overscroll",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "d97606faa3d65ad91d18023ee2cf57329ceff46a375d1af567195b9040c0d6ee"
+          },
+          {
             name: "HideProfileWishlistSuggestions",
             source: hide_profile_wishlist_suggestions_default,
             description: "Hide suggested items on profile wishlists",
@@ -56847,6 +56897,16 @@ Fragment ${url2.hash ? "present" : "absent"}`;
               "Appearance"
             ],
             appearanceRevision: "da60585a8ab4da89858be053f0f6d424044931f6616fd7457012c0cd96dc5f58"
+          },
+          {
+            name: "HideRecapServerRecommendations",
+            source: hide_recap_server_recommendations_default,
+            description: "Hide server recommendations in the In Case You Missed It recap",
+            mobileOnly: true,
+            categories: [
+              "Appearance"
+            ],
+            appearanceRevision: "77aa33e16568aa2df33f63b467ae1a2fef42bafa503e49a6098fe7462146b474"
           },
           {
             name: "HideReplyPreviews",
@@ -69273,7 +69333,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "504537ceef484cf2ee298d5ba2f4c33b0d6de4d3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b8d6c59f7d44499c485f9cc6c5a8384c08ab668";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
