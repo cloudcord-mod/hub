@@ -7,8 +7,10 @@ const jsx = (type, props) => ({ type, props });
 let layout;
 let theme;
 let avatarFailed = false;
+let avatarAttempt = 0;
 const react = { useState: initial => typeof initial === "boolean"
     ? [avatarFailed, value => { avatarFailed = value; }]
+    : typeof initial === "number" ? [avatarAttempt, value => { avatarAttempt = value; }]
     : [layout ?? initial, value => { layout = value; }] };
 const requireMock = name => {
     if (name === "react/jsx-runtime") return { jsx, jsxs: jsx, Fragment: "Fragment" };
@@ -135,15 +137,19 @@ for (const [mode, avatarClass] of [
     ["popout", "cpx-dc-avatar-img"],
     ["chat", "cpx-chat-avatar"],
 ]) {
+    const fallbackAvatar = "https://example.com/native-avatar.png";
     const render = () => flatten(ProfilePreview({
-        data: { avatar: avatarPreview.avatar }, fallbackName: "Nova", fallbackUsername: "nova", fallbackAvatar: "",
+        data: { avatar: avatarPreview.avatar }, fallbackName: "Nova", fallbackUsername: "nova", fallbackAvatar,
     }));
     layout = mode;
     const image = render().find(node => node.type === "img" && node.props.className === avatarClass);
     assert.equal(image?.props.src, avatarPreview.avatar, mode);
     image.props.onError();
+    const fallback = render().find(node => node.type === "img" && node.props.className === avatarClass);
+    assert.equal(fallback?.props.src, fallbackAvatar, mode);
+    fallback.props.onError();
     assert.ok(render().some(node => node.type === "span" && node.props.className === avatarClass + " cpx-avatar-fallback" && node.props.children === "N"), mode);
-    avatarFailed = false;
+    avatarAttempt = 0;
 }
 layout = "chat";
 const desktop = flatten(ProfilePreview({
