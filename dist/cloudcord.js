@@ -40586,6 +40586,15 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       if (action === "server-nickname" && guildId) {
         return nonBlankText(members?.getMember?.(guildId, id)?.nick);
       }
+      if (action === "server-avatar-link") {
+        if (!isCxProfileUserId(guildId) || !isCxProfileUserId(id))
+          return;
+        var hash = members?.getMember?.(guildId, id)?.avatar;
+        if (typeof hash !== "string" || !/^(?:a_)?[0-9a-f]{32}$/.test(hash))
+          return;
+        var format = hash.startsWith("a_") ? "webp?size=4096&animated=true" : "png?size=4096";
+        return "https://cdn.discordapp.com/guilds/" + guildId + "/users/" + id + "/avatars/" + hash + "." + format;
+      }
       var profile = entry.scope === "server" ? profiles?.getGuildMemberProfile?.(id, guildId) : profiles?.getUserProfile?.(id);
       if (action === "profile-bio" || action === "server-profile-bio")
         return nonBlankText(profile?.bio);
@@ -40653,6 +40662,10 @@ Fragment ${url2.hash ? "present" : "absent"}`;
         },
         "server-nickname": {
           label: "Copy Server Nickname",
+          scope: "server"
+        },
+        "server-avatar-link": {
+          label: "Copy Server Avatar Link",
           scope: "server"
         },
         "profile-colors": {
@@ -49703,6 +49716,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
     }
   });
 
+  // ../examples/cx/catalog/plugins/copy-server-avatar-link.cx
+  var copy_server_avatar_link_default;
+  var init_copy_server_avatar_link = __esm({
+    "../examples/cx/catalog/plugins/copy-server-avatar-link.cx"() {
+      copy_server_avatar_link_default = 'plugin "CopyServerAvatarLink":\n  needs profilemenu.copy\n  on profile menu copy server-avatar-link\n';
+    }
+  });
+
   // ../examples/cx/catalog/plugins/copy-server-bio.cx
   var copy_server_bio_default;
   var init_copy_server_bio = __esm({
@@ -53702,6 +53723,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
       init_copy_role_color();
       init_copy_role_mention();
       init_copy_role_name();
+      init_copy_server_avatar_link();
       init_copy_server_bio();
       init_copy_server_details();
       init_copy_server_media_links();
@@ -54802,6 +54824,14 @@ Fragment ${url2.hash ? "present" : "absent"}`;
             description: "Copy the selected server role\u2019s name as plain text",
             categories: [
               "Servers & channels"
+            ]
+          },
+          {
+            name: "CopyServerAvatarLink",
+            source: copy_server_avatar_link_default,
+            description: "Copy Server Avatar Link",
+            categories: [
+              "Profiles"
             ]
           },
           {
@@ -68273,7 +68303,7 @@ Fragment ${url2.hash ? "present" : "absent"}`;
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d6c0adea8cf53f74ebd025e72cc6fd9075b9b7ea";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "26bf05ea9fe6cedb4ad194ed2d34bfc3b79e6af2";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
