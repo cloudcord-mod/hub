@@ -303,7 +303,8 @@ for (const [key, rule] of Object.entries(cxAppearanceTargets)) {
         const document = parseCx(require("node:fs").readFileSync(require("node:path").resolve(__dirname,
             "../../../examples/cx/catalog/plugins/" + key + ".cx"), "utf8"));
         assert.equal(document.name, rule.plugin);
-        assert.deepEqual([...document.hiddenTargets], [key]);
+        assert.deepEqual([...document.hiddenTargets], "style" in rule ? [] : [key]);
+        assert.deepEqual([...document.styledTargets], "style" in rule ? [key] : []);
         assert.ok(!matches.some(record => record.name === rule.plugin), rule.plugin + " cannot be inferred from desktop CSS");
         continue;
     }
