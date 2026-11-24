@@ -32048,6 +32048,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       CLOUDCORD_BADGE_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
       CLOUDCORD_STAFF_ROLES = {
         "544915373812744216": "Founder",
+        "463515440606609419": "Founder",
         "1417880742502994042": "Chief of staff",
         "1394648991223779328": "Management Supervisor",
         "1526004298020950075": "Management Supervisor",
@@ -74862,7 +74863,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "163effa2fa8987fc5fabcef8a4f8c7f884d2d6b3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7ad0cc505c8306317dc6a8cd7c8036470003ad89";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
