@@ -11,12 +11,19 @@ const entries = roster.roles.flatMap(role => role.userIds.map(id => [id, role.na
 assert.equal(entries.length, 17, 'the Discord snapshot has 17 staff accounts plus the server owner');
 assert.equal(new Set(entries.map(([id]) => id)).size, entries.length, 'each staff account has exactly one highest-rank badge');
 assert(!entries.some(([id]) => id === roster.owner), 'owner is outside the staff slots');
-const expected = { [roster.owner]: 'Founder', ...Object.fromEntries(entries) };
-const removedStaff = ['318501167741272066', '1121228881425354832', '1169999011642605628', '1312331817818394665', '1453130879537905734', '1541881462914023501', '463515440606609419', '1465007041390317579', '1470732628461359251'];
+const founderIds = [roster.owner, ...roster.additionalFounderIds];
+const expected = { ...Object.fromEntries(founderIds.map(id => [id, 'Founder'])), ...Object.fromEntries(entries) };
+const icons = JSON.parse(fs.readFileSync('config/staff-badge-icons.json', 'utf8'));
+for (const role of ['Founder', ...roster.roles.map(role => role.name)]) {
+    assert.ok(icons[role], `Missing badge artwork for ${role}`);
+    assert.ok(fs.existsSync(`assets/staff-badges/${icons[role]}.png`), `Missing badge image for ${role}`);
+}
+const removedStaff = ['318501167741272066', '1121228881425354832', '1169999011642605628', '1312331817818394665', '1453130879537905734', '1541881462914023501', '1465007041390317579', '1470732628461359251'];
 for (const id of removedStaff) assert.equal(expected[id], undefined, 'former staff must not keep an official badge');
 assert.equal(expected['1330236504198611029'], 'Manager', 'highest rank wins over trial/support roles');
 assert.equal(expected['1416192374895542455'], 'Mod');
 assert.equal(expected['544915373812744216'], 'Founder');
+assert.equal(expected['463515440606609419'], 'Founder');
 assert.equal(expected['257020965756731403'], 'Senior Support');
 for (const path of ['desktop/client/src/api/Badges.ts', '.github/workflows/cloudcord.yml']) {
     const source = fs.readFileSync(path, 'utf8');

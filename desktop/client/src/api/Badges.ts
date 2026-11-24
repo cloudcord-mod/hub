@@ -98,6 +98,7 @@ function readBadgeSource(source: object, load: () => unknown): ProfileBadge[] {
 
 export const CLOUDCORD_STAFF_ROLES: Record<string, string> = {
     "544915373812744216": "Founder",
+    "463515440606609419": "Founder",
     "1417880742502994042": "Chief of staff",
     "1394648991223779328": "Management Supervisor",
     "1526004298020950075": "Management Supervisor",
