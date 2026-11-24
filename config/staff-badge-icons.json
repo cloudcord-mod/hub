@@ -1,0 +1,22 @@
+{
+  "Founder": "owner",
+  "Owner": "owner",
+  "Management Supervisor": "supervisor",
+  "Supervisor": "supervisor",
+  "Chief of staff": "head-of-staff",
+  "Head of Staff": "head-of-staff",
+  "Manager": "manager",
+  "Social Media Manager": "manager",
+  "Admin": "moderation-admin",
+  "Administrator": "moderation-admin",
+  "Moderation Admin": "moderation-admin",
+  "Lead of Support": "support-admin",
+  "Support Admin": "support-admin",
+  "Senior Mod": "senior-moderator",
+  "Senior Moderator": "senior-moderator",
+  "Mod": "moderator",
+  "Moderator": "moderator",
+  "Trial Moderator": "moderator",
+  "Senior Support": "senior-support",
+  "Support": "support"
+}

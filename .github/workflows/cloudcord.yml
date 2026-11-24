@@ -432,7 +432,10 @@ jobs:
           # internal collectibles stores/API are unavailable on mobile.
           cp "../ios/assets/cloudcord-decorations.json" "src/assets/cloudcord-decorations.json"
 
+          cp ../config/staff-badge-icons.json src/assets/staff-badge-icons.json
+
           cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'
+          import staffBadgeIcons from "@assets/staff-badge-icons.json";
           import type { ProfileTab } from "@core/ui/settings/components/FakeProfileGlass";
           // FakeProfile is imported for its profile patches during startup.
           // Its new visual/native dependencies must load only when the page renders.
@@ -923,7 +926,9 @@ jobs:
           function cloudCordStaffBadge(userId: string) {
               if (isRealProfileView(userId)) return null;
               const role = CLOUDCORD_STAFF_ROLES[userId];
-              return role ? { id: `cloudcord-official-${role.toLowerCase()}`, label: `CloudCord ${role}` } : null;
+              const icons: Record<string, string> = staffBadgeIcons;
+              const icon = role && Object.prototype.hasOwnProperty.call(icons, role) ? icons[role] : undefined;
+              return role ? { id: `cloudcord-official-${role.toLowerCase()}`, label: `CloudCord ${role}`, icon: icon ? `https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/assets/staff-badges/${icon}.png` : CLOUDCORD_BADGE_ICON } : null;
           }
 
           const useBadgesModule = findByNameLazy("useBadges", false);
@@ -2093,6 +2098,10 @@ jobs:
           }
 
           function addOfficialBadge(result: any[], badge: any, user: any, data: any) {
+              if (badge.icon && badge.icon !== CLOUDCORD_BADGE_ICON) {
+                  addRenderedBadge(result, badge.id, badge.label, badge.icon);
+                  return;
+              }
               const candidates = [user?.displayProfile, user?.guildMemberProfile, user?.userProfile, user?.profile, user, safeStore("UserProfileStore")?.getUserProfile?.(user?.userId || user?.id)];
               // Badge hooks receive different profile shapes across Discord versions.
               // An empty wrapper must not hide the actual profile's colors.
@@ -2349,7 +2358,7 @@ jobs:
               const rows = draftBadgeRows(data);
               if (!shouldReplaceLocalBadges(data)) rows.push(...native);
               const staff = cloudCordStaffBadge(userId);
-              if (staff) rows.unshift({ id: staff.id, description: staff.label, iconSrc: CLOUDCORD_BADGE_ICON });
+              if (staff) rows.unshift({ id: staff.id, description: staff.label, iconSrc: staff.icon ?? CLOUDCORD_BADGE_ICON });
               for (const badge of publishedBadges) if (badge.userId === userId) rows.push({ id: `cloudcord-custom-${badge.id}`, description: badge.name, iconSrc: badge.icon });
               const unique = new Map<string, any>();
               for (const row of rows) { const id = badgeLayoutKey(row); if (id && !unique.has(id)) unique.set(id, { ...row, id }); }

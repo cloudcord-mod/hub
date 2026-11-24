@@ -26,6 +26,8 @@ import Plugins from "~plugins";
 import { isRealProfileView } from "@utils/realProfileView";
 import { Logger } from "@utils/Logger";
 
+import staffBadgeIcons from "../../../../config/staff-badge-icons.json";
+
 import { isPluginEnabled } from "./PluginManager";
 
 export const enum BadgePosition {
@@ -116,7 +118,28 @@ export const CLOUDCORD_STAFF_ROLES: Record<string, string> = {
 };
 export const CLOUDCORD_BADGE_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
 
+export function getCloudCordStaffBadgeIcon(role: string) {
+    const icons: Record<string, string> = staffBadgeIcons;
+    const icon = Object.prototype.hasOwnProperty.call(icons, role) ? icons[role] : undefined;
+    return icon ? `https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/assets/staff-badges/${icon}.png` : CLOUDCORD_BADGE_ICON;
+}
+
 function createOfficialCloudBadgeIcon(badge: ProfileBadge & BadgeUserArgs) {
+    if (badge.iconSrc && badge.iconSrc !== CLOUDCORD_BADGE_ICON) {
+        const label = badge.description || "CloudCord Staff";
+        return React.createElement("img", {
+            src: badge.iconSrc, alt: label, width: 20, height: 20,
+            role: "button", tabIndex: 0,
+            onClick: () => showStaffRole(label),
+            onKeyDown: (event: React.KeyboardEvent) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    showStaffRole(label);
+                }
+            },
+            style: { objectFit: "contain", imageRendering: "pixelated", cursor: "pointer" }
+        });
+    }
     // Choose the higher contrast of true black/white for every RGB hue.
     const useBlack = (colors: number[][]) => {
         const luminance = colors.reduce((total, rgb) => {
@@ -343,13 +366,14 @@ export function _getBadges(args: BadgeUserArgs) {
 
     const staffRole = CLOUDCORD_STAFF_ROLES[args.userId];
     if (staffRole) {
+        const iconSrc = getCloudCordStaffBadgeIcon(staffRole);
         badges.unshift({
             ...args,
             id: `cloudcord-official-${staffRole.toLowerCase()}`,
             description: `CloudCord ${staffRole}`,
             // Keep Discord's native image path usable if its component renderer changes.
-            iconSrc: CLOUDCORD_BADGE_ICON,
-            props: createOfficialCloudBadgeIcon({ ...args, id: `cloudcord-official-${staffRole.toLowerCase()}`, description: `CloudCord ${staffRole}` }).props,
+            iconSrc,
+            props: createOfficialCloudBadgeIcon({ ...args, iconSrc, id: `cloudcord-official-${staffRole.toLowerCase()}`, description: `CloudCord ${staffRole}` }).props,
             onClick: () => showStaffRole(`CloudCord ${staffRole}`),
             component: OfficialCloudBadge,
             key: `CloudCord ${staffRole}`,

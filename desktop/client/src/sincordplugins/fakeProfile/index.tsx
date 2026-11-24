@@ -24,7 +24,7 @@ import { filters, findByCodeLazy, findByProps, findStoreLazy, waitFor } from "@w
 import { fetchProfileResponse } from "@utils/profileSyncNetwork";
 import { decodePortableLook, duplicateSavedLook, encodePortableLook, profileMentionAliasScore, SAVED_LOOK_PAGE_SIZE, selectSavedLooks, sharedProfileColorPair } from "@utils/profileAppearance";
 
-import { CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, ProfileBadge } from "@api/Badges";
+import { CLOUDCORD_STAFF_ROLES, getCloudCordStaffBadgeIcon, ProfileBadge } from "@api/Badges";
 import { applyBadgeLayout, badgeLayoutKey, defaultBadgeOrder, moveBadgeOrder } from "@api/BadgeLayout";
 import { addContextMenuPatch, NavContextMenuPatchCallback, removeContextMenuPatch } from "@api/ContextMenu";
 import { addHeaderBarButton, HeaderBarButton, removeHeaderBarButton } from "@api/HeaderBar";
@@ -1845,7 +1845,7 @@ function badgeLayoutRows(data: CustomProfileData, userId: string): ProfileBadge[
     for (const badge of special) if (data.customBadgeIds?.includes(badge.id)) rows.push({ id: badge.id, description: badge.label, iconSrc: badge.icon });
     rows.push(...uploadedUserBadges(userId));
     const role = CLOUDCORD_STAFF_ROLES[userId];
-    if (role) rows.unshift({ id: `cloudcord-official-${role.toLowerCase()}`, description: `CloudCord ${role}`, iconSrc: CLOUDCORD_BADGE_ICON });
+    if (role) rows.unshift({ id: `cloudcord-official-${role.toLowerCase()}`, description: `CloudCord ${role}`, iconSrc: getCloudCordStaffBadgeIcon(role) });
     if (!shouldReplaceBadges(data) && Array.isArray(native)) {
         for (const badge of native) {
             if (!badge?.id || /^(?:sp_|fakeprofile-|cloudcord-shared-)/.test(badge.id)) continue;
