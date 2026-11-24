@@ -12665,6 +12665,35 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   });
 
+  // src/assets/staff-badge-icons.json
+  var staff_badge_icons_default;
+  var init_staff_badge_icons = __esm({
+    "src/assets/staff-badge-icons.json"() {
+      staff_badge_icons_default = {
+        Founder: "owner",
+        Owner: "owner",
+        "Management Supervisor": "supervisor",
+        Supervisor: "supervisor",
+        "Chief of staff": "head-of-staff",
+        "Head of Staff": "head-of-staff",
+        Manager: "manager",
+        "Social Media Manager": "manager",
+        Admin: "moderation-admin",
+        Administrator: "moderation-admin",
+        "Moderation Admin": "moderation-admin",
+        "Lead of Support": "support-admin",
+        "Support Admin": "support-admin",
+        "Senior Mod": "senior-moderator",
+        "Senior Moderator": "senior-moderator",
+        Mod: "moderator",
+        Moderator: "moderator",
+        "Trial Moderator": "moderator",
+        "Senior Support": "senior-support",
+        Support: "support"
+      };
+    }
+  });
+
   // src/assets/cloudcord-decorations.json
   var cloudcord_decorations_default;
   var init_cloudcord_decorations = __esm({
@@ -22160,9 +22189,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (isRealProfileView(userId))
       return null;
     var role = CLOUDCORD_STAFF_ROLES[userId];
+    var icons = staff_badge_icons_default;
+    var icon3 = role && Object.prototype.hasOwnProperty.call(icons, role) ? icons[role] : void 0;
     return role ? {
       id: `cloudcord-official-${role.toLowerCase()}`,
-      label: `CloudCord ${role}`
+      label: `CloudCord ${role}`,
+      icon: icon3 ? `https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/assets/staff-badges/${icon3}.png` : CLOUDCORD_BADGE_ICON
     } : null;
   }
   function nitroBadgeId(months) {
@@ -23681,6 +23713,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
   }
   function addOfficialBadge(result, badge, user, data) {
+    if (badge.icon && badge.icon !== CLOUDCORD_BADGE_ICON) {
+      addRenderedBadge(result, badge.id, badge.label, badge.icon);
+      return;
+    }
     var candidates = [
       user?.displayProfile,
       user?.guildMemberProfile,
@@ -23997,7 +24033,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       rows.unshift({
         id: staff.id,
         description: staff.label,
-        iconSrc: CLOUDCORD_BADGE_ICON
+        iconSrc: staff.icon ?? CLOUDCORD_BADGE_ICON
       });
     for (var badge of publishedBadges)
       if (badge.userId === userId)
@@ -31552,6 +31588,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_define_property();
       init_inherits();
       init_jsxRuntime();
+      init_staff_badge_icons();
       init_cloudcord_decorations();
       init_storage();
       init_patcher();
@@ -74825,7 +74862,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "12ba7c32f5406b6021d4ee84b8b82a3fd2a48fe3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "163effa2fa8987fc5fabcef8a4f8c7f884d2d6b3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
