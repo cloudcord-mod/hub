@@ -83,8 +83,10 @@ export default function General() {
                     {canFetchRuntime ? <TableRow label="Fetch Runtime" subLabel="Download the latest runtime. Reopen Discord to apply it." onPress={async () => {
                         (settings as any).cloudcordUpdateStatus = "Checking for updates…";
                         try {
-                            await fetchRuntimeUpdate(BundleUpdaterManager);
-                            (settings as any).cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
+                            const updated = await fetchRuntimeUpdate(BundleUpdaterManager);
+                            (settings as any).cloudcordUpdateStatus = updated === false
+                                ? "CloudCord is up to date."
+                                : "Latest runtime saved. Reopen Discord to apply it.";
                         } catch (error) {
                             const message = error instanceof Error ? error.message : "Runtime download failed";
                             (settings as any).cloudcordUpdateStatus = message;
