@@ -61,7 +61,7 @@ export function createRainUpdater(files: any) {
         if (path && typeof files.readFile === "function" && await files.readFile(path, "utf8") !== code) throw new Error("saved runtime did not match download");
     })().finally(() => { pending = undefined; });
     const checkForUpdates = () => checking ??= (async () => {
-        const manifest = await readResponse(MANIFEST_URL, response => response.json(), 15000);
+        const manifest = await readResponse(MANIFEST_URL + "?t=" + Date.now(), response => response.json(), 15000);
         if (manifest?.schema !== 1 || typeof manifest.version !== "string" || !REVISION.test(manifest.version) || typeof manifest.url !== "string") {
             throw new Error("invalid runtime manifest");
         }

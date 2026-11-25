@@ -9,7 +9,7 @@ const context = { module: moduleObject, exports: moduleObject.exports, Date, Pro
     setInterval: fn => { timers.push(fn); return fn; }, clearInterval() {},
     __CLOUDCORD_RUNTIME_REVISION__: running,
     fetch: async url => {
-        if (url.endsWith("runtime-manifest.json")) {
+        if (url.includes("runtime-manifest.json?t=")) {
             return { ok: true, json: async () => ({
                 schema: 1, version: manifestVersion,
                 url: `https://getcloudcord.com/api/proxy/raw/dist/cc.js?ref=${payload}`
