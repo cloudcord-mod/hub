@@ -252,6 +252,37 @@
     fetchRuntimeUpdate: () => fetchRuntimeUpdate,
     startAutoUpdates: () => startAutoUpdates
   });
+  function readResponse(url2, readBody, deadline) {
+    return _async_to_generator(function* () {
+      var timeout;
+      var abort = typeof AbortController === "function" ? new AbortController() : void 0;
+      try {
+        return yield Promise.race([
+          (() => _async_to_generator(function* () {
+            var response = yield fetch(url2, {
+              headers: {
+                "X-CC-Client": "1"
+              },
+              cache: "no-store",
+              signal: abort?.signal
+            });
+            if (!response.ok)
+              throw new Error("runtime download failed (" + response.status + ")");
+            return readBody(response);
+          })())(),
+          new Promise((_2, reject) => {
+            timeout = setTimeout(() => {
+              reject(new Error("download timed out"));
+              abort?.abort();
+            }, deadline);
+          })
+        ]);
+      } finally {
+        if (timeout !== void 0)
+          clearTimeout(timeout);
+      }
+    })();
+  }
   function fetchRuntimeUpdate(updater) {
     return _async_to_generator(function* () {
       if (typeof updater?.checkForUpdates === "function")
@@ -269,9 +300,9 @@
       checking = true;
       prefs.cloudcordUpdateStatus = "Checking for updates\u2026";
       try {
-        yield fetchRuntimeUpdate(updater);
+        var updated = yield fetchRuntimeUpdate(updater);
         if (!stopped)
-          prefs.cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
+          prefs.cloudcordUpdateStatus = updated === false ? "CloudCord is up to date." : "Latest runtime saved. Reopen Discord to apply it.";
       } catch (error) {
         if (!stopped)
           prefs.cloudcordUpdateStatus = "Update failed: " + (error?.message || "connection unavailable") + ". Retrying automatically.";
@@ -289,27 +320,13 @@
     };
   }
   function createRainUpdater(files) {
-    var download = () => pending ??= (() => _async_to_generator(function* () {
-      var timeout;
-      var code = yield Promise.race([
-        (() => _async_to_generator(function* () {
-          var response = yield fetch(URL2 + "?t=" + Date.now(), {
-            headers: {
-              "X-CC-Client": "1"
-            },
-            cache: "no-store"
-          });
-          if (!response.ok)
-            throw new Error("runtime download failed (" + response.status + ")");
-          var body = yield response.text();
-          if (body.length < 1e4 || !body.includes("CloudCord"))
-            throw new Error("invalid runtime response");
-          return body;
-        })())(),
-        new Promise((_2, reject) => {
-          timeout = setTimeout(() => reject(new Error("download timed out")), 9e4);
-        })
-      ]).finally(() => clearTimeout(timeout));
+    var pending;
+    var checking;
+    var savedRevision;
+    var download = (url2 = URL2 + "?t=" + Date.now()) => pending ??= (() => _async_to_generator(function* () {
+      var code = yield readResponse(url2, (response) => response.text(), 9e4);
+      if (code.length < 1e4 || !code.includes("CloudCord"))
+        throw new Error("invalid runtime response");
       if (typeof files?.writeFile !== "function")
         throw new Error("runtime file writer unavailable");
       var path = yield files.writeFile("documents", "rain/bundle.js", code, "utf8");
@@ -318,9 +335,31 @@
     })())().finally(() => {
       pending = void 0;
     });
+    var checkForUpdates = () => checking ??= (() => _async_to_generator(function* () {
+      var manifest = yield readResponse(MANIFEST_URL, (response) => response.json(), 15e3);
+      if (manifest?.schema !== 1 || typeof manifest.version !== "string" || !REVISION.test(manifest.version) || typeof manifest.url !== "string") {
+        throw new Error("invalid runtime manifest");
+      }
+      if (manifest.version === globalThis.__CLOUDCORD_RUNTIME_REVISION__)
+        return false;
+      if (manifest.version === savedRevision)
+        return true;
+      var raw = manifest.url.match(/^https:\/\/raw\.githubusercontent\.com\/xohus\/cloudcord\/([a-f0-9]{40})\/dist\/cc\.js$/);
+      var proxy = manifest.url.startsWith(URL2 + "?ref=") ? manifest.url.slice(URL2.length + 5) : void 0;
+      var payloadRevision = raw?.[1] ?? proxy;
+      if (!payloadRevision || !REVISION.test(payloadRevision))
+        throw new Error("invalid runtime payload URL");
+      if (pending)
+        yield pending;
+      yield download(URL2 + "?ref=" + payloadRevision);
+      savedRevision = manifest.version;
+      return true;
+    })())().finally(() => {
+      checking = void 0;
+    });
     return {
       download,
-      checkForUpdates: download,
+      checkForUpdates,
       reload: () => _async_to_generator(function* () {
         yield download();
         var bridge = globalThis.__RAIN_BRIDGE_CALL_SYNC__;
@@ -337,7 +376,7 @@
       })()
     };
   }
-  var URL2, pending;
+  var URL2, MANIFEST_URL, REVISION;
   var init_runtimeUpdates = __esm({
     "src/lib/api/native/runtimeUpdates.ts"() {
       "use strict";
@@ -345,6 +384,8 @@
       init_promiseAllSettled();
       init_async_to_generator();
       URL2 = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
+      MANIFEST_URL = "https://getcloudcord.com/api/proxy/raw/dist/runtime-manifest.json";
+      REVISION = /^[a-f0-9]{40}$/;
     }
   });
 
@@ -10265,11 +10306,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
 
   // src/lib/ui/settings/patches/shared.tsx
   function wrapOnPress(onPress, navigation2, renderPromise, screenOptions, props, navigationMethod = "navigate") {
-    var pending2 = false;
+    var pending = false;
     return () => _async_to_generator(function* () {
-      if (pending2)
+      if (pending)
         return;
-      pending2 = true;
+      pending = true;
       try {
         if (onPress)
           return void (yield withTimeout(Promise.resolve().then(onPress)));
@@ -10308,7 +10349,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         ]);
       } finally {
-        pending2 = false;
+        pending = false;
       }
     })();
   }
@@ -10452,7 +10493,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function observeSettingsModules(visit) {
     var root2 = globalThis;
     var modules = root2.__CLOUDCORD_MODULE_VIEW__ ?? root2.modules;
-    var pending2 = /* @__PURE__ */ new Map();
+    var pending = /* @__PURE__ */ new Map();
     var seen = /* @__PURE__ */ new WeakSet();
     var active = true;
     var inspect = (exports, path) => {
@@ -10477,7 +10518,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         return;
       var observed = function observed1(...args) {
         var result = original.apply(this, args);
-        pending2.delete(definition2);
+        pending.delete(definition2);
         if (definition2.factory === observed)
           definition2.factory = original;
         inspect(args[4]?.exports ?? definition2.publicModule?.exports, definition2.__filePath);
@@ -10485,7 +10526,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
       try {
         definition2.factory = observed;
-        pending2.set(definition2, {
+        pending.set(definition2, {
           original,
           observed
         });
@@ -10530,11 +10571,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       active = false;
       if (root2.__d === define2)
         root2.__d = originalDefine;
-      for (var [definition2, { original, observed }] of pending2) {
+      for (var [definition2, { original, observed }] of pending) {
         if (definition2.factory === observed)
           definition2.factory = original;
       }
-      pending2.clear();
+      pending.clear();
     };
   }
   var init_observeModules = __esm({
@@ -12418,8 +12459,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 onPress: () => _async_to_generator(function* () {
                   settings.cloudcordUpdateStatus = "Checking for updates\u2026";
                   try {
-                    yield fetchRuntimeUpdate(BundleUpdaterManager);
-                    settings.cloudcordUpdateStatus = "Latest runtime saved. Reopen Discord to apply it.";
+                    var updated = yield fetchRuntimeUpdate(BundleUpdaterManager);
+                    settings.cloudcordUpdateStatus = updated === false ? "CloudCord is up to date." : "Latest runtime saved. Reopen Discord to apply it.";
                   } catch (error) {
                     var message = error instanceof Error ? error.message : "Runtime download failed";
                     settings.cloudcordUpdateStatus = message;
@@ -16516,9 +16557,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         fetchPlugin(id) {
           if (!id.endsWith("/"))
             id += "/";
-          var pending2 = pendingFetches.get(id);
-          if (pending2)
-            return pending2;
+          var pending = pendingFetches.get(id);
+          if (pending)
+            return pending;
           var fetch2 = () => _async_to_generator(function* () {
             var existingPlugin = plugins[id];
             var manifest;
@@ -16565,9 +16606,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               throw new Error("Invalid plugin link");
             if (!id.endsWith("/"))
               id += "/";
-            var pending2 = pendingInstalls.get(id);
-            if (pending2)
-              return pending2;
+            var pending = pendingInstalls.get(id);
+            if (pending)
+              return pending;
             if (id in plugins)
               throw new Error("Plugin already installed");
             var install = () => _async_to_generator(function* () {
@@ -22389,11 +22430,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     };
   }
   function unmarkMediaCleared(key) {
-    var pending2 = {
+    var pending = {
       ...rootSettings.fakeProfileMediaCleared || {}
     };
-    delete pending2[key];
-    rootSettings.fakeProfileMediaCleared = pending2;
+    delete pending[key];
+    rootSettings.fakeProfileMediaCleared = pending;
   }
   function localBadgesHidden() {
     return rootSettings.fakeProfileLocalOnly && preview.hideBadgesWhenSyncOff === true;
@@ -35726,28 +35767,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function bindCxChannelOpenRead({ dispatcher: dispatcher2, selected, user, read, jump, enabled = () => true }) {
     if (typeof dispatcher2?.subscribe !== "function" || typeof read?.lastMessageId !== "function")
       throw new Error("Discord channel read state is unavailable");
-    var pending2;
+    var pending;
     var generation = 0;
     var previous;
     var previousUser;
     function onSelect({ channelId, messageId: targetId, jumpToMessageId }) {
       var account = user();
       if (targetId || jumpToMessageId) {
-        clearTimeout(pending2);
+        clearTimeout(pending);
         generation++;
         previous = void 0;
         return;
       }
       if (enabled() && channelId === previous && account === previousUser)
         return;
-      clearTimeout(pending2);
+      clearTimeout(pending);
       var request = ++generation;
       previous = void 0;
       if (!enabled() || !account || typeof channelId !== "string" || !/^\d{17,20}$/.test(channelId))
         return;
       previous = channelId;
       previousUser = account;
-      pending2 = setTimeout(() => _async_to_generator(function* () {
+      pending = setTimeout(() => _async_to_generator(function* () {
         try {
           if (!enabled() || user() !== account || selected() !== channelId || !read.hasUnread(channelId))
             return;
@@ -35784,7 +35825,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     dispatcher2.subscribe("CHANNEL_SELECT", onSelect);
     return () => {
       generation++;
-      clearTimeout(pending2);
+      clearTimeout(pending);
       dispatcher2.unsubscribe("CHANNEL_SELECT", onSelect);
     };
   }
@@ -44530,11 +44571,11 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       return;
     var active = true;
     var account;
-    var pending2;
+    var pending;
     var lastChannel = /* @__PURE__ */ new Map();
     var recentRemovals = /* @__PURE__ */ new Map();
     function reset() {
-      pending2 = void 0;
+      pending = void 0;
       lastChannel.clear();
       recentRemovals.clear();
     }
@@ -44576,7 +44617,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           if (!isId(channel)) {
             lastChannel.delete(id2);
             if (id2 === follow)
-              pending2 = void 0;
+              pending = void 0;
             return "continue";
           }
           remember(lastChannel, id2, channel);
@@ -44584,16 +44625,16 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             return "continue";
           if (watch)
             context.notify(label(context.userName(id2), "A friend") + " joined " + label(context.channelName(channel), "a voice channel"));
-          if (id2 !== follow || pending2 === channel)
+          if (id2 !== follow || pending === channel)
             return "continue";
           var current = context.voiceChannel();
           if (!current || current === channel)
             return "continue";
-          pending2 = channel;
+          pending = channel;
           void Promise.resolve().then(() => {
-            if (pending2 !== channel)
+            if (pending !== channel)
               return;
-            pending2 = void 0;
+            pending = void 0;
             if (!active || !context.enabled() || context.currentUser() !== me || !context.isFriend(id2) || lastChannel.get(id2) !== channel || context.voiceChannel() !== current)
               return;
             context.joinVoice(channel);
@@ -44786,10 +44827,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         var options = sendOptions;
         if (message?.tts || message?.attachments?.length || message?.stickers?.length || message?.stickerIds?.length || options?.uploads?.length || options?.stickers?.length || options?.stickerIds?.length || options?.scheduledTimestamp)
           return invoke(args);
-        var pending2 = plan(channel, message?.content);
-        if (!pending2)
+        var pending = plan(channel, message?.content);
+        if (!pending)
           return invoke(args);
-        var { channelId, parts, key, user } = pending2;
+        var { channelId, parts, key, user } = pending;
         busy.add(key);
         return (() => _async_to_generator(function* () {
           try {
@@ -45657,7 +45698,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   }
   function createCxVoiceQueue(context, options) {
     var active = true;
-    var pending2;
+    var pending;
     var promptToken;
     function room(id, account) {
       if (!active || context.enabled?.() === false || context.account() !== account || context.currentVoice() === id)
@@ -45688,7 +45729,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     }
     function setPending(id, account) {
       promptToken = void 0;
-      pending2 = {
+      pending = {
         id,
         account
       };
@@ -45703,17 +45744,17 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         setPending(id, account);
     }
     function update() {
-      if (!pending2)
+      if (!pending)
         return;
-      var { id, account } = pending2;
+      var { id, account } = pending;
       var channel = room(id, account);
       if (!channel) {
-        pending2 = void 0;
+        pending = void 0;
         return;
       }
       if (channel.occupants >= channel.limit)
         return;
-      pending2 = void 0;
+      pending = void 0;
       if (!options.quiet) {
         try {
           context.sound();
@@ -45747,7 +45788,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         var channel = room(id, account);
         if (!channel)
           return;
-        var waiting = pending2?.id === id && pending2.account === account;
+        var waiting = pending?.id === id && pending.account === account;
         if (!waiting && channel.occupants < channel.limit)
           return;
         return {
@@ -45757,8 +45798,8 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             if (!latest)
               return;
             if (waiting) {
-              if (pending2?.id === id && pending2.account === account)
-                pending2 = void 0;
+              if (pending?.id === id && pending.account === account)
+                pending = void 0;
             } else
               waitFor2(id, account);
           }
@@ -45771,19 +45812,19 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         var channel = room(id, account);
         if (!channel || channel.occupants < channel.limit)
           return false;
-        if (pending2?.id === id && pending2.account === account)
+        if (pending?.id === id && pending.account === account)
           return true;
         offer("Voice channel is full", `Wait for a slot in ${channel.name}?`, "Wait", () => waitFor2(id, account));
         return true;
       },
       update,
       reset() {
-        pending2 = void 0;
+        pending = void 0;
         promptToken = void 0;
       },
       stop() {
         active = false;
-        pending2 = void 0;
+        pending = void 0;
         promptToken = void 0;
       }
     };
@@ -62582,7 +62623,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   function registerSendConfirmation(check) {
     var composer = findByFilePath("modules/chat_input/native/accessories/ChatInputSendUtils.tsx");
     var active = true;
-    var pending2;
+    var pending;
     var stop = overrideCxMethods(composer, {
       chatInputHandleSendText(args, invoke) {
         var draft = args[0];
@@ -62591,15 +62632,15 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         var body = typeof text === "string" && channel ? check(text) : void 0;
         if (!body)
           return invoke(args);
-        if (pending2)
+        if (pending)
           return;
         var account = UserStore?.getCurrentUser?.()?.id;
         var selected = SelectedChannelStore?.getChannelId?.();
         var request = {};
-        pending2 = request;
+        pending = request;
         var dismiss = () => {
-          if (pending2 === request)
-            pending2 = void 0;
+          if (pending === request)
+            pending = void 0;
         };
         try {
           import_react_native29.Alert.alert("Confirm message", body, [
@@ -62611,7 +62652,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             {
               text: "Send anyway",
               onPress: () => {
-                if (pending2 !== request)
+                if (pending !== request)
                   return;
                 dismiss();
                 if (active && !settings.safeMode?.enabled && account && account === UserStore?.getCurrentUser?.()?.id && selected === SelectedChannelStore?.getChannelId?.() && draft?.text === text && draft?.params?.channel?.id === channel)
@@ -71488,7 +71529,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var [draft, setDraft] = react.useState(void 0);
     var [message, setMessage] = react.useState("");
     var [saving, setSaving] = react.useState(false);
-    var pending2 = react.useRef(false);
+    var pending = react.useRef(false);
     var storageRef = react.useRef(storage);
     storageRef.current = storage;
     react.useEffect(() => {
@@ -71515,7 +71556,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var error = draft && draft.id === entry?.id ? draft.error : review?.error ?? "";
     function save(status) {
       return _async_to_generator(function* () {
-        if (!entry || !records || pending2.current || !authorized())
+        if (!entry || !records || pending.current || !authorized())
           return;
         var cloudcord = build.cloudcord.trim();
         var discord = build.discord.trim();
@@ -71536,7 +71577,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             error: status === "Pass" ? "" : error
           }
         };
-        pending2.current = true;
+        pending.current = true;
         setSaving(true);
         try {
           yield storageRef.current.write(next);
@@ -71546,7 +71587,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         } catch (e) {
           setMessage("Could not save this result.");
         } finally {
-          pending2.current = false;
+          pending.current = false;
           setSaving(false);
         }
       })();
@@ -74863,7 +74904,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7ad0cc505c8306317dc6a8cd7c8036470003ad89";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "285817b0e3f4b36b42f55c07197d2b3aabdeb131";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
