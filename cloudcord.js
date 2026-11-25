@@ -336,7 +336,7 @@
       pending = void 0;
     });
     var checkForUpdates = () => checking ??= (() => _async_to_generator(function* () {
-      var manifest = yield readResponse(MANIFEST_URL, (response) => response.json(), 15e3);
+      var manifest = yield readResponse(MANIFEST_URL + "?t=" + Date.now(), (response) => response.json(), 15e3);
       if (manifest?.schema !== 1 || typeof manifest.version !== "string" || !REVISION.test(manifest.version) || typeof manifest.url !== "string") {
         throw new Error("invalid runtime manifest");
       }
@@ -74904,7 +74904,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "285817b0e3f4b36b42f55c07197d2b3aabdeb131";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "25d1112df67de7c8840c8a6f801db5bebf198664";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
