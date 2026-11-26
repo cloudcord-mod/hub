@@ -169,7 +169,7 @@ vm.runInNewContext(esbuild.transformSync(fs.readFileSync("../../ios/runtime/src/
 states.length = 0;
 const MobileAddonPage = mobileModule.exports.default;
 const mobileItems = [{ name: "Native" }, { name: "Command", privateCommands: true, alternate: true }, { name: "Changed", needsReview: true }];
-const mobileList = () => {
+const mobilePage = () => {
     cursor = 0;
     return walk(MobileAddonPage({
         CardComponent: "Card", title: "Plugins", items: mobileItems, searchKeywords: ["name"],
@@ -178,18 +178,17 @@ const mobileList = () => {
         searchCommands: (rows, query) => rows.filter(row => "/" + row.name.toLowerCase() === query),
         filterOptions: { "Private commands": row => row.privateCommands, "Needs review": row => row.needsReview },
         defaultFilter: row => !row.alternate,
-    })).find(node => node.type === "FlashList");
+    }));
 };
+const mobileList = () => mobilePage().find(node => node.type === "FlashList");
 const mobileRows = () => Array.from(mobileList().props.data, entry => entry.obj.name);
 const selectMobileFilter = label => {
-    const header = mobileList().props.ListHeaderComponent;
-    walk(header).find(node => node.type === "Button").props.onPress();
-    filterSheet.options.find(option => option.label === label).onPress();
+    mobilePage().find(node => node.type === "Button" && node.props.text === label).props.onPress();
 };
 assert.deepEqual(mobileRows(), ["Native", "Changed"]);
 assert.equal(mobileList().props.keyExtractor(mobileList().props.data[1]), "Changed");
 assert.equal(mobileList().props.keyboardShouldPersistTaps, "handled");
-const searchMobile = value => walk(mobileList().props.ListHeaderComponent)
+const searchMobile = value => mobilePage()
     .find(node => node.type === "Search").props.onChangeText(value);
 searchMobile("  /changed  ");
 assert.deepEqual(mobileRows(), ["Changed"], "slash search uses the command matcher");
@@ -206,20 +205,20 @@ searchMobile("");
 assert.deepEqual(mobileRows(), ["Command"]);
 selectMobileFilter("Needs review");
 assert.deepEqual(mobileRows(), ["Changed"]);
-selectMobileFilter("All plugins");
+selectMobileFilter("Default");
 searchMobile("search");
-const sortButton = walk(mobileList().props.ListHeaderComponent).find(node => node.type === "IconButton");
+const sortButton = mobilePage().find(node => node.type === "IconButton");
 assert.ok(!sortButton.props.disabled, "sorting must remain available during search");
 sortButton.props.onPress();
 filterSheet.options.find(option => option.label === "Name (A-Z)").onPress();
 assert.deepEqual(mobileRows(), ["Changed", "Native"]);
-const sortedButton = walk(mobileList().props.ListHeaderComponent).find(node => node.type === "IconButton");
+const sortedButton = mobilePage().find(node => node.type === "IconButton");
 assert.match(sortedButton.props.accessibilityLabel, /Name \(A-Z\)/);
 sortedButton.props.onPress();
 filterSheet.options.find(option => option.label === "Relevance").onPress();
 assert.deepEqual(mobileRows(), ["Native", "Changed"], "relevance restores default search order");
 mobileItems.length = 0;
 assert.deepEqual(mobileRows(), [], "an empty filter must leave the filter controls available");
-selectMobileFilter("All plugins");
-assert.equal(filterSheet.header.title, "Filter plugins");
+selectMobileFilter("Default");
+assert.ok(mobilePage().find(node => node.type === "Button" && node.props.text === "Default"));
 console.log("PASS desktop and mobile Add-ons navigation, private command filtering and review visibility");
