@@ -21032,8 +21032,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     PreviewsPage: () => PreviewsPage,
     default: () => FakeProfile,
     initializeFakeProfile: () => initializeFakeProfile,
-    mobileWelcomeCopy: () => mobileWelcomeCopy,
-    testMobileWelcome: () => testMobileWelcome
+    mobileWelcomeCopy: () => mobileWelcomeCopy
   });
   function Card2(props) {
     var _$Component = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports)).Panel;
@@ -26261,61 +26260,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     ]);
   }
-  function existingWelcomeChannel() {
-    var store = safeStore("ChannelStore");
-    var id = store?.getDMFromUserId?.(welcomeSender);
-    return id && store?.getChannel?.(id)?.type === 1 ? String(id) : void 0;
-  }
-  function deliverMobileWelcome(force = false) {
-    var channelId = existingWelcomeChannel();
-    if (!channelId || !fakeMessages)
-      return false;
-    var list = savedConversations();
-    var exists = list.some((item) => item.id === "cloudcord-welcome-demo" && item.channelId === channelId);
-    if (!force && (exists || settings.cloudcordWelcomeDmCreated))
-      return true;
-    if (!exists) {
-      saveConversations([
-        ...list,
-        {
-          id: "cloudcord-welcome-demo",
-          name: "CloudCord welcome",
-          channelId,
-          people: [
-            {
-              key: "welcome-sender",
-              userId: welcomeSender
-            }
-          ],
-          lines: [
-            {
-              key: "welcome-banner",
-              person: "welcome-sender",
-              text: "",
-              minutesAgo: 0,
-              showWelcomeBanner: true
-            },
-            {
-              key: "welcome",
-              person: "welcome-sender",
-              text: mobileWelcomeCopy,
-              minutesAgo: 0
-            }
-          ],
-          savedAt: Date.now()
-        }
-      ]);
-    }
-    fakeMessages.show(channelId);
-    settings.cloudcordWelcomeDmCreated = true;
-    return true;
-  }
-  function testMobileWelcome() {
-    return deliverMobileWelcome(true);
-  }
   function savedConversations() {
     var list = rootSettings.fakeMessages;
-    return (Array.isArray(list) ? list : []).filter((item) => item?.id !== "cloudcord-welcome-demo" || !item.dm?.local && item.channelId === existingWelcomeChannel()).map(normalizeConversation).filter(Boolean);
+    return (Array.isArray(list) ? list : []).filter((item) => item?.id !== "cloudcord-welcome-demo").map(normalizeConversation).filter(Boolean);
   }
   function saveConversations(list) {
     rootSettings.fakeMessages = list.map(normalizeConversation).filter(Boolean);
@@ -27177,25 +27124,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           } catch (e) {
           }
         }, 1500);
-        var welcomeLater = () => setTimeout(() => {
-          if (import_react_native23.AppState.currentState === "active") {
-            try {
-              deliverMobileWelcome();
-            } catch (e) {
-            }
-          }
-        }, 0);
         restoreLater();
-        welcomeLater();
-        for (var event of [
-          "CONNECTION_OPEN",
-          "CHANNEL_SELECT"
-        ]) {
-          try {
-            FluxDispatcher.subscribe(event, welcomeLater);
-          } catch (e) {
-          }
-        }
         try {
           FluxDispatcher.subscribe("CONNECTION_OPEN", () => {
             fakeRequestIds.clear();
@@ -30908,7 +30837,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react6, import_react_native23, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbPreviews, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, mobileWelcomeCopy, welcomeSender, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react6, import_react_native23, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbPreviews, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, mobileWelcomeCopy, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -32151,7 +32080,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         "Have an idea for CloudCord? Drop it in suggestions. If it\u2019s a plugin or theme, tell us what you want it to do and whether you\u2019d use it on mobile, desktop, or both.",
         "Thanks for being here. Enjoy making Discord your own."
       ].join("\n\n");
-      welcomeSender = "643945264868098049";
       NamePreviewBoundary = /* @__PURE__ */ function(Component2) {
         "use strict";
         _inherits(NamePreviewBoundary2, Component2);
@@ -32574,8 +32502,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 subLabel: welcomeStatus ? "Hide preview" : "Preview the welcome message on this device",
                 onPress: () => {
                   try {
-                    var welcome = (init_FakeProfile(), __toCommonJS(FakeProfile_exports));
-                    setWelcomeStatus(welcomeStatus ? "" : welcome.testMobileWelcome() ? "Welcome message ready in the existing DM in Messages." : "Open a DM with 643945264868098049 first, then run this test again.\n\n" + welcome.mobileWelcomeCopy);
+                    setWelcomeStatus(welcomeStatus ? "" : (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).mobileWelcomeCopy);
                   } catch (e) {
                     setWelcomeStatus("Couldn\u2019t load the welcome preview");
                   }
@@ -75509,7 +75436,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e49ca10697d7bf508295309c9617a2a7f9332be3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e6327cce77eca7e377d8e13bfdb73ded4fb06bf1";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
