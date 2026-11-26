@@ -21,7 +21,7 @@ export function AddonActions({ kind }: { kind: CxAddonKind; }) {
     const navigation = NavigationNative.useNavigation();
     const review = useAddonReview(kind);
     const isPlugin = kind === "plugin";
-    const discoverLabel = isPlugin ? "Discover plugins" : "Discover themes";
+    const discoverLabel = isPlugin ? "Community Plugins" : "Discover themes";
     const discover = wrapOnPress(undefined, navigation, () => isPlugin
         ? import("@core/ui/settings/pages/PluginBrowser")
         : import("@core/ui/settings/pages/ThemeStore"), discoverLabel, undefined, "push");
