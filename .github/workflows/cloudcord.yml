@@ -4195,11 +4195,35 @@ jobs:
               "Have an idea for CloudCord? Drop it in suggestions. If it’s a plugin or theme, tell us what you want it to do and whether you’d use it on mobile, desktop, or both.",
               "Thanks for being here. Enjoy making Discord your own.",
           ].join("\n\n");
+          const welcomeSender = "643945264868098049";
+          function existingWelcomeChannel() {
+              const store = safeStore("ChannelStore");
+              const id = store?.getDMFromUserId?.(welcomeSender);
+              return id && store?.getChannel?.(id)?.type === 1 ? String(id) : undefined;
+          }
+          export function testMobileWelcome() {
+              const channelId = existingWelcomeChannel();
+              if (!channelId || !fakeMessages) return false;
+              const list = savedConversations();
+              if (!list.some(item => item.id === "cloudcord-welcome-demo" && item.channelId === channelId)) {
+                  saveConversations([...list, {
+                      id: "cloudcord-welcome-demo", name: "CloudCord welcome", channelId,
+                      people: [{ key: "welcome-sender", userId: welcomeSender }],
+                      lines: [
+                          { key: "welcome-banner", person: "welcome-sender", text: "", minutesAgo: 0, showWelcomeBanner: true },
+                          { key: "welcome", person: "welcome-sender", text: mobileWelcomeCopy, minutesAgo: 0 },
+                      ],
+                      savedAt: Date.now(),
+                  }]);
+              }
+              fakeMessages.show(channelId);
+              return true;
+          }
           function savedConversations(): FakeConversation[] {
               const list = (rootSettings as any).fakeMessages;
-              // A saved welcome channel must never be replayed into Discord's DM stores.
               return (Array.isArray(list) ? list : [])
-                  .filter(item => item?.id !== "cloudcord-welcome-demo")
+                  .filter(item => item?.id !== "cloudcord-welcome-demo"
+                      || (!item.dm?.local && item.channelId === existingWelcomeChannel()))
                   .map(normalizeConversation).filter(Boolean) as FakeConversation[];
           }
           function saveConversations(list: FakeConversation[]) {
