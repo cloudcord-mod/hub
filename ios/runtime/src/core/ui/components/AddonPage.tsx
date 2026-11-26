@@ -141,12 +141,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         }
     }, [navigation]);
 
-    const items = useMemo(() => {
+    const catalog = useMemo(() => {
         const values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
-        return values.filter(item => isNotNil(item) && typeof item === "object"
-            && (!matchesFilter || matchesFilter(item))
-            && (status === "All" || !props.isEnabled || props.isEnabled(item) === (status === "Enabled")));
-    }, [props.items, props.resolveItem, props.isEnabled, status, matchesFilter]);
+        return values.filter(item => isNotNil(item) && typeof item === "object");
+    }, [props.items, props.resolveItem]);
+    const items = catalog.filter(item => (!matchesFilter || matchesFilter(item))
+        && (status === "All" || !props.isEnabled || props.isEnabled(item) === (status === "Enabled")));
 
     const results = useMemo(() => {
         const matches = commandSearch
@@ -191,7 +191,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     }
 
     const headerElement = (
-        <View style={{ paddingBottom: 14, gap: 12 }}>
+        <View style={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10, gap: 10 }}>
             {settings.safeMode?.enabled && <View style={{ marginBottom: 10 }}>
                 <Text variant="text-sm/medium" color="text-muted">
                     {props.safeModeHint?.message}
@@ -227,28 +227,30 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 {props.installAction && <Button text={props.installAction.label ?? "Install"} icon={findAssetId("PlusLargeIcon")}
                     size="sm" variant="tertiary" onPress={onInstallPress} />}
             </View>
-            {props.filterOptions && <Button variant="secondary" size="sm" text={filter || "All plugins"}
-                onPress={() => showSimpleActionSheet({
-                    key: "AddonListFilters",
-                    header: { title: "Filter plugins", onClose: () => hideActionSheet("AddonListFilters") },
-                    options: ["", ...Object.keys(props.filterOptions!)].map(name => ({
-                        label: name || "All plugins",
-                        onPress: () => setFilter(name),
-                    })),
-                })} />}
-            {props.ListHeaderComponent && <props.ListHeaderComponent />}
+            {props.filterOptions && <ScrollView horizontal showsHorizontalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 8 }}>
+                {["", ...Object.keys(props.filterOptions)].map(name => (
+                    <Button key={name || "default"} size="sm" text={name || "Default"}
+                        variant={filter === name ? "primary" : "secondary"} onPress={() => setFilter(name)} />
+                ))}
+            </ScrollView>}
+            <Text variant="text-sm/medium" color="text-muted">
+                {results.length} shown{props.isEnabled ? ` · ${catalog.filter(props.isEnabled).length} enabled` : ""}
+            </Text>
         </View>
     );
 
     return (
         <ErrorBoundary>
+            <View style={{ flex: 1, alignSelf: "center", width: "100%", maxWidth: 840 }}>
+            {headerElement}
             <FlashList
                 data={results}
                 extraData={search}
                 keyExtractor={getItemKey ? keyExtractor : undefined}
                 keyboardShouldPersistTaps="handled"
                 estimatedItemSize={136}
-                ListHeaderComponent={headerElement}
+                ListHeaderComponent={props.ListHeaderComponent}
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>
                     <Image source={findAssetId("devices_not_found")!} />
                     <Text variant="text-lg/semibold" color="text-default">
@@ -264,6 +266,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 ListFooterComponent={props.ListFooterComponent}
                 renderItem={renderItem}
             />
+            </View>
         </ErrorBoundary>
     );
 }

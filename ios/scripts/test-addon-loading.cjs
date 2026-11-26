@@ -73,20 +73,20 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
     } };
     vm.runInNewContext(compile('ios/runtime/src/core/ui/components/AddonPage.tsx'), addonList);
     const items = [{ name: 'first', enabled: true }, { name: 'second', enabled: false }];
-    const renderList = () => {
+    const renderPage = () => {
         cursor = 0;
-        return walk(addonList.module.exports.default({ title: 'Plugins', items, isEnabled: item => item.enabled, searchKeywords: ['name'] }))
-            .find(node => node.type === 'FlashList');
+        return walk(addonList.module.exports.default({ title: 'Plugins', items, isEnabled: item => item.enabled, searchKeywords: ['name'] }));
     };
-    const filter = (list, status) => walk(list.props.ListHeaderComponent).find(node => node.type === 'Button' && node.props.text === status);
+    const renderList = () => renderPage().find(node => node.type === 'FlashList');
+    const filter = status => renderPage().find(node => node.type === 'Button' && node.props.text === status);
     assert.equal(renderList().props.data.length, 2);
-    filter(renderList(), 'Enabled').props.onPress();
+    filter('Enabled').props.onPress();
     assert.deepEqual(renderList().props.data.map(item => item.obj.name), ['first']);
     items[0].enabled = false;
     assert.equal(renderList().props.data.length, 0, 'the list stays open when the last enabled plugin is turned off');
-    filter(renderList(), 'Disabled').props.onPress();
+    filter('Disabled').props.onPress();
     assert.equal(renderList().props.data.length, 2);
-    filter(renderList(), 'All').props.onPress();
+    filter('All').props.onPress();
     assert.equal(renderList().props.data.length, 2);
     let themeCursor = 0;
     let effectKey;

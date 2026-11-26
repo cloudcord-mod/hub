@@ -1,6 +1,6 @@
 import { ScrollView } from "react-native";
 import { NavigationNative, React } from "@metro/common";
-import { Stack, TableRow, TableRowGroup } from "@metro/common/components";
+import { Card, Stack, TableRow } from "@metro/common/components";
 import { isFontSupported, isThemeSupported } from "@lib/api/native/loader";
 import { findAssetId } from "@lib/api/assets";
 import { wrapOnPress } from "@lib/ui/settings/patches/shared";
@@ -23,12 +23,10 @@ export default function Addons() {
     }, [navigation]);
     const hasThemes = isThemeSupported();
     return <ScrollView contentContainerStyle={{ paddingBottom: 38 }}>
-        <Stack style={{ paddingVertical: 24, paddingHorizontal: 12 }} spacing={24}>
-            <TableRowGroup title="Add-ons">
-                <TableRow arrow label="Plugins" subLabel="Manage and configure your plugins" icon={icon("PuzzlePieceIcon", "AppsIcon", "SettingsIcon")} onPress={() => open("Plugins", () => require("@core/ui/settings/pages/Plugins"))} />
-                {hasThemes && <TableRow arrow label="Themes" subLabel="Manage your Discord themes" icon={icon("PaintPaletteIcon", "ThemeIcon", "SettingsIcon")} onPress={() => open("Themes", () => require("@core/ui/settings/pages/Themes"))} />}
-                <TableRow arrow label="Fonts" subLabel={isFontSupported() ? "Browse and apply fonts" : "Browse fonts · applying requires a compatible loader"} icon={icon("LettersIcon", "TextIcon")} onPress={() => open("Fonts", () => require("@core/ui/settings/pages/Fonts"))} />
-            </TableRowGroup>
+        <Stack style={{ width: "100%", maxWidth: 720, alignSelf: "center", paddingVertical: 20, paddingHorizontal: 16 }} spacing={12}>
+            <Card><TableRow arrow label="Plugins" subLabel="Find, enable, and configure plugins" icon={icon("PuzzlePieceIcon", "AppsIcon", "SettingsIcon")} onPress={() => open("Plugins", () => require("@core/ui/settings/pages/Plugins"))} /></Card>
+            {hasThemes && <Card><TableRow arrow label="Themes" subLabel="Change colors and chat backgrounds" icon={icon("PaintPaletteIcon", "ThemeIcon", "SettingsIcon")} onPress={() => open("Themes", () => require("@core/ui/settings/pages/Themes"))} /></Card>}
+            <Card><TableRow arrow label="Fonts" subLabel={isFontSupported() ? "Browse and apply fonts" : "Browse fonts · applying requires a compatible loader"} icon={icon("LettersIcon", "TextIcon")} onPress={() => open("Fonts", () => require("@core/ui/settings/pages/Fonts"))} /></Card>
         </Stack>
     </ScrollView>;
 }
