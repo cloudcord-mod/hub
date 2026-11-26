@@ -284,6 +284,7 @@ jobs:
           import ScaledPluginSettings from "@core/ui/settings/components/ScaledPluginSettings";
           import { findAssetId } from "@lib/api/assets";
           import { showToast } from "@lib/ui/toasts";
+          import { dismissAlert, openAlert } from "@lib/ui/alerts";
           import { Card, Stack, TableRow, TableRowGroup, Text } from "@metro/common/components";
           import { useState } from "react";
           import { ScrollView, View } from "react-native";
@@ -3506,7 +3507,7 @@ jobs:
               { value: 5, label: "Cake" }, { value: 6, label: "Chest" }, { value: 7, label: "Coffee" }, { value: 8, label: "Seasonal box" },
               { value: 9, label: "Seasonal cake" }, { value: 10, label: "Seasonal chest" }, { value: 11, label: "Seasonal coffee" }, { value: 12, label: "Nitroween" }
           ];
-          type ExtrasState = { fakeNitro?: boolean; giftCode?: string; giftPlan?: string; giftStyle?: number; boosts?: Record<string, any>; fakeOrbs?: number };
+          type ExtrasState = { fakeNitro?: boolean; giftCode?: string; giftPlan?: string; giftStyle?: number; boosts?: Record<string, any>; fakeOrbs?: number; fakeOrbInventory?: Record<string, string[]> };
           const fakeRequestIds = new Set<string>();
           let localRequestActions: ReturnType<typeof installLocalRelationshipActions> | undefined;
           function extrasState(): ExtrasState { const value = (settings as any)[EXTRAS_KEY]; return value && typeof value === "object" ? value : {}; }
@@ -3705,6 +3706,63 @@ jobs:
           // Fake orbs: the wallet shows our number instead of the real balance, only on this device.
           const orbHooked: { currency?: any; wallet?: any } = {};
           const fakeOrbCount = () => { const value = extrasState().fakeOrbs; return typeof value === "number" && value >= 0 ? value : null; };
+          const orbPreviews = [
+              { id: "cloud-frame", name: "Cloud Frame", cost: 250 },
+              { id: "blue-comet", name: "Blue Comet", cost: 500 },
+          ];
+
+          function FakeOrbPanel({ inventory }: { inventory: boolean }) {
+              useProxy(settings);
+              const state = extrasState();
+              const owner = currentUserId;
+              if (!owner || (!inventory && fakeOrbCount() === null)) return null;
+              const owned = state.fakeOrbInventory?.[owner] ?? [];
+              if (inventory && !owned.length) return null;
+              return <View style={{ padding: 10, gap: 8 }}>
+                  <Text variant="text-sm/semibold">{inventory ? "CloudCord inventory · Simulated" : `CloudCord preview · ${state.fakeOrbs} fake Orbs`}</Text>
+                  {orbPreviews.filter(item => !inventory || owned.includes(item.id)).map(item => inventory
+                      ? <Text key={item.id} variant="text-sm/medium">{item.name}</Text>
+                      : <Button key={item.id} size="sm" variant="secondary"
+                          text={owned.includes(item.id) ? item.name + " · Owned" : item.name + " · " + item.cost + " fake Orbs"}
+                          disabled={owned.includes(item.id) || (state.fakeOrbs ?? 0) < item.cost}
+                          onPress={() => {
+                              if (owner !== currentUserId) return;
+                              const latest = extrasState();
+                              const balance = latest.fakeOrbs;
+                              const items = latest.fakeOrbInventory?.[owner] ?? [];
+                              if (!Number.isSafeInteger(balance) || balance! < item.cost || items.includes(item.id)) return;
+                              setExtras({ ...latest, fakeOrbs: balance! - item.cost, fakeOrbInventory: { ...latest.fakeOrbInventory, [owner]: [...items, item.id] } });
+                              refreshOrbs();
+                          }} />)}
+              </View>;
+          }
+
+          function installOrbPreviewPanels() {
+              for (const [name, inventory] of [["CollectiblesShopOrbsPage", false], ["EditAvatarDecorationSection", true]] as const) {
+                  onJsxCreate(name, (component, element) => <>
+                      <FakeOrbPanel inventory={inventory} />
+                      {createElement(element.type || component, { ...element.props, key: "native" })}
+                  </>);
+              }
+          }
+
+          function showMobileWelcome() {
+              const key = "cloudcord-mobile-welcome";
+              if ((settings as any).cloudcordMobileWelcomeSeen || AppState.currentState !== "active") return;
+              const close = () => dismissAlert(key);
+              openAlert(key, <View style={{ width: 360, maxWidth: "92%", borderRadius: 20, backgroundColor: "#171b25", padding: 20, gap: 12 }}>
+                  <View style={{ backgroundColor: "#0b1020", borderRadius: 14, padding: 14, flexDirection: "row", alignItems: "center", gap: 12 }}>
+                      <Image source={{ uri: CLOUDCORD_BADGE_ICON }} accessibilityLabel="CloudCord logo" resizeMode="contain" style={{ width: 46, height: 46 }} />
+                      <Text variant="heading-lg/semibold" style={{ color: "#fff", flex: 1 }}>Thanks for installing CloudCord!</Text>
+                  </View>
+                  <Text variant="text-md/medium" style={{ color: "#e3e7ef" }}>In Discord, open your profile tab, tap Settings, and scroll to CloudCord.</Text>
+                  <Text variant="text-sm/medium" style={{ color: "#c6cfdf" }}>Profile Studio changes your look. Add-ons is where you’ll find plugins, themes, and fonts.</Text>
+                  <Text variant="text-sm/medium" style={{ color: "#c6cfdf" }}>Join our Discord and check #faq before asking for help.</Text>
+                  <Button size="sm" variant="primary" text="Join the CloudCord server" onPress={() => void Linking.openURL("https://discord.gg/cloudcord").catch(() => showToast("Couldn’t open the invite"))} />
+                  <Button size="sm" variant="secondary" text="Got it" onPress={close} />
+              </View>);
+              (settings as any).cloudcordMobileWelcomeSeen = true;
+          }
           // Store lookups that miss scan every module on mobile, so each store is searched at most twice.
           let orbSearches = 0;
           function installOrbHooks() {
@@ -4399,7 +4457,8 @@ jobs:
                       } catch {}
                       for (const step of [installGiftHook, installBoostHooks, applyFakeNitro]) { try { step(); } catch {} }
                       // One late retry for stores that load after startup. A miss scans every module on mobile, so no polling.
-                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook]) { try { step(); } catch {} } }, 15000);
+                      installOrbPreviewPanels();
+                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook, showMobileWelcome]) { try { step(); } catch {} } }, 15000);
                       const restoreLater = () => setTimeout(() => { try { restoreFakeRequests(); } catch {} }, 1500);
                       restoreLater();
                       try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); }); } catch {}
@@ -4412,7 +4471,11 @@ jobs:
                       connectRealProfileMenu();
                       await pullOwnSharedProfile();
                       void refreshPublishedBadges(true);
-                      AppState.addEventListener("change", state => { if (state === "active") void refreshPublishedBadges(true); });
+                      AppState.addEventListener("change", state => {
+                          if (state !== "active") return;
+                          void refreshPublishedBadges(true);
+                          try { showMobileWelcome(); } catch {}
+                      });
                       if (!sharedSyncTimer) sharedSyncTimer = setInterval(() => {
                           if (AppState.currentState !== "active") return;
                           void pullOwnSharedProfile().catch(error => {
@@ -5218,7 +5281,6 @@ jobs:
           export default function FakeProfile() {
               const editorOwner = useRef(currentUserId);
               const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
-              const [showMobileGuide, setShowMobileGuide] = useState(false);
               const [showDetails, setShowDetails] = useState(false);
               useProxy(settings);
               const [, redraw] = useReducer(value => value + 1, 0);
@@ -5454,22 +5516,7 @@ jobs:
                               const badgeCount = Object.values(preview.selectedBadges || {}).filter(Boolean).length + (preview.nitroEnabled ? 1 : 0) + (preview.boostMonths > 0 ? 1 : 0) + (preview.giftLevel >= 0 ? 1 : 0);
                               const connections = (preview.customConnections || []).length;
                               const name = preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "there";
-                              return <><Card>
-                                  <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-                                      <Image source={{ uri: CLOUDCORD_BADGE_ICON }} resizeMode="contain" style={{ width: 42, height: 42 }} />
-                                      <View style={{ flex: 1 }}>
-                                          <Text variant="text-sm/medium" color="text-muted">CloudCord</Text>
-                                          <Text variant="heading-md/semibold">Thanks for installing CloudCord!</Text>
-                                      </View>
-                                  </View>
-                                  <ActionButton muted label={showMobileGuide ? "Hide mobile tutorial" : "Open mobile tutorial"} onPress={() => setShowMobileGuide(value => !value)} />
-                                  {showMobileGuide ? <View style={{ gap: 8 }}>
-                                      <Text variant="text-sm/normal" color="text-normal">Open Settings → CloudCord to get back here. Use Profile Studio to change your picture, banner, and badges, then open your profile to see your changes.</Text>
-                                      <Text variant="text-sm/normal" color="text-normal">Open Add-ons to browse plugins, themes, and fonts. On iOS, shake the device and use Refetch Bundle if you need to refresh the runtime.</Text>
-                                      <ActionButton muted label="Edit profile" onPress={() => setActiveTab("profile")} />
-                                      <ActionButton muted label="Choose badges" onPress={() => setActiveTab("badges")} />
-                                  </View> : null}
-                              </Card><OverviewPanel name={name} subtitle={preview.enabled ? "Your custom profile is on" : "Your custom profile is off"}
+                              return <OverviewPanel name={name} subtitle={preview.enabled ? "Your custom profile is on" : "Your custom profile is off"}
                                   stats={[
                                       { label: "Username", value: preview.username || realCurrentUser?.username || "-", hint: "Your public name" },
                                       { label: "Badges", value: String(badgeCount), hint: preview.replaceBadges ? "Real badges hidden" : "Shown with your real ones" },
@@ -5484,7 +5531,7 @@ jobs:
                                       { label: "Choose badges", done: badgeCount > 0, tab: "badges" },
                                       { label: "Add a connection", done: connections > 0, tab: "social" }
                                   ]}
-                                  onSelect={setActiveTab} /></>;
+                                  onSelect={setActiveTab} />;
                           })() : null}
                           {activeTab === "social" ? <Card><CustomSocialEditor data={preview} onChange={(value: ProfileAppearance) => { rootSettings.fakeProfile = { ...preview, ...value, syncRevision: Date.now() }; preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw(); }} resolveUser={async (id: string) => {
                               let shared = sharedProfiles.get(id);
