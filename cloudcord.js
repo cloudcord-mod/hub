@@ -25311,8 +25311,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       if (module.__filePath === "modules/message_previews/useLatestChannelMessage.tsx") {
         addPatch("default", exports, (args, original) => presentationIdentity(original(...args)));
       }
-      if (module.__filePath === "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelAvatar.tsx") {
-        addPatch("type", exports?.default, (args, original) => {
+    }
+    var dmAvatarRenderers = /* @__PURE__ */ new WeakMap();
+    onJsxCreate("MessagesItemChannelAvatar", (renderAvatar, rendered) => {
+      var Wrapper = dmAvatarRenderers.get(renderAvatar);
+      if (!Wrapper) {
+        Wrapper = function CloudCordDmAvatar(props) {
           var [, refresh] = (0, import_react7.useReducer)((value) => value + 1, 0);
           (0, import_react7.useEffect)(() => {
             var update = () => refresh();
@@ -25321,20 +25325,28 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               identityRefreshers.delete(update);
             };
           }, []);
-          var element = original(...args);
-          if (args[0]?.channel?.type !== 1 || !/* @__PURE__ */ (0, import_react7.isValidElement)(element))
+          var element = renderAvatar(props);
+          if (props.channel?.type !== 1 || !/* @__PURE__ */ (0, import_react7.isValidElement)(element))
             return element;
-          var props = element.props;
-          var user = presentationIdentity(props.user);
-          if (!user || user === props.user)
+          var id = String(element.props.user?.id || "");
+          if (!id || isRealProfileView(id))
             return element;
-          return /* @__PURE__ */ (0, import_react7.cloneElement)(element, {
-            user,
-            avatarDecoration: user.avatarDecoration
-          });
-        });
+          if (!isCurrentUser(id))
+            requestSharedProfile(id);
+          var uri = isCurrentUser(id) ? preview.enabled ? mediaUri("avatarMedia") : "" : getProfileOverride(id)?.avatar;
+          return uri ? /* @__PURE__ */ (0, import_react7.cloneElement)(element, {
+            source: {
+              uri
+            }
+          }) : element;
+        };
+        dmAvatarRenderers.set(renderAvatar, Wrapper);
       }
-    }
+      return {
+        ...rendered,
+        type: Wrapper
+      };
+    });
     var rowManager = findByName("RowManager");
     var channelNames2 = findByProps("computeChannelName", "useComputedGroupDmName");
     addPatch("default", channelNames2, (args, original) => {
@@ -75045,7 +75057,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "17629cce8cc753757896c0242d086f40f8c3dc22";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8c68af6142af439140593313be7dc019058ff038";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
