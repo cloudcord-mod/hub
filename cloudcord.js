@@ -24637,21 +24637,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     } catch (e) {
     }
   }
-  function openCloudCordBadgeLabel(label2, uri) {
-    var module = Object.values(metroModules).find((item) => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
-    var toast = module?.publicModule?.exports?.default;
-    if (typeof toast?.open === "function") {
-      toast.open("PROFILE_BADGE-" + label2, {
-        text: label2,
-        icon: {
-          type: "image",
-          src: uri,
-          alt: label2
-        }
-      });
-    } else {
-      showToast(label2);
-    }
+  function openCloudCordBadgeLabel(label2) {
+    import_react_native27.Alert.alert(label2);
   }
   function connectBadgeRenderer() {
     onJsxCreate("BadgeSection", (_component, rendered) => {
@@ -24672,7 +24659,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         },
         ...props.badges
       ];
-      props.onPressBadge = (badge) => badge?.badge_id === staff.id ? openCloudCordBadgeLabel(staff.label, staff.icon) : nativePress(badge);
+      props.onPressBadge = (badge) => badge?.badge_id === staff.id ? openCloudCordBadgeLabel(staff.label) : nativePress(badge);
     });
     onJsxCreate("ProfileBadgeRows", (_component, rendered) => {
       var props = rendered.props;
@@ -24780,7 +24767,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   tintColor: props.tintColor
                 }
               });
-              var openLabel = () => openCloudCordBadgeLabel(label2, props.source.uri);
+              var openLabel = () => openCloudCordBadgeLabel(label2);
               return /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: label2,
@@ -75154,7 +75141,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "078c567975fff04f0e7ae9b8a3f668c18c86065a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "73fb4056937307afa4bea2eb272b111f3b9f5f09";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
