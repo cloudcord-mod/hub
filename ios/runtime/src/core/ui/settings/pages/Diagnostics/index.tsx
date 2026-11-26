@@ -11,7 +11,7 @@ import { Button, Stack, TableRow, TableRowGroup, TableSwitchRow, Text, TextInput
 import { getSafeModuleCompatibilityReport } from "@metro/internals/modules";
 import { showToast } from "@ui/toasts";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Image, Pressable, ScrollView, View } from "react-native";
 
 type RequestEvent = {
     id: number;
@@ -267,14 +267,18 @@ export default function Diagnostics() {
     return <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 48 }}>
         <Stack style={{ paddingVertical: 24, paddingHorizontal: 12 }} spacing={24}>
             <TableRowGroup title="Runtime diagnostics">
-                <TableRow label="Test Welcome Message" subLabel={welcomeStatus || "Preview the welcome DM on this device"} onPress={() => {
+                <TableRow label="Test Welcome Message" subLabel={welcomeStatus ? "Hide preview" : "Preview the welcome message on this device"} onPress={() => {
                     try {
-                        const channelId = require("@core/ui/settings/pages/FakeProfile").testMobileWelcome();
-                        setWelcomeStatus(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
+                        setWelcomeStatus(welcomeStatus ? "" : require("@core/ui/settings/pages/FakeProfile").mobileWelcomeCopy);
                     } catch {
-                        setWelcomeStatus("Couldn’t prepare the welcome DM");
+                        setWelcomeStatus("Couldn’t load the welcome preview");
                     }
                 }} />
+                {!!welcomeStatus && <Stack style={{ padding: 12 }} spacing={8}>
+                    <Image source={{ uri: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png" }}
+                        style={{ width: "100%", aspectRatio: 1672 / 940 }} resizeMode="contain" accessibilityLabel="CloudCord welcome banner" />
+                    <Text variant="text-sm/normal">{welcomeStatus.replace(/^#{2,3} /gm, "").replace(/\*\*/g, "")}</Text>
+                </Stack>}
                 <TableSwitchRow
                     label="Intercept CloudCord events"
                     subLabel="Records sanitized runtime, UI, and request timing metadata only"

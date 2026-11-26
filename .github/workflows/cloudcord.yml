@@ -3746,33 +3746,6 @@ jobs:
               }
           }
 
-          function deliverMobileWelcome(test = false) {
-              if (!fakeMessages || !currentUserId || AppState.currentState !== "active") return;
-              const list = savedConversations();
-              const existing = list.find(item => item.id === "cloudcord-welcome-demo");
-              if (existing) {
-                  if (test) fakeMessages.show(existing.channelId);
-                  return existing.channelId;
-              }
-              if (!test && (settings as any).cloudcordWelcomeDmCreated) return;
-              const channelId = newLocalChannelId();
-              saveConversations([...list, {
-                  id: "cloudcord-welcome-demo",
-                  name: "CloudCord welcome",
-                  channelId,
-                  dm: { person: "discord-demo", local: true },
-                  people: [{ key: "discord-demo", userId: "643945264868098049" }],
-                  lines: [{ key: "welcome", person: "discord-demo", minutesAgo: 0, text: mobileWelcomeCopy }],
-                  savedAt: Date.now(),
-              }]);
-              (settings as any).cloudcordWelcomeDmCreated = true;
-              fakeMessages.show(channelId);
-              return channelId;
-          }
-
-          export function testMobileWelcome() {
-              return deliverMobileWelcome(true);
-          }
           // Store lookups that miss scan every module on mobile, so each store is searched at most twice.
           let orbSearches = 0;
           function installOrbHooks() {
@@ -4213,7 +4186,7 @@ jobs:
           }
           // ---- Fake messages (device only) ----
           let fakeMessages: ReturnType<typeof installFakeMessages> | null = null;
-          const mobileWelcomeCopy = [
+          export const mobileWelcomeCopy = [
               "## Welcome to CloudCord",
               "Thanks for installing CloudCord! Here’s where to find everything and what to check if you get stuck.",
               "### Find CloudCord on mobile\n\nOpen Discord, tap your profile tab, then tap the settings gear. Scroll down until you see **CloudCord**.",
@@ -4224,17 +4197,10 @@ jobs:
           ].join("\n\n");
           function savedConversations(): FakeConversation[] {
               const list = (rootSettings as any).fakeMessages;
-              return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean).map((item: FakeConversation) => {
-                  if (item.id !== "cloudcord-welcome-demo") return item;
-                  return {
-                      ...item,
-                      name: "CloudCord welcome",
-                      people: item.people.map(person => person.key === "discord-demo" ? { key: person.key, userId: "643945264868098049" } : person),
-                      lines: item.lines.filter(line => line.key !== "welcome-banner").flatMap(line => line.key === "welcome"
-                          ? [{ ...line, key: "welcome-banner", text: "", showWelcomeBanner: true }, { ...line, text: mobileWelcomeCopy, showWelcomeBanner: false }]
-                          : [line]),
-                  };
-              });
+              // A saved welcome channel must never be replayed into Discord's DM stores.
+              return (Array.isArray(list) ? list : [])
+                  .filter(item => item?.id !== "cloudcord-welcome-demo")
+                  .map(normalizeConversation).filter(Boolean) as FakeConversation[];
           }
           function saveConversations(list: FakeConversation[]) {
               (rootSettings as any).fakeMessages = list.map(normalizeConversation).filter(Boolean);
@@ -4487,10 +4453,10 @@ jobs:
                       for (const step of [installGiftHook, installBoostHooks, applyFakeNitro]) { try { step(); } catch {} }
                       // One late retry for stores that load after startup. A miss scans every module on mobile, so no polling.
                       installOrbPreviewPanels();
-                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook, deliverMobileWelcome]) { try { step(); } catch {} } }, 15000);
+                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook]) { try { step(); } catch {} } }, 15000);
                       const restoreLater = () => setTimeout(() => { try { restoreFakeRequests(); } catch {} }, 1500);
                       restoreLater();
-                      try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); setTimeout(() => { try { deliverMobileWelcome(); } catch {} }, 1500); }); } catch {}
+                      try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); }); } catch {}
                       try { FluxDispatcher.subscribe("CURRENT_USER_UPDATE", () => { try { applyFakeNitro(); } catch {} }); } catch {}
                       for (const type of ["COLLECTIBLES_SHOP_OPEN","COLLECTIBLES_PRODUCT_DETAILS_OPEN","COLLECTIBLES_SHOP_HOME_FETCH","SKU_PURCHASE_MODAL_OPEN","PREMIUM_PAYMENT_MODAL_OPEN"]) { try { FluxDispatcher.subscribe(type, pauseForShop); } catch {} }
                       for (const type of ["SKU_PURCHASE_MODAL_CLOSE","SKU_PURCHASE_SUCCESS","PREMIUM_PAYMENT_MODAL_CLOSED","CHANNEL_SELECT"]) { try { FluxDispatcher.subscribe(type, resumeAfterShop); } catch {} }
@@ -4503,7 +4469,6 @@ jobs:
                       AppState.addEventListener("change", state => {
                           if (state !== "active") return;
                           void refreshPublishedBadges(true);
-                          try { deliverMobileWelcome(); } catch {}
                       });
                       if (!sharedSyncTimer) sharedSyncTimer = setInterval(() => {
                           if (AppState.currentState !== "active") return;
