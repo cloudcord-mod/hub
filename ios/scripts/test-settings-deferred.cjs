@@ -9,8 +9,10 @@ const patcher = require('spitroast');
 
 // Execute real settings code with modules that become available only when
 // Discord opens settings. A startup-only finder can never pass this fixture.
-for (const platform of ['android', 'ios']) for (const version of ['352.17', '354.12']) for (const delayed of [false, true]) {
+for (const platform of ['android', 'ios']) for (const version of ['352.17', '354.12', '355.0', '']) for (const delayed of [false, true]) {
   for (const screenKind of ['memo-sections', 'default-node', 'named-node']) {
+    const fallback = version === '355.0' || version === '';
+    const root = fallback ? [{ settings: ['ACCOUNT_SETTINGS'] }, { settings: ['NOTIFICATIONS', 'ACCESSIBILITY'] }] : [{ settings: ['ACCOUNT'] }];
     for (const readonlyNamespace of [false, true]) {
         const rows = { CloudCord: [{ key: 'CLOUDCORD', title: () => 'Overview', render: async () => ({ default: () => null }) }] };
         const nativeTable = { ACCOUNT: { type: 'route' } };
@@ -23,7 +25,7 @@ for (const platform of ['android', 'ios']) for (const version of ['352.17', '354
         // passes its memoized createList result to SearchableSettingsList.node.
         // Build the list before patching, as happens when settings was mounted
         // before CloudCord finished starting. Hooking createList alone misses it.
-        const cachedNode = lists[0].createList({ sections: [{ settings: ['ACCOUNT'] }] });
+        const cachedNode = lists[0].createList({ sections: root });
         function SettingsOverviewScreen() {
             return { props: screenKind === 'memo-sections' ? cachedNode : { node: cachedNode } };
         }
@@ -96,9 +98,7 @@ for (const platform of ['android', 'ios']) for (const version of ['352.17', '354
         // Actual Android 352 list props, cached before injection; frozen like
         // a compiler-owned node. Both component references use the lightweight
         // cached-list path, while recursive list/overview hooks stay disabled.
-        const frozenNode = Object.freeze({ sections: Object.freeze([
-            Object.freeze({ settings: Object.freeze(['ACCOUNT']) })
-        ]) });
+        const frozenNode = Object.freeze({ sections: Object.freeze(root.map(section => Object.freeze({ settings: Object.freeze(section.settings) }))) });
         const frozenProps = Object.freeze({ node: frozenNode });
         const direct = searchList.SearchableSettingsList(frozenProps);
         assert.equal(direct.sections[1]?.label, 'CloudCord', 'direct cached-list hook inserts without mutating native data');
@@ -106,23 +106,23 @@ for (const platform of ['android', 'ios']) for (const version of ['352.17', '354
         assert.equal(capturedSearchList(element.props).sections[1]?.label, 'CloudCord', 'cached list gets rows through one JSX hook');
         assert.equal(element.props.node.sections.filter(s => s.label === 'CloudCord').length, 1, 'JSX and component hooks do not duplicate sections');
         assert.equal(searchList.SearchableSettingsList(element.props), element.props.node, 'already prepared list props are reused without cloning');
-        assert.equal(frozenNode.sections.length, 1, 'native frozen node remains untouched');
+        assert.equal(frozenNode.sections.length, root.length, 'native frozen node remains untouched');
         const nested = { node: { sections: [{ settings: ['PRIVACY'] }] } };
         assert.equal(searchList.SearchableSettingsList(nested), nested.node, 'subpages do not receive root settings');
         for (const list of lists) {
             const config = Object.freeze({ sections: frozenNode.sections });
             for (let repeat = 0; repeat < 3; repeat++) {
                 const result = list.createList(config);
-                assert.equal(result.sections.filter(s => s.label === 'CloudCord').length, version === '354.12' ? 1 : 0,
+                assert.equal(result.sections.filter(s => s.label === 'CloudCord').length, version === '352.17' ? 0 : 1,
                     '354 has a root fallback for renamed renderers while 352 keeps its lightweight list hooks');
             }
-            assert.equal(config.sections.length, 1, 'the root fallback leaves native configs untouched');
+            assert.equal(config.sections.length, root.length, 'the root fallback leaves native configs untouched');
             assert.deepEqual(list.createList({ sections: nested.node.sections }), nested.node, 'the fallback leaves subpages alone');
         }
         for (let render = 0; render < 3; render++) {
             const output = screenParent[screenKey]();
             const sections = output.props.node?.sections ?? output.props.sections;
-            assert.equal(sections.filter(s => s.label === 'CloudCord').length, 0, screenKind + ': overview render is not recursively patched');
+            assert.equal(sections.filter(s => s.label === 'CloudCord').length, fallback ? 1 : 0, screenKind + ': overview fallback only runs for newer or unknown versions');
         }
         assert.throws(() => lateRecord.factory(), /native factory failure/, 'native errors must not be swallowed');
         cleanups.forEach(fn => fn());

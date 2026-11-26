@@ -211,6 +211,8 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
         visit(root, 0);
     };
 
+    const settingsVersion = getSettingsVersion();
+    const useRootShapeFallback = settingsVersion >= 355 || !Number.isFinite(settingsVersion);
     const patchedRenderers = new WeakSet<object>();
     const patchedLists = new WeakSet<object>();
     const patchedScreens = new WeakSet<object>();
@@ -219,8 +221,17 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
     // the overview function itself may already have been captured by navigation.
     const prepareRootList = (node: any) => {
         const sections = node?.sections;
-        if (!Array.isArray(sections) || !sections.some(section => section?.settings?.includes?.("ACCOUNT"))) return node;
-        if (sections.some(section => section?.label === "CloudCord")) return node;
+        if (!Array.isArray(sections)) return node;
+        const sectionsContain = (match: (key: string) => boolean) => sections.some(section =>
+            Array.isArray(section?.settings) && section.settings.some((key: unknown) => typeof key === "string" && match(key)));
+        const hasAccount = sectionsContain(key => key === "ACCOUNT");
+        // When the account route is renamed, require independent root sections.
+        // Account, Notifications and Accessibility are separate overview routes.
+        const hasRootShape = useRootShapeFallback
+            && sectionsContain(key => /^(?:MY_ACCOUNT|ACCOUNT_SETTINGS|SETTINGS_ACCOUNT)$/.test(key))
+            && sectionsContain(key => /^(?:SETTINGS_)?NOTIFICATIONS(?:_SETTINGS)?$/.test(key))
+            && sectionsContain(key => /^(?:SETTINGS_)?ACCESSIBILITY(?:_SETTINGS)?$/.test(key));
+        if ((!hasAccount && !hasRootShape) || sections.some(section => section?.label === "CloudCord")) return node;
         const copy = sections.map(section => ({ ...section,
             ...(Array.isArray(section?.settings) ? { settings: [...section.settings] } : {})
         }));
@@ -229,7 +240,8 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
     };
     const prepareListProps = (props: any) => {
         const node = prepareRootList(props?.node);
-        return node === props?.node ? props : { ...props, node };
+        if (node !== props?.node) return { ...props, node };
+        return useRootShapeFallback ? prepareRootList(props) : props;
     };
     const listJsx = (_component: any, element: any) => ({ ...element, props: prepareListProps(element.props) });
     onJsxCreate("SearchableSettingsList", listJsx);
@@ -350,6 +362,14 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
             key = typeof parent?.type === "function" ? "type" : "render";
         }
         if (!parent || typeof parent[key] !== "function" || patchedScreens.has(parent)) return;
+        if (useRootShapeFallback) {
+            unpatches.push(after(key, parent, (_, result) => {
+                const props = prepareListProps(result?.props);
+                return props === result?.props ? result : { ...result, props };
+            }));
+            patchedScreens.add(parent);
+            return;
+        }
         unpatches.push(before(key, parent, args => {
             args.forEach(insertCloudCordSectionsInTree);
             return args;
@@ -363,9 +383,8 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
         patchedScreens.add(parent);
     };
 
-    const settingsVersion = getSettingsVersion();
     const cachedSettingsList = settingsVersion >= 352;
-    const patchRootList = settingsVersion >= 354;
+    const patchRootList = settingsVersion >= 354 || useRootShapeFallback;
     unpatches.push(observeSettingsModules((exports, path) => {
         // Match exports only after their factory succeeded. Each hook is
         // independent, so a frozen namespace cannot disable the other hooks.
@@ -386,7 +405,7 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
             catch (error) { console.warn("CloudCord direct settings list patch failed", error); }
         }
         // Cached settings lists use the direct root hooks above.
-        if (cachedSettingsList) return;
+        if (cachedSettingsList && !useRootShapeFallback) return;
         const screen = exports?.SettingsOverviewScreen ?? exports?.default;
         if (path?.endsWith("/SettingsOverviewScreen.tsx") ||
             [screen?.name, screen?.displayName, screen?.type?.name, screen?.render?.name].includes("SettingsOverviewScreen")) {
