@@ -12399,10 +12399,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   // src/lib/ui/alerts.ts
   var alerts_exports = {};
   __export(alerts_exports, {
-    dismissAlert: () => dismissAlert2,
-    openAlert: () => openAlert2
+    dismissAlert: () => dismissAlert,
+    openAlert: () => openAlert
   });
-  var openAlert2, dismissAlert2;
+  var openAlert, dismissAlert;
   var init_alerts = __esm({
     "src/lib/ui/alerts.ts"() {
       "use strict";
@@ -12410,7 +12410,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       init_promiseAllSettled();
       init_lazy();
       init_metro();
-      ({ openAlert: openAlert2, dismissAlert: dismissAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ openAlert, dismissAlert } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
     }
   });
 
@@ -12594,7 +12594,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                     to,
                     reload: false
                   });
-                  openAlert2("bunny-reload-safe-mode", /* @__PURE__ */ jsx(AlertModal, {
+                  openAlert("bunny-reload-safe-mode", /* @__PURE__ */ jsx(AlertModal, {
                     title: "Reload now?",
                     content: !to ? "All add-ons will load normally." : "All add-ons will be temporarily disabled upon reload.",
                     actions: /* @__PURE__ */ jsxs(AlertActions, {
@@ -15752,7 +15752,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         showWelcomeBanner: true
       } : {},
       minutesAgo: Math.max(0, Math.min(60 * 24 * 365, Number(line?.minutesAgo) || 0))
-    })).filter((line) => keys.has(line.person) && line.text.trim());
+    })).filter((line) => keys.has(line.person) && (line.text.trim() || line.showWelcomeBanner));
     var dm = input.dm && keys.has(String(input.dm.person)) ? {
       person: String(input.dm.person),
       local: input.dm.local === true
@@ -15897,7 +15897,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             {
               type: "image",
               image: {
-                url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/logo-full.png"
+                url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png",
+                width: 1672,
+                height: 940
               }
             }
           ] : [],
@@ -26122,135 +26124,42 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ])
       _loop2(name, inventory);
   }
-  function showMobileWelcome() {
-    var key = "cloudcord-mobile-welcome";
-    if (settings.cloudcordMobileWelcomeSeen || import_react_native27.AppState.currentState !== "active")
+  function deliverMobileWelcome() {
+    if (!fakeMessages || !currentUserId || import_react_native27.AppState.currentState !== "active")
       return;
-    var close = () => dismissAlert(key);
-    openAlert(key, /* @__PURE__ */ jsxs(import_react_native27.View, {
-      style: {
-        width: 360,
-        maxWidth: "92%",
-        borderRadius: 20,
-        backgroundColor: "#171b25",
-        padding: 20,
-        gap: 12
-      },
-      children: [
-        /* @__PURE__ */ jsxs(import_react_native27.View, {
-          style: {
-            backgroundColor: "#0b1020",
-            borderRadius: 14,
-            padding: 14,
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 12
-          },
-          children: [
-            /* @__PURE__ */ jsx(import_react_native27.Image, {
-              source: {
-                uri: CLOUDCORD_BADGE_ICON
-              },
-              accessibilityLabel: "CloudCord logo",
-              resizeMode: "contain",
-              style: {
-                width: 46,
-                height: 46
-              }
-            }),
-            /* @__PURE__ */ jsx(Text, {
-              variant: "heading-lg/semibold",
-              style: {
-                color: "#fff",
-                flex: 1
-              },
-              children: "Thanks for installing CloudCord!"
-            })
-          ]
-        }),
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-md/medium",
-          style: {
-            color: "#e3e7ef"
-          },
-          children: "In Discord, open your profile tab, tap Settings, and scroll to CloudCord."
-        }),
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-sm/medium",
-          style: {
-            color: "#c6cfdf"
-          },
-          children: "Profile Studio changes your look. Add-ons is where you\u2019ll find plugins, themes, and fonts."
-        }),
-        /* @__PURE__ */ jsx(Text, {
-          variant: "text-sm/medium",
-          style: {
-            color: "#c6cfdf"
-          },
-          children: "Join our Discord and check #faq before asking for help."
-        }),
-        /* @__PURE__ */ jsx(Button2, {
-          size: "sm",
-          variant: "primary",
-          text: "Join the CloudCord server",
-          onPress: () => void import_react_native27.Linking.openURL("https://discord.gg/cloudcord").catch(() => showToast("Couldn\u2019t open the invite"))
-        }),
-        /* @__PURE__ */ jsx(Button2, {
-          size: "sm",
-          variant: "secondary",
-          text: "Add simulated welcome DM",
-          onPress: () => {
-            if (!fakeMessages)
-              return;
-            var list = savedConversations();
-            var existing = list.find((item) => item.id === "cloudcord-welcome-demo");
-            if (existing) {
-              fakeMessages.show(existing.channelId);
-              close();
-              return;
-            }
-            var channelId = newLocalChannelId();
-            saveConversations([
-              ...list,
-              {
-                id: "cloudcord-welcome-demo",
-                name: "CloudCord welcome",
-                channelId,
-                dm: {
-                  person: "discord-demo",
-                  local: true
-                },
-                people: [
-                  {
-                    key: "discord-demo",
-                    userId: "643945264868098049"
-                  }
-                ],
-                lines: [
-                  {
-                    key: "welcome",
-                    person: "discord-demo",
-                    minutesAgo: 0,
-                    showWelcomeBanner: true,
-                    text: "**Simulated welcome DM**\n\nThanks for installing CloudCord!\n\nOpen Discord Settings and scroll to **CloudCord**. Join the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking for help."
-                  }
-                ],
-                savedAt: Date.now()
-              }
-            ]);
-            fakeMessages.show(channelId);
-            close();
+    var list = savedConversations();
+    if (settings.cloudcordWelcomeDmCreated || list.some((item) => item.id === "cloudcord-welcome-demo"))
+      return;
+    var channelId = newLocalChannelId();
+    saveConversations([
+      ...list,
+      {
+        id: "cloudcord-welcome-demo",
+        name: "CloudCord welcome",
+        channelId,
+        dm: {
+          person: "discord-demo",
+          local: true
+        },
+        people: [
+          {
+            key: "discord-demo",
+            userId: "643945264868098049"
           }
-        }),
-        /* @__PURE__ */ jsx(Button2, {
-          size: "sm",
-          variant: "secondary",
-          text: "Got it",
-          onPress: close
-        })
-      ]
-    }));
-    settings.cloudcordMobileWelcomeSeen = true;
+        ],
+        lines: [
+          {
+            key: "welcome",
+            person: "discord-demo",
+            minutesAgo: 0,
+            text: mobileWelcomeCopy
+          }
+        ],
+        savedAt: Date.now()
+      }
+    ]);
+    settings.cloudcordWelcomeDmCreated = true;
+    fakeMessages.show(channelId);
   }
   function installOrbHooks() {
     if (orbHooked.currency && orbHooked.wallet || orbSearches++ > 1)
@@ -27476,7 +27385,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         people: item.people.map((person) => person.key === "discord-demo" ? {
           key: person.key,
           userId: "643945264868098049"
-        } : person)
+        } : person),
+        lines: item.lines.filter((line) => line.key !== "welcome-banner").flatMap((line) => line.key === "welcome" ? [
+          {
+            ...line,
+            key: "welcome-banner",
+            text: "",
+            showWelcomeBanner: true
+          },
+          {
+            ...line,
+            text: mobileWelcomeCopy,
+            showWelcomeBanner: false
+          }
+        ] : [
+          line
+        ])
       };
     });
   }
@@ -28327,7 +28251,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           for (var step2 of [
             installOrbHooks,
             installSwitcherHook,
-            showMobileWelcome
+            deliverMobileWelcome
           ]) {
             try {
               step2();
@@ -28350,6 +28274,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             } catch (e) {
             }
             restoreLater();
+            setTimeout(() => {
+              try {
+                deliverMobileWelcome();
+              } catch (e) {
+              }
+            }, 1500);
           });
         } catch (e) {
         }
@@ -28408,7 +28338,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             return;
           void refreshPublishedBadges(true);
           try {
-            showMobileWelcome();
+            deliverMobileWelcome();
           } catch (e) {
           }
         });
@@ -32058,7 +31988,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       })
     });
   }
-  var import_react7, import_react_native27, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbPreviews, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
+  var import_react7, import_react_native27, EXPERIMENTAL_BADGE_GROUPS, EVENT_BADGES, EXTRA_BADGES, BADGES, GIFT_LEVELS, CLOUDCORD_BADGE_ICON, CLOUDCORD_STAFF_ROLES, useBadgesModule2, useUserProfileModule, useDisplayProfileModule, badgeRenderProps, simpleSheets, LinearGradient, NITRO_DURATIONS, BOOST_DURATIONS, NITRO_ICONS, NITRO_LABELS, BOOST_ICONS, BOOST_ICON_BY_MONTHS, rootSettings, defaultPreview, preview, configReady, initPromise, realCordSyncTimer, realCordManagedPlugins, realCordConfigFingerprint, REALCORD_NITRO_MONTHS, diagnostics, initialized, currentUserId, realCurrentUser, readNativeProfile, readNativePresence, userCache, profileCache, SHARED_PROFILE_API, sharedProfiles, sharedProfileFetchedAt, sharedRequests, publishTimer, sharedSyncTimer, fakeProfileEditorOpen, suppressOwnPullUntil, mediaSelections, REPLACE_BADGES_SYNC_ID, activeMobileTemplate, profileSyncFeedback, profileSyncRetry, profileSyncListeners, sharedProfileSeenAt, SHARED_RECENT_PROFILE_LIMIT, SHARED_PROFILE_CACHE_LIMIT, sharedRenderTimer, realProfileMenuConnected, checkingPrivacy, mergedOverrides, sharedUserPresentation, sharedDecorations, collectiblesCatalog, collectiblesRequest, collectiblesGeneration, decorationRequest, publishedBadges, publishedBadgeRequest, publishedBadgeFetchedAt, nativeBadgeRows, NATIVE_BADGE_IDS, DIRECTORY_BADGE_IDS, BOOST_MONTHS, DIRECTORY_ONLY_BADGES, shortDate, ACTIVITY_BADGES, ACTIVITY_ICON_HASHES, originalProfileBadges, restoredProfileBadges, KNOWN_BADGE_INFO, nativeBadgeDirectories, badgeDirectoryReplays, queuedBadgeDirectoryReplays, nativeBadgeHooksInstalled, identityRefreshers, identityRenderers, socialRenderers, socialWrapperTypes, EXTRAS_KEY, NITRO_APP_ID, NITRO_SKU, NITRO_BASIC_SKU, GIFT_PLANS, GIFT_STYLES, fakeRequestIds, localRequestActions, ownedNitroOverride, shopPaused, shopResumeTimer, resumeAfterShop, pauseForShop, rememberTheme, themeTimer, restoreKeptTheme, fakeNitroActive, currentUserNitroHooked, giftHookInstalled, rawUser, guildOverlays, overlaySet, featureCache, boostHooksInstalled, orbHooked, fakeOrbCount, orbPreviews, orbSearches, switcherHooked, switcherSearches, fakeMemberCache, listCache, ownerRowCache, countCache, hexNumber, visualRoleCache, visualRoleLists, roleHooksInstalled, leavingServers, fakeMessages, mobileWelcomeCopy, NamePreviewBoundary, SHARE_VISIBILITIES, shareLink, shareCodeFrom, TEMPLATE_CATEGORIES, countTemplateUse, DISCORD_BADGE_FLAGS, PROFILE_COLORS;
   var init_FakeProfile = __esm({
     "src/core/ui/settings/pages/FakeProfile/index.tsx"() {
       "use strict";
@@ -33292,6 +33222,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       roleHooksInstalled = false;
       leavingServers = false;
       fakeMessages = null;
+      mobileWelcomeCopy = [
+        "## Welcome to CloudCord",
+        "Thanks for installing CloudCord! Here\u2019s where to find everything and what to check if you get stuck.",
+        "### Find CloudCord on mobile\n\nOpen Discord, tap your profile tab, then tap the settings gear. Scroll down until you see **CloudCord**.",
+        "- **Profile Studio** is where you can change your display name, profile picture, banner, badges, and more. Open your profile after editing to see how it looks.\n- **Add-ons** is where you\u2019ll find plugins, themes, and fonts. Open **Plugins \u2192 Community Plugins** to see our featured picks.\n- **CloudSync** lets you share your custom profile with other CloudCord users. If you want your edits to stay on one device, use the device-only option.",
+        "### Need help?\n\nJoin the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking. If you\u2019re reporting a bug, include your device, your Discord version, and what you were doing when it happened. A screenshot or the exact error helps us figure it out faster.",
+        "Have an idea for CloudCord? Drop it in suggestions. If it\u2019s a plugin or theme, tell us what you want it to do and whether you\u2019d use it on mobile, desktop, or both.",
+        "Thanks for being here. Enjoy making Discord your own."
+      ].join("\n\n");
       NamePreviewBoundary = /* @__PURE__ */ function(Component2) {
         "use strict";
         _inherits(NamePreviewBoundary2, Component2);
@@ -34243,7 +34182,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var [isFetching, setIsFetching] = (0, import_react8.useState)(false);
     function onConfirmWrapper() {
       setIsFetching(true);
-      props.fetchFn(value).then(() => dismissAlert2("AddonInputAlert")).catch((e) => e instanceof Error ? setError(e.message) : String(e)).finally(() => setIsFetching(false));
+      props.fetchFn(value).then(() => dismissAlert("AddonInputAlert")).catch((e) => e instanceof Error ? setError(e.message) : String(e)).finally(() => setIsFetching(false));
     }
     return /* @__PURE__ */ jsx(AlertModal, {
       title: props.label,
@@ -34368,7 +34307,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         };
       var { label: label2, onPress, fetchFn } = props.installAction;
       if (fetchFn) {
-        openAlert2("AddonInputAlert", /* @__PURE__ */ jsx(InputAlert2, {
+        openAlert("AddonInputAlert", /* @__PURE__ */ jsx(InputAlert2, {
           label: label2 ?? "Install",
           fetchFn
         }));
@@ -65264,7 +65203,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var alertKey = tags ? "cloudcord-cx-user-tags" : channel ? "cloudcord-cx-channel-note" : "cloudcord-cx-user-note";
     var edit = (initial, save) => {
       var draft = initial;
-      openAlert2(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
+      openAlert(alertKey, /* @__PURE__ */ jsx(AlertModal5, {
         title: label2,
         extraContent: /* @__PURE__ */ jsx(import_react_native29.TextInput, {
           accessibilityLabel: tags ? "Private tags" : "Private note",
@@ -65286,13 +65225,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             /* @__PURE__ */ jsx(AlertActionButton5, {
               text: "Cancel",
               variant: "secondary",
-              onPress: () => dismissAlert2(alertKey)
+              onPress: () => dismissAlert(alertKey)
             }),
             /* @__PURE__ */ jsx(AlertActionButton5, {
               text: "Save",
               variant: "primary",
               onPress: () => {
-                void save(draft).then(() => dismissAlert2(alertKey), failed);
+                void save(draft).then(() => dismissAlert(alertKey), failed);
               }
             })
           ]
@@ -65326,12 +65265,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             id,
             name: getCxChannelNoteLabel(id, ChannelStore?.getChannel?.(id), (user) => UserStore?.getUser?.(user)?.username, (guild) => GuildStore?.getGuild?.(guild)?.name)
           })).sort((a, b3) => a.name.localeCompare(b3.name));
-          openAlert2(browseKey, /* @__PURE__ */ jsx(AlertModal5, {
+          openAlert(browseKey, /* @__PURE__ */ jsx(AlertModal5, {
             title: "Saved channel notes",
             extraContent: /* @__PURE__ */ jsx(ChannelNotesPicker, {
               items,
               open: (id) => {
-                dismissAlert2(browseKey);
+                dismissAlert(browseKey);
                 void open(id, edit).catch(failed);
               }
             }),
@@ -65339,7 +65278,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               children: /* @__PURE__ */ jsx(AlertActionButton5, {
                 text: "Close",
                 variant: "secondary",
-                onPress: () => dismissAlert2(browseKey)
+                onPress: () => dismissAlert(browseKey)
               })
             })
           }));
@@ -67604,7 +67543,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         return;
       }
       var key = "plugin-catalog-install";
-      openAlert2(key, /* @__PURE__ */ jsx(AlertModal, {
+      openAlert(key, /* @__PURE__ */ jsx(AlertModal, {
         title: "Install " + addon.name + "?",
         content: addon.warningMessage || "The catalog reports this plugin as untested or potentially incompatible.",
         actions: /* @__PURE__ */ jsxs(AlertActions, {
@@ -67613,14 +67552,14 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               text: "Install",
               variant: "primary",
               onPress: () => {
-                dismissAlert2(key);
+                dismissAlert(key);
                 void change(addon, false);
               }
             }),
             /* @__PURE__ */ jsx(AlertActionButton2, {
               text: "Cancel",
               variant: "secondary",
-              onPress: () => dismissAlert2(key)
+              onPress: () => dismissAlert(key)
             })
           ]
         })
@@ -68486,7 +68425,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   // src/core/ui/settings/pages/Fonts/FontEditor.tsx
   function promptDetachConfirmationForThen(fontName, cb) {
     if (fontName && fonts[fontName].source)
-      openAlert3("revenge-fonts-detach-source-confirmation", /* @__PURE__ */ jsx(AlertModal3, {
+      openAlert2("revenge-fonts-detach-source-confirmation", /* @__PURE__ */ jsx(AlertModal3, {
         title: "Detach font pack URL?",
         content: "You need to detach the font pack URL from this font pack before you can manually edit its font entries. Do you want to detach the font pack URL?",
         actions: /* @__PURE__ */ jsxs(Stack, {
@@ -68928,7 +68867,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react9, import_react_native33, actionSheet2, openAlert3, AlertModal3, AlertActionButton3;
+  var import_react9, import_react_native33, actionSheet2, openAlert2, AlertModal3, AlertActionButton3;
   var init_FontEditor = __esm({
     "src/core/ui/settings/pages/Fonts/FontEditor.tsx"() {
       "use strict";
@@ -68950,7 +68889,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       import_react9 = __toESM(require_react());
       import_react_native33 = __toESM(require_react_native());
       actionSheet2 = findByPropsLazy("hideActionSheet");
-      ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ openAlert: openAlert2 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
       ({ AlertModal: AlertModal3, AlertActionButton: AlertActionButton3 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
     }
   });
@@ -70659,7 +70598,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         label: "Install a plugin",
         fetchFn: (url2) => _async_to_generator(function* () {
           if (!url2.startsWith(VD_PROXY_PREFIX) && !url2.startsWith(BUNNY_PROXY_PREFIX) && !settings.developerSettings) {
-            openAlert4("bunny-plugin-unproxied-confirmation", /* @__PURE__ */ jsx(AlertModal4, {
+            openAlert3("bunny-plugin-unproxied-confirmation", /* @__PURE__ */ jsx(AlertModal4, {
               title: "Hold On!",
               content: "You're trying to install a plugin from an unproxied external source. This means you're trusting the creator to run their code in this app without your knowledge. Are you sure you want to continue?",
               extraContent: /* @__PURE__ */ jsx(Card, {
@@ -70674,7 +70613,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     text: "Continue",
                     variant: "primary",
                     onPress: () => {
-                      VdPluginManager.installPlugin(url2).then(() => showToast(Strings.TOASTS_INSTALLED_PLUGIN, findAssetId("Check"))).catch((e) => openAlert4("bunny-plugin-install-failed", /* @__PURE__ */ jsx(AlertModal4, {
+                      VdPluginManager.installPlugin(url2).then(() => showToast(Strings.TOASTS_INSTALLED_PLUGIN, findAssetId("Check"))).catch((e) => openAlert3("bunny-plugin-install-failed", /* @__PURE__ */ jsx(AlertModal4, {
                         title: "Install Failed",
                         content: `Unable to install plugin from '${url2}':`,
                         extraContent: /* @__PURE__ */ jsx(Card, {
@@ -70704,7 +70643,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     });
   }
-  var import_react_native40, openAlert4, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
+  var import_react_native40, openAlert3, AlertModal4, AlertActions2, AlertActionButton4, isPluginRowEnabled, showDefaultRow, getPluginRowKey, searchPluginCommands, pluginFilters;
   var init_Plugins = __esm({
     "src/core/ui/settings/pages/Plugins/index.tsx"() {
       "use strict";
@@ -70733,7 +70672,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       import_react_native40 = __toESM(require_react_native());
       init_bunny();
       init_vendetta();
-      ({ openAlert: openAlert4 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
+      ({ openAlert: openAlert3 } = lazyDestructure(() => findByProps("openAlert", "dismissAlert")));
       ({ AlertModal: AlertModal4, AlertActions: AlertActions2, AlertActionButton: AlertActionButton4 } = lazyDestructure(() => findByProps("AlertModal", "AlertActions")));
       isPluginRowEnabled = (item) => "source" in item ? item.active : item.isEnabled();
       showDefaultRow = (item) => !("source" in item && item.alternate);
@@ -75527,7 +75466,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8382f241ca827b81aa7099a4e6371c56f62599a3";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "c2aa1c9dad44173f37ff21ed752c4884371afc7e";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
