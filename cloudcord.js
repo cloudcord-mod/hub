@@ -7574,7 +7574,43 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (cbs.length === 0)
       list.delete(Component2);
   }
+  function preserveAndroidListChildren(component, element) {
+    var props = element.props;
+    if (!props || typeof props.renderItem !== "function" || props.removeClippedSubviews === false)
+      return element;
+    var inner = component?.$$typeof === Symbol.for("react.memo") ? component.type : component;
+    var names = [
+      component?.displayName,
+      component?.name,
+      inner?.displayName,
+      inner?.name,
+      inner?.render?.displayName,
+      inner?.render?.name
+    ];
+    var list = names.some((name) => typeof name === "string" && (/^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name) || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
+    if (!list)
+      return element;
+    var count;
+    if (Array.isArray(props.data))
+      count = props.data.length;
+    else if (Array.isArray(props.sections) && props.sections.every((section) => Array.isArray(section?.data)))
+      count = props.sections.reduce((total, section) => total + section.data.length, 0);
+    if (count === void 0 || count > 256)
+      return element;
+    return {
+      ...element,
+      props: {
+        ...props,
+        removeClippedSubviews: false
+      }
+    };
+  }
   function patchJsx() {
+    var android = false;
+    try {
+      android = require_react_native()?.Platform?.OS === "android";
+    } catch (e) {
+    }
     var callback = ([Component2], ret) => {
       if (!ret || typeof ret !== "object")
         return;
@@ -7584,6 +7620,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           type: "RCTView"
         };
       }
+      var original = ret;
+      if (android)
+        ret = preserveAndroidListChildren(Component2, ret);
       var component = Component2;
       var inner = component?.$$typeof === Symbol.for("react.memo") ? component.type : component;
       var target = typeof inner === "function" ? inner : inner?.$$typeof === Symbol.for("react.forward_ref") && typeof inner.render === "function" ? inner.render : null;
@@ -7623,6 +7662,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         }
         return ret;
       }
+      if (ret !== original)
+        return ret;
     };
     var patches3 = [
       after("jsx", jsxRuntime2, callback),
@@ -7704,6 +7745,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var color = theme?.semantic?.BACKGROUND_PRIMARY?.value;
     var tint = typeof color === "string" && import_chroma_js2.default.valid(color) ? color : "black";
     var content = url2 && loaded === request ? tintMessageSurface(children, opacity, tint, direct) : children;
+    if (import_react_native4.Platform.OS === "android" && !request.source)
+      return /* @__PURE__ */ jsx(React2.Fragment, {
+        children
+      }, "messages");
     return /* @__PURE__ */ jsxs(import_react_native4.View, {
       style: styles.container,
       children: [
@@ -25285,7 +25330,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return;
     initialized = true;
     try {
-      installMentionAliases(findByProps("queryMentionResults", "queryChannelUsers", "queryGuildUsers"));
+      if (import_react_native27.Platform.OS !== "android")
+        installMentionAliases(findByProps("queryMentionResults", "queryChannelUsers", "queryGuildUsers"));
     } catch (error) {
       diagnostics.last = error?.message || "Could not connect mention autocomplete";
     }
@@ -75141,7 +75187,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "febcbf9be6e9773e79213e5977e26c123bd7dbec";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b83d425b7ceeb13afb3eb6345b07de8f5cfab50";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
