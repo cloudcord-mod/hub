@@ -3746,43 +3746,22 @@ jobs:
               }
           }
 
-          function showMobileWelcome() {
-              const key = "cloudcord-mobile-welcome";
-              if ((settings as any).cloudcordMobileWelcomeSeen || AppState.currentState !== "active") return;
-              const close = () => dismissAlert(key);
-              openAlert(key, <View style={{ width: 360, maxWidth: "92%", borderRadius: 20, backgroundColor: "#171b25", padding: 20, gap: 12 }}>
-                  <View style={{ backgroundColor: "#0b1020", borderRadius: 14, padding: 14, flexDirection: "row", alignItems: "center", gap: 12 }}>
-                      <Image source={{ uri: CLOUDCORD_BADGE_ICON }} accessibilityLabel="CloudCord logo" resizeMode="contain" style={{ width: 46, height: 46 }} />
-                      <Text variant="heading-lg/semibold" style={{ color: "#fff", flex: 1 }}>Thanks for installing CloudCord!</Text>
-                  </View>
-                  <Text variant="text-md/medium" style={{ color: "#e3e7ef" }}>In Discord, open your profile tab, tap Settings, and scroll to CloudCord.</Text>
-                  <Text variant="text-sm/medium" style={{ color: "#c6cfdf" }}>Profile Studio changes your look. Add-ons is where you’ll find plugins, themes, and fonts.</Text>
-                  <Text variant="text-sm/medium" style={{ color: "#c6cfdf" }}>Join our Discord and check #faq before asking for help.</Text>
-                  <Button size="sm" variant="primary" text="Join the CloudCord server" onPress={() => void Linking.openURL("https://discord.gg/cloudcord").catch(() => showToast("Couldn’t open the invite"))} />
-                  <Button size="sm" variant="secondary" text="Add simulated welcome DM" onPress={() => {
-                      if (!fakeMessages) return;
-                      const list = savedConversations();
-                      const existing = list.find(item => item.id === "cloudcord-welcome-demo");
-                      if (existing) { fakeMessages.show(existing.channelId); close(); return; }
-                      const channelId = newLocalChannelId();
-                      saveConversations([...list, {
-                          id: "cloudcord-welcome-demo",
-                          name: "CloudCord welcome",
-                          channelId,
-                          dm: { person: "discord-demo", local: true },
-                          people: [{ key: "discord-demo", userId: "643945264868098049" }],
-                          lines: [{
-                              key: "welcome", person: "discord-demo", minutesAgo: 0, showWelcomeBanner: true,
-                              text: "**Simulated welcome DM**\n\nThanks for installing CloudCord!\n\nOpen Discord Settings and scroll to **CloudCord**. Join the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking for help.",
-                          }],
-                          savedAt: Date.now(),
-                      }]);
-                      fakeMessages.show(channelId);
-                      close();
-                  }} />
-                  <Button size="sm" variant="secondary" text="Got it" onPress={close} />
-              </View>);
-              (settings as any).cloudcordMobileWelcomeSeen = true;
+          function deliverMobileWelcome() {
+              if (!fakeMessages || !currentUserId || AppState.currentState !== "active") return;
+              const list = savedConversations();
+              if ((settings as any).cloudcordWelcomeDmCreated || list.some(item => item.id === "cloudcord-welcome-demo")) return;
+              const channelId = newLocalChannelId();
+              saveConversations([...list, {
+                  id: "cloudcord-welcome-demo",
+                  name: "CloudCord welcome",
+                  channelId,
+                  dm: { person: "discord-demo", local: true },
+                  people: [{ key: "discord-demo", userId: "643945264868098049" }],
+                  lines: [{ key: "welcome", person: "discord-demo", minutesAgo: 0, text: mobileWelcomeCopy }],
+                  savedAt: Date.now(),
+              }]);
+              (settings as any).cloudcordWelcomeDmCreated = true;
+              fakeMessages.show(channelId);
           }
           // Store lookups that miss scan every module on mobile, so each store is searched at most twice.
           let orbSearches = 0;
@@ -4224,12 +4203,27 @@ jobs:
           }
           // ---- Fake messages (device only) ----
           let fakeMessages: ReturnType<typeof installFakeMessages> | null = null;
+          const mobileWelcomeCopy = [
+              "## Welcome to CloudCord",
+              "Thanks for installing CloudCord! Here’s where to find everything and what to check if you get stuck.",
+              "### Find CloudCord on mobile\n\nOpen Discord, tap your profile tab, then tap the settings gear. Scroll down until you see **CloudCord**.",
+              "- **Profile Studio** is where you can change your display name, profile picture, banner, badges, and more. Open your profile after editing to see how it looks.\n- **Add-ons** is where you’ll find plugins, themes, and fonts. Open **Plugins → Community Plugins** to see our featured picks.\n- **CloudSync** lets you share your custom profile with other CloudCord users. If you want your edits to stay on one device, use the device-only option.",
+              "### Need help?\n\nJoin the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking. If you’re reporting a bug, include your device, your Discord version, and what you were doing when it happened. A screenshot or the exact error helps us figure it out faster.",
+              "Have an idea for CloudCord? Drop it in suggestions. If it’s a plugin or theme, tell us what you want it to do and whether you’d use it on mobile, desktop, or both.",
+              "Thanks for being here. Enjoy making Discord your own.",
+          ].join("\n\n");
           function savedConversations(): FakeConversation[] {
               const list = (rootSettings as any).fakeMessages;
               return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean).map((item: FakeConversation) => {
                   if (item.id !== "cloudcord-welcome-demo") return item;
-                  return { ...item, name: "CloudCord welcome", people: item.people.map(person =>
-                      person.key === "discord-demo" ? { key: person.key, userId: "643945264868098049" } : person) };
+                  return {
+                      ...item,
+                      name: "CloudCord welcome",
+                      people: item.people.map(person => person.key === "discord-demo" ? { key: person.key, userId: "643945264868098049" } : person),
+                      lines: item.lines.filter(line => line.key !== "welcome-banner").flatMap(line => line.key === "welcome"
+                          ? [{ ...line, key: "welcome-banner", text: "", showWelcomeBanner: true }, { ...line, text: mobileWelcomeCopy, showWelcomeBanner: false }]
+                          : [line]),
+                  };
               });
           }
           function saveConversations(list: FakeConversation[]) {
@@ -4483,10 +4477,10 @@ jobs:
                       for (const step of [installGiftHook, installBoostHooks, applyFakeNitro]) { try { step(); } catch {} }
                       // One late retry for stores that load after startup. A miss scans every module on mobile, so no polling.
                       installOrbPreviewPanels();
-                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook, showMobileWelcome]) { try { step(); } catch {} } }, 15000);
+                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook, deliverMobileWelcome]) { try { step(); } catch {} } }, 15000);
                       const restoreLater = () => setTimeout(() => { try { restoreFakeRequests(); } catch {} }, 1500);
                       restoreLater();
-                      try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); }); } catch {}
+                      try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); setTimeout(() => { try { deliverMobileWelcome(); } catch {} }, 1500); }); } catch {}
                       try { FluxDispatcher.subscribe("CURRENT_USER_UPDATE", () => { try { applyFakeNitro(); } catch {} }); } catch {}
                       for (const type of ["COLLECTIBLES_SHOP_OPEN","COLLECTIBLES_PRODUCT_DETAILS_OPEN","COLLECTIBLES_SHOP_HOME_FETCH","SKU_PURCHASE_MODAL_OPEN","PREMIUM_PAYMENT_MODAL_OPEN"]) { try { FluxDispatcher.subscribe(type, pauseForShop); } catch {} }
                       for (const type of ["SKU_PURCHASE_MODAL_CLOSE","SKU_PURCHASE_SUCCESS","PREMIUM_PAYMENT_MODAL_CLOSED","CHANNEL_SELECT"]) { try { FluxDispatcher.subscribe(type, resumeAfterShop); } catch {} }
@@ -4499,7 +4493,7 @@ jobs:
                       AppState.addEventListener("change", state => {
                           if (state !== "active") return;
                           void refreshPublishedBadges(true);
-                          try { showMobileWelcome(); } catch {}
+                          try { deliverMobileWelcome(); } catch {}
                       });
                       if (!sharedSyncTimer) sharedSyncTimer = setInterval(() => {
                           if (AppState.currentState !== "active") return;

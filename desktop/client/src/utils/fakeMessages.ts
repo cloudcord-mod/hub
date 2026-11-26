@@ -80,7 +80,7 @@ export function normalizeConversation(input: any): FakeConversation | null {
         text: String(line?.text || "").slice(0, 4000),
         ...(input.id === "cloudcord-welcome-demo" && line?.showWelcomeBanner === true ? { showWelcomeBanner: true } : {}),
         minutesAgo: Math.max(0, Math.min(60 * 24 * 365, Number(line?.minutesAgo) || 0)),
-    })).filter((line: FakeLine) => keys.has(line.person) && line.text.trim());
+    })).filter((line: FakeLine) => keys.has(line.person) && (line.text.trim() || line.showWelcomeBanner));
     const dm = input.dm && keys.has(String(input.dm.person)) ? { person: String(input.dm.person), local: input.dm.local === true } : undefined;
     const savedAt = Number(input.savedAt) > 0 ? Number(input.savedAt) : undefined;
     return { id: String(input.id || newKey()), name: String(input.name || "Fake conversation").slice(0, 60), channelId: String(input.channelId), people, lines, ...(dm ? { dm } : {}), ...(savedAt ? { savedAt } : {}) };
@@ -160,7 +160,7 @@ export function installFakeMessages(options: FakeMessagesOptions) {
                     timestamp: new Date(time).toISOString(), edited_timestamp: null, flags: 0,
                     author: author(person), attachments: [], embeds: line.showWelcomeBanner ? [{
                         type: "image",
-                        image: { url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/logo-full.png" },
+                        image: { url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png", width: 1672, height: 940 },
                     }] : [], mentions: [], mention_roles: [],
                     mention_everyone: false, pinned: false, tts: false, components: [], cloudcordFake: true,
                 };
