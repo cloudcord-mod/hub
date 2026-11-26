@@ -80,6 +80,9 @@ const renderItem = () => null;
 const props = Object.freeze({ data, renderItem, removeClippedSubviews: true });
 const element = Object.freeze({ type: FlatList, key: 'list', props });
 assert.equal(patches.jsx([FlatList], element), undefined, 'iOS is unchanged');
+for (const component of [GifFavoritesGrid, MentionAutocompleteList]) {
+    assert.equal(patches.jsx([component], { ...element, type: component }).props.removeClippedSubviews, false);
+}
 platform = 'android';
 api.patchJsx();
 for (const component of [FlatList, GifFavoritesGrid, MentionAutocompleteList, MasonryFlashList,
@@ -98,4 +101,4 @@ assert.equal(patches.jsx([UnrelatedComponent], element), undefined);
 assert.equal(patches.jsx([FlatList], {type: FlatList, props: {...props, data: Array(257)}}), undefined);
 assert.equal(patches.jsx([FlatList], {type: FlatList, props: {...props, removeClippedSubviews: false}}), undefined);
 assert.equal(patches.jsx([FlatList], {type: FlatList, props: {data}}), undefined);
-console.log('PASS: Android bounded overlay-list clipping guard; iOS and large lists unchanged.');
+console.log('PASS: bounded GIF and mention list clipping guard on iOS and Android.');

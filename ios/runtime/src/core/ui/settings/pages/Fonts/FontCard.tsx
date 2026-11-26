@@ -29,15 +29,12 @@ export default function FontCard({ item: font }: CardWrapper<FontDefinition>) {
     return (
         <Card>
             <Stack spacing={16}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View>
-                        <Text variant="heading-lg/semibold">
+                <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
+                    <View style={{ flexGrow: 1, flexShrink: 1, minWidth: 120 }}>
+                        <Text variant="heading-md/semibold">
                             {font.name}
                         </Text>
-                        {/* TODO: Text wrapping doesn't work well */}
-                        {/* <Text color="text-muted" variant="text-sm/semibold">
-                            {font.description}
-                        </Text> */}
+                        {font.description ? <Text color="text-muted" variant="text-sm/medium">{font.description}</Text> : null}
                     </View>
                     <View style={{ marginLeft: "auto" }}>
                         <Stack spacing={12} direction="horizontal">

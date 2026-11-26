@@ -7,7 +7,7 @@ import isValidHttpUrl from "@lib/utils/isValidHttpUrl";
 import { lazyDestructure, proxyLazy } from "@lib/utils/lazy";
 import { findByProps } from "@metro";
 import { clipboard, NavigationNative } from "@metro/common";
-import { AlertActionButton, AlertModal, Button, FlashList, FloatingActionButton, IconButton, Stack, TableSwitchRow, Text, TextInput, useSafeAreaInsets } from "@metro/common/components";
+import { AlertActionButton, AlertModal, Button, FlashList, IconButton, Stack, Text, TextInput, useSafeAreaInsets } from "@metro/common/components";
 import { ErrorBoundary, Search } from "@ui/components";
 import { isNotNil } from "es-toolkit";
 import fuzzysort from "fuzzysort";
@@ -117,7 +117,7 @@ function InputAlert(props: { label: string, fetchFn: (url: string) => Promise<vo
 export default function AddonPage<T extends object>({ CardComponent, ...props }: AddonPageProps<T>) {
     const [search, setSearch] = useState("");
     const query = search.trim();
-    const [enabledOnly, setEnabledOnly] = useState(false);
+    const [status, setStatus] = useState<"All" | "Enabled" | "Disabled">("All");
     const [sort, setSort] = useState<string>();
     const sortFn = sort ? props.sortOptions?.[sort] : undefined;
     const defaultSortLabel = query ? "Relevance" : "Default order";
@@ -145,8 +145,8 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         const values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
         return values.filter(item => isNotNil(item) && typeof item === "object"
             && (!matchesFilter || matchesFilter(item))
-            && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
-    }, [props.items, props.resolveItem, props.isEnabled, enabledOnly, matchesFilter]);
+            && (status === "All" || !props.isEnabled || props.isEnabled(item) === (status === "Enabled")));
+    }, [props.items, props.resolveItem, props.isEnabled, status, matchesFilter]);
 
     const results = useMemo(() => {
         const matches = commandSearch
@@ -173,12 +173,12 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
         }
     }, []);
 
-    if (results.length === 0 && !query && !enabledOnly && !filter && !props.ListHeaderComponent) {
+    if (results.length === 0 && !query && status === "All" && !filter && !props.ListHeaderComponent && !props.items.length) {
         return <View style={{ gap: 32, flexGrow: 1, justifyContent: "center", alignItems: "center" }}>
             <View style={{ gap: 8, alignItems: "center" }}>
                 <Image source={findAssetId("empty_quick_switcher")!} />
                 <Text variant="text-lg/semibold" color="text-default">
-                    Oops! Nothing to see here… yet!
+                    No {props.title.toLowerCase()} installed
                 </Text>
             </View>
             <Button
@@ -191,7 +191,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
     }
 
     const headerElement = (
-        <View style={{ paddingBottom: 8 }}>
+        <View style={{ paddingBottom: 14, gap: 12 }}>
             {settings.safeMode?.enabled && <View style={{ marginBottom: 10 }}>
                 <Text variant="text-sm/medium" color="text-muted">
                     {props.safeModeHint?.message}
@@ -220,7 +220,13 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                     })}
                 />}
             </View>
-            {props.isEnabled && <TableSwitchRow label="Enabled only" value={enabledOnly} onValueChange={setEnabledOnly} />}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+                {props.isEnabled && (["All", "Enabled", "Disabled"] as const).map(option => (
+                    <Button key={option} text={option} size="sm" variant={status === option ? "primary" : "secondary"} onPress={() => setStatus(option)} />
+                ))}
+                {props.installAction && <Button text={props.installAction.label ?? "Install"} icon={findAssetId("PlusLargeIcon")}
+                    size="sm" variant="tertiary" onPress={onInstallPress} />}
+            </View>
             {props.filterOptions && <Button variant="secondary" size="sm" text={filter || "All plugins"}
                 onPress={() => showSimpleActionSheet({
                     key: "AddonListFilters",
@@ -246,23 +252,18 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>
                     <Image source={findAssetId("devices_not_found")!} />
                     <Text variant="text-lg/semibold" color="text-default">
-                        {filter ? "No plugins match these filters." : enabledOnly && !query ? "No add-ons are enabled." : "No add-ons found."}
+                        {filter ? "No plugins match these filters." : "No add-ons match this view."}
                     </Text>
-                    {(filter || enabledOnly) && <Button variant="secondary" size="sm" text="Clear filters" onPress={() => {
+                    {(filter || status !== "All") && <Button variant="secondary" size="sm" text="Clear filters" onPress={() => {
                         setFilter("");
-                        setEnabledOnly(false);
+                        setStatus("All");
                     }} />}
                 </View>}
-                contentContainerStyle={{ padding: 8, paddingHorizontal: 12, paddingBottom: 90 }}
-                ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                contentContainerStyle={{ paddingTop: 12, paddingHorizontal: 16, paddingBottom: bottomInset + 16 }}
+                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
                 ListFooterComponent={props.ListFooterComponent}
                 renderItem={renderItem}
             />
-            {props.installAction && <FloatingActionButton
-                positionBottom={bottomInset + 8}
-                icon={findAssetId("PlusLargeIcon")}
-                onPress={onInstallPress}
-            />}
         </ErrorBoundary>
     );
 }

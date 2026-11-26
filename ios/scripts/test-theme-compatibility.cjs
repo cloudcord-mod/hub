@@ -208,8 +208,8 @@ for (const route of rendererRoutes) {
     assert.equal(component.render(), root, 'the actual renderer takes priority over the fallback');
   }
   assert.equal(render(wrapped)[0], undefined);
-  assert.equal(wrapped.type(wrapped.props).type, iosRoute ? 'View' : 'Fragment',
-    'Android without wallpaper must not introduce an extra native layout container');
+  assert.equal(wrapped.type(wrapped.props).type, 'Fragment',
+    'A missing wallpaper must preserve the native layout');
   const disableCx = updater.applyTemporaryTheme({...ref.current, background: {url: wallpaper, opacity: 0.75, blur: 0.6}});
   const [image, loading] = render(wrapped);
   assert.equal(loading.props.children, original);

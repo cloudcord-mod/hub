@@ -30,7 +30,7 @@ export function deleteJsxCreate(Component: ComponentTarget, callback: Callback, 
  */
 // Android's clipped native children can stay detached after keyboard or
 // sheet layout changes. Limit the workaround to small, identifiable lists.
-function preserveAndroidListChildren(component: any, element: JSX.Element) {
+function preserveOverlayListChildren(component: any, element: JSX.Element, android: boolean) {
     const props = element.props;
     if (!props || typeof props.renderItem !== "function" || props.removeClippedSubviews === false)
         return element;
@@ -38,7 +38,7 @@ function preserveAndroidListChildren(component: any, element: JSX.Element) {
     const names = [component?.displayName, component?.name, inner?.displayName, inner?.name,
         inner?.render?.displayName, inner?.render?.name];
     const list = names.some(name => typeof name === "string" &&
-        (/^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name)
+        ((android && /^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name))
             || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
     if (!list) return element;
     let count: number | undefined;
@@ -61,7 +61,7 @@ export function patchJsx() {
         }
 
         const original = ret;
-        if (android) ret = preserveAndroidListChildren(Component, ret);
+        ret = preserveOverlayListChildren(Component, ret, android);
         const component: any = Component;
         const inner = component?.$$typeof === Symbol.for("react.memo") ? component.type : component;
         const target = typeof inner === "function" ? inner

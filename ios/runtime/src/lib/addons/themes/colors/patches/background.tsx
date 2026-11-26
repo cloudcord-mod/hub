@@ -62,9 +62,9 @@ function ThemeBackground({ children, direct }: { children: React.ReactNode; dire
     const tint = typeof color === "string" && chroma.valid(color) ? color : "black";
     const content = url && loaded === request ? tintMessageSurface(children, opacity, tint, direct) : children;
 
-    // No wallpaper should mean no extra native layout parent on Android.
+    // No wallpaper should mean no extra native layout parent.
     // Keep Discord's own sizing and keyboard/sheet clipping boundaries intact.
-    if (Platform.OS === "android" && !request.source)
+    if (!request.source)
         return <React.Fragment key="messages">{children}</React.Fragment>;
 
     return <View style={styles.container}>

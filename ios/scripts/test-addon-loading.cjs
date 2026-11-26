@@ -66,7 +66,7 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
         if (name === '@lib/api/settings') return { settings: {} };
         if (name === '@lib/api/assets') return { findAssetId: () => 1 };
         if (name === '@lib/utils/lazy') return { lazyDestructure: () => ({}) };
-        if (name === '@metro/common/components') return { FlashList: 'FlashList', TableSwitchRow: 'TableSwitchRow', useSafeAreaInsets: () => ({ bottom: 0 }) };
+        if (name === '@metro/common/components') return { FlashList: 'FlashList', Button: 'Button', useSafeAreaInsets: () => ({ bottom: 0 }) };
         if (name === 'es-toolkit') return { isNotNil: value => value != null };
         if (name === 'fuzzysort') return { go: (query, items) => items.filter(item => item.name.includes(query)).map(obj => ({ obj })) };
         return {};
@@ -78,13 +78,15 @@ const walk = node => !node || typeof node !== 'object' ? [] : [node, ...(node.pr
         return walk(addonList.module.exports.default({ title: 'Plugins', items, isEnabled: item => item.enabled, searchKeywords: ['name'] }))
             .find(node => node.type === 'FlashList');
     };
-    const filter = list => walk(list.props.ListHeaderComponent).find(node => node.type === 'TableSwitchRow');
+    const filter = (list, status) => walk(list.props.ListHeaderComponent).find(node => node.type === 'Button' && node.props.text === status);
     assert.equal(renderList().props.data.length, 2);
-    filter(renderList()).props.onValueChange(true);
+    filter(renderList(), 'Enabled').props.onPress();
     assert.deepEqual(renderList().props.data.map(item => item.obj.name), ['first']);
     items[0].enabled = false;
     assert.equal(renderList().props.data.length, 0, 'the list stays open when the last enabled plugin is turned off');
-    filter(renderList()).props.onValueChange(false);
+    filter(renderList(), 'Disabled').props.onPress();
+    assert.equal(renderList().props.data.length, 2);
+    filter(renderList(), 'All').props.onPress();
     assert.equal(renderList().props.data.length, 2);
     let themeCursor = 0;
     let effectKey;
