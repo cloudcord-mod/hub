@@ -10794,14 +10794,19 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       };
       visit(root2, 0);
     };
+    var settingsVersion = getSettingsVersion();
+    var useRootShapeFallback = settingsVersion >= 355 || !Number.isFinite(settingsVersion);
     var patchedRenderers = /* @__PURE__ */ new WeakSet();
     var patchedLists = /* @__PURE__ */ new WeakSet();
     var patchedScreens = /* @__PURE__ */ new WeakSet();
     var prepareRootList = (node) => {
       var sections = node?.sections;
-      if (!Array.isArray(sections) || !sections.some((section) => section?.settings?.includes?.("ACCOUNT")))
+      if (!Array.isArray(sections))
         return node;
-      if (sections.some((section) => section?.label === "CloudCord"))
+      var sectionsContain = (match) => sections.some((section) => Array.isArray(section?.settings) && section.settings.some((key) => typeof key === "string" && match(key)));
+      var hasAccount = sectionsContain((key) => key === "ACCOUNT");
+      var hasRootShape = useRootShapeFallback && sectionsContain((key) => /^(?:MY_ACCOUNT|ACCOUNT_SETTINGS|SETTINGS_ACCOUNT)$/.test(key)) && sectionsContain((key) => /^(?:SETTINGS_)?NOTIFICATIONS(?:_SETTINGS)?$/.test(key)) && sectionsContain((key) => /^(?:SETTINGS_)?ACCESSIBILITY(?:_SETTINGS)?$/.test(key));
+      if (!hasAccount && !hasRootShape || sections.some((section) => section?.label === "CloudCord"))
         return node;
       var copy = sections.map((section) => ({
         ...section,
@@ -10819,10 +10824,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     };
     var prepareListProps = (props) => {
       var node = prepareRootList(props?.node);
-      return node === props?.node ? props : {
-        ...props,
-        node
-      };
+      if (node !== props?.node)
+        return {
+          ...props,
+          node
+        };
+      return useRootShapeFallback ? prepareRootList(props) : props;
     };
     var listJsx = (_component, element) => ({
       ...element,
@@ -10957,6 +10964,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
       if (!parent || typeof parent[key] !== "function" || patchedScreens.has(parent))
         return;
+      if (useRootShapeFallback) {
+        unpatches.push(after(key, parent, (_2, result) => {
+          var props = prepareListProps(result?.props);
+          return props === result?.props ? result : {
+            ...result,
+            props
+          };
+        }));
+        patchedScreens.add(parent);
+        return;
+      }
       unpatches.push(before(key, parent, (args) => {
         args.forEach(insertCloudCordSectionsInTree);
         return args;
@@ -10969,9 +10987,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }));
       patchedScreens.add(parent);
     };
-    var settingsVersion = getSettingsVersion();
     var cachedSettingsList = settingsVersion >= 352;
-    var patchRootList = settingsVersion >= 354;
+    var patchRootList = settingsVersion >= 354 || useRootShapeFallback;
     unpatches.push(observeSettingsModules((exports, path) => {
       for (var module of [
         exports,
@@ -11007,7 +11024,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           console.warn("CloudCord direct settings list patch failed", error);
         }
       }
-      if (cachedSettingsList)
+      if (cachedSettingsList && !useRootShapeFallback)
         return;
       var screen = exports?.SettingsOverviewScreen ?? exports?.default;
       if (path?.endsWith("/SettingsOverviewScreen.tsx") || [
@@ -74904,7 +74921,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "25d1112df67de7c8840c8a6f801db5bebf198664";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1134acae09b9ceee06d1e3d2af1496c85cdd2a94";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
