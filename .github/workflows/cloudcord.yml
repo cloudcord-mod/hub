@@ -4186,7 +4186,7 @@ jobs:
           // ---- Fake messages (device only) ----
           let fakeMessages: ReturnType<typeof installFakeMessages> | null = null;
           const welcomeAccountId = "643945264868098049";
-          export const mobileWelcomeCopy = [
+          const mobileWelcomeCopy = [
               "## Welcome to CloudCord",
               "Thanks for installing CloudCord! Here’s where to find everything and what to check if you get stuck.",
               "### Find CloudCord on mobile\n\nOpen Discord, tap your profile tab, then tap the settings gear. Scroll down until you see **CloudCord**.",
