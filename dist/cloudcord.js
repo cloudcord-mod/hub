@@ -32480,6 +32480,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ...TAB_KEYS.filter((key) => !savedOrder.includes(key))
     ];
     var [movingKey, setMovingKey] = (0, import_react7.useState)(null);
+    var [welcomeStatus, setWelcomeStatus] = (0, import_react7.useState)("");
     var [broadcastCheck, setBroadcastCheck] = (0, import_react7.useState)(null);
     (0, import_react7.useEffect)(() => {
       var active = true;
@@ -32596,13 +32597,13 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             children: [
               /* @__PURE__ */ jsx(TableRow, {
                 label: "Test Welcome Message",
-                subLabel: "Preview the welcome DM on this device",
+                subLabel: welcomeStatus || "Preview the welcome DM on this device",
                 onPress: () => {
                   try {
                     var channelId = (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).testMobileWelcome();
-                    showToast(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
+                    setWelcomeStatus(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
                   } catch (e) {
-                    showToast("Couldn\u2019t open the welcome DM");
+                    setWelcomeStatus("Couldn\u2019t prepare the welcome DM");
                   }
                 }
               }),
@@ -34432,6 +34433,33 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   }))
                 ]
               })
+            })
+          ]
+        }),
+        props.showPluginSummary && props.isEnabled && /* @__PURE__ */ jsxs(import_react_native28.View, {
+          style: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 8
+          },
+          children: [
+            /* @__PURE__ */ jsx(Button, {
+              size: "sm",
+              variant: "secondary",
+              text: catalog.length + " available",
+              onPress: () => {
+                setStatus("All");
+                setFilter("");
+              }
+            }),
+            /* @__PURE__ */ jsx(Button, {
+              size: "sm",
+              variant: "secondary",
+              text: catalog.filter(props.isEnabled).length + " enabled",
+              onPress: () => {
+                setStatus("Enabled");
+                setFilter("");
+              }
             })
           ]
         }),
@@ -69469,7 +69497,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     size: "sm",
                     variant: selected ? "secondary" : "primary",
                     disabled: !canApply || busy,
-                    text: !canApply ? "Requires loader update" : busy ? "Loading\u2026" : selected ? "Unapply" : "Use font",
+                    text: !canApply ? "Requires loader update" : busy ? "Loading\u2026" : selected ? "Unapply" : "Use",
                     onPress: () => _async_to_generator(function* () {
                       setBusy(true);
                       try {
@@ -70476,6 +70504,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     return /* @__PURE__ */ jsx(AddonPage, {
       CardComponent: PluginListCard,
       isEnabled: isPluginRowEnabled,
+      showPluginSummary: true,
       title: Strings.PLUGINS,
       filterOptions: pluginFilters,
       defaultFilter: showDefaultRow,
@@ -71227,44 +71256,38 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       contentContainerStyle: {
         paddingBottom: 38
       },
-      children: /* @__PURE__ */ jsxs(Stack, {
+      children: /* @__PURE__ */ jsx(Stack, {
         style: {
-          width: "100%",
-          maxWidth: 720,
-          alignSelf: "center",
-          paddingVertical: 20,
-          paddingHorizontal: 16
+          paddingVertical: 24,
+          paddingHorizontal: 12
         },
-        spacing: 12,
-        children: [
-          /* @__PURE__ */ jsx(Card, {
-            children: /* @__PURE__ */ jsx(TableRow, {
+        spacing: 24,
+        children: /* @__PURE__ */ jsxs(TableRowGroup, {
+          title: "Add-ons",
+          children: [
+            /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Plugins",
-              subLabel: "Find, enable, and configure plugins",
+              subLabel: "Manage and configure your plugins",
               icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
               onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
-            })
-          }),
-          hasThemes && /* @__PURE__ */ jsx(Card, {
-            children: /* @__PURE__ */ jsx(TableRow, {
+            }),
+            hasThemes && /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Themes",
-              subLabel: "Change colors and chat backgrounds",
+              subLabel: "Manage your Discord themes",
               icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
               onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
-            })
-          }),
-          /* @__PURE__ */ jsx(Card, {
-            children: /* @__PURE__ */ jsx(TableRow, {
+            }),
+            /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Fonts",
               subLabel: isFontSupported() ? "Browse and apply fonts" : "Browse fonts \xB7 applying requires a compatible loader",
               icon: icon2("LettersIcon", "TextIcon"),
               onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
             })
-          })
-        ]
+          ]
+        })
       })
     });
   }
@@ -75489,7 +75512,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e39dc5113f4a61ae1f894642c352f87600292e4f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d57dfed9afeb8593918baae5248d5152684cb42b";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
