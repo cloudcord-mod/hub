@@ -269,10 +269,7 @@ export default function Diagnostics() {
             <TableRowGroup title="Runtime diagnostics">
                 <TableRow label="Test Welcome Message" subLabel={welcomeStatus ? "Hide preview" : "Preview the welcome message on this device"} onPress={() => {
                     try {
-                        const welcome = require("@core/ui/settings/pages/FakeProfile");
-                        setWelcomeStatus(welcomeStatus ? "" : welcome.testMobileWelcome()
-                            ? "Welcome message ready in the existing DM in Messages."
-                            : "Open a DM with 643945264868098049 first, then run this test again.\n\n" + welcome.mobileWelcomeCopy);
+                        setWelcomeStatus(welcomeStatus ? "" : require("@core/ui/settings/pages/FakeProfile").mobileWelcomeCopy);
                     } catch {
                         setWelcomeStatus("Couldn’t load the welcome preview");
                     }

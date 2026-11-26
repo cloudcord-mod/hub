@@ -4195,41 +4195,11 @@ jobs:
               "Have an idea for CloudCord? Drop it in suggestions. If it’s a plugin or theme, tell us what you want it to do and whether you’d use it on mobile, desktop, or both.",
               "Thanks for being here. Enjoy making Discord your own.",
           ].join("\n\n");
-          const welcomeSender = "643945264868098049";
-          function existingWelcomeChannel() {
-              const store = safeStore("ChannelStore");
-              const id = store?.getDMFromUserId?.(welcomeSender);
-              return id && store?.getChannel?.(id)?.type === 1 ? String(id) : undefined;
-          }
-          function deliverMobileWelcome(force = false) {
-              const channelId = existingWelcomeChannel();
-              if (!channelId || !fakeMessages) return false;
-              const list = savedConversations();
-              const exists = list.some(item => item.id === "cloudcord-welcome-demo" && item.channelId === channelId);
-              if (!force && (exists || settings.cloudcordWelcomeDmCreated)) return true;
-              if (!exists) {
-                  saveConversations([...list, {
-                      id: "cloudcord-welcome-demo", name: "CloudCord welcome", channelId,
-                      people: [{ key: "welcome-sender", userId: welcomeSender }],
-                      lines: [
-                          { key: "welcome-banner", person: "welcome-sender", text: "", minutesAgo: 0, showWelcomeBanner: true },
-                          { key: "welcome", person: "welcome-sender", text: mobileWelcomeCopy, minutesAgo: 0 },
-                      ],
-                      savedAt: Date.now(),
-                  }]);
-              }
-              fakeMessages.show(channelId);
-              settings.cloudcordWelcomeDmCreated = true;
-              return true;
-          }
-          export function testMobileWelcome() {
-              return deliverMobileWelcome(true);
-          }
           function savedConversations(): FakeConversation[] {
               const list = (rootSettings as any).fakeMessages;
+              // A saved welcome channel must never be replayed into Discord's DM stores.
               return (Array.isArray(list) ? list : [])
-                  .filter(item => item?.id !== "cloudcord-welcome-demo"
-                      || (!item.dm?.local && item.channelId === existingWelcomeChannel()))
+                  .filter(item => item?.id !== "cloudcord-welcome-demo")
                   .map(normalizeConversation).filter(Boolean) as FakeConversation[];
           }
           function saveConversations(list: FakeConversation[]) {
@@ -4485,16 +4455,7 @@ jobs:
                       installOrbPreviewPanels();
                       setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook]) { try { step(); } catch {} } }, 15000);
                       const restoreLater = () => setTimeout(() => { try { restoreFakeRequests(); } catch {} }, 1500);
-                      const welcomeLater = () => setTimeout(() => {
-                          if (AppState.currentState === "active") {
-                              try { deliverMobileWelcome(); } catch {}
-                          }
-                      }, 0);
                       restoreLater();
-                      welcomeLater();
-                      for (const event of ["CONNECTION_OPEN", "CHANNEL_SELECT"]) {
-                          try { FluxDispatcher.subscribe(event, welcomeLater); } catch {}
-                      }
                       try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); }); } catch {}
                       try { FluxDispatcher.subscribe("CURRENT_USER_UPDATE", () => { try { applyFakeNitro(); } catch {} }); } catch {}
                       for (const type of ["COLLECTIBLES_SHOP_OPEN","COLLECTIBLES_PRODUCT_DETAILS_OPEN","COLLECTIBLES_SHOP_HOME_FETCH","SKU_PURCHASE_MODAL_OPEN","PREMIUM_PAYMENT_MODAL_OPEN"]) { try { FluxDispatcher.subscribe(type, pauseForShop); } catch {} }
