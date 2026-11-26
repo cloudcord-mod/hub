@@ -5219,6 +5219,7 @@ jobs:
           export default function FakeProfile() {
               const editorOwner = useRef(currentUserId);
               const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
+              const [showMobileGuide, setShowMobileGuide] = useState(false);
               const [showDetails, setShowDetails] = useState(false);
               useProxy(settings);
               const [, redraw] = useReducer(value => value + 1, 0);
@@ -5454,7 +5455,22 @@ jobs:
                               const badgeCount = Object.values(preview.selectedBadges || {}).filter(Boolean).length + (preview.nitroEnabled ? 1 : 0) + (preview.boostMonths > 0 ? 1 : 0) + (preview.giftLevel >= 0 ? 1 : 0);
                               const connections = (preview.customConnections || []).length;
                               const name = preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "there";
-                              return <OverviewPanel name={name} subtitle={preview.enabled ? "Your custom profile is on" : "Your custom profile is off"}
+                              return <><Card>
+                                  <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                                      <Image source={{ uri: CLOUDCORD_BADGE_ICON }} resizeMode="contain" style={{ width: 42, height: 42 }} />
+                                      <View style={{ flex: 1 }}>
+                                          <Text variant="text-sm/medium" color="text-muted">CloudCord</Text>
+                                          <Text variant="heading-md/semibold">Thanks for installing CloudCord!</Text>
+                                      </View>
+                                  </View>
+                                  <ActionButton muted label={showMobileGuide ? "Hide mobile tutorial" : "Open mobile tutorial"} onPress={() => setShowMobileGuide(value => !value)} />
+                                  {showMobileGuide ? <View style={{ gap: 8 }}>
+                                      <Text variant="text-sm/normal" color="text-normal">Open Settings → CloudCord to get back here. Use Profile Studio to change your picture, banner, and badges, then open your profile to see your changes.</Text>
+                                      <Text variant="text-sm/normal" color="text-normal">Open Add-ons to browse plugins, themes, and fonts. On iOS, shake the device and use Refetch Bundle if you need to refresh the runtime.</Text>
+                                      <ActionButton muted label="Edit profile" onPress={() => setActiveTab("profile")} />
+                                      <ActionButton muted label="Choose badges" onPress={() => setActiveTab("badges")} />
+                                  </View> : null}
+                              </Card><OverviewPanel name={name} subtitle={preview.enabled ? "Your custom profile is on" : "Your custom profile is off"}
                                   stats={[
                                       { label: "Username", value: preview.username || realCurrentUser?.username || "-", hint: "Your public name" },
                                       { label: "Badges", value: String(badgeCount), hint: preview.replaceBadges ? "Real badges hidden" : "Shown with your real ones" },
@@ -5469,7 +5485,7 @@ jobs:
                                       { label: "Choose badges", done: badgeCount > 0, tab: "badges" },
                                       { label: "Add a connection", done: connections > 0, tab: "social" }
                                   ]}
-                                  onSelect={setActiveTab} />;
+                                  onSelect={setActiveTab} /></>;
                           })() : null}
                           {activeTab === "social" ? <Card><CustomSocialEditor data={preview} onChange={(value: ProfileAppearance) => { rootSettings.fakeProfile = { ...preview, ...value, syncRevision: Date.now() }; preview = rootSettings.fakeProfile as PreviewSettings; queueSharedPublish(); clearCache(); suppressOwnPullUntil = Date.now() + 15000; refreshPreview(); redraw(); }} resolveUser={async (id: string) => {
                               let shared = sharedProfiles.get(id);
