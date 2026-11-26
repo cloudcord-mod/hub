@@ -95,6 +95,7 @@ export interface FakeMessagesOptions {
     rest?: any;
     /** The stored conversations. */
     getConversations: () => FakeConversation[];
+    getHistoryPreview?: (channelId: string) => FakeConversation | undefined;
     /** A real user's current data (UserStore.getUser), or null. */
     getUser: (id: string) => any;
     /** The channel's guild, if any. */
@@ -238,8 +239,10 @@ export function installFakeMessages(options: FakeMessagesOptions) {
     // When Discord loads a chat, merge the fake messages into the page it gets, in time order.
     // They are never sent again as "new", so a chat's latest message (and its place in the DM
     // list) stays your real latest message.
-    const merge = (channelId: string, page: any[], query: string) => {
-        const fakes = conversationsIn(channelId).flatMap(messagesFor);
+    const merge = (channelId: string, page: any[], query: string, preview?: FakeConversation) => {
+        const conversations = conversationsIn(channelId);
+        if (preview) conversations.push(preview);
+        const fakes = conversations.flatMap(messagesFor);
         if (!fakes.length) return page;
         // Parsed by hand: React Native's URLSearchParams does not implement get().
         const values = new Map<string, string>();
@@ -271,7 +274,9 @@ export function installFakeMessages(options: FakeMessagesOptions) {
         const match = url.match(/\/channels\/(\d+)\/messages(?:\?(.*))?$/);
         if (!match && !isLocalDm(channel)) return original(...args);
         if (!match) return ok({});
-        if (!isLocalDm(match[1]) && !conversationsIn(match[1]).length) return original(...args);
+        let preview: FakeConversation | undefined;
+        try { preview = options.getHistoryPreview?.(match[1]); } catch { /* Keep native message loading available. */ }
+        if (!isLocalDm(match[1]) && !preview && !conversationsIn(match[1]).length) return original(...args);
         // React Native's URLSearchParams has no set(), so build the query by hand.
         const extra = Object.entries(args[0]?.query || {}).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
         const query = [match[2], ...extra].filter(Boolean).join("&");
@@ -279,7 +284,7 @@ export function installFakeMessages(options: FakeMessagesOptions) {
         return Promise.resolve(original(...args)).then((response: any) => {
             const page = response?.body;
             if (!Array.isArray(page)) return response;
-            return { ...response, body: merge(match[1], page, query.toString()) };
+            return { ...response, body: merge(match[1], page, query, preview) };
         });
     });
 
