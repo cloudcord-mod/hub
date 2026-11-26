@@ -15748,6 +15748,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       key: String(line?.key || newKey()),
       person: String(line?.person || ""),
       text: String(line?.text || "").slice(0, 4e3),
+      ...input.id === "cloudcord-welcome-demo" && line?.showWelcomeBanner === true ? {
+        showWelcomeBanner: true
+      } : {},
       minutesAgo: Math.max(0, Math.min(60 * 24 * 365, Number(line?.minutesAgo) || 0))
     })).filter((line) => keys.has(line.person) && line.text.trim());
     var dm = input.dm && keys.has(String(input.dm.person)) ? {
@@ -15890,7 +15893,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           flags: 0,
           author: author(person),
           attachments: [],
-          embeds: [],
+          embeds: line.showWelcomeBanner ? [
+            {
+              type: "image",
+              image: {
+                url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/logo-full.png"
+              }
+            }
+          ] : [],
           mentions: [],
           mention_roles: [],
           mention_everyone: false,
@@ -26184,6 +26194,54 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           variant: "primary",
           text: "Join the CloudCord server",
           onPress: () => void import_react_native27.Linking.openURL("https://discord.gg/cloudcord").catch(() => showToast("Couldn\u2019t open the invite"))
+        }),
+        /* @__PURE__ */ jsx(Button2, {
+          size: "sm",
+          variant: "secondary",
+          text: "Add simulated welcome DM",
+          onPress: () => {
+            if (!fakeMessages)
+              return;
+            var list = savedConversations();
+            var existing = list.find((item) => item.id === "cloudcord-welcome-demo");
+            if (existing) {
+              fakeMessages.show(existing.channelId);
+              close();
+              return;
+            }
+            var channelId = newLocalChannelId();
+            saveConversations([
+              ...list,
+              {
+                id: "cloudcord-welcome-demo",
+                name: "Discord (Simulation)",
+                channelId,
+                dm: {
+                  person: "discord-demo",
+                  local: true
+                },
+                people: [
+                  {
+                    key: "discord-demo",
+                    name: "Discord (Simulation)",
+                    username: "discord-simulation"
+                  }
+                ],
+                lines: [
+                  {
+                    key: "welcome",
+                    person: "discord-demo",
+                    minutesAgo: 0,
+                    showWelcomeBanner: true,
+                    text: "**Simulated welcome DM**\n\nThanks for installing CloudCord!\n\nOpen Discord Settings and scroll to **CloudCord**. Join the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking for help."
+                  }
+                ],
+                savedAt: Date.now()
+              }
+            ]);
+            fakeMessages.show(channelId);
+            close();
+          }
         }),
         /* @__PURE__ */ jsx(Button2, {
           size: "sm",
@@ -75459,7 +75517,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "562b320b1fa2945a8823b7171a9fb5bc2d5ee4da";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8fd034e3626f061ea13df40cc4d292efaeee5e78";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
