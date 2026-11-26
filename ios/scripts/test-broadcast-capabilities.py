@@ -67,14 +67,16 @@ class BroadcastCapabilitiesTest(unittest.TestCase):
     def test_final_signer_must_authorize_group_and_identity(self):
         signed = {**self.host, "com.apple.developer.team-identifier": "TEAM", "application-identifier": "TEAM.example.app"}
         profile = {"TeamIdentifier": ["TEAM"], "Entitlements": {**self.host, "application-identifier": "TEAM.example.*"}}
-        check.verify_provisioning(signed, profile, "Host")
+        check.verify_provisioning(signed, profile, "Host", "example.app")
+        with self.assertRaisesRegex(ValueError, "does not match its bundle ID"):
+            check.verify_provisioning(signed, profile, "Host", "example.other")
         for bad in [
             {**profile, "TeamIdentifier": ["OTHER"]},
             {**profile, "Entitlements": {"application-identifier": "TEAM.example.*"}},
             {**profile, "Entitlements": {**self.host, "application-identifier": "TEAM.different.*"}},
         ]:
             with self.assertRaises(ValueError):
-                check.verify_provisioning(signed, bad, "Host")
+                check.verify_provisioning(signed, bad, "Host", "example.app")
 
     def test_windows_reads_embedded_entitlement_metadata(self):
         xml = plistlib.dumps(self.host)

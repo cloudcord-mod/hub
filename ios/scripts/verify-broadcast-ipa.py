@@ -55,14 +55,17 @@ def embedded_entitlements(executable):
 
 
 def provisioning_metadata(bundle):
-    raw = (bundle / "embedded.mobileprovision").read_bytes()
+    path = bundle / "embedded.mobileprovision"
+    if not path.is_file():
+        raise ValueError(f"{bundle.name} has no embedded provisioning profile")
+    raw = path.read_bytes()
     start, end = raw.find(b"<?xml"), raw.find(b"</plist>")
     if start < 0 or end < start:
         raise ValueError("Cannot read provisioning profile metadata")
     return plistlib.loads(raw[start:end + len(b"</plist>")])
 
 
-def verify_provisioning(entitlements, profile, label):
+def verify_provisioning(entitlements, profile, label, bundle_id):
     permitted = profile.get("Entitlements", {})
     groups = permitted.get("com.apple.security.application-groups", [])
     for group in entitlements.get("com.apple.security.application-groups", []):
@@ -74,6 +77,8 @@ def verify_provisioning(entitlements, profile, label):
     app_id = entitlements.get("application-identifier", "")
     if not app_id or not fnmatch.fnmatchcase(app_id, permitted.get("application-identifier", "")):
         raise ValueError(f"{label} application identifier is not authorized by its provisioning profile")
+    if app_id.partition(".")[2] != bundle_id:
+        raise ValueError(f"{label} signed application identifier does not match its bundle ID")
 
 
 def verify_bundle_identity(app, expected_id):
@@ -112,8 +117,9 @@ def verify_ipa(ipa, signed=False, bundle_id=None):
             raise ValueError("Unable to inspect packaged host/broadcast entitlements")
         verify_capabilities(plistlib.loads(host_bytes), plistlib.loads(extension_bytes), info)
         if signed:
-            verify_provisioning(plistlib.loads(host_bytes), provisioning_metadata(app), "Discord")
-            verify_provisioning(plistlib.loads(extension_bytes), provisioning_metadata(broadcast), "BroadcastUpload")
+            host_info = plistlib.loads((app / "Info.plist").read_bytes())
+            verify_provisioning(plistlib.loads(host_bytes), provisioning_metadata(app), "Discord", host_info.get("CFBundleIdentifier"))
+            verify_provisioning(plistlib.loads(extension_bytes), provisioning_metadata(broadcast), "BroadcastUpload", info.get("CFBundleIdentifier"))
         print("PASS: ReplayKit/shared-group metadata" + (" and provisioning authorization" if signed else "") + "; signature-chain validation and device testing still required")
 
 

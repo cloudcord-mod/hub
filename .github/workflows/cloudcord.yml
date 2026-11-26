@@ -1548,6 +1548,7 @@ jobs:
                   if (JSON.stringify(nextPreview) !== JSON.stringify(preview)) {
                       rootSettings.fakeProfile = preview = nextPreview;
                       clearCache();
+                      reapplyBadgeDirectory(requestedUserId);
                   }
                   setProfileSyncFeedback(requestedUserId, "confirmed");
                   diagnostics.last = "Fake Profile synced across devices";
@@ -2658,7 +2659,10 @@ jobs:
               if (action?.guildId || !preview.enabled) return;
               if (Array.isArray(action.pendingBadgeDisplayOrder)) rootSettings.fakeProfileNativeOrder = action.pendingBadgeDisplayOrder.map(Number);
               if (Array.isArray(action.pendingBadgeHiddenBadges)) rootSettings.fakeProfileNativeHidden = action.pendingBadgeHiddenBadges.map(Number);
-              if (Array.isArray(action.pendingBadgeDisplayOrder) || Array.isArray(action.pendingBadgeHiddenBadges)) queueSharedPublish();
+              if (Array.isArray(action.pendingBadgeDisplayOrder) || Array.isArray(action.pendingBadgeHiddenBadges)) {
+                  queueSharedPublish();
+                  if (currentUserId) reapplyBadgeDirectory(currentUserId);
+              }
           }
           // Reapply the current view to cached native data without a network request.
           function reapplyBadgeDirectory(id: string) {
@@ -3155,10 +3159,44 @@ jobs:
                   return original(...args.map(value => presentationIdentity(value)));
               });
               for (const module of Object.values(metroModules) as any[]) {
-                  if (module?.isInitialized !== true || module?.hasError || module?.__filePath !== "modules/message_previews/useLatestChannelMessage.tsx") continue;
-                  addPatch("default", module.publicModule?.exports, (args, original) => presentationIdentity(original(...args)));
+                  if (module?.isInitialized !== true || module?.hasError) continue;
+                  const exports = module.publicModule?.exports;
+                  if (module.__filePath === "modules/message_previews/useLatestChannelMessage.tsx") {
+                      addPatch("default", exports, (args, original) => presentationIdentity(original(...args)));
+                  }
+                  if (module.__filePath === "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelAvatar.tsx") {
+                      addPatch("type", exports?.default, (args, original) => {
+                          const [, refresh] = useReducer(value => value + 1, 0);
+                          useEffect(() => {
+                              const update = () => refresh();
+                              identityRefreshers.add(update);
+                              return () => { identityRefreshers.delete(update); };
+                          }, []);
+                          const element = original(...args);
+                          if (args[0]?.channel?.type !== 1 || !isValidElement(element)) return element;
+                          const props = element.props as any;
+                          const user = presentationIdentity(props.user);
+                          if (!user || user === props.user) return element;
+                          return cloneElement(element, { user, avatarDecoration: user.avatarDecoration } as any);
+                      });
+                  }
               }
               const rowManager = findByName("RowManager") as any;
+              const channelNames = findByProps("computeChannelName", "useComputedGroupDmName") as any;
+              addPatch("default", channelNames, (args, original) => {
+                  const [, refresh] = useReducer(value => value + 1, 0);
+                  useEffect(() => {
+                      const update = () => refresh();
+                      identityRefreshers.add(update);
+                      return () => { identityRefreshers.delete(update); };
+                  }, []);
+                  const result = original(...args);
+                  const channel = args[0];
+                  if (channel?.type !== 1 || channel.isObfuscated?.()) return result;
+                  const id = channel.getRecipientId?.() ?? channel.recipients?.[0];
+                  const user = id ? safeStore("UserStore")?.getUser?.(id) : null;
+                  return presentationName(result, user);
+              });
               addPatch("generate", rowManager?.prototype, (args, original) => original(...args.map(value => presentationIdentity(value))));
               for (const method of ["default", "useNullableMessageAuthor", "getMessageAuthor", "useUserNickAndColor", "useNullableUserAuthor", "getUserAuthor"]) {
                   addPatch(method, messageAuthors, (args, original) => {
@@ -5134,7 +5172,10 @@ jobs:
                   preview = rootSettings.fakeProfile as PreviewSettings;
                   queueSharedPublish();
                   clearCache();
-                  if (refresh) refreshPreview();
+                  if (refresh) {
+                      refreshPreview();
+                      if (currentUserId && /badge|nitro|boost|^enabled$/i.test(key)) reapplyBadgeDirectory(currentUserId);
+                  }
                   suppressOwnPullUntil = Date.now() + 15_000;
                   if (key === "nitroEnabled" || key === "enabled") { try { applyFakeNitro(); } catch {} }
                   redraw();

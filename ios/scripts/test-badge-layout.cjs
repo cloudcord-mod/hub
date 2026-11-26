@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const vm = require('node:vm');
 const assert = require('node:assert/strict');
-const esbuild = require('../../desktop/client/node_modules/esbuild');
+const esbuild = require(process.env.CLOUDCORD_ESBUILD || '../../desktop/client/node_modules/esbuild');
 const workflow = fs.readFileSync('.github/workflows/cloudcord.yml', 'utf8');
 const mobile = workflow.split("cat > src/core/ui/settings/pages/FakeProfile/index.tsx <<'TSX'")[1].split('\n          TSX')[0].replace(/^          /gm, '');
 const desktop = fs.readFileSync('desktop/client/src/sincordplugins/fakeProfile/index.tsx', 'utf8');
@@ -65,12 +65,16 @@ assert.equal(patchHost.profile.cloudcordUnorderedBadges().length, 3);
 // Exercise the actual mobile update function; previously selectedBadges was
 // overwritten by the old snapshot after assigning [key].
 const updateSource = mobile.slice(mobile.indexOf('const update = (key:'), mobile.indexOf('const choose = async'));
-const updateHost = vm.createContext({ rootSettings: {}, preview: { selectedBadges: { staff: true } }, queueSharedPublish() {}, clearCache() {}, refreshPreview() {}, redraw() {}, suppressOwnPullUntil: 0 });
+const directoryReplays = [];
+const updateHost = vm.createContext({ rootSettings: {}, preview: { selectedBadges: { staff: true } }, queueSharedPublish() {}, clearCache() {}, refreshPreview() {}, redraw() {}, suppressOwnPullUntil: 0,
+    currentUserId: 'owner', reapplyBadgeDirectory: id => directoryReplays.push(id) });
 vm.runInContext(esbuild.transformSync(updateSource, { loader: 'ts' }).code + ';globalThis.update=update;', updateHost);
 updateHost.update('selectedBadges', { account_age_10: true }, true);
 assert.deepEqual(result(updateHost.rootSettings.fakeProfile.selectedBadges), { account_age_10: true });
 updateHost.update('hiddenBadgeIds', ['nitro'], true);
 updateHost.update('badgeOrder', ['boost', 'staff'], true);
+updateHost.update('displayName', 'Changed', true);
+assert.deepEqual(directoryReplays, ['owner', 'owner', 'owner']);
 assert.deepEqual(result(updateHost.rootSettings.fakeProfile.hiddenBadgeIds), ['nitro']);
 assert.deepEqual(result(updateHost.rootSettings.fakeProfile.badgeOrder), ['boost', 'staff']);
 const serializer = desktop.slice(desktop.indexOf('function toSharedProfile('), desktop.indexOf('async function publishSharedProfile('));
