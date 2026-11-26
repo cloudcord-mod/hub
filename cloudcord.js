@@ -24638,6 +24638,36 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
   }
   function connectBadgeRenderer() {
+    onJsxCreate("ProfileBadgeRows", (_component, rendered) => {
+      var props = rendered.props;
+      var id = String(props.userId || "");
+      if (!id || isRealProfileView(id) || badgesHiddenFor(id))
+        return;
+      var staff = cloudCordStaffBadge(id);
+      if (!staff)
+        return;
+      var badges = [];
+      addOfficialBadge(badges, staff, {
+        userId: id
+      }, isCurrentUser(id) ? preview.enabled ? preview : null : getProfileOverride(id));
+      var row = badges[0];
+      if (!row)
+        return;
+      props.badges = [
+        row,
+        ...Array.isArray(props.badges) ? props.badges.filter((badge) => !String(badge?.id || "").startsWith("cloudcord-official-")) : []
+      ];
+      if (Array.isArray(props.catalogBadges)) {
+        props.catalogBadges = [
+          {
+            badge_id: row.id,
+            info_label: row.description,
+            name: row.description
+          },
+          ...props.catalogBadges
+        ];
+      }
+    });
     try {
       after("default", useBadgesModule2, ([user], result) => {
         if (!Array.isArray(result))
@@ -24704,19 +24734,36 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           var label2 = String(props?.label || rendered.props.accessibilityLabel || rendered.props.label || rendered.props.description || "Badge");
           if (props) {
             if (String(props.id || "").startsWith("cloudcord-official-")) {
+              var size = rendered.props.badgeSize ?? 20;
               var image = /* @__PURE__ */ jsx(import_react_native27.Image, {
                 source: props.source,
                 resizeMode: "contain",
                 style: {
-                  width: 20,
-                  height: 20,
+                  width: size,
+                  height: size,
                   tintColor: props.tintColor
                 }
               });
+              var openLabel = () => {
+                var module = Object.values(metroModules).find((item) => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
+                var toast = module?.publicModule?.exports?.default;
+                if (typeof toast?.open === "function") {
+                  toast.open("PROFILE_BADGE-" + label2, {
+                    text: label2,
+                    icon: {
+                      type: "image",
+                      src: props.source.uri,
+                      alt: label2
+                    }
+                  });
+                } else {
+                  showToast(label2);
+                }
+              };
               return /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: label2,
-                onPress: rendered.props.onPress ?? (() => import_react_native27.Alert.alert(label2)),
+                onPress: openLabel,
                 children: image
               });
             }
@@ -24747,22 +24794,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     return props?.userId || props?.user_id || props?.profileUserId || props?.message?.author?.id || props?.author?.id || props?.user?.userId || props?.user?.id || props?.userProfile?.userId || props?.userProfile?.user_id || props?.userProfile?.user?.id || props?.guildMemberProfile?.userId || props?.guildMemberProfile?.user?.id || props?.displayProfile?.userId || props?.displayProfile?.user_id || props?.displayProfile?.user?.id || props?.profile?.userId || props?.profile?.user?.id;
   }
   function connectMediaRenderer() {
-    var avatarComponents = [
-      "UserHeaderAvatar",
-      "ProfileAvatar",
-      "UserProfileAvatar"
-    ];
-    var bannerComponents = [
-      "UserBanner",
-      "ProfileBanner",
-      "UserProfileBanner"
-    ];
-    for (var component of avatarComponents) {
+    var _loop2 = function(component2) {
       try {
-        onJsxCreate(component, (_component, rendered) => {
+        onJsxCreate(component2, (_component, rendered) => {
           var props = rendered?.props;
           var id = String(renderedUserId(props) || "");
-          if (!id)
+          if (!id || isRealProfileView(id))
             return;
           if (!isCurrentUser(id)) {
             requestSharedProfile(id);
@@ -24780,6 +24817,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             };
             props.avatarSrc = data.avatar;
             props.avatarURL = data.avatar;
+            if (component2 === "HeaderAvatar" && props.pendingAvatarSrc == null)
+              props.pendingAvatarSrc = data.avatar;
             props.resizeMode = "cover";
             props.contentFit = "cover";
             if (props.user)
@@ -24804,6 +24843,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           };
           props.avatarSrc = uri;
           props.avatarURL = uri;
+          if (component2 === "HeaderAvatar" && props.pendingAvatarSrc == null)
+            props.pendingAvatarSrc = uri;
           props.resizeMode = "cover";
           props.contentFit = "cover";
           if (props.user)
@@ -24812,14 +24853,22 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         diagnostics.patches += 1;
       } catch (e) {
       }
-    }
-    for (var component1 of bannerComponents) {
+    }, _loop1 = function(component12) {
       try {
-        onJsxCreate(component1, (_component, rendered) => {
+        onJsxCreate(component12, (_component, rendered) => {
           var props = rendered?.props;
           var id = String(renderedUserId(props) || "");
-          if (!id)
+          if (!id || isRealProfileView(id))
             return;
+          var setDisplayBanner = (uri2) => {
+            if (component12 !== "UserProfileBanner" || !props.displayProfile)
+              return;
+            props.displayProfile = copyProfilePresentation(props.displayProfile, {
+              banner: uri2,
+              getBannerURL: () => uri2,
+              getPreviewBanner: () => uri2
+            });
+          };
           if (!isCurrentUser(id)) {
             requestSharedProfile(id);
             var data = getProfileOverride(id);
@@ -24833,6 +24882,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             };
             props.bannerSrc = data.banner;
             props.bannerURL = data.banner;
+            setDisplayBanner(data.banner);
             props.resizeMode = "cover";
             props.contentFit = "cover";
             return;
@@ -24848,13 +24898,30 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           };
           props.bannerSrc = uri;
           props.bannerURL = uri;
+          setDisplayBanner(uri);
           props.resizeMode = "cover";
           props.contentFit = "cover";
         });
         diagnostics.patches += 1;
       } catch (e) {
       }
-    }
+    };
+    var avatarComponents = [
+      "HeaderAvatar",
+      "OpenableUserProfileAvatar",
+      "UserHeaderAvatar",
+      "ProfileAvatar",
+      "UserProfileAvatar"
+    ];
+    var bannerComponents = [
+      "UserBanner",
+      "ProfileBanner",
+      "UserProfileBanner"
+    ];
+    for (var component of avatarComponents)
+      _loop2(component);
+    for (var component1 of bannerComponents)
+      _loop1(component1);
   }
   function socialEntryFromProps(props) {
     var source = props?.connection || props?.account || props?.row || props?.user || props?.item;
@@ -74978,7 +75045,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b69afc878194faf93e85bb325aa4371a140ae6da";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "17629cce8cc753757896c0242d086f40f8c3dc22";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
