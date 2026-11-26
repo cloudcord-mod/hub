@@ -26266,12 +26266,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var id = store?.getDMFromUserId?.(welcomeSender);
     return id && store?.getChannel?.(id)?.type === 1 ? String(id) : void 0;
   }
-  function testMobileWelcome() {
+  function deliverMobileWelcome(force = false) {
     var channelId = existingWelcomeChannel();
     if (!channelId || !fakeMessages)
       return false;
     var list = savedConversations();
-    if (!list.some((item) => item.id === "cloudcord-welcome-demo" && item.channelId === channelId)) {
+    var exists = list.some((item) => item.id === "cloudcord-welcome-demo" && item.channelId === channelId);
+    if (!force && (exists || settings.cloudcordWelcomeDmCreated))
+      return true;
+    if (!exists) {
       saveConversations([
         ...list,
         {
@@ -26304,7 +26307,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ]);
     }
     fakeMessages.show(channelId);
+    settings.cloudcordWelcomeDmCreated = true;
     return true;
+  }
+  function testMobileWelcome() {
+    return deliverMobileWelcome(true);
   }
   function savedConversations() {
     var list = rootSettings.fakeMessages;
@@ -27170,7 +27177,25 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           } catch (e) {
           }
         }, 1500);
+        var welcomeLater = () => setTimeout(() => {
+          if (import_react_native23.AppState.currentState === "active") {
+            try {
+              deliverMobileWelcome();
+            } catch (e) {
+            }
+          }
+        }, 0);
         restoreLater();
+        welcomeLater();
+        for (var event of [
+          "CONNECTION_OPEN",
+          "CHANNEL_SELECT"
+        ]) {
+          try {
+            FluxDispatcher.subscribe(event, welcomeLater);
+          } catch (e) {
+          }
+        }
         try {
           FluxDispatcher.subscribe("CONNECTION_OPEN", () => {
             fakeRequestIds.clear();
@@ -75484,7 +75509,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "72970ecd7cfea6019fcc2860091ffb8880c80879";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e49ca10697d7bf508295309c9617a2a7f9332be3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
