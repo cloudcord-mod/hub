@@ -348,6 +348,10 @@ def main() -> None:
                     shutil.rmtree(target)
                 shutil.copytree(bundle, target)
 
+        # Include provenance before final signing, for every IPA variant.
+        from build_provenance import create
+        create(discord_app / "cloudcord-build.json", "ios:" + args.output.stem)
+
         # Screen sharing runs in BroadcastUpload.appex. Preserve and re-apply every
         # extension's original capabilities, then sign the containing app last.
         for extension, entitlements in extension_entitlements.items():

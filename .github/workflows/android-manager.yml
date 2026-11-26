@@ -134,6 +134,7 @@ jobs:
           python3 android/scripts/prepare-xposed-startup.py _kettu_xposed/app/src/main/kotlin/io/github/revenge/xposed/modules/HookScriptLoaderModule.kt
           mkdir -p _kettu_xposed/app/src/main/assets
           cp dist/cc.js _kettu_xposed/app/src/main/assets/revenge.bundle
+          python3 android/scripts/build_provenance.py write _kettu_xposed/app/src/main/assets/cloudcord-build.json android-module
 
       - name: Build KettuXposed module
         run: |
@@ -155,6 +156,8 @@ jobs:
           fi
           mkdir -p android/app/src/main/assets
           cp "$module_apk" android/app/src/main/assets/cloudcord-module.apk
+          python3 android/scripts/build_provenance.py write android/app/src/main/assets/cloudcord-build.json android-manager
+          unzip -p "$module_apk" assets/cloudcord-build.json | python3 -m json.tool > /dev/null
           test -s android/app/src/main/assets/cloudcord-module.apk
           cmp dist/cc.js <(unzip -p "$module_apk" assets/revenge.bundle)
 
