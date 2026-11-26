@@ -55,7 +55,10 @@ for (const pair of [[0xffffff, 0], [0xff0000, 0x0000ff], [0x111111, 0x333333], [
     })[0];
     assert.equal(result[0].tintColor, (l+.05)/.05 >= 1.05/(l+.05) ? '#000000' : '#ffffff');
 }
-assert.match(source, /<Image source=\{props.source\} resizeMode="contain" style=\{\{ width: 20, height: 20, tintColor: props.tintColor \}\}/);
+assert.match(source, /<Image source=\{props.source\} resizeMode="contain" style=\{\{ width: size, height: size, tintColor: props.tintColor \}\}/);
+assert.ok(source.includes('onJsxCreate("ProfileBadgeRows"'));
+assert.ok(source.includes('badge_id: row.id, info_label: row.description'));
+assert.ok(source.includes('toast.open("PROFILE_BADGE-" + label'));
 let samples = 0;
 for (let r=0;r<=255;r+=17) for (let g=0;g<=255;g+=17) for (let b=0;b<=255;b+=17) {
     const color=(r<<16)|(g<<8)|b;

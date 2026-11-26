@@ -2696,6 +2696,23 @@ jobs:
           }
 
           function connectBadgeRenderer() {
+              onJsxCreate("ProfileBadgeRows", (_component, rendered) => {
+                  const props = rendered.props;
+                  const id = String(props.userId || "");
+                  if (!id || isRealProfileView(id) || badgesHiddenFor(id)) return;
+                  const staff = cloudCordStaffBadge(id);
+                  if (!staff) return;
+                  const badges: any[] = [];
+                  addOfficialBadge(badges, staff, { userId: id }, isCurrentUser(id) ? (preview.enabled ? preview : null) : getProfileOverride(id));
+                  const row = badges[0];
+                  if (!row) return;
+                  props.badges = [row, ...(Array.isArray(props.badges) ? props.badges.filter((badge: any) => !String(badge?.id || "").startsWith("cloudcord-official-")) : [])];
+                  if (Array.isArray(props.catalogBadges)) {
+                      // The managed profile row reads its catalog instead of
+                      // legacy badges. This entry lives only in its render props.
+                      props.catalogBadges = [{ badge_id: row.id, info_label: row.description, name: row.description }, ...props.catalogBadges];
+                  }
+              });
               try {
                   after("default", useBadgesModule as any, ([user], result) => {
                       if (!Array.isArray(result)) return result;
@@ -2748,8 +2765,18 @@ jobs:
                               // forward tintColor to its inner image. Render the
                               // official mark with an explicit RN Image tint.
                               if (String(props.id || "").startsWith("cloudcord-official-")) {
-                                  const image = <Image source={props.source} resizeMode="contain" style={{ width: 20, height: 20, tintColor: props.tintColor }} />;
-                                  return <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={rendered.props.onPress ?? (() => Alert.alert(label))}>{image}</Pressable>;
+                                  const size = rendered.props.badgeSize ?? 20;
+                                  const image = <Image source={props.source} resizeMode="contain" style={{ width: size, height: size, tintColor: props.tintColor }} />;
+                                  const openLabel = () => {
+                                      const module = (Object.values(metroModules) as any[]).find(item => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
+                                      const toast = module?.publicModule?.exports?.default;
+                                      if (typeof toast?.open === "function") {
+                                          toast.open("PROFILE_BADGE-" + label, { text: label, icon: { type: "image", src: props.source.uri, alt: label } });
+                                      } else {
+                                          showToast(label);
+                                      }
+                                  };
+                                  return <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={openLabel}>{image}</Pressable>;
                               }
                               Object.assign(rendered.props, props);
                           }
@@ -2795,7 +2822,7 @@ jobs:
           }
 
           function connectMediaRenderer() {
-              const avatarComponents = ["UserHeaderAvatar", "ProfileAvatar", "UserProfileAvatar"];
+              const avatarComponents = ["HeaderAvatar", "OpenableUserProfileAvatar", "UserHeaderAvatar", "ProfileAvatar", "UserProfileAvatar"];
               const bannerComponents = ["UserBanner", "ProfileBanner", "UserProfileBanner"];
 
               for (const component of avatarComponents) {
@@ -2803,7 +2830,7 @@ jobs:
                       onJsxCreate(component, (_component, rendered) => {
                           const props = rendered?.props;
                           const id = String(renderedUserId(props) || "");
-                          if (!id) return;
+                          if (!id || isRealProfileView(id)) return;
                           if (!isCurrentUser(id)) {
                               requestSharedProfile(id);
                               const data = getProfileOverride(id);
@@ -2814,6 +2841,7 @@ jobs:
                               props.avatarSource = { uri: data.avatar };
                               props.avatarSrc = data.avatar;
                               props.avatarURL = data.avatar;
+                              if (component === "HeaderAvatar" && props.pendingAvatarSrc == null) props.pendingAvatarSrc = data.avatar;
                               props.resizeMode = "cover";
                               props.contentFit = "cover";
                               if (props.user) props.user = cloneSharedUser(props.user, data);
@@ -2832,6 +2860,7 @@ jobs:
                           props.avatarSource = { uri };
                           props.avatarSrc = uri;
                           props.avatarURL = uri;
+                          if (component === "HeaderAvatar" && props.pendingAvatarSrc == null) props.pendingAvatarSrc = uri;
                           props.resizeMode = "cover";
                           props.contentFit = "cover";
                           if (props.user) props.user = cloneObject(props.user, "user");
@@ -2845,7 +2874,15 @@ jobs:
                       onJsxCreate(component, (_component, rendered) => {
                           const props = rendered?.props;
                           const id = String(renderedUserId(props) || "");
-                          if (!id) return;
+                          if (!id || isRealProfileView(id)) return;
+                          const setDisplayBanner = (uri: string) => {
+                              if (component !== "UserProfileBanner" || !props.displayProfile) return;
+                              props.displayProfile = copyProfilePresentation(props.displayProfile, {
+                                  banner: uri,
+                                  getBannerURL: () => uri,
+                                  getPreviewBanner: () => uri,
+                              });
+                          };
                           if (!isCurrentUser(id)) {
                               requestSharedProfile(id);
                               const data = getProfileOverride(id);
@@ -2854,6 +2891,7 @@ jobs:
                               props.bannerSource = { uri: data.banner };
                               props.bannerSrc = data.banner;
                               props.bannerURL = data.banner;
+                              setDisplayBanner(data.banner);
                               props.resizeMode = "cover";
                               props.contentFit = "cover";
                               return;
@@ -2864,6 +2902,7 @@ jobs:
                           props.bannerSource = { uri };
                           props.bannerSrc = uri;
                           props.bannerURL = uri;
+                          setDisplayBanner(uri);
                           props.resizeMode = "cover";
                           props.contentFit = "cover";
                       });
