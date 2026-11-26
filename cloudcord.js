@@ -34156,16 +34156,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }, [
       navigation2
     ]);
-    var items = (0, import_react8.useMemo)(() => {
+    var catalog = (0, import_react8.useMemo)(() => {
       var values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
-      return values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (status === "All" || !props.isEnabled || props.isEnabled(item) === (status === "Enabled")));
+      return values.filter((item) => isNotNil(item) && typeof item === "object");
     }, [
       props.items,
-      props.resolveItem,
-      props.isEnabled,
-      status,
-      matchesFilter
+      props.resolveItem
     ]);
+    var items = catalog.filter((item) => (!matchesFilter || matchesFilter(item)) && (status === "All" || !props.isEnabled || props.isEnabled(item) === (status === "Enabled")));
     var results = (0, import_react8.useMemo)(() => {
       var matches = commandSearch ? commandSearch(items, query).map((obj) => ({
         obj
@@ -34246,8 +34244,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     var headerElement = /* @__PURE__ */ jsxs(import_react_native28.View, {
       style: {
-        paddingBottom: 14,
-        gap: 12
+        paddingHorizontal: 16,
+        paddingTop: 12,
+        paddingBottom: 10,
+        gap: 10
       },
       children: [
         settings.safeMode?.enabled && /* @__PURE__ */ jsxs(import_react_native28.View, {
@@ -34328,74 +34328,91 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        props.filterOptions && /* @__PURE__ */ jsx(Button, {
-          variant: "secondary",
-          size: "sm",
-          text: filter || "All plugins",
-          onPress: () => showSimpleActionSheet2({
-            key: "AddonListFilters",
-            header: {
-              title: "Filter plugins",
-              onClose: () => hideActionSheet("AddonListFilters")
-            },
-            options: [
-              "",
-              ...Object.keys(props.filterOptions)
-            ].map((name) => ({
-              label: name || "All plugins",
-              onPress: () => setFilter(name)
-            }))
-          })
+        props.filterOptions && /* @__PURE__ */ jsx(import_react_native28.ScrollView, {
+          horizontal: true,
+          showsHorizontalScrollIndicator: false,
+          keyboardShouldPersistTaps: "handled",
+          contentContainerStyle: {
+            gap: 8
+          },
+          children: [
+            "",
+            ...Object.keys(props.filterOptions)
+          ].map((name) => /* @__PURE__ */ jsx(Button, {
+            size: "sm",
+            text: name || "Default",
+            variant: filter === name ? "primary" : "secondary",
+            onPress: () => setFilter(name)
+          }, name || "default"))
         }),
-        props.ListHeaderComponent && /* @__PURE__ */ jsx(props.ListHeaderComponent, {})
+        /* @__PURE__ */ jsxs(Text, {
+          variant: "text-sm/medium",
+          color: "text-muted",
+          children: [
+            results.length,
+            " shown",
+            props.isEnabled ? ` \xB7 ${catalog.filter(props.isEnabled).length} enabled` : ""
+          ]
+        })
       ]
     });
     return /* @__PURE__ */ jsx(ErrorBoundary, {
-      children: /* @__PURE__ */ jsx(FlashList, {
-        data: results,
-        extraData: search,
-        keyExtractor: getItemKey ? keyExtractor : void 0,
-        keyboardShouldPersistTaps: "handled",
-        estimatedItemSize: 136,
-        ListHeaderComponent: headerElement,
-        ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native28.View, {
-          style: {
-            gap: 12,
-            padding: 12,
-            alignItems: "center"
-          },
-          children: [
-            /* @__PURE__ */ jsx(import_react_native28.Image, {
-              source: findAssetId("devices_not_found")
-            }),
-            /* @__PURE__ */ jsx(Text, {
-              variant: "text-lg/semibold",
-              color: "text-default",
-              children: filter ? "No plugins match these filters." : "No add-ons match this view."
-            }),
-            (filter || status !== "All") && /* @__PURE__ */ jsx(Button, {
-              variant: "secondary",
-              size: "sm",
-              text: "Clear filters",
-              onPress: () => {
-                setFilter("");
-                setStatus("All");
-              }
-            })
-          ]
-        }),
-        contentContainerStyle: {
-          paddingTop: 12,
-          paddingHorizontal: 16,
-          paddingBottom: bottomInset + 16
+      children: /* @__PURE__ */ jsxs(import_react_native28.View, {
+        style: {
+          flex: 1,
+          alignSelf: "center",
+          width: "100%",
+          maxWidth: 840
         },
-        ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native28.View, {
-          style: {
-            height: 10
-          }
-        }),
-        ListFooterComponent: props.ListFooterComponent,
-        renderItem
+        children: [
+          headerElement,
+          /* @__PURE__ */ jsx(FlashList, {
+            data: results,
+            extraData: search,
+            keyExtractor: getItemKey ? keyExtractor : void 0,
+            keyboardShouldPersistTaps: "handled",
+            estimatedItemSize: 136,
+            ListHeaderComponent: props.ListHeaderComponent,
+            ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native28.View, {
+              style: {
+                gap: 12,
+                padding: 12,
+                alignItems: "center"
+              },
+              children: [
+                /* @__PURE__ */ jsx(import_react_native28.Image, {
+                  source: findAssetId("devices_not_found")
+                }),
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "text-lg/semibold",
+                  color: "text-default",
+                  children: filter ? "No plugins match these filters." : "No add-ons match this view."
+                }),
+                (filter || status !== "All") && /* @__PURE__ */ jsx(Button, {
+                  variant: "secondary",
+                  size: "sm",
+                  text: "Clear filters",
+                  onPress: () => {
+                    setFilter("");
+                    setStatus("All");
+                  }
+                })
+              ]
+            }),
+            contentContainerStyle: {
+              paddingTop: 12,
+              paddingHorizontal: 16,
+              paddingBottom: bottomInset + 16
+            },
+            ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native28.View, {
+              style: {
+                height: 10
+              }
+            }),
+            ListFooterComponent: props.ListFooterComponent,
+            renderItem
+          })
+        ]
       })
     });
   }
@@ -70989,38 +71006,44 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       contentContainerStyle: {
         paddingBottom: 38
       },
-      children: /* @__PURE__ */ jsx(Stack, {
+      children: /* @__PURE__ */ jsxs(Stack, {
         style: {
-          paddingVertical: 24,
-          paddingHorizontal: 12
+          width: "100%",
+          maxWidth: 720,
+          alignSelf: "center",
+          paddingVertical: 20,
+          paddingHorizontal: 16
         },
-        spacing: 24,
-        children: /* @__PURE__ */ jsxs(TableRowGroup, {
-          title: "Add-ons",
-          children: [
-            /* @__PURE__ */ jsx(TableRow, {
+        spacing: 12,
+        children: [
+          /* @__PURE__ */ jsx(Card, {
+            children: /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Plugins",
-              subLabel: "Manage and configure your plugins",
+              subLabel: "Find, enable, and configure plugins",
               icon: icon2("PuzzlePieceIcon", "AppsIcon", "SettingsIcon"),
               onPress: () => open("Plugins", () => (init_Plugins(), __toCommonJS(Plugins_exports)))
-            }),
-            hasThemes && /* @__PURE__ */ jsx(TableRow, {
+            })
+          }),
+          hasThemes && /* @__PURE__ */ jsx(Card, {
+            children: /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Themes",
-              subLabel: "Manage your Discord themes",
+              subLabel: "Change colors and chat backgrounds",
               icon: icon2("PaintPaletteIcon", "ThemeIcon", "SettingsIcon"),
               onPress: () => open("Themes", () => (init_Themes(), __toCommonJS(Themes_exports)))
-            }),
-            /* @__PURE__ */ jsx(TableRow, {
+            })
+          }),
+          /* @__PURE__ */ jsx(Card, {
+            children: /* @__PURE__ */ jsx(TableRow, {
               arrow: true,
               label: "Fonts",
               subLabel: isFontSupported() ? "Browse and apply fonts" : "Browse fonts \xB7 applying requires a compatible loader",
               icon: icon2("LettersIcon", "TextIcon"),
               onPress: () => open("Fonts", () => (init_Fonts(), __toCommonJS(Fonts_exports)))
             })
-          ]
-        })
+          })
+        ]
       })
     });
   }
@@ -75245,7 +75268,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7c7a71da5c62799e2cbae3c51a1e22a313c291de";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ae7df5f6242fbf225433557818f5b03c9c9df0ca";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
