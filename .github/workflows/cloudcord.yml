@@ -3746,10 +3746,15 @@ jobs:
               }
           }
 
-          function deliverMobileWelcome() {
+          function deliverMobileWelcome(test = false) {
               if (!fakeMessages || !currentUserId || AppState.currentState !== "active") return;
               const list = savedConversations();
-              if ((settings as any).cloudcordWelcomeDmCreated || list.some(item => item.id === "cloudcord-welcome-demo")) return;
+              const existing = list.find(item => item.id === "cloudcord-welcome-demo");
+              if (existing) {
+                  if (test) fakeMessages.show(existing.channelId);
+                  return existing.channelId;
+              }
+              if (!test && (settings as any).cloudcordWelcomeDmCreated) return;
               const channelId = newLocalChannelId();
               saveConversations([...list, {
                   id: "cloudcord-welcome-demo",
@@ -3762,6 +3767,11 @@ jobs:
               }]);
               (settings as any).cloudcordWelcomeDmCreated = true;
               fakeMessages.show(channelId);
+              return channelId;
+          }
+
+          export function testMobileWelcome() {
+              return deliverMobileWelcome(true);
           }
           // Store lookups that miss scan every module on mobile, so each store is searched at most twice.
           let orbSearches = 0;

@@ -266,6 +266,14 @@ export default function Diagnostics() {
     return <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 48 }}>
         <Stack style={{ paddingVertical: 24, paddingHorizontal: 12 }} spacing={24}>
             <TableRowGroup title="Runtime diagnostics">
+                <TableRow label="Test Welcome Message" subLabel="Preview the welcome DM on this device" onPress={() => {
+                    try {
+                        const channelId = require("@core/ui/settings/pages/FakeProfile").testMobileWelcome();
+                        showToast(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
+                    } catch {
+                        showToast("Couldn’t open the welcome DM");
+                    }
+                }} />
                 <TableSwitchRow
                     label="Intercept CloudCord events"
                     subLabel="Records sanitized runtime, UI, and request timing metadata only"
