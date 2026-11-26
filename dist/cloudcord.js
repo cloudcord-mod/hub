@@ -26214,7 +26214,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               ...list,
               {
                 id: "cloudcord-welcome-demo",
-                name: "Discord (Simulation)",
+                name: "CloudCord welcome",
                 channelId,
                 dm: {
                   person: "discord-demo",
@@ -26223,8 +26223,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                 people: [
                   {
                     key: "discord-demo",
-                    name: "Discord (Simulation)",
-                    username: "discord-simulation"
+                    userId: "643945264868098049"
                   }
                 ],
                 lines: [
@@ -27468,7 +27467,18 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function savedConversations() {
     var list = rootSettings.fakeMessages;
-    return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean);
+    return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean).map((item) => {
+      if (item.id !== "cloudcord-welcome-demo")
+        return item;
+      return {
+        ...item,
+        name: "CloudCord welcome",
+        people: item.people.map((person) => person.key === "discord-demo" ? {
+          key: person.key,
+          userId: "643945264868098049"
+        } : person)
+      };
+    });
   }
   function saveConversations(list) {
     rootSettings.fakeMessages = list.map(normalizeConversation).filter(Boolean);
@@ -75517,7 +75527,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8fd034e3626f061ea13df40cc4d292efaeee5e78";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8382f241ca827b81aa7099a4e6371c56f62599a3";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
