@@ -54,7 +54,7 @@ export default function FontCard({ item: font }: CardWrapper<FontDefinition>) {
                                 size="sm"
                                 variant={selected ? "secondary" : "primary"}
                                 disabled={!canApply || busy}
-                                text={!canApply ? "Requires loader update" : busy ? "Loading…" : selected ? "Unapply" : "Use font"}
+                                text={!canApply ? "Requires loader update" : busy ? "Loading…" : selected ? "Unapply" : "Use"}
                                 onPress={async () => {
                                     setBusy(true);
                                     try {

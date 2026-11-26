@@ -65,6 +65,7 @@ function PluginPage(props: PluginPageProps) {
     <AddonPage<PluginRow>
       CardComponent={PluginListCard}
       isEnabled={isPluginRowEnabled}
+      showPluginSummary
       title={Strings.PLUGINS}
       filterOptions={pluginFilters}
       defaultFilter={showDefaultRow}

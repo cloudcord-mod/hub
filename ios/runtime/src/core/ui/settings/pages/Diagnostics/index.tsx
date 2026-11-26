@@ -178,6 +178,7 @@ export default function Diagnostics() {
     const savedOrder = settings.cloudcordTabOrder ?? [];
     const order = [...savedOrder.filter(key => TAB_KEYS.includes(key as any)), ...TAB_KEYS.filter(key => !savedOrder.includes(key))];
     const [movingKey, setMovingKey] = useState<string | null>(null);
+    const [welcomeStatus, setWelcomeStatus] = useState("");
     const [broadcastCheck, setBroadcastCheck] = useState<Record<string, boolean> | null>(null);
     useEffect(() => {
         let active = true;
@@ -266,12 +267,12 @@ export default function Diagnostics() {
     return <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 48 }}>
         <Stack style={{ paddingVertical: 24, paddingHorizontal: 12 }} spacing={24}>
             <TableRowGroup title="Runtime diagnostics">
-                <TableRow label="Test Welcome Message" subLabel="Preview the welcome DM on this device" onPress={() => {
+                <TableRow label="Test Welcome Message" subLabel={welcomeStatus || "Preview the welcome DM on this device"} onPress={() => {
                     try {
                         const channelId = require("@core/ui/settings/pages/FakeProfile").testMobileWelcome();
-                        showToast(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
+                        setWelcomeStatus(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
                     } catch {
-                        showToast("Couldn’t open the welcome DM");
+                        setWelcomeStatus("Couldn’t prepare the welcome DM");
                     }
                 }} />
                 <TableSwitchRow

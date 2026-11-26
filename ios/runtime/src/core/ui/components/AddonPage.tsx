@@ -29,6 +29,7 @@ interface AddonPageProps<T extends object, I = any> {
     defaultFilter?: (item: T) => boolean;
     resolveItem?: (value: I) => T | undefined;
     isEnabled?: (item: T) => boolean;
+    showPluginSummary?: boolean;
     safeModeHint?: {
         message?: string;
         footer?: ReactNode;
@@ -220,6 +221,10 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                     })}
                 />}
             </View>
+            {props.showPluginSummary && props.isEnabled && <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+                <Button size="sm" variant="secondary" text={catalog.length + " available"} onPress={() => { setStatus("All"); setFilter(""); }} />
+                <Button size="sm" variant="secondary" text={catalog.filter(props.isEnabled).length + " enabled"} onPress={() => { setStatus("Enabled"); setFilter(""); }} />
+            </View>}
             <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
                 {props.isEnabled && (["All", "Enabled", "Disabled"] as const).map(option => (
                     <Button key={option} text={option} size="sm" variant={status === option ? "primary" : "secondary"} onPress={() => setStatus(option)} />
