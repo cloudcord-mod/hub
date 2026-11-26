@@ -11186,20 +11186,15 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   __export(toasts_exports, {
     showToast: () => showToast
   });
-  var import_react_native16, uuid4, showToast;
+  var import_react_native16, showToast;
   var init_toasts = __esm({
     "src/lib/ui/toasts.ts"() {
       "use strict";
       init_asyncIteratorSymbol();
       init_promiseAllSettled();
       init_i18n();
-      init_assets();
-      init_lazy();
-      init_common();
-      init_wrappers();
       import_react_native16 = __toESM(require_react_native());
-      ({ uuid4 } = lazyDestructure(() => findByProps("uuid4")));
-      showToast = (content, asset) => {
+      showToast = (content, _asset) => {
         if (import_react_native16.Platform.OS === "android") {
           try {
             if (typeof import_react_native16.ToastAndroid?.show === "function") {
@@ -11208,20 +11203,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             }
           } catch (e) {
           }
-          import_react_native16.Alert.alert("CloudCord", content);
-          return;
         }
-        return toasts.open({
-          // ? In build 182205/44707, Discord changed their toasts, source is no longer used, rather icon, and a key is needed.
-          // TODO: We could probably have the developer specify a key themselves, but this works to fix toasts
-          key: `vd-toast-${uuid4()}`,
-          content,
-          source: asset,
-          icon: asset
-        });
+        import_react_native16.Alert.alert("CloudCord", content);
       };
       showToast.showCopyToClipboard = (message = Strings.COPIED_TO_CLIPBOARD) => {
-        showToast(message, findAssetId("toast_copy_link"));
+        showToast(message);
       };
     }
   });
@@ -75512,7 +75498,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "d57dfed9afeb8593918baae5248d5152684cb42b";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8a2e3011861ae4dc318d4521dc599a63b64fc08a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
