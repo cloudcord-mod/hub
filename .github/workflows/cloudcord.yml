@@ -493,7 +493,7 @@ jobs:
               return <S.Row label={label} icon={icon} selected={selected} onPress={onPress} />;
           }
           import { Component, cloneElement, createElement, isValidElement, useEffect, useReducer, useRef, useState } from "react";
-          import { Alert, AppState, FlatList, Image, Linking, NativeModules, Pressable, ScrollView, View } from "react-native";
+          import { Alert, AppState, FlatList, Image, Linking, NativeModules, Platform, Pressable, ScrollView, View } from "react-native";
 
           type MediaValue = { uri: string; name: string; type: string; width?: number; height?: number; normalized?: boolean } | null;
           type PreviewSettings = {
@@ -3185,7 +3185,10 @@ jobs:
               if (initialized) return;
               initialized = true;
               try {
-                  installMentionAliases(findByProps("queryMentionResults", "queryChannelUsers", "queryGuildUsers"));
+                  // Keep Discord's native mention result objects on Android until the
+                  // new autocomplete list contract is verified on a physical device.
+                  if (Platform.OS !== "android")
+                      installMentionAliases(findByProps("queryMentionResults", "queryChannelUsers", "queryGuildUsers"));
               } catch (error: any) {
                   diagnostics.last = error?.message || "Could not connect mention autocomplete";
               }

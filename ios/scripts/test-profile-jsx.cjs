@@ -4,9 +4,10 @@ const assert = require('node:assert/strict');
 const esbuild = require(process.env.CLOUDCORD_ESBUILD || 'esbuild');
 const source = fs.readFileSync('ios/runtime/src/lib/api/react/jsx.ts', 'utf8');
 const patches = {};
+let platform = "ios";
 const context = vm.createContext({
     exports: {}, module: { exports: {} },
-    require: name => name === '@lib/api/patcher' ? { after: (method, parent, callback) => { patches[method] = callback; return () => {}; } } : { findByPropsLazy: () => ({}) },
+    require: name => name === '@lib/api/patcher' ? { after: (method, parent, callback) => { patches[method] = callback; return () => {}; } } : name === 'react-native' ? { Platform: { OS: platform } } : { findByPropsLazy: () => ({}) },
 });
 vm.runInContext(esbuild.transformSync(source, { loader: 'ts', format: 'cjs' }).code, context);
 const api = context.module.exports;
@@ -66,3 +67,35 @@ const invalid = Object.freeze({ type: undefined, props: frozenProps });
 assert.equal(patches.jsx([undefined], invalid).type, 'RCTView');
 assert.equal(invalid.type, undefined);
 console.log('PASS: named, displayName and memoized profile hooks match; unrelated elements are untouched.');
+
+// Android overlay lists keep their original data, callbacks, and keys.
+function FlatList() {}
+function GifFavoritesGrid() {}
+function MentionAutocompleteList() {}
+function MasonryFlashList() {}
+function SectionList() {}
+function UnrelatedComponent() {}
+const data = Object.freeze([{id: '1'}, {id: '2'}]);
+const renderItem = () => null;
+const props = Object.freeze({ data, renderItem, removeClippedSubviews: true });
+const element = Object.freeze({ type: FlatList, key: 'list', props });
+assert.equal(patches.jsx([FlatList], element), undefined, 'iOS is unchanged');
+platform = 'android';
+api.patchJsx();
+for (const component of [FlatList, GifFavoritesGrid, MentionAutocompleteList, MasonryFlashList,
+    { $$typeof: Symbol.for('react.memo'), type: FlatList }]) {
+    const input = Object.freeze({ ...element, type: component });
+    const fixed = patches.jsx([component], input);
+    assert.equal(fixed.props.removeClippedSubviews, false);
+    assert.equal(fixed.props.data, data);
+    assert.equal(fixed.props.renderItem, renderItem);
+    assert.equal(fixed.key, 'list');
+    assert.equal(input.props.removeClippedSubviews, true);
+}
+const sections = [{ data }];
+assert.equal(patches.jsxs([SectionList], {type: SectionList, props: {sections, renderItem}}).props.removeClippedSubviews, false);
+assert.equal(patches.jsx([UnrelatedComponent], element), undefined);
+assert.equal(patches.jsx([FlatList], {type: FlatList, props: {...props, data: Array(257)}}), undefined);
+assert.equal(patches.jsx([FlatList], {type: FlatList, props: {...props, removeClippedSubviews: false}}), undefined);
+assert.equal(patches.jsx([FlatList], {type: FlatList, props: {data}}), undefined);
+console.log('PASS: Android bounded overlay-list clipping guard; iOS and large lists unchanged.');

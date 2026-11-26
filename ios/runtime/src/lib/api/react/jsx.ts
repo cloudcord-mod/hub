@@ -28,7 +28,31 @@ export function deleteJsxCreate(Component: ComponentTarget, callback: Callback, 
 /**
  * @internal
  */
+// Android's clipped native children can stay detached after keyboard or
+// sheet layout changes. Limit the workaround to small, identifiable lists.
+function preserveAndroidListChildren(component: any, element: JSX.Element) {
+    const props = element.props;
+    if (!props || typeof props.renderItem !== "function" || props.removeClippedSubviews === false)
+        return element;
+    const inner = component?.$$typeof === Symbol.for("react.memo") ? component.type : component;
+    const names = [component?.displayName, component?.name, inner?.displayName, inner?.name,
+        inner?.render?.displayName, inner?.render?.name];
+    const list = names.some(name => typeof name === "string" &&
+        (/^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name)
+            || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
+    if (!list) return element;
+    let count: number | undefined;
+    if (Array.isArray(props.data)) count = props.data.length;
+    else if (Array.isArray(props.sections) && props.sections.every((section: any) => Array.isArray(section?.data)))
+        count = props.sections.reduce((total: number, section: any) => total + section.data.length, 0);
+    if (count === undefined || count > 256) return element;
+    return { ...element, props: { ...props, removeClippedSubviews: false } };
+}
+
 export function patchJsx() {
+    let android = false;
+    try { android = require("react-native")?.Platform?.OS === "android"; } catch {}
+
     const callback = ([Component]: unknown[], ret: JSX.Element) => {
         if (!ret || typeof ret !== "object") return;
         // Band-aid fix for iOS invalid element type crashes
@@ -36,6 +60,8 @@ export function patchJsx() {
             return { ...ret, type: "RCTView" };
         }
 
+        const original = ret;
+        if (android) ret = preserveAndroidListChildren(Component, ret);
         const component: any = Component;
         const inner = component?.$$typeof === Symbol.for("react.memo") ? component.type : component;
         const target = typeof inner === "function" ? inner
@@ -65,6 +91,7 @@ export function patchJsx() {
             }
             return ret;
         }
+        if (ret !== original) return ret;
     };
 
     const patches = [
