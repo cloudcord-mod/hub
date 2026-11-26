@@ -24587,8 +24587,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       rootSettings.fakeProfileNativeOrder = action.pendingBadgeDisplayOrder.map(Number);
     if (Array.isArray(action.pendingBadgeHiddenBadges))
       rootSettings.fakeProfileNativeHidden = action.pendingBadgeHiddenBadges.map(Number);
-    if (Array.isArray(action.pendingBadgeDisplayOrder) || Array.isArray(action.pendingBadgeHiddenBadges))
+    if (Array.isArray(action.pendingBadgeDisplayOrder) || Array.isArray(action.pendingBadgeHiddenBadges)) {
       queueSharedPublish();
+      if (currentUserId)
+        reapplyBadgeDirectory(currentUserId);
+    }
   }
   function reapplyBadgeDirectory(id) {
     if (queuedBadgeDirectoryReplays.has(id))
@@ -25235,11 +25238,55 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return original(...args.map((value) => presentationIdentity(value)));
     });
     for (var module of Object.values(metroModules)) {
-      if (module?.isInitialized !== true || module?.hasError || module?.__filePath !== "modules/message_previews/useLatestChannelMessage.tsx")
+      if (module?.isInitialized !== true || module?.hasError)
         continue;
-      addPatch("default", module.publicModule?.exports, (args, original) => presentationIdentity(original(...args)));
+      var exports = module.publicModule?.exports;
+      if (module.__filePath === "modules/message_previews/useLatestChannelMessage.tsx") {
+        addPatch("default", exports, (args, original) => presentationIdentity(original(...args)));
+      }
+      if (module.__filePath === "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelAvatar.tsx") {
+        addPatch("type", exports?.default, (args, original) => {
+          var [, refresh] = (0, import_react7.useReducer)((value) => value + 1, 0);
+          (0, import_react7.useEffect)(() => {
+            var update = () => refresh();
+            identityRefreshers.add(update);
+            return () => {
+              identityRefreshers.delete(update);
+            };
+          }, []);
+          var element = original(...args);
+          if (args[0]?.channel?.type !== 1 || !/* @__PURE__ */ (0, import_react7.isValidElement)(element))
+            return element;
+          var props = element.props;
+          var user = presentationIdentity(props.user);
+          if (!user || user === props.user)
+            return element;
+          return /* @__PURE__ */ (0, import_react7.cloneElement)(element, {
+            user,
+            avatarDecoration: user.avatarDecoration
+          });
+        });
+      }
     }
     var rowManager = findByName("RowManager");
+    var channelNames2 = findByProps("computeChannelName", "useComputedGroupDmName");
+    addPatch("default", channelNames2, (args, original) => {
+      var [, refresh] = (0, import_react7.useReducer)((value) => value + 1, 0);
+      (0, import_react7.useEffect)(() => {
+        var update = () => refresh();
+        identityRefreshers.add(update);
+        return () => {
+          identityRefreshers.delete(update);
+        };
+      }, []);
+      var result = original(...args);
+      var channel = args[0];
+      if (channel?.type !== 1 || channel.isObfuscated?.())
+        return result;
+      var id = channel.getRecipientId?.() ?? channel.recipients?.[0];
+      var user = id ? safeStore("UserStore")?.getUser?.(id) : null;
+      return presentationName(result, user);
+    });
     addPatch("generate", rowManager?.prototype, (args, original) => original(...args.map((value) => presentationIdentity(value))));
     for (var method of [
       "default",
@@ -29803,8 +29850,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       preview = rootSettings.fakeProfile;
       queueSharedPublish();
       clearCache();
-      if (refresh)
+      if (refresh) {
         refreshPreview();
+        if (currentUserId && /badge|nitro|boost|^enabled$/i.test(key))
+          reapplyBadgeDirectory(currentUserId);
+      }
       suppressOwnPullUntil = Date.now() + 15e3;
       if (key === "nitroEnabled" || key === "enabled") {
         try {
@@ -74928,7 +74978,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3eae40a6c252fa4a8c9d8eb2fbc1be29f8a9f40c";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b69afc878194faf93e85bb325aa4371a140ae6da";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
