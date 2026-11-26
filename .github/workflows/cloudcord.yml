@@ -1548,7 +1548,6 @@ jobs:
                   if (JSON.stringify(nextPreview) !== JSON.stringify(preview)) {
                       rootSettings.fakeProfile = preview = nextPreview;
                       clearCache();
-                      reapplyBadgeDirectory(requestedUserId);
                   }
                   setProfileSyncFeedback(requestedUserId, "confirmed");
                   diagnostics.last = "Fake Profile synced across devices";
