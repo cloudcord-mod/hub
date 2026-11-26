@@ -67377,6 +67377,19 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   __export(PluginBrowser_exports, {
     default: () => BrowserPage
   });
+  function parseRankings(value) {
+    var lists = value;
+    var read = (key) => {
+      var list = lists?.[key];
+      return Array.isArray(list) ? [
+        ...new Set(list.slice(0, 50).map(pluginDirectory).filter((url2) => Boolean(url2)))
+      ] : [];
+    };
+    return {
+      Popular: read("Popular"),
+      Trending: read("Trending")
+    };
+  }
   function pluginDirectory(value) {
     if (typeof value !== "string" || value.length > 2048 || /[\s\\]/.test(value) || !/^https:\/\//i.test(value))
       return;
@@ -67518,6 +67531,11 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var [workingOnly, setWorkingOnly] = React2.useState(true);
     var [installedOnly, setInstalledOnly] = React2.useState(false);
     var [alphabetical, setAlphabetical] = React2.useState(false);
+    var [section, setSection] = React2.useState("Featured");
+    var [rankings, setRankings] = React2.useState({
+      Popular: [],
+      Trending: []
+    });
     var [busyIds, setBusyIds] = React2.useState(() => /* @__PURE__ */ new Set());
     var actions = React2.useRef(/* @__PURE__ */ new Set());
     var refreshing = React2.useRef(false);
@@ -67538,6 +67556,17 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     })();
     React2.useEffect(() => {
       void refresh();
+    }, []);
+    React2.useEffect(() => {
+      var active = true;
+      void safeFetch(rankingsUrl).then((response) => response.json()).then((value) => {
+        if (active)
+          setRankings(parseRankings(value));
+      }).catch(() => {
+      });
+      return () => {
+        active = false;
+      };
     }, []);
     function change(addon, remove) {
       return _async_to_generator(function* () {
@@ -67561,18 +67590,36 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })();
     }
     var query = search.trim().toLowerCase();
-    var shown = plugins2.filter((addon) => (!workingOnly || addon.status === "working" || Boolean(library[addon.installUrl])) && (!installedOnly || Boolean(library[addon.installUrl])) && (!query || [
+    var rank = (addon) => section === "Featured" ? featured.indexOf(addon.name) : section === "All" ? -1 : rankings[section].indexOf(addon.installUrl);
+    var shown = plugins2.filter((addon) => (query ? section === "All" || section === "Featured" || rank(addon) >= 0 : section === "All" || rank(addon) >= 0) && (!workingOnly || addon.status === "working" || Boolean(library[addon.installUrl])) && (!installedOnly || Boolean(library[addon.installUrl])) && (!query || [
       addon.name,
       addon.description,
       ...addon.authors
     ].some((value) => value.toLowerCase().includes(query))));
     if (alphabetical)
       shown.sort((a, b3) => a.name.localeCompare(b3.name));
+    else if (section !== "All" && !query)
+      shown.sort((a, b3) => rank(a) - rank(b3));
     else
       shown.reverse();
+    var enabled = plugins2.filter((addon) => library[addon.installUrl]?.enabled === true);
+    function shareEnabled() {
+      return _async_to_generator(function* () {
+        try {
+          yield import_react_native31.Share.share({
+            message: "CloudCord Community Plugins I use\n" + enabled.map((addon) => addon.name + " \u2014 " + addon.installUrl).join("\n")
+          });
+        } catch (e) {
+          showToast("Couldn't open the share menu");
+        }
+      })();
+    }
     return /* @__PURE__ */ jsxs(import_react_native31.View, {
       style: {
-        flex: 1
+        flex: 1,
+        width: "100%",
+        maxWidth: 840,
+        alignSelf: "center"
       },
       children: [
         /* @__PURE__ */ jsxs(import_react_native31.View, {
@@ -67586,6 +67633,29 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               placeholder: "Search plugins or authors",
               isRound: true,
               onChangeText: setSearch
+            }),
+            /* @__PURE__ */ jsx(import_react_native31.View, {
+              style: {
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 6
+              },
+              children: [
+                "Featured",
+                "Popular",
+                "Trending",
+                "All"
+              ].map((tab) => /* @__PURE__ */ jsx(Button, {
+                size: "sm",
+                text: tab,
+                variant: section === tab ? "primary" : "secondary",
+                onPress: () => setSection(tab)
+              }, tab))
+            }),
+            section === "Featured" && !query && /* @__PURE__ */ jsx(Text, {
+              variant: "text-sm/medium",
+              color: "text-muted",
+              children: "CloudCord picks while community rankings get started."
             }),
             /* @__PURE__ */ jsxs(import_react_native31.View, {
               style: {
@@ -67628,6 +67698,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               variant: "text-sm/medium",
               color: "text-muted",
               children: "Third-party plugins run code in your client. Install plugins from authors you trust."
+            }),
+            !!enabled.length && /* @__PURE__ */ jsx(Button, {
+              size: "sm",
+              text: "Share enabled community plugins",
+              variant: "tertiary",
+              onPress: () => void shareEnabled()
             }),
             !!error && /* @__PURE__ */ jsxs(import_react_native31.View, {
               style: {
@@ -67672,7 +67748,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               padding: 24,
               textAlign: "center"
             },
-            children: loading ? "Loading plugins\u2026" : "No plugins match these filters."
+            children: loading ? "Loading plugins\u2026" : (section === "Popular" || section === "Trending") && !rankings[section].length ? "No community rankings yet." : "No plugins match these filters."
           }),
           renderItem: ({ item }) => /* @__PURE__ */ jsx(PluginCard, {
             addon: item,
@@ -67684,7 +67760,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       ]
     });
   }
-  var import_react_native31, pluginIndex;
+  var import_react_native31, pluginIndex, featured, rankingsUrl;
   var init_PluginBrowser = __esm({
     "src/core/ui/settings/pages/PluginBrowser/index.tsx"() {
       "use strict";
@@ -67704,6 +67780,17 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_Search();
       import_react_native31 = __toESM(require_react_native());
       pluginIndex = "https://raw.githubusercontent.com/Purple-EyeZ/Plugins-List/refs/heads/main/src/plugins-data.json";
+      featured = [
+        "Clean URLs",
+        "No typing",
+        "Use System Emoji",
+        "PlatformIndicators",
+        "Read All",
+        "Better Chat Buttons",
+        "Gif Categories",
+        "NoAutoReplyMention"
+      ];
+      rankingsUrl = "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/community-plugin-rankings.json";
     }
   });
 
@@ -69408,7 +69495,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var navigation2 = NavigationNative.useNavigation();
     var review = useAddonReview(kind);
     var isPlugin = kind === "plugin";
-    var discoverLabel = isPlugin ? "Discover plugins" : "Discover themes";
+    var discoverLabel = isPlugin ? "Community Plugins" : "Discover themes";
     var discover = wrapOnPress(void 0, navigation2, () => isPlugin ? Promise.resolve().then(() => (init_PluginBrowser(), PluginBrowser_exports)) : Promise.resolve().then(() => (init_ThemeStore(), ThemeStore_exports)), discoverLabel, void 0, "push");
     var openFonts = wrapOnPress(void 0, navigation2, () => Promise.resolve().then(() => (init_Fonts(), Fonts_exports)), "Fonts", void 0, "push");
     return /* @__PURE__ */ jsxs(import_react_native35.View, {
@@ -75268,7 +75355,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "ae7df5f6242fbf225433557818f5b03c9c9df0ca";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "404ecc4dd6fab4f24e314349861687f513198f18";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
