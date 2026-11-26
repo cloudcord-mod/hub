@@ -3772,7 +3772,7 @@ jobs:
                           dm: { person: "discord-demo", local: true },
                           people: [{ key: "discord-demo", name: "Discord (Simulation)", username: "discord-simulation" }],
                           lines: [{
-                              key: "welcome", person: "discord-demo", minutesAgo: 0,
+                              key: "welcome", person: "discord-demo", minutesAgo: 0, showWelcomeBanner: true,
                               text: "**Simulated welcome DM**\n\nThanks for installing CloudCord!\n\nOpen Discord Settings and scroll to **CloudCord**. Join the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking for help.",
                           }],
                           savedAt: Date.now(),

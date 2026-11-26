@@ -28,6 +28,7 @@ export interface FakeLine {
     key: string;
     person: string;
     text: string;
+    showWelcomeBanner?: boolean;
     /** Minutes before "now" this line appears to be sent, so the conversation reads in order. */
     minutesAgo: number;
 }
@@ -77,6 +78,7 @@ export function normalizeConversation(input: any): FakeConversation | null {
         key: String(line?.key || newKey()),
         person: String(line?.person || ""),
         text: String(line?.text || "").slice(0, 4000),
+        ...(input.id === "cloudcord-welcome-demo" && line?.showWelcomeBanner === true ? { showWelcomeBanner: true } : {}),
         minutesAgo: Math.max(0, Math.min(60 * 24 * 365, Number(line?.minutesAgo) || 0)),
     })).filter((line: FakeLine) => keys.has(line.person) && line.text.trim());
     const dm = input.dm && keys.has(String(input.dm.person)) ? { person: String(input.dm.person), local: input.dm.local === true } : undefined;
@@ -156,7 +158,10 @@ export function installFakeMessages(options: FakeMessagesOptions) {
                 return {
                     id, type: 0, content: line.text, channel_id: conversation.channelId, guild_id: guildId,
                     timestamp: new Date(time).toISOString(), edited_timestamp: null, flags: 0,
-                    author: author(person), attachments: [], embeds: [], mentions: [], mention_roles: [],
+                    author: author(person), attachments: [], embeds: line.showWelcomeBanner ? [{
+                        type: "image",
+                        image: { url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/logo-full.png" },
+                    }] : [], mentions: [], mention_roles: [],
                     mention_everyone: false, pinned: false, tts: false, components: [], cloudcordFake: true,
                 };
             });
