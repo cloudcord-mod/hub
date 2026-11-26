@@ -91,4 +91,26 @@ assert.equal(searches.queryMentionResults({ channelId, query: 'bounded' }).users
 assert.equal(probes.length - existingCount, 3, 'alias searches probe at most three cached users');
 assert(page.includes('<NameStylePreview />'));
 assert(page.includes('findByProps("AVERAGE_FONT_WIDTH_RATIO")'));
-console.log('PASS: message names/styles update for own and synced users without mutating message records; removal restores originals; native preview wired.');
+const avatarStart = page.indexOf('    const dmAvatarRenderers');
+const avatarEnd = page.indexOf('\n    });', avatarStart) + '\n    });'.length;
+let avatarHook;
+const fakeUri = 'https://example.test/avatar.png';
+const nativeAvatar = Object.freeze({ props: Object.freeze({ user: member, status: 'online' }) });
+Object.assign(context, {
+    onJsxCreate(name, callback) { assert.equal(name, 'MessagesItemChannelAvatar'); avatarHook = callback; },
+    useReducer: () => [0, () => {}], useEffect() {}, identityRefreshers: new Set(),
+    isValidElement: value => value === nativeAvatar, isCurrentUser: () => false,
+    isRealProfileView: () => false, requestSharedProfile() {},
+    cloneElement: (value, props) => ({ ...value, props: { ...value.props, ...props } }),
+    getProfileOverride: id => id === member.id ? { avatar: fakeUri } : undefined,
+});
+vm.runInContext(esbuild.transformSync(page.slice(avatarStart, avatarEnd), { loader: 'ts' }).code, context);
+const nativeRenderer = () => nativeAvatar;
+const row = avatarHook(nativeRenderer, { type: nativeRenderer });
+assert.equal(avatarHook(nativeRenderer, {}).type, row.type);
+assert.equal(row.type({ channel: { type: 1 } }).props.source.uri, fakeUri);
+assert.equal(row.type({ channel: { type: 1 } }).props.status, 'online');
+assert.equal(row.type({ channel: { type: 3 } }), nativeAvatar);
+context.getProfileOverride = () => undefined;
+assert.equal(row.type({ channel: { type: 1 } }), nativeAvatar);
+console.log('PASS: DM avatars use the synced image source and restore Discord’s avatar when removed.');

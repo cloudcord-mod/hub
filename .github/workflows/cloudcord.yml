@@ -3202,23 +3202,36 @@ jobs:
                   if (module.__filePath === "modules/message_previews/useLatestChannelMessage.tsx") {
                       addPatch("default", exports, (args, original) => presentationIdentity(original(...args)));
                   }
-                  if (module.__filePath === "modules/main_tabs_v2/native/tabs/messages/items/channel/MessagesItemChannelAvatar.tsx") {
-                      addPatch("type", exports?.default, (args, original) => {
+              }
+              // Attach when the DM component is rendered, including lazy Metro
+              // modules. Avatar prioritizes a source over its user lookup.
+              const dmAvatarRenderers = new WeakMap<Function, any>();
+              onJsxCreate("MessagesItemChannelAvatar", (renderAvatar, rendered) => {
+                  let Wrapper = dmAvatarRenderers.get(renderAvatar);
+                  if (!Wrapper) {
+                      Wrapper = function CloudCordDmAvatar(props: any) {
                           const [, refresh] = useReducer(value => value + 1, 0);
                           useEffect(() => {
                               const update = () => refresh();
                               identityRefreshers.add(update);
                               return () => { identityRefreshers.delete(update); };
                           }, []);
-                          const element = original(...args);
-                          if (args[0]?.channel?.type !== 1 || !isValidElement(element)) return element;
-                          const props = element.props as any;
-                          const user = presentationIdentity(props.user);
-                          if (!user || user === props.user) return element;
-                          return cloneElement(element, { user, avatarDecoration: user.avatarDecoration } as any);
-                      });
+                          // Execute the same native render on every render of
+                          // this wrapper, even while its recipient is loading.
+                          const element = renderAvatar(props);
+                          if (props.channel?.type !== 1 || !isValidElement(element)) return element;
+                          const id = String((element.props as any).user?.id || "");
+                          if (!id || isRealProfileView(id)) return element;
+                          if (!isCurrentUser(id)) requestSharedProfile(id);
+                          const uri = isCurrentUser(id)
+                              ? (preview.enabled ? mediaUri("avatarMedia") : "")
+                              : getProfileOverride(id)?.avatar;
+                          return uri ? cloneElement(element, { source: { uri } } as any) : element;
+                      };
+                      dmAvatarRenderers.set(renderAvatar, Wrapper);
                   }
-              }
+                  return { ...rendered, type: Wrapper };
+              });
               const rowManager = findByName("RowManager") as any;
               const channelNames = findByProps("computeChannelName", "useComputedGroupDmName") as any;
               addPatch("default", channelNames, (args, original) => {
