@@ -21032,7 +21032,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     PreviewsPage: () => PreviewsPage,
     default: () => FakeProfile,
     initializeFakeProfile: () => initializeFakeProfile,
-    testMobileWelcome: () => testMobileWelcome
+    mobileWelcomeCopy: () => mobileWelcomeCopy
   });
   function Card2(props) {
     var _$Component = (init_ProfileStudio(), __toCommonJS(ProfileStudio_exports)).Panel;
@@ -25047,53 +25047,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ])
       _loop2(name, inventory);
   }
-  function deliverMobileWelcome(test = false) {
-    if (!fakeMessages || !currentUserId || import_react_native23.AppState.currentState !== "active")
-      return;
-    var list = savedConversations();
-    var existing = list.find((item) => item.id === "cloudcord-welcome-demo");
-    if (existing) {
-      if (test)
-        fakeMessages.show(existing.channelId);
-      return existing.channelId;
-    }
-    if (!test && settings.cloudcordWelcomeDmCreated)
-      return;
-    var channelId = newLocalChannelId();
-    saveConversations([
-      ...list,
-      {
-        id: "cloudcord-welcome-demo",
-        name: "CloudCord welcome",
-        channelId,
-        dm: {
-          person: "discord-demo",
-          local: true
-        },
-        people: [
-          {
-            key: "discord-demo",
-            userId: "643945264868098049"
-          }
-        ],
-        lines: [
-          {
-            key: "welcome",
-            person: "discord-demo",
-            minutesAgo: 0,
-            text: mobileWelcomeCopy
-          }
-        ],
-        savedAt: Date.now()
-      }
-    ]);
-    settings.cloudcordWelcomeDmCreated = true;
-    fakeMessages.show(channelId);
-    return channelId;
-  }
-  function testMobileWelcome() {
-    return deliverMobileWelcome(true);
-  }
   function installOrbHooks() {
     if (orbHooked.currency && orbHooked.wallet || orbSearches++ > 1)
       return;
@@ -26309,33 +26262,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   }
   function savedConversations() {
     var list = rootSettings.fakeMessages;
-    return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean).map((item) => {
-      if (item.id !== "cloudcord-welcome-demo")
-        return item;
-      return {
-        ...item,
-        name: "CloudCord welcome",
-        people: item.people.map((person) => person.key === "discord-demo" ? {
-          key: person.key,
-          userId: "643945264868098049"
-        } : person),
-        lines: item.lines.filter((line) => line.key !== "welcome-banner").flatMap((line) => line.key === "welcome" ? [
-          {
-            ...line,
-            key: "welcome-banner",
-            text: "",
-            showWelcomeBanner: true
-          },
-          {
-            ...line,
-            text: mobileWelcomeCopy,
-            showWelcomeBanner: false
-          }
-        ] : [
-          line
-        ])
-      };
-    });
+    return (Array.isArray(list) ? list : []).filter((item) => item?.id !== "cloudcord-welcome-demo").map(normalizeConversation).filter(Boolean);
   }
   function saveConversations(list) {
     rootSettings.fakeMessages = list.map(normalizeConversation).filter(Boolean);
@@ -27183,8 +27110,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         setTimeout(() => {
           for (var step2 of [
             installOrbHooks,
-            installSwitcherHook,
-            deliverMobileWelcome
+            installSwitcherHook
           ]) {
             try {
               step2();
@@ -27207,12 +27133,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             } catch (e) {
             }
             restoreLater();
-            setTimeout(() => {
-              try {
-                deliverMobileWelcome();
-              } catch (e) {
-              }
-            }, 1500);
           });
         } catch (e) {
         }
@@ -27270,10 +27190,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           if (state2 !== "active")
             return;
           void refreshPublishedBadges(true);
-          try {
-            deliverMobileWelcome();
-          } catch (e) {
-          }
         });
         if (!sharedSyncTimer)
           sharedSyncTimer = setInterval(() => {
@@ -32583,15 +32499,37 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             children: [
               /* @__PURE__ */ jsx(TableRow, {
                 label: "Test Welcome Message",
-                subLabel: welcomeStatus || "Preview the welcome DM on this device",
+                subLabel: welcomeStatus ? "Hide preview" : "Preview the welcome message on this device",
                 onPress: () => {
                   try {
-                    var channelId = (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).testMobileWelcome();
-                    setWelcomeStatus(channelId ? "Welcome DM ready in Messages" : "Wait for Discord to finish connecting and try again");
+                    setWelcomeStatus(welcomeStatus ? "" : (init_FakeProfile(), __toCommonJS(FakeProfile_exports)).mobileWelcomeCopy);
                   } catch (e) {
-                    setWelcomeStatus("Couldn\u2019t prepare the welcome DM");
+                    setWelcomeStatus("Couldn\u2019t load the welcome preview");
                   }
                 }
+              }),
+              !!welcomeStatus && /* @__PURE__ */ jsxs(Stack, {
+                style: {
+                  padding: 12
+                },
+                spacing: 8,
+                children: [
+                  /* @__PURE__ */ jsx(import_react_native24.Image, {
+                    source: {
+                      uri: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png"
+                    },
+                    style: {
+                      width: "100%",
+                      aspectRatio: 1672 / 940
+                    },
+                    resizeMode: "contain",
+                    accessibilityLabel: "CloudCord welcome banner"
+                  }),
+                  /* @__PURE__ */ jsx(Text, {
+                    variant: "text-sm/normal",
+                    children: welcomeStatus.replace(/^#{2,3} /gm, "").replace(/\*\*/g, "")
+                  })
+                ]
               }),
               /* @__PURE__ */ jsx(TableSwitchRow, {
                 label: "Intercept CloudCord events",
@@ -75498,7 +75436,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8a2e3011861ae4dc318d4521dc599a63b64fc08a";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "a0eab2970bfe6da2c36d6baf30f9fc9872ca4d16";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
