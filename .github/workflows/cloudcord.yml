@@ -2695,7 +2695,30 @@ jobs:
               try { FluxDispatcher.subscribe("USER_PROFILE_SETTINGS_SET_PENDING_CHANGES", onBadgeCustomiserChange); } catch {}
           }
 
+          function openCloudCordBadgeLabel(label: string, uri: string) {
+              const module = (Object.values(metroModules) as any[]).find(item => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
+              const toast = module?.publicModule?.exports?.default;
+              if (typeof toast?.open === "function") {
+                  toast.open("PROFILE_BADGE-" + label, { text: label, icon: { type: "image", src: uri, alt: label } });
+              } else {
+                  showToast(label);
+              }
+          }
+
           function connectBadgeRenderer() {
+              onJsxCreate("BadgeSection", (_component, rendered) => {
+                  const props = rendered.props;
+                  // The directory supplies empty-state text only for its own
+                  // earned section, including accounts with zero native badges.
+                  if (!currentUserId || !Array.isArray(props.badges) || typeof props.emptyText !== "string" || typeof props.onPressBadge !== "function") return;
+                  const staff = cloudCordStaffBadge(currentUserId);
+                  if (!staff || props.badges.some((badge: any) => badge?.badge_id === staff.id)) return;
+                  const nativePress = props.onPressBadge;
+                  props.badges = [{ badge_id: staff.id, owned: true, name: staff.label, info_label: staff.label, simple_icon_raster_url: staff.icon }, ...props.badges];
+                  props.onPressBadge = (badge: any) => badge?.badge_id === staff.id
+                      ? openCloudCordBadgeLabel(staff.label, staff.icon)
+                      : nativePress(badge);
+              });
               onJsxCreate("ProfileBadgeRows", (_component, rendered) => {
                   const props = rendered.props;
                   const id = String(props.userId || "");
@@ -2767,15 +2790,7 @@ jobs:
                               if (String(props.id || "").startsWith("cloudcord-official-")) {
                                   const size = rendered.props.badgeSize ?? 20;
                                   const image = <Image source={props.source} resizeMode="contain" style={{ width: size, height: size, tintColor: props.tintColor }} />;
-                                  const openLabel = () => {
-                                      const module = (Object.values(metroModules) as any[]).find(item => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
-                                      const toast = module?.publicModule?.exports?.default;
-                                      if (typeof toast?.open === "function") {
-                                          toast.open("PROFILE_BADGE-" + label, { text: label, icon: { type: "image", src: props.source.uri, alt: label } });
-                                      } else {
-                                          showToast(label);
-                                      }
-                                  };
+                                  const openLabel = () => openCloudCordBadgeLabel(label, props.source.uri);
                                   return <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={openLabel}>{image}</Pressable>;
                               }
                               Object.assign(rendered.props, props);
