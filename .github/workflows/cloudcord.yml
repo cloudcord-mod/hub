@@ -3759,6 +3759,27 @@ jobs:
                   <Text variant="text-sm/medium" style={{ color: "#c6cfdf" }}>Profile Studio changes your look. Add-ons is where you’ll find plugins, themes, and fonts.</Text>
                   <Text variant="text-sm/medium" style={{ color: "#c6cfdf" }}>Join our Discord and check #faq before asking for help.</Text>
                   <Button size="sm" variant="primary" text="Join the CloudCord server" onPress={() => void Linking.openURL("https://discord.gg/cloudcord").catch(() => showToast("Couldn’t open the invite"))} />
+                  <Button size="sm" variant="secondary" text="Add simulated welcome DM" onPress={() => {
+                      if (!fakeMessages) return;
+                      const list = savedConversations();
+                      const existing = list.find(item => item.id === "cloudcord-welcome-demo");
+                      if (existing) { fakeMessages.show(existing.channelId); close(); return; }
+                      const channelId = newLocalChannelId();
+                      saveConversations([...list, {
+                          id: "cloudcord-welcome-demo",
+                          name: "Discord (Simulation)",
+                          channelId,
+                          dm: { person: "discord-demo", local: true },
+                          people: [{ key: "discord-demo", name: "Discord (Simulation)", username: "discord-simulation" }],
+                          lines: [{
+                              key: "welcome", person: "discord-demo", minutesAgo: 0,
+                              text: "**Simulated welcome DM**\n\nThanks for installing CloudCord!\n\nOpen Discord Settings and scroll to **CloudCord**. Join the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking for help.",
+                          }],
+                          savedAt: Date.now(),
+                      }]);
+                      fakeMessages.show(channelId);
+                      close();
+                  }} />
                   <Button size="sm" variant="secondary" text="Got it" onPress={close} />
               </View>);
               (settings as any).cloudcordMobileWelcomeSeen = true;
