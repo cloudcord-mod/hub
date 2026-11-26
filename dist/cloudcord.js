@@ -7574,7 +7574,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (cbs.length === 0)
       list.delete(Component2);
   }
-  function preserveAndroidListChildren(component, element) {
+  function preserveOverlayListChildren(component, element, android) {
     var props = element.props;
     if (!props || typeof props.renderItem !== "function" || props.removeClippedSubviews === false)
       return element;
@@ -7587,7 +7587,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       inner?.render?.displayName,
       inner?.render?.name
     ];
-    var list = names.some((name) => typeof name === "string" && (/^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name) || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
+    var list = names.some((name) => typeof name === "string" && (android && /^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name) || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
     if (!list)
       return element;
     var count;
@@ -7621,8 +7621,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         };
       }
       var original = ret;
-      if (android)
-        ret = preserveAndroidListChildren(Component2, ret);
+      ret = preserveOverlayListChildren(Component2, ret, android);
       var component = Component2;
       var inner = component?.$$typeof === Symbol.for("react.memo") ? component.type : component;
       var target = typeof inner === "function" ? inner : inner?.$$typeof === Symbol.for("react.forward_ref") && typeof inner.render === "function" ? inner.render : null;
@@ -7745,7 +7744,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var color = theme?.semantic?.BACKGROUND_PRIMARY?.value;
     var tint = typeof color === "string" && import_chroma_js2.default.valid(color) ? color : "black";
     var content = url2 && loaded === request ? tintMessageSurface(children, opacity, tint, direct) : children;
-    if (import_react_native4.Platform.OS === "android" && !request.source)
+    if (!request.source)
       return /* @__PURE__ */ jsx(React2.Fragment, {
         children
       }, "messages");
@@ -34133,7 +34132,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function AddonPage({ CardComponent, ...props }) {
     var [search, setSearch] = (0, import_react8.useState)("");
     var query = search.trim();
-    var [enabledOnly, setEnabledOnly] = (0, import_react8.useState)(false);
+    var [status, setStatus] = (0, import_react8.useState)("All");
     var [sort, setSort] = (0, import_react8.useState)();
     var sortFn = sort ? props.sortOptions?.[sort] : void 0;
     var defaultSortLabel = query ? "Relevance" : "Default order";
@@ -34159,12 +34158,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     ]);
     var items = (0, import_react8.useMemo)(() => {
       var values = props.resolveItem ? props.items.map(props.resolveItem) : props.items;
-      return values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (!enabledOnly || !props.isEnabled || props.isEnabled(item)));
+      return values.filter((item) => isNotNil(item) && typeof item === "object" && (!matchesFilter || matchesFilter(item)) && (status === "All" || !props.isEnabled || props.isEnabled(item) === (status === "Enabled")));
     }, [
       props.items,
       props.resolveItem,
       props.isEnabled,
-      enabledOnly,
+      status,
       matchesFilter
     ]);
     var results = (0, import_react8.useMemo)(() => {
@@ -34207,7 +34206,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         onPress?.();
       }
     }, []);
-    if (results.length === 0 && !query && !enabledOnly && !filter && !props.ListHeaderComponent) {
+    if (results.length === 0 && !query && status === "All" && !filter && !props.ListHeaderComponent && !props.items.length) {
       return /* @__PURE__ */ jsxs(import_react_native28.View, {
         style: {
           gap: 32,
@@ -34225,10 +34224,14 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
               /* @__PURE__ */ jsx(import_react_native28.Image, {
                 source: findAssetId("empty_quick_switcher")
               }),
-              /* @__PURE__ */ jsx(Text, {
+              /* @__PURE__ */ jsxs(Text, {
                 variant: "text-lg/semibold",
                 color: "text-default",
-                children: "Oops! Nothing to see here\u2026 yet!"
+                children: [
+                  "No ",
+                  props.title.toLowerCase(),
+                  " installed"
+                ]
               })
             ]
           }),
@@ -34243,7 +34246,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     }
     var headerElement = /* @__PURE__ */ jsxs(import_react_native28.View, {
       style: {
-        paddingBottom: 8
+        paddingBottom: 14,
+        gap: 12
       },
       children: [
         settings.safeMode?.enabled && /* @__PURE__ */ jsxs(import_react_native28.View, {
@@ -34297,10 +34301,32 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             })
           ]
         }),
-        props.isEnabled && /* @__PURE__ */ jsx(TableSwitchRow, {
-          label: "Enabled only",
-          value: enabledOnly,
-          onValueChange: setEnabledOnly
+        /* @__PURE__ */ jsxs(import_react_native28.View, {
+          style: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 8
+          },
+          children: [
+            props.isEnabled && [
+              "All",
+              "Enabled",
+              "Disabled"
+            ].map((option) => /* @__PURE__ */ jsx(Button, {
+              text: option,
+              size: "sm",
+              variant: status === option ? "primary" : "secondary",
+              onPress: () => setStatus(option)
+            }, option)),
+            props.installAction && /* @__PURE__ */ jsx(Button, {
+              text: props.installAction.label ?? "Install",
+              icon: findAssetId("PlusLargeIcon"),
+              size: "sm",
+              variant: "tertiary",
+              onPress: onInstallPress
+            })
+          ]
         }),
         props.filterOptions && /* @__PURE__ */ jsx(Button, {
           variant: "secondary",
@@ -34324,60 +34350,53 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         props.ListHeaderComponent && /* @__PURE__ */ jsx(props.ListHeaderComponent, {})
       ]
     });
-    return /* @__PURE__ */ jsxs(ErrorBoundary, {
-      children: [
-        /* @__PURE__ */ jsx(FlashList, {
-          data: results,
-          extraData: search,
-          keyExtractor: getItemKey ? keyExtractor : void 0,
-          keyboardShouldPersistTaps: "handled",
-          estimatedItemSize: 136,
-          ListHeaderComponent: headerElement,
-          ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native28.View, {
-            style: {
-              gap: 12,
-              padding: 12,
-              alignItems: "center"
-            },
-            children: [
-              /* @__PURE__ */ jsx(import_react_native28.Image, {
-                source: findAssetId("devices_not_found")
-              }),
-              /* @__PURE__ */ jsx(Text, {
-                variant: "text-lg/semibold",
-                color: "text-default",
-                children: filter ? "No plugins match these filters." : enabledOnly && !query ? "No add-ons are enabled." : "No add-ons found."
-              }),
-              (filter || enabledOnly) && /* @__PURE__ */ jsx(Button, {
-                variant: "secondary",
-                size: "sm",
-                text: "Clear filters",
-                onPress: () => {
-                  setFilter("");
-                  setEnabledOnly(false);
-                }
-              })
-            ]
-          }),
-          contentContainerStyle: {
-            padding: 8,
-            paddingHorizontal: 12,
-            paddingBottom: 90
+    return /* @__PURE__ */ jsx(ErrorBoundary, {
+      children: /* @__PURE__ */ jsx(FlashList, {
+        data: results,
+        extraData: search,
+        keyExtractor: getItemKey ? keyExtractor : void 0,
+        keyboardShouldPersistTaps: "handled",
+        estimatedItemSize: 136,
+        ListHeaderComponent: headerElement,
+        ListEmptyComponent: () => /* @__PURE__ */ jsxs(import_react_native28.View, {
+          style: {
+            gap: 12,
+            padding: 12,
+            alignItems: "center"
           },
-          ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native28.View, {
-            style: {
-              height: 8
-            }
-          }),
-          ListFooterComponent: props.ListFooterComponent,
-          renderItem
+          children: [
+            /* @__PURE__ */ jsx(import_react_native28.Image, {
+              source: findAssetId("devices_not_found")
+            }),
+            /* @__PURE__ */ jsx(Text, {
+              variant: "text-lg/semibold",
+              color: "text-default",
+              children: filter ? "No plugins match these filters." : "No add-ons match this view."
+            }),
+            (filter || status !== "All") && /* @__PURE__ */ jsx(Button, {
+              variant: "secondary",
+              size: "sm",
+              text: "Clear filters",
+              onPress: () => {
+                setFilter("");
+                setStatus("All");
+              }
+            })
+          ]
         }),
-        props.installAction && /* @__PURE__ */ jsx(FloatingActionButton, {
-          positionBottom: bottomInset + 8,
-          icon: findAssetId("PlusLargeIcon"),
-          onPress: onInstallPress
-        })
-      ]
+        contentContainerStyle: {
+          paddingTop: 12,
+          paddingHorizontal: 16,
+          paddingBottom: bottomInset + 16
+        },
+        ItemSeparatorComponent: () => /* @__PURE__ */ jsx(import_react_native28.View, {
+          style: {
+            height: 10
+          }
+        }),
+        ListFooterComponent: props.ListFooterComponent,
+        renderItem
+      })
     });
   }
   var import_fuzzysort, import_react8, import_react_native28, showSimpleActionSheet2, hideActionSheet;
@@ -69163,14 +69182,28 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         children: /* @__PURE__ */ jsxs(import_react_native34.View, {
           style: {
             flexDirection: "row",
-            alignItems: "center"
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 12
           },
           children: [
-            /* @__PURE__ */ jsx(import_react_native34.View, {
-              children: /* @__PURE__ */ jsx(Text, {
-                variant: "heading-lg/semibold",
-                children: font.name
-              })
+            /* @__PURE__ */ jsxs(import_react_native34.View, {
+              style: {
+                flexGrow: 1,
+                flexShrink: 1,
+                minWidth: 120
+              },
+              children: [
+                /* @__PURE__ */ jsx(Text, {
+                  variant: "heading-md/semibold",
+                  children: font.name
+                }),
+                font.description ? /* @__PURE__ */ jsx(Text, {
+                  color: "text-muted",
+                  variant: "text-sm/medium",
+                  children: font.description
+                }) : null
+              ]
             }),
             /* @__PURE__ */ jsx(import_react_native34.View, {
               style: {
@@ -70666,10 +70699,33 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     if (removed)
       return null;
     var { authors } = theme.data;
+    var colors = theme.data.rawColors;
+    var semantic = theme.data.semanticColors;
+    var swatches = [
+      semantic?.BACKGROUND_PRIMARY?.[0],
+      semantic?.BACKGROUND_SECONDARY?.[0],
+      semantic?.TEXT_NORMAL?.[0],
+      colors?.BRAND_500
+    ].filter((color) => typeof color === "string" && /^#[a-f0-9]{6}(?:[a-f0-9]{2})?$/i.test(color));
     return /* @__PURE__ */ jsx(AddonCard, {
       headerLabel: theme.data.name,
       headerSublabel: authors ? `by ${authors.map((i) => i.name).join(", ")}` : "",
       descriptionLabel: theme.data.description ?? "No description.",
+      preview: swatches.length ? /* @__PURE__ */ jsx(import_react_native42.View, {
+        accessibilityLabel: "Theme palette",
+        style: {
+          flexDirection: "row",
+          gap: 4
+        },
+        children: swatches.map((color, index) => /* @__PURE__ */ jsx(import_react_native42.View, {
+          style: {
+            flex: 1,
+            height: 20,
+            borderRadius: 6,
+            backgroundColor: color
+          }
+        }, index))
+      }) : void 0,
       toggleType: !settings.safeMode?.enabled ? "radio" : void 0,
       toggleValue: () => !overridden && themes[theme.id].selected,
       onToggleChange: (v2) => _async_to_generator(function* () {
@@ -70698,6 +70754,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       ]
     });
   }
+  var import_react_native42;
   var init_ThemeCard = __esm({
     "src/core/ui/settings/pages/Themes/ThemeCard.tsx"() {
       "use strict";
@@ -70712,6 +70769,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_toasts();
       init_sheets();
       init_common();
+      import_react_native42 = __toESM(require_react_native());
     }
   });
 
@@ -70784,7 +70842,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             /* @__PURE__ */ jsx(BottomSheetTitleHeader, {
               title: "Options"
             }),
-            /* @__PURE__ */ jsxs(import_react_native42.View, {
+            /* @__PURE__ */ jsxs(import_react_native43.View, {
               style: {
                 paddingVertical: 20,
                 gap: 12
@@ -70870,7 +70928,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     });
   }
-  var import_react_native42;
+  var import_react_native43;
   var init_Themes = __esm({
     "src/core/ui/settings/pages/Themes/index.tsx"() {
       "use strict";
@@ -70890,7 +70948,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_settings();
       init_storage2();
       init_components();
-      import_react_native42 = __toESM(require_react_native());
+      import_react_native43 = __toESM(require_react_native());
     }
   });
 
@@ -70927,7 +70985,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       navigation2
     ]);
     var hasThemes = isThemeSupported();
-    return /* @__PURE__ */ jsx(import_react_native43.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native44.ScrollView, {
       contentContainerStyle: {
         paddingBottom: 38
       },
@@ -70966,7 +71024,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native43;
+  var import_react_native44;
   var init_Addons = __esm({
     "src/core/ui/settings/pages/Addons/index.tsx"() {
       "use strict";
@@ -70974,7 +71032,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_promiseAllSettled();
       init_async_to_generator();
       init_jsxRuntime();
-      import_react_native43 = __toESM(require_react_native());
+      import_react_native44 = __toESM(require_react_native());
       init_common();
       init_components();
       init_loader();
@@ -71995,13 +72053,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
 
   // src/lib/api/pluginTesting.ts
   function currentTestingAssignment() {
-    return getTestingAssignment(testingUserId(UserStore3), import_react_native44.Platform.OS);
+    return getTestingAssignment(testingUserId(UserStore3), import_react_native45.Platform.OS);
   }
   function useMobileTestingAssignment() {
     var userId = useTestingUserId(React2, UserStore3);
-    return getTestingAssignment(userId, import_react_native44.Platform.OS);
+    return getTestingAssignment(userId, import_react_native45.Platform.OS);
   }
-  var import_react_native44, UserStore3;
+  var import_react_native45, UserStore3;
   var init_pluginTesting = __esm({
     "src/lib/api/pluginTesting.ts"() {
       "use strict";
@@ -72010,7 +72068,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_cxTesting();
       init_common();
       init_wrappers();
-      import_react_native44 = __toESM(require_react_native());
+      import_react_native45 = __toESM(require_react_native());
       UserStore3 = findByStoreNameLazy("UserStore");
     }
   });
@@ -72095,7 +72153,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         component: SettingsComponent
       }, `storecloud-settings-${refresh}`);
     }
-    return /* @__PURE__ */ jsx(import_react_native45.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
       style: {
         flex: 1
       },
@@ -72112,7 +72170,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           /* @__PURE__ */ jsxs(TableRowGroup, {
             title: "CloudSync",
             children: [
-              /* @__PURE__ */ jsxs(import_react_native45.View, {
+              /* @__PURE__ */ jsxs(import_react_native46.View, {
                 style: {
                   paddingHorizontal: 12,
                   paddingBottom: 12
@@ -72163,7 +72221,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           }),
           /* @__PURE__ */ jsx(Card, {
             border: "strong",
-            children: /* @__PURE__ */ jsx(import_react_native45.View, {
+            children: /* @__PURE__ */ jsx(import_react_native46.View, {
               style: {
                 padding: 12
               },
@@ -72178,7 +72236,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react15, import_react_native45, PLUGIN_URL, STORECLOUD_ICON;
+  var import_react15, import_react_native46, PLUGIN_URL, STORECLOUD_ICON;
   var init_StoreCloud = __esm({
     "src/core/ui/settings/pages/StoreCloud/index.tsx"() {
       "use strict";
@@ -72193,7 +72251,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_toasts();
       init_components();
       import_react15 = __toESM(require_react());
-      import_react_native45 = __toESM(require_react_native());
+      import_react_native46 = __toESM(require_react_native());
       PLUGIN_URL = "https://revenge.nexpid.xyz/cloud-sync/";
       STORECLOUD_ICON = "https://raw.githubusercontent.com/cloudcord-mod/release-hub/main/cloudcord-favicon.png";
     }
@@ -72637,7 +72695,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     var uri = avatarUrl(user, 128);
     var colors = getNativeColors();
     if (uri)
-      return /* @__PURE__ */ jsx(import_react_native46.Image, {
+      return /* @__PURE__ */ jsx(import_react_native47.Image, {
         source: {
           uri
         },
@@ -72648,7 +72706,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         }
       });
     var label2 = displayName(user).trim().slice(0, 2).toUpperCase() || "?";
-    return /* @__PURE__ */ jsx(import_react_native46.View, {
+    return /* @__PURE__ */ jsx(import_react_native47.View, {
       style: {
         width: size,
         height: size,
@@ -72671,17 +72729,17 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       minute: "2-digit"
     }) : "";
     var reactionCount = message.reactions?.reduce((sum, reaction) => sum + (reaction.count || 0), 0) || 0;
-    return /* @__PURE__ */ jsxs(import_react_native46.View, {
+    return /* @__PURE__ */ jsxs(import_react_native47.View, {
       style: styles2.row,
       children: [
         /* @__PURE__ */ jsx(ApiAvatar, {
           user: author,
           size: 40
         }),
-        /* @__PURE__ */ jsxs(import_react_native46.View, {
+        /* @__PURE__ */ jsxs(import_react_native47.View, {
           style: styles2.messageBody,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native46.View, {
+            /* @__PURE__ */ jsxs(import_react_native47.View, {
               style: styles2.nameLine,
               children: [
                 /* @__PURE__ */ jsx(Text, {
@@ -72705,7 +72763,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               variant: "text-md/normal",
               children: message.content
             }),
-            !!message.attachments?.length && /* @__PURE__ */ jsx(import_react_native46.View, {
+            !!message.attachments?.length && /* @__PURE__ */ jsx(import_react_native47.View, {
               style: {
                 marginTop: 6,
                 gap: 6
@@ -72714,7 +72772,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 var uri = attachment.url || attachment.proxy_url;
                 var type = String(attachment.content_type || "");
                 var isImage = type.startsWith("image/") || /\.(png|jpe?g|gif|webp)(?:$|\?)/i.test(String(uri || attachment.filename || ""));
-                return isImage && uri ? /* @__PURE__ */ jsx(import_react_native46.Image, {
+                return isImage && uri ? /* @__PURE__ */ jsx(import_react_native47.Image, {
                   source: {
                     uri
                   },
@@ -72757,7 +72815,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   }
   function AccountSheet({ accounts, active, onMain }) {
     return /* @__PURE__ */ jsx(ActionSheet, {
-      children: /* @__PURE__ */ jsxs(import_react_native46.View, {
+      children: /* @__PURE__ */ jsxs(import_react_native47.View, {
         style: {
           paddingHorizontal: 12,
           paddingBottom: 20
@@ -73115,15 +73173,15 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
     };
     if (channel) {
       var dmUser = channel.recipients?.[0];
-      return /* @__PURE__ */ jsxs(import_react_native46.KeyboardAvoidingView, {
+      return /* @__PURE__ */ jsxs(import_react_native47.KeyboardAvoidingView, {
         style: styles2.root,
-        behavior: import_react_native46.Platform.OS === "ios" ? "padding" : void 0,
+        behavior: import_react_native47.Platform.OS === "ios" ? "padding" : void 0,
         keyboardVerticalOffset: 0,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native46.View, {
+          /* @__PURE__ */ jsxs(import_react_native47.View, {
             style: styles2.header,
             children: [
-              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native47.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: "Back",
                 onPress: returnFromChat,
@@ -73139,7 +73197,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   opacity: pressed ? 0.7 : 1,
                   zIndex: 20
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native47.Text, {
                   style: {
                     color: nativeColors2.text,
                     fontSize: 15,
@@ -73152,7 +73210,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 user: dmUser,
                 size: 32
               }) : null,
-              /* @__PURE__ */ jsxs(import_react_native46.View, {
+              /* @__PURE__ */ jsxs(import_react_native47.View, {
                 style: {
                   flex: 1
                 },
@@ -73179,7 +73237,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               })
             ]
           }),
-          error ? /* @__PURE__ */ jsx(import_react_native46.View, {
+          error ? /* @__PURE__ */ jsx(import_react_native47.View, {
             style: {
               paddingHorizontal: 12,
               paddingVertical: 8
@@ -73199,7 +73257,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             },
             children: "Loading"
           }) : null,
-          /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+          /* @__PURE__ */ jsx(import_react_native47.FlatList, {
             ref: listRef,
             style: {
               flex: 1
@@ -73212,13 +73270,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             contentContainerStyle: {
               paddingVertical: 6
             },
-            keyboardDismissMode: import_react_native46.Platform.OS === "ios" ? "interactive" : "on-drag",
+            keyboardDismissMode: import_react_native47.Platform.OS === "ios" ? "interactive" : "on-drag",
             keyboardShouldPersistTaps: "handled",
             onContentSizeChange: () => listRef.current?.scrollToEnd?.({
               animated: false
             })
           }),
-          selectedImage ? /* @__PURE__ */ jsxs(import_react_native46.View, {
+          selectedImage ? /* @__PURE__ */ jsxs(import_react_native47.View, {
             style: {
               height: 72,
               paddingHorizontal: 10,
@@ -73229,7 +73287,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               backgroundColor: tokens.colors.BACKGROUND_PRIMARY
             },
             children: [
-              /* @__PURE__ */ jsx(import_react_native46.Image, {
+              /* @__PURE__ */ jsx(import_react_native47.Image, {
                 source: {
                   uri: selectedImage.uri
                 },
@@ -73240,7 +73298,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   backgroundColor: tokens.colors.BACKGROUND_SECONDARY
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native46.Text, {
+              /* @__PURE__ */ jsx(import_react_native47.Text, {
                 numberOfLines: 1,
                 style: {
                   flex: 1,
@@ -73249,7 +73307,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 },
                 children: selectedImage.name
               }),
-              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native47.Pressable, {
                 onPress: () => setSelectedImage(null),
                 hitSlop: 8,
                 style: ({ pressed }) => ({
@@ -73261,7 +73319,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   backgroundColor: nativeColors2.selected,
                   opacity: pressed ? 0.7 : 1
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native47.Text, {
                   style: {
                     color: nativeColors2.text,
                     fontSize: 13,
@@ -73272,10 +73330,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
               })
             ]
           }) : null,
-          /* @__PURE__ */ jsxs(import_react_native46.View, {
+          /* @__PURE__ */ jsxs(import_react_native47.View, {
             style: styles2.composer,
             children: [
-              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native47.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: "Add photo",
                 onPress: pickImage,
@@ -73290,7 +73348,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   backgroundColor: nativeColors2.selected,
                   opacity: pressed ? 0.7 : 1
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native47.Text, {
                   style: {
                     color: nativeColors2.text,
                     fontSize: 13,
@@ -73299,7 +73357,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   children: "Photo"
                 })
               }),
-              /* @__PURE__ */ jsx(import_react_native46.TextInput, {
+              /* @__PURE__ */ jsx(import_react_native47.TextInput, {
                 value: composer,
                 placeholder: channel.botcordDM ? `Message ${displayName(dmUser)}` : `Message #${channel.name}`,
                 placeholderTextColor: nativeColors2.muted,
@@ -73324,7 +73382,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   fontSize: 16
                 }
               }),
-              /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+              /* @__PURE__ */ jsx(import_react_native47.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: "Send message",
                 disabled: !composer.trim() && !selectedImage,
@@ -73340,7 +73398,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   opacity: !composer.trim() && !selectedImage ? 0.45 : pressed ? 0.72 : 1,
                   backgroundColor: nativeColors2.brand
                 }),
-                children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+                children: /* @__PURE__ */ jsx(import_react_native47.Text, {
                   style: {
                     color: nativeColors2.inverse,
                     fontSize: 13,
@@ -73354,13 +73412,13 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         ]
       });
     }
-    return /* @__PURE__ */ jsxs(import_react_native46.View, {
+    return /* @__PURE__ */ jsxs(import_react_native47.View, {
       style: styles2.root,
       children: [
-        /* @__PURE__ */ jsxs(import_react_native46.View, {
+        /* @__PURE__ */ jsxs(import_react_native47.View, {
           style: styles2.header,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native46.View, {
+            /* @__PURE__ */ jsxs(import_react_native47.View, {
               style: {
                 flex: 1
               },
@@ -73378,7 +73436,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 })
               ]
             }),
-            screen === "members" ? /* @__PURE__ */ jsx(import_react_native46.Pressable, {
+            screen === "members" ? /* @__PURE__ */ jsx(import_react_native47.Pressable, {
               accessibilityRole: "button",
               accessibilityLabel: "Back",
               onPress: openMessages,
@@ -73389,7 +73447,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 justifyContent: "center",
                 opacity: pressed ? 0.65 : 1
               }),
-              children: /* @__PURE__ */ jsx(import_react_native46.Text, {
+              children: /* @__PURE__ */ jsx(import_react_native47.Text, {
                 style: {
                   color: nativeColors2.text,
                   fontSize: 16,
@@ -73412,7 +73470,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
             })
           ]
         }),
-        error ? /* @__PURE__ */ jsx(import_react_native46.View, {
+        error ? /* @__PURE__ */ jsx(import_react_native47.View, {
           style: {
             paddingHorizontal: 12,
             paddingVertical: 8
@@ -73432,10 +73490,10 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           },
           children: "Loading"
         }) : null,
-        /* @__PURE__ */ jsxs(import_react_native46.View, {
+        /* @__PURE__ */ jsxs(import_react_native47.View, {
           style: styles2.navigator,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native46.View, {
+            /* @__PURE__ */ jsxs(import_react_native47.View, {
               style: styles2.guildRail,
               children: [
                 /* @__PURE__ */ jsx(PressableScale, {
@@ -73448,7 +73506,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     onPress: openMessages
                   })
                 }),
-                /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                /* @__PURE__ */ jsx(import_react_native47.FlatList, {
                   data: guilds,
                   keyExtractor: (g2) => g2.id,
                   showsVerticalScrollIndicator: false,
@@ -73457,12 +73515,12 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     return /* @__PURE__ */ jsx(PressableScale, {
                       onPress: () => openGuild(item),
                       style: styles2.guildButton,
-                      children: uri ? /* @__PURE__ */ jsx(import_react_native46.Image, {
+                      children: uri ? /* @__PURE__ */ jsx(import_react_native47.Image, {
                         source: {
                           uri
                         },
                         style: styles2.guildImage
-                      }) : /* @__PURE__ */ jsx(import_react_native46.View, {
+                      }) : /* @__PURE__ */ jsx(import_react_native47.View, {
                         style: styles2.guildImage,
                         children: /* @__PURE__ */ jsx(Text, {
                           variant: "text-sm/semibold",
@@ -73474,11 +73532,11 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 })
               ]
             }),
-            /* @__PURE__ */ jsx(import_react_native46.View, {
+            /* @__PURE__ */ jsx(import_react_native47.View, {
               style: styles2.sidebar,
               children: screen === "messages" ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native46.View, {
+                  /* @__PURE__ */ jsxs(import_react_native47.View, {
                     style: styles2.sidebarHeader,
                     children: [
                       /* @__PURE__ */ jsx(Text, {
@@ -73496,7 +73554,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                  /* @__PURE__ */ jsx(import_react_native47.FlatList, {
                     data: recentDMs,
                     keyExtractor: (dm) => dm.channelId,
                     renderItem: ({ item }) => /* @__PURE__ */ jsxs(PressableScale, {
@@ -73507,7 +73565,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                           user: item.recipient,
                           size: 36
                         }),
-                        /* @__PURE__ */ jsxs(import_react_native46.View, {
+                        /* @__PURE__ */ jsxs(import_react_native47.View, {
                           style: {
                             flex: 1
                           },
@@ -73526,7 +73584,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                         })
                       ]
                     }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native46.View, {
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native47.View, {
                       style: styles2.listEmpty,
                       children: /* @__PURE__ */ jsx(Text, {
                         variant: "text-md/normal",
@@ -73538,7 +73596,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 ]
               }) : screen === "members" ? /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsxs(import_react_native46.View, {
+                  /* @__PURE__ */ jsxs(import_react_native47.View, {
                     style: styles2.sidebarHeader,
                     children: [
                       /* @__PURE__ */ jsx(Button, {
@@ -73547,7 +73605,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                         text: "Back",
                         onPress: openMessages
                       }),
-                      /* @__PURE__ */ jsxs(import_react_native46.View, {
+                      /* @__PURE__ */ jsxs(import_react_native47.View, {
                         style: {
                           flex: 1
                         },
@@ -73565,7 +73623,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                       })
                     ]
                   }),
-                  /* @__PURE__ */ jsx(import_react_native46.View, {
+                  /* @__PURE__ */ jsx(import_react_native47.View, {
                     style: styles2.search,
                     children: /* @__PURE__ */ jsx(TextInput, {
                       size: "md",
@@ -73574,7 +73632,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                       onChange: (value) => setMemberSearch(typeof value === "string" ? value : value?.nativeEvent?.text ?? "")
                     })
                   }),
-                  /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                  /* @__PURE__ */ jsx(import_react_native47.FlatList, {
                     data: filteredMembers,
                     keyExtractor: (member, i) => member.user?.id || String(i),
                     keyboardShouldPersistTaps: "handled",
@@ -73590,7 +73648,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                           user: item.user,
                           size: 36
                         }),
-                        /* @__PURE__ */ jsxs(import_react_native46.View, {
+                        /* @__PURE__ */ jsxs(import_react_native47.View, {
                           style: {
                             flex: 1
                           },
@@ -73614,7 +73672,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                         })
                       ]
                     }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native46.View, {
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native47.View, {
                       style: styles2.listEmpty,
                       children: /* @__PURE__ */ jsx(Text, {
                         variant: "text-md/normal",
@@ -73626,7 +73684,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 ]
               }) : /* @__PURE__ */ jsxs(Fragment, {
                 children: [
-                  /* @__PURE__ */ jsx(import_react_native46.View, {
+                  /* @__PURE__ */ jsx(import_react_native47.View, {
                     style: styles2.sidebarHeader,
                     children: /* @__PURE__ */ jsx(Text, {
                       variant: "heading-md/semibold",
@@ -73634,7 +73692,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                       children: guild?.name
                     })
                   }),
-                  /* @__PURE__ */ jsx(import_react_native46.FlatList, {
+                  /* @__PURE__ */ jsx(import_react_native47.FlatList, {
                     data: [
                       ...textChannels(null),
                       ...categories.flatMap((cat) => [
@@ -73660,7 +73718,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                         children: item.name
                       })
                     }),
-                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native46.View, {
+                    ListEmptyComponent: /* @__PURE__ */ jsx(import_react_native47.View, {
                       style: styles2.listEmpty,
                       children: /* @__PURE__ */ jsx(Text, {
                         variant: "text-md/normal",
@@ -73694,7 +73752,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         activeId: active.id,
         onExit: () => setOpened(false)
       });
-    return /* @__PURE__ */ jsx(import_react_native46.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
       style: {
         flex: 1
       },
@@ -73708,7 +73766,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         },
         spacing: 16,
         children: [
-          /* @__PURE__ */ jsxs(import_react_native46.View, {
+          /* @__PURE__ */ jsxs(import_react_native47.View, {
             children: [
               /* @__PURE__ */ jsx(Text, {
                 variant: "heading-xl/bold",
@@ -73752,7 +73810,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
           /* @__PURE__ */ jsx(TableRowGroup, {
             title: "Add Bot Account",
             children: /* @__PURE__ */ jsx(TableRow, {
-              label: /* @__PURE__ */ jsxs(import_react_native46.View, {
+              label: /* @__PURE__ */ jsxs(import_react_native47.View, {
                 style: {
                   width: "100%",
                   gap: 10
@@ -73800,7 +73858,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react17, import_react_native46, useStyles3, avatarUrl, guildIconUrl, displayName, getNativeColors;
+  var import_react17, import_react_native47, useStyles3, avatarUrl, guildIconUrl, displayName, getNativeColors;
   var init_BotCord = __esm({
     "src/core/ui/settings/pages/BotCord/index.tsx"() {
       "use strict";
@@ -73817,7 +73875,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_common();
       init_components();
       import_react17 = __toESM(require_react());
-      import_react_native46 = __toESM(require_react_native());
+      import_react_native47 = __toESM(require_react_native());
       useStyles3 = createStyles({
         root: {
           flex: 1,
@@ -73990,7 +74048,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         })
       ]
     });
-    return /* @__PURE__ */ jsx(import_react_native47.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
       keyboardShouldPersistTaps: "handled",
       contentContainerStyle: {
         padding: 16,
@@ -74039,7 +74097,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 ]
               }),
               field("Exact error or blocker", review.error, review.setError, 3e3),
-              /* @__PURE__ */ jsxs(import_react_native47.View, {
+              /* @__PURE__ */ jsxs(import_react_native48.View, {
                 style: {
                   flexDirection: "row",
                   flexWrap: "wrap",
@@ -74069,7 +74127,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                   })
                 ]
               }),
-              /* @__PURE__ */ jsxs(import_react_native47.View, {
+              /* @__PURE__ */ jsxs(import_react_native48.View, {
                 style: {
                   flexDirection: "row",
                   gap: 8
@@ -74121,7 +74179,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       assignment
     }, assignment.userId) : null;
   }
-  var import_react_native47;
+  var import_react_native48;
   var init_TestingPlugins = __esm({
     "src/core/ui/settings/pages/TestingPlugins/index.tsx"() {
       "use strict";
@@ -74136,7 +74194,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_pluginTesting();
       init_common();
       init_components();
-      import_react_native47 = __toESM(require_react_native());
+      import_react_native48 = __toESM(require_react_native());
     }
   });
 
@@ -74219,7 +74277,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       index
     ]));
     var visible = tools.filter((item) => item.visible !== false && !hidden.includes(item.key)).sort((a, b3) => (order.get(a.key) ?? Infinity) - (order.get(b3.key) ?? Infinity));
-    return /* @__PURE__ */ jsx(import_react_native48.ScrollView, {
+    return /* @__PURE__ */ jsx(import_react_native49.ScrollView, {
       contentContainerStyle: {
         paddingBottom: 38
       },
@@ -74247,7 +74305,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native48;
+  var import_react_native49;
   var init_Tools = __esm({
     "src/core/ui/settings/pages/Tools/index.tsx"() {
       "use strict";
@@ -74262,7 +74320,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_shared();
       init_common();
       init_components();
-      import_react_native48 = __toESM(require_react_native());
+      import_react_native49 = __toESM(require_react_native());
     }
   });
 
@@ -74426,7 +74484,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
         children: /* @__PURE__ */ jsxs(SafeAreaView, {
           style: styles2.container,
           children: [
-            /* @__PURE__ */ jsxs(import_react_native49.View, {
+            /* @__PURE__ */ jsxs(import_react_native50.View, {
               style: {
                 gap: 4
               },
@@ -74454,7 +74512,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                 })
               ]
             }),
-            /* @__PURE__ */ jsxs(import_react_native49.ScrollView, {
+            /* @__PURE__ */ jsxs(import_react_native50.ScrollView, {
               fadingEdgeLength: 64,
               contentContainerStyle: {
                 gap: 12
@@ -74497,7 +74555,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       })
     });
   }
-  var import_react_native49, useStyles4;
+  var import_react_native50, useStyles4;
   var init_ErrorBoundaryScreen = __esm({
     "src/core/ui/reporter/components/ErrorBoundaryScreen.tsx"() {
       "use strict";
@@ -74512,7 +74570,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_styles();
       init_common();
       init_components();
-      import_react_native49 = __toESM(require_react_native());
+      import_react_native50 = __toESM(require_react_native());
       init_ErrorComponentStackCard();
       init_ErrorStackCard();
       useStyles4 = createStyles({
@@ -74601,7 +74659,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   });
 
   // src/core/vendetta/api.tsx
-  var import_react18, import_react_native50, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
+  var import_react18, import_react_native51, makeIcon, CompatRow, CompatSwitchRow, CompatSection, PatchedFormRow, PatchedFormSwitchRow, PatchedFormSection, PatchedForms, initVendettaObject;
   var init_api3 = __esm({
     "src/core/vendetta/api.tsx"() {
       "use strict";
@@ -74632,7 +74690,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_toasts();
       init_dist();
       import_react18 = __toESM(require_react());
-      import_react_native50 = __toESM(require_react_native());
+      import_react_native51 = __toESM(require_react_native());
       init_plugins();
       makeIcon = (leading) => leading;
       CompatRow = TableRow ?? Forms.FormRow ?? ReactNative.View;
@@ -74697,7 +74755,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
                     ActionSheetTitleHeader: module.BottomSheetTitleHeader,
                     ActionSheetContentContainer: ({ children }) => {
                       (0, import_react18.useEffect)(() => console.warn("Discord has removed 'ActionSheetContentContainer', please move into something else. This has been temporarily replaced with View"), []);
-                      return /* @__PURE__ */ (0, import_react18.createElement)(import_react_native50.View, null, children);
+                      return /* @__PURE__ */ (0, import_react18.createElement)(import_react_native51.View, null, children);
                     }
                   };
                 }
@@ -74884,7 +74942,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   // src/lib/api/native/legacyRuntimeRefresh.ts
   function invokeLegacyReload() {
     return _async_to_generator(function* () {
-      var reader = import_react_native51.NativeModules.FileReaderModule ?? import_react_native51.NativeModules.RCTFileReaderModule;
+      var reader = import_react_native52.NativeModules.FileReaderModule ?? import_react_native52.NativeModules.RCTFileReaderModule;
       if (typeof reader?.readAsDataURL !== "function")
         return false;
       yield reader.readAsDataURL({
@@ -74921,7 +74979,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       }
     })();
   }
-  var import_react_native51, CURRENT_RUNTIME_URL;
+  var import_react_native52, CURRENT_RUNTIME_URL;
   var init_legacyRuntimeRefresh = __esm({
     "src/lib/api/native/legacyRuntimeRefresh.ts"() {
       "use strict";
@@ -74930,7 +74988,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
       init_async_to_generator();
       init_storage();
       init_settings();
-      import_react_native51 = __toESM(require_react_native());
+      import_react_native52 = __toESM(require_react_native());
       CURRENT_RUNTIME_URL = "https://getcloudcord.com/api/proxy/raw/dist/cc.js";
     }
   });
@@ -75187,7 +75245,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1b83d425b7ceeb13afb3eb6345b07de8f5cfab50";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "7c7a71da5c62799e2cbae3c51a1e22a313c291de";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
