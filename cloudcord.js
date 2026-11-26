@@ -26272,7 +26272,10 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (!currentUserId || currentUserId === welcomeAccountId)
       return;
     var channel = safeStore("ChannelStore")?.getChannel?.(channelId);
-    if (channel?.type !== 1 || channel.getRecipientId?.() !== welcomeAccountId)
+    if (channel?.type !== 1)
+      return;
+    var recipient = channel.getRecipientId?.() ?? channel.recipients?.[0];
+    if (String(recipient?.id ?? recipient ?? "") !== welcomeAccountId)
       return;
     var savedAt = Number(settings.cloudcordWelcomeTimestamp) || Date.now();
     settings.cloudcordWelcomeTimestamp ??= savedAt;
@@ -75482,7 +75485,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4292f96d3e2b64c8ff3002eb54e4ade760b5c829";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "036898fa0c4e26d33b55fca0af9599320b77eeeb";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
