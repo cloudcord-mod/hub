@@ -107,6 +107,20 @@ for (const platform of ['android', 'ios']) for (const version of ['352.17', '354
         assert.equal(element.props.node.sections.filter(s => s.label === 'CloudCord').length, 1, 'JSX and component hooks do not duplicate sections');
         assert.equal(searchList.SearchableSettingsList(element.props), element.props.node, 'already prepared list props are reused without cloning');
         assert.equal(frozenNode.sections.length, root.length, 'native frozen node remains untouched');
+        if (fallback) {
+            const rootNode = Object.freeze({ sections: Object.freeze([
+                { label: 'Account Settings', settings: ['account_route'] },
+                { label: 'Billing', settings: ['billing'] },
+                { label: 'App Settings', settings: ['app'] },
+                { label: 'Support', settings: ['help'] },
+            ]) });
+            const identityHook = jsxCallbacks.get(capturedSearchList);
+            assert.equal(typeof identityHook, 'function', 'the captured component gets an identity hook');
+            const rootElement = identityHook(capturedSearchList, { type: capturedSearchList, props: { node: rootNode } });
+            assert.equal(rootElement.props.node.sections[1]?.label, 'CloudCord');
+            assert.equal(rootNode.sections.length, 4, 'root overview data stays immutable');
+        }
+
         const nested = { node: { sections: [{ settings: ['PRIVACY'] }] } };
         assert.equal(searchList.SearchableSettingsList(nested), nested.node, 'subpages do not receive root settings');
         for (const list of lists) {

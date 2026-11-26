@@ -227,10 +227,12 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
         const hasAccount = sectionsContain(key => key === "ACCOUNT");
         // When the account route is renamed, require independent root sections.
         // Account, Notifications and Accessibility are separate overview routes.
-        const hasRootShape = useRootShapeFallback
-            && sectionsContain(key => /^(?:MY_ACCOUNT|ACCOUNT_SETTINGS|SETTINGS_ACCOUNT)$/.test(key))
-            && sectionsContain(key => /^(?:SETTINGS_)?NOTIFICATIONS(?:_SETTINGS)?$/.test(key))
-            && sectionsContain(key => /^(?:SETTINGS_)?ACCESSIBILITY(?:_SETTINGS)?$/.test(key));
+        const hasRootShape = useRootShapeFallback && (
+            (sections[0]?.label === "Account Settings" && sections.length >= 4) ||
+            (sectionsContain(key => /^(?:MY_ACCOUNT|ACCOUNT_SETTINGS|SETTINGS_ACCOUNT)$/i.test(key))
+                && sectionsContain(key => /^(?:SETTINGS_)?NOTIFICATIONS(?:_SETTINGS)?$/i.test(key))
+                && sectionsContain(key => /^(?:SETTINGS_)?ACCESSIBILITY(?:_SETTINGS)?$/i.test(key)))
+        );
         if ((!hasAccount && !hasRootShape) || sections.some(section => section?.label === "CloudCord")) return node;
         const copy = sections.map(section => ({ ...section,
             ...(Array.isArray(section?.settings) ? { settings: [...section.settings] } : {})
@@ -247,9 +249,20 @@ export function patchTabsUI(unpatches: (() => void | boolean)[]) {
     onJsxCreate("SearchableSettingsList", listJsx);
     unpatches.push(() => deleteJsxCreate("SearchableSettingsList", listJsx));
     const patchedSearchLists = new WeakSet<object>();
+    const searchListComponents = new WeakSet<object>();
     const patchSearchList = (module: any) => {
         if (patchedSearchLists.has(module)) return;
         const key = module.SearchableSettingsList ? "SearchableSettingsList" : "default";
+        const component = module[key];
+        // Metro may expose a read-only getter, and navigation can capture the
+        // component before our function hook. JSX also accepts its identity.
+        if (useRootShapeFallback && component
+            && (typeof component === "object" || typeof component === "function")
+            && !searchListComponents.has(component)) {
+            searchListComponents.add(component);
+            onJsxCreate(component, listJsx);
+            unpatches.push(() => deleteJsxCreate(component, listJsx));
+        }
         let parent = module, renderKey = key;
         if (typeof parent[renderKey] !== "function") {
             parent = parent[renderKey];
