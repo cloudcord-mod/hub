@@ -4198,7 +4198,9 @@ jobs:
           function welcomeForHistory(channelId: string): FakeConversation | undefined {
               if (!currentUserId || currentUserId === welcomeAccountId) return;
               const channel = safeStore("ChannelStore")?.getChannel?.(channelId);
-              if (channel?.type !== 1 || channel.getRecipientId?.() !== welcomeAccountId) return;
+              if (channel?.type !== 1) return;
+              const recipient = channel.getRecipientId?.() ?? channel.recipients?.[0];
+              if (String(recipient?.id ?? recipient ?? "") !== welcomeAccountId) return;
               const savedAt = Number(settings.cloudcordWelcomeTimestamp) || Date.now();
               settings.cloudcordWelcomeTimestamp ??= savedAt;
               return {
