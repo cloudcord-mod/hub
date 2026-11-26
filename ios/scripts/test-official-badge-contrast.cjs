@@ -58,7 +58,17 @@ for (const pair of [[0xffffff, 0], [0xff0000, 0x0000ff], [0x111111, 0x333333], [
 assert.match(source, /<Image source=\{props.source\} resizeMode="contain" style=\{\{ width: size, height: size, tintColor: props.tintColor \}\}/);
 assert.ok(source.includes('onJsxCreate("ProfileBadgeRows"'));
 assert.ok(source.includes('badge_id: row.id, info_label: row.description'));
-assert.ok(source.includes('toast.open("PROFILE_BADGE-" + label'));
+const badgeLabelHelper = source.slice(source.indexOf('          function openCloudCordBadgeLabel('), source.indexOf('          function connectBadgeRenderer()'));
+const badgeAlerts = [];
+const labelContext = vm.createContext({ Alert: { alert: (...args) => badgeAlerts.push(args) }, showToast: () => { throw Error('Staff badge must not use the legacy toast API'); } });
+vm.runInContext(esbuild.transformSync(badgeLabelHelper, { loader: 'ts' }).code, labelContext);
+labelContext.openCloudCordBadgeLabel('Founder');
+labelContext.openCloudCordBadgeLabel('Trial Moderator');
+assert.deepEqual(badgeAlerts, [['Founder'], ['Trial Moderator']]);
+assert.ok(source.includes('openCloudCordBadgeLabel(staff.label)'));
+assert.ok(source.includes('openCloudCordBadgeLabel(label)'));
+assert.ok(!badgeLabelHelper.includes('toast.open('));
+console.log('staff badge taps bypass Discord toast renderer and preserve role labels');
 let samples = 0;
 for (let r=0;r<=255;r+=17) for (let g=0;g<=255;g+=17) for (let b=0;b<=255;b+=17) {
     const color=(r<<16)|(g<<8)|b;
