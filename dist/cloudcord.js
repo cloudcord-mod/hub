@@ -24637,7 +24637,43 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     } catch (e) {
     }
   }
+  function openCloudCordBadgeLabel(label2, uri) {
+    var module = Object.values(metroModules).find((item) => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
+    var toast = module?.publicModule?.exports?.default;
+    if (typeof toast?.open === "function") {
+      toast.open("PROFILE_BADGE-" + label2, {
+        text: label2,
+        icon: {
+          type: "image",
+          src: uri,
+          alt: label2
+        }
+      });
+    } else {
+      showToast(label2);
+    }
+  }
   function connectBadgeRenderer() {
+    onJsxCreate("BadgeSection", (_component, rendered) => {
+      var props = rendered.props;
+      if (!currentUserId || !Array.isArray(props.badges) || typeof props.emptyText !== "string" || typeof props.onPressBadge !== "function")
+        return;
+      var staff = cloudCordStaffBadge(currentUserId);
+      if (!staff || props.badges.some((badge) => badge?.badge_id === staff.id))
+        return;
+      var nativePress = props.onPressBadge;
+      props.badges = [
+        {
+          badge_id: staff.id,
+          owned: true,
+          name: staff.label,
+          info_label: staff.label,
+          simple_icon_raster_url: staff.icon
+        },
+        ...props.badges
+      ];
+      props.onPressBadge = (badge) => badge?.badge_id === staff.id ? openCloudCordBadgeLabel(staff.label, staff.icon) : nativePress(badge);
+    });
     onJsxCreate("ProfileBadgeRows", (_component, rendered) => {
       var props = rendered.props;
       var id = String(props.userId || "");
@@ -24744,22 +24780,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
                   tintColor: props.tintColor
                 }
               });
-              var openLabel = () => {
-                var module = Object.values(metroModules).find((item) => item?.isInitialized === true && item.__filePath === "modules/toast/native/ToastActionCreators.tsx");
-                var toast = module?.publicModule?.exports?.default;
-                if (typeof toast?.open === "function") {
-                  toast.open("PROFILE_BADGE-" + label2, {
-                    text: label2,
-                    icon: {
-                      type: "image",
-                      src: props.source.uri,
-                      alt: label2
-                    }
-                  });
-                } else {
-                  showToast(label2);
-                }
-              };
+              var openLabel = () => openCloudCordBadgeLabel(label2, props.source.uri);
               return /* @__PURE__ */ jsx(import_react_native27.Pressable, {
                 accessibilityRole: "button",
                 accessibilityLabel: label2,
@@ -75057,7 +75078,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "8c68af6142af439140593313be7dc019058ff038";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b8f35e72d611ddaf10c3b7dba5ae79c8f47989d6";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
