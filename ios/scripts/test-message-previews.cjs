@@ -23,7 +23,7 @@ const context = vm.createContext({ module: { exports: {} },
 });
 vm.runInContext(esbuild.transformSync(fs.readFileSync('ios/runtime/src/lib/api/profileIdentity.ts', 'utf8'), { loader: 'ts', format: 'cjs' }).code, context);
 context.presentationIdentity = context.module.exports.presentationIdentity;
-vm.runInContext(esbuild.transformSync(page.slice(page.indexOf('const messagePreviews ='), page.indexOf('const rowManager =')), { loader: 'ts' }).code, context);
+vm.runInContext(esbuild.transformSync(page.slice(page.indexOf('const messagePreviews ='), page.indexOf('const dmAvatarRenderers =')), { loader: 'ts' }).code, context);
 assert.equal(registrations.get('preview:formatMessagePreview')([message], item => `${item.author.username}: ${item.content}`), 'custom: real is unchanged');
 assert.equal(registrations.get('latest:default')(['channel'], () => message).author.username, 'custom');
 assert.equal(registrations.get('preview:useFormattedMessagePreview')([message], item => item.author.username), 'custom');
