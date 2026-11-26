@@ -10805,7 +10805,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         return node;
       var sectionsContain = (match) => sections.some((section) => Array.isArray(section?.settings) && section.settings.some((key) => typeof key === "string" && match(key)));
       var hasAccount = sectionsContain((key) => key === "ACCOUNT");
-      var hasRootShape = useRootShapeFallback && sectionsContain((key) => /^(?:MY_ACCOUNT|ACCOUNT_SETTINGS|SETTINGS_ACCOUNT)$/.test(key)) && sectionsContain((key) => /^(?:SETTINGS_)?NOTIFICATIONS(?:_SETTINGS)?$/.test(key)) && sectionsContain((key) => /^(?:SETTINGS_)?ACCESSIBILITY(?:_SETTINGS)?$/.test(key));
+      var hasRootShape = useRootShapeFallback && (sections[0]?.label === "Account Settings" && sections.length >= 4 || sectionsContain((key) => /^(?:MY_ACCOUNT|ACCOUNT_SETTINGS|SETTINGS_ACCOUNT)$/i.test(key)) && sectionsContain((key) => /^(?:SETTINGS_)?NOTIFICATIONS(?:_SETTINGS)?$/i.test(key)) && sectionsContain((key) => /^(?:SETTINGS_)?ACCESSIBILITY(?:_SETTINGS)?$/i.test(key)));
       if (!hasAccount && !hasRootShape || sections.some((section) => section?.label === "CloudCord"))
         return node;
       var copy = sections.map((section) => ({
@@ -10838,10 +10838,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     onJsxCreate("SearchableSettingsList", listJsx);
     unpatches.push(() => deleteJsxCreate("SearchableSettingsList", listJsx));
     var patchedSearchLists = /* @__PURE__ */ new WeakSet();
+    var searchListComponents = /* @__PURE__ */ new WeakSet();
     var patchSearchList = (module) => {
       if (patchedSearchLists.has(module))
         return;
       var key = module.SearchableSettingsList ? "SearchableSettingsList" : "default";
+      var component = module[key];
+      if (useRootShapeFallback && component && (typeof component === "object" || typeof component === "function") && !searchListComponents.has(component)) {
+        searchListComponents.add(component);
+        onJsxCreate(component, listJsx);
+        unpatches.push(() => deleteJsxCreate(component, listJsx));
+      }
       var parent = module, renderKey = key;
       if (typeof parent[renderKey] !== "function") {
         parent = parent[renderKey];
@@ -74921,7 +74928,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "1134acae09b9ceee06d1e3d2af1496c85cdd2a94";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "3eae40a6c252fa4a8c9d8eb2fbc1be29f8a9f40c";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
