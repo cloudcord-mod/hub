@@ -14814,8 +14814,11 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       status: body == null ? 204 : 200,
       body
     });
-    var merge = (channelId, page, query) => {
-      var fakes = conversationsIn(channelId).flatMap(messagesFor);
+    var merge = (channelId, page, query, preview2) => {
+      var conversations = conversationsIn(channelId);
+      if (preview2)
+        conversations.push(preview2);
+      var fakes = conversations.flatMap(messagesFor);
       if (!fakes.length)
         return page;
       var values = /* @__PURE__ */ new Map();
@@ -14860,7 +14863,12 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         return original(...args);
       if (!match)
         return ok({});
-      if (!isLocalDm(match[1]) && !conversationsIn(match[1]).length)
+      var preview2;
+      try {
+        preview2 = options.getHistoryPreview?.(match[1]);
+      } catch (e) {
+      }
+      if (!isLocalDm(match[1]) && !preview2 && !conversationsIn(match[1]).length)
         return original(...args);
       var extra = Object.entries(args[0]?.query || {}).map(([key2, value]) => `${encodeURIComponent(key2)}=${encodeURIComponent(String(value))}`);
       var query = [
@@ -14875,7 +14883,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           return response;
         return {
           ...response,
-          body: merge(match[1], page, query.toString())
+          body: merge(match[1], page, query, preview2)
         };
       });
     });
@@ -24585,28 +24593,6 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     });
     connectMediaRenderer();
     connectIdentityRenderer();
-    for (var name of [
-      "Messages",
-      "MessagesRenderer"
-    ]) {
-      onJsxCreate(name, (_component, element) => {
-        var channelId = element.props?.channelId;
-        if (!channelId || !currentUserId || currentUserId === welcomeAccountId)
-          return;
-        var channel = safeStore("ChannelStore")?.getChannel?.(channelId);
-        if (channel?.type !== 1 || channel.getRecipientId?.() !== welcomeAccountId)
-          return;
-        return /* @__PURE__ */ jsxs(import_react_native23.View, {
-          style: {
-            flex: 1
-          },
-          children: [
-            /* @__PURE__ */ jsx(MobileWelcomeCard, {}, channelId),
-            element
-          ]
-        }, element.key);
-      }, true);
-    }
     var bannerComposer = findByProps("getBanner", "getBannerColor") || findByProps("getBanner");
     addAfterPatch("getBanner", bannerComposer, (args, result) => {
       var id = args?.[0]?.displayProfile?.userId || args?.[0]?.userId;
@@ -26282,76 +26268,41 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       }
     ]);
   }
-  function MobileWelcomeCard() {
-    var [expanded2, setExpanded] = (0, import_react6.useState)(false);
-    var [visible, setVisible] = (0, import_react6.useState)(true);
-    if (!visible)
-      return null;
-    var sender = safeStore("UserStore")?.getUser?.(welcomeAccountId);
-    return /* @__PURE__ */ jsxs(import_react_native23.View, {
-      style: {
-        padding: 10,
-        gap: 8
-      },
-      children: [
-        /* @__PURE__ */ jsxs(import_react_native23.Pressable, {
-          accessibilityRole: "button",
-          accessibilityState: {
-            expanded: expanded2
-          },
-          onPress: () => setExpanded(!expanded2),
-          children: [
-            /* @__PURE__ */ jsx(Text, {
-              variant: "text-sm/semibold",
-              children: "CloudCord welcome \xB7 Local preview"
-            }),
-            /* @__PURE__ */ jsx(Text, {
-              variant: "text-xs/medium",
-              color: "text-muted",
-              children: sender?.globalName || sender?.username || welcomeAccountId
-            })
-          ]
-        }),
-        expanded2 && /* @__PURE__ */ jsxs(Fragment, {
-          children: [
-            /* @__PURE__ */ jsx(import_react_native23.Image, {
-              source: {
-                uri: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png"
-              },
-              resizeMode: "contain",
-              style: {
-                width: "100%",
-                height: 72
-              },
-              accessibilityLabel: "CloudCord welcome banner"
-            }),
-            /* @__PURE__ */ jsx(import_react_native23.ScrollView, {
-              style: {
-                maxHeight: 160
-              },
-              nestedScrollEnabled: true,
-              children: /* @__PURE__ */ jsx(Text, {
-                variant: "text-sm/normal",
-                children: mobileWelcomeCopy.replace(/^#{2,3} /gm, "").replace(/\*\*/g, "").replace(/\[CloudCord server\]\(https:\/\/discord\.gg\/cloudcord\)/g, "CloudCord server")
-              })
-            }),
-            /* @__PURE__ */ jsx(Button2, {
-              size: "sm",
-              variant: "secondary",
-              text: "Join CloudCord",
-              onPress: () => void import_react_native23.Linking.openURL("https://discord.gg/cloudcord").catch(() => {
-              })
-            })
-          ]
-        }),
-        /* @__PURE__ */ jsx(Button2, {
-          size: "sm",
-          variant: "secondary",
-          text: "Dismiss welcome",
-          onPress: () => setVisible(false)
-        })
+  function welcomeForHistory(channelId) {
+    if (!currentUserId || currentUserId === welcomeAccountId)
+      return;
+    var channel = safeStore("ChannelStore")?.getChannel?.(channelId);
+    if (channel?.type !== 1 || channel.getRecipientId?.() !== welcomeAccountId)
+      return;
+    var savedAt = Number(settings.cloudcordWelcomeTimestamp) || Date.now();
+    settings.cloudcordWelcomeTimestamp ??= savedAt;
+    return {
+      id: "cloudcord-welcome-demo",
+      name: "CloudCord welcome",
+      channelId,
+      savedAt,
+      people: [
+        {
+          key: "welcome-sender",
+          userId: welcomeAccountId
+        }
+      ],
+      lines: [
+        {
+          key: "welcome-banner",
+          person: "welcome-sender",
+          text: "",
+          minutesAgo: 0,
+          showWelcomeBanner: true
+        },
+        {
+          key: "welcome",
+          person: "welcome-sender",
+          text: mobileWelcomeCopy,
+          minutesAgo: 0
+        }
       ]
-    });
+    };
   }
   function savedConversations() {
     var list = rootSettings.fakeMessages;
@@ -27143,6 +27094,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             rest: extrasHttp(),
             iconUtils: findByProps("getUserAvatarURL"),
             getConversations: savedConversations,
+            getHistoryPreview: welcomeForHistory,
             getUser: (id) => findByStoreName("UserStore")?.getUser?.(id),
             getGuildId: (channelId) => findByStoreName("ChannelStore")?.getChannel?.(channelId)?.guild_id,
             removeLine: (conversationId, lineKey) => saveConversations(savedConversations().map((item) => item.id === conversationId ? {
@@ -75530,7 +75482,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "f2fe075289c251cde86b62118dfbcb4c282d2a1f";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "4292f96d3e2b64c8ff3002eb54e4ade760b5c829";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
