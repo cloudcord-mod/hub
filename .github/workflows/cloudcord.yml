@@ -3767,10 +3767,10 @@ jobs:
                       const channelId = newLocalChannelId();
                       saveConversations([...list, {
                           id: "cloudcord-welcome-demo",
-                          name: "Discord (Simulation)",
+                          name: "CloudCord welcome",
                           channelId,
                           dm: { person: "discord-demo", local: true },
-                          people: [{ key: "discord-demo", name: "Discord (Simulation)", username: "discord-simulation" }],
+                          people: [{ key: "discord-demo", userId: "643945264868098049" }],
                           lines: [{
                               key: "welcome", person: "discord-demo", minutesAgo: 0, showWelcomeBanner: true,
                               text: "**Simulated welcome DM**\n\nThanks for installing CloudCord!\n\nOpen Discord Settings and scroll to **CloudCord**. Join the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking for help.",
@@ -4226,7 +4226,11 @@ jobs:
           let fakeMessages: ReturnType<typeof installFakeMessages> | null = null;
           function savedConversations(): FakeConversation[] {
               const list = (rootSettings as any).fakeMessages;
-              return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean) as FakeConversation[];
+              return (Array.isArray(list) ? list : []).map(normalizeConversation).filter(Boolean).map((item: FakeConversation) => {
+                  if (item.id !== "cloudcord-welcome-demo") return item;
+                  return { ...item, name: "CloudCord welcome", people: item.people.map(person =>
+                      person.key === "discord-demo" ? { key: person.key, userId: "643945264868098049" } : person) };
+              });
           }
           function saveConversations(list: FakeConversation[]) {
               (rootSettings as any).fakeMessages = list.map(normalizeConversation).filter(Boolean);
