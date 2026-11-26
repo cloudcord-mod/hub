@@ -36,7 +36,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: CloudCord-Android-loader
-          run-id: 45021522164
+          run-id: 45741852060
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/cloudcord-loader
       - name: Prepare CloudCord branding and pinned module
@@ -45,8 +45,8 @@ jobs:
           node android-manager-test/prepare-cloudcord.cjs
           python3 android-manager-test/prepare-lspatch.py
           module="$RUNNER_TEMP/cloudcord-loader/cloudcord-module.apk"
-          echo "9d43a6997ad24a392a6e242e6e6f9a2df5f14ad50602fedcdc6a8cffb94c9416  $module" | sha256sum --check
-          unzip -p "$module" assets/revenge.bundle | sha256sum | grep -q '^2f4b0a20744e407ff6119067a387208e4f7a9d6d6082d08ea880266cd582fff5  '
+          echo "75d9fbd6db1c74b60633279ee563c210b11de11aaf724afd867d0540b09baf33  $module" | sha256sum --check
+          unzip -p "$module" assets/revenge.bundle | sha256sum | grep -q '^3af4d4e352fdd78ca129c0299767030b0906144739417ec5771da8ab0121da4e  '
           mkdir -p android-manager-test/app/src/main/assets
           unzip -p "$module" assets/xposed_init > "$RUNNER_TEMP/cloudcord-xposed-init"
           test -s "$RUNNER_TEMP/cloudcord-xposed-init"
@@ -103,8 +103,8 @@ jobs:
           set -euo pipefail
           apk="$RUNNER_TEMP/cloudcord-manager-public.apk"
           curl --fail --location --retry 3 --output "$apk" \
-            "https://github.com/cloudcord-mod/hub/releases/download/manager-1023/CloudCordManager.apk"
-          echo "cdbdfb5c7492da2d08d1a5433a281ad32b97309002d29abaf41d72f61cc09151  $apk" | sha256sum --check
+            "https://github.com/cloudcord-mod/hub/releases/download/manager-1024/CloudCordManager.apk"
+          echo "daccd08df3be72b26e4e09cb50d43b58b624680849fb35137456e08d22c38b6e  $apk" | sha256sum --check
       - name: Patch, install and launch real Discord on Android 15
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -118,8 +118,8 @@ jobs:
           script: |
             adb install "$RUNNER_TEMP/cloudcord-manager-public.apk"
             adb install -r android-manager-test/app/build/outputs/apk/debug/app-debug.apk
-            adb shell dumpsys package com.getcloudcord.manager | grep 'versionCode=1024 '
-            cd android-manager-test && CLOUDCORD_TEST_DISCORD_VERSION=354012 CHECK_NATIVE_RECOVERY=1 bash test-patched-install.sh
+            adb shell dumpsys package com.getcloudcord.manager | grep 'versionCode=1025 '
+            cd android-manager-test && CLOUDCORD_TEST_DISCORD_VERSION=355010 CHECK_NATIVE_RECOVERY=1 bash test-patched-install.sh
       - name: Upload patched Discord diagnostics
         if: always()
         uses: actions/upload-artifact@v4

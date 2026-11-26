@@ -67,9 +67,9 @@ android {
         applicationId = "com.getcloudcord.manager"
         minSdk = 28
         targetSdk = 36
-        versionCode = 1024
+        versionCode = 1025
         // InstallMetadata uses the upstream numeric-only SemVer serializer.
-        versionName = "v1.0.15"
+        versionName = "v1.0.16"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
