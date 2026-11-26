@@ -3458,6 +3458,18 @@ jobs:
 
               connectMediaRenderer();
               connectIdentityRenderer();
+              for (const name of ["Messages", "MessagesRenderer"]) {
+                  onJsxCreate(name, (_component, element) => {
+                      const channelId = (element.props as any)?.channelId;
+                      if (!channelId || !currentUserId || currentUserId === welcomeAccountId) return;
+                      const channel = safeStore("ChannelStore")?.getChannel?.(channelId);
+                      if (channel?.type !== 1 || channel.getRecipientId?.() !== welcomeAccountId) return;
+                      return <View key={element.key} style={{ flex: 1 }}>
+                          <MobileWelcomeCard key={channelId} />
+                          {element}
+                      </View>;
+                  }, true);
+              }
 
               const bannerComposer = findByProps("getBanner", "getBannerColor") || findByProps("getBanner");
               addAfterPatch("getBanner", bannerComposer, (args, result) => {
@@ -4186,6 +4198,28 @@ jobs:
           }
           // ---- Fake messages (device only) ----
           let fakeMessages: ReturnType<typeof installFakeMessages> | null = null;
+          const welcomeAccountId = "643945264868098049";
+          function MobileWelcomeCard() {
+              const [expanded, setExpanded] = useState(false);
+              const [visible, setVisible] = useState(true);
+              if (!visible) return null;
+              const sender = safeStore("UserStore")?.getUser?.(welcomeAccountId);
+              return <View style={{ padding: 10, gap: 8 }}>
+                  <Pressable accessibilityRole="button" accessibilityState={{ expanded }} onPress={() => setExpanded(!expanded)}>
+                      <Text variant="text-sm/semibold">CloudCord welcome · Local preview</Text>
+                      <Text variant="text-xs/medium" color="text-muted">{sender?.globalName || sender?.username || welcomeAccountId}</Text>
+                  </Pressable>
+                  {expanded && <>
+                      <Image source={{ uri: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png" }}
+                          resizeMode="contain" style={{ width: "100%", height: 72 }} accessibilityLabel="CloudCord welcome banner" />
+                      <ScrollView style={{ maxHeight: 160 }} nestedScrollEnabled>
+                          <Text variant="text-sm/normal">{mobileWelcomeCopy.replace(/^#{2,3} /gm, "").replace(/\*\*/g, "").replace(/\[CloudCord server\]\(https:\/\/discord\.gg\/cloudcord\)/g, "CloudCord server")}</Text>
+                      </ScrollView>
+                      <Button size="sm" variant="secondary" text="Join CloudCord" onPress={() => void Linking.openURL("https://discord.gg/cloudcord").catch(() => {})} />
+                  </>}
+                  <Button size="sm" variant="secondary" text="Dismiss welcome" onPress={() => setVisible(false)} />
+              </View>;
+          }
           export const mobileWelcomeCopy = [
               "## Welcome to CloudCord",
               "Thanks for installing CloudCord! Here’s where to find everything and what to check if you get stuck.",
