@@ -29912,6 +29912,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
   function FakeProfile() {
     var editorOwner = (0, import_react7.useRef)(currentUserId);
     var [activeTab, setActiveTab] = (0, import_react7.useState)("overview");
+    var [showMobileGuide, setShowMobileGuide] = (0, import_react7.useState)(false);
     var [showDetails, setShowDetails] = (0, import_react7.useState)(false);
     useProxy(settings);
     var [, redraw] = (0, import_react7.useReducer)((value) => value + 1, 0);
@@ -30380,64 +30381,139 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
             var badgeCount = Object.values(preview.selectedBadges || {}).filter(Boolean).length + (preview.nitroEnabled ? 1 : 0) + (preview.boostMonths > 0 ? 1 : 0) + (preview.giftLevel >= 0 ? 1 : 0);
             var connections = (preview.customConnections || []).length;
             var name = preview.displayName || realCurrentUser?.globalName || realCurrentUser?.username || "there";
-            return /* @__PURE__ */ jsx(OverviewPanel, {
-              name,
-              subtitle: preview.enabled ? "Your custom profile is on" : "Your custom profile is off",
-              stats: [
-                {
-                  label: "Username",
-                  value: preview.username || realCurrentUser?.username || "-",
-                  hint: "Your public name"
-                },
-                {
-                  label: "Badges",
-                  value: String(badgeCount),
-                  hint: preview.replaceBadges ? "Real badges hidden" : "Shown with your real ones"
-                },
-                {
-                  label: "Connections",
-                  value: String(connections),
-                  hint: "Accounts and domains"
-                },
-                {
-                  label: "Sync",
-                  value: syncLabel,
-                  hint: rootSettings.fakeProfileLocalOnly ? "Edits stay on this device" : "CloudCord profile sharing"
-                }
-              ],
-              tasks: [
-                {
-                  label: "Upload a profile picture",
-                  done: !!preview.avatarMedia,
-                  tab: "profile"
-                },
-                {
-                  label: "Add your name",
-                  done: !!preview.displayName,
-                  tab: "profile"
-                },
-                {
-                  label: "Write a bio",
-                  done: !!preview.bio,
-                  tab: "profile"
-                },
-                {
-                  label: "Pick a decoration, frame or nameplate",
-                  done: !!(preview.avatarDecoration || preview.profileFrame || preview.nameplate),
-                  tab: "cosmetics"
-                },
-                {
-                  label: "Choose badges",
-                  done: badgeCount > 0,
-                  tab: "badges"
-                },
-                {
-                  label: "Add a connection",
-                  done: connections > 0,
-                  tab: "social"
-                }
-              ],
-              onSelect: setActiveTab
+            return /* @__PURE__ */ jsxs(Fragment, {
+              children: [
+                /* @__PURE__ */ jsxs(Card2, {
+                  children: [
+                    /* @__PURE__ */ jsxs(import_react_native27.View, {
+                      style: {
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 10
+                      },
+                      children: [
+                        /* @__PURE__ */ jsx(import_react_native27.Image, {
+                          source: {
+                            uri: CLOUDCORD_BADGE_ICON
+                          },
+                          resizeMode: "contain",
+                          style: {
+                            width: 42,
+                            height: 42
+                          }
+                        }),
+                        /* @__PURE__ */ jsxs(import_react_native27.View, {
+                          style: {
+                            flex: 1
+                          },
+                          children: [
+                            /* @__PURE__ */ jsx(Text, {
+                              variant: "text-sm/medium",
+                              color: "text-muted",
+                              children: "CloudCord"
+                            }),
+                            /* @__PURE__ */ jsx(Text, {
+                              variant: "heading-md/semibold",
+                              children: "Thanks for installing CloudCord!"
+                            })
+                          ]
+                        })
+                      ]
+                    }),
+                    /* @__PURE__ */ jsx(ActionButton, {
+                      muted: true,
+                      label: showMobileGuide ? "Hide mobile tutorial" : "Open mobile tutorial",
+                      onPress: () => setShowMobileGuide((value) => !value)
+                    }),
+                    showMobileGuide ? /* @__PURE__ */ jsxs(import_react_native27.View, {
+                      style: {
+                        gap: 8
+                      },
+                      children: [
+                        /* @__PURE__ */ jsx(Text, {
+                          variant: "text-sm/normal",
+                          color: "text-normal",
+                          children: "Open Settings \u2192 CloudCord to get back here. Use Profile Studio to change your picture, banner, and badges, then open your profile to see your changes."
+                        }),
+                        /* @__PURE__ */ jsx(Text, {
+                          variant: "text-sm/normal",
+                          color: "text-normal",
+                          children: "Open Add-ons to browse plugins, themes, and fonts. On iOS, shake the device and use Refetch Bundle if you need to refresh the runtime."
+                        }),
+                        /* @__PURE__ */ jsx(ActionButton, {
+                          muted: true,
+                          label: "Edit profile",
+                          onPress: () => setActiveTab("profile")
+                        }),
+                        /* @__PURE__ */ jsx(ActionButton, {
+                          muted: true,
+                          label: "Choose badges",
+                          onPress: () => setActiveTab("badges")
+                        })
+                      ]
+                    }) : null
+                  ]
+                }),
+                /* @__PURE__ */ jsx(OverviewPanel, {
+                  name,
+                  subtitle: preview.enabled ? "Your custom profile is on" : "Your custom profile is off",
+                  stats: [
+                    {
+                      label: "Username",
+                      value: preview.username || realCurrentUser?.username || "-",
+                      hint: "Your public name"
+                    },
+                    {
+                      label: "Badges",
+                      value: String(badgeCount),
+                      hint: preview.replaceBadges ? "Real badges hidden" : "Shown with your real ones"
+                    },
+                    {
+                      label: "Connections",
+                      value: String(connections),
+                      hint: "Accounts and domains"
+                    },
+                    {
+                      label: "Sync",
+                      value: syncLabel,
+                      hint: rootSettings.fakeProfileLocalOnly ? "Edits stay on this device" : "CloudCord profile sharing"
+                    }
+                  ],
+                  tasks: [
+                    {
+                      label: "Upload a profile picture",
+                      done: !!preview.avatarMedia,
+                      tab: "profile"
+                    },
+                    {
+                      label: "Add your name",
+                      done: !!preview.displayName,
+                      tab: "profile"
+                    },
+                    {
+                      label: "Write a bio",
+                      done: !!preview.bio,
+                      tab: "profile"
+                    },
+                    {
+                      label: "Pick a decoration, frame or nameplate",
+                      done: !!(preview.avatarDecoration || preview.profileFrame || preview.nameplate),
+                      tab: "cosmetics"
+                    },
+                    {
+                      label: "Choose badges",
+                      done: badgeCount > 0,
+                      tab: "badges"
+                    },
+                    {
+                      label: "Add a connection",
+                      done: connections > 0,
+                      tab: "social"
+                    }
+                  ],
+                  onSelect: setActiveTab
+                })
+              ]
             });
           })() : null,
           activeTab === "social" ? /* @__PURE__ */ jsx(Card2, {
@@ -75078,7 +75154,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "b8f35e72d611ddaf10c3b7dba5ae79c8f47989d6";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "078c567975fff04f0e7ae9b8a3f668c18c86065a";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
