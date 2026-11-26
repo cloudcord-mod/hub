@@ -9,6 +9,9 @@ old_candidates = '''        listOf(
 if source.count(old_candidates) != 1:
     raise SystemExit("Unexpected script loader class candidates")
 source = source.replace(old_candidates, '''        listOf(
+            // Discord 355.10 uses these names for the React bundle delegates.
+            "kp.z",
+            "kp.d",
             "os.i",
             "um.d",
             "org.chromium.net.j",
@@ -49,6 +52,8 @@ payload = payload.replace(
     '''        listOfNotNull(
             catalystInstance,
             scriptLoader,
+            classLoader.safeLoadClass("kp.z"),
+            classLoader.safeLoadClass("kp.d"),
             classLoader.safeLoadClass("os.i"),
             classLoader.safeLoadClass("um.d"),
             classLoader.safeLoadClass("com.facebook.react.runtime.ReactInstance\\$loadJSBundle$1"),
