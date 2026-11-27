@@ -14726,8 +14726,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       } catch (e) {
       }
     };
-    var show = (channelId) => {
-      var conversations = options.getConversations();
+    var show = (channelId, previewOnly = false) => {
+      var conversations = previewOnly ? [] : options.getConversations();
       var preview2 = channelId ? options.getHistoryPreview?.(channelId) : void 0;
       var dispatched = 0;
       for (var raw of preview2 ? [
@@ -26330,6 +26330,24 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       return "Open the DM with 643945264868098049 first, then return here.";
     return fakeMessages?.show(channelId) === 2 ? "Welcome added locally. Return to the DM in Messages." : "Couldn\u2019t add the welcome. Reopen the DM and try again.";
   }
+  function deliverWelcomeToLoadedDm() {
+    if (import_react_native23.AppState.currentState !== "active" || !currentUserId || !fakeMessages)
+      return;
+    var store = safeStore("ChannelStore");
+    var id = store?.getDMFromUserId?.(welcomeAccountId);
+    var channel = id && store?.getChannel?.(id);
+    if (channel?.type !== 1 || typeof channel.isSystemDM !== "function" || channel.isSystemDM())
+      return;
+    var delivered = settings.cloudcordWelcomeDelivered ?? {};
+    if (delivered[currentUserId] === String(id))
+      return;
+    if (fakeMessages.show(String(id), true) === 2) {
+      settings.cloudcordWelcomeDelivered = {
+        ...delivered,
+        [currentUserId]: String(id)
+      };
+    }
+  }
   function saveConversations(list) {
     rootSettings.fakeMessages = list.map(normalizeConversation).filter(Boolean);
   }
@@ -27192,6 +27210,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
           }
         }, 1500);
         restoreLater();
+        var welcomeLater = () => setTimeout(() => {
+          try {
+            deliverWelcomeToLoadedDm();
+          } catch (e) {
+          }
+        }, 1500);
+        welcomeLater();
+        try {
+          FluxDispatcher.subscribe("CONNECTION_OPEN", welcomeLater);
+        } catch (e) {
+        }
         try {
           FluxDispatcher.subscribe("CONNECTION_OPEN", () => {
             fakeRequestIds.clear();
@@ -75481,7 +75510,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "53465f4d052445ac52ba4c990ec8173327e1ee3d";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5c0fad377ef101941ac1876a0de8593f807e1291";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
