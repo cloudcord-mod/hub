@@ -28116,11 +28116,16 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
         installOrbPreviewPanels();
         setTimeout(() => {
           for (var step2 of [
-            installOrbHooks,
             installSwitcherHook
           ]) {
             try {
               step2();
+            } catch (e) {
+            }
+          }
+          if (fakeOrbCount() !== null) {
+            try {
+              installOrbHooks();
             } catch (e) {
             }
           }
@@ -75335,7 +75340,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5f7c165c3d69e4425e63dcbd7856aa04d8b5c193";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "eae2e734ae3c519105667096d30be3c52cb10645";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
