@@ -103,6 +103,8 @@ export default function patchChatBackground() {
     // renderer. iOS exposes a memoized forward ref with displayName "Messages".
     function wrapRenderer(_: unknown, element: React.ReactElement) {
         if (!active || element.type === ThemeBackground) return element;
+        const { channel } = element.props as { channel?: { type?: number; }; };
+        if (channel?.type === 15 || channel?.type === 16) return element;
         modernSeen = true;
         unpatch?.();
         unpatch = undefined;

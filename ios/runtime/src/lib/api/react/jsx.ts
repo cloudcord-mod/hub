@@ -39,7 +39,7 @@ function preserveOverlayListChildren(component: any, element: JSX.Element, andro
         inner?.render?.displayName, inner?.render?.name];
     const list = names.some(name => typeof name === "string" &&
         ((android && /^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name))
-            || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
+            || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker|forum|guildchannel).*(?:list|grid)|(?:list|grid).*(?:mention|autocomplete|typeahead|gif|forum)/i.test(name)));
     if (!list) return element;
     let count: number | undefined;
     if (Array.isArray(props.data)) count = props.data.length;

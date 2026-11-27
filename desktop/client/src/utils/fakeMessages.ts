@@ -271,7 +271,7 @@ export function installFakeMessages(options: FakeMessagesOptions) {
         const channel = url.match(/\/channels\/(\d+)/)?.[1];
         // Everything else (GIF search, member search, ...) goes straight to Discord untouched.
         if (!channel) return original(...args);
-        const match = url.match(/\/channels\/(\d+)\/messages(?:\?(.*))?$/);
+        const match = url.match(/\/channels\/(\d+)\/messages\/?(?:\?(.*))?$/);
         if (!match && !isLocalDm(channel)) return original(...args);
         if (!match) return ok({});
         let preview: FakeConversation | undefined;
