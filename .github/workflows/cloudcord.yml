@@ -4443,7 +4443,7 @@ jobs:
                       for (const step of [installGiftHook, installBoostHooks, applyFakeNitro]) { try { step(); } catch {} }
                       // One late retry for stores that load after startup. A miss scans every module on mobile, so no polling.
                       installOrbPreviewPanels();
-                      setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook]) { try { step(); } catch {} } }, 15000);
+                      setTimeout(() => { for (const step of [installSwitcherHook]) { try { step(); } catch {} } if (fakeOrbCount() !== null) { try { installOrbHooks(); } catch {} } }, 15000);
                       const restoreLater = () => setTimeout(() => { try { restoreFakeRequests(); } catch {} }, 1500);
                       restoreLater();
                       try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); }); } catch {}
