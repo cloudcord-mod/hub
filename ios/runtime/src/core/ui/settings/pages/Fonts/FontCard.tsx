@@ -8,7 +8,8 @@ import { BundleUpdaterManager } from "@lib/api/native/modules";
 import { lazyDestructure } from "@lib/utils/lazy";
 import { findByProps } from "@metro";
 import { NavigationNative, tokens } from "@metro/common";
-import { Button, Card, IconButton, Stack, Text } from "@metro/common/components";
+import { Button, IconButton, Stack, Text } from "@metro/common/components";
+import { semanticColors } from "@ui/color";
 import { View } from "react-native";
 
 import FontEditor from "./FontEditor";
@@ -22,17 +23,21 @@ export default function FontCard({ item: font }: CardWrapper<FontDefinition>) {
     const selected = fonts.__selected === font.name;
 
     return (
-        <Card>
-            <Stack spacing={16}>
+        <View
+            style={{
+                backgroundColor: semanticColors.CARD_SECONDARY_BG,
+                borderRadius: 16,
+                overflow: "hidden",
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+            }}
+        >
+            <Stack spacing={12}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View>
-                        <Text variant="heading-lg/semibold">
+                    <View style={{ flexShrink: 1 }}>
+                        <Text variant="heading-lg/semibold" numberOfLines={2}>
                             {font.name}
                         </Text>
-                        {/* TODO: Text wrapping doesn't work well */}
-                        {/* <Text color="text-muted" variant="text-sm/semibold">
-                            {font.description}
-                        </Text> */}
                     </View>
                     <View style={{ marginLeft: "auto" }}>
                         <Stack spacing={12} direction="horizontal">
@@ -68,6 +73,6 @@ export default function FontCard({ item: font }: CardWrapper<FontDefinition>) {
                     </View>
                 </View>
             </Stack>
-        </Card>
+        </View>
     );
 }

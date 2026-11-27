@@ -1,6 +1,6 @@
 import { findAssetId } from "@lib/api/assets";
 import { lazyDestructure } from "@lib/utils/lazy";
-import { Card, FormRadio, FormSwitch, IconButton, LegacyFormRow, Stack, Text } from "@metro/common/components";
+import { FormRadio, FormSwitch, IconButton, LegacyFormRow, Text } from "@metro/common/components";
 import { findByProps } from "@metro/wrappers";
 import { semanticColors } from "@ui/color";
 import { createStyles, TextStyleSheet } from "@ui/styles";
@@ -9,52 +9,44 @@ import { TouchableOpacity, View } from "react-native";
 const { hideActionSheet } = lazyDestructure(() => findByProps("openLazy", "hideActionSheet"));
 const { showSimpleActionSheet } = lazyDestructure(() => findByProps("showSimpleActionSheet"));
 
-// TODO: These styles work weirdly. Low DPI Has cramped text. Fix?
 const useStyles = createStyles({
     card: {
         backgroundColor: semanticColors?.CARD_SECONDARY_BG,
-        borderRadius: 12,
-        overflow: "hidden"
+        borderRadius: 16,
+        overflow: "hidden",
+        paddingHorizontal: 16,
+        paddingVertical: 14,
+        gap: 12
     },
-    header: {
-        padding: 0,
+    headerRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12
     },
     headerLeading: {
+        flex: 1,
+        minWidth: 0,
         flexDirection: "column",
         justifyContent: "center",
-        scale: 1.2
-    },
-    headerTrailing: {
-        display: "flex",
-        flexDirection: "row",
-        gap: 15,
-        alignItems: "center"
+        gap: 2
     },
     headerLabel: {
-        ...TextStyleSheet["heading-md/semibold"],
+        ...TextStyleSheet["heading-lg/semibold"],
         color: semanticColors.MOBILE_TEXT_HEADING_PRIMARY,
     },
     headerSubtitle: {
-        ...TextStyleSheet["text-md/semibold"],
+        ...TextStyleSheet["text-sm/medium"],
         color: semanticColors.TEXT_MUTED,
     },
     descriptionLabel: {
-        ...TextStyleSheet["text-md/semibold"],
+        ...TextStyleSheet["text-md/medium"],
         color: semanticColors.TEXT_NORMAL,
     },
-    actions: {
-        flexDirection: "row-reverse",
+    footer: {
+        flexDirection: "row",
         alignItems: "center",
-        gap: 5
-    },
-    iconStyle: {
-        tintColor: semanticColors.INTERACTIVE_ICON_DEFAULT,
-        opacity: 0.2,
-        height: 64,
-        width: 64,
-        left: void 0,
-        right: "30%",
-        top: "-10%"
+        justifyContent: "flex-end",
+        gap: 8
     }
 });
 
@@ -90,65 +82,74 @@ interface CardProps {
 
 export default function AddonCard(props: CardProps) {
     const styles = useStyles();
+    const hasFooter = !!props.overflowActions?.length || !!props.actions?.length;
 
     return (
-        <Card>
-            <Stack spacing={16}>
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View style={styles.headerLeading}>
-                        <Text style={styles.headerLabel}>{props.headerLabel}</Text>
-                        {props.headerSublabel && (
-                            <Text style={styles.headerSubtitle}>{props.headerSublabel}</Text>
-                        )}
-                    </View>
-                    <View style={[styles.headerTrailing, { marginLeft: "auto" }]}>
-                        <View style={styles.actions}>
-                            {props.overflowActions &&
-                                <IconButton
-                                    onPress={() => showSimpleActionSheet({
-                                        key: "CardOverflow",
-                                        header: {
-                                            title: props.overflowTitle,
-                                            icon: props.headerIcon && <LegacyFormRow.Icon style={{ marginRight: 8 }} source={findAssetId(props.headerIcon)} />,
-                                            onClose: () => hideActionSheet(),
-                                        },
-                                        options: props.overflowActions?.map(i => ({
-                                            ...i,
-                                            icon: findAssetId(i.icon)
-                                        })),
-                                    })}
-                                    size="sm"
-                                    variant="secondary"
-                                    icon={findAssetId("CircleInformationIcon-primary")}
-                                />}
-                            {props.actions?.map(({ icon, onPress, disabled }) => (
-                                <IconButton
-                                    onPress={onPress}
-                                    disabled={disabled}
-                                    size="sm"
-                                    variant="secondary"
-                                    icon={findAssetId(icon)}
-                                />
-                            ))}
-                        </View>
-                        {props.toggleType && (props.toggleType === "switch" ?
-                            <FormSwitch
-                                value={props.toggleValue()}
-                                onValueChange={props.onToggleChange}
-                            />
-                            :
-                            <TouchableOpacity onPress={() => {
-                                props.onToggleChange?.(!props.toggleValue());
-                            }}>
-                                <FormRadio selected={props.toggleValue()} />
-                            </TouchableOpacity>
-                        )}
-                    </View>
+        <View style={styles.card}>
+            <View style={styles.headerRow}>
+                <View style={styles.headerLeading}>
+                    <Text style={styles.headerLabel} numberOfLines={2}>{props.headerLabel}</Text>
+                    {!!props.headerSublabel && (
+                        <Text style={styles.headerSubtitle} numberOfLines={1}>{props.headerSublabel}</Text>
+                    )}
                 </View>
-                {props.descriptionLabel && <Text variant="text-md/medium">
+                {props.toggleType && (props.toggleType === "switch" ?
+                    <FormSwitch
+                        value={props.toggleValue()}
+                        onValueChange={props.onToggleChange}
+                    />
+                    :
+                    <TouchableOpacity
+                        accessibilityRole="radio"
+                        accessibilityLabel={props.headerLabel}
+                        accessibilityState={{ selected: props.toggleValue() }}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        onPress={() => {
+                            props.onToggleChange?.(!props.toggleValue());
+                        }}
+                    >
+                        <FormRadio selected={props.toggleValue()} />
+                    </TouchableOpacity>
+                )}
+            </View>
+            {!!props.descriptionLabel && (
+                <Text style={styles.descriptionLabel} numberOfLines={4}>
                     {props.descriptionLabel}
-                </Text>}
-            </Stack>
-        </Card >
+                </Text>
+            )}
+            {hasFooter && (
+                <View style={styles.footer}>
+                    {props.overflowActions?.length ? (
+                        <IconButton
+                            onPress={() => showSimpleActionSheet({
+                                key: "CardOverflow",
+                                header: {
+                                    title: props.overflowTitle,
+                                    icon: props.headerIcon && <LegacyFormRow.Icon style={{ marginRight: 8 }} source={findAssetId(props.headerIcon)} />,
+                                    onClose: () => hideActionSheet(),
+                                },
+                                options: props.overflowActions?.map(i => ({
+                                    ...i,
+                                    icon: findAssetId(i.icon)
+                                })),
+                            })}
+                            size="sm"
+                            variant="secondary"
+                            icon={findAssetId("CircleInformationIcon-primary")}
+                        />
+                    ) : null}
+                    {props.actions?.map(({ icon, onPress, disabled }, index) => (
+                        <IconButton
+                            key={`${icon}-${index}`}
+                            onPress={onPress}
+                            disabled={disabled}
+                            size="sm"
+                            variant="secondary"
+                            icon={findAssetId(icon)}
+                        />
+                    ))}
+                </View>
+            )}
+        </View>
     );
 }

@@ -5,12 +5,12 @@ import { findAssetId } from "@lib/api/assets";
 import { showToast } from "@lib/ui/toasts";
 import { NavigationNative, tokens } from "@metro/common";
 import {
-  Card,
   IconButton,
   Stack,
   TableSwitch,
   Text,
 } from "@metro/common/components";
+import { semanticColors } from "@ui/color";
 import { showSheet } from "@ui/sheets";
 import chroma from "chroma-js";
 import { createContext, useContext, useMemo, useState } from "react";
@@ -149,22 +149,29 @@ export default function PluginCard({
   plugin.usePluginState();
 
   
-const [toggling, setToggling] = useState(false);
-const cardContextValue = useMemo(() => ({ plugin, result }), [plugin, result]);
-    const core = isCorePlugin(plugin.id);
+  const [toggling, setToggling] = useState(false);
+  const cardContextValue = useMemo(() => ({ plugin, result }), [plugin, result]);
+  const core = isCorePlugin(plugin.id);
 
     return (
         <CardContext.Provider value={cardContextValue}>
-            <Card>
-                <Stack spacing={16}>
+            <View
+                style={{
+                    backgroundColor: semanticColors.CARD_SECONDARY_BG,
+                    borderRadius: 16,
+                    overflow: "hidden",
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                }}
+            >
+                <Stack spacing={12}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ flexShrink: 1 }}>
                             <Title />
                             <Authors />
                         </View>
-                        <View>
+                        <View style={{ flexShrink: 0 }}>
                             <Stack spacing={12} direction="horizontal">
-                                <Actions />
                                 <View style={core ? { opacity: 0.5 } : undefined}>
                                     <TableSwitch
                                         value={core ? true : plugin.isEnabled()}
@@ -187,8 +194,11 @@ const cardContextValue = useMemo(() => ({ plugin, result }), [plugin, result]);
                         </View>
                     </View>
                     <Description />
+                    <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                        <Actions />
+                    </View>
                 </Stack>
-            </Card>
+            </View>
         </CardContext.Provider>
     );
 }

@@ -4,6 +4,7 @@ import { Stack, Button, IconButton, Text, Card, FlashList } from "@metro/common/
 import { findAssetId } from "@lib/api/assets";
 import safeFetch from "@lib/utils/safeFetch";
 import { showToast } from "@ui/toasts";
+import { semanticColors } from "@ui/color";
 import Search from "@ui/components/Search";
 import { VdPluginManager } from "@core/vendetta/plugins";
 import { installTheme, themes, removeTheme } from "@lib/addons/themes";
@@ -221,8 +222,16 @@ function AddonCard({ addon, isPluginMode, installing, setInstalling, setRefreshT
     }
 
     return (
-        <Card>
-            <Stack spacing={16}>
+        <View
+            style={{
+                backgroundColor: semanticColors.CARD_SECONDARY_BG,
+                borderRadius: 16,
+                overflow: "hidden",
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+            }}
+        >
+            <Stack spacing={12}>
                 <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                     <View style={{ flexShrink: 1 }}>
                         <Text numberOfLines={1} variant="heading-lg/semibold">
@@ -256,7 +265,7 @@ function AddonCard({ addon, isPluginMode, installing, setInstalling, setRefreshT
                     </Text>
                 )}
             </Stack>
-        </Card>
+        </View>
     );
 }
 
@@ -284,7 +293,7 @@ export default function BrowserPage() {
 
     React.useEffect(() => {
         navigation.setOptions({
-            title: "Browser"
+            title: "Discover plugins"
         });
     }, [navigation]);
 

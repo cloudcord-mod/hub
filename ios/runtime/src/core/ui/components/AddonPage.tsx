@@ -191,6 +191,9 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                     })}
                 />}
             </View>
+            <Text variant="text-sm/medium" color="text-muted" style={{ marginTop: 10, marginLeft: 4 }}>
+                {results.length} {results.length === 1 ? "item" : "items"}
+            </Text>
             {props.ListHeaderComponent && <props.ListHeaderComponent />}
         </View>
     );
@@ -200,7 +203,7 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
             <FlashList
                 data={results}
                 extraData={search}
-                estimatedItemSize={136}
+                estimatedItemSize={150}
                 ListHeaderComponent={headerElement}
                 ListEmptyComponent={() => <View style={{ gap: 12, padding: 12, alignItems: "center" }}>
                     <Image source={findAssetId("devices_not_found")!} />
@@ -208,8 +211,8 @@ export default function AddonPage<T extends object>({ CardComponent, ...props }:
                         Hmmm... could not find that!
                     </Text>
                 </View>}
-                contentContainerStyle={{ padding: 8, paddingHorizontal: 12, paddingBottom: 90 }}
-                ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                contentContainerStyle={{ padding: 8, paddingHorizontal: 16, paddingBottom: 96 }}
+                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                 ListFooterComponent={props.ListFooterComponent}
                 renderItem={({ item }: any) => <CardComponent item={item.obj} result={item} />}
             />
