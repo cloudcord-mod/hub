@@ -111,10 +111,7 @@ const root = Object.freeze(jsx('Fragment', Object.freeze({children: Object.freez
 let renderUpdates = 0;
 const unsubscribe = updater.subscribeThemeColors(() => renderUpdates++);
 const wallpaper = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aPZ0AAAAASUVORK5CYII=';
-const render = element => {
-  const rendered = element.type(element.props);
-  return rendered.type === 'Fragment' ? [undefined, rendered] : rendered.props.children;
-};
+const render = element => element.type(element.props).props.children;
 
 const rendererRoutes = ['legacy', 'default-export', 'display-name', 'missing-file', 'jsx', 'android-display-name',
   'ios-renderer', 'ios-late-renderer', 'exact-android', 'exact-ios', 'late-exact'];
@@ -208,8 +205,6 @@ for (const route of rendererRoutes) {
     assert.equal(component.render(), root, 'the actual renderer takes priority over the fallback');
   }
   assert.equal(render(wrapped)[0], undefined);
-  assert.equal(wrapped.type(wrapped.props).type, 'Fragment',
-    'A missing wallpaper must preserve the native layout');
   const disableCx = updater.applyTemporaryTheme({...ref.current, background: {url: wallpaper, opacity: 0.75, blur: 0.6}});
   const [image, loading] = render(wrapped);
   assert.equal(loading.props.children, original);

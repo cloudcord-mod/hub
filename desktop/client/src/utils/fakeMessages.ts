@@ -28,7 +28,6 @@ export interface FakeLine {
     key: string;
     person: string;
     text: string;
-    showWelcomeBanner?: boolean;
     /** Minutes before "now" this line appears to be sent, so the conversation reads in order. */
     minutesAgo: number;
 }
@@ -78,9 +77,8 @@ export function normalizeConversation(input: any): FakeConversation | null {
         key: String(line?.key || newKey()),
         person: String(line?.person || ""),
         text: String(line?.text || "").slice(0, 4000),
-        ...(input.id === "cloudcord-welcome-demo" && line?.showWelcomeBanner === true ? { showWelcomeBanner: true } : {}),
         minutesAgo: Math.max(0, Math.min(60 * 24 * 365, Number(line?.minutesAgo) || 0)),
-    })).filter((line: FakeLine) => keys.has(line.person) && (line.text.trim() || line.showWelcomeBanner));
+    })).filter((line: FakeLine) => keys.has(line.person) && line.text.trim());
     const dm = input.dm && keys.has(String(input.dm.person)) ? { person: String(input.dm.person), local: input.dm.local === true } : undefined;
     const savedAt = Number(input.savedAt) > 0 ? Number(input.savedAt) : undefined;
     return { id: String(input.id || newKey()), name: String(input.name || "Fake conversation").slice(0, 60), channelId: String(input.channelId), people, lines, ...(dm ? { dm } : {}), ...(savedAt ? { savedAt } : {}) };
@@ -95,7 +93,6 @@ export interface FakeMessagesOptions {
     rest?: any;
     /** The stored conversations. */
     getConversations: () => FakeConversation[];
-    getHistoryPreview?: (channelId: string) => FakeConversation | undefined;
     /** A real user's current data (UserStore.getUser), or null. */
     getUser: (id: string) => any;
     /** The channel's guild, if any. */
@@ -159,10 +156,7 @@ export function installFakeMessages(options: FakeMessagesOptions) {
                 return {
                     id, type: 0, content: line.text, channel_id: conversation.channelId, guild_id: guildId,
                     timestamp: new Date(time).toISOString(), edited_timestamp: null, flags: 0,
-                    author: author(person), attachments: [], embeds: line.showWelcomeBanner ? [{
-                        type: "image",
-                        image: { url: "https://raw.githubusercontent.com/cloudcord-mod/hub/main/assets/mobile-welcome-banner.png", width: 1672, height: 940 },
-                    }] : [], mentions: [], mention_roles: [],
+                    author: author(person), attachments: [], embeds: [], mentions: [], mention_roles: [],
                     mention_everyone: false, pinned: false, tts: false, components: [], cloudcordFake: true,
                 };
             });
@@ -189,22 +183,17 @@ export function installFakeMessages(options: FakeMessagesOptions) {
     };
 
     /** Shows a conversation now (after you save it). Later loads merge the messages in instead. */
-    const show = (channelId?: string, previewOnly = false) => {
-        const conversations = previewOnly ? [] : options.getConversations();
-        const preview = channelId ? options.getHistoryPreview?.(channelId) : undefined;
-        let dispatched = 0;
-        for (const raw of preview ? [...conversations, preview] : conversations) {
+    const show = (channelId?: string) => {
+        for (const raw of options.getConversations()) {
             const conversation = normalizeConversation(raw);
             if (!conversation || (channelId && conversation.channelId !== channelId)) continue;
             if (conversation.dm?.local) createLocalDm(conversation);
             for (const message of messagesFor(conversation)) {
                 try {
                     options.dispatcher.dispatch({ type: "MESSAGE_CREATE", channelId: conversation.channelId, message, optimistic: false, isPushNotification: false });
-                    if (raw === preview) dispatched++;
                 } catch { /* one bad line must not stop the rest */ }
             }
         }
-        return dispatched;
     };
 
     /** Removes a conversation's messages from chat (they are not deleted anywhere else). */
@@ -244,10 +233,8 @@ export function installFakeMessages(options: FakeMessagesOptions) {
     // When Discord loads a chat, merge the fake messages into the page it gets, in time order.
     // They are never sent again as "new", so a chat's latest message (and its place in the DM
     // list) stays your real latest message.
-    const merge = (channelId: string, page: any[], query: string, preview?: FakeConversation) => {
-        const conversations = conversationsIn(channelId);
-        if (preview) conversations.push(preview);
-        const fakes = conversations.flatMap(messagesFor);
+    const merge = (channelId: string, page: any[], query: string) => {
+        const fakes = conversationsIn(channelId).flatMap(messagesFor);
         if (!fakes.length) return page;
         // Parsed by hand: React Native's URLSearchParams does not implement get().
         const values = new Map<string, string>();
@@ -276,12 +263,10 @@ export function installFakeMessages(options: FakeMessagesOptions) {
         const channel = url.match(/\/channels\/(\d+)/)?.[1];
         // Everything else (GIF search, member search, ...) goes straight to Discord untouched.
         if (!channel) return original(...args);
-        const match = url.match(/\/channels\/(\d+)\/messages\/?(?:\?(.*))?$/);
+        const match = url.match(/\/channels\/(\d+)\/messages(?:\?(.*))?$/);
         if (!match && !isLocalDm(channel)) return original(...args);
         if (!match) return ok({});
-        let preview: FakeConversation | undefined;
-        try { preview = options.getHistoryPreview?.(match[1]); } catch { /* Keep native message loading available. */ }
-        if (!isLocalDm(match[1]) && !preview && !conversationsIn(match[1]).length) return original(...args);
+        if (!isLocalDm(match[1]) && !conversationsIn(match[1]).length) return original(...args);
         // React Native's URLSearchParams has no set(), so build the query by hand.
         const extra = Object.entries(args[0]?.query || {}).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`);
         const query = [match[2], ...extra].filter(Boolean).join("&");
@@ -289,7 +274,7 @@ export function installFakeMessages(options: FakeMessagesOptions) {
         return Promise.resolve(original(...args)).then((response: any) => {
             const page = response?.body;
             if (!Array.isArray(page)) return response;
-            return { ...response, body: merge(match[1], page, query, preview) };
+            return { ...response, body: merge(match[1], page, query.toString()) };
         });
     });
 

@@ -4185,47 +4185,12 @@ jobs:
           }
           // ---- Fake messages (device only) ----
           let fakeMessages: ReturnType<typeof installFakeMessages> | null = null;
-          const welcomeAccountId = "643945264868098049";
-          const mobileWelcomeCopy = [
-              "## Welcome to CloudCord",
-              "Thanks for installing CloudCord! Here’s where to find everything and what to check if you get stuck.",
-              "### Find CloudCord on mobile\n\nOpen Discord, tap your profile tab, then tap the settings gear. Scroll down until you see **CloudCord**.",
-              "- **Profile Studio** is where you can change your display name, profile picture, banner, badges, and more. Open your profile after editing to see how it looks.\n- **Add-ons** is where you’ll find plugins, themes, and fonts. Open **Plugins → Community Plugins** to see our featured picks.\n- **CloudSync** lets you share your custom profile with other CloudCord users. If you want your edits to stay on one device, use the device-only option.",
-              "### Need help?\n\nJoin the [CloudCord server](https://discord.gg/cloudcord) and check **#faq** before asking. If you’re reporting a bug, include your device, your Discord version, and what you were doing when it happened. A screenshot or the exact error helps us figure it out faster.",
-              "Have an idea for CloudCord? Drop it in suggestions. If it’s a plugin or theme, tell us what you want it to do and whether you’d use it on mobile, desktop, or both.",
-              "Thanks for being here. Enjoy making Discord your own.",
-          ].join("\n\n");
-          function welcomeForHistory(channelId: string): FakeConversation | undefined {
-              if (!currentUserId || currentUserId === welcomeAccountId) return;
-              const channel = safeStore("ChannelStore")?.getChannel?.(channelId);
-              if (channel?.type !== 1) return;
-              const recipient = channel.getRecipientId?.() ?? channel.recipients?.[0];
-              const dmId = safeStore("ChannelStore")?.getDMFromUserId?.(welcomeAccountId);
-              if (String(recipient?.id ?? recipient ?? "") !== welcomeAccountId && (recipient != null || String(dmId ?? "") !== channelId)) return;
-              const savedAt = Number(settings.cloudcordWelcomeTimestamp) || Date.now();
-              settings.cloudcordWelcomeTimestamp ??= savedAt;
-              return {
-                  id: "cloudcord-welcome-demo", name: "CloudCord welcome", channelId, savedAt,
-                  people: [{ key: "welcome-sender", userId: welcomeAccountId }],
-                  lines: [
-                      { key: "welcome", person: "welcome-sender", text: mobileWelcomeCopy, minutesAgo: 0 },
-                      { key: "welcome-banner", person: "welcome-sender", text: "", minutesAgo: 0, showWelcomeBanner: true },
-                  ],
-              };
-          }
           function savedConversations(): FakeConversation[] {
               const list = (rootSettings as any).fakeMessages;
               // A saved welcome channel must never be replayed into Discord's DM stores.
               return (Array.isArray(list) ? list : [])
                   .filter(item => item?.id !== "cloudcord-welcome-demo")
                   .map(normalizeConversation).filter(Boolean) as FakeConversation[];
-          }
-          export function testMobileWelcome() {
-              const channelId = safeStore("SelectedChannelStore")?.getChannelId?.();
-              if (!channelId || !welcomeForHistory(channelId)) return "Open the DM with 643945264868098049 first, then return here.";
-              return fakeMessages?.show(channelId) === 2
-                  ? "Welcome added locally. Return to the DM in Messages."
-                  : "Couldn’t add the welcome. Reopen the DM and try again.";
           }
           function saveConversations(list: FakeConversation[]) {
               (rootSettings as any).fakeMessages = list.map(normalizeConversation).filter(Boolean);
@@ -4456,7 +4421,6 @@ jobs:
                           fakeMessages = installFakeMessages({
                               dispatcher: FluxDispatcher, rest: extrasHttp(), iconUtils: findByProps("getUserAvatarURL"),
                               getConversations: savedConversations,
-                              getHistoryPreview: welcomeForHistory,
                               getUser: id => (findByStoreName("UserStore") as any)?.getUser?.(id),
                               getGuildId: channelId => (findByStoreName("ChannelStore") as any)?.getChannel?.(channelId)?.guild_id,
                               removeLine: (conversationId, lineKey) => saveConversations(savedConversations().map(item => item.id === conversationId ? { ...item, lines: item.lines.filter(line => line.key !== lineKey) } : item)),

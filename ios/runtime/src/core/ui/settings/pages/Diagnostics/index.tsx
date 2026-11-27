@@ -171,7 +171,6 @@ const TAB_LABELS: Record<string, string> = {
 };
 
 export default function Diagnostics() {
-    const [welcomeStatus, setWelcomeStatus] = useState("");
     useProxy(settings);
     useProxy(loaderConfig);
     const debug = getDebugInfo();
@@ -267,13 +266,6 @@ export default function Diagnostics() {
     return <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 48 }}>
         <Stack style={{ paddingVertical: 24, paddingHorizontal: 12 }} spacing={24}>
             <TableRowGroup title="Runtime diagnostics">
-                <TableRow label="Test Welcome Message" subLabel={welcomeStatus || "Add the welcome to the open DM on this device"} onPress={() => {
-                    try {
-                        setWelcomeStatus(require("@core/ui/settings/pages/FakeProfile").testMobileWelcome());
-                    } catch {
-                        setWelcomeStatus("Couldn’t add the welcome message.");
-                    }
-                }} />
                 <TableSwitchRow
                     label="Intercept CloudCord events"
                     subLabel="Records sanitized runtime, UI, and request timing metadata only"

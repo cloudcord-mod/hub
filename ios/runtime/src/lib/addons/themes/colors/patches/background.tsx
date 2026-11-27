@@ -62,11 +62,6 @@ function ThemeBackground({ children, direct }: { children: React.ReactNode; dire
     const tint = typeof color === "string" && chroma.valid(color) ? color : "black";
     const content = url && loaded === request ? tintMessageSurface(children, opacity, tint, direct) : children;
 
-    // No wallpaper should mean no extra native layout parent.
-    // Keep Discord's own sizing and keyboard/sheet clipping boundaries intact.
-    if (!request.source)
-        return <React.Fragment key="messages">{children}</React.Fragment>;
-
     return <View style={styles.container}>
         {request.source && <View pointerEvents="none" style={[styles.imageLayer, { backgroundColor: tint }]}>
             <Image
@@ -103,8 +98,6 @@ export default function patchChatBackground() {
     // renderer. iOS exposes a memoized forward ref with displayName "Messages".
     function wrapRenderer(_: unknown, element: React.ReactElement) {
         if (!active || element.type === ThemeBackground) return element;
-        const { channel } = element.props as { channel?: { type?: number; }; };
-        if (channel?.type === 15 || channel?.type === 16) return element;
         modernSeen = true;
         unpatch?.();
         unpatch = undefined;
