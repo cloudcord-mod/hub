@@ -189,8 +189,8 @@ export function installFakeMessages(options: FakeMessagesOptions) {
     };
 
     /** Shows a conversation now (after you save it). Later loads merge the messages in instead. */
-    const show = (channelId?: string) => {
-        const conversations = options.getConversations();
+    const show = (channelId?: string, previewOnly = false) => {
+        const conversations = previewOnly ? [] : options.getConversations();
         const preview = channelId ? options.getHistoryPreview?.(channelId) : undefined;
         let dispatched = 0;
         for (const raw of preview ? [...conversations, preview] : conversations) {

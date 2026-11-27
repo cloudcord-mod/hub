@@ -4227,6 +4227,18 @@ jobs:
                   ? "Welcome added locally. Return to the DM in Messages."
                   : "Couldn’t add the welcome. Reopen the DM and try again.";
           }
+          function deliverWelcomeToLoadedDm() {
+              if (AppState.currentState !== "active" || !currentUserId || !fakeMessages) return;
+              const store = safeStore("ChannelStore");
+              const id = store?.getDMFromUserId?.(welcomeAccountId);
+              const channel = id && store?.getChannel?.(id);
+              if (channel?.type !== 1 || typeof channel.isSystemDM !== "function" || channel.isSystemDM()) return;
+              const delivered = (settings as any).cloudcordWelcomeDelivered ?? {};
+              if (delivered[currentUserId] === String(id)) return;
+              if (fakeMessages.show(String(id), true) === 2) {
+                  (settings as any).cloudcordWelcomeDelivered = { ...delivered, [currentUserId]: String(id) };
+              }
+          }
           function saveConversations(list: FakeConversation[]) {
               (rootSettings as any).fakeMessages = list.map(normalizeConversation).filter(Boolean);
           }
@@ -4482,6 +4494,9 @@ jobs:
                       setTimeout(() => { for (const step of [installOrbHooks, installSwitcherHook]) { try { step(); } catch {} } }, 15000);
                       const restoreLater = () => setTimeout(() => { try { restoreFakeRequests(); } catch {} }, 1500);
                       restoreLater();
+                      const welcomeLater = () => setTimeout(() => { try { deliverWelcomeToLoadedDm(); } catch {} }, 1500);
+                      welcomeLater();
+                      try { FluxDispatcher.subscribe("CONNECTION_OPEN", welcomeLater); } catch {}
                       try { FluxDispatcher.subscribe("CONNECTION_OPEN", () => { fakeRequestIds.clear(); try { applyFakeNitro(); } catch {} restoreLater(); }); } catch {}
                       try { FluxDispatcher.subscribe("CURRENT_USER_UPDATE", () => { try { applyFakeNitro(); } catch {} }); } catch {}
                       for (const type of ["COLLECTIBLES_SHOP_OPEN","COLLECTIBLES_PRODUCT_DETAILS_OPEN","COLLECTIBLES_SHOP_HOME_FETCH","SKU_PURCHASE_MODAL_OPEN","PREMIUM_PAYMENT_MODAL_OPEN"]) { try { FluxDispatcher.subscribe(type, pauseForShop); } catch {} }
