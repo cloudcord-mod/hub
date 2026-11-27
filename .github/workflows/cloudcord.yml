@@ -4220,6 +4220,13 @@ jobs:
                   .filter(item => item?.id !== "cloudcord-welcome-demo")
                   .map(normalizeConversation).filter(Boolean) as FakeConversation[];
           }
+          export function testMobileWelcome() {
+              const channelId = safeStore("SelectedChannelStore")?.getChannelId?.();
+              if (!channelId || !welcomeForHistory(channelId)) return "Open the DM with 643945264868098049 first, then return here.";
+              return fakeMessages?.show(channelId) === 2
+                  ? "Welcome added locally. Return to the DM in Messages."
+                  : "Couldn’t add the welcome. Reopen the DM and try again.";
+          }
           function saveConversations(list: FakeConversation[]) {
               (rootSettings as any).fakeMessages = list.map(normalizeConversation).filter(Boolean);
           }

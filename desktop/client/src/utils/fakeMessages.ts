@@ -190,16 +190,21 @@ export function installFakeMessages(options: FakeMessagesOptions) {
 
     /** Shows a conversation now (after you save it). Later loads merge the messages in instead. */
     const show = (channelId?: string) => {
-        for (const raw of options.getConversations()) {
+        const conversations = options.getConversations();
+        const preview = channelId ? options.getHistoryPreview?.(channelId) : undefined;
+        let dispatched = 0;
+        for (const raw of preview ? [...conversations, preview] : conversations) {
             const conversation = normalizeConversation(raw);
             if (!conversation || (channelId && conversation.channelId !== channelId)) continue;
             if (conversation.dm?.local) createLocalDm(conversation);
             for (const message of messagesFor(conversation)) {
                 try {
                     options.dispatcher.dispatch({ type: "MESSAGE_CREATE", channelId: conversation.channelId, message, optimistic: false, isPushNotification: false });
+                    if (raw === preview) dispatched++;
                 } catch { /* one bad line must not stop the rest */ }
             }
         }
+        return dispatched;
     };
 
     /** Removes a conversation's messages from chat (they are not deleted anywhere else). */
