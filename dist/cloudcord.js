@@ -26305,17 +26305,17 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       ],
       lines: [
         {
+          key: "welcome",
+          person: "welcome-sender",
+          text: mobileWelcomeCopy,
+          minutesAgo: 0
+        },
+        {
           key: "welcome-banner",
           person: "welcome-sender",
           text: "",
           minutesAgo: 0,
           showWelcomeBanner: true
-        },
-        {
-          key: "welcome",
-          person: "welcome-sender",
-          text: mobileWelcomeCopy,
-          minutesAgo: 0
         }
       ]
     };
@@ -75510,7 +75510,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "5c0fad377ef101941ac1876a0de8593f807e1291";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "0472dbb6f528a209f01ea21a88a892c17d105ba1";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
