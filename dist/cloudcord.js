@@ -7587,7 +7587,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       inner?.render?.displayName,
       inner?.render?.name
     ];
-    var list = names.some((name) => typeof name === "string" && (android && /^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name) || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker).*(?:list|grid)/i.test(name)));
+    var list = names.some((name) => typeof name === "string" && (android && /^(?:FlatList|VirtualizedList|SectionList|FlashList|MasonryFlashList)$/.test(name) || /(?:mention|autocomplete|typeahead|suggestion|gif|expressionpicker|forum|guildchannel).*(?:list|grid)|(?:list|grid).*(?:mention|autocomplete|typeahead|gif|forum)/i.test(name)));
     if (!list)
       return element;
     var count;
@@ -7800,6 +7800,9 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     var exactRenderer;
     function wrapRenderer(_2, element) {
       if (!active || element.type === ThemeBackground)
+        return element;
+      var { channel } = element.props;
+      if (channel?.type === 15 || channel?.type === 16)
         return element;
       modernSeen = true;
       unpatch?.();
@@ -16059,7 +16062,7 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
       var channel = url2.match(/\/channels\/(\d+)/)?.[1];
       if (!channel)
         return original(...args);
-      var match = url2.match(/\/channels\/(\d+)\/messages(?:\?(.*))?$/);
+      var match = url2.match(/\/channels\/(\d+)\/messages\/?(?:\?(.*))?$/);
       if (!match && !isLocalDm(channel))
         return original(...args);
       if (!match)
@@ -27338,7 +27341,8 @@ Download the latest CloudCord bundle without reinstalling the app. Your account 
     if (channel?.type !== 1)
       return;
     var recipient = channel.getRecipientId?.() ?? channel.recipients?.[0];
-    if (String(recipient?.id ?? recipient ?? "") !== welcomeAccountId)
+    var dmId = safeStore("ChannelStore")?.getDMFromUserId?.(welcomeAccountId);
+    if (String(recipient?.id ?? recipient ?? "") !== welcomeAccountId && (recipient != null || String(dmId ?? "") !== channelId))
       return;
     var savedAt = Number(settings.cloudcordWelcomeTimestamp) || Date.now();
     settings.cloudcordWelcomeTimestamp ??= savedAt;
@@ -75449,7 +75453,7 @@ ${over.slice(0, 20).join("\n")}` : `All ${lines.length} lines fit within ${maxim
   init_asyncIteratorSymbol();
   init_promiseAllSettled();
   init_async_to_generator();
-  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "e0df93c52d30d288d58c8c399fe0cdb938c489be";
+  globalThis.__CLOUDCORD_RUNTIME_REVISION__ = "073a9bac70817d69cdb2dccd7931281e2e256232";
   var root = globalThis;
   var rain = root.__RAIN_LOADER__;
   var existingLoader = root.__CLOUDCORD_LOADER__;
