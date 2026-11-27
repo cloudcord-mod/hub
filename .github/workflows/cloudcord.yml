@@ -4208,8 +4208,8 @@ jobs:
                   id: "cloudcord-welcome-demo", name: "CloudCord welcome", channelId, savedAt,
                   people: [{ key: "welcome-sender", userId: welcomeAccountId }],
                   lines: [
-                      { key: "welcome-banner", person: "welcome-sender", text: "", minutesAgo: 0, showWelcomeBanner: true },
                       { key: "welcome", person: "welcome-sender", text: mobileWelcomeCopy, minutesAgo: 0 },
+                      { key: "welcome-banner", person: "welcome-sender", text: "", minutesAgo: 0, showWelcomeBanner: true },
                   ],
               };
           }
